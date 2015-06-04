@@ -1,0 +1,596 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - edge_list_graphs.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2010  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_EDGE_LIST_GrAPHS_Hh_
+<font color='#0000FF'>#define</font> DLIB_EDGE_LIST_GrAPHS_Hh_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='edge_list_graphs_abstract.h.html'>edge_list_graphs_abstract.h</a>"
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>limits<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>vector<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../string.h.html'>../string.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../rand.h.html'>../rand.h</a>"
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>algorithm<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='sample_pair.h.html'>sample_pair.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='ordered_sample_pair.h.html'>ordered_sample_pair.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> vector_type
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='remove_duplicate_edges'></a>remove_duplicate_edges</b> <font face='Lucida Console'>(</font>
+        vector_type<font color='#5555FF'>&amp;</font> pairs
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> vector_type::value_type T;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>pairs.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#009900'>// sort pairs so that we can avoid duplicates in the loop below
+</font>            std::<font color='#BB00BB'>sort</font><font face='Lucida Console'>(</font>pairs.<font color='#BB00BB'>begin</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, pairs.<font color='#BB00BB'>end</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, <font color='#5555FF'>&amp;</font>order_by_index<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// now put edges into temp while avoiding duplicates
+</font>            vector_type temp;
+            temp.<font color='#BB00BB'>reserve</font><font face='Lucida Console'>(</font>pairs.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            temp.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>pairs[<font color='#979000'>0</font>]<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>1</font>; i <font color='#5555FF'>&lt;</font> pairs.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>pairs[i] <font color='#5555FF'>!</font><font color='#5555FF'>=</font> pairs[i<font color='#5555FF'>-</font><font color='#979000'>1</font>]<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    temp.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>pairs[i]<font face='Lucida Console'>)</font>;
+                <b>}</b>
+            <b>}</b>
+
+            temp.<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>pairs<font face='Lucida Console'>)</font>;
+        <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>namespace</font> impl
+    <b>{</b>
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> iterator<font color='#5555FF'>&gt;</font>
+        iterator <b><a name='iterator_of_worst'></a>iterator_of_worst</b> <font face='Lucida Console'>(</font>
+            iterator begin,
+            <font color='#0000FF'>const</font> iterator<font color='#5555FF'>&amp;</font> end
+        <font face='Lucida Console'>)</font> 
+        <font color='#009900'>/*!
+            ensures
+                - returns an iterator that points to the element in the given range 
+                  that has the biggest distance 
+        !*/</font>
+        <b>{</b>
+            <font color='#0000FF'><u>double</u></font> dist <font color='#5555FF'>=</font> begin<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>distance</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            iterator worst <font color='#5555FF'>=</font> begin;
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>; begin <font color='#5555FF'>!</font><font color='#5555FF'>=</font> end; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>begin<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>begin<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>distance</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> dist<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    dist <font color='#5555FF'>=</font> begin<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>distance</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                    worst <font color='#5555FF'>=</font> begin;
+                <b>}</b>
+            <b>}</b>
+
+            <font color='#0000FF'>return</font> worst;
+        <b>}</b>
+
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> vector_type,
+        <font color='#0000FF'>typename</font> distance_function_type,
+        <font color='#0000FF'>typename</font> alloc,
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='find_percent_shortest_edges_randomly'></a>find_percent_shortest_edges_randomly</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> vector_type<font color='#5555FF'>&amp;</font> samples,
+        <font color='#0000FF'>const</font> distance_function_type<font color='#5555FF'>&amp;</font> dist_funct,
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> percent,
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> num,
+        <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> random_seed,
+        std::vector<font color='#5555FF'>&lt;</font>sample_pair, alloc<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> out
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#009900'>// make sure requires clause is not broken
+</font>        <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font> <font color='#979000'>0</font> <font color='#5555FF'>&lt;</font> percent <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> percent <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#979000'>1</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font>
+                    num <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font>,
+            "<font color='#CC0000'>\t void find_percent_shortest_edges_randomly()</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t Invalid inputs were given to this function.</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t samples.size(): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> samples.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t percent:        </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> percent 
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t num:            </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> num 
+            <font face='Lucida Console'>)</font>;
+
+        out.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>samples.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>return</font>;
+        <b>}</b>
+
+        std::vector<font color='#5555FF'>&lt;</font>sample_pair, alloc<font color='#5555FF'>&gt;</font> edges;
+        edges.<font color='#BB00BB'>reserve</font><font face='Lucida Console'>(</font>num<font face='Lucida Console'>)</font>;
+
+        dlib::rand rnd;
+        rnd.<font color='#BB00BB'>set_seed</font><font face='Lucida Console'>(</font><font color='#BB00BB'>cast_to_string</font><font face='Lucida Console'>(</font>random_seed<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// randomly sample a bunch of edges
+</font>        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> num; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> idx1 <font color='#5555FF'>=</font> rnd.<font color='#BB00BB'>get_random_32bit_number</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>%</font>samples.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> idx2 <font color='#5555FF'>=</font> rnd.<font color='#BB00BB'>get_random_32bit_number</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>%</font>samples.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>idx1 <font color='#5555FF'>!</font><font color='#5555FF'>=</font> idx2<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> dist <font color='#5555FF'>=</font> <font color='#BB00BB'>dist_funct</font><font face='Lucida Console'>(</font>samples[idx1], samples[idx2]<font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>dist <font color='#5555FF'>&lt;</font> std::numeric_limits<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>infinity</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                <b>{</b>
+                    edges.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font><font color='#BB00BB'>sample_pair</font><font face='Lucida Console'>(</font>idx1, idx2, dist<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                <b>}</b>
+            <b>}</b>
+        <b>}</b>
+
+
+        <font color='#009900'>// now put edges into out while avoiding duplicates
+</font>        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>edges.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#BB00BB'>remove_duplicate_edges</font><font face='Lucida Console'>(</font>edges<font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// now sort all the edges by distance and take the percent with the smallest distance
+</font>            std::<font color='#BB00BB'>sort</font><font face='Lucida Console'>(</font>edges.<font color='#BB00BB'>begin</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, edges.<font color='#BB00BB'>end</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, <font color='#5555FF'>&amp;</font>order_by_distance<font color='#5555FF'>&lt;</font>sample_pair<font color='#5555FF'>&gt;</font><font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> out_size <font color='#5555FF'>=</font> std::min<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>num<font color='#5555FF'>*</font>percent<font face='Lucida Console'>)</font>, edges.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            out.<font color='#BB00BB'>assign</font><font face='Lucida Console'>(</font>edges.<font color='#BB00BB'>begin</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, edges.<font color='#BB00BB'>begin</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> out_size<font face='Lucida Console'>)</font>;
+        <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> vector_type,
+        <font color='#0000FF'>typename</font> distance_function_type,
+        <font color='#0000FF'>typename</font> alloc,
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='find_approximate_k_nearest_neighbors'></a>find_approximate_k_nearest_neighbors</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> vector_type<font color='#5555FF'>&amp;</font> samples,
+        <font color='#0000FF'>const</font> distance_function_type<font color='#5555FF'>&amp;</font> dist_funct,
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> k,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> num,
+        <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> random_seed,
+        std::vector<font color='#5555FF'>&lt;</font>sample_pair, alloc<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> out
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#009900'>// make sure requires clause is not broken
+</font>        <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font> num <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> k <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font>,
+            "<font color='#CC0000'>\t void find_approximate_k_nearest_neighbors()</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t Invalid inputs were given to this function.</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t samples.size(): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> samples.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t k:              </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> k  
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t num:            </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> num 
+            <font face='Lucida Console'>)</font>;
+
+        out.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>samples.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>return</font>;
+        <b>}</b>
+
+        <font color='#009900'>// we add each edge twice in the following loop.  So multiply num by 2 to account for that.
+</font>        num <font color='#5555FF'>*</font><font color='#5555FF'>=</font> <font color='#979000'>2</font>;
+
+        std::vector<font color='#5555FF'>&lt;</font>ordered_sample_pair<font color='#5555FF'>&gt;</font> edges;
+        edges.<font color='#BB00BB'>reserve</font><font face='Lucida Console'>(</font>num<font face='Lucida Console'>)</font>;
+        std::vector<font color='#5555FF'>&lt;</font>sample_pair, alloc<font color='#5555FF'>&gt;</font> temp;
+        temp.<font color='#BB00BB'>reserve</font><font face='Lucida Console'>(</font>num<font face='Lucida Console'>)</font>;
+
+        dlib::rand rnd;
+        rnd.<font color='#BB00BB'>set_seed</font><font face='Lucida Console'>(</font><font color='#BB00BB'>cast_to_string</font><font face='Lucida Console'>(</font>random_seed<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// randomly sample a bunch of edges
+</font>        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> num; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> idx1 <font color='#5555FF'>=</font> rnd.<font color='#BB00BB'>get_random_32bit_number</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>%</font>samples.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> idx2 <font color='#5555FF'>=</font> rnd.<font color='#BB00BB'>get_random_32bit_number</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>%</font>samples.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>idx1 <font color='#5555FF'>!</font><font color='#5555FF'>=</font> idx2<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> dist <font color='#5555FF'>=</font> <font color='#BB00BB'>dist_funct</font><font face='Lucida Console'>(</font>samples[idx1], samples[idx2]<font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>dist <font color='#5555FF'>&lt;</font> std::numeric_limits<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>infinity</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                <b>{</b>
+                    edges.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font><font color='#BB00BB'>ordered_sample_pair</font><font face='Lucida Console'>(</font>idx1, idx2, dist<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                    edges.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font><font color='#BB00BB'>ordered_sample_pair</font><font face='Lucida Console'>(</font>idx2, idx1, dist<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                <b>}</b>
+            <b>}</b>
+        <b>}</b>
+
+        std::<font color='#BB00BB'>sort</font><font face='Lucida Console'>(</font>edges.<font color='#BB00BB'>begin</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, edges.<font color='#BB00BB'>end</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, <font color='#5555FF'>&amp;</font>order_by_index<font color='#5555FF'>&lt;</font>ordered_sample_pair<font color='#5555FF'>&gt;</font><font face='Lucida Console'>)</font>;
+
+        std::vector<font color='#5555FF'>&lt;</font>ordered_sample_pair<font color='#5555FF'>&gt;</font>::iterator beg, itr;
+        <font color='#009900'>// now copy edges into temp when they aren't duplicates and also only move in the k shortest for
+</font>        <font color='#009900'>// each index.
+</font>        itr <font color='#5555FF'>=</font> edges.<font color='#BB00BB'>begin</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>itr <font color='#5555FF'>!</font><font color='#5555FF'>=</font> edges.<font color='#BB00BB'>end</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#009900'>// first find the bounding range for all the edges connected to node itr-&gt;index1()
+</font>            beg <font color='#5555FF'>=</font> itr; 
+            <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>itr <font color='#5555FF'>!</font><font color='#5555FF'>=</font> edges.<font color='#BB00BB'>end</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> itr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>index1</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> beg<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>index1</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                <font color='#5555FF'>+</font><font color='#5555FF'>+</font>itr;
+
+            <font color='#009900'>// If the node has more than k edges then sort them by distance so that
+</font>            <font color='#009900'>// we will end up with the k best.
+</font>            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>itr <font color='#5555FF'>-</font> beg<font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> k<font face='Lucida Console'>)</font>
+            <b>{</b>
+                std::<font color='#BB00BB'>sort</font><font face='Lucida Console'>(</font>beg, itr, <font color='#5555FF'>&amp;</font>order_by_distance_and_index<font color='#5555FF'>&lt;</font>ordered_sample_pair<font color='#5555FF'>&gt;</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+            <font color='#009900'>// take the k best unique edges from the range [beg,itr)
+</font>            temp.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font><font color='#BB00BB'>sample_pair</font><font face='Lucida Console'>(</font>beg<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>index1</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, beg<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>index2</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, beg<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>distance</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> prev_index2 <font color='#5555FF'>=</font> beg<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>index2</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#5555FF'>+</font><font color='#5555FF'>+</font>beg;
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> count <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>; beg <font color='#5555FF'>!</font><font color='#5555FF'>=</font> itr <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> count <font color='#5555FF'>&lt;</font> k; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>beg<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>beg<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>index2</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>!</font><font color='#5555FF'>=</font> prev_index2<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    temp.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font><font color='#BB00BB'>sample_pair</font><font face='Lucida Console'>(</font>beg<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>index1</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, beg<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>index2</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, beg<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>distance</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                    <font color='#5555FF'>+</font><font color='#5555FF'>+</font>count;
+                <b>}</b>
+                prev_index2 <font color='#5555FF'>=</font> beg<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>index2</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+        <b>}</b>
+
+
+        <font color='#BB00BB'>remove_duplicate_edges</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font>;
+        temp.<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>out<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> vector_type,
+        <font color='#0000FF'>typename</font> distance_function_type,
+        <font color='#0000FF'>typename</font> alloc
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='find_k_nearest_neighbors'></a>find_k_nearest_neighbors</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> vector_type<font color='#5555FF'>&amp;</font> samples,
+        <font color='#0000FF'>const</font> distance_function_type<font color='#5555FF'>&amp;</font> dist_funct,
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> k,
+        std::vector<font color='#5555FF'>&lt;</font>sample_pair, alloc<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> out
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#009900'>// make sure requires clause is not broken
+</font>        <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font>k <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font>,
+            "<font color='#CC0000'>\t void find_k_nearest_neighbors()</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t Invalid inputs were given to this function.</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t samples.size(): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> samples.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t k:              </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> k 
+            <font face='Lucida Console'>)</font>;
+
+        out.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>samples.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>return</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> impl;
+        std::vector<font color='#5555FF'>&lt;</font>sample_pair<font color='#5555FF'>&gt;</font> edges;
+
+        <font color='#009900'>// Initialize all the edges to an edge with an invalid index
+</font>        edges.<font color='#BB00BB'>resize</font><font face='Lucida Console'>(</font>samples.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>*</font>k, 
+                     <font color='#BB00BB'>sample_pair</font><font face='Lucida Console'>(</font>samples.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,samples.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,std::numeric_limits<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>infinity</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// Hold the length for the longest edge for each node.  Initially they are all infinity.
+</font>        std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font> <font color='#BB00BB'>worst_dists</font><font face='Lucida Console'>(</font>samples.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, std::numeric_limits<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>infinity</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+        std::vector<font color='#5555FF'>&lt;</font>sample_pair<font color='#5555FF'>&gt;</font>::iterator begin_i, end_i, begin_j, end_j, itr;
+        begin_i <font color='#5555FF'>=</font> edges.<font color='#BB00BB'>begin</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        end_i <font color='#5555FF'>=</font> begin_i <font color='#5555FF'>+</font> k;
+
+        <font color='#009900'>// Loop over all combinations of samples.   We will maintain the iterator ranges so that
+</font>        <font color='#009900'>// within the inner for loop we have:
+</font>        <font color='#009900'>//   [begin_i, end_i) == the range in edges that contains neighbors of samples[i]
+</font>        <font color='#009900'>//   [begin_j, end_j) == the range in edges that contains neighbors of samples[j]
+</font>        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i<font color='#5555FF'>+</font><font color='#979000'>1</font> <font color='#5555FF'>&lt;</font> samples.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+        <b>{</b>
+            begin_j <font color='#5555FF'>=</font> begin_i;
+            end_j <font color='#5555FF'>=</font> end_i;
+
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> j <font color='#5555FF'>=</font> i<font color='#5555FF'>+</font><font color='#979000'>1</font>; j <font color='#5555FF'>&lt;</font> samples.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>j<font face='Lucida Console'>)</font>
+            <b>{</b>
+                begin_j <font color='#5555FF'>+</font><font color='#5555FF'>=</font> k;
+                end_j <font color='#5555FF'>+</font><font color='#5555FF'>=</font> k;
+
+                <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> dist <font color='#5555FF'>=</font> <font color='#BB00BB'>dist_funct</font><font face='Lucida Console'>(</font>samples[i], samples[j]<font face='Lucida Console'>)</font>;
+
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>dist <font color='#5555FF'>&lt;</font> worst_dists[i]<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#5555FF'>*</font><font color='#BB00BB'>iterator_of_worst</font><font face='Lucida Console'>(</font>begin_i, end_i<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#BB00BB'>sample_pair</font><font face='Lucida Console'>(</font>i, j, dist<font face='Lucida Console'>)</font>;
+                    worst_dists[i] <font color='#5555FF'>=</font> <font color='#BB00BB'>iterator_of_worst</font><font face='Lucida Console'>(</font>begin_i, end_i<font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>distance</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                <b>}</b>
+
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>dist <font color='#5555FF'>&lt;</font> worst_dists[j]<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#5555FF'>*</font><font color='#BB00BB'>iterator_of_worst</font><font face='Lucida Console'>(</font>begin_j, end_j<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#BB00BB'>sample_pair</font><font face='Lucida Console'>(</font>i, j, dist<font face='Lucida Console'>)</font>;
+                    worst_dists[j] <font color='#5555FF'>=</font> <font color='#BB00BB'>iterator_of_worst</font><font face='Lucida Console'>(</font>begin_j, end_j<font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>distance</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                <b>}</b>
+            <b>}</b>
+
+            begin_i <font color='#5555FF'>+</font><font color='#5555FF'>=</font> k;
+            end_i <font color='#5555FF'>+</font><font color='#5555FF'>=</font> k;
+        <b>}</b>
+
+        <font color='#009900'>// sort the edges so that duplicate edges will be adjacent
+</font>        std::<font color='#BB00BB'>sort</font><font face='Lucida Console'>(</font>edges.<font color='#BB00BB'>begin</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, edges.<font color='#BB00BB'>end</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, <font color='#5555FF'>&amp;</font>order_by_index<font color='#5555FF'>&lt;</font>sample_pair<font color='#5555FF'>&gt;</font><font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// if the first edge is valid 
+</font>        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>edges[<font color='#979000'>0</font>].<font color='#BB00BB'>index1</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> samples.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#009900'>// now put edges into out while avoiding duplicates and any remaining invalid edges.
+</font>            out.<font color='#BB00BB'>reserve</font><font face='Lucida Console'>(</font>edges.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            out.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>edges[<font color='#979000'>0</font>]<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>1</font>; i <font color='#5555FF'>&lt;</font> edges.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#009900'>// if we hit an invalid edge then we can stop
+</font>                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>edges[i].<font color='#BB00BB'>index1</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> samples.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                    <font color='#0000FF'>break</font>;
+
+                <font color='#009900'>// if this isn't a duplicate edge
+</font>                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>edges[i] <font color='#5555FF'>!</font><font color='#5555FF'>=</font> edges[i<font color='#5555FF'>-</font><font color='#979000'>1</font>]<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    out.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>edges[i]<font face='Lucida Console'>)</font>;
+                <b>}</b>
+            <b>}</b>
+        <b>}</b>
+
+
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> vector_type
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>bool</u></font> <b><a name='contains_duplicate_pairs'></a>contains_duplicate_pairs</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> vector_type<font color='#5555FF'>&amp;</font> pairs
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> vector_type::value_type T;
+        vector_type <font color='#BB00BB'>temp</font><font face='Lucida Console'>(</font>pairs<font face='Lucida Console'>)</font>;
+        std::<font color='#BB00BB'>sort</font><font face='Lucida Console'>(</font>temp.<font color='#BB00BB'>begin</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, temp.<font color='#BB00BB'>end</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, <font color='#5555FF'>&amp;</font>order_by_index<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>1</font>; i <font color='#5555FF'>&lt;</font> temp.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#009900'>// if we found a duplicate
+</font>            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>temp[i<font color='#5555FF'>-</font><font color='#979000'>1</font>] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> temp[i]<font face='Lucida Console'>)</font>
+                <font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>return</font> <font color='#979000'>false</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> vector_type 
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>typename</font> enable_if_c<font color='#5555FF'>&lt;</font><font face='Lucida Console'>(</font>is_same_type<font color='#5555FF'>&lt;</font>sample_pair, <font color='#0000FF'>typename</font> vector_type::value_type<font color='#5555FF'>&gt;</font>::value <font color='#5555FF'>|</font><font color='#5555FF'>|</font>
+                          is_same_type<font color='#5555FF'>&lt;</font>ordered_sample_pair, <font color='#0000FF'>typename</font> vector_type::value_type<font color='#5555FF'>&gt;</font>::value<font face='Lucida Console'>)</font>,
+                          <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font>::type
+    <b><a name='max_index_plus_one'></a>max_index_plus_one</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> vector_type<font color='#5555FF'>&amp;</font> pairs
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>pairs.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>return</font> <font color='#979000'>0</font>;
+        <b>}</b>
+        <font color='#0000FF'>else</font>
+        <b>{</b>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> max_idx <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> pairs.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>pairs[i].<font color='#BB00BB'>index1</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> max_idx<font face='Lucida Console'>)</font>
+                    max_idx <font color='#5555FF'>=</font> pairs[i].<font color='#BB00BB'>index1</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>pairs[i].<font color='#BB00BB'>index2</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> max_idx<font face='Lucida Console'>)</font>
+                    max_idx <font color='#5555FF'>=</font> pairs[i].<font color='#BB00BB'>index2</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+            <font color='#0000FF'>return</font> max_idx <font color='#5555FF'>+</font> <font color='#979000'>1</font>;
+        <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> vector_type
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='remove_long_edges'></a>remove_long_edges</b> <font face='Lucida Console'>(</font>
+        vector_type<font color='#5555FF'>&amp;</font> pairs,
+        <font color='#0000FF'><u>double</u></font> distance_threshold
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        vector_type temp;
+        temp.<font color='#BB00BB'>reserve</font><font face='Lucida Console'>(</font>pairs.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// add all the pairs shorter than the given threshold into temp
+</font>        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> pairs.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>pairs[i].<font color='#BB00BB'>distance</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> distance_threshold<font face='Lucida Console'>)</font>
+                temp.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>pairs[i]<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#009900'>// move temp into the output vector
+</font>        temp.<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>pairs<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> vector_type
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='remove_short_edges'></a>remove_short_edges</b> <font face='Lucida Console'>(</font>
+        vector_type<font color='#5555FF'>&amp;</font> pairs,
+        <font color='#0000FF'><u>double</u></font> distance_threshold
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        vector_type temp;
+        temp.<font color='#BB00BB'>reserve</font><font face='Lucida Console'>(</font>pairs.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// add all the pairs longer than the given threshold into temp
+</font>        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> pairs.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>pairs[i].<font color='#BB00BB'>distance</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> distance_threshold<font face='Lucida Console'>)</font>
+                temp.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>pairs[i]<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#009900'>// move temp into the output vector
+</font>        temp.<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>pairs<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> vector_type
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='remove_percent_longest_edges'></a>remove_percent_longest_edges</b> <font face='Lucida Console'>(</font>
+        vector_type<font color='#5555FF'>&amp;</font> pairs,
+        <font color='#0000FF'><u>double</u></font> percent 
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#009900'>// make sure requires clause is not broken
+</font>        <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font> <font color='#979000'>0</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> percent <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> percent <font color='#5555FF'>&lt;</font> <font color='#979000'>1</font>,
+            "<font color='#CC0000'>\t void remove_percent_longest_edges()</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t Invalid inputs were given to this function.</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t percent:        </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> percent 
+            <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> vector_type::value_type T;
+        std::<font color='#BB00BB'>sort</font><font face='Lucida Console'>(</font>pairs.<font color='#BB00BB'>begin</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, pairs.<font color='#BB00BB'>end</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, <font color='#5555FF'>&amp;</font>order_by_distance<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> num <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#979000'>1.0</font><font color='#5555FF'>-</font>percent<font face='Lucida Console'>)</font><font color='#5555FF'>*</font>pairs.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// pick out the num shortest pairs
+</font>        vector_type <font color='#BB00BB'>temp</font><font face='Lucida Console'>(</font>pairs.<font color='#BB00BB'>begin</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, pairs.<font color='#BB00BB'>begin</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> num<font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// move temp into the output vector
+</font>        temp.<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>pairs<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> vector_type
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='remove_percent_shortest_edges'></a>remove_percent_shortest_edges</b> <font face='Lucida Console'>(</font>
+        vector_type<font color='#5555FF'>&amp;</font> pairs,
+        <font color='#0000FF'><u>double</u></font> percent 
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#009900'>// make sure requires clause is not broken
+</font>        <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font> <font color='#979000'>0</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> percent <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> percent <font color='#5555FF'>&lt;</font> <font color='#979000'>1</font>,
+            "<font color='#CC0000'>\t void remove_percent_shortest_edges()</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t Invalid inputs were given to this function.</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t percent:        </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> percent 
+            <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> vector_type::value_type T;
+        std::<font color='#BB00BB'>sort</font><font face='Lucida Console'>(</font>pairs.<font color='#BB00BB'>rbegin</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, pairs.<font color='#BB00BB'>rend</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, <font color='#5555FF'>&amp;</font>order_by_distance<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> num <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#979000'>1.0</font><font color='#5555FF'>-</font>percent<font face='Lucida Console'>)</font><font color='#5555FF'>*</font>pairs.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// pick out the num shortest pairs
+</font>        vector_type <font color='#BB00BB'>temp</font><font face='Lucida Console'>(</font>pairs.<font color='#BB00BB'>begin</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, pairs.<font color='#BB00BB'>begin</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> num<font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// move temp into the output vector
+</font>        temp.<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>pairs<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> vector_type
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>bool</u></font> <b><a name='is_ordered_by_index'></a>is_ordered_by_index</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> vector_type<font color='#5555FF'>&amp;</font> edges
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>1</font>; i <font color='#5555FF'>&lt;</font> edges.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>order_by_index</font><font face='Lucida Console'>(</font>edges[i], edges[i<font color='#5555FF'>-</font><font color='#979000'>1</font>]<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                <font color='#0000FF'>return</font> <font color='#979000'>false</font>;
+        <b>}</b>
+        <font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> alloc1, 
+        <font color='#0000FF'>typename</font> alloc2
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='find_neighbor_ranges'></a>find_neighbor_ranges</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>ordered_sample_pair,alloc1<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> edges,
+        std::vector<font color='#5555FF'>&lt;</font>std::pair<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font>, <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font>,alloc2<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> neighbors
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#009900'>// make sure requires clause is not broken
+</font>        <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font><font color='#BB00BB'>is_ordered_by_index</font><font face='Lucida Console'>(</font>edges<font face='Lucida Console'>)</font>,
+                    "<font color='#CC0000'>\t void find_neighbor_ranges()</font>"
+                    <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t Invalid inputs were given to this function</font>"
+        <font face='Lucida Console'>)</font>;
+
+
+        <font color='#009900'>// setup neighbors so that [neighbors[i].first, neighbors[i].second) is the range
+</font>        <font color='#009900'>// within edges that contains all node i's edges.
+</font>        <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> num_nodes <font color='#5555FF'>=</font> <font color='#BB00BB'>max_index_plus_one</font><font face='Lucida Console'>(</font>edges<font face='Lucida Console'>)</font>;
+        neighbors.<font color='#BB00BB'>assign</font><font face='Lucida Console'>(</font>num_nodes, std::<font color='#BB00BB'>make_pair</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> cur_node <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> start_idx <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> edges.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>edges[i].<font color='#BB00BB'>index1</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>!</font><font color='#5555FF'>=</font> cur_node<font face='Lucida Console'>)</font>
+            <b>{</b>
+                neighbors[cur_node] <font color='#5555FF'>=</font> std::<font color='#BB00BB'>make_pair</font><font face='Lucida Console'>(</font>start_idx, i<font face='Lucida Console'>)</font>;
+                start_idx <font color='#5555FF'>=</font> i;
+                cur_node <font color='#5555FF'>=</font> edges[i].<font color='#BB00BB'>index1</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+        <b>}</b>
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>neighbors.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+            neighbors[cur_node] <font color='#5555FF'>=</font> std::<font color='#BB00BB'>make_pair</font><font face='Lucida Console'>(</font>start_idx, <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font>edges.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> alloc1, 
+        <font color='#0000FF'>typename</font> alloc2
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='convert_unordered_to_ordered'></a>convert_unordered_to_ordered</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>sample_pair,alloc1<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> edges,
+        std::vector<font color='#5555FF'>&lt;</font>ordered_sample_pair,alloc2<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> out_edges
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        out_edges.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        out_edges.<font color='#BB00BB'>reserve</font><font face='Lucida Console'>(</font>edges.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>*</font><font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> edges.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+        <b>{</b>
+            out_edges.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font><font color='#BB00BB'>ordered_sample_pair</font><font face='Lucida Console'>(</font>edges[i].<font color='#BB00BB'>index1</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, edges[i].<font color='#BB00BB'>index2</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, edges[i].<font color='#BB00BB'>distance</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>edges[i].<font color='#BB00BB'>index1</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>!</font><font color='#5555FF'>=</font> edges[i].<font color='#BB00BB'>index2</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                out_edges.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font><font color='#BB00BB'>ordered_sample_pair</font><font face='Lucida Console'>(</font>edges[i].<font color='#BB00BB'>index2</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, edges[i].<font color='#BB00BB'>index1</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, edges[i].<font color='#BB00BB'>distance</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_EDGE_LIST_GrAPHS_Hh_
+</font>
+
+
+</pre></body></html>

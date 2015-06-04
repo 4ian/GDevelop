@@ -1,0 +1,245 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - server_http.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2006  Davis E. King (davis@dlib.net), Steven Van Ingelgem
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_SERVER_HTTp_1_
+<font color='#0000FF'>#define</font> DLIB_SERVER_HTTp_1_
+
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='server_http_abstract.h.html'>server_http_abstract.h</a>"
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>iostream<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>sstream<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>string<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>cctype<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>map<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../logger.h.html'>../logger.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../string.h.html'>../string.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='server_iostream.h.html'>server_iostream.h</a>"
+
+<font color='#0000FF'>#ifdef</font>  __INTEL_COMPILER
+<font color='#009900'>// ignore the bogus warning about hiding on_connect()
+</font><font color='#0000FF'>#pragma</font> warning <font face='Lucida Console'>(</font>disable: <font color='#979000'>1125</font><font face='Lucida Console'>)</font>
+<font color='#0000FF'>#endif</font>
+
+<font color='#0000FF'>#if</font> _MSC_VER
+#  pragma <b><a name='warning'></a>warning</b><font face='Lucida Console'>(</font> disable: <font color='#979000'>4503</font> <font face='Lucida Console'>)</font>
+<font color='#0000FF'>#endif</font> <font color='#009900'>// _MSC_VER
+</font>
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>class</font> <b><a name='http_parse_error'></a>http_parse_error</b> : <font color='#0000FF'>public</font> error
+    <b>{</b>
+    <font color='#0000FF'>public</font>:
+        <b><a name='http_parse_error'></a>http_parse_error</b><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> str, <font color='#0000FF'><u>int</u></font> http_error_code_<font face='Lucida Console'>)</font>:
+            error<font face='Lucida Console'>(</font>str<font face='Lucida Console'>)</font>,http_error_code<font face='Lucida Console'>(</font>http_error_code_<font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>int</u></font> http_error_code;
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> Key, <font color='#0000FF'>typename</font> Value, <font color='#0000FF'>typename</font> Comparer <font color='#5555FF'>=</font> std::less<font color='#5555FF'>&lt;</font>Key<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>class</font> <b><a name='constmap'></a>constmap</b> : <font color='#0000FF'>public</font> std::map<font color='#5555FF'>&lt;</font>Key, Value, Comparer<font color='#5555FF'>&gt;</font>
+    <b>{</b>
+    <font color='#0000FF'>public</font>:
+        <font color='#0000FF'>const</font> Value<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b>[]<font face='Lucida Console'>(</font><font color='#0000FF'>const</font> Key<font color='#5555FF'>&amp;</font> k<font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#0000FF'>static</font> <font color='#0000FF'>const</font> Value dummy <font color='#5555FF'>=</font> <font color='#BB00BB'>Value</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>typename</font> std::map<font color='#5555FF'>&lt;</font>Key, Value, Comparer<font color='#5555FF'>&gt;</font>::const_iterator ci <font color='#5555FF'>=</font> std::map<font color='#5555FF'>&lt;</font>Key, Value, Comparer<font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>find</font><font face='Lucida Console'>(</font>k<font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> ci <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#0000FF'>this</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>end</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>)</font>
+                <font color='#0000FF'>return</font> dummy;
+            <font color='#0000FF'>else</font>
+                <font color='#0000FF'>return</font> ci<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>second;
+        <b>}</b>
+
+        Value<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b>[]<font face='Lucida Console'>(</font><font color='#0000FF'>const</font> Key<font color='#5555FF'>&amp;</font> k<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>return</font> std::map<font color='#5555FF'>&lt;</font>Key, Value, Comparer<font color='#5555FF'>&gt;</font>::<font color='#0000FF'>operator</font> []<font face='Lucida Console'>(</font>k<font face='Lucida Console'>)</font>;
+        <b>}</b>
+    <b>}</b>;
+
+
+    <font color='#0000FF'>class</font> <b><a name='less_case_insensitive'></a>less_case_insensitive</b> 
+    <b>{</b>
+    <font color='#0000FF'>public</font>:
+        <font color='#0000FF'><u>bool</u></font> <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> a, <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> b<font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> 
+        <b>{</b>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>i <font color='#5555FF'>&lt;</font> a.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> i <font color='#5555FF'>&lt;</font> b.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>const</font> <font color='#0000FF'><u>int</u></font> cha <font color='#5555FF'>=</font> std::<font color='#BB00BB'>tolower</font><font face='Lucida Console'>(</font>a[i]<font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>const</font> <font color='#0000FF'><u>int</u></font> chb <font color='#5555FF'>=</font> std::<font color='#BB00BB'>tolower</font><font face='Lucida Console'>(</font>b[i]<font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>cha <font color='#5555FF'>&lt;</font> chb<font face='Lucida Console'>)</font>
+                    <font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+                <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>cha <font color='#5555FF'>&gt;</font> chb<font face='Lucida Console'>)</font>
+                    <font color='#0000FF'>return</font> <font color='#979000'>false</font>;
+                <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i;
+            <b>}</b>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>a.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> b.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                <font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+            <font color='#0000FF'>else</font>
+                <font color='#0000FF'>return</font> <font color='#979000'>false</font>;
+        <b>}</b>
+    <b>}</b>;
+    <font color='#0000FF'>typedef</font> constmap<font color='#5555FF'>&lt;</font> std::string, std::string, less_case_insensitive <font color='#5555FF'>&gt;</font> key_value_map_ci;
+    <font color='#0000FF'>typedef</font> constmap<font color='#5555FF'>&lt;</font> std::string, std::string <font color='#5555FF'>&gt;</font> key_value_map;
+
+    <font color='#0000FF'>struct</font> <b><a name='incoming_things'></a>incoming_things</b> 
+    <b>{</b>
+        <b><a name='incoming_things'></a>incoming_things</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> foreign_ip_,
+            <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> local_ip_,
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>short</u></font> foreign_port_,
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>short</u></font> local_port_
+        <font face='Lucida Console'>)</font>: 
+            foreign_ip<font face='Lucida Console'>(</font>foreign_ip_<font face='Lucida Console'>)</font>,
+            foreign_port<font face='Lucida Console'>(</font>foreign_port_<font face='Lucida Console'>)</font>,
+            local_ip<font face='Lucida Console'>(</font>local_ip_<font face='Lucida Console'>)</font>,
+            local_port<font face='Lucida Console'>(</font>local_port_<font face='Lucida Console'>)</font>
+        <b>{</b><b>}</b>
+            
+
+        std::string path;
+        std::string request_type;
+        std::string content_type;
+        std::string protocol;
+        std::string body;
+
+        key_value_map queries;
+        key_value_map cookies;
+        key_value_map_ci headers;
+
+        std::string foreign_ip;
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>short</u></font> foreign_port;
+        std::string local_ip;
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>short</u></font> local_port;
+    <b>}</b>;
+
+    <font color='#0000FF'>struct</font> <b><a name='outgoing_things'></a>outgoing_things</b> 
+    <b>{</b>
+        <b><a name='outgoing_things'></a>outgoing_things</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> : http_return<font face='Lucida Console'>(</font><font color='#979000'>200</font><font face='Lucida Console'>)</font>, http_return_status<font face='Lucida Console'>(</font>"<font color='#CC0000'>OK</font>"<font face='Lucida Console'>)</font> <b>{</b> <b>}</b>
+
+        key_value_map  cookies;
+        key_value_map_ci  headers;
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>short</u></font> http_return;
+        std::string    http_return_status;
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='parse_http_request'></a>parse_http_request</b> <font face='Lucida Console'>(</font> 
+        std::istream<font color='#5555FF'>&amp;</font> in,
+        incoming_things<font color='#5555FF'>&amp;</font> incoming,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> max_content_length
+    <font face='Lucida Console'>)</font>;
+
+    <font color='#0000FF'><u>void</u></font> <b><a name='read_body'></a>read_body</b> <font face='Lucida Console'>(</font>
+        std::istream<font color='#5555FF'>&amp;</font> in,
+        incoming_things<font color='#5555FF'>&amp;</font> incoming
+    <font face='Lucida Console'>)</font>;
+
+    <font color='#0000FF'><u>void</u></font> <b><a name='write_http_response'></a>write_http_response</b> <font face='Lucida Console'>(</font>
+        std::ostream<font color='#5555FF'>&amp;</font> out,
+        outgoing_things outgoing,
+        <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> result
+    <font face='Lucida Console'>)</font>;
+
+    <font color='#0000FF'><u>void</u></font> <b><a name='write_http_response'></a>write_http_response</b> <font face='Lucida Console'>(</font>
+        std::ostream<font color='#5555FF'>&amp;</font> out,
+        <font color='#0000FF'>const</font> http_parse_error<font color='#5555FF'>&amp;</font> e 
+    <font face='Lucida Console'>)</font>;
+
+    <font color='#0000FF'><u>void</u></font> <b><a name='write_http_response'></a>write_http_response</b> <font face='Lucida Console'>(</font>
+        std::ostream<font color='#5555FF'>&amp;</font> out,
+        <font color='#0000FF'>const</font> std::exception<font color='#5555FF'>&amp;</font> e 
+    <font face='Lucida Console'>)</font>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>class</font> <b><a name='server_http'></a>server_http</b> : <font color='#0000FF'>public</font> server_iostream 
+    <b>{</b>
+
+    <font color='#0000FF'>public</font>:
+
+        <b><a name='server_http'></a>server_http</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            max_content_length <font color='#5555FF'>=</font> <font color='#979000'>10</font><font color='#5555FF'>*</font><font color='#979000'>1024</font><font color='#5555FF'>*</font><font color='#979000'>1024</font>; <font color='#009900'>// 10MB
+</font>        <b>}</b>
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='get_max_content_length'></a>get_max_content_length</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> 
+        <b>{</b> 
+            auto_mutex <font color='#BB00BB'>lock</font><font face='Lucida Console'>(</font>http_class_mutex<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>return</font> max_content_length; 
+        <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_max_content_length'></a>set_max_content_length</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> max_length
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            auto_mutex <font color='#BB00BB'>lock</font><font face='Lucida Console'>(</font>http_class_mutex<font face='Lucida Console'>)</font>;
+            max_content_length <font color='#5555FF'>=</font> max_length;
+        <b>}</b>
+
+
+    <font color='#0000FF'>private</font>:
+        <font color='#0000FF'>virtual</font> <font color='#0000FF'>const</font> std::string <b><a name='on_request'></a>on_request</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> incoming_things<font color='#5555FF'>&amp;</font> incoming,
+            outgoing_things<font color='#5555FF'>&amp;</font> outgoing
+        <font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+
+      
+        <font color='#0000FF'>virtual</font> <font color='#0000FF'><u>void</u></font> <b><a name='on_connect'></a>on_connect</b> <font face='Lucida Console'>(</font>
+            std::istream<font color='#5555FF'>&amp;</font> in,
+            std::ostream<font color='#5555FF'>&amp;</font> out,
+            <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> foreign_ip,
+            <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> local_ip,
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>short</u></font> foreign_port,
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>short</u></font> local_port,
+            uint64
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>try</font>
+            <b>{</b>
+                incoming_things <font color='#BB00BB'>incoming</font><font face='Lucida Console'>(</font>foreign_ip, local_ip, foreign_port, local_port<font face='Lucida Console'>)</font>;
+                outgoing_things outgoing;
+
+                <font color='#BB00BB'>parse_http_request</font><font face='Lucida Console'>(</font>in, incoming, <font color='#BB00BB'>get_max_content_length</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                <font color='#BB00BB'>read_body</font><font face='Lucida Console'>(</font>in, incoming<font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> result <font color='#5555FF'>=</font> <font color='#BB00BB'>on_request</font><font face='Lucida Console'>(</font>incoming, outgoing<font face='Lucida Console'>)</font>;
+                <font color='#BB00BB'>write_http_response</font><font face='Lucida Console'>(</font>out, outgoing, result<font face='Lucida Console'>)</font>;
+            <b>}</b>
+            <font color='#0000FF'>catch</font> <font face='Lucida Console'>(</font>http_parse_error<font color='#5555FF'>&amp;</font> e<font face='Lucida Console'>)</font>
+            <b>{</b>
+                dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LERROR <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>Error processing request from: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> foreign_ip <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'> - </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> e.<font color='#BB00BB'>what</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                <font color='#BB00BB'>write_http_response</font><font face='Lucida Console'>(</font>out, e<font face='Lucida Console'>)</font>;
+            <b>}</b>
+            <font color='#0000FF'>catch</font> <font face='Lucida Console'>(</font>std::exception<font color='#5555FF'>&amp;</font> e<font face='Lucida Console'>)</font>
+            <b>{</b>
+                dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LERROR <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>Error processing request from: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> foreign_ip <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'> - </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> e.<font color='#BB00BB'>what</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                <font color='#BB00BB'>write_http_response</font><font face='Lucida Console'>(</font>out, e<font face='Lucida Console'>)</font>;
+            <b>}</b>
+        <b>}</b>
+
+        mutex http_class_mutex;
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> max_content_length;
+        <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> logger dlog;
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#ifdef</font> NO_MAKEFILE
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='server_http.cpp.html'>server_http.cpp</a>"
+<font color='#0000FF'>#endif</font>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_SERVER_HTTp_1_
+</font>
+
+</pre></body></html>

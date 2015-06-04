@@ -1,0 +1,1506 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - serialize.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2005  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_SERIALIZe_
+<font color='#0000FF'>#define</font> DLIB_SERIALIZe_
+
+<font color='#009900'>/*!
+    There are two global functions in the dlib namespace that provide serialization and
+    deserialization support.  Their signatures and specifications are as follows:
+        
+        void serialize (
+            const serializable_type&amp; item,
+            std::ostream&amp; out
+        );
+        /!*
+            ensures
+                - writes the state of item to the output stream out
+                - if (serializable_type implements the enumerable interface) then
+                    - item.at_start() == true
+            throws                    
+                - serialization_error
+                    This exception is thrown if there is some problem which prevents
+                    us from successfully writing item to the output stream.
+                - any other exception
+        *!/
+
+        void deserialize (
+            serializable_type&amp; item,
+            std::istream&amp; in
+        );
+        /!*
+            ensures
+                - #item == a deserialized copy of the serializable_type that was
+                  in the input stream in.
+                - Reads all the bytes associated with the serialized serializable_type
+                  contained inside the input stream and no more.  This means you
+                  can serialize multiple objects to an output stream and then read
+                  them all back in, one after another, using deserialize().
+                - if (serializable_type implements the enumerable interface) then
+                    - item.at_start() == true
+            throws                    
+                - serialization_error
+                    This exception is thrown if there is some problem which prevents
+                    us from successfully deserializing item from the input stream.
+                    If this exception is thrown then item will have an initial value 
+                    for its type.
+                - any other exception
+        *!/
+
+    For convenience, you can also serialize to a file using this syntax:
+        serialize("your_file.dat") &lt;&lt; some_object &lt;&lt; another_object;
+
+    That overwrites the contents of your_file.dat with the serialized data from some_object
+    and another_object.  Then to recall the objects from the file you can do:
+        deserialize("your_file.dat") &gt;&gt; some_object &gt;&gt; another_object;
+
+    Finally, you can chain as many objects together using the &lt;&lt; and &gt;&gt; operators as you
+    like.
+
+
+    This file provides serialization support to the following object types:
+        - The C++ base types (NOT including pointer types)
+        - std::string
+        - std::wstring
+        - std::vector
+        - std::map
+        - std::set
+        - std::pair
+        - std::complex
+        - dlib::uint64
+        - dlib::int64
+        - float_details
+        - enumerable&lt;T&gt; where T is a serializable type
+        - map_pair&lt;D,R&gt; where D and R are both serializable types.
+        - C style arrays of serializable types
+        - Google protocol buffer objects.
+
+    This file provides deserialization support to the following object types:
+        - The C++ base types (NOT including pointer types)
+        - std::string
+        - std::wstring
+        - std::vector
+        - std::map
+        - std::set
+        - std::pair
+        - std::complex
+        - dlib::uint64
+        - dlib::int64
+        - float_details
+        - C style arrays of serializable types
+        - Google protocol buffer objects.
+
+    Support for deserialization of objects which implement the enumerable or
+    map_pair interfaces is the responsibility of those objects.  
+    
+    Note that you can deserialize an integer value to any integral type (except for a 
+    char type) if its value will fit into the target integer type.  I.e.  the types 
+    short, int, long, unsigned short, unsigned int, unsigned long, and dlib::uint64 
+    can all receive serialized data from each other so long as the actual serizlied 
+    value fits within the receiving integral type's range.
+
+    Also note that for any container to be serializable the type of object it contains 
+    must be serializable.
+
+    FILE STREAMS
+        If you are serializing to and from file streams it is important to 
+        remember to set the file streams to binary mode using the std::ios::binary
+        flag.  
+
+
+    INTEGRAL SERIALIZATION FORMAT
+        All C++ integral types (except the char types) are serialized to the following
+        format:
+        The first byte is a control byte.  It tells you if the serialized number is 
+        positive or negative and also tells you how many of the following bytes are 
+        part of the number.  The absolute value of the number is stored in little 
+        endian byte order and follows the control byte.
+
+        The control byte:  
+            The high order bit of the control byte is a flag that tells you if the
+            encoded number is negative or not.  It is set to 1 when the number is
+            negative and 0 otherwise.
+            The 4 low order bits of the control byte represent an unsigned number
+            and tells you how many of the following bytes are part of the encoded
+            number.
+
+    bool SERIALIZATION FORMAT
+        A bool value is serialized as the single byte character '1' or '0' in ASCII.
+        Where '1' indicates true and '0' indicates false.
+
+    FLOATING POINT SERIALIZATION FORMAT
+        To serialize a floating point value we convert it into a float_details object and
+        then serialize the exponent and mantissa values using dlib's integral serialization
+        format.  Therefore, the output is first the exponent and then the mantissa.  Note that
+        the mantissa is a signed integer (i.e. there is not a separate sign bit).
+!*/</font>
+
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='algs.h.html'>algs.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='assert.h.html'>assert.h</a>"
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>iomanip<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>cstddef<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>iostream<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>fstream<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>string<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>vector<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>complex<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>map<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>set<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>limits<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='uintn.h.html'>uintn.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='interfaces/enumerable.h.html'>interfaces/enumerable.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='interfaces/map_pair.h.html'>interfaces/map_pair.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='enable_if.h.html'>enable_if.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='unicode.h.html'>unicode.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='unicode.h.html'>unicode.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='byte_orderer.h.html'>byte_orderer.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='float_details.h.html'>float_details.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='smart_pointers/shared_ptr.h.html'>smart_pointers/shared_ptr.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>class</font> <b><a name='serialization_error'></a>serialization_error</b> : <font color='#0000FF'>public</font> error 
+    <b>{</b>
+    <font color='#0000FF'>public</font>: 
+        <b><a name='serialization_error'></a>serialization_error</b><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> e<font face='Lucida Console'>)</font>:error<font face='Lucida Console'>(</font>e<font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>namespace</font> ser_helper
+    <b>{</b>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'>typename</font> T
+            <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>typename</font> enable_if_c<font color='#5555FF'>&lt;</font>std::numeric_limits<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font>::is_signed,<font color='#0000FF'><u>bool</u></font><font color='#5555FF'>&gt;</font>::type <b><a name='pack_int'></a>pack_int</b> <font face='Lucida Console'>(</font>
+            T item,
+            std::ostream<font color='#5555FF'>&amp;</font> out
+        <font face='Lucida Console'>)</font>
+        <font color='#009900'>/*!
+            requires
+                - T is a signed integral type
+            ensures
+                - if (no problems occur serializing item) then
+                    - writes item to out
+                    - returns false
+                - else
+                    - returns true
+        !*/</font>
+        <b>{</b>
+            <font color='#BB00BB'>COMPILE_TIME_ASSERT</font><font face='Lucida Console'>(</font><font color='#0000FF'>sizeof</font><font face='Lucida Console'>(</font>T<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#979000'>8</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> buf[<font color='#979000'>9</font>];
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> size <font color='#5555FF'>=</font> <font color='#0000FF'>sizeof</font><font face='Lucida Console'>(</font>T<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> neg;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>item <font color='#5555FF'>&lt;</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                neg <font color='#5555FF'>=</font> <font color='#979000'>0x80</font>;
+                item <font color='#5555FF'>*</font><font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>1</font>;
+            <b>}</b>
+            <font color='#0000FF'>else</font>
+            <b>{</b>
+                neg <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            <b>}</b>
+
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>1</font>; i <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#0000FF'>sizeof</font><font face='Lucida Console'>(</font>T<font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                buf[i] <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>item<font color='#5555FF'>&amp;</font><font color='#979000'>0xFF</font><font face='Lucida Console'>)</font>;                
+                item <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#979000'>8</font>;
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>item <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font> <b>{</b> size <font color='#5555FF'>=</font> i; <font color='#0000FF'>break</font>; <b>}</b>
+            <b>}</b>
+
+            std::streambuf<font color='#5555FF'>*</font> sbuf <font color='#5555FF'>=</font> out.<font color='#BB00BB'>rdbuf</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            buf[<font color='#979000'>0</font>] <font color='#5555FF'>=</font> size<font color='#5555FF'>|</font>neg;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>sbuf<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>sputn</font><font face='Lucida Console'>(</font><font color='#0000FF'>reinterpret_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>char</u></font><font color='#5555FF'>*</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>buf<font face='Lucida Console'>)</font>,size<font color='#5555FF'>+</font><font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>!</font><font color='#5555FF'>=</font> size<font color='#5555FF'>+</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                out.<font color='#BB00BB'>setstate</font><font face='Lucida Console'>(</font>std::ios::eofbit <font color='#5555FF'>|</font> std::ios::badbit<font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+            <b>}</b>
+
+            <font color='#0000FF'>return</font> <font color='#979000'>false</font>;
+        <b>}</b>
+
+    <font color='#009900'>// ------------------------------------------------------------------------------------
+</font>
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'>typename</font> T
+            <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>typename</font> enable_if_c<font color='#5555FF'>&lt;</font>std::numeric_limits<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font>::is_signed,<font color='#0000FF'><u>bool</u></font><font color='#5555FF'>&gt;</font>::type <b><a name='unpack_int'></a>unpack_int</b> <font face='Lucida Console'>(</font>
+            T<font color='#5555FF'>&amp;</font> item,
+            std::istream<font color='#5555FF'>&amp;</font> in
+        <font face='Lucida Console'>)</font>
+        <font color='#009900'>/*!
+            requires
+                - T is a signed integral type
+            ensures
+                - if (there are no problems deserializing item) then
+                    - returns false
+                    - #item == the value stored in in
+                - else
+                    - returns true
+
+        !*/</font>
+        <b>{</b>
+            <font color='#BB00BB'>COMPILE_TIME_ASSERT</font><font face='Lucida Console'>(</font><font color='#0000FF'>sizeof</font><font face='Lucida Console'>(</font>T<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#979000'>8</font><font face='Lucida Console'>)</font>;
+
+
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> buf[<font color='#979000'>8</font>];
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> size;
+            <font color='#0000FF'><u>bool</u></font> is_negative;
+
+            std::streambuf<font color='#5555FF'>*</font> sbuf <font color='#5555FF'>=</font> in.<font color='#BB00BB'>rdbuf</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+            item <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            <font color='#0000FF'><u>int</u></font> ch <font color='#5555FF'>=</font> sbuf<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>sbumpc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>ch <font color='#5555FF'>!</font><font color='#5555FF'>=</font> EOF<font face='Lucida Console'>)</font>
+            <b>{</b>
+                size <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>ch<font face='Lucida Console'>)</font>;
+            <b>}</b>
+            <font color='#0000FF'>else</font>
+            <b>{</b>
+                in.<font color='#BB00BB'>setstate</font><font face='Lucida Console'>(</font>std::ios::badbit<font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+            <b>}</b>
+
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>size<font color='#5555FF'>&amp;</font><font color='#979000'>0x80</font><font face='Lucida Console'>)</font>
+                is_negative <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+            <font color='#0000FF'>else</font>
+                is_negative <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+            size <font color='#5555FF'>&amp;</font><font color='#5555FF'>=</font> <font color='#979000'>0x0F</font>;
+            
+            <font color='#009900'>// check if the serialized object is too big
+</font>            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>size <font color='#5555FF'>&gt;</font> <font color='#0000FF'>sizeof</font><font face='Lucida Console'>(</font>T<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+            <b>}</b>
+
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>sbuf<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>sgetn</font><font face='Lucida Console'>(</font><font color='#0000FF'>reinterpret_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>char</u></font><font color='#5555FF'>*</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>buf<font face='Lucida Console'>)</font>,size<font face='Lucida Console'>)</font> <font color='#5555FF'>!</font><font color='#5555FF'>=</font> size<font face='Lucida Console'>)</font>
+            <b>{</b>
+                in.<font color='#BB00BB'>setstate</font><font face='Lucida Console'>(</font>std::ios::badbit<font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+            <b>}</b>
+
+
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> i <font color='#5555FF'>=</font> size<font color='#5555FF'>-</font><font color='#979000'>1</font>; <font color='#979000'>true</font>; <font color='#5555FF'>-</font><font color='#5555FF'>-</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                item <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#979000'>8</font>;
+                item <font color='#5555FF'>|</font><font color='#5555FF'>=</font> buf[i];
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>i <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                    <font color='#0000FF'>break</font>;
+            <b>}</b>
+
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>is_negative<font face='Lucida Console'>)</font>
+                item <font color='#5555FF'>*</font><font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>1</font>;
+        
+
+            <font color='#0000FF'>return</font> <font color='#979000'>false</font>;
+        <b>}</b>
+
+    <font color='#009900'>// ------------------------------------------------------------------------------------
+</font>
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'>typename</font> T
+            <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>typename</font> disable_if_c<font color='#5555FF'>&lt;</font>std::numeric_limits<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font>::is_signed,<font color='#0000FF'><u>bool</u></font><font color='#5555FF'>&gt;</font>::type <b><a name='pack_int'></a>pack_int</b> <font face='Lucida Console'>(</font>
+            T item,
+            std::ostream<font color='#5555FF'>&amp;</font> out
+        <font face='Lucida Console'>)</font>
+        <font color='#009900'>/*!
+            requires
+                - T is an unsigned integral type
+            ensures
+                - if (no problems occur serializing item) then
+                    - writes item to out
+                    - returns false
+                - else
+                    - returns true
+        !*/</font>
+        <b>{</b>
+            <font color='#BB00BB'>COMPILE_TIME_ASSERT</font><font face='Lucida Console'>(</font><font color='#0000FF'>sizeof</font><font face='Lucida Console'>(</font>T<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#979000'>8</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> buf[<font color='#979000'>9</font>];
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> size <font color='#5555FF'>=</font> <font color='#0000FF'>sizeof</font><font face='Lucida Console'>(</font>T<font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>1</font>; i <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#0000FF'>sizeof</font><font face='Lucida Console'>(</font>T<font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                buf[i] <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>item<font color='#5555FF'>&amp;</font><font color='#979000'>0xFF</font><font face='Lucida Console'>)</font>;                
+                item <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#979000'>8</font>;
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>item <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font> <b>{</b> size <font color='#5555FF'>=</font> i; <font color='#0000FF'>break</font>; <b>}</b>
+            <b>}</b>
+
+            std::streambuf<font color='#5555FF'>*</font> sbuf <font color='#5555FF'>=</font> out.<font color='#BB00BB'>rdbuf</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            buf[<font color='#979000'>0</font>] <font color='#5555FF'>=</font> size;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>sbuf<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>sputn</font><font face='Lucida Console'>(</font><font color='#0000FF'>reinterpret_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>char</u></font><font color='#5555FF'>*</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>buf<font face='Lucida Console'>)</font>,size<font color='#5555FF'>+</font><font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>!</font><font color='#5555FF'>=</font> size<font color='#5555FF'>+</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                out.<font color='#BB00BB'>setstate</font><font face='Lucida Console'>(</font>std::ios::eofbit <font color='#5555FF'>|</font> std::ios::badbit<font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+            <b>}</b>
+
+            <font color='#0000FF'>return</font> <font color='#979000'>false</font>;
+        <b>}</b>
+
+    <font color='#009900'>// ------------------------------------------------------------------------------------
+</font>
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'>typename</font> T
+            <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>typename</font> disable_if_c<font color='#5555FF'>&lt;</font>std::numeric_limits<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font>::is_signed,<font color='#0000FF'><u>bool</u></font><font color='#5555FF'>&gt;</font>::type <b><a name='unpack_int'></a>unpack_int</b> <font face='Lucida Console'>(</font>
+            T<font color='#5555FF'>&amp;</font> item,
+            std::istream<font color='#5555FF'>&amp;</font> in
+        <font face='Lucida Console'>)</font>
+        <font color='#009900'>/*!
+            requires
+                - T is an unsigned integral type
+            ensures
+                - if (there are no problems deserializing item) then
+                    - returns false
+                    - #item == the value stored in in
+                - else
+                    - returns true
+
+        !*/</font>
+        <b>{</b>
+            <font color='#BB00BB'>COMPILE_TIME_ASSERT</font><font face='Lucida Console'>(</font><font color='#0000FF'>sizeof</font><font face='Lucida Console'>(</font>T<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#979000'>8</font><font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> buf[<font color='#979000'>8</font>];
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> size;
+
+            item <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+
+            std::streambuf<font color='#5555FF'>*</font> sbuf <font color='#5555FF'>=</font> in.<font color='#BB00BB'>rdbuf</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'><u>int</u></font> ch <font color='#5555FF'>=</font> sbuf<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>sbumpc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>ch <font color='#5555FF'>!</font><font color='#5555FF'>=</font> EOF<font face='Lucida Console'>)</font>
+            <b>{</b>
+                size <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>ch<font face='Lucida Console'>)</font>;
+            <b>}</b>
+            <font color='#0000FF'>else</font>
+            <b>{</b>
+                in.<font color='#BB00BB'>setstate</font><font face='Lucida Console'>(</font>std::ios::badbit<font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+            <b>}</b>
+
+
+            <font color='#009900'>// mask out the 3 reserved bits
+</font>            size <font color='#5555FF'>&amp;</font><font color='#5555FF'>=</font> <font color='#979000'>0x8F</font>;
+
+            <font color='#009900'>// check if an error occurred 
+</font>            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>size <font color='#5555FF'>&gt;</font> <font color='#0000FF'>sizeof</font><font face='Lucida Console'>(</font>T<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> 
+                <font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+           
+
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>sbuf<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>sgetn</font><font face='Lucida Console'>(</font><font color='#0000FF'>reinterpret_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>char</u></font><font color='#5555FF'>*</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>buf<font face='Lucida Console'>)</font>,size<font face='Lucida Console'>)</font> <font color='#5555FF'>!</font><font color='#5555FF'>=</font> size<font face='Lucida Console'>)</font>
+            <b>{</b>
+                in.<font color='#BB00BB'>setstate</font><font face='Lucida Console'>(</font>std::ios::badbit<font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+            <b>}</b>
+
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> i <font color='#5555FF'>=</font> size<font color='#5555FF'>-</font><font color='#979000'>1</font>; <font color='#979000'>true</font>; <font color='#5555FF'>-</font><font color='#5555FF'>-</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                item <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#979000'>8</font>;
+                item <font color='#5555FF'>|</font><font color='#5555FF'>=</font> buf[i];
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>i <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                    <font color='#0000FF'>break</font>;
+            <b>}</b>
+
+            <font color='#0000FF'>return</font> <font color='#979000'>false</font>;
+        <b>}</b>
+
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>#define</font> USE_DEFAULT_INT_SERIALIZATION_FOR<font face='Lucida Console'>(</font>T<font face='Lucida Console'>)</font>  \
+        <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='serialize'></a>serialize</b> <font face='Lucida Console'>(</font><font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> item, std::ostream<font color='#5555FF'>&amp;</font> out<font face='Lucida Console'>)</font> \
+        <b>{</b> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>ser_helper::<font color='#BB00BB'>pack_int</font><font face='Lucida Console'>(</font>item,out<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#0000FF'>throw</font> <font color='#BB00BB'>serialization_error</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>Error serializing object of type </font>" <font color='#5555FF'>+</font> std::<font color='#BB00BB'>string</font><font face='Lucida Console'>(</font>#T<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>; <b>}</b>   \
+        <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='deserialize'></a>deserialize</b> <font face='Lucida Console'>(</font>T<font color='#5555FF'>&amp;</font> item, std::istream<font color='#5555FF'>&amp;</font> in<font face='Lucida Console'>)</font> \
+        <b>{</b> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>ser_helper::<font color='#BB00BB'>unpack_int</font><font face='Lucida Console'>(</font>item,in<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#0000FF'>throw</font> <font color='#BB00BB'>serialization_error</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>Error deserializing object of type </font>" <font color='#5555FF'>+</font> std::<font color='#BB00BB'>string</font><font face='Lucida Console'>(</font>#T<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>; <b>}</b>   
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>bool</u></font> <b><a name='pack_byte'></a>pack_byte</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> ch,
+        std::ostream<font color='#5555FF'>&amp;</font> out
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        std::streambuf<font color='#5555FF'>*</font> sbuf <font color='#5555FF'>=</font> out.<font color='#BB00BB'>rdbuf</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>return</font> <font face='Lucida Console'>(</font>sbuf<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>sputc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>char</u></font><font face='Lucida Console'>)</font>ch<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> EOF<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>bool</u></font> <b><a name='unpack_byte'></a>unpack_byte</b> <font face='Lucida Console'>(</font>
+        T<font color='#5555FF'>&amp;</font> ch,
+        std::istream<font color='#5555FF'>&amp;</font> in
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        std::streambuf<font color='#5555FF'>*</font> sbuf <font color='#5555FF'>=</font> in.<font color='#BB00BB'>rdbuf</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'><u>int</u></font> temp <font color='#5555FF'>=</font> sbuf<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>sbumpc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>temp <font color='#5555FF'>!</font><font color='#5555FF'>=</font> EOF<font face='Lucida Console'>)</font>
+        <b>{</b>
+            ch <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>return</font> <font color='#979000'>false</font>;
+        <b>}</b>
+        <font color='#0000FF'>else</font>
+        <b>{</b>
+            <font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+        <b>}</b>
+    <b>}</b>
+
+    <font color='#0000FF'>#define</font> USE_DEFAULT_BYTE_SERIALIZATION_FOR<font face='Lucida Console'>(</font>T<font face='Lucida Console'>)</font>  \
+        <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='serialize'></a>serialize</b> <font face='Lucida Console'>(</font><font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> item,std::ostream<font color='#5555FF'>&amp;</font> out<font face='Lucida Console'>)</font> \
+        <b>{</b> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>pack_byte</font><font face='Lucida Console'>(</font>item,out<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#0000FF'>throw</font> <font color='#BB00BB'>serialization_error</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>Error serializing object of type </font>" <font color='#5555FF'>+</font> std::<font color='#BB00BB'>string</font><font face='Lucida Console'>(</font>#T<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>; <b>}</b> \
+        <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='deserialize'></a>deserialize</b> <font face='Lucida Console'>(</font>T<font color='#5555FF'>&amp;</font> item, std::istream<font color='#5555FF'>&amp;</font> in<font face='Lucida Console'>)</font> \
+        <b>{</b> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>unpack_byte</font><font face='Lucida Console'>(</font>item,in<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#0000FF'>throw</font> <font color='#BB00BB'>serialization_error</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>Error deserializing object of type </font>" <font color='#5555FF'>+</font> std::<font color='#BB00BB'>string</font><font face='Lucida Console'>(</font>#T<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>; <b>}</b>   
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <b><a name='USE_DEFAULT_INT_SERIALIZATION_FOR'></a>USE_DEFAULT_INT_SERIALIZATION_FOR</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>short</u></font><font face='Lucida Console'>)</font>
+    <b><a name='USE_DEFAULT_INT_SERIALIZATION_FOR'></a>USE_DEFAULT_INT_SERIALIZATION_FOR</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font>
+    <b><a name='USE_DEFAULT_INT_SERIALIZATION_FOR'></a>USE_DEFAULT_INT_SERIALIZATION_FOR</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font>
+    <b><a name='USE_DEFAULT_INT_SERIALIZATION_FOR'></a>USE_DEFAULT_INT_SERIALIZATION_FOR</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>short</u></font><font face='Lucida Console'>)</font>
+    <b><a name='USE_DEFAULT_INT_SERIALIZATION_FOR'></a>USE_DEFAULT_INT_SERIALIZATION_FOR</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font>
+    <b><a name='USE_DEFAULT_INT_SERIALIZATION_FOR'></a>USE_DEFAULT_INT_SERIALIZATION_FOR</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font>
+    <b><a name='USE_DEFAULT_INT_SERIALIZATION_FOR'></a>USE_DEFAULT_INT_SERIALIZATION_FOR</b><font face='Lucida Console'>(</font>uint64<font face='Lucida Console'>)</font>
+    <b><a name='USE_DEFAULT_INT_SERIALIZATION_FOR'></a>USE_DEFAULT_INT_SERIALIZATION_FOR</b><font face='Lucida Console'>(</font>int64<font face='Lucida Console'>)</font>
+
+    <b><a name='USE_DEFAULT_BYTE_SERIALIZATION_FOR'></a>USE_DEFAULT_BYTE_SERIALIZATION_FOR</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>char</u></font><font face='Lucida Console'>)</font>
+    <b><a name='USE_DEFAULT_BYTE_SERIALIZATION_FOR'></a>USE_DEFAULT_BYTE_SERIALIZATION_FOR</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>signed</u></font> <font color='#0000FF'><u>char</u></font><font face='Lucida Console'>)</font>
+    <b><a name='USE_DEFAULT_BYTE_SERIALIZATION_FOR'></a>USE_DEFAULT_BYTE_SERIALIZATION_FOR</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font face='Lucida Console'>)</font>
+
+    <font color='#009900'>// Don't define serialization for wchar_t when using visual studio and
+</font>    <font color='#009900'>// _NATIVE_WCHAR_T_DEFINED isn't defined since if it isn't they improperly set
+</font>    <font color='#009900'>// wchar_t to be a typedef rather than its own type as required by the C++ 
+</font>    <font color='#009900'>// standard.
+</font><font color='#0000FF'>#if</font> <font color='#5555FF'>!</font>defined<font face='Lucida Console'>(</font>_MSC_VER<font face='Lucida Console'>)</font> <font color='#5555FF'>|</font><font color='#5555FF'>|</font> _NATIVE_WCHAR_T_DEFINED
+    <b><a name='USE_DEFAULT_INT_SERIALIZATION_FOR'></a>USE_DEFAULT_INT_SERIALIZATION_FOR</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>wchar_t</u></font><font face='Lucida Console'>)</font>
+<font color='#0000FF'>#endif</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='serialize'></a>serialize</b><font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> float_details<font color='#5555FF'>&amp;</font> item,
+        std::ostream<font color='#5555FF'>&amp;</font> out
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item.mantissa, out<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item.exponent, out<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='deserialize'></a>deserialize</b><font face='Lucida Console'>(</font>
+        float_details<font color='#5555FF'>&amp;</font> item,
+        std::istream<font color='#5555FF'>&amp;</font> in 
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item.mantissa, in<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item.exponent, in<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='serialize_floating_point'></a>serialize_floating_point</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> item,
+        std::ostream<font color='#5555FF'>&amp;</font> out
+    <font face='Lucida Console'>)</font>
+    <b>{</b> 
+        <font color='#0000FF'>try</font>
+        <b>{</b>
+            float_details temp <font color='#5555FF'>=</font> item;
+            <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>temp, out<font face='Lucida Console'>)</font>;
+        <b>}</b>
+        <font color='#0000FF'>catch</font> <font face='Lucida Console'>(</font>serialization_error<font color='#5555FF'>&amp;</font> e<font face='Lucida Console'>)</font>
+        <b>{</b> <font color='#0000FF'>throw</font> <font color='#BB00BB'>serialization_error</font><font face='Lucida Console'>(</font>e.info <font color='#5555FF'>+</font> "<font color='#CC0000'>\n   while serializing a floating point number.</font>"<font face='Lucida Console'>)</font>; <b>}</b>
+    <b>}</b>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>bool</u></font> <b><a name='old_deserialize_floating_point'></a>old_deserialize_floating_point</b> <font face='Lucida Console'>(</font>
+        T<font color='#5555FF'>&amp;</font> item,
+        std::istream<font color='#5555FF'>&amp;</font> in 
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        std::ios::fmtflags oldflags <font color='#5555FF'>=</font> in.<font color='#BB00BB'>flags</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;  
+        in.<font color='#BB00BB'>flags</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; 
+        std::streamsize ss <font color='#5555FF'>=</font> in.<font color='#BB00BB'>precision</font><font face='Lucida Console'>(</font><font color='#979000'>35</font><font face='Lucida Console'>)</font>; 
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>in.<font color='#BB00BB'>peek</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> '<font color='#FF0000'>i</font>'<font face='Lucida Console'>)</font>
+        <b>{</b>
+            item <font color='#5555FF'>=</font> std::numeric_limits<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>infinity</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            in.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            in.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            in.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+        <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>in.<font color='#BB00BB'>peek</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> '<font color='#FF0000'>n</font>'<font face='Lucida Console'>)</font>
+        <b>{</b>
+            item <font color='#5555FF'>=</font> <font color='#5555FF'>-</font>std::numeric_limits<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>infinity</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            in.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            in.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            in.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            in.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+        <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>in.<font color='#BB00BB'>peek</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> '<font color='#FF0000'>N</font>'<font face='Lucida Console'>)</font>
+        <b>{</b>
+            item <font color='#5555FF'>=</font> std::numeric_limits<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>quiet_NaN</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            in.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            in.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            in.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+        <font color='#0000FF'>else</font>
+        <b>{</b>
+            in <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font> item; 
+        <b>}</b>
+        in.<font color='#BB00BB'>flags</font><font face='Lucida Console'>(</font>oldflags<font face='Lucida Console'>)</font>; 
+        in.<font color='#BB00BB'>precision</font><font face='Lucida Console'>(</font>ss<font face='Lucida Console'>)</font>; 
+        <font color='#0000FF'>return</font> <font face='Lucida Console'>(</font>in.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>!</font><font color='#5555FF'>=</font> '<font color='#FF0000'> </font>'<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='deserialize_floating_point'></a>deserialize_floating_point</b> <font face='Lucida Console'>(</font>
+        T<font color='#5555FF'>&amp;</font> item,
+        std::istream<font color='#5555FF'>&amp;</font> in 
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#009900'>// check if the serialized data uses the older ASCII based format.  We can check
+</font>        <font color='#009900'>// this easily because the new format starts with the integer control byte which
+</font>        <font color='#009900'>// always has 0 bits in the positions corresponding to the bitmask 0x70.  Moreover,
+</font>        <font color='#009900'>// since the previous format used ASCII numbers we know that no valid bytes can
+</font>        <font color='#009900'>// have bit values of one in the positions indicated 0x70.  So this test looks at
+</font>        <font color='#009900'>// the first byte and checks if the serialized data uses the old format or the new
+</font>        <font color='#009900'>// format.
+</font>        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>in.<font color='#BB00BB'>rdbuf</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>sgetc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>&amp;</font><font color='#979000'>0x70</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>try</font>
+            <b>{</b>
+                <font color='#009900'>// Use the fast and compact binary serialization format.
+</font>                float_details temp;
+                <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>temp, in<font face='Lucida Console'>)</font>;
+                item <font color='#5555FF'>=</font> temp;
+            <b>}</b>
+            <font color='#0000FF'>catch</font> <font face='Lucida Console'>(</font>serialization_error<font color='#5555FF'>&amp;</font> e<font face='Lucida Console'>)</font>
+            <b>{</b> <font color='#0000FF'>throw</font> <font color='#BB00BB'>serialization_error</font><font face='Lucida Console'>(</font>e.info <font color='#5555FF'>+</font> "<font color='#CC0000'>\n   while deserializing a floating point number.</font>"<font face='Lucida Console'>)</font>; <b>}</b>
+        <b>}</b>
+        <font color='#0000FF'>else</font>
+        <b>{</b>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>old_deserialize_floating_point</font><font face='Lucida Console'>(</font>item, in<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                <font color='#0000FF'>throw</font> <font color='#BB00BB'>serialization_error</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>Error deserializing a floating point number.</font>"<font face='Lucida Console'>)</font>;
+        <b>}</b>
+    <b>}</b>
+
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='serialize'></a>serialize</b> <font face='Lucida Console'>(</font> <font color='#0000FF'>const</font> <font color='#0000FF'><u>float</u></font><font color='#5555FF'>&amp;</font> item, std::ostream<font color='#5555FF'>&amp;</font> out<font face='Lucida Console'>)</font> 
+    <b>{</b> 
+        <font color='#BB00BB'>serialize_floating_point</font><font face='Lucida Console'>(</font>item,out<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='deserialize'></a>deserialize</b> <font face='Lucida Console'>(</font><font color='#0000FF'><u>float</u></font><font color='#5555FF'>&amp;</font> item, std::istream<font color='#5555FF'>&amp;</font> in<font face='Lucida Console'>)</font> 
+    <b>{</b> 
+        <font color='#BB00BB'>deserialize_floating_point</font><font face='Lucida Console'>(</font>item,in<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='serialize'></a>serialize</b> <font face='Lucida Console'>(</font> <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font><font color='#5555FF'>&amp;</font> item, std::ostream<font color='#5555FF'>&amp;</font> out<font face='Lucida Console'>)</font> 
+    <b>{</b> 
+        <font color='#BB00BB'>serialize_floating_point</font><font face='Lucida Console'>(</font>item,out<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='deserialize'></a>deserialize</b> <font face='Lucida Console'>(</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&amp;</font> item, std::istream<font color='#5555FF'>&amp;</font> in<font face='Lucida Console'>)</font> 
+    <b>{</b> 
+        <font color='#BB00BB'>deserialize_floating_point</font><font face='Lucida Console'>(</font>item,in<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='serialize'></a>serialize</b> <font face='Lucida Console'>(</font> <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> <font color='#0000FF'><u>double</u></font><font color='#5555FF'>&amp;</font> item, std::ostream<font color='#5555FF'>&amp;</font> out<font face='Lucida Console'>)</font> 
+    <b>{</b> 
+        <font color='#BB00BB'>serialize_floating_point</font><font face='Lucida Console'>(</font>item,out<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='deserialize'></a>deserialize</b> <font face='Lucida Console'>(</font> <font color='#0000FF'><u>long</u></font> <font color='#0000FF'><u>double</u></font><font color='#5555FF'>&amp;</font> item, std::istream<font color='#5555FF'>&amp;</font> in<font face='Lucida Console'>)</font> 
+    <b>{</b> 
+        <font color='#BB00BB'>deserialize_floating_point</font><font face='Lucida Console'>(</font>item,in<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// prototypes
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> domain, <font color='#0000FF'>typename</font> range, <font color='#0000FF'>typename</font> compare, <font color='#0000FF'>typename</font> alloc<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='serialize'></a>serialize</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> std::map<font color='#5555FF'>&lt;</font>domain,range, compare, alloc<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> item,
+        std::ostream<font color='#5555FF'>&amp;</font> out
+    <font face='Lucida Console'>)</font>;
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> domain, <font color='#0000FF'>typename</font> range, <font color='#0000FF'>typename</font> compare, <font color='#0000FF'>typename</font> alloc<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='deserialize'></a>deserialize</b> <font face='Lucida Console'>(</font>
+        std::map<font color='#5555FF'>&lt;</font>domain, range, compare, alloc<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> item,
+        std::istream<font color='#5555FF'>&amp;</font> in
+    <font face='Lucida Console'>)</font>;
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> domain, <font color='#0000FF'>typename</font> compare, <font color='#0000FF'>typename</font> alloc<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='serialize'></a>serialize</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> std::set<font color='#5555FF'>&lt;</font>domain, compare, alloc<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> item,
+        std::ostream<font color='#5555FF'>&amp;</font> out
+    <font face='Lucida Console'>)</font>;
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> domain, <font color='#0000FF'>typename</font> compare, <font color='#0000FF'>typename</font> alloc<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='deserialize'></a>deserialize</b> <font face='Lucida Console'>(</font>
+        std::set<font color='#5555FF'>&lt;</font>domain, compare, alloc<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> item,
+        std::istream<font color='#5555FF'>&amp;</font> in
+    <font face='Lucida Console'>)</font>;
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> alloc<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='serialize'></a>serialize</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>T,alloc<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> item,
+        std::ostream<font color='#5555FF'>&amp;</font> out
+    <font face='Lucida Console'>)</font>;
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> alloc<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='deserialize'></a>deserialize</b> <font face='Lucida Console'>(</font>
+        std::vector<font color='#5555FF'>&lt;</font>T,alloc<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> item,
+        std::istream<font color='#5555FF'>&amp;</font> in
+    <font face='Lucida Console'>)</font>;
+
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='serialize'></a>serialize</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> item,
+        std::ostream<font color='#5555FF'>&amp;</font> out
+    <font face='Lucida Console'>)</font>;
+
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='deserialize'></a>deserialize</b> <font face='Lucida Console'>(</font>
+        std::string<font color='#5555FF'>&amp;</font> item,
+        std::istream<font color='#5555FF'>&amp;</font> in
+    <font face='Lucida Console'>)</font>;
+
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='serialize'></a>serialize</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> std::wstring<font color='#5555FF'>&amp;</font> item,
+        std::ostream<font color='#5555FF'>&amp;</font> out
+    <font face='Lucida Console'>)</font>;
+
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='deserialize'></a>deserialize</b> <font face='Lucida Console'>(</font>
+        std::wstring<font color='#5555FF'>&amp;</font> item,
+        std::istream<font color='#5555FF'>&amp;</font> in
+    <font face='Lucida Console'>)</font>;
+
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='serialize'></a>serialize</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> ustring<font color='#5555FF'>&amp;</font> item,
+        std::ostream<font color='#5555FF'>&amp;</font> out
+    <font face='Lucida Console'>)</font>;
+
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='deserialize'></a>deserialize</b> <font face='Lucida Console'>(</font>
+        ustring<font color='#5555FF'>&amp;</font> item,
+        std::istream<font color='#5555FF'>&amp;</font> in
+    <font face='Lucida Console'>)</font>;
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='serialize'></a>serialize</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> enumerable<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> item,
+        std::ostream<font color='#5555FF'>&amp;</font> out
+    <font face='Lucida Console'>)</font>;
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> domain,
+        <font color='#0000FF'>typename</font> range
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='serialize'></a>serialize</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> map_pair<font color='#5555FF'>&lt;</font>domain,range<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> item,
+        std::ostream<font color='#5555FF'>&amp;</font> out
+    <font face='Lucida Console'>)</font>;
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T,
+        <font color='#0000FF'><u>size_t</u></font> length
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='serialize'></a>serialize</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> <font color='#BB00BB'>T</font> <font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>array<font face='Lucida Console'>)</font>[length],
+        std::ostream<font color='#5555FF'>&amp;</font> out
+    <font face='Lucida Console'>)</font>;
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T,
+        <font color='#0000FF'><u>size_t</u></font> length
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='deserialize'></a>deserialize</b> <font face='Lucida Console'>(</font>
+        <font color='#BB00BB'>T</font> <font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>array<font face='Lucida Console'>)</font>[length],
+        std::istream<font color='#5555FF'>&amp;</font> in
+    <font face='Lucida Console'>)</font>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='serialize'></a>serialize</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'><u>bool</u></font> item,
+        std::ostream<font color='#5555FF'>&amp;</font> out
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>item<font face='Lucida Console'>)</font>
+            out <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> '<font color='#FF0000'>1</font>';
+        <font color='#0000FF'>else</font>
+            out <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> '<font color='#FF0000'>0</font>';
+
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font>out<font face='Lucida Console'>)</font> 
+            <font color='#0000FF'>throw</font> <font color='#BB00BB'>serialization_error</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>Error serializing object of type bool</font>"<font face='Lucida Console'>)</font>;    
+    <b>}</b>
+
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='deserialize'></a>deserialize</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'><u>bool</u></font><font color='#5555FF'>&amp;</font> item,
+        std::istream<font color='#5555FF'>&amp;</font> in
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'><u>int</u></font> ch <font color='#5555FF'>=</font> in.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>ch <font color='#5555FF'>!</font><font color='#5555FF'>=</font> EOF<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>ch <font color='#5555FF'>=</font><font color='#5555FF'>=</font> '<font color='#FF0000'>1</font>'<font face='Lucida Console'>)</font>
+                item <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+            <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>ch <font color='#5555FF'>=</font><font color='#5555FF'>=</font> '<font color='#FF0000'>0</font>'<font face='Lucida Console'>)</font>
+                item <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+            <font color='#0000FF'>else</font>
+                <font color='#0000FF'>throw</font> <font color='#BB00BB'>serialization_error</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>Error deserializing object of type bool</font>"<font face='Lucida Console'>)</font>;    
+        <b>}</b>
+        <font color='#0000FF'>else</font>
+        <b>{</b>
+            <font color='#0000FF'>throw</font> <font color='#BB00BB'>serialization_error</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>Error deserializing object of type bool</font>"<font face='Lucida Console'>)</font>;    
+        <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> first_type, <font color='#0000FF'>typename</font> second_type<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='serialize'></a>serialize</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> std::pair<font color='#5555FF'>&lt;</font>first_type, second_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> item,
+        std::ostream<font color='#5555FF'>&amp;</font> out
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>try</font>
+        <b>{</b> 
+            <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item.first,out<font face='Lucida Console'>)</font>; 
+            <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item.second,out<font face='Lucida Console'>)</font>; 
+        <b>}</b>
+        <font color='#0000FF'>catch</font> <font face='Lucida Console'>(</font>serialization_error<font color='#5555FF'>&amp;</font> e<font face='Lucida Console'>)</font>
+        <b>{</b> <font color='#0000FF'>throw</font> <font color='#BB00BB'>serialization_error</font><font face='Lucida Console'>(</font>e.info <font color='#5555FF'>+</font> "<font color='#CC0000'>\n   while serializing object of type std::pair</font>"<font face='Lucida Console'>)</font>; <b>}</b>
+    <b>}</b>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> first_type, <font color='#0000FF'>typename</font> second_type<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='deserialize'></a>deserialize</b> <font face='Lucida Console'>(</font>
+        std::pair<font color='#5555FF'>&lt;</font>first_type, second_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> item,
+        std::istream<font color='#5555FF'>&amp;</font> in 
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>try</font>
+        <b>{</b> 
+            <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item.first,in<font face='Lucida Console'>)</font>; 
+            <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item.second,in<font face='Lucida Console'>)</font>; 
+        <b>}</b>
+        <font color='#0000FF'>catch</font> <font face='Lucida Console'>(</font>serialization_error<font color='#5555FF'>&amp;</font> e<font face='Lucida Console'>)</font>
+        <b>{</b> <font color='#0000FF'>throw</font> <font color='#BB00BB'>serialization_error</font><font face='Lucida Console'>(</font>e.info <font color='#5555FF'>+</font> "<font color='#CC0000'>\n   while deserializing object of type std::pair</font>"<font face='Lucida Console'>)</font>; <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> domain, <font color='#0000FF'>typename</font> range, <font color='#0000FF'>typename</font> compare, <font color='#0000FF'>typename</font> alloc<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='serialize'></a>serialize</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> std::map<font color='#5555FF'>&lt;</font>domain,range, compare, alloc<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> item,
+        std::ostream<font color='#5555FF'>&amp;</font> out
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>try</font>
+        <b>{</b> 
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> size <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>item.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+            <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>size,out<font face='Lucida Console'>)</font>; 
+            <font color='#0000FF'>typename</font> std::map<font color='#5555FF'>&lt;</font>domain,range,compare,alloc<font color='#5555FF'>&gt;</font>::const_iterator i;
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>i <font color='#5555FF'>=</font> item.<font color='#BB00BB'>begin</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; i <font color='#5555FF'>!</font><font color='#5555FF'>=</font> item.<font color='#BB00BB'>end</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>i<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>first,out<font face='Lucida Console'>)</font>;
+                <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>i<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>second,out<font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+        <b>}</b>
+        <font color='#0000FF'>catch</font> <font face='Lucida Console'>(</font>serialization_error<font color='#5555FF'>&amp;</font> e<font face='Lucida Console'>)</font>
+        <b>{</b> <font color='#0000FF'>throw</font> <font color='#BB00BB'>serialization_error</font><font face='Lucida Console'>(</font>e.info <font color='#5555FF'>+</font> "<font color='#CC0000'>\n   while serializing object of type std::map</font>"<font face='Lucida Console'>)</font>; <b>}</b>
+    <b>}</b>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> domain, <font color='#0000FF'>typename</font> range, <font color='#0000FF'>typename</font> compare, <font color='#0000FF'>typename</font> alloc<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='deserialize'></a>deserialize</b> <font face='Lucida Console'>(</font>
+        std::map<font color='#5555FF'>&lt;</font>domain, range, compare, alloc<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> item,
+        std::istream<font color='#5555FF'>&amp;</font> in
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>try</font> 
+        <b>{</b> 
+            item.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> size;
+            <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>size,in<font face='Lucida Console'>)</font>; 
+            domain d;
+            range r;
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> size; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>d,in<font face='Lucida Console'>)</font>;
+                <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>r,in<font face='Lucida Console'>)</font>;
+                item[d] <font color='#5555FF'>=</font> r;
+            <b>}</b>
+        <b>}</b>
+        <font color='#0000FF'>catch</font> <font face='Lucida Console'>(</font>serialization_error<font color='#5555FF'>&amp;</font> e<font face='Lucida Console'>)</font>
+        <b>{</b> <font color='#0000FF'>throw</font> <font color='#BB00BB'>serialization_error</font><font face='Lucida Console'>(</font>e.info <font color='#5555FF'>+</font> "<font color='#CC0000'>\n   while deserializing object of type std::map</font>"<font face='Lucida Console'>)</font>; <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> domain, <font color='#0000FF'>typename</font> compare, <font color='#0000FF'>typename</font> alloc<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='serialize'></a>serialize</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> std::set<font color='#5555FF'>&lt;</font>domain, compare, alloc<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> item,
+        std::ostream<font color='#5555FF'>&amp;</font> out
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>try</font>
+        <b>{</b> 
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> size <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>item.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+            <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>size,out<font face='Lucida Console'>)</font>; 
+            <font color='#0000FF'>typename</font> std::set<font color='#5555FF'>&lt;</font>domain,compare,alloc<font color='#5555FF'>&gt;</font>::const_iterator i;
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>i <font color='#5555FF'>=</font> item.<font color='#BB00BB'>begin</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; i <font color='#5555FF'>!</font><font color='#5555FF'>=</font> item.<font color='#BB00BB'>end</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font>i,out<font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+        <b>}</b>
+        <font color='#0000FF'>catch</font> <font face='Lucida Console'>(</font>serialization_error<font color='#5555FF'>&amp;</font> e<font face='Lucida Console'>)</font>
+        <b>{</b> <font color='#0000FF'>throw</font> <font color='#BB00BB'>serialization_error</font><font face='Lucida Console'>(</font>e.info <font color='#5555FF'>+</font> "<font color='#CC0000'>\n   while serializing object of type std::set</font>"<font face='Lucida Console'>)</font>; <b>}</b>
+    <b>}</b>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> domain, <font color='#0000FF'>typename</font> compare, <font color='#0000FF'>typename</font> alloc<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='deserialize'></a>deserialize</b> <font face='Lucida Console'>(</font>
+        std::set<font color='#5555FF'>&lt;</font>domain, compare, alloc<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> item,
+        std::istream<font color='#5555FF'>&amp;</font> in
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>try</font> 
+        <b>{</b> 
+            item.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> size;
+            <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>size,in<font face='Lucida Console'>)</font>; 
+            domain d;
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> size; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>d,in<font face='Lucida Console'>)</font>;
+                item.<font color='#BB00BB'>insert</font><font face='Lucida Console'>(</font>d<font face='Lucida Console'>)</font>;
+            <b>}</b>
+        <b>}</b>
+        <font color='#0000FF'>catch</font> <font face='Lucida Console'>(</font>serialization_error<font color='#5555FF'>&amp;</font> e<font face='Lucida Console'>)</font>
+        <b>{</b> <font color='#0000FF'>throw</font> <font color='#BB00BB'>serialization_error</font><font face='Lucida Console'>(</font>e.info <font color='#5555FF'>+</font> "<font color='#CC0000'>\n   while deserializing object of type std::set</font>"<font face='Lucida Console'>)</font>; <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> alloc<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='serialize'></a>serialize</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>bool</u></font>,alloc<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> item,
+        std::ostream<font color='#5555FF'>&amp;</font> out
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font> <font color='#BB00BB'>temp</font><font face='Lucida Console'>(</font>item.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> item.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>item[i]<font face='Lucida Console'>)</font>
+                temp[i] <font color='#5555FF'>=</font> '<font color='#FF0000'>1</font>';
+            <font color='#0000FF'>else</font>
+                temp[i] <font color='#5555FF'>=</font> '<font color='#FF0000'>0</font>';
+        <b>}</b>
+        <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>temp, out<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> alloc<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='deserialize'></a>deserialize</b> <font face='Lucida Console'>(</font>
+        std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>bool</u></font>,alloc<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> item,
+        std::istream<font color='#5555FF'>&amp;</font> in 
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font> temp;
+        <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>temp, in<font face='Lucida Console'>)</font>;
+        item.<font color='#BB00BB'>resize</font><font face='Lucida Console'>(</font>temp.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> temp.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>temp[i] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> '<font color='#FF0000'>1</font>'<font face='Lucida Console'>)</font>
+                item[i] <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+            <font color='#0000FF'>else</font>
+                item[i] <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+        <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> alloc<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='serialize'></a>serialize</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>T,alloc<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> item,
+        std::ostream<font color='#5555FF'>&amp;</font> out
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>try</font>
+        <b>{</b> 
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> size <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>item.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+            <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>size,out<font face='Lucida Console'>)</font>; 
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> item.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item[i],out<font face='Lucida Console'>)</font>;
+        <b>}</b>
+        <font color='#0000FF'>catch</font> <font face='Lucida Console'>(</font>serialization_error<font color='#5555FF'>&amp;</font> e<font face='Lucida Console'>)</font>
+        <b>{</b> <font color='#0000FF'>throw</font> <font color='#BB00BB'>serialization_error</font><font face='Lucida Console'>(</font>e.info <font color='#5555FF'>+</font> "<font color='#CC0000'>\n   while serializing object of type std::vector</font>"<font face='Lucida Console'>)</font>; <b>}</b>
+    <b>}</b>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> alloc<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='deserialize'></a>deserialize</b> <font face='Lucida Console'>(</font>
+        std::vector<font color='#5555FF'>&lt;</font>T, alloc<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> item,
+        std::istream<font color='#5555FF'>&amp;</font> in
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>try</font> 
+        <b>{</b> 
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> size;
+            <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>size,in<font face='Lucida Console'>)</font>; 
+            item.<font color='#BB00BB'>resize</font><font face='Lucida Console'>(</font>size<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> size; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item[i],in<font face='Lucida Console'>)</font>;
+        <b>}</b>
+        <font color='#0000FF'>catch</font> <font face='Lucida Console'>(</font>serialization_error<font color='#5555FF'>&amp;</font> e<font face='Lucida Console'>)</font>
+        <b>{</b> <font color='#0000FF'>throw</font> <font color='#BB00BB'>serialization_error</font><font face='Lucida Console'>(</font>e.info <font color='#5555FF'>+</font> "<font color='#CC0000'>\n   while deserializing object of type std::vector</font>"<font face='Lucida Console'>)</font>; <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> alloc<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='serialize'></a>serialize</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>char</u></font>,alloc<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> item,
+        std::ostream<font color='#5555FF'>&amp;</font> out
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>try</font>
+        <b>{</b> 
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> size <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>item.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>size,out<font face='Lucida Console'>)</font>; 
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>item.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                out.<font color='#BB00BB'>write</font><font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>item[<font color='#979000'>0</font>], item.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+        <font color='#0000FF'>catch</font> <font face='Lucida Console'>(</font>serialization_error<font color='#5555FF'>&amp;</font> e<font face='Lucida Console'>)</font>
+        <b>{</b> <font color='#0000FF'>throw</font> <font color='#BB00BB'>serialization_error</font><font face='Lucida Console'>(</font>e.info <font color='#5555FF'>+</font> "<font color='#CC0000'>\n   while serializing object of type std::vector</font>"<font face='Lucida Console'>)</font>; <b>}</b>
+    <b>}</b>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> alloc<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='deserialize'></a>deserialize</b> <font face='Lucida Console'>(</font>
+        std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>char</u></font>, alloc<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> item,
+        std::istream<font color='#5555FF'>&amp;</font> in
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>try</font> 
+        <b>{</b> 
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> size;
+            <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>size,in<font face='Lucida Console'>)</font>; 
+            item.<font color='#BB00BB'>resize</font><font face='Lucida Console'>(</font>size<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>item.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                in.<font color='#BB00BB'>read</font><font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>item[<font color='#979000'>0</font>], item.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+        <font color='#0000FF'>catch</font> <font face='Lucida Console'>(</font>serialization_error<font color='#5555FF'>&amp;</font> e<font face='Lucida Console'>)</font>
+        <b>{</b> <font color='#0000FF'>throw</font> <font color='#BB00BB'>serialization_error</font><font face='Lucida Console'>(</font>e.info <font color='#5555FF'>+</font> "<font color='#CC0000'>\n   while deserializing object of type std::vector</font>"<font face='Lucida Console'>)</font>; <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> alloc<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='serialize'></a>serialize</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font>,alloc<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> item,
+        std::ostream<font color='#5555FF'>&amp;</font> out
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>try</font>
+        <b>{</b> 
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> size <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>item.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>size,out<font face='Lucida Console'>)</font>; 
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>item.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                out.<font color='#BB00BB'>write</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>char</u></font><font color='#5555FF'>*</font><font face='Lucida Console'>)</font><font color='#5555FF'>&amp;</font>item[<font color='#979000'>0</font>], item.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+        <font color='#0000FF'>catch</font> <font face='Lucida Console'>(</font>serialization_error<font color='#5555FF'>&amp;</font> e<font face='Lucida Console'>)</font>
+        <b>{</b> <font color='#0000FF'>throw</font> <font color='#BB00BB'>serialization_error</font><font face='Lucida Console'>(</font>e.info <font color='#5555FF'>+</font> "<font color='#CC0000'>\n   while serializing object of type std::vector</font>"<font face='Lucida Console'>)</font>; <b>}</b>
+    <b>}</b>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> alloc<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='deserialize'></a>deserialize</b> <font face='Lucida Console'>(</font>
+        std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font>, alloc<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> item,
+        std::istream<font color='#5555FF'>&amp;</font> in
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>try</font> 
+        <b>{</b> 
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> size;
+            <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>size,in<font face='Lucida Console'>)</font>; 
+            item.<font color='#BB00BB'>resize</font><font face='Lucida Console'>(</font>size<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>item.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                in.<font color='#BB00BB'>read</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>char</u></font><font color='#5555FF'>*</font><font face='Lucida Console'>)</font><font color='#5555FF'>&amp;</font>item[<font color='#979000'>0</font>], item.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+        <font color='#0000FF'>catch</font> <font face='Lucida Console'>(</font>serialization_error<font color='#5555FF'>&amp;</font> e<font face='Lucida Console'>)</font>
+        <b>{</b> <font color='#0000FF'>throw</font> <font color='#BB00BB'>serialization_error</font><font face='Lucida Console'>(</font>e.info <font color='#5555FF'>+</font> "<font color='#CC0000'>\n   while deserializing object of type std::vector</font>"<font face='Lucida Console'>)</font>; <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='serialize'></a>serialize</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> item,
+        std::ostream<font color='#5555FF'>&amp;</font> out
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> size <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>item.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>try</font><b>{</b> <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>size,out<font face='Lucida Console'>)</font>; <b>}</b>
+        <font color='#0000FF'>catch</font> <font face='Lucida Console'>(</font>serialization_error<font color='#5555FF'>&amp;</font> e<font face='Lucida Console'>)</font>
+        <b>{</b> <font color='#0000FF'>throw</font> <font color='#BB00BB'>serialization_error</font><font face='Lucida Console'>(</font>e.info <font color='#5555FF'>+</font> "<font color='#CC0000'>\n   while serializing object of type std::string</font>"<font face='Lucida Console'>)</font>; <b>}</b>
+
+        out.<font color='#BB00BB'>write</font><font face='Lucida Console'>(</font>item.<font color='#BB00BB'>c_str</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,size<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font>out<font face='Lucida Console'>)</font> <font color='#0000FF'>throw</font> <font color='#BB00BB'>serialization_error</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>Error serializing object of type std::string</font>"<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='deserialize'></a>deserialize</b> <font face='Lucida Console'>(</font>
+        std::string<font color='#5555FF'>&amp;</font> item,
+        std::istream<font color='#5555FF'>&amp;</font> in
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> size;
+        <font color='#0000FF'>try</font> <b>{</b> <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>size,in<font face='Lucida Console'>)</font>; <b>}</b>
+        <font color='#0000FF'>catch</font> <font face='Lucida Console'>(</font>serialization_error<font color='#5555FF'>&amp;</font> e<font face='Lucida Console'>)</font>
+        <b>{</b> <font color='#0000FF'>throw</font> <font color='#BB00BB'>serialization_error</font><font face='Lucida Console'>(</font>e.info <font color='#5555FF'>+</font> "<font color='#CC0000'>\n   while deserializing object of type std::string</font>"<font face='Lucida Console'>)</font>; <b>}</b>
+
+        item.<font color='#BB00BB'>resize</font><font face='Lucida Console'>(</font>size<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>size <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            in.<font color='#BB00BB'>read</font><font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>item[<font color='#979000'>0</font>],size<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font>in<font face='Lucida Console'>)</font> <font color='#0000FF'>throw</font> <font color='#BB00BB'>serialization_error</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>Error deserializing object of type std::string</font>"<font face='Lucida Console'>)</font>;
+        <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='serialize'></a>serialize</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> std::wstring<font color='#5555FF'>&amp;</font> item,
+        std::ostream<font color='#5555FF'>&amp;</font> out
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> size <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>item.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>try</font><b>{</b> <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>size,out<font face='Lucida Console'>)</font>; <b>}</b>
+        <font color='#0000FF'>catch</font> <font face='Lucida Console'>(</font>serialization_error<font color='#5555FF'>&amp;</font> e<font face='Lucida Console'>)</font>
+        <b>{</b> <font color='#0000FF'>throw</font> <font color='#BB00BB'>serialization_error</font><font face='Lucida Console'>(</font>e.info <font color='#5555FF'>+</font> "<font color='#CC0000'>\n   while serializing object of type std::wstring</font>"<font face='Lucida Console'>)</font>; <b>}</b>
+
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> item.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item[i], out<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font>out<font face='Lucida Console'>)</font> <font color='#0000FF'>throw</font> <font color='#BB00BB'>serialization_error</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>Error serializing object of type std::wstring</font>"<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='deserialize'></a>deserialize</b> <font face='Lucida Console'>(</font>
+        std::wstring<font color='#5555FF'>&amp;</font> item,
+        std::istream<font color='#5555FF'>&amp;</font> in
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> size;
+        <font color='#0000FF'>try</font> <b>{</b> <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>size,in<font face='Lucida Console'>)</font>; <b>}</b>
+        <font color='#0000FF'>catch</font> <font face='Lucida Console'>(</font>serialization_error<font color='#5555FF'>&amp;</font> e<font face='Lucida Console'>)</font>
+        <b>{</b> <font color='#0000FF'>throw</font> <font color='#BB00BB'>serialization_error</font><font face='Lucida Console'>(</font>e.info <font color='#5555FF'>+</font> "<font color='#CC0000'>\n   while deserializing object of type std::wstring</font>"<font face='Lucida Console'>)</font>; <b>}</b>
+
+        item.<font color='#BB00BB'>resize</font><font face='Lucida Console'>(</font>size<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> item.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item[i],in<font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font>in<font face='Lucida Console'>)</font> <font color='#0000FF'>throw</font> <font color='#BB00BB'>serialization_error</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>Error deserializing object of type std::wstring</font>"<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='serialize'></a>serialize</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> ustring<font color='#5555FF'>&amp;</font> item,
+        std::ostream<font color='#5555FF'>&amp;</font> out
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> size <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>item.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>try</font><b>{</b> <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>size,out<font face='Lucida Console'>)</font>; <b>}</b>
+        <font color='#0000FF'>catch</font> <font face='Lucida Console'>(</font>serialization_error<font color='#5555FF'>&amp;</font> e<font face='Lucida Console'>)</font>
+        <b>{</b> <font color='#0000FF'>throw</font> <font color='#BB00BB'>serialization_error</font><font face='Lucida Console'>(</font>e.info <font color='#5555FF'>+</font> "<font color='#CC0000'>\n   while serializing object of type ustring</font>"<font face='Lucida Console'>)</font>; <b>}</b>
+
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> item.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item[i], out<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font>out<font face='Lucida Console'>)</font> <font color='#0000FF'>throw</font> <font color='#BB00BB'>serialization_error</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>Error serializing object of type ustring</font>"<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='deserialize'></a>deserialize</b> <font face='Lucida Console'>(</font>
+        ustring<font color='#5555FF'>&amp;</font> item,
+        std::istream<font color='#5555FF'>&amp;</font> in
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> size;
+        <font color='#0000FF'>try</font> <b>{</b> <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>size,in<font face='Lucida Console'>)</font>; <b>}</b>
+        <font color='#0000FF'>catch</font> <font face='Lucida Console'>(</font>serialization_error<font color='#5555FF'>&amp;</font> e<font face='Lucida Console'>)</font>
+        <b>{</b> <font color='#0000FF'>throw</font> <font color='#BB00BB'>serialization_error</font><font face='Lucida Console'>(</font>e.info <font color='#5555FF'>+</font> "<font color='#CC0000'>\n   while deserializing object of type ustring</font>"<font face='Lucida Console'>)</font>; <b>}</b>
+
+        item.<font color='#BB00BB'>resize</font><font face='Lucida Console'>(</font>size<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> item.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item[i],in<font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font>in<font face='Lucida Console'>)</font> <font color='#0000FF'>throw</font> <font color='#BB00BB'>serialization_error</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>Error deserializing object of type ustring</font>"<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='serialize'></a>serialize</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> enumerable<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> item,
+        std::ostream<font color='#5555FF'>&amp;</font> out
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>try</font>
+        <b>{</b>
+            item.<font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,out<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>item.<font color='#BB00BB'>move_next</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item.<font color='#BB00BB'>element</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,out<font face='Lucida Console'>)</font>;
+            item.<font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+        <font color='#0000FF'>catch</font> <font face='Lucida Console'>(</font>serialization_error<font color='#5555FF'>&amp;</font> e<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>throw</font> <font color='#BB00BB'>serialization_error</font><font face='Lucida Console'>(</font>e.info <font color='#5555FF'>+</font> "<font color='#CC0000'>\n   while serializing object of type enumerable</font>"<font face='Lucida Console'>)</font>;
+        <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> domain,
+        <font color='#0000FF'>typename</font> range
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='serialize'></a>serialize</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> map_pair<font color='#5555FF'>&lt;</font>domain,range<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> item,
+        std::ostream<font color='#5555FF'>&amp;</font> out
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>try</font>
+        <b>{</b>
+            <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item.<font color='#BB00BB'>key</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,out<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item.<font color='#BB00BB'>value</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,out<font face='Lucida Console'>)</font>;
+        <b>}</b>
+        <font color='#0000FF'>catch</font> <font face='Lucida Console'>(</font>serialization_error<font color='#5555FF'>&amp;</font> e<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>throw</font> <font color='#BB00BB'>serialization_error</font><font face='Lucida Console'>(</font>e.info <font color='#5555FF'>+</font> "<font color='#CC0000'>\n   while serializing object of type map_pair</font>"<font face='Lucida Console'>)</font>;
+        <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T,
+        <font color='#0000FF'><u>size_t</u></font> length
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='serialize'></a>serialize</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> <font color='#BB00BB'>T</font> <font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>array<font face='Lucida Console'>)</font>[length],
+        std::ostream<font color='#5555FF'>&amp;</font> out
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>try</font>
+        <b>{</b>
+            <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>length,out<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>size_t</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> length; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>array[i],out<font face='Lucida Console'>)</font>;
+        <b>}</b>
+        <font color='#0000FF'>catch</font> <font face='Lucida Console'>(</font>serialization_error<font color='#5555FF'>&amp;</font> e<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>throw</font> <font color='#BB00BB'>serialization_error</font><font face='Lucida Console'>(</font>e.info <font color='#5555FF'>+</font> "<font color='#CC0000'>\n   while serializing a C style array</font>"<font face='Lucida Console'>)</font>;
+        <b>}</b>
+    <b>}</b>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'><u>size_t</u></font> length
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='serialize'></a>serialize</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>char</u></font> <font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>array<font face='Lucida Console'>)</font>[length],
+        std::ostream<font color='#5555FF'>&amp;</font> out
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>length <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> array[length<font color='#5555FF'>-</font><font color='#979000'>1</font>] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> '<font color='#FF0000'>\0</font>'<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#009900'>// If this is a null terminated string then don't serialize the trailing null.
+</font>            <font color='#009900'>// We do this so that the serialization format for C-strings is the same as
+</font>            <font color='#009900'>// std::string.
+</font>            <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>length<font color='#5555FF'>-</font><font color='#979000'>1</font>, out<font face='Lucida Console'>)</font>;
+            out.<font color='#BB00BB'>write</font><font face='Lucida Console'>(</font>array, length<font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font>out<font face='Lucida Console'>)</font>
+                <font color='#0000FF'>throw</font> <font color='#BB00BB'>serialization_error</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>Error serializing a C-style string</font>"<font face='Lucida Console'>)</font>;
+        <b>}</b>
+        <font color='#0000FF'>else</font> 
+        <b>{</b>
+            <font color='#0000FF'>try</font>
+            <b>{</b>
+                <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>length,out<font face='Lucida Console'>)</font>;
+            <b>}</b>
+            <font color='#0000FF'>catch</font> <font face='Lucida Console'>(</font>serialization_error<font color='#5555FF'>&amp;</font> e<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>throw</font> <font color='#BB00BB'>serialization_error</font><font face='Lucida Console'>(</font>e.info <font color='#5555FF'>+</font> "<font color='#CC0000'>\n   while serializing a C style array</font>"<font face='Lucida Console'>)</font>;
+            <b>}</b>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>length <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                out.<font color='#BB00BB'>write</font><font face='Lucida Console'>(</font>array, length<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font>out<font face='Lucida Console'>)</font>
+                <font color='#0000FF'>throw</font> <font color='#BB00BB'>serialization_error</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>Error serializing a C-style string</font>"<font face='Lucida Console'>)</font>;
+        <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T,
+        <font color='#0000FF'><u>size_t</u></font> length
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='deserialize'></a>deserialize</b> <font face='Lucida Console'>(</font>
+        <font color='#BB00BB'>T</font> <font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>array<font face='Lucida Console'>)</font>[length],
+        std::istream<font color='#5555FF'>&amp;</font> in
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'><u>size_t</u></font> size;
+        <font color='#0000FF'>try</font>
+        <b>{</b>
+            <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>size,in<font face='Lucida Console'>)</font>; 
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>size <font color='#5555FF'>=</font><font color='#5555FF'>=</font> length<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>size_t</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> length; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                    <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>array[i],in<font face='Lucida Console'>)</font>;            
+            <b>}</b>
+        <b>}</b>
+        <font color='#0000FF'>catch</font> <font face='Lucida Console'>(</font>serialization_error<font color='#5555FF'>&amp;</font> e<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>throw</font> <font color='#BB00BB'>serialization_error</font><font face='Lucida Console'>(</font>e.info <font color='#5555FF'>+</font> "<font color='#CC0000'>\n   while deserializing a C style array</font>"<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>size <font color='#5555FF'>!</font><font color='#5555FF'>=</font> length<font face='Lucida Console'>)</font>
+            <font color='#0000FF'>throw</font> <font color='#BB00BB'>serialization_error</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>Error deserializing a C style array, lengths do not match</font>"<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'><u>size_t</u></font> length
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='deserialize'></a>deserialize</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'><u>char</u></font> <font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>array<font face='Lucida Console'>)</font>[length],
+        std::istream<font color='#5555FF'>&amp;</font> in
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'><u>size_t</u></font> size;
+        <font color='#0000FF'>try</font>
+        <b>{</b>
+            <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>size,in<font face='Lucida Console'>)</font>; 
+        <b>}</b>
+        <font color='#0000FF'>catch</font> <font face='Lucida Console'>(</font>serialization_error<font color='#5555FF'>&amp;</font> e<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>throw</font> <font color='#BB00BB'>serialization_error</font><font face='Lucida Console'>(</font>e.info <font color='#5555FF'>+</font> "<font color='#CC0000'>\n   while deserializing a C style array</font>"<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>size <font color='#5555FF'>=</font><font color='#5555FF'>=</font> length<font face='Lucida Console'>)</font>
+        <b>{</b>
+            in.<font color='#BB00BB'>read</font><font face='Lucida Console'>(</font>array, size<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font>in<font face='Lucida Console'>)</font>
+                <font color='#0000FF'>throw</font> <font color='#BB00BB'>serialization_error</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>Error deserializing a C-style array</font>"<font face='Lucida Console'>)</font>;
+        <b>}</b>
+        <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>size<font color='#5555FF'>+</font><font color='#979000'>1</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> length<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#009900'>// In this case we are deserializing a C-style array so we need to add the null
+</font>            <font color='#009900'>// terminator.
+</font>            in.<font color='#BB00BB'>read</font><font face='Lucida Console'>(</font>array, size<font face='Lucida Console'>)</font>;
+            array[size] <font color='#5555FF'>=</font> '<font color='#FF0000'>\0</font>';
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font>in<font face='Lucida Console'>)</font>
+                <font color='#0000FF'>throw</font> <font color='#BB00BB'>serialization_error</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>Error deserializing a C-style string</font>"<font face='Lucida Console'>)</font>;
+        <b>}</b>
+        <font color='#0000FF'>else</font>
+        <b>{</b>
+            <font color='#0000FF'>throw</font> <font color='#BB00BB'>serialization_error</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>Error deserializing a C style array, lengths do not match</font>"<font face='Lucida Console'>)</font>;
+        <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='serialize'></a>serialize</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> std::complex<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> item,
+        std::ostream<font color='#5555FF'>&amp;</font> out
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>try</font>
+        <b>{</b>
+            <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item.<font color='#BB00BB'>real</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,out<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item.<font color='#BB00BB'>imag</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,out<font face='Lucida Console'>)</font>;
+        <b>}</b>
+        <font color='#0000FF'>catch</font> <font face='Lucida Console'>(</font>serialization_error<font color='#5555FF'>&amp;</font> e<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>throw</font> <font color='#BB00BB'>serialization_error</font><font face='Lucida Console'>(</font>e.info <font color='#5555FF'>+</font> "<font color='#CC0000'>\n   while serializing an object of type std::complex</font>"<font face='Lucida Console'>)</font>;
+        <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='deserialize'></a>deserialize</b> <font face='Lucida Console'>(</font>
+        std::complex<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> item,
+        std::istream<font color='#5555FF'>&amp;</font> in
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>try</font>
+        <b>{</b>
+            T real, imag;
+            <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>real,in<font face='Lucida Console'>)</font>; 
+            <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>imag,in<font face='Lucida Console'>)</font>; 
+            item <font color='#5555FF'>=</font> std::complex<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>real,imag<font face='Lucida Console'>)</font>;
+        <b>}</b>
+        <font color='#0000FF'>catch</font> <font face='Lucida Console'>(</font>serialization_error<font color='#5555FF'>&amp;</font> e<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>throw</font> <font color='#BB00BB'>serialization_error</font><font face='Lucida Console'>(</font>e.info <font color='#5555FF'>+</font> "<font color='#CC0000'>\n   while deserializing an object of type std::complex</font>"<font face='Lucida Console'>)</font>;
+        <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>class</font> <b><a name='proxy_serialize'></a>proxy_serialize</b> 
+    <b>{</b>
+    <font color='#0000FF'>public</font>:
+        <font color='#0000FF'>explicit</font> <b><a name='proxy_serialize'></a>proxy_serialize</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> filename
+        <font face='Lucida Console'>)</font> 
+        <b>{</b>
+            fout.<font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font><font color='#0000FF'>new</font> std::<font color='#BB00BB'>ofstream</font><font face='Lucida Console'>(</font>filename.<font color='#BB00BB'>c_str</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, std::ios::binary<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font>fout<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                <font color='#0000FF'>throw</font> <font color='#BB00BB'>serialization_error</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>Unable to open </font>" <font color='#5555FF'>+</font> filename <font color='#5555FF'>+</font> "<font color='#CC0000'> for writing.</font>"<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>inline</font> proxy_serialize<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> item<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item, <font color='#5555FF'>*</font>fout<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>return</font> <font color='#5555FF'>*</font><font color='#0000FF'>this</font>;
+        <b>}</b>
+
+    <font color='#0000FF'>private</font>:
+        shared_ptr<font color='#5555FF'>&lt;</font>std::ofstream<font color='#5555FF'>&gt;</font> fout;
+    <b>}</b>;
+
+    <font color='#0000FF'>class</font> <b><a name='proxy_deserialize'></a>proxy_deserialize</b> 
+    <b>{</b>
+    <font color='#0000FF'>public</font>:
+        <font color='#0000FF'>explicit</font> <b><a name='proxy_deserialize'></a>proxy_deserialize</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> filename
+        <font face='Lucida Console'>)</font> 
+        <b>{</b>
+            fin.<font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font><font color='#0000FF'>new</font> std::<font color='#BB00BB'>ifstream</font><font face='Lucida Console'>(</font>filename.<font color='#BB00BB'>c_str</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, std::ios::binary<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font>fin<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                <font color='#0000FF'>throw</font> <font color='#BB00BB'>serialization_error</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>Unable to open </font>" <font color='#5555FF'>+</font> filename <font color='#5555FF'>+</font> "<font color='#CC0000'> for reading.</font>"<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>inline</font> proxy_deserialize<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>T<font color='#5555FF'>&amp;</font> item<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item, <font color='#5555FF'>*</font>fin<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>return</font> <font color='#5555FF'>*</font><font color='#0000FF'>this</font>;
+        <b>}</b>
+
+    <font color='#0000FF'>private</font>:
+        shared_ptr<font color='#5555FF'>&lt;</font>std::ifstream<font color='#5555FF'>&gt;</font> fin;
+    <b>}</b>;
+
+    <font color='#0000FF'>inline</font> proxy_serialize <b><a name='serialize'></a>serialize</b><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> filename<font face='Lucida Console'>)</font>
+    <b>{</b> <font color='#0000FF'>return</font> <font color='#BB00BB'>proxy_serialize</font><font face='Lucida Console'>(</font>filename<font face='Lucida Console'>)</font>; <b>}</b>
+    <font color='#0000FF'>inline</font> proxy_deserialize <b><a name='deserialize'></a>deserialize</b><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> filename<font face='Lucida Console'>)</font>
+    <b>{</b> <font color='#0000FF'>return</font> <font color='#BB00BB'>proxy_deserialize</font><font face='Lucida Console'>(</font>filename<font face='Lucida Console'>)</font>; <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#009900'>// forward declare the MessageLite object so we can reference it below.
+</font><font color='#0000FF'>namespace</font> google
+<b>{</b>
+    <font color='#0000FF'>namespace</font> protobuf
+    <b>{</b>
+        <font color='#0000FF'>class</font> MessageLite;
+    <b>}</b>
+<b>}</b>
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+    <a name='is_protocol_buffer'/><font color='#009900'>/*!A is_protocol_buffer
+        This is a template that tells you if a type is a Google protocol buffer object.  
+    !*/</font>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> U <font color='#5555FF'>=</font> <font color='#0000FF'><u>void</u></font> <font color='#5555FF'>&gt;</font> 
+    <font color='#0000FF'>struct</font> <b><a name='is_protocol_buffer'></a>is_protocol_buffer</b> 
+    <b>{</b>
+        <font color='#0000FF'>static</font> <font color='#0000FF'>const</font> <font color='#0000FF'><u>bool</u></font> value <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+    <b>}</b>;
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>struct</font> <b><a name='is_protocol_buffer'></a>is_protocol_buffer</b> <font color='#5555FF'>&lt;</font>T,<font color='#0000FF'>typename</font> enable_if<font color='#5555FF'>&lt;</font>is_convertible<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>*</font>,::google::protobuf::MessageLite<font color='#5555FF'>*</font><font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font>::type  <font color='#5555FF'>&gt;</font>
+    <b>{</b>
+        <font color='#0000FF'>static</font> <font color='#0000FF'>const</font> <font color='#0000FF'><u>bool</u></font> value <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+    <b>}</b>;
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>typename</font> enable_if<font color='#5555FF'>&lt;</font>is_protocol_buffer<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font>::type <b><a name='serialize'></a>serialize</b><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> item, std::ostream<font color='#5555FF'>&amp;</font> out<font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#009900'>// Note that Google protocol buffer messages are not self delimiting 
+</font>        <font color='#009900'>// (see https://developers.google.com/protocol-buffers/docs/techniques)
+</font>        <font color='#009900'>// This means they don't record their length or where they end, so we have 
+</font>        <font color='#009900'>// to record this information ourselves.  So we save the size as a little endian 32bit 
+</font>        <font color='#009900'>// integer prefixed onto the front of the message.
+</font>
+        byte_orderer bo;
+
+        <font color='#009900'>// serialize into temp string
+</font>        std::string temp;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font>item.<font color='#BB00BB'>SerializeToString</font><font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>temp<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+            <font color='#0000FF'>throw</font> dlib::<font color='#BB00BB'>serialization_error</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>Error while serializing a Google Protocol Buffer object.</font>"<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>temp.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> std::numeric_limits<font color='#5555FF'>&lt;</font>uint32<font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>max</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+            <font color='#0000FF'>throw</font> dlib::<font color='#BB00BB'>serialization_error</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>Error while serializing a Google Protocol Buffer object, message too large.</font>"<font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// write temp to the output stream
+</font>        uint32 size <font color='#5555FF'>=</font> temp.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        bo.<font color='#BB00BB'>host_to_little</font><font face='Lucida Console'>(</font>size<font face='Lucida Console'>)</font>;
+        out.<font color='#BB00BB'>write</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>char</u></font><font color='#5555FF'>*</font><font face='Lucida Console'>)</font><font color='#5555FF'>&amp;</font>size, <font color='#0000FF'>sizeof</font><font face='Lucida Console'>(</font>size<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        out.<font color='#BB00BB'>write</font><font face='Lucida Console'>(</font>temp.<font color='#BB00BB'>c_str</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, temp.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>typename</font> enable_if<font color='#5555FF'>&lt;</font>is_protocol_buffer<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font>::type <b><a name='deserialize'></a>deserialize</b><font face='Lucida Console'>(</font>T<font color='#5555FF'>&amp;</font> item, std::istream<font color='#5555FF'>&amp;</font> in<font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#009900'>// Note that Google protocol buffer messages are not self delimiting 
+</font>        <font color='#009900'>// (see https://developers.google.com/protocol-buffers/docs/techniques)
+</font>        <font color='#009900'>// This means they don't record their length or where they end, so we have 
+</font>        <font color='#009900'>// to record this information ourselves.  So we save the size as a little endian 32bit 
+</font>        <font color='#009900'>// integer prefixed onto the front of the message.
+</font>
+        byte_orderer bo;
+
+        uint32 size <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <font color='#009900'>// read the size
+</font>        in.<font color='#BB00BB'>read</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>char</u></font><font color='#5555FF'>*</font><font face='Lucida Console'>)</font><font color='#5555FF'>&amp;</font>size, <font color='#0000FF'>sizeof</font><font face='Lucida Console'>(</font>size<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        bo.<font color='#BB00BB'>little_to_host</font><font face='Lucida Console'>(</font>size<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font>in <font color='#5555FF'>|</font><font color='#5555FF'>|</font> size <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+            <font color='#0000FF'>throw</font> dlib::<font color='#BB00BB'>serialization_error</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>Error while deserializing a Google Protocol Buffer object.</font>"<font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// read the bytes into temp
+</font>        std::string temp;
+        temp.<font color='#BB00BB'>resize</font><font face='Lucida Console'>(</font>size<font face='Lucida Console'>)</font>;
+        in.<font color='#BB00BB'>read</font><font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>temp[<font color='#979000'>0</font>], size<font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// parse temp into item
+</font>        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font>in <font color='#5555FF'>|</font><font color='#5555FF'>|</font> <font color='#5555FF'>!</font>item.<font color='#BB00BB'>ParseFromString</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>throw</font> dlib::<font color='#BB00BB'>serialization_error</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>Error while deserializing a Google Protocol Buffer object.</font>"<font face='Lucida Console'>)</font>;
+        <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_SERIALIZe_
+</font>
+
+</pre></body></html>

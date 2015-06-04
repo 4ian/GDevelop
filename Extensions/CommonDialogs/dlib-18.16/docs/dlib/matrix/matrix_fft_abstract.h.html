@@ -1,0 +1,121 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - matrix_fft_abstract.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2013  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#undef</font> DLIB_FFt_ABSTRACT_Hh_
+<font color='#0000FF'>#ifdef</font> DLIB_FFt_ABSTRACT_Hh_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='matrix_abstract.h.html'>matrix_abstract.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../algs.h.html'>../algs.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>bool</u></font> <b><a name='is_power_of_two'></a>is_power_of_two</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&amp;</font> value
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        ensures
+            - returns true if value contains a power of two and false otherwise.  As a
+              special case, we also consider 0 to be a power of two.
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> EXP<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>typename</font> EXP::matrix_type <b><a name='fft'></a>fft</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&lt;</font>EXP<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> data
+    <font face='Lucida Console'>)</font>;  
+    <font color='#009900'>/*!
+        requires
+            - data contains elements of type std::complex&lt;&gt;
+            - is_power_of_two(data.nr()) == true
+            - is_power_of_two(data.nc()) == true
+        ensures
+            - Computes the 1 or 2 dimensional discrete Fourier transform of the given data
+              matrix and returns it.  In particular, we return a matrix D such that:
+                - D.nr() == data.nr()
+                - D.nc() == data.nc()
+                - D(0,0) == the DC term of the Fourier transform.
+                - starting with D(0,0), D contains progressively higher frequency components
+                  of the input data.
+                - ifft(D) == D
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> EXP<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>typename</font> EXP::matrix_type <b><a name='ifft'></a>ifft</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&lt;</font>EXP<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> data
+    <font face='Lucida Console'>)</font>;  
+    <font color='#009900'>/*!
+        requires
+            - data contains elements of type std::complex&lt;&gt;
+            - is_power_of_two(data.nr()) == true
+            - is_power_of_two(data.nc()) == true
+        ensures
+            - Computes the 1 or 2 dimensional inverse discrete Fourier transform of the
+              given data vector and returns it.  In particular, we return a matrix D such
+              that:
+                - D.nr() == data.nr()
+                - D.nc() == data.nc()
+                - fft(D) == data 
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font> 
+        <font color='#0000FF'>typename</font> T, 
+        <font color='#0000FF'><u>long</u></font> NR,
+        <font color='#0000FF'><u>long</u></font> NC,
+        <font color='#0000FF'>typename</font> MM,
+        <font color='#0000FF'>typename</font> L 
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='fft_inplace'></a>fft_inplace</b> <font face='Lucida Console'>(</font>
+        matrix<font color='#5555FF'>&lt;</font>std::complex<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font>,NR,NC,MM,L<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> data
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - data contains elements of type std::complex&lt;&gt;
+            - is_power_of_two(data.nr()) == true
+            - is_power_of_two(data.nc()) == true
+        ensures
+            - This function is identical to fft() except that it does the FFT in-place.
+              That is, after this function executes we will have:
+                - #data == fft(data)
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font> 
+        <font color='#0000FF'>typename</font> T, 
+        <font color='#0000FF'><u>long</u></font> NR,
+        <font color='#0000FF'><u>long</u></font> NC,
+        <font color='#0000FF'>typename</font> MM,
+        <font color='#0000FF'>typename</font> L 
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='ifft_inplace'></a>ifft_inplace</b> <font face='Lucida Console'>(</font>
+        matrix<font color='#5555FF'>&lt;</font>std::complex<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font>,NR,NC,MM,L<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> data
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - data contains elements of type std::complex&lt;&gt;
+            - is_power_of_two(data.nr()) == true
+            - is_power_of_two(data.nc()) == true
+        ensures
+            - This function is identical to ifft() except that it does the inverse FFT
+              in-place.  That is, after this function executes we will have:
+                - #data == ifft(data)*data.size()
+                - Note that the output needs to be divided by data.size() to complete the 
+                  inverse transformation.  
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_FFt_ABSTRACT_Hh_
+</font>
+
+</pre></body></html>

@@ -1,0 +1,78 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - active_learning_abstract.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2012  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#undef</font> DLIB_ACTIVE_LEARnING_ABSTRACT_Hh_
+<font color='#0000FF'>#ifdef</font> DLIB_ACTIVE_LEARnING_ABSTRACT_Hh_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='svm_c_linear_dcd_trainer_abstract.h.html'>svm_c_linear_dcd_trainer_abstract.h</a>"
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>vector<font color='#5555FF'>&gt;</font>
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>enum</font> <b><a name='active_learning_mode'></a>active_learning_mode</b>
+    <b>{</b>
+        max_min_margin,
+        ratio_margin
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> kernel_type,
+        <font color='#0000FF'>typename</font> in_sample_vector_type,
+        <font color='#0000FF'>typename</font> in_scalar_vector_type,
+        <font color='#0000FF'>typename</font> in_sample_vector_type2
+        <font color='#5555FF'>&gt;</font>
+    std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font> <b><a name='rank_unlabeled_training_samples'></a>rank_unlabeled_training_samples</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> svm_c_linear_dcd_trainer<font color='#5555FF'>&lt;</font>kernel_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> trainer,
+        <font color='#0000FF'>const</font> in_sample_vector_type<font color='#5555FF'>&amp;</font> samples,
+        <font color='#0000FF'>const</font> in_scalar_vector_type<font color='#5555FF'>&amp;</font> labels,
+        <font color='#0000FF'>const</font> in_sample_vector_type2<font color='#5555FF'>&amp;</font> unlabeled_samples,
+        <font color='#0000FF'>const</font> active_learning_mode mode <font color='#5555FF'>=</font> max_min_margin
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - if (samples.size() != 0) then
+                - it must be legal to call trainer.train(samples, labels)
+                - is_learning_problem(samples, labels) == true
+            - unlabeled_samples must contain the same kind of vectors as samples.
+            - unlabeled_samples, samples, and labels must be matrices or types of 
+              objects convertible to a matrix via mat().
+            - is_vector(unlabeled_samples) == true
+        ensures
+            - Suppose that we wish to learn a binary classifier by calling
+              trainer.train(samples, labels) but we are also interested in selecting one of
+              the elements of unlabeled_samples to add to our training data.  Since doing
+              this requires us to find out the label of the sample, a potentially tedious
+              or expensive process, we would like to select the "best" element from
+              unlabeled_samples for labeling.  The rank_unlabeled_training_samples()
+              attempts to find this "best" element.  In particular, this function returns a
+              ranked list of all the elements in unlabeled_samples such that that the
+              "best" elements come first.
+            - The method used by this function is described in the paper:
+                Support Vector Machine Active Learning with Applications to Text Classification
+                by Simon Tong and Daphne Koller
+              In particular, this function implements the MaxMin Margin and Ratio Margin 
+              selection strategies described in the paper.  Moreover, the mode argument
+              to this function selects which of these strategies is used.
+            - returns a std::vector V such that:
+                - V contains a list of all the indices from unlabeled_samples.  Moreover,
+                  they are ordered so that the most useful samples come first.
+                - V.size() == unlabeled_samples.size()
+                - unlabeled_samples[V[0]] == The best sample to add into the training set.
+                - unlabeled_samples[V[1]] == The second best sample to add into the training set.
+                - unlabeled_samples[V[i]] == The i-th best sample to add into the training set.
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_ACTIVE_LEARnING_ABSTRACT_Hh_
+</font>
+
+
+</pre></body></html>

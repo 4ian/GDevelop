@@ -1,0 +1,270 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - reduced_abstract.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2008  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#undef</font> DLIB_REDUCED_TRAINERs_ABSTRACT_
+<font color='#0000FF'>#ifdef</font> DLIB_REDUCED_TRAINERs_ABSTRACT_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../matrix.h.html'>../matrix.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../algs.h.html'>../algs.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='function_abstract.h.html'>function_abstract.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='kernel_abstract.h.html'>kernel_abstract.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../optimization.h.html'>../optimization.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> trainer_type 
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>class</font> <b><a name='reduced_decision_function_trainer'></a>reduced_decision_function_trainer</b>
+    <b>{</b>
+        <font color='#009900'>/*!
+            REQUIREMENTS ON trainer_type
+                - trainer_type == some kind of batch trainer object (e.g. svm_nu_trainer)
+
+            WHAT THIS OBJECT REPRESENTS
+                This object represents an implementation of a reduced set algorithm.  
+                This object acts as a post processor for anything that creates 
+                decision_function objects.  It wraps another trainer object and 
+                performs this reduced set post processing with the goal of 
+                representing the original decision function in a form that 
+                involves fewer basis vectors.
+        !*/</font>
+
+    <font color='#0000FF'>public</font>:
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> trainer_type::kernel_type kernel_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> trainer_type::scalar_type scalar_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> trainer_type::sample_type sample_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> trainer_type::mem_manager_type mem_manager_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> trainer_type::trained_function_type trained_function_type;
+
+        <b><a name='reduced_decision_function_trainer'></a>reduced_decision_function_trainer</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - This object is in an uninitialized state.  You must
+                  construct a real one with the other constructor and assign it
+                  to this instance before you use this object.
+        !*/</font>
+
+        <b><a name='reduced_decision_function_trainer'></a>reduced_decision_function_trainer</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> trainer_type<font color='#5555FF'>&amp;</font> trainer,
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> num_bv 
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - num_bv &gt; 0
+            ensures
+                - returns a trainer object that applies post processing to the decision_function
+                  objects created by the given trainer object with the goal of creating
+                  decision_function objects with fewer basis vectors.
+                - The reduced decision functions that are output will have at most
+                  num_bv basis vectors.
+        !*/</font>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'>typename</font> in_sample_vector_type,
+            <font color='#0000FF'>typename</font> in_scalar_vector_type
+            <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>const</font> decision_function<font color='#5555FF'>&lt;</font>kernel_type<font color='#5555FF'>&gt;</font> <b><a name='train'></a>train</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> in_sample_vector_type<font color='#5555FF'>&amp;</font> x,
+            <font color='#0000FF'>const</font> in_scalar_vector_type<font color='#5555FF'>&amp;</font> y
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - trains a decision_function using the trainer that was supplied to
+                  this object's constructor and then finds a reduced representation
+                  for it and returns the reduced version.  
+            throws
+                - std::bad_alloc
+                - any exceptions thrown by the trainer_type object
+        !*/</font>
+
+    <b>}</b>; 
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> trainer_type
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>const</font> reduced_decision_function_trainer<font color='#5555FF'>&lt;</font>trainer_type<font color='#5555FF'>&gt;</font> <b><a name='reduced'></a>reduced</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> trainer_type<font color='#5555FF'>&amp;</font> trainer,
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> num_bv
+    <font face='Lucida Console'>)</font> <b>{</b> <font color='#0000FF'>return</font> reduced_decision_function_trainer<font color='#5555FF'>&lt;</font>trainer_type<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>trainer, num_bv<font face='Lucida Console'>)</font>; <b>}</b>
+    <font color='#009900'>/*!
+        requires
+            - num_bv &gt; 0
+            - trainer_type == some kind of batch trainer object that creates decision_function
+              objects (e.g. svm_nu_trainer)
+        ensures
+            - returns a reduced_decision_function_trainer object that has been
+              instantiated with the given arguments.
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> K,
+        <font color='#0000FF'>typename</font> stop_strategy_type,
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    distance_function<font color='#5555FF'>&lt;</font>K<font color='#5555FF'>&gt;</font> <b><a name='approximate_distance_function'></a>approximate_distance_function</b> <font face='Lucida Console'>(</font>
+        stop_strategy_type stop_strategy,
+        <font color='#0000FF'>const</font> distance_function<font color='#5555FF'>&lt;</font>K<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> target,
+        <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> starting_basis
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - stop_strategy == an object that defines a stop strategy such as one of 
+              the objects from dlib/optimization/optimization_stop_strategies_abstract.h
+            - requirements on starting_basis
+                - T must be a dlib::matrix type or something convertible to a matrix via mat()
+                  (e.g. a std::vector).  Additionally, starting_basis must contain K::sample_type
+                  objects which can be supplied to the kernel function used by target.
+                - is_vector(starting_basis) == true
+                - starting_basis.size() &gt; 0
+            - target.get_basis_vectors().size() &gt; 0 
+            - kernel_derivative&lt;K&gt; is defined
+              (i.e. The analytic derivative for the given kernel must be defined)
+            - K::sample_type must be a dlib::matrix object and the basis_vectors inside target
+              and starting_basis must be column vectors.
+        ensures
+            - This routine attempts to find a distance_function object which is close
+              to the given target.  That is, it searches for an X such that target(X) is
+              minimized.  The optimization begins with an X in the span of the elements
+              of starting_basis and searches for an X which locally minimizes target(X).  
+              Since this problem can have many local minima, the quality of the starting 
+              basis can significantly influence the results.   
+            - The optimization is over all variables in a distance_function, however,
+              the size of the basis set is constrained to no more than starting_basis.size().
+              That is, in the returned distance_function DF, we will have: 
+                - DF.get_basis_vectors().size() &lt;= starting_basis.size()
+            - The optimization is carried out until the stop_strategy indicates it 
+              should stop.
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> trainer_type 
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>class</font> <b><a name='reduced_decision_function_trainer2'></a>reduced_decision_function_trainer2</b>
+    <b>{</b>
+        <font color='#009900'>/*!
+            REQUIREMENTS ON trainer_type
+                - trainer_type == some kind of batch trainer object (e.g. svm_nu_trainer)
+                - trainer_type::sample_type must be a dlib::matrix object
+                - kernel_derivative&lt;trainer_type::kernel_type&gt; must be defined
+
+            WHAT THIS OBJECT REPRESENTS
+                This object represents an implementation of a reduced set algorithm.  
+                This object acts as a post processor for anything that creates 
+                decision_function objects.  It wraps another trainer object and 
+                performs this reduced set post processing with the goal of 
+                representing the original decision function in a form that 
+                involves fewer basis vectors.
+
+                This object's implementation is the same as that in the above
+                reduced_decision_function_trainer object except it also performs 
+                a global gradient based optimization at the end to further
+                improve the approximation to the original decision function
+                object. 
+        !*/</font>
+
+    <font color='#0000FF'>public</font>:
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> trainer_type::kernel_type kernel_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> trainer_type::scalar_type scalar_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> trainer_type::sample_type sample_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> trainer_type::mem_manager_type mem_manager_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> trainer_type::trained_function_type trained_function_type;
+
+        <b><a name='reduced_decision_function_trainer2'></a>reduced_decision_function_trainer2</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - This object is in an uninitialized state.  You must
+                  construct a real one with the other constructor and assign it
+                  to this instance before you use this object.
+        !*/</font>
+
+        <b><a name='reduced_decision_function_trainer2'></a>reduced_decision_function_trainer2</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> trainer_type<font color='#5555FF'>&amp;</font> trainer,
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> num_bv,
+            <font color='#0000FF'><u>double</u></font> eps <font color='#5555FF'>=</font> <font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>3</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - num_bv &gt; 0
+                - eps &gt; 0
+            ensures
+                - returns a trainer object that applies post processing to the decision_function
+                  objects created by the given trainer object with the goal of creating
+                  decision_function objects with fewer basis vectors.
+                - The reduced decision functions that are output will have at most
+                  num_bv basis vectors.
+                - the gradient based optimization will continue until the change in the
+                  objective function is less than eps.  So smaller values of eps will
+                  give better results but take longer to compute.
+        !*/</font>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'>typename</font> in_sample_vector_type,
+            <font color='#0000FF'>typename</font> in_scalar_vector_type
+            <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>const</font> decision_function<font color='#5555FF'>&lt;</font>kernel_type<font color='#5555FF'>&gt;</font> <b><a name='train'></a>train</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> in_sample_vector_type<font color='#5555FF'>&amp;</font> x,
+            <font color='#0000FF'>const</font> in_scalar_vector_type<font color='#5555FF'>&amp;</font> y
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - x must be a list of objects which are each some kind of dlib::matrix 
+                  which represents column or row vectors.
+            ensures
+                - trains a decision_function using the trainer that was supplied to
+                  this object's constructor and then finds a reduced representation
+                  for it and returns the reduced version.  
+            throws
+                - std::bad_alloc
+                - any exceptions thrown by the trainer_type object
+        !*/</font>
+
+    <b>}</b>; 
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> trainer_type
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>const</font> reduced_decision_function_trainer2<font color='#5555FF'>&lt;</font>trainer_type<font color='#5555FF'>&gt;</font> <b><a name='reduced2'></a>reduced2</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> trainer_type<font color='#5555FF'>&amp;</font> trainer,
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> num_bv,
+        <font color='#0000FF'><u>double</u></font> eps <font color='#5555FF'>=</font> <font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>3</font>
+    <font face='Lucida Console'>)</font> <b>{</b> <font color='#0000FF'>return</font> reduced_decision_function_trainer2<font color='#5555FF'>&lt;</font>trainer_type<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>trainer, num_bv, eps<font face='Lucida Console'>)</font>; <b>}</b>
+    <font color='#009900'>/*!
+        requires
+            - num_bv &gt; 0
+            - trainer_type == some kind of batch trainer object that creates decision_function
+              objects (e.g. svm_nu_trainer)
+            - kernel_derivative&lt;trainer_type::kernel_type&gt; is defined
+            - eps &gt; 0
+        ensures
+            - returns a reduced_decision_function_trainer2 object that has been
+              instantiated with the given arguments.
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_REDUCED_TRAINERs_ABSTRACT_
+</font>
+
+</pre></body></html>

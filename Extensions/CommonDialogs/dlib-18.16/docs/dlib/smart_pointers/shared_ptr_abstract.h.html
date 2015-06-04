@@ -1,0 +1,409 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - shared_ptr_abstract.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2007  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#undef</font> DLIB_SHARED_PTr_ABSTRACT_
+<font color='#0000FF'>#ifdef</font> DLIB_SHARED_PTr_ABSTRACT_ 
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='weak_ptr_abstract.h.html'>weak_ptr_abstract.h</a>"
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>exception<font color='#5555FF'>&gt;</font>     
+
+<font color='#0000FF'>namespace</font> dlib 
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>class</font> <b><a name='bad_weak_ptr'></a>bad_weak_ptr</b>: <font color='#0000FF'>public</font> std::exception <b>{</b><b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font> 
+    <font color='#0000FF'>class</font> <b><a name='shared_ptr'></a>shared_ptr</b> 
+    <b>{</b>
+        <font color='#009900'>/*!
+            INITIAL VALUE
+                defined by constructors
+
+            WHAT THIS OBJECT REPRESENTS
+                This object represents a reference counted smart pointer.  Each shared_ptr
+                contains a pointer to some object and when the last shared_ptr that points
+                to the object is destructed or reset() then the object is guaranteed to be 
+                deleted.
+
+                This is an implementation of the std::tr1::shared_ptr template from the 
+                document ISO/IEC PDTR 19768, Proposed Draft Technical Report on C++
+                Library Extensions.  The only deviation from that document is that this 
+                shared_ptr is declared inside the dlib namespace rather than std::tr1.
+
+            THREAD SAFETY
+                This object is not thread safe.  Especially so since it is
+                reference counted.  So you should take care to not have two shared_ptr
+                objects in different threads that point to the same object.
+
+                If you want a thread safe version of this object you should use the
+                dlib::shared_ptr_thread_safe object instead.
+        !*/</font>
+
+    <font color='#0000FF'>public</font>:
+
+        <font color='#0000FF'>typedef</font> T element_type;
+
+        <b><a name='shared_ptr'></a>shared_ptr</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #get() == 0
+                - #use_count() == 0
+        !*/</font>
+
+        <font color='#0000FF'>template</font><font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> Y<font color='#5555FF'>&gt;</font> 
+        <font color='#0000FF'>explicit</font> <b><a name='shared_ptr'></a>shared_ptr</b><font face='Lucida Console'>(</font>
+            Y<font color='#5555FF'>*</font> p
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - p is convertible to a T* type pointer
+                - p can be deleted by calling "delete p;" and doing so will not throw exceptions
+                - p != 0
+            ensures
+                - #get() == p
+                - #use_count() == 1
+                - #*this object owns the pointer p
+            throws
+                - std::bad_alloc
+                  if this exception is thrown then "delete p;" is called
+        !*/</font>
+
+        <font color='#0000FF'>template</font><font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> Y, <font color='#0000FF'>typename</font> D<font color='#5555FF'>&gt;</font> 
+        <b><a name='shared_ptr'></a>shared_ptr</b><font face='Lucida Console'>(</font>
+            Y<font color='#5555FF'>*</font> p, 
+            <font color='#0000FF'>const</font> D<font color='#5555FF'>&amp;</font> d
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - p is convertible to a T* type pointer
+                - D is copy constructable (and the copy constructor of D doesn't throw) 
+                - p can be deleted by calling "d(p);" and doing so will not throw exceptions
+                - p != 0
+            ensures
+                - #get() == p
+                - #use_count() == 1
+                - #*this object owns the pointer p
+            throws
+                - std::bad_alloc
+                  if this exception is thrown then "d(p);" is called
+        !*/</font>
+
+        <b><a name='shared_ptr'></a>shared_ptr</b><font face='Lucida Console'>(</font> 
+            <font color='#0000FF'>const</font> shared_ptr<font color='#5555FF'>&amp;</font> r
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #get() == #r.get()
+                - #use_count() == #r.use_count()
+                - If r is empty, constructs an empty shared_ptr object; otherwise, constructs 
+                  a shared_ptr object that shares ownership with r.
+        !*/</font>
+
+        <font color='#0000FF'>template</font><font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> Y<font color='#5555FF'>&gt;</font> 
+        <b><a name='shared_ptr'></a>shared_ptr</b><font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> shared_ptr<font color='#5555FF'>&lt;</font>Y<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> r
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - Y* is convertible to T* 
+            ensures
+                - #get() == #r.get()
+                - #use_count() == #r.use_count()
+                - If r is empty, constructs an empty shared_ptr object; otherwise, constructs 
+                  a shared_ptr object that shares ownership with r.
+        !*/</font>
+
+        <font color='#0000FF'>template</font><font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> Y<font color='#5555FF'>&gt;</font> 
+        <font color='#0000FF'>explicit</font> <b><a name='shared_ptr'></a>shared_ptr</b><font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> weak_ptr<font color='#5555FF'>&lt;</font>Y<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> r
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - Y* is convertible to T* 
+            ensures
+                - #get() == #r.get()
+                - #use_count() == #r.use_count()
+                - If r is empty, constructs an empty shared_ptr object; otherwise, constructs 
+                  a shared_ptr object that shares ownership with r.
+            throws
+                - bad_weak_ptr
+                  this exception is thrown if r.expired() == true
+        !*/</font>
+
+        <font color='#0000FF'>template</font><font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> Y<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>explicit</font> <b><a name='shared_ptr'></a>shared_ptr</b><font face='Lucida Console'>(</font>
+            std::auto_ptr<font color='#5555FF'>&lt;</font>Y<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> r
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - p.get() != 0
+                - p.release() is convertible to a T* type pointer
+                - p.release() can be deleted by calling "delete p.release();" and doing so will not throw exceptions
+            ensures
+                - #get() == p.release()
+                - #use_count() == 1
+                - #r.get() == 0
+                - #*this object owns the pointer p.release()
+            throws
+                - std::bad_alloc
+        !*/</font>
+
+        ~<b><a name='shared_ptr'></a>shared_ptr</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - if (use_count() &gt; 1)
+                    - this object destroys itself but otherwise has no effect (i.e. 
+                      the pointer get() is still valid and shared between the remaining
+                      shared_ptr objects)
+                - else if (use_count() == 1)
+                    - deletes the pointer get() by calling delete (or using the deleter passed
+                      to the constructor if one was passed in)
+                - else
+                    - in this case get() == 0 so there is nothing to do so nothing occurs
+        !*/</font>
+
+        shared_ptr<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> shared_ptr<font color='#5555FF'>&amp;</font> r
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - equivalent to shared_ptr(r).swap(*this).
+                - returns #*this
+        !*/</font>
+
+        <font color='#0000FF'>template</font><font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> Y<font color='#5555FF'>&gt;</font> 
+        shared_ptr<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> shared_ptr<font color='#5555FF'>&lt;</font>Y<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> r
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - Y* is convertible to T* 
+            ensures
+                - equivalent to shared_ptr(r).swap(*this).
+                - returns #*this
+        !*/</font>
+
+        <font color='#0000FF'>template</font><font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> Y<font color='#5555FF'>&gt;</font> 
+        shared_ptr<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>
+            std::auto_ptr<font color='#5555FF'>&lt;</font>Y<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> r
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - p.get() != 0
+                - p.release() is convertible to a T* type pointer
+                - p.release() can be deleted by calling "delete p.release();" and doing so will not throw exceptions
+            ensures
+                - equivalent to shared_ptr(r).swap(*this).
+                - returns #*this
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='reset'></a>reset</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - equivalent to shared_ptr().swap(*this)
+        !*/</font>
+
+        <font color='#0000FF'>template</font><font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> Y<font color='#5555FF'>&gt;</font> 
+        <font color='#0000FF'><u>void</u></font> <b><a name='reset'></a>reset</b><font face='Lucida Console'>(</font>
+            Y<font color='#5555FF'>*</font> p
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - p is convertible to a T* type pointer
+                - p can be deleted by calling "delete p;" and doing so will not throw exceptions
+                - p != 0
+            ensures
+                - equivalent to shared_ptr(p).swap(*this)
+        !*/</font>
+
+        <font color='#0000FF'>template</font><font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> Y, <font color='#0000FF'>typename</font> D<font color='#5555FF'>&gt;</font> 
+        <font color='#0000FF'><u>void</u></font> <b><a name='reset'></a>reset</b><font face='Lucida Console'>(</font>
+            Y<font color='#5555FF'>*</font> p, 
+            <font color='#0000FF'>const</font> D<font color='#5555FF'>&amp;</font> d
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - p is convertible to a T* type pointer
+                - D is copy constructable (and the copy constructor of D doesn't throw) 
+                - p can be deleted by calling "d(p);" and doing so will not throw exceptions
+                - p != 0
+            ensures
+                - equivalent to shared_ptr(p,d).swap(*this)
+        !*/</font>
+
+        T<font color='#5555FF'>*</font> <b><a name='get'></a>get</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>; 
+        <font color='#009900'>/*!
+            ensures
+                - returns the stored pointer
+        !*/</font>
+
+        T<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>*</font><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>; 
+        <font color='#009900'>/*!
+            requires
+                - get() != 0
+            ensures
+                - returns a reference to *get()
+        !*/</font>
+
+        T<font color='#5555FF'>*</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>; 
+        <font color='#009900'>/*!
+            requires
+                - get() != 0
+            ensures
+                - returns get()
+        !*/</font>
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='unique'></a>unique</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns (use_count() == 1)
+        !*/</font>
+
+        <font color='#0000FF'><u>long</u></font> <b><a name='use_count'></a>use_count</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - The number of shared_ptr objects, *this included, that share ownership with *this, or 0 when *this
+                  is empty.
+        !*/</font>
+
+        <b><a name='operator'></a>operator</b> <font color='#0000FF'><u>bool</u></font><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns (get() != 0)
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='swap'></a>swap</b><font face='Lucida Console'>(</font>
+            shared_ptr<font color='#5555FF'>&amp;</font> b
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - swaps *this and item
+        !*/</font>
+
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font><font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> U<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>bool</u></font> <b><a name='operator'></a>operator</b><font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> shared_ptr<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> a, 
+        <font color='#0000FF'>const</font> shared_ptr<font color='#5555FF'>&lt;</font>U<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> b
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        ensures
+            - returns a.get() == b.get()
+    !*/</font>
+
+    <font color='#0000FF'>template</font><font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> U<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>bool</u></font> <b><a name='operator'></a>operator</b><font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> shared_ptr<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> a, 
+        <font color='#0000FF'>const</font> shared_ptr<font color='#5555FF'>&lt;</font>U<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> b
+    <font face='Lucida Console'>)</font> <b>{</b> <font color='#0000FF'>return</font> a.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>!</font><font color='#5555FF'>=</font> b.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <b>}</b>
+    <font color='#009900'>/*!
+        ensures
+            - returns a.get() != b.get()
+    !*/</font>
+
+    <font color='#0000FF'>template</font><font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> U<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>bool</u></font> <b><a name='operator'></a>operator</b><font color='#5555FF'>&lt;</font> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> shared_ptr<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> a, 
+        <font color='#0000FF'>const</font> shared_ptr<font color='#5555FF'>&lt;</font>U<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> b
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        ensures
+            - Defines an operator&lt; on shared_ptr types appropriate for use in the associative 
+              containers.  
+    !*/</font>
+
+    <font color='#0000FF'>template</font><font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font> 
+    <font color='#0000FF'><u>void</u></font> <b><a name='swap'></a>swap</b><font face='Lucida Console'>(</font>
+        shared_ptr<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> a, 
+        shared_ptr<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> b
+    <font face='Lucida Console'>)</font> <b>{</b> a.<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>b<font face='Lucida Console'>)</font>; <b>}</b>
+    <font color='#009900'>/*!
+        provides a global swap function
+    !*/</font>
+
+    <font color='#0000FF'>template</font><font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> U<font color='#5555FF'>&gt;</font>
+    shared_ptr<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font> <b><a name='static_pointer_cast'></a>static_pointer_cast</b><font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> shared_ptr<font color='#5555FF'>&lt;</font>U<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> r
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        - if (r.get() == 0) then
+            - returns shared_ptr&lt;T&gt;()
+        - else
+            - returns a shared_ptr&lt;T&gt; object that stores static_cast&lt;T*&gt;(r.get()) and shares 
+              ownership with r.
+    !*/</font>
+
+    <font color='#0000FF'>template</font><font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> U<font color='#5555FF'>&gt;</font>
+    shared_ptr<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font> <b><a name='const_pointer_cast'></a>const_pointer_cast</b><font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> shared_ptr<font color='#5555FF'>&lt;</font>U<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> r
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        - if (r.get() == 0) then
+            - returns shared_ptr&lt;T&gt;()
+        - else
+            - returns a shared_ptr&lt;T&gt; object that stores const_cast&lt;T*&gt;(r.get()) and shares 
+              ownership with r.
+    !*/</font>
+
+    <font color='#0000FF'>template</font><font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> U<font color='#5555FF'>&gt;</font>
+    shared_ptr<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font> <b><a name='dynamic_pointer_cast'></a>dynamic_pointer_cast</b><font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> shared_ptr<font color='#5555FF'>&lt;</font>U<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> r
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        ensures
+            - if (dynamic_cast&lt;T*&gt;(r.get()) returns a nonzero value) then
+                - returns a shared_ptr&lt;T&gt; object that stores a copy of 
+                  dynamic_cast&lt;T*&gt;(r.get()) and shares ownership with r
+            - else
+                - returns an empty shared_ptr&lt;T&gt; object.
+    !*/</font>
+
+    <font color='#0000FF'>template</font><font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> E, <font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> Y<font color='#5555FF'>&gt;</font>
+    std::basic_ostream<font color='#5555FF'>&lt;</font>E, T<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font face='Lucida Console'>(</font>
+        std::basic_ostream<font color='#5555FF'>&lt;</font>E, T<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&amp;</font> os, 
+        <font color='#0000FF'>const</font> shared_ptr<font color='#5555FF'>&lt;</font>Y<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> p
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        ensures
+            - performs os &lt;&lt; p.get()
+            - returns os 
+    !*/</font>
+
+    <font color='#0000FF'>template</font><font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> D, <font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+    D<font color='#5555FF'>*</font> <b><a name='get_deleter'></a>get_deleter</b><font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> shared_ptr<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> p
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        ensures
+            - if (*this owns a deleter d of type cv-unqualified D) then
+                - returns &amp;d
+            - else
+                - returns 0
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_SHARED_PTr_ABSTRACT_
+</font>
+
+</pre></body></html>

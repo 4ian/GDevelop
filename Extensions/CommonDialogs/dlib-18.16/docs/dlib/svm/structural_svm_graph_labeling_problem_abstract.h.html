@@ -1,0 +1,252 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - structural_svm_graph_labeling_problem_abstract.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2012  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#undef</font> DLIB_STRUCTURAL_SVM_GRAPH_LAbELING_PROBLEM_ABSTRACT_Hh_
+<font color='#0000FF'>#ifdef</font> DLIB_STRUCTURAL_SVM_GRAPH_LAbELING_PROBLEM_ABSTRACT_Hh_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../array/array_kernel_abstract.h.html'>../array/array_kernel_abstract.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../graph/graph_kernel_abstract.h.html'>../graph/graph_kernel_abstract.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../matrix/matrix_abstract.h.html'>../matrix/matrix_abstract.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='sparse_vector_abstract.h.html'>sparse_vector_abstract.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='structural_svm_problem_threaded_abstract.h.html'>structural_svm_problem_threaded_abstract.h</a>"
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>vector<font color='#5555FF'>&gt;</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> graph_type
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>bool</u></font> <b><a name='is_graph_labeling_problem'></a>is_graph_labeling_problem</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> dlib::array<font color='#5555FF'>&lt;</font>graph_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> samples,
+        <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>bool</u></font><font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> labels
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - graph_type is an implementation of dlib/graph/graph_kernel_abstract.h
+            - graph_type::type and graph_type::edge_type are either both dlib::matrix types
+              capable of containing column vectors or both some kind of sparse vector type
+              as defined in dlib/svm/sparse_vector_abstract.h.
+        ensures
+            - Note that a graph labeling problem is a task to learn a binary classifier which 
+              predicts the correct label for each node in the provided graphs.  Additionally, 
+              we have information in the form of edges between nodes where edges are present 
+              when we believe the linked nodes are likely to have the same label.  Therefore, 
+              part of a graph labeling problem is to learn to score each edge in terms of how 
+              strongly the edge should enforce labeling consistency between its two nodes.  
+              Thus, to be a valid graph labeling problem, samples should contain example graphs 
+              of connected nodes while labels should indicate the desired label of each node.  
+              The precise requirements for a valid graph labeling problem are listed below.
+            - This function returns true if all of the following are true and false otherwise:
+                - is_learning_problem(samples, labels) == true
+                - All the vectors stored on the edges of each graph in samples 
+                  contain only values which are &gt;= 0. 
+                - for all valid i:
+                    - graph_contains_length_one_cycle(samples[i]) == false 
+                    - samples[i].number_of_nodes() == labels[i].size()
+                      (i.e. Every graph node gets its own label)
+                - if (graph_type::edge_type is a dlib::matrix) then     
+                    - All the nodes must contain vectors with the same number of dimensions.
+                    - All the edges must contain vectors with the same number of dimensions.
+                      (However, edge vectors may differ in dimension from node vectors.)
+                    - All vectors have non-zero size.  That is, they have more than 0 dimensions.
+    !*/</font>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> graph_type
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>bool</u></font> <b><a name='is_graph_labeling_problem'></a>is_graph_labeling_problem</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> dlib::array<font color='#5555FF'>&lt;</font>graph_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> samples,
+        <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>bool</u></font><font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> labels,
+        std::string<font color='#5555FF'>&amp;</font> reason_for_failure
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        This function is identical to the above version of is_graph_labeling_problem()
+        except that if it returns false it will populate reason_for_failure with a message
+        describing why the graph is not a valid learning problem.
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T,
+        <font color='#0000FF'>typename</font> U
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>bool</u></font> <b><a name='sizes_match'></a>sizes_match</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>std::vector<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> lhs,
+        <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>std::vector<font color='#5555FF'>&lt;</font>U<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> rhs
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        ensures
+            - returns true if the sizes of lhs and rhs, as well as their constituent vectors
+              all match.  In particular, we return true if all of the following conditions are
+              met and false otherwise:
+                - lhs.size() == rhs.size()
+                - for all valid i:
+                    - lhs[i].size() == rhs[i].size()
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>bool</u></font> <b><a name='all_values_are_nonnegative'></a>all_values_are_nonnegative</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> x
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        ensures
+            - returns true if all the double values contained in x are &gt;= 0.
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> graph_type 
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>class</font> <b><a name='structural_svm_graph_labeling_problem'></a>structural_svm_graph_labeling_problem</b> : noncopyable,
+                                                  <font color='#0000FF'>public</font> structural_svm_problem_threaded<font color='#5555FF'>&lt;</font>matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>0</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font>, 
+                                                         <font color='#0000FF'>typename</font> graph_type::type <font color='#5555FF'>&gt;</font>
+    <b>{</b>
+        <font color='#009900'>/*!
+            REQUIREMENTS ON graph_type 
+                - graph_type is an implementation of dlib/graph/graph_kernel_abstract.h
+                - graph_type::type and graph_type::edge_type must be either matrix objects
+                  capable of representing column vectors or some kind of sparse vector
+                  type as defined in dlib/svm/sparse_vector_abstract.h.
+
+            WHAT THIS OBJECT REPRESENTS
+                This object is a tool for learning the weight vectors needed to use
+                a graph_labeler object.  It learns the parameter vectors by formulating 
+                the problem as a structural SVM problem.  
+        !*/</font>
+
+    <font color='#0000FF'>public</font>:
+        <font color='#0000FF'>typedef</font> matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>0</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> matrix_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> graph_type::type feature_vector_type;
+        <font color='#0000FF'>typedef</font> graph_type sample_type;
+        <font color='#0000FF'>typedef</font> std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>bool</u></font><font color='#5555FF'>&gt;</font> label_type;
+
+        <b><a name='structural_svm_graph_labeling_problem'></a>structural_svm_graph_labeling_problem</b><font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> dlib::array<font color='#5555FF'>&lt;</font>sample_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> samples,
+            <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>label_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> labels,
+            <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> losses,
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> num_threads 
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - is_graph_labeling_problem(samples,labels) == true
+                - if (losses.size() != 0) then
+                    - sizes_match(labels, losses) == true
+                    - all_values_are_nonnegative(losses) == true
+            ensures
+                - This object attempts to learn a mapping from the given samples to the 
+                  given labels.  In particular, it attempts to learn to predict labels[i] 
+                  based on samples[i].  Or in other words, this object can be used to learn 
+                  parameter vectors, E and W, such that a graph_labeler declared as:
+                    graph_labeler&lt;feature_vector_type&gt; labeler(E,W)
+                  results in a labeler object which attempts to compute the following mapping:
+                    labels[i] == labeler(samples[i])
+                - When you use this object with the oca optimizer you get back just one
+                  big parameter vector as the solution.  Therefore, note that this single
+                  big vector is the concatenation of E and W.  The first get_num_edge_weights()
+                  elements of this vector correspond to E and the rest is W.
+                - This object will use num_threads threads during the optimization 
+                  procedure.  You should set this parameter equal to the number of 
+                  available processing cores on your machine.
+                - if (losses.size() == 0) then
+                    - #get_loss_on_positive_class() == 1.0
+                    - #get_loss_on_negative_class() == 1.0
+                    - #get_losses().size() == 0
+                    - The losses argument is effectively ignored if its size is zero.
+                - else
+                    - #get_losses() == losses
+                    - Each node in the training data has its own loss value defined by
+                      the corresponding entry of losses.  In particular, this means that 
+                      the node with label labels[i][j] incurs a loss of losses[i][j] if 
+                      it is incorrectly labeled.
+                    - The get_loss_on_positive_class() and get_loss_on_negative_class()
+                      parameters are ignored.  Only get_losses() is used in this case.
+        !*/</font>
+
+        <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> <b><a name='get_losses'></a>get_losses</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the losses vector given to this object's constructor. 
+                  This vector defines the per sample loss values used.  If the vector
+                  is empty then the loss values defined by get_loss_on_positive_class() and
+                  get_loss_on_positive_class() are used instead.
+        !*/</font>
+
+        <font color='#0000FF'><u>long</u></font> <b><a name='get_num_edge_weights'></a>get_num_edge_weights</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the dimensionality of the edge weight vector.  It is also
+                  important to know that when using the oca solver with this object,
+                  you must set it to generate non-negative weights for the edge weight
+                  part of the total weight vector.  You can do this by passing get_num_edge_weights()
+                  to the third argument to oca::operator().
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_loss_on_positive_class'></a>set_loss_on_positive_class</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>double</u></font> loss
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - loss &gt;= 0
+                - get_losses().size() == 0
+            ensures
+                - #get_loss_on_positive_class() == loss
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_loss_on_negative_class'></a>set_loss_on_negative_class</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>double</u></font> loss
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - loss &gt;= 0
+                - get_losses().size() == 0
+            ensures
+                - #get_loss_on_negative_class() == loss
+        !*/</font>
+
+        <font color='#0000FF'><u>double</u></font> <b><a name='get_loss_on_positive_class'></a>get_loss_on_positive_class</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - get_losses().size() == 0
+            ensures
+                - returns the loss incurred when a graph node which is supposed to have
+                  a label of true gets misclassified.  This value controls how much we care 
+                  about correctly classifying nodes which should be labeled as true.  Larger 
+                  loss values indicate that we care more strongly than smaller values.
+        !*/</font>
+
+        <font color='#0000FF'><u>double</u></font> <b><a name='get_loss_on_negative_class'></a>get_loss_on_negative_class</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - get_losses().size() == 0
+            ensures
+                - returns the loss incurred when a graph node which is supposed to have
+                  a label of false gets misclassified.  This value controls how much we care 
+                  about correctly classifying nodes which should be labeled as false.  Larger 
+                  loss values indicate that we care more strongly than smaller values.
+        !*/</font>
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_STRUCTURAL_SVM_GRAPH_LAbELING_PROBLEM_ABSTRACT_Hh_
+</font>
+
+
+
+
+</pre></body></html>

@@ -1,0 +1,156 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - logger_ex_2.cpp</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// The contents of this file are in the public domain. See LICENSE_FOR_EXAMPLE_PROGRAMS.txt
+</font>
+<font color='#009900'>/*
+
+    This is a somewhat complex example illustrating the use of the logger object 
+    from the dlib C++ Library.  It will demonstrate using multiple loggers and threads.  
+
+
+    The output of this program looks like this:
+    0 INFO  [0] example: This is an informational message.
+    0 WARN  [0] example: The variable is bigger than 4!  Its value is 8
+    0 INFO  [0] example: make two threads
+    0 WARN  [0] example.test_class: warning!  someone called warning()!
+    0 INFO  [0] example: we are going to sleep for half a second.
+    0 INFO  [1] example.thread: entering our thread
+    0 WARN  [1] example.test_class: warning!  someone called warning()!
+    0 INFO  [2] example.thread: entering our thread
+    0 WARN  [2] example.test_class: warning!  someone called warning()!
+  203 INFO  [1] example.thread: exiting our thread
+  203 INFO  [2] example.thread: exiting our thread
+  503 INFO  [0] example: we just woke up
+  503 INFO  [0] example: program ending
+
+
+*/</font>
+
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>logger.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>misc_api.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>threads.h<font color='#5555FF'>&gt;</font>
+
+<font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> dlib;
+
+<font color='#009900'>/*
+    Here we create three loggers.  Note that it is the case that:
+        - logp.is_child_of(logp) == true
+        - logt.is_child_of(logp) == true
+        - logc.is_child_of(logp) == true
+
+    logp is the child of itself because all loggers are their own children :)  But the other
+    two are child loggers of logp because their names start with logp.name() + "." which means
+    that whenever you set a property on a logger it will also set that same property on all of
+    the logger's children.
+*/</font>
+logger <b><a name='logp'></a>logp</b><font face='Lucida Console'>(</font>"<font color='#CC0000'>example</font>"<font face='Lucida Console'>)</font>;
+logger <b><a name='logt'></a>logt</b><font face='Lucida Console'>(</font>"<font color='#CC0000'>example.thread</font>"<font face='Lucida Console'>)</font>;
+logger <b><a name='logc'></a>logc</b><font face='Lucida Console'>(</font>"<font color='#CC0000'>example.test_class</font>"<font face='Lucida Console'>)</font>;
+
+<font color='#0000FF'>class</font> <b><a name='test'></a>test</b>
+<b>{</b>
+<font color='#0000FF'>public</font>:
+    <b><a name='test'></a>test</b> <font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#009900'>// this message won't get logged because LINFO is too low
+</font>        logc <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>constructed a test object</font>";
+    <b>}</b>
+
+    ~<b><a name='test'></a>test</b> <font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#009900'>// this message won't get logged because LINFO is too low
+</font>        logc <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>destructed a test object</font>";
+    <b>}</b>
+
+    <font color='#0000FF'><u>void</u></font> <b><a name='warning'></a>warning</b> <font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+    <b>{</b>
+        logc <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LWARN <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>warning!  someone called warning()!</font>";
+    <b>}</b>
+<b>}</b>;
+
+<font color='#0000FF'><u>void</u></font> <b><a name='thread'></a>thread</b> <font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font color='#5555FF'>*</font><font face='Lucida Console'>)</font>
+<b>{</b>
+    logt <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>entering our thread</font>";
+
+    
+    test mytest;
+    mytest.<font color='#BB00BB'>warning</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+    dlib::<font color='#BB00BB'>sleep</font><font face='Lucida Console'>(</font><font color='#979000'>200</font><font face='Lucida Console'>)</font>;
+
+    logt <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>exiting our thread</font>";
+<b>}</b>
+
+
+<font color='#0000FF'><u>void</u></font> <b><a name='setup_loggers'></a>setup_loggers</b> <font face='Lucida Console'>(</font>
+<font face='Lucida Console'>)</font>
+<b>{</b>
+    <font color='#009900'>// Create a logger that has the same name as our root logger logp.  This isn't very useful in 
+</font>    <font color='#009900'>// this example program but if you had loggers defined in other files then you might not have
+</font>    <font color='#009900'>// easy access to them when starting up your program and setting log levels.  This mechanism
+</font>    <font color='#009900'>// allows you to manipulate the properties of any logger so long as you know its name.
+</font>    logger <font color='#BB00BB'>temp_log</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>example</font>"<font face='Lucida Console'>)</font>;
+
+    <font color='#009900'>// For this example I don't want to log debug messages so I'm setting the logging level of 
+</font>    <font color='#009900'>// All our loggers to LINFO.  Note that this statement sets all three of our loggers to this
+</font>    <font color='#009900'>// logging level because they are all children of temp_log.   
+</font>    temp_log.<font color='#BB00BB'>set_level</font><font face='Lucida Console'>(</font>LINFO<font face='Lucida Console'>)</font>;
+
+
+    <font color='#009900'>// In addition I only want the example.test_class to print LWARN or higher messages so I'm going
+</font>    <font color='#009900'>// to set that here too.  Note that we set this value after calling temp_log.set_level(). If we 
+</font>    <font color='#009900'>// did it the other way around the set_level() call on temp_log would set logc_temp.level() and 
+</font>    <font color='#009900'>// logc.level() back to LINFO since temp_log is a parent of logc_temp.
+</font>    logger <font color='#BB00BB'>logc_temp</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>example.test_class</font>"<font face='Lucida Console'>)</font>;
+    logc_temp.<font color='#BB00BB'>set_level</font><font face='Lucida Console'>(</font>LWARN<font face='Lucida Console'>)</font>;
+
+
+    <font color='#009900'>// Finally, note that you can also configure your loggers from a text config file.  
+</font>    <font color='#009900'>// See the documentation for the configure_loggers_from_file() function for details.
+</font><b>}</b>
+
+<font color='#0000FF'><u>int</u></font> <b><a name='main'></a>main</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+<b>{</b>
+    <font color='#BB00BB'>setup_loggers</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+    <font color='#009900'>// print our first message.  It will go to cout because that is the default.
+</font>    logp <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>This is an informational message.</font>";
+
+    <font color='#0000FF'><u>int</u></font> variable <font color='#5555FF'>=</font> <font color='#979000'>8</font>;
+
+    <font color='#009900'>// Here is a debug message.  It won't print though because its log level is too low (it is below LINFO).
+</font>    logp <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LDEBUG <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>The integer variable is set to </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> variable;
+
+    
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>variable <font color='#5555FF'>&gt;</font> <font color='#979000'>4</font><font face='Lucida Console'>)</font>
+        logp <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LWARN <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>The variable is bigger than 4!  Its value is </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> variable;
+
+    logp <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>make two threads</font>";
+    <font color='#BB00BB'>create_new_thread</font><font face='Lucida Console'>(</font>thread,<font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+    <font color='#BB00BB'>create_new_thread</font><font face='Lucida Console'>(</font>thread,<font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+
+    test mytest;
+    mytest.<font color='#BB00BB'>warning</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+    logp <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>we are going to sleep for half a second.</font>";
+    <font color='#009900'>// sleep for half a second
+</font>    dlib::<font color='#BB00BB'>sleep</font><font face='Lucida Console'>(</font><font color='#979000'>500</font><font face='Lucida Console'>)</font>;
+    logp <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>we just woke up</font>";
+
+
+
+    logp <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>program ending</font>";
+
+
+    <font color='#009900'>// It is also worth pointing out that the logger messages are atomic.  This means, for example, that
+</font>    <font color='#009900'>// in the above log statements that involve a string literal and a variable, no other thread can
+</font>    <font color='#009900'>// come in and print a log message in-between the literal string and the variable.  This is good
+</font>    <font color='#009900'>// because it means your messages don't get corrupted.  However, this also means that you shouldn't 
+</font>    <font color='#009900'>// make any function calls inside a logging statement if those calls might try to log a message 
+</font>    <font color='#009900'>// themselves since the atomic nature of the logger would cause your application to deadlock.
+</font><b>}</b>
+
+
+
+
+</pre></body></html>

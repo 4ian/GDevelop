@@ -1,0 +1,1001 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - style.cpp</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2008  Davis E. King (davis@dlib.net), and Nils Labugt
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_WIDGETs_STYLE_CPP_
+<font color='#0000FF'>#define</font> DLIB_WIDGETs_STYLE_CPP_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='style.h.html'>style.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>    <font color='#009900'>// button style stuff 
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>void</u></font> button_style_default::<b><a name='draw_button'></a>draw_button</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> canvas<font color='#5555FF'>&amp;</font> c,
+        <font color='#0000FF'>const</font> rectangle<font color='#5555FF'>&amp;</font> rect,
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>bool</u></font> enabled,
+        <font color='#0000FF'>const</font> font<font color='#5555FF'>&amp;</font> mfont,
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> ,
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> ,
+        <font color='#0000FF'>const</font> ustring<font color='#5555FF'>&amp;</font> name,
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>bool</u></font> is_depressed
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        rectangle area <font color='#5555FF'>=</font> rect.<font color='#BB00BB'>intersect</font><font face='Lucida Console'>(</font>c<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>area.<font color='#BB00BB'>is_empty</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+            <font color='#0000FF'>return</font>;
+
+        <font color='#BB00BB'>fill_rect</font><font face='Lucida Console'>(</font>c,rect,<font color='#BB00BB'>rgb_pixel</font><font face='Lucida Console'>(</font><font color='#979000'>212</font>,<font color='#979000'>208</font>,<font color='#979000'>200</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> red, green, blue;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>enabled<font face='Lucida Console'>)</font>
+        <b>{</b>
+            red <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            green <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            blue <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <b>}</b>
+        <font color='#0000FF'>else</font>
+        <b>{</b>
+            red <font color='#5555FF'>=</font> <font color='#979000'>128</font>;
+            green <font color='#5555FF'>=</font> <font color='#979000'>128</font>;
+            blue <font color='#5555FF'>=</font> <font color='#979000'>128</font>;
+        <b>}</b>
+
+        <font color='#009900'>// compute the name length if it hasn't already been computed
+</font>        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>name_width <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> height;
+            mfont.<font color='#BB00BB'>compute_size</font><font face='Lucida Console'>(</font>name,name_width,height<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#009900'>// figure out where the name string should appear
+</font>        rectangle name_rect;
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> width <font color='#5555FF'>=</font> name_width;
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> height <font color='#5555FF'>=</font> mfont.<font color='#BB00BB'>height</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        name_rect.<font color='#BB00BB'>set_left</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>rect.<font color='#BB00BB'>right</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> rect.<font color='#BB00BB'>left</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> width<font face='Lucida Console'>)</font><font color='#5555FF'>/</font><font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+        name_rect.<font color='#BB00BB'>set_top</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>rect.<font color='#BB00BB'>bottom</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> rect.<font color='#BB00BB'>top</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> height<font face='Lucida Console'>)</font><font color='#5555FF'>/</font><font color='#979000'>2</font> <font color='#5555FF'>+</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+        name_rect.<font color='#BB00BB'>set_right</font><font face='Lucida Console'>(</font>name_rect.<font color='#BB00BB'>left</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>+</font>width<font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+        name_rect.<font color='#BB00BB'>set_bottom</font><font face='Lucida Console'>(</font>name_rect.<font color='#BB00BB'>top</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>+</font>height<font face='Lucida Console'>)</font>;
+
+
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>is_depressed<font face='Lucida Console'>)</font>
+        <b>{</b>
+            name_rect.<font color='#BB00BB'>set_left</font><font face='Lucida Console'>(</font>name_rect.<font color='#BB00BB'>left</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>+</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+            name_rect.<font color='#BB00BB'>set_right</font><font face='Lucida Console'>(</font>name_rect.<font color='#BB00BB'>right</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>+</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+            name_rect.<font color='#BB00BB'>set_top</font><font face='Lucida Console'>(</font>name_rect.<font color='#BB00BB'>top</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>+</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+            name_rect.<font color='#BB00BB'>set_bottom</font><font face='Lucida Console'>(</font>name_rect.<font color='#BB00BB'>bottom</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>+</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+
+            mfont.<font color='#BB00BB'>draw_string</font><font face='Lucida Console'>(</font>c,name_rect,name,<font color='#BB00BB'>rgb_pixel</font><font face='Lucida Console'>(</font>red,green,blue<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+            <font color='#BB00BB'>draw_button_down</font><font face='Lucida Console'>(</font>c,rect<font face='Lucida Console'>)</font>; 
+        <b>}</b>
+        <font color='#0000FF'>else</font>
+        <b>{</b>
+            mfont.<font color='#BB00BB'>draw_string</font><font face='Lucida Console'>(</font>c,name_rect,name,<font color='#BB00BB'>rgb_pixel</font><font face='Lucida Console'>(</font>red,green,blue<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// now draw the edge of the button
+</font>            <font color='#BB00BB'>draw_button_up</font><font face='Lucida Console'>(</font>c,rect<font face='Lucida Console'>)</font>;
+        <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    rectangle button_style_default::
+    <b><a name='get_min_size'></a>get_min_size</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> ustring<font color='#5555FF'>&amp;</font> name,
+        <font color='#0000FF'>const</font> font<font color='#5555FF'>&amp;</font> mfont 
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> 
+    <b>{</b>
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> width; 
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> height;
+        mfont.<font color='#BB00BB'>compute_size</font><font face='Lucida Console'>(</font>name,width,height<font face='Lucida Console'>)</font>;
+        name_width <font color='#5555FF'>=</font> width;
+
+        <font color='#0000FF'>return</font> <font color='#BB00BB'>rectangle</font><font face='Lucida Console'>(</font>width<font color='#5555FF'>+</font><font color='#979000'>2</font><font color='#5555FF'>*</font>padding, height<font color='#5555FF'>+</font><font color='#979000'>2</font><font color='#5555FF'>*</font>padding<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>void</u></font> button_style_toolbar1::<b><a name='draw_button'></a>draw_button</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> canvas<font color='#5555FF'>&amp;</font> c,
+        <font color='#0000FF'>const</font> rectangle<font color='#5555FF'>&amp;</font> rect,
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>bool</u></font> enabled,
+        <font color='#0000FF'>const</font> font<font color='#5555FF'>&amp;</font> mfont,
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> lastx,
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> lasty,
+        <font color='#0000FF'>const</font> ustring<font color='#5555FF'>&amp;</font> name,
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>bool</u></font> is_depressed
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        rectangle area <font color='#5555FF'>=</font> rect.<font color='#BB00BB'>intersect</font><font face='Lucida Console'>(</font>c<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>area.<font color='#BB00BB'>is_empty</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+            <font color='#0000FF'>return</font>;
+
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> radius <font color='#5555FF'>=</font> <font color='#979000'>4</font>;
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> red, green, blue;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>enabled<font face='Lucida Console'>)</font>
+        <b>{</b>
+            red <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            green <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            blue <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+
+            <font color='#0000FF'><u>long</u></font> d <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>rect.<font color='#BB00BB'>contains</font><font face='Lucida Console'>(</font>lastx,lasty<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                d <font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>70</font>; 
+
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>is_depressed<font face='Lucida Console'>)</font>
+                d <font color='#5555FF'>=</font> <font color='#979000'>20</font>;
+
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>d <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                rectangle <font color='#BB00BB'>temp</font><font face='Lucida Console'>(</font>rect<font face='Lucida Console'>)</font>;
+                temp.<font color='#BB00BB'>left</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#5555FF'>-</font>; temp.<font color='#BB00BB'>top</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#5555FF'>-</font>; temp.<font color='#BB00BB'>right</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>+</font><font color='#5555FF'>+</font>; temp.<font color='#BB00BB'>bottom</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>+</font><font color='#5555FF'>+</font>;
+                <font color='#BB00BB'>draw_rounded_rectangle</font><font face='Lucida Console'>(</font>c, temp, radius, <font color='#BB00BB'>rgb_alpha_pixel</font><font face='Lucida Console'>(</font><font color='#979000'>255</font>,<font color='#979000'>255</font>,<font color='#979000'>0</font>,<font color='#979000'>120</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>; 
+                temp.<font color='#BB00BB'>left</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#5555FF'>-</font>; temp.<font color='#BB00BB'>top</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#5555FF'>-</font>; temp.<font color='#BB00BB'>right</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>+</font><font color='#5555FF'>+</font>; temp.<font color='#BB00BB'>bottom</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>+</font><font color='#5555FF'>+</font>;
+                <font color='#BB00BB'>draw_rounded_rectangle</font><font face='Lucida Console'>(</font>c, temp, radius, <font color='#BB00BB'>rgb_alpha_pixel</font><font face='Lucida Console'>(</font><font color='#979000'>255</font>,<font color='#979000'>255</font>,<font color='#979000'>0</font>,<font color='#979000'>40</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>; 
+            <b>}</b>
+
+            <font color='#BB00BB'>fill_gradient_rounded</font><font face='Lucida Console'>(</font>c,rect,radius,<font color='#BB00BB'>rgb_alpha_pixel</font><font face='Lucida Console'>(</font><font color='#979000'>255</font>, <font color='#979000'>255</font>, <font color='#979000'>255</font>,<font color='#979000'>120</font><font color='#5555FF'>-</font>d<font face='Lucida Console'>)</font>, 
+                                  <font color='#BB00BB'>rgb_alpha_pixel</font><font face='Lucida Console'>(</font><font color='#979000'>255</font>, <font color='#979000'>255</font>, <font color='#979000'>255</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>draw_rounded_rectangle</font><font face='Lucida Console'>(</font>c,rect,radius, <font color='#BB00BB'>rgb_alpha_pixel</font><font face='Lucida Console'>(</font><font color='#979000'>30</font>,<font color='#979000'>30</font>,<font color='#979000'>30</font>,<font color='#979000'>200</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+        <font color='#0000FF'>else</font>
+        <b>{</b>
+            red <font color='#5555FF'>=</font> <font color='#979000'>128</font>;
+            green <font color='#5555FF'>=</font> <font color='#979000'>128</font>;
+            blue <font color='#5555FF'>=</font> <font color='#979000'>128</font>;
+            <font color='#BB00BB'>draw_rounded_rectangle</font><font face='Lucida Console'>(</font>c,rect,radius, <font color='#BB00BB'>rgb_alpha_pixel</font><font face='Lucida Console'>(</font>red,green,blue,<font color='#979000'>210</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+
+        <font color='#009900'>// compute the name length if it hasn't already been computed
+</font>        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>name_width <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> height;
+            mfont.<font color='#BB00BB'>compute_size</font><font face='Lucida Console'>(</font>name,name_width,height<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#009900'>// figure out where the name string should appear
+</font>        rectangle name_rect;
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> width <font color='#5555FF'>=</font> name_width;
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> height <font color='#5555FF'>=</font> mfont.<font color='#BB00BB'>height</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        name_rect.<font color='#BB00BB'>set_left</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>rect.<font color='#BB00BB'>right</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> rect.<font color='#BB00BB'>left</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> width<font face='Lucida Console'>)</font><font color='#5555FF'>/</font><font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+        name_rect.<font color='#BB00BB'>set_top</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>rect.<font color='#BB00BB'>bottom</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> rect.<font color='#BB00BB'>top</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> height<font face='Lucida Console'>)</font><font color='#5555FF'>/</font><font color='#979000'>2</font> <font color='#5555FF'>+</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+        name_rect.<font color='#BB00BB'>set_right</font><font face='Lucida Console'>(</font>name_rect.<font color='#BB00BB'>left</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>+</font>width<font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+        name_rect.<font color='#BB00BB'>set_bottom</font><font face='Lucida Console'>(</font>name_rect.<font color='#BB00BB'>top</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>+</font>height<font face='Lucida Console'>)</font>;
+
+
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>is_depressed<font face='Lucida Console'>)</font>
+        <b>{</b>
+            name_rect.<font color='#BB00BB'>set_left</font><font face='Lucida Console'>(</font>name_rect.<font color='#BB00BB'>left</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>+</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+            name_rect.<font color='#BB00BB'>set_right</font><font face='Lucida Console'>(</font>name_rect.<font color='#BB00BB'>right</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>+</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+            name_rect.<font color='#BB00BB'>set_top</font><font face='Lucida Console'>(</font>name_rect.<font color='#BB00BB'>top</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>+</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+            name_rect.<font color='#BB00BB'>set_bottom</font><font face='Lucida Console'>(</font>name_rect.<font color='#BB00BB'>bottom</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>+</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+
+            mfont.<font color='#BB00BB'>draw_string</font><font face='Lucida Console'>(</font>c,name_rect,name,<font color='#BB00BB'>rgb_pixel</font><font face='Lucida Console'>(</font>red,green,blue<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+        <b>}</b>
+        <font color='#0000FF'>else</font>
+        <b>{</b>
+            mfont.<font color='#BB00BB'>draw_string</font><font face='Lucida Console'>(</font>c,name_rect,name,<font color='#BB00BB'>rgb_pixel</font><font face='Lucida Console'>(</font>red,green,blue<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    rectangle button_style_toolbar1::
+    <b><a name='get_min_size'></a>get_min_size</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> ustring<font color='#5555FF'>&amp;</font> name,
+        <font color='#0000FF'>const</font> font<font color='#5555FF'>&amp;</font> mfont 
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> 
+    <b>{</b>
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> width; 
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> height;
+        mfont.<font color='#BB00BB'>compute_size</font><font face='Lucida Console'>(</font>name,width,height<font face='Lucida Console'>)</font>;
+        name_width <font color='#5555FF'>=</font> width;
+
+        <font color='#0000FF'>return</font> <font color='#BB00BB'>rectangle</font><font face='Lucida Console'>(</font>width<font color='#5555FF'>+</font><font color='#979000'>2</font><font color='#5555FF'>*</font>padding, height<font color='#5555FF'>+</font><font color='#979000'>2</font><font color='#5555FF'>*</font>padding<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>void</u></font> button_style_toolbar_icon1::<b><a name='draw_button'></a>draw_button</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> canvas<font color='#5555FF'>&amp;</font> c,
+        <font color='#0000FF'>const</font> rectangle<font color='#5555FF'>&amp;</font> rect,
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>bool</u></font> enabled,
+        <font color='#0000FF'>const</font> font<font color='#5555FF'>&amp;</font> ,
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> lastx,
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> lasty,
+        <font color='#0000FF'>const</font> ustring<font color='#5555FF'>&amp;</font> ,
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>bool</u></font> is_depressed
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        rectangle area <font color='#5555FF'>=</font> rect.<font color='#BB00BB'>intersect</font><font face='Lucida Console'>(</font>c<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>area.<font color='#BB00BB'>is_empty</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+            <font color='#0000FF'>return</font>;
+
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> radius <font color='#5555FF'>=</font> padding;
+
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>enabled<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>rect.<font color='#BB00BB'>contains</font><font face='Lucida Console'>(</font>lastx,lasty<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>is_depressed<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#BB00BB'>fill_gradient_rounded</font><font face='Lucida Console'>(</font>c,rect,radius,<font color='#BB00BB'>rgb_alpha_pixel</font><font face='Lucida Console'>(</font><font color='#979000'>100</font>,<font color='#979000'>100</font>,<font color='#979000'>200</font>,<font color='#979000'>150</font><font face='Lucida Console'>)</font>, 
+                                                        <font color='#BB00BB'>rgb_alpha_pixel</font><font face='Lucida Console'>(</font><font color='#979000'>50</font>,<font color='#979000'>50</font>,<font color='#979000'>100</font>,<font color='#979000'>100</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                    <font color='#BB00BB'>draw_rounded_rectangle</font><font face='Lucida Console'>(</font>c,rect,radius, <font color='#BB00BB'>rgb_alpha_pixel</font><font face='Lucida Console'>(</font><font color='#979000'>150</font>,<font color='#979000'>150</font>,<font color='#979000'>30</font>,<font color='#979000'>200</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                <b>}</b>
+                <font color='#0000FF'>else</font>
+                <b>{</b>
+                    <font color='#BB00BB'>fill_gradient_rounded</font><font face='Lucida Console'>(</font>c,rect,radius,<font color='#BB00BB'>rgb_alpha_pixel</font><font face='Lucida Console'>(</font><font color='#979000'>150</font>,<font color='#979000'>150</font>,<font color='#979000'>250</font>,<font color='#979000'>130</font><font face='Lucida Console'>)</font>, 
+                                                        <font color='#BB00BB'>rgb_alpha_pixel</font><font face='Lucida Console'>(</font><font color='#979000'>100</font>,<font color='#979000'>100</font>,<font color='#979000'>150</font>,<font color='#979000'>90</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                    <font color='#BB00BB'>draw_rounded_rectangle</font><font face='Lucida Console'>(</font>c,rect,radius, <font color='#BB00BB'>rgb_alpha_pixel</font><font face='Lucida Console'>(</font><font color='#979000'>150</font>,<font color='#979000'>150</font>,<font color='#979000'>30</font>,<font color='#979000'>200</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                <b>}</b>
+            <b>}</b>
+
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>is_depressed<font face='Lucida Console'>)</font>
+            <b>{</b>
+                rectangle <font color='#BB00BB'>img_rect</font><font face='Lucida Console'>(</font><font color='#BB00BB'>translate_rect</font><font face='Lucida Console'>(</font><font color='#BB00BB'>centered_rect</font><font face='Lucida Console'>(</font>rect,img_mouseover.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,img_mouseover.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>,<font color='#979000'>1</font>,<font color='#979000'>1</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                point <font color='#BB00BB'>p</font><font face='Lucida Console'>(</font>img_rect.<font color='#BB00BB'>left</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,img_rect.<font color='#BB00BB'>top</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                <font color='#BB00BB'>draw_image</font><font face='Lucida Console'>(</font>c,p,img_mouseover<font face='Lucida Console'>)</font>;
+            <b>}</b>
+            <font color='#0000FF'>else</font>
+            <b>{</b>
+                rectangle <font color='#BB00BB'>img_rect</font><font face='Lucida Console'>(</font><font color='#BB00BB'>centered_rect</font><font face='Lucida Console'>(</font>rect,img_normal.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,img_normal.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                point <font color='#BB00BB'>p</font><font face='Lucida Console'>(</font>img_rect.<font color='#BB00BB'>left</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,img_rect.<font color='#BB00BB'>top</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>rect.<font color='#BB00BB'>contains</font><font face='Lucida Console'>(</font>lastx,lasty<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                    <font color='#BB00BB'>draw_image</font><font face='Lucida Console'>(</font>c,p,img_mouseover<font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>else</font>
+                    <font color='#BB00BB'>draw_image</font><font face='Lucida Console'>(</font>c,p,img_normal<font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+        <b>}</b>
+        <font color='#0000FF'>else</font>
+        <b>{</b>
+            rectangle <font color='#BB00BB'>img_rect</font><font face='Lucida Console'>(</font><font color='#BB00BB'>centered_rect</font><font face='Lucida Console'>(</font>rect,img_normal.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,img_normal.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            point <font color='#BB00BB'>p</font><font face='Lucida Console'>(</font>img_rect.<font color='#BB00BB'>left</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,img_rect.<font color='#BB00BB'>top</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>draw_image</font><font face='Lucida Console'>(</font>c,p,img_disabled<font face='Lucida Console'>)</font>;
+        <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    rectangle button_style_toolbar_icon1::
+    <b><a name='get_min_size'></a>get_min_size</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> ustring<font color='#5555FF'>&amp;</font> ,
+        <font color='#0000FF'>const</font> font<font color='#5555FF'>&amp;</font>  
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> 
+    <b>{</b>
+        <font color='#0000FF'>return</font> <font color='#BB00BB'>rectangle</font><font face='Lucida Console'>(</font>img_normal.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>+</font><font color='#979000'>2</font><font color='#5555FF'>*</font>padding, img_normal.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>+</font><font color='#979000'>2</font><font color='#5555FF'>*</font>padding<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>void</u></font> button_style_arrow::
+    <b><a name='draw_button'></a>draw_button</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> canvas<font color='#5555FF'>&amp;</font> c,
+        <font color='#0000FF'>const</font> rectangle<font color='#5555FF'>&amp;</font> rect,
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>bool</u></font> enabled,
+        <font color='#0000FF'>const</font> font<font color='#5555FF'>&amp;</font> ,
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> ,
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> ,
+        <font color='#0000FF'>const</font> ustring<font color='#5555FF'>&amp;</font> ,
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>bool</u></font> is_depressed
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        rectangle area <font color='#5555FF'>=</font> rect.<font color='#BB00BB'>intersect</font><font face='Lucida Console'>(</font>c<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>area.<font color='#BB00BB'>is_empty</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+            <font color='#0000FF'>return</font>;
+
+        <font color='#BB00BB'>fill_rect</font><font face='Lucida Console'>(</font>c,rect,<font color='#BB00BB'>rgb_pixel</font><font face='Lucida Console'>(</font><font color='#979000'>212</font>,<font color='#979000'>208</font>,<font color='#979000'>200</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> height <font color='#5555FF'>=</font> rect.<font color='#BB00BB'>height</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> width <font color='#5555FF'>=</font> rect.<font color='#BB00BB'>width</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> smallest <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>width <font color='#5555FF'>&lt;</font> height<font face='Lucida Console'>)</font> ? width : height; 
+
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> rows <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>smallest<font color='#5555FF'>+</font><font color='#979000'>3</font><font face='Lucida Console'>)</font><font color='#5555FF'>/</font><font color='#979000'>4</font>;
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> start <font color='#5555FF'>=</font> rows <font color='#5555FF'>+</font> rows<font color='#5555FF'>/</font><font color='#979000'>2</font><font color='#5555FF'>-</font><font color='#979000'>1</font>;
+        <font color='#0000FF'><u>long</u></font> dep;
+
+        <font color='#0000FF'><u>long</u></font> tip_x <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <font color='#0000FF'><u>long</u></font> tip_y <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <font color='#0000FF'><u>long</u></font> wy <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <font color='#0000FF'><u>long</u></font> hy <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <font color='#0000FF'><u>long</u></font> wx <font color='#5555FF'>=</font> <font color='#979000'>0</font>; 
+        <font color='#0000FF'><u>long</u></font> hx <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>is_depressed<font face='Lucida Console'>)</font>
+        <b>{</b>
+            dep <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+
+            <font color='#009900'>// draw the button's border
+</font>            <font color='#BB00BB'>draw_button_down</font><font face='Lucida Console'>(</font>c,rect<font face='Lucida Console'>)</font>; 
+        <b>}</b>
+        <font color='#0000FF'>else</font>
+        <b>{</b>
+            dep <font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>1</font>;
+
+            <font color='#009900'>// draw the button's border
+</font>            <font color='#BB00BB'>draw_button_up</font><font face='Lucida Console'>(</font>c,rect<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+
+        <font color='#0000FF'>switch</font> <font face='Lucida Console'>(</font>dir<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>case</font> UP:
+                tip_x <font color='#5555FF'>=</font> width<font color='#5555FF'>/</font><font color='#979000'>2</font> <font color='#5555FF'>+</font> rect.<font color='#BB00BB'>left</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> dep;
+                tip_y <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>height <font color='#5555FF'>-</font> start<font face='Lucida Console'>)</font><font color='#5555FF'>/</font><font color='#979000'>2</font> <font color='#5555FF'>+</font> rect.<font color='#BB00BB'>top</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> dep <font color='#5555FF'>+</font> <font color='#979000'>1</font>;
+                wy <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                hy <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+                wx <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+                hx <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                <font color='#0000FF'>break</font>;
+
+            <font color='#0000FF'>case</font> DOWN:
+                tip_x <font color='#5555FF'>=</font> width<font color='#5555FF'>/</font><font color='#979000'>2</font> <font color='#5555FF'>+</font> rect.<font color='#BB00BB'>left</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> dep;
+                tip_y <font color='#5555FF'>=</font> rect.<font color='#BB00BB'>bottom</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> <font face='Lucida Console'>(</font>height <font color='#5555FF'>-</font> start<font face='Lucida Console'>)</font><font color='#5555FF'>/</font><font color='#979000'>2</font> <font color='#5555FF'>+</font> dep;
+                wy <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                hy <font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>1</font>;
+                wx <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+                hx <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                <font color='#0000FF'>break</font>;
+
+            <font color='#0000FF'>case</font> LEFT:
+                tip_x <font color='#5555FF'>=</font> rect.<font color='#BB00BB'>left</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> <font face='Lucida Console'>(</font>width <font color='#5555FF'>-</font> start<font face='Lucida Console'>)</font><font color='#5555FF'>/</font><font color='#979000'>2</font> <font color='#5555FF'>+</font> dep <font color='#5555FF'>+</font> <font color='#979000'>1</font>;
+                tip_y <font color='#5555FF'>=</font> height<font color='#5555FF'>/</font><font color='#979000'>2</font> <font color='#5555FF'>+</font> rect.<font color='#BB00BB'>top</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> dep;
+                wy <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+                hy <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                wx <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                hx <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+                <font color='#0000FF'>break</font>;
+
+            <font color='#0000FF'>case</font> RIGHT:
+                tip_x <font color='#5555FF'>=</font> rect.<font color='#BB00BB'>right</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> <font face='Lucida Console'>(</font>width <font color='#5555FF'>-</font> start<font face='Lucida Console'>)</font><font color='#5555FF'>/</font><font color='#979000'>2</font> <font color='#5555FF'>+</font> dep;
+                tip_y <font color='#5555FF'>=</font> height<font color='#5555FF'>/</font><font color='#979000'>2</font> <font color='#5555FF'>+</font> rect.<font color='#BB00BB'>top</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> dep;
+                wy <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+                hy <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                wx <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                hx <font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>1</font>;
+                <font color='#0000FF'>break</font>;
+        <b>}</b>
+
+
+        rgb_pixel color;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>enabled<font face='Lucida Console'>)</font>
+        <b>{</b>
+            color.red <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            color.green <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            color.blue <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <b>}</b>
+        <font color='#0000FF'>else</font>
+        <b>{</b>
+            color.red <font color='#5555FF'>=</font> <font color='#979000'>128</font>;
+            color.green <font color='#5555FF'>=</font> <font color='#979000'>128</font>;
+            color.blue <font color='#5555FF'>=</font> <font color='#979000'>128</font>;
+        <b>}</b>
+
+
+
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> rows; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#BB00BB'>draw_line</font><font face='Lucida Console'>(</font>c,<font color='#BB00BB'>point</font><font face='Lucida Console'>(</font>tip_x <font color='#5555FF'>+</font> wx<font color='#5555FF'>*</font>i <font color='#5555FF'>+</font> hx<font color='#5555FF'>*</font>i, tip_y <font color='#5555FF'>+</font> wy<font color='#5555FF'>*</font>i <font color='#5555FF'>+</font> hy<font color='#5555FF'>*</font>i<font face='Lucida Console'>)</font>, 
+                      <font color='#BB00BB'>point</font><font face='Lucida Console'>(</font>tip_x <font color='#5555FF'>+</font> wx<font color='#5555FF'>*</font>i<font color='#5555FF'>*</font><font color='#5555FF'>-</font><font color='#979000'>1</font> <font color='#5555FF'>+</font> hx<font color='#5555FF'>*</font>i, tip_y <font color='#5555FF'>+</font> wy<font color='#5555FF'>*</font>i<font color='#5555FF'>*</font><font color='#5555FF'>-</font><font color='#979000'>1</font> <font color='#5555FF'>+</font> hy<font color='#5555FF'>*</font>i<font face='Lucida Console'>)</font>, 
+                      color<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>    <font color='#009900'>// toggle button style stuff 
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>void</u></font> toggle_button_style_default::<b><a name='draw_toggle_button'></a>draw_toggle_button</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> canvas<font color='#5555FF'>&amp;</font> c,
+        <font color='#0000FF'>const</font> rectangle<font color='#5555FF'>&amp;</font> rect,
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>bool</u></font> enabled,
+        <font color='#0000FF'>const</font> font<font color='#5555FF'>&amp;</font> mfont,
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> ,
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> ,
+        <font color='#0000FF'>const</font> ustring<font color='#5555FF'>&amp;</font> name,
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>bool</u></font> is_depressed,
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>bool</u></font> is_checked
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        rectangle area <font color='#5555FF'>=</font> rect.<font color='#BB00BB'>intersect</font><font face='Lucida Console'>(</font>c<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>area.<font color='#BB00BB'>is_empty</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+            <font color='#0000FF'>return</font>;
+
+        <font color='#BB00BB'>fill_rect</font><font face='Lucida Console'>(</font>c,rect,<font color='#BB00BB'>rgb_pixel</font><font face='Lucida Console'>(</font><font color='#979000'>212</font>,<font color='#979000'>208</font>,<font color='#979000'>200</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> red, green, blue;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>enabled<font face='Lucida Console'>)</font>
+        <b>{</b>
+            red <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            green <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            blue <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <b>}</b>
+        <font color='#0000FF'>else</font>
+        <b>{</b>
+            red <font color='#5555FF'>=</font> <font color='#979000'>128</font>;
+            green <font color='#5555FF'>=</font> <font color='#979000'>128</font>;
+            blue <font color='#5555FF'>=</font> <font color='#979000'>128</font>;
+        <b>}</b>
+
+        <font color='#009900'>// compute the name length if it hasn't already been computed
+</font>        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>name_width <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> height;
+            mfont.<font color='#BB00BB'>compute_size</font><font face='Lucida Console'>(</font>name,name_width,height<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#009900'>// figure out where the name string should appear
+</font>        rectangle name_rect;
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> width <font color='#5555FF'>=</font> name_width;
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> height <font color='#5555FF'>=</font> mfont.<font color='#BB00BB'>height</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        name_rect.<font color='#BB00BB'>set_left</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>rect.<font color='#BB00BB'>right</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> rect.<font color='#BB00BB'>left</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> width<font face='Lucida Console'>)</font><font color='#5555FF'>/</font><font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+        name_rect.<font color='#BB00BB'>set_top</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>rect.<font color='#BB00BB'>bottom</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> rect.<font color='#BB00BB'>top</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> height<font face='Lucida Console'>)</font><font color='#5555FF'>/</font><font color='#979000'>2</font> <font color='#5555FF'>+</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+        name_rect.<font color='#BB00BB'>set_right</font><font face='Lucida Console'>(</font>name_rect.<font color='#BB00BB'>left</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>+</font>width<font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+        name_rect.<font color='#BB00BB'>set_bottom</font><font face='Lucida Console'>(</font>name_rect.<font color='#BB00BB'>top</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>+</font>height<font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'><u>long</u></font> d <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>is_checked<font face='Lucida Console'>)</font>
+            d <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>is_depressed<font face='Lucida Console'>)</font>
+            d <font color='#5555FF'>=</font> <font color='#979000'>2</font>;
+
+        name_rect.<font color='#BB00BB'>set_left</font><font face='Lucida Console'>(</font>name_rect.<font color='#BB00BB'>left</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>+</font>d<font face='Lucida Console'>)</font>;
+        name_rect.<font color='#BB00BB'>set_right</font><font face='Lucida Console'>(</font>name_rect.<font color='#BB00BB'>right</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>+</font>d<font face='Lucida Console'>)</font>;
+        name_rect.<font color='#BB00BB'>set_top</font><font face='Lucida Console'>(</font>name_rect.<font color='#BB00BB'>top</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>+</font>d<font face='Lucida Console'>)</font>;
+        name_rect.<font color='#BB00BB'>set_bottom</font><font face='Lucida Console'>(</font>name_rect.<font color='#BB00BB'>bottom</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>+</font>d<font face='Lucida Console'>)</font>;
+
+        mfont.<font color='#BB00BB'>draw_string</font><font face='Lucida Console'>(</font>c,name_rect,name,<font color='#BB00BB'>rgb_pixel</font><font face='Lucida Console'>(</font>red,green,blue<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// now draw the edge of the button
+</font>        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>is_checked <font color='#5555FF'>|</font><font color='#5555FF'>|</font> is_depressed<font face='Lucida Console'>)</font>
+            <font color='#BB00BB'>draw_button_down</font><font face='Lucida Console'>(</font>c,rect<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>else</font>
+            <font color='#BB00BB'>draw_button_up</font><font face='Lucida Console'>(</font>c,rect<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    rectangle toggle_button_style_default::
+    <b><a name='get_min_size'></a>get_min_size</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> ustring<font color='#5555FF'>&amp;</font> name,
+        <font color='#0000FF'>const</font> font<font color='#5555FF'>&amp;</font> mfont 
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> 
+    <b>{</b>
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> width; 
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> height;
+        mfont.<font color='#BB00BB'>compute_size</font><font face='Lucida Console'>(</font>name,width,height<font face='Lucida Console'>)</font>;
+        name_width <font color='#5555FF'>=</font> width;
+
+        <font color='#0000FF'>return</font> <font color='#BB00BB'>rectangle</font><font face='Lucida Console'>(</font>width<font color='#5555FF'>+</font><font color='#979000'>2</font><font color='#5555FF'>*</font>padding, height<font color='#5555FF'>+</font><font color='#979000'>2</font><font color='#5555FF'>*</font>padding<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>void</u></font> toggle_button_style_check_box::<b><a name='draw_toggle_button'></a>draw_toggle_button</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> canvas<font color='#5555FF'>&amp;</font> c,
+        <font color='#0000FF'>const</font> rectangle<font color='#5555FF'>&amp;</font> rect,
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>bool</u></font> enabled,
+        <font color='#0000FF'>const</font> font<font color='#5555FF'>&amp;</font> mfont,
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> ,
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> ,
+        <font color='#0000FF'>const</font> ustring<font color='#5555FF'>&amp;</font> name,
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>bool</u></font> is_depressed,
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>bool</u></font> is_checked
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        rectangle area <font color='#5555FF'>=</font> rect.<font color='#BB00BB'>intersect</font><font face='Lucida Console'>(</font>c<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>area.<font color='#BB00BB'>is_empty</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+            <font color='#0000FF'>return</font>;
+
+
+        rgb_pixel color;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>enabled<font face='Lucida Console'>)</font>
+        <b>{</b>
+            color.red <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            color.green <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            color.blue <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <b>}</b>
+        <font color='#0000FF'>else</font>
+        <b>{</b>
+            color.red <font color='#5555FF'>=</font> <font color='#979000'>128</font>;
+            color.green <font color='#5555FF'>=</font> <font color='#979000'>128</font>;
+            color.blue <font color='#5555FF'>=</font> <font color='#979000'>128</font>;
+        <b>}</b>
+
+
+        <font color='#009900'>// figure out where the name string should appear
+</font>        rectangle name_rect, box_rect;
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> padding <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>mfont.<font color='#BB00BB'>height</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> <font color='#979000'>13</font><font face='Lucida Console'>)</font>
+            padding <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>rect.<font color='#BB00BB'>height</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> mfont.<font color='#BB00BB'>height</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font color='#5555FF'>/</font><font color='#979000'>2</font>;
+
+        name_rect <font color='#5555FF'>=</font> rect;
+        name_rect.<font color='#BB00BB'>set_left</font><font face='Lucida Console'>(</font>rect.<font color='#BB00BB'>left</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> <font color='#979000'>17</font><font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+        name_rect.<font color='#BB00BB'>set_top</font><font face='Lucida Console'>(</font>rect.<font color='#BB00BB'>top</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> padding<font face='Lucida Console'>)</font>;
+        name_rect.<font color='#BB00BB'>set_bottom</font><font face='Lucida Console'>(</font>rect.<font color='#BB00BB'>bottom</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> padding<font face='Lucida Console'>)</font>;
+            
+        box_rect <font color='#5555FF'>=</font> rect;
+        box_rect.<font color='#BB00BB'>set_right</font><font face='Lucida Console'>(</font>rect.<font color='#BB00BB'>left</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> <font color='#979000'>12</font><font face='Lucida Console'>)</font>;
+        box_rect.<font color='#BB00BB'>set_bottom</font><font face='Lucida Console'>(</font>rect.<font color='#BB00BB'>top</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> <font color='#979000'>12</font><font face='Lucida Console'>)</font>;
+
+        mfont.<font color='#BB00BB'>draw_string</font><font face='Lucida Console'>(</font>c,name_rect,name,color<font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>enabled <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> is_depressed <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font><font face='Lucida Console'>)</font>
+            <font color='#BB00BB'>fill_rect</font><font face='Lucida Console'>(</font>c, box_rect,<font color='#BB00BB'>rgb_pixel</font><font face='Lucida Console'>(</font><font color='#979000'>255</font>,<font color='#979000'>255</font>,<font color='#979000'>255</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>else</font>
+            <font color='#BB00BB'>fill_rect</font><font face='Lucida Console'>(</font>c, box_rect,<font color='#BB00BB'>rgb_pixel</font><font face='Lucida Console'>(</font><font color='#979000'>212</font>,<font color='#979000'>208</font>,<font color='#979000'>200</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+        <font color='#BB00BB'>draw_sunken_rectangle</font><font face='Lucida Console'>(</font>c, box_rect<font face='Lucida Console'>)</font>;
+
+
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>is_checked<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> x <font color='#5555FF'>=</font> box_rect.<font color='#BB00BB'>left</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> y <font color='#5555FF'>=</font> box_rect.<font color='#BB00BB'>top</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>draw_line</font><font face='Lucida Console'>(</font>c,<font color='#BB00BB'>point</font><font face='Lucida Console'>(</font><font color='#979000'>3</font><font color='#5555FF'>+</font>x,<font color='#979000'>5</font><font color='#5555FF'>+</font>y<font face='Lucida Console'>)</font>,<font color='#BB00BB'>point</font><font face='Lucida Console'>(</font><font color='#979000'>6</font><font color='#5555FF'>+</font>x,<font color='#979000'>8</font><font color='#5555FF'>+</font>y<font face='Lucida Console'>)</font>,color<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>draw_line</font><font face='Lucida Console'>(</font>c,<font color='#BB00BB'>point</font><font face='Lucida Console'>(</font><font color='#979000'>3</font><font color='#5555FF'>+</font>x,<font color='#979000'>6</font><font color='#5555FF'>+</font>y<font face='Lucida Console'>)</font>,<font color='#BB00BB'>point</font><font face='Lucida Console'>(</font><font color='#979000'>5</font><font color='#5555FF'>+</font>x,<font color='#979000'>8</font><font color='#5555FF'>+</font>y<font face='Lucida Console'>)</font>,color<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>draw_line</font><font face='Lucida Console'>(</font>c,<font color='#BB00BB'>point</font><font face='Lucida Console'>(</font><font color='#979000'>3</font><font color='#5555FF'>+</font>x,<font color='#979000'>7</font><font color='#5555FF'>+</font>y<font face='Lucida Console'>)</font>,<font color='#BB00BB'>point</font><font face='Lucida Console'>(</font><font color='#979000'>5</font><font color='#5555FF'>+</font>x,<font color='#979000'>9</font><font color='#5555FF'>+</font>y<font face='Lucida Console'>)</font>,color<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>draw_line</font><font face='Lucida Console'>(</font>c,<font color='#BB00BB'>point</font><font face='Lucida Console'>(</font><font color='#979000'>6</font><font color='#5555FF'>+</font>x,<font color='#979000'>6</font><font color='#5555FF'>+</font>y<font face='Lucida Console'>)</font>,<font color='#BB00BB'>point</font><font face='Lucida Console'>(</font><font color='#979000'>9</font><font color='#5555FF'>+</font>x,<font color='#979000'>3</font><font color='#5555FF'>+</font>y<font face='Lucida Console'>)</font>,color<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>draw_line</font><font face='Lucida Console'>(</font>c,<font color='#BB00BB'>point</font><font face='Lucida Console'>(</font><font color='#979000'>6</font><font color='#5555FF'>+</font>x,<font color='#979000'>7</font><font color='#5555FF'>+</font>y<font face='Lucida Console'>)</font>,<font color='#BB00BB'>point</font><font face='Lucida Console'>(</font><font color='#979000'>9</font><font color='#5555FF'>+</font>x,<font color='#979000'>4</font><font color='#5555FF'>+</font>y<font face='Lucida Console'>)</font>,color<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>draw_line</font><font face='Lucida Console'>(</font>c,<font color='#BB00BB'>point</font><font face='Lucida Console'>(</font><font color='#979000'>6</font><font color='#5555FF'>+</font>x,<font color='#979000'>8</font><font color='#5555FF'>+</font>y<font face='Lucida Console'>)</font>,<font color='#BB00BB'>point</font><font face='Lucida Console'>(</font><font color='#979000'>9</font><font color='#5555FF'>+</font>x,<font color='#979000'>5</font><font color='#5555FF'>+</font>y<font face='Lucida Console'>)</font>,color<font face='Lucida Console'>)</font>;
+        <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    rectangle toggle_button_style_check_box::
+    <b><a name='get_min_size'></a>get_min_size</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> ustring<font color='#5555FF'>&amp;</font> name,
+        <font color='#0000FF'>const</font> font<font color='#5555FF'>&amp;</font> mfont 
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> 
+    <b>{</b>
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> width;
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> height;
+        mfont.<font color='#BB00BB'>compute_size</font><font face='Lucida Console'>(</font>name,width,height<font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>height <font color='#5555FF'>&lt;</font> <font color='#979000'>13</font><font face='Lucida Console'>)</font>
+            height <font color='#5555FF'>=</font> <font color='#979000'>13</font>;
+
+        <font color='#0000FF'>return</font> <font color='#BB00BB'>rectangle</font><font face='Lucida Console'>(</font>width <font color='#5555FF'>+</font> <font color='#979000'>17</font> <font color='#5555FF'>-</font><font color='#979000'>1</font>, height <font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>void</u></font> toggle_button_style_radio_button::<b><a name='draw_toggle_button'></a>draw_toggle_button</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> canvas<font color='#5555FF'>&amp;</font> c,
+        <font color='#0000FF'>const</font> rectangle<font color='#5555FF'>&amp;</font> rect,
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>bool</u></font> enabled,
+        <font color='#0000FF'>const</font> font<font color='#5555FF'>&amp;</font> mfont,
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> ,
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> ,
+        <font color='#0000FF'>const</font> ustring<font color='#5555FF'>&amp;</font> name,
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>bool</u></font> is_depressed,
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>bool</u></font> is_checked
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        rectangle area <font color='#5555FF'>=</font> rect.<font color='#BB00BB'>intersect</font><font face='Lucida Console'>(</font>c<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>area.<font color='#BB00BB'>is_empty</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+            <font color='#0000FF'>return</font>;
+        
+
+        rgb_pixel color;
+
+        <font color='#009900'>// figure out where the name string should appear
+</font>        rectangle name_rect, box_rect;
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> padding <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>mfont.<font color='#BB00BB'>height</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> <font color='#979000'>13</font><font face='Lucida Console'>)</font>
+            padding <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>rect.<font color='#BB00BB'>height</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> mfont.<font color='#BB00BB'>height</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font color='#5555FF'>/</font><font color='#979000'>2</font>;
+
+        name_rect <font color='#5555FF'>=</font> rect;
+        name_rect.<font color='#BB00BB'>set_left</font><font face='Lucida Console'>(</font>rect.<font color='#BB00BB'>left</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> <font color='#979000'>17</font><font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+        name_rect.<font color='#BB00BB'>set_top</font><font face='Lucida Console'>(</font>rect.<font color='#BB00BB'>top</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> padding<font face='Lucida Console'>)</font>;
+        name_rect.<font color='#BB00BB'>set_bottom</font><font face='Lucida Console'>(</font>rect.<font color='#BB00BB'>bottom</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> padding<font face='Lucida Console'>)</font>;
+            
+        box_rect <font color='#5555FF'>=</font> rect;
+        box_rect.<font color='#BB00BB'>set_right</font><font face='Lucida Console'>(</font>rect.<font color='#BB00BB'>left</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> <font color='#979000'>12</font><font face='Lucida Console'>)</font>;
+        box_rect.<font color='#BB00BB'>set_bottom</font><font face='Lucida Console'>(</font>rect.<font color='#BB00BB'>top</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> <font color='#979000'>12</font><font face='Lucida Console'>)</font>;
+
+        
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> x <font color='#5555FF'>=</font> box_rect.<font color='#BB00BB'>left</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> y <font color='#5555FF'>=</font> box_rect.<font color='#BB00BB'>top</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>enabled <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> is_depressed <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font><font face='Lucida Console'>)</font>
+            <font color='#BB00BB'>draw_solid_circle</font><font face='Lucida Console'>(</font>c,<font color='#BB00BB'>point</font><font face='Lucida Console'>(</font>rect.<font color='#BB00BB'>left</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>+</font><font color='#979000'>5</font>,rect.<font color='#BB00BB'>top</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>+</font><font color='#979000'>5</font><font face='Lucida Console'>)</font>,<font color='#979000'>4.5</font>,<font color='#BB00BB'>rgb_pixel</font><font face='Lucida Console'>(</font><font color='#979000'>255</font>,<font color='#979000'>255</font>,<font color='#979000'>255</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>else</font>
+            <font color='#BB00BB'>draw_solid_circle</font><font face='Lucida Console'>(</font>c,<font color='#BB00BB'>point</font><font face='Lucida Console'>(</font>rect.<font color='#BB00BB'>left</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>+</font><font color='#979000'>5</font>,rect.<font color='#BB00BB'>top</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>+</font><font color='#979000'>5</font><font face='Lucida Console'>)</font>,<font color='#979000'>4.5</font>,<font color='#BB00BB'>rgb_pixel</font><font face='Lucida Console'>(</font><font color='#979000'>212</font>,<font color='#979000'>208</font>,<font color='#979000'>200</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+
+        color <font color='#5555FF'>=</font> <font color='#BB00BB'>rgb_pixel</font><font face='Lucida Console'>(</font><font color='#979000'>128</font>,<font color='#979000'>128</font>,<font color='#979000'>128</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>draw_line</font><font face='Lucida Console'>(</font>c,<font color='#BB00BB'>point</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font color='#5555FF'>+</font>x,<font color='#979000'>4</font><font color='#5555FF'>+</font>y<font face='Lucida Console'>)</font>,<font color='#BB00BB'>point</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font color='#5555FF'>+</font>x,<font color='#979000'>7</font><font color='#5555FF'>+</font>y<font face='Lucida Console'>)</font>,color<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>draw_line</font><font face='Lucida Console'>(</font>c,<font color='#BB00BB'>point</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font color='#5555FF'>+</font>x,<font color='#979000'>2</font><font color='#5555FF'>+</font>y<font face='Lucida Console'>)</font>,<font color='#BB00BB'>point</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font color='#5555FF'>+</font>x,<font color='#979000'>9</font><font color='#5555FF'>+</font>y<font face='Lucida Console'>)</font>,color<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>draw_line</font><font face='Lucida Console'>(</font>c,<font color='#BB00BB'>point</font><font face='Lucida Console'>(</font><font color='#979000'>2</font><font color='#5555FF'>+</font>x,<font color='#979000'>1</font><font color='#5555FF'>+</font>y<font face='Lucida Console'>)</font>,<font color='#BB00BB'>point</font><font face='Lucida Console'>(</font><font color='#979000'>9</font><font color='#5555FF'>+</font>x,<font color='#979000'>1</font><font color='#5555FF'>+</font>y<font face='Lucida Console'>)</font>,color<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>draw_line</font><font face='Lucida Console'>(</font>c,<font color='#BB00BB'>point</font><font face='Lucida Console'>(</font><font color='#979000'>4</font><font color='#5555FF'>+</font>x,<font color='#979000'>0</font><font color='#5555FF'>+</font>y<font face='Lucida Console'>)</font>,<font color='#BB00BB'>point</font><font face='Lucida Console'>(</font><font color='#979000'>7</font><font color='#5555FF'>+</font>x,<font color='#979000'>0</font><font color='#5555FF'>+</font>y<font face='Lucida Console'>)</font>,color<font face='Lucida Console'>)</font>;
+
+        color <font color='#5555FF'>=</font> <font color='#BB00BB'>rgb_pixel</font><font face='Lucida Console'>(</font><font color='#979000'>255</font>,<font color='#979000'>255</font>,<font color='#979000'>255</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>draw_line</font><font face='Lucida Console'>(</font>c,<font color='#BB00BB'>point</font><font face='Lucida Console'>(</font><font color='#979000'>4</font><font color='#5555FF'>+</font>x,<font color='#979000'>11</font><font color='#5555FF'>+</font>y<font face='Lucida Console'>)</font>,<font color='#BB00BB'>point</font><font face='Lucida Console'>(</font><font color='#979000'>7</font><font color='#5555FF'>+</font>x,<font color='#979000'>11</font><font color='#5555FF'>+</font>y<font face='Lucida Console'>)</font>,color<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>draw_line</font><font face='Lucida Console'>(</font>c,<font color='#BB00BB'>point</font><font face='Lucida Console'>(</font><font color='#979000'>2</font><font color='#5555FF'>+</font>x,<font color='#979000'>10</font><font color='#5555FF'>+</font>y<font face='Lucida Console'>)</font>,<font color='#BB00BB'>point</font><font face='Lucida Console'>(</font><font color='#979000'>9</font><font color='#5555FF'>+</font>x,<font color='#979000'>10</font><font color='#5555FF'>+</font>y<font face='Lucida Console'>)</font>,color<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>draw_line</font><font face='Lucida Console'>(</font>c,<font color='#BB00BB'>point</font><font face='Lucida Console'>(</font><font color='#979000'>10</font><font color='#5555FF'>+</font>x,<font color='#979000'>2</font><font color='#5555FF'>+</font>y<font face='Lucida Console'>)</font>,<font color='#BB00BB'>point</font><font face='Lucida Console'>(</font><font color='#979000'>10</font><font color='#5555FF'>+</font>x,<font color='#979000'>9</font><font color='#5555FF'>+</font>y<font face='Lucida Console'>)</font>,color<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>draw_line</font><font face='Lucida Console'>(</font>c,<font color='#BB00BB'>point</font><font face='Lucida Console'>(</font><font color='#979000'>11</font><font color='#5555FF'>+</font>x,<font color='#979000'>4</font><font color='#5555FF'>+</font>y<font face='Lucida Console'>)</font>,<font color='#BB00BB'>point</font><font face='Lucida Console'>(</font><font color='#979000'>11</font><font color='#5555FF'>+</font>x,<font color='#979000'>7</font><font color='#5555FF'>+</font>y<font face='Lucida Console'>)</font>,color<font face='Lucida Console'>)</font>;
+
+        color <font color='#5555FF'>=</font> <font color='#BB00BB'>rgb_pixel</font><font face='Lucida Console'>(</font><font color='#979000'>64</font>,<font color='#979000'>64</font>,<font color='#979000'>64</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>draw_line</font><font face='Lucida Console'>(</font>c,<font color='#BB00BB'>point</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font color='#5555FF'>+</font>x,<font color='#979000'>4</font><font color='#5555FF'>+</font>y<font face='Lucida Console'>)</font>,<font color='#BB00BB'>point</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font color='#5555FF'>+</font>x,<font color='#979000'>7</font><font color='#5555FF'>+</font>y<font face='Lucida Console'>)</font>,color<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>draw_line</font><font face='Lucida Console'>(</font>c,<font color='#BB00BB'>point</font><font face='Lucida Console'>(</font><font color='#979000'>4</font><font color='#5555FF'>+</font>x,<font color='#979000'>1</font><font color='#5555FF'>+</font>y<font face='Lucida Console'>)</font>,<font color='#BB00BB'>point</font><font face='Lucida Console'>(</font><font color='#979000'>7</font><font color='#5555FF'>+</font>x,<font color='#979000'>1</font><font color='#5555FF'>+</font>y<font face='Lucida Console'>)</font>,color<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>draw_pixel</font><font face='Lucida Console'>(</font>c,<font color='#BB00BB'>point</font><font face='Lucida Console'>(</font><font color='#979000'>2</font><font color='#5555FF'>+</font>x,<font color='#979000'>3</font><font color='#5555FF'>+</font>y<font face='Lucida Console'>)</font>,color<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>draw_pixel</font><font face='Lucida Console'>(</font>c,<font color='#BB00BB'>point</font><font face='Lucida Console'>(</font><font color='#979000'>3</font><font color='#5555FF'>+</font>x,<font color='#979000'>2</font><font color='#5555FF'>+</font>y<font face='Lucida Console'>)</font>,color<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>draw_pixel</font><font face='Lucida Console'>(</font>c,<font color='#BB00BB'>point</font><font face='Lucida Console'>(</font><font color='#979000'>2</font><font color='#5555FF'>+</font>x,<font color='#979000'>2</font><font color='#5555FF'>+</font>y<font face='Lucida Console'>)</font>,color<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>draw_pixel</font><font face='Lucida Console'>(</font>c,<font color='#BB00BB'>point</font><font face='Lucida Console'>(</font><font color='#979000'>2</font><font color='#5555FF'>+</font>x,<font color='#979000'>8</font><font color='#5555FF'>+</font>y<font face='Lucida Console'>)</font>,color<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>draw_pixel</font><font face='Lucida Console'>(</font>c,<font color='#BB00BB'>point</font><font face='Lucida Console'>(</font><font color='#979000'>8</font><font color='#5555FF'>+</font>x,<font color='#979000'>2</font><font color='#5555FF'>+</font>y<font face='Lucida Console'>)</font>,color<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>draw_pixel</font><font face='Lucida Console'>(</font>c,<font color='#BB00BB'>point</font><font face='Lucida Console'>(</font><font color='#979000'>9</font><font color='#5555FF'>+</font>x,<font color='#979000'>2</font><font color='#5555FF'>+</font>y<font face='Lucida Console'>)</font>,color<font face='Lucida Console'>)</font>;
+
+        color <font color='#5555FF'>=</font> <font color='#BB00BB'>rgb_pixel</font><font face='Lucida Console'>(</font><font color='#979000'>212</font>,<font color='#979000'>208</font>,<font color='#979000'>200</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>draw_line</font><font face='Lucida Console'>(</font>c,<font color='#BB00BB'>point</font><font face='Lucida Console'>(</font><font color='#979000'>4</font><font color='#5555FF'>+</font>x,<font color='#979000'>10</font><font color='#5555FF'>+</font>y<font face='Lucida Console'>)</font>,<font color='#BB00BB'>point</font><font face='Lucida Console'>(</font><font color='#979000'>7</font><font color='#5555FF'>+</font>x,<font color='#979000'>10</font><font color='#5555FF'>+</font>y<font face='Lucida Console'>)</font>,color<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>draw_line</font><font face='Lucida Console'>(</font>c,<font color='#BB00BB'>point</font><font face='Lucida Console'>(</font><font color='#979000'>10</font><font color='#5555FF'>+</font>x,<font color='#979000'>4</font><font color='#5555FF'>+</font>y<font face='Lucida Console'>)</font>,<font color='#BB00BB'>point</font><font face='Lucida Console'>(</font><font color='#979000'>10</font><font color='#5555FF'>+</font>x,<font color='#979000'>7</font><font color='#5555FF'>+</font>y<font face='Lucida Console'>)</font>,color<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>draw_pixel</font><font face='Lucida Console'>(</font>c,<font color='#BB00BB'>point</font><font face='Lucida Console'>(</font><font color='#979000'>3</font><font color='#5555FF'>+</font>x,<font color='#979000'>9</font><font color='#5555FF'>+</font>y<font face='Lucida Console'>)</font>,color<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>draw_pixel</font><font face='Lucida Console'>(</font>c,<font color='#BB00BB'>point</font><font face='Lucida Console'>(</font><font color='#979000'>9</font><font color='#5555FF'>+</font>x,<font color='#979000'>3</font><font color='#5555FF'>+</font>y<font face='Lucida Console'>)</font>,color<font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>enabled<font face='Lucida Console'>)</font>
+        <b>{</b>
+            color.red <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            color.green <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            color.blue <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <b>}</b>
+        <font color='#0000FF'>else</font>
+        <b>{</b>
+            color.red <font color='#5555FF'>=</font> <font color='#979000'>128</font>;
+            color.green <font color='#5555FF'>=</font> <font color='#979000'>128</font>;
+            color.blue <font color='#5555FF'>=</font> <font color='#979000'>128</font>;
+        <b>}</b>
+
+        mfont.<font color='#BB00BB'>draw_string</font><font face='Lucida Console'>(</font>c,name_rect,name,color<font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>is_checked<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#BB00BB'>draw_line</font><font face='Lucida Console'>(</font>c,<font color='#BB00BB'>point</font><font face='Lucida Console'>(</font><font color='#979000'>5</font><font color='#5555FF'>+</font>x,<font color='#979000'>4</font><font color='#5555FF'>+</font>y<font face='Lucida Console'>)</font>,<font color='#BB00BB'>point</font><font face='Lucida Console'>(</font><font color='#979000'>6</font><font color='#5555FF'>+</font>x,<font color='#979000'>4</font><font color='#5555FF'>+</font>y<font face='Lucida Console'>)</font>,color<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>draw_line</font><font face='Lucida Console'>(</font>c,<font color='#BB00BB'>point</font><font face='Lucida Console'>(</font><font color='#979000'>4</font><font color='#5555FF'>+</font>x,<font color='#979000'>5</font><font color='#5555FF'>+</font>y<font face='Lucida Console'>)</font>,<font color='#BB00BB'>point</font><font face='Lucida Console'>(</font><font color='#979000'>7</font><font color='#5555FF'>+</font>x,<font color='#979000'>5</font><font color='#5555FF'>+</font>y<font face='Lucida Console'>)</font>,color<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>draw_line</font><font face='Lucida Console'>(</font>c,<font color='#BB00BB'>point</font><font face='Lucida Console'>(</font><font color='#979000'>4</font><font color='#5555FF'>+</font>x,<font color='#979000'>6</font><font color='#5555FF'>+</font>y<font face='Lucida Console'>)</font>,<font color='#BB00BB'>point</font><font face='Lucida Console'>(</font><font color='#979000'>7</font><font color='#5555FF'>+</font>x,<font color='#979000'>6</font><font color='#5555FF'>+</font>y<font face='Lucida Console'>)</font>,color<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>draw_line</font><font face='Lucida Console'>(</font>c,<font color='#BB00BB'>point</font><font face='Lucida Console'>(</font><font color='#979000'>5</font><font color='#5555FF'>+</font>x,<font color='#979000'>7</font><font color='#5555FF'>+</font>y<font face='Lucida Console'>)</font>,<font color='#BB00BB'>point</font><font face='Lucida Console'>(</font><font color='#979000'>6</font><font color='#5555FF'>+</font>x,<font color='#979000'>7</font><font color='#5555FF'>+</font>y<font face='Lucida Console'>)</font>,color<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    rectangle toggle_button_style_radio_button::
+    <b><a name='get_min_size'></a>get_min_size</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> ustring<font color='#5555FF'>&amp;</font> name,
+        <font color='#0000FF'>const</font> font<font color='#5555FF'>&amp;</font> mfont 
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> 
+    <b>{</b>
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> width;
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> height;
+        mfont.<font color='#BB00BB'>compute_size</font><font face='Lucida Console'>(</font>name,width,height<font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>height <font color='#5555FF'>&lt;</font> <font color='#979000'>13</font><font face='Lucida Console'>)</font>
+            height <font color='#5555FF'>=</font> <font color='#979000'>13</font>;
+
+        <font color='#0000FF'>return</font> <font color='#BB00BB'>rectangle</font><font face='Lucida Console'>(</font>width <font color='#5555FF'>+</font> <font color='#979000'>17</font> <font color='#5555FF'>-</font><font color='#979000'>1</font>, height <font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>    <font color='#009900'>// scroll bar style stuff 
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>long</u></font> scroll_bar_style_default::
+    <b><a name='get_slider_length'></a>get_slider_length</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'><u>long</u></font> total_length,
+        <font color='#0000FF'><u>long</u></font> max_pos
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        <font color='#009900'>// if the length is too small then we have to smash up the arrow buttons
+</font>        <font color='#009900'>// and hide the slider.
+</font>        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>total_length <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#BB00BB'>get_width</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>*</font><font color='#979000'>2</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>return</font> <font color='#979000'>0</font>;
+        <b>}</b>
+        <font color='#0000FF'>else</font>
+        <b>{</b>
+            <font color='#0000FF'><u>double</u></font> range <font color='#5555FF'>=</font> total_length <font color='#5555FF'>-</font> <font color='#BB00BB'>get_button_length</font><font face='Lucida Console'>(</font>total_length, max_pos<font face='Lucida Console'>)</font><font color='#5555FF'>*</font><font color='#979000'>2</font>;
+
+            <font color='#0000FF'><u>double</u></font> scale_factor <font color='#5555FF'>=</font> <font color='#979000'>30.0</font><font color='#5555FF'>/</font><font face='Lucida Console'>(</font>max_pos <font color='#5555FF'>+</font> <font color='#979000'>30.0</font><font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>scale_factor <font color='#5555FF'>&lt;</font> <font color='#979000'>0.1</font><font face='Lucida Console'>)</font>
+                scale_factor <font color='#5555FF'>=</font> <font color='#979000'>0.1</font>;
+
+
+            <font color='#0000FF'><u>double</u></font> fraction <font color='#5555FF'>=</font> range<font color='#5555FF'>/</font><font face='Lucida Console'>(</font>max_pos <font color='#5555FF'>+</font> range<font face='Lucida Console'>)</font><font color='#5555FF'>*</font>scale_factor;
+            <font color='#0000FF'><u>double</u></font> result <font color='#5555FF'>=</font> fraction <font color='#5555FF'>*</font> range;
+            <font color='#0000FF'><u>long</u></font> res <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>result<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>res <font color='#5555FF'>&lt;</font> <font color='#979000'>8</font><font face='Lucida Console'>)</font>
+                res <font color='#5555FF'>=</font> <font color='#979000'>8</font>;
+            <font color='#0000FF'>return</font> res;
+        <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>long</u></font> scroll_bar_style_default::
+    <b><a name='get_button_length'></a>get_button_length</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'><u>long</u></font> total_length,
+        <font color='#0000FF'><u>long</u></font> 
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        <font color='#009900'>// if the length is too small then we have to smash up the arrow buttons
+</font>        <font color='#009900'>// and hide the slider.
+</font>        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>total_length <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#BB00BB'>get_width</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>*</font><font color='#979000'>2</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>return</font> total_length<font color='#5555FF'>/</font><font color='#979000'>2</font>;
+        <b>}</b>
+        <font color='#0000FF'>else</font>
+        <b>{</b>
+            <font color='#0000FF'>return</font> <font color='#BB00BB'>get_width</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>void</u></font> scroll_bar_style_default::
+    <b><a name='draw_scroll_bar_background'></a>draw_scroll_bar_background</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> canvas<font color='#5555FF'>&amp;</font> c,
+        <font color='#0000FF'>const</font> rectangle<font color='#5555FF'>&amp;</font> rect,
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>bool</u></font> ,
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> ,
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> ,
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>bool</u></font> is_depressed
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>is_depressed<font face='Lucida Console'>)</font>
+            <font color='#BB00BB'>draw_checkered</font><font face='Lucida Console'>(</font>c, rect,<font color='#BB00BB'>rgb_pixel</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font>,<font color='#BB00BB'>rgb_pixel</font><font face='Lucida Console'>(</font><font color='#979000'>43</font>,<font color='#979000'>47</font>,<font color='#979000'>55</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>else</font>
+            <font color='#BB00BB'>draw_checkered</font><font face='Lucida Console'>(</font>c, rect,<font color='#BB00BB'>rgb_pixel</font><font face='Lucida Console'>(</font><font color='#979000'>255</font>,<font color='#979000'>255</font>,<font color='#979000'>255</font><font face='Lucida Console'>)</font>,<font color='#BB00BB'>rgb_pixel</font><font face='Lucida Console'>(</font><font color='#979000'>212</font>,<font color='#979000'>208</font>,<font color='#979000'>200</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>void</u></font> scroll_bar_style_default::
+    <b><a name='draw_scroll_bar_slider'></a>draw_scroll_bar_slider</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> canvas<font color='#5555FF'>&amp;</font> c,
+        <font color='#0000FF'>const</font> rectangle<font color='#5555FF'>&amp;</font> rect,
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>bool</u></font> ,
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> ,
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> ,
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>bool</u></font> 
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        <font color='#BB00BB'>fill_rect</font><font face='Lucida Console'>(</font>c, rect, <font color='#BB00BB'>rgb_pixel</font><font face='Lucida Console'>(</font><font color='#979000'>212</font>,<font color='#979000'>208</font>,<font color='#979000'>200</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>draw_button_up</font><font face='Lucida Console'>(</font>c, rect<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>    <font color='#009900'>// text_field styles  
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> text_field_style_default::
+    <b><a name='get_padding'></a>get_padding</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> font<font color='#5555FF'>&amp;</font> mfont 
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>  
+    <b>{</b> 
+        <font color='#0000FF'>return</font> mfont.<font color='#BB00BB'>height</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font>mfont.<font color='#BB00BB'>ascender</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>void</u></font> text_field_style_default::
+    <b><a name='draw_text_field'></a>draw_text_field</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> canvas<font color='#5555FF'>&amp;</font> c,
+        <font color='#0000FF'>const</font> rectangle<font color='#5555FF'>&amp;</font> rect,
+        <font color='#0000FF'>const</font> rectangle<font color='#5555FF'>&amp;</font> text_rect,
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>bool</u></font> enabled,
+        <font color='#0000FF'>const</font> font<font color='#5555FF'>&amp;</font> mfont,
+        <font color='#0000FF'>const</font> ustring<font color='#5555FF'>&amp;</font> text,
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> cursor_x,
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> text_pos,
+        <font color='#0000FF'>const</font> rgb_pixel<font color='#5555FF'>&amp;</font> text_color,
+        <font color='#0000FF'>const</font> rgb_pixel<font color='#5555FF'>&amp;</font> bg_color,
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>bool</u></font> has_focus,
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>bool</u></font> cursor_visible,
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> highlight_start,
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> highlight_end
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> 
+    <b>{</b>
+        rectangle area <font color='#5555FF'>=</font> rect.<font color='#BB00BB'>intersect</font><font face='Lucida Console'>(</font>c<font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>enabled<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#009900'>// first fill our area with the bg_color
+</font>            <font color='#BB00BB'>fill_rect</font><font face='Lucida Console'>(</font>c, area,bg_color<font face='Lucida Console'>)</font>;
+        <b>}</b>
+        <font color='#0000FF'>else</font>
+        <b>{</b>
+            <font color='#009900'>// first fill our area with gray 
+</font>            <font color='#BB00BB'>fill_rect</font><font face='Lucida Console'>(</font>c, area,<font color='#BB00BB'>rgb_pixel</font><font face='Lucida Console'>(</font><font color='#979000'>212</font>,<font color='#979000'>208</font>,<font color='#979000'>200</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>enabled<font face='Lucida Console'>)</font>
+            mfont.<font color='#BB00BB'>draw_string</font><font face='Lucida Console'>(</font>c,text_rect,text,text_color,text_pos<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>else</font>
+            mfont.<font color='#BB00BB'>draw_string</font><font face='Lucida Console'>(</font>c,text_rect,text,<font color='#BB00BB'>rgb_pixel</font><font face='Lucida Console'>(</font><font color='#979000'>128</font>,<font color='#979000'>128</font>,<font color='#979000'>128</font><font face='Lucida Console'>)</font>,text_pos<font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// now draw the edge of the text_field
+</font>        <font color='#BB00BB'>draw_sunken_rectangle</font><font face='Lucida Console'>(</font>c, rect<font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>highlight_start <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> highlight_end <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> enabled<font face='Lucida Console'>)</font>
+        <b>{</b>
+            rectangle highlight_rect <font color='#5555FF'>=</font> text_rect;
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> left_pad <font color='#5555FF'>=</font> <font color='#979000'>0</font>, right_pad <font color='#5555FF'>=</font> mfont.<font color='#BB00BB'>left_overflow</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'><u>long</u></font> i;
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>i <font color='#5555FF'>=</font> text_pos; i <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> highlight_end; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>i <font color='#5555FF'>=</font><font color='#5555FF'>=</font> highlight_start<font face='Lucida Console'>)</font>
+                    left_pad <font color='#5555FF'>=</font> right_pad;
+
+                right_pad <font color='#5555FF'>+</font><font color='#5555FF'>=</font> mfont[text[i]].<font color='#BB00BB'>width</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+            highlight_rect.<font color='#BB00BB'>set_left</font><font face='Lucida Console'>(</font>text_rect.<font color='#BB00BB'>left</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>+</font>left_pad<font face='Lucida Console'>)</font>;
+            highlight_rect.<font color='#BB00BB'>set_right</font><font face='Lucida Console'>(</font>text_rect.<font color='#BB00BB'>left</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>+</font>right_pad<font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// highlight the highlight_rect area
+</font>            highlight_rect <font color='#5555FF'>=</font> highlight_rect.<font color='#BB00BB'>intersect</font><font face='Lucida Console'>(</font>c<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> row <font color='#5555FF'>=</font> highlight_rect.<font color='#BB00BB'>top</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; row <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> highlight_rect.<font color='#BB00BB'>bottom</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>row<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> col <font color='#5555FF'>=</font> highlight_rect.<font color='#BB00BB'>left</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; col <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> highlight_rect.<font color='#BB00BB'>right</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>col<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    canvas::pixel<font color='#5555FF'>&amp;</font> pixel <font color='#5555FF'>=</font> c[row<font color='#5555FF'>-</font>c.<font color='#BB00BB'>top</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>][col<font color='#5555FF'>-</font>c.<font color='#BB00BB'>left</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>];
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>pixel.red <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>255</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> pixel.green <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>255</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> pixel.blue <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>255</font><font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        <font color='#009900'>// this is a background (and white) pixel so set it to a dark 
+</font>                        <font color='#009900'>// blueish color.
+</font>                        pixel.red <font color='#5555FF'>=</font> <font color='#979000'>10</font>;
+                        pixel.green <font color='#5555FF'>=</font> <font color='#979000'>36</font>;
+                        pixel.blue <font color='#5555FF'>=</font> <font color='#979000'>106</font>;
+                    <b>}</b>
+                    <font color='#0000FF'>else</font>
+                    <b>{</b>
+                        <font color='#009900'>// this should be a pixel that is part of a letter so set it to white
+</font>                        pixel.red <font color='#5555FF'>=</font> <font color='#979000'>255</font>;
+                        pixel.green <font color='#5555FF'>=</font> <font color='#979000'>255</font>;
+                        pixel.blue <font color='#5555FF'>=</font> <font color='#979000'>255</font>;
+                    <b>}</b>
+                <b>}</b>
+            <b>}</b>
+        <b>}</b>
+
+        <font color='#009900'>// now draw the cursor if we need to
+</font>        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>cursor_visible <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> has_focus <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> enabled<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> top <font color='#5555FF'>=</font> rect.<font color='#BB00BB'>top</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>+</font><font color='#979000'>3</font>;
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> bottom <font color='#5555FF'>=</font> rect.<font color='#BB00BB'>bottom</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#979000'>3</font>;
+            <font color='#BB00BB'>draw_line</font><font face='Lucida Console'>(</font>c, <font color='#BB00BB'>point</font><font face='Lucida Console'>(</font>rect.<font color='#BB00BB'>left</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>+</font>cursor_x,top<font face='Lucida Console'>)</font>,<font color='#BB00BB'>point</font><font face='Lucida Console'>(</font>rect.<font color='#BB00BB'>left</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>+</font>cursor_x,bottom<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>    <font color='#009900'>// text_box styles  
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>void</u></font> text_box_style_default::
+    <b><a name='draw_text_box'></a>draw_text_box</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> canvas<font color='#5555FF'>&amp;</font> c,
+        <font color='#0000FF'>const</font> rectangle<font color='#5555FF'>&amp;</font> display_rect,
+        <font color='#0000FF'>const</font> rectangle<font color='#5555FF'>&amp;</font> text_rect,
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>bool</u></font> enabled,
+        <font color='#0000FF'>const</font> font<font color='#5555FF'>&amp;</font> mfont,
+        <font color='#0000FF'>const</font> ustring<font color='#5555FF'>&amp;</font> text,
+        <font color='#0000FF'>const</font> rectangle<font color='#5555FF'>&amp;</font> cursor_rect,
+        <font color='#0000FF'>const</font> rgb_pixel<font color='#5555FF'>&amp;</font> text_color,
+        <font color='#0000FF'>const</font> rgb_pixel<font color='#5555FF'>&amp;</font> bg_color,
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>bool</u></font> has_focus,
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>bool</u></font> cursor_visible,
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> highlight_start,
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> highlight_end
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> 
+    <b>{</b>
+        rectangle area <font color='#5555FF'>=</font> display_rect.<font color='#BB00BB'>intersect</font><font face='Lucida Console'>(</font>c<font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>enabled<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#009900'>// first fill our area with the bg_color
+</font>            <font color='#BB00BB'>fill_rect</font><font face='Lucida Console'>(</font>c, area,bg_color<font face='Lucida Console'>)</font>;
+        <b>}</b>
+        <font color='#0000FF'>else</font>
+        <b>{</b>
+            <font color='#009900'>// first fill our area with gray 
+</font>            <font color='#BB00BB'>fill_rect</font><font face='Lucida Console'>(</font>c, area,<font color='#BB00BB'>rgb_pixel</font><font face='Lucida Console'>(</font><font color='#979000'>212</font>,<font color='#979000'>208</font>,<font color='#979000'>200</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>enabled<font face='Lucida Console'>)</font>
+            mfont.<font color='#BB00BB'>draw_string</font><font face='Lucida Console'>(</font>c,text_rect,text,text_color, <font color='#979000'>0</font>, ustring::npos, area<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>else</font>
+            mfont.<font color='#BB00BB'>draw_string</font><font face='Lucida Console'>(</font>c,text_rect,text,<font color='#BB00BB'>rgb_pixel</font><font face='Lucida Console'>(</font><font color='#979000'>128</font>,<font color='#979000'>128</font>,<font color='#979000'>128</font><font face='Lucida Console'>)</font>, <font color='#979000'>0</font>, ustring::npos, area<font face='Lucida Console'>)</font>;
+
+
+        <font color='#009900'>// now draw the highlight if there is any
+</font>        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>highlight_start <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> highlight_end <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> enabled<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>const</font> rectangle first_pos <font color='#5555FF'>=</font> mfont.<font color='#BB00BB'>compute_cursor_rect</font><font face='Lucida Console'>(</font>text_rect, text, highlight_start<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>const</font> rectangle last_pos <font color='#5555FF'>=</font> mfont.<font color='#BB00BB'>compute_cursor_rect</font><font face='Lucida Console'>(</font>text_rect, text, highlight_end<font color='#5555FF'>+</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>const</font> rgb_alpha_pixel <font color='#BB00BB'>color</font><font face='Lucida Console'>(</font><font color='#979000'>10</font>, <font color='#979000'>30</font>, <font color='#979000'>106</font>, <font color='#979000'>90</font><font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// if the highlighted text is all on one line
+</font>            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>first_pos.<font color='#BB00BB'>top</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> last_pos.<font color='#BB00BB'>top</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#BB00BB'>fill_rect</font><font face='Lucida Console'>(</font>c, <font face='Lucida Console'>(</font>first_pos <font color='#5555FF'>+</font> last_pos<font face='Lucida Console'>)</font>.<font color='#BB00BB'>intersect</font><font face='Lucida Console'>(</font>display_rect<font face='Lucida Console'>)</font>, color<font face='Lucida Console'>)</font>;
+            <b>}</b>
+            <font color='#0000FF'>else</font>
+            <b>{</b>
+                <font color='#0000FF'>const</font> rectangle <font color='#BB00BB'>min_boundary</font><font face='Lucida Console'>(</font>display_rect.<font color='#BB00BB'>left</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>+</font><font color='#979000'>4</font>, display_rect.<font color='#BB00BB'>top</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>+</font><font color='#979000'>4</font>,
+                                             display_rect.<font color='#BB00BB'>right</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#979000'>4</font>, display_rect.<font color='#BB00BB'>bottom</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#979000'>4</font><font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>const</font> rectangle <font color='#BB00BB'>boundary</font><font face='Lucida Console'>(</font> display_rect.<font color='#BB00BB'>intersect</font><font face='Lucida Console'>(</font>text_rect<font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> min_boundary<font face='Lucida Console'>)</font>;
+
+                rectangle first_row, last_row, middle_rows;
+                first_row <font color='#5555FF'>+</font><font color='#5555FF'>=</font> first_pos;
+                first_row <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#BB00BB'>point</font><font face='Lucida Console'>(</font>boundary.<font color='#BB00BB'>right</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, first_pos.<font color='#BB00BB'>top</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                last_row <font color='#5555FF'>+</font><font color='#5555FF'>=</font> last_pos;
+                last_row <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#BB00BB'>point</font><font face='Lucida Console'>(</font>boundary.<font color='#BB00BB'>left</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, last_pos.<font color='#BB00BB'>bottom</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+                middle_rows.<font color='#BB00BB'>left</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> boundary.<font color='#BB00BB'>left</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                middle_rows.<font color='#BB00BB'>right</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> boundary.<font color='#BB00BB'>right</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                middle_rows.<font color='#BB00BB'>top</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> first_row.<font color='#BB00BB'>bottom</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>+</font><font color='#979000'>1</font>;
+                middle_rows.<font color='#BB00BB'>bottom</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> last_row.<font color='#BB00BB'>top</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#979000'>1</font>;
+
+                <font color='#BB00BB'>fill_rect</font><font face='Lucida Console'>(</font>c, first_row.<font color='#BB00BB'>intersect</font><font face='Lucida Console'>(</font>display_rect<font face='Lucida Console'>)</font>, color<font face='Lucida Console'>)</font>;
+                <font color='#BB00BB'>fill_rect</font><font face='Lucida Console'>(</font>c, middle_rows, color<font face='Lucida Console'>)</font>;
+                <font color='#BB00BB'>fill_rect</font><font face='Lucida Console'>(</font>c, last_row.<font color='#BB00BB'>intersect</font><font face='Lucida Console'>(</font>display_rect<font face='Lucida Console'>)</font>, color<font face='Lucida Console'>)</font>;
+            <b>}</b>
+        <b>}</b>
+
+        <font color='#009900'>// now draw the cursor if we need to
+</font>        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>cursor_visible <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> has_focus <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> enabled<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#BB00BB'>draw_line</font><font face='Lucida Console'>(</font>c, <font color='#BB00BB'>point</font><font face='Lucida Console'>(</font>cursor_rect.<font color='#BB00BB'>left</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, cursor_rect.<font color='#BB00BB'>top</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>,<font color='#BB00BB'>point</font><font face='Lucida Console'>(</font>cursor_rect.<font color='#BB00BB'>left</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, cursor_rect.<font color='#BB00BB'>bottom</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>, <font color='#979000'>0</font>, area<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_WIDGETs_STYLE_CPP_
+</font>
+
+</pre></body></html>

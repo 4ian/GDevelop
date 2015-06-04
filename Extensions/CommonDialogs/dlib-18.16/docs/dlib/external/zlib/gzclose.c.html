@@ -1,0 +1,28 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - gzclose.c</title></head><body bgcolor='white'><pre>
+<font color='#009900'>/* gzclose.c -- zlib gzclose() function
+ * Copyright (C) 2004, 2010 Mark Adler
+ * For conditions of distribution and use, see copyright notice in zlib.h
+ */</font>
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='gzguts.h.html'>gzguts.h</a>"
+
+<font color='#009900'>/* gzclose() is in a separate file so that it is linked in only if it is used.
+   That way the other gzclose functions can be used instead to avoid linking in
+   unneeded compression or decompression routines. */</font>
+<font color='#0000FF'><u>int</u></font> ZEXPORT <b><a name='gzclose'></a>gzclose</b><font face='Lucida Console'>(</font>file<font face='Lucida Console'>)</font>
+    gzFile file;
+<b>{</b>
+<font color='#0000FF'>#ifndef</font> NO_GZCOMPRESS
+    gz_statep state;
+
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>file <font color='#5555FF'>=</font><font color='#5555FF'>=</font> NULL<font face='Lucida Console'>)</font>
+        <font color='#0000FF'>return</font> Z_STREAM_ERROR;
+    state <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>gz_statep<font face='Lucida Console'>)</font>file;
+
+    <font color='#0000FF'>return</font> state<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>mode <font color='#5555FF'>=</font><font color='#5555FF'>=</font> GZ_READ ? <font color='#BB00BB'>gzclose_r</font><font face='Lucida Console'>(</font>file<font face='Lucida Console'>)</font> : <font color='#BB00BB'>gzclose_w</font><font face='Lucida Console'>(</font>file<font face='Lucida Console'>)</font>;
+<font color='#0000FF'>#else</font>
+    <font color='#0000FF'>return</font> <font color='#BB00BB'>gzclose_r</font><font face='Lucida Console'>(</font>file<font face='Lucida Console'>)</font>;
+<font color='#0000FF'>#endif</font>
+<b>}</b>
+
+</pre></body></html>

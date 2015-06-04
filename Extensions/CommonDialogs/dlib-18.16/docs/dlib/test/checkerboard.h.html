@@ -1,0 +1,58 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - checkerboard.h</title></head><body bgcolor='white'><pre>
+<font color='#0000FF'>#ifndef</font> DLIB_CHECKERBOARD_TeST_H_
+<font color='#0000FF'>#define</font> DLIB_CHECKERBOARD_TeST_H_
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>matrix.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>vector<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>rand.h<font color='#5555FF'>&gt;</font>
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> scalar_type<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='get_checkerboard_problem'></a>get_checkerboard_problem</b> <font face='Lucida Console'>(</font>
+        std::vector<font color='#5555FF'>&lt;</font>matrix<font color='#5555FF'>&lt;</font>scalar_type,<font color='#979000'>2</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> x,
+        std::vector<font color='#5555FF'>&lt;</font>scalar_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> y,
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> num_samples,
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> board_dimension <font color='#5555FF'>=</font> <font color='#979000'>8</font>
+    <font face='Lucida Console'>)</font>
+    <font color='#009900'>/*!
+        requires
+            - num_samples &gt; 0
+            - board_dimension &gt; 0
+        ensures
+            - #x.size() == y.size() == num_samples
+            - is_binary_classification_problem(#x,#y) == true
+            - #x will contain points and #y labels that were
+              sampled randomly from a checkers board that has 
+              board_dimension squares on each side. 
+    !*/</font>
+    <b>{</b>
+        <font color='#0000FF'>static</font> dlib::rand rnd;
+
+        x.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        y.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+        matrix<font color='#5555FF'>&lt;</font>scalar_type,<font color='#979000'>2</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> sample;
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> num_samples; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#BB00BB'>sample</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> rnd.<font color='#BB00BB'>get_random_double</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>sample</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> rnd.<font color='#BB00BB'>get_random_double</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            sample <font color='#5555FF'>*</font><font color='#5555FF'>=</font> board_dimension;
+
+            x.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>sample<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font><font color='#BB00BB'>sum</font><font face='Lucida Console'>(</font><font color='#BB00BB'>floor</font><font face='Lucida Console'>(</font>sample<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>%</font><font color='#979000'>2</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                y.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font><font color='#5555FF'>+</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>else</font>
+                y.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font><font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+            
+        <b>}</b>
+    <b>}</b>
+
+
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_CHECKERBOARD_TeST_H_
+</font>
+
+</pre></body></html>

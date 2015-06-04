@@ -1,0 +1,323 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - thread_pool_extension.cpp</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2008  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_THREAD_POOl_CPPh_
+<font color='#0000FF'>#define</font> DLIB_THREAD_POOl_CPPh_ 
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='thread_pool_extension.h.html'>thread_pool_extension.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    thread_pool_implementation::
+    <b><a name='thread_pool_implementation'></a>thread_pool_implementation</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> num_threads
+    <font face='Lucida Console'>)</font> : 
+        task_done_signaler<font face='Lucida Console'>(</font>m<font face='Lucida Console'>)</font>,
+        task_ready_signaler<font face='Lucida Console'>(</font>m<font face='Lucida Console'>)</font>,
+        we_are_destructing<font face='Lucida Console'>(</font><font color='#979000'>false</font><font face='Lucida Console'>)</font>
+    <b>{</b>
+        tasks.<font color='#BB00BB'>resize</font><font face='Lucida Console'>(</font>num_threads<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> num_threads; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#BB00BB'>register_thread</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font>, <font color='#5555FF'>&amp;</font>thread_pool_implementation::thread<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#BB00BB'>start</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>void</u></font> thread_pool_implementation::
+    <b><a name='shutdown_pool'></a>shutdown_pool</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <b>{</b>
+            auto_mutex <font color='#BB00BB'>M</font><font face='Lucida Console'>(</font>m<font face='Lucida Console'>)</font>;
+            
+            <font color='#009900'>// first wait for all pending tasks to finish
+</font>            <font color='#0000FF'><u>bool</u></font> found_task <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+            <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>found_task<font face='Lucida Console'>)</font>
+            <b>{</b>
+                found_task <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> tasks.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#009900'>// If task bucket i has a task that is currently supposed to be processed
+</font>                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>tasks[i].<font color='#BB00BB'>is_empty</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font><font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        found_task <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+                        <font color='#0000FF'>break</font>;
+                    <b>}</b>
+                <b>}</b>
+
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>found_task<font face='Lucida Console'>)</font>
+                    task_done_signaler.<font color='#BB00BB'>wait</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+            <font color='#009900'>// now tell the threads to kill themselves
+</font>            we_are_destructing <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+            task_ready_signaler.<font color='#BB00BB'>broadcast</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#BB00BB'>wait</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    thread_pool_implementation::
+    ~<b><a name='thread_pool_implementation'></a>thread_pool_implementation</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#BB00BB'>shutdown_pool</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> thread_pool_implementation::
+    <b><a name='num_threads_in_pool'></a>num_threads_in_pool</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        auto_mutex <font color='#BB00BB'>M</font><font face='Lucida Console'>(</font>m<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>return</font> tasks.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>void</u></font> thread_pool_implementation::
+    <b><a name='wait_for_task'></a>wait_for_task</b> <font face='Lucida Console'>(</font>
+        uint64 task_id
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        auto_mutex <font color='#BB00BB'>M</font><font face='Lucida Console'>(</font>m<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>tasks.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> idx <font color='#5555FF'>=</font> <font color='#BB00BB'>task_id_to_index</font><font face='Lucida Console'>(</font>task_id<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>tasks[idx].task_id <font color='#5555FF'>=</font><font color='#5555FF'>=</font> task_id<font face='Lucida Console'>)</font>
+                task_done_signaler.<font color='#BB00BB'>wait</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>void</u></font> thread_pool_implementation::
+    <b><a name='wait_for_all_tasks'></a>wait_for_all_tasks</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        <font color='#0000FF'>const</font> thread_id_type thread_id <font color='#5555FF'>=</font> <font color='#BB00BB'>get_thread_id</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+        auto_mutex <font color='#BB00BB'>M</font><font face='Lucida Console'>(</font>m<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'><u>bool</u></font> found_task <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+        <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>found_task<font face='Lucida Console'>)</font>
+        <b>{</b>
+            found_task <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> tasks.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#009900'>// If task bucket i has a task that is currently supposed to be processed
+</font>                <font color='#009900'>// and it originated from the calling thread
+</font>                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>tasks[i].<font color='#BB00BB'>is_empty</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> tasks[i].thread_id <font color='#5555FF'>=</font><font color='#5555FF'>=</font> thread_id<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    found_task <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+                    <font color='#0000FF'>break</font>;
+                <b>}</b>
+            <b>}</b>
+
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>found_task<font face='Lucida Console'>)</font>
+                task_done_signaler.<font color='#BB00BB'>wait</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>bool</u></font> thread_pool_implementation::
+    <b><a name='is_worker_thread'></a>is_worker_thread</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> thread_id_type id
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> worker_thread_ids.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>worker_thread_ids[i] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> id<font face='Lucida Console'>)</font>
+                <font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+        <b>}</b>
+
+        <font color='#009900'>// if there aren't any threads in the pool then we consider all threads
+</font>        <font color='#009900'>// to be worker threads
+</font>        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>tasks.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+            <font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+        <font color='#0000FF'>else</font>
+            <font color='#0000FF'>return</font> <font color='#979000'>false</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>void</u></font> thread_pool_implementation::
+    <b><a name='thread'></a>thread</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <b>{</b>
+            <font color='#009900'>// save the id of this worker thread into worker_thread_ids
+</font>            auto_mutex <font color='#BB00BB'>M</font><font face='Lucida Console'>(</font>m<font face='Lucida Console'>)</font>;
+            thread_id_type id <font color='#5555FF'>=</font> <font color='#BB00BB'>get_thread_id</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            worker_thread_ids.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>id<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        task_state_type task;
+        <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>we_are_destructing <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'><u>long</u></font> idx <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+
+            <font color='#009900'>// wait for a task to do 
+</font>            <b>{</b> auto_mutex <font color='#BB00BB'>M</font><font face='Lucida Console'>(</font>m<font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font> <font face='Lucida Console'>(</font>idx <font color='#5555FF'>=</font> <font color='#BB00BB'>find_ready_task</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>1</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> we_are_destructing <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font><font face='Lucida Console'>)</font>
+                    task_ready_signaler.<font color='#BB00BB'>wait</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>we_are_destructing<font face='Lucida Console'>)</font>
+                    <font color='#0000FF'>break</font>;
+
+                tasks[idx].is_being_processed <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+                task <font color='#5555FF'>=</font> tasks[idx];
+            <b>}</b>
+
+            <font color='#009900'>// now do the task
+</font>            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>task.bfp<font face='Lucida Console'>)</font>
+                task.<font color='#BB00BB'>bfp</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>task.mfp0<font face='Lucida Console'>)</font>
+                task.<font color='#BB00BB'>mfp0</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>task.mfp1<font face='Lucida Console'>)</font>
+                task.<font color='#BB00BB'>mfp1</font><font face='Lucida Console'>(</font>task.arg1<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>task.mfp2<font face='Lucida Console'>)</font>
+                task.<font color='#BB00BB'>mfp2</font><font face='Lucida Console'>(</font>task.arg1, task.arg2<font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// Now let others know that we finished the task.  We do this
+</font>            <font color='#009900'>// by clearing out the state of this task
+</font>            <b>{</b> auto_mutex <font color='#BB00BB'>M</font><font face='Lucida Console'>(</font>m<font face='Lucida Console'>)</font>;
+                tasks[idx].is_being_processed <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+                tasks[idx].task_id <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                tasks[idx].bfp.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                tasks[idx].mfp0.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                tasks[idx].mfp1.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                tasks[idx].mfp2.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                tasks[idx].arg1 <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                tasks[idx].arg2 <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                task_done_signaler.<font color='#BB00BB'>broadcast</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+        <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>long</u></font> thread_pool_implementation::
+    <b><a name='find_empty_task_slot'></a>find_empty_task_slot</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> tasks.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>tasks[i].<font color='#BB00BB'>is_empty</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                <font color='#0000FF'>return</font> i;
+        <b>}</b>
+
+        <font color='#0000FF'>return</font> <font color='#5555FF'>-</font><font color='#979000'>1</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>long</u></font> thread_pool_implementation::
+    <b><a name='find_ready_task'></a>find_ready_task</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> tasks.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>tasks[i].<font color='#BB00BB'>is_ready</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                <font color='#0000FF'>return</font> i;
+        <b>}</b>
+
+        <font color='#0000FF'>return</font> <font color='#5555FF'>-</font><font color='#979000'>1</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    uint64 thread_pool_implementation::
+    <b><a name='make_next_task_id'></a>make_next_task_id</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'><u>long</u></font> idx
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        uint64 id <font color='#5555FF'>=</font> tasks[idx].next_task_id <font color='#5555FF'>*</font> tasks.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> idx;
+        tasks[idx].next_task_id <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+        <font color='#0000FF'>return</font> id;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> thread_pool_implementation::
+    <b><a name='task_id_to_index'></a>task_id_to_index</b> <font face='Lucida Console'>(</font>
+        uint64 id
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        <font color='#0000FF'>return</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>id<font color='#5555FF'>%</font>tasks.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    uint64 thread_pool_implementation::
+    <b><a name='add_task_internal'></a>add_task_internal</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> bfp_type<font color='#5555FF'>&amp;</font> bfp,
+        shared_ptr<font color='#5555FF'>&lt;</font>function_object_copy<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> item
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        auto_mutex <font color='#BB00BB'>M</font><font face='Lucida Console'>(</font>m<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>const</font> thread_id_type my_thread_id <font color='#5555FF'>=</font> <font color='#BB00BB'>get_thread_id</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// find a thread that isn't doing anything
+</font>        <font color='#0000FF'><u>long</u></font> idx <font color='#5555FF'>=</font> <font color='#BB00BB'>find_empty_task_slot</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>idx <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>1</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> <font color='#BB00BB'>is_worker_thread</font><font face='Lucida Console'>(</font>my_thread_id<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#009900'>// this function is being called from within a worker thread and there
+</font>            <font color='#009900'>// aren't any other worker threads free so just perform the task right
+</font>            <font color='#009900'>// here
+</font>
+            M.<font color='#BB00BB'>unlock</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>bfp</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// return a task id that is both non-zero and also one
+</font>            <font color='#009900'>// that is never normally returned.  This way calls
+</font>            <font color='#009900'>// to wait_for_task() will never block given this id.
+</font>            <font color='#0000FF'>return</font> <font color='#979000'>1</font>;
+        <b>}</b>
+
+        <font color='#009900'>// wait until there is a thread that isn't doing anything
+</font>        <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>idx <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            task_done_signaler.<font color='#BB00BB'>wait</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            idx <font color='#5555FF'>=</font> <font color='#BB00BB'>find_empty_task_slot</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        tasks[idx].thread_id <font color='#5555FF'>=</font> my_thread_id;
+        tasks[idx].task_id <font color='#5555FF'>=</font> <font color='#BB00BB'>make_next_task_id</font><font face='Lucida Console'>(</font>idx<font face='Lucida Console'>)</font>;
+        tasks[idx].bfp <font color='#5555FF'>=</font> bfp;
+        tasks[idx].function_copy.<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>item<font face='Lucida Console'>)</font>;
+
+        task_ready_signaler.<font color='#BB00BB'>signal</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>return</font> tasks[idx].task_id;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>bool</u></font> thread_pool_implementation::
+    <b><a name='is_task_thread'></a>is_task_thread</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        auto_mutex <font color='#BB00BB'>M</font><font face='Lucida Console'>(</font>m<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>return</font> <font color='#BB00BB'>is_worker_thread</font><font face='Lucida Console'>(</font><font color='#BB00BB'>get_thread_id</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_THREAD_POOl_CPPh_
+</font>
+
+</pre></body></html>

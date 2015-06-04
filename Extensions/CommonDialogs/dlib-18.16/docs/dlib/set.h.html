@@ -1,0 +1,77 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - set.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2003  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_SEt_
+<font color='#0000FF'>#define</font> DLIB_SEt_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='set/set_kernel_1.h.html'>set/set_kernel_1.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='set/set_kernel_c.h.html'>set/set_kernel_c.h</a>"
+
+
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='binary_search_tree.h.html'>binary_search_tree.h</a>"
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='set/set_compare_1.h.html'>set/set_compare_1.h</a>"
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='algs.h.html'>algs.h</a>"
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>functional<font color='#5555FF'>&gt;</font>
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T,
+        <font color='#0000FF'>typename</font> mem_manager <font color='#5555FF'>=</font> default_memory_manager,
+        <font color='#0000FF'>typename</font> compare <font color='#5555FF'>=</font> std::less<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font>
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>class</font> <b><a name='set'></a>set</b>
+    <b>{</b>
+        <b><a name='set'></a>set</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+
+
+
+
+
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> binary_search_tree<font color='#5555FF'>&lt;</font>T,<font color='#0000FF'><u>char</u></font>,mem_manager,compare<font color='#5555FF'>&gt;</font>::kernel_1a
+                binary_search_tree_1;
+
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> binary_search_tree<font color='#5555FF'>&lt;</font>T,<font color='#0000FF'><u>char</u></font>,mem_manager,compare<font color='#5555FF'>&gt;</font>::kernel_2a
+                binary_search_tree_2;
+
+    <font color='#0000FF'>public</font>:
+        
+        <font color='#009900'>//----------- kernels ---------------
+</font>
+        <font color='#009900'>// kernel_1a
+</font>        <font color='#0000FF'>typedef</font>     set_kernel_1<font color='#5555FF'>&lt;</font>T,binary_search_tree_1,mem_manager<font color='#5555FF'>&gt;</font>
+                    kernel_1a;
+        <font color='#0000FF'>typedef</font>     set_kernel_c<font color='#5555FF'>&lt;</font>kernel_1a<font color='#5555FF'>&gt;</font>
+                    kernel_1a_c;
+
+        <font color='#009900'>// kernel_1b
+</font>        <font color='#0000FF'>typedef</font>     set_kernel_1<font color='#5555FF'>&lt;</font>T,binary_search_tree_2,mem_manager<font color='#5555FF'>&gt;</font>
+                    kernel_1b;
+        <font color='#0000FF'>typedef</font>     set_kernel_c<font color='#5555FF'>&lt;</font>kernel_1b<font color='#5555FF'>&gt;</font>
+                    kernel_1b_c;
+
+
+        <font color='#009900'>//---------- extensions ------------
+</font>
+        <font color='#009900'>// compare extensions
+</font>        <font color='#0000FF'>typedef</font>     set_compare_1<font color='#5555FF'>&lt;</font>kernel_1a<font color='#5555FF'>&gt;</font>
+                    compare_1a;
+        <font color='#0000FF'>typedef</font>     set_compare_1<font color='#5555FF'>&lt;</font>kernel_1a_c<font color='#5555FF'>&gt;</font>
+                    compare_1a_c;
+
+        <font color='#0000FF'>typedef</font>     set_compare_1<font color='#5555FF'>&lt;</font>kernel_1b<font color='#5555FF'>&gt;</font>
+                    compare_1b;
+        <font color='#0000FF'>typedef</font>     set_compare_1<font color='#5555FF'>&lt;</font>kernel_1b_c<font color='#5555FF'>&gt;</font>
+                    compare_1b_c;
+
+    <b>}</b>;
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_SEt_
+</font>
+
+</pre></body></html>

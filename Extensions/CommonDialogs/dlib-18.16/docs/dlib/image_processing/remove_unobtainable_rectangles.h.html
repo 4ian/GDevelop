@@ -1,0 +1,319 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - remove_unobtainable_rectangles.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2013  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_REMOVE_UnOBTAINABLE_RECTANGLES_Hh_
+<font color='#0000FF'>#define</font> DLIB_REMOVE_UnOBTAINABLE_RECTANGLES_Hh_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='remove_unobtainable_rectangles_abstract.h.html'>remove_unobtainable_rectangles_abstract.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='scan_image_pyramid.h.html'>scan_image_pyramid.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='scan_image_boxes.h.html'>scan_image_boxes.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='scan_image_custom.h.html'>scan_image_custom.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='scan_fhog_pyramid.h.html'>scan_fhog_pyramid.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../svm/structural_object_detection_trainer.h.html'>../svm/structural_object_detection_trainer.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../geometry.h.html'>../geometry.h</a>"
+
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>namespace</font> impl
+    <b>{</b>
+        <font color='#0000FF'>inline</font> <font color='#0000FF'><u>bool</u></font> <b><a name='matches_rect'></a>matches_rect</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>rectangle<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> rects,
+            <font color='#0000FF'>const</font> rectangle<font color='#5555FF'>&amp;</font> rect,
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> eps
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> rects.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> score <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>rect.<font color='#BB00BB'>intersect</font><font face='Lucida Console'>(</font>rects[i]<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>area</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>/</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>double</u></font><font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>rect<font color='#5555FF'>+</font>rects[i]<font face='Lucida Console'>)</font>.<font color='#BB00BB'>area</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>score <font color='#5555FF'>&gt;</font> eps<font face='Lucida Console'>)</font>
+                    <font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+            <b>}</b>
+
+            <font color='#0000FF'>return</font> <font color='#979000'>false</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>inline</font> rectangle <b><a name='get_best_matching_rect'></a>get_best_matching_rect</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>rectangle<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> rects,
+            <font color='#0000FF'>const</font> rectangle<font color='#5555FF'>&amp;</font> rect
+        <font face='Lucida Console'>)</font> 
+        <b>{</b>
+            <font color='#0000FF'><u>double</u></font> best_score <font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>1</font>;
+            rectangle best_rect;
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> rects.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> score <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>rect.<font color='#BB00BB'>intersect</font><font face='Lucida Console'>(</font>rects[i]<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>area</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>/</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>double</u></font><font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>rect<font color='#5555FF'>+</font>rects[i]<font face='Lucida Console'>)</font>.<font color='#BB00BB'>area</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>score <font color='#5555FF'>&gt;</font> best_score<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    best_score <font color='#5555FF'>=</font> score;
+                    best_rect <font color='#5555FF'>=</font> rects[i];
+                <b>}</b>
+            <b>}</b>
+            <font color='#0000FF'>return</font> best_rect;
+        <b>}</b>
+
+    <font color='#009900'>// ------------------------------------------------------------------------------------
+</font>
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'>typename</font> image_array_type,
+            <font color='#0000FF'>typename</font> image_scanner_type
+            <font color='#5555FF'>&gt;</font>
+        std::vector<font color='#5555FF'>&lt;</font>std::vector<font color='#5555FF'>&lt;</font>rectangle<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> <b><a name='pyramid_remove_unobtainable_rectangles'></a>pyramid_remove_unobtainable_rectangles</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> structural_object_detection_trainer<font color='#5555FF'>&lt;</font>image_scanner_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> trainer,
+            <font color='#0000FF'>const</font> image_array_type<font color='#5555FF'>&amp;</font> images,
+            std::vector<font color='#5555FF'>&lt;</font>std::vector<font color='#5555FF'>&lt;</font>rectangle<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> object_locations
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> dlib::impl;
+            <font color='#009900'>// make sure requires clause is not broken
+</font>            <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font>images.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> object_locations.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,
+                "<font color='#CC0000'>\t std::vector&lt;std::vector&lt;rectangle&gt;&gt; remove_unobtainable_rectangles()</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t Invalid inputs were given to this function.</font>"
+            <font face='Lucida Console'>)</font>;
+
+
+            std::vector<font color='#5555FF'>&lt;</font>std::vector<font color='#5555FF'>&lt;</font>rectangle<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> <font color='#BB00BB'>rejects</font><font face='Lucida Console'>(</font>images.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// If the trainer is setup to automatically fit the overlap tester to the data then
+</font>            <font color='#009900'>// we should use the loosest possible overlap tester here.  Otherwise we should use
+</font>            <font color='#009900'>// the tester the trainer will use.
+</font>            test_box_overlap <font color='#BB00BB'>boxes_overlap</font><font face='Lucida Console'>(</font><font color='#979000'>0.9999999</font>,<font color='#979000'>1</font><font face='Lucida Console'>)</font>; 
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font>trainer.<font color='#BB00BB'>auto_set_overlap_tester</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                boxes_overlap <font color='#5555FF'>=</font> trainer.<font color='#BB00BB'>get_overlap_tester</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> k <font color='#5555FF'>=</font> <font color='#979000'>0</font>; k <font color='#5555FF'>&lt;</font> images.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>k<font face='Lucida Console'>)</font>
+            <b>{</b>
+                std::vector<font color='#5555FF'>&lt;</font>rectangle<font color='#5555FF'>&gt;</font> objs <font color='#5555FF'>=</font> object_locations[k];
+
+                <font color='#009900'>// First remove things that don't have any matches with the candidate object
+</font>                <font color='#009900'>// locations.
+</font>                std::vector<font color='#5555FF'>&lt;</font>rectangle<font color='#5555FF'>&gt;</font> good_rects;
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> j <font color='#5555FF'>=</font> <font color='#979000'>0</font>; j <font color='#5555FF'>&lt;</font> objs.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>j<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#0000FF'>const</font> rectangle rect <font color='#5555FF'>=</font> trainer.<font color='#BB00BB'>get_scanner</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>get_best_matching_rect</font><font face='Lucida Console'>(</font>objs[j]<font face='Lucida Console'>)</font>;
+                    <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> score <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>objs[j].<font color='#BB00BB'>intersect</font><font face='Lucida Console'>(</font>rect<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>area</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>/</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>double</u></font><font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>objs[j] <font color='#5555FF'>+</font> rect<font face='Lucida Console'>)</font>.<font color='#BB00BB'>area</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>score <font color='#5555FF'>&gt;</font> trainer.<font color='#BB00BB'>get_match_eps</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                        good_rects.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>objs[j]<font face='Lucida Console'>)</font>;
+                    <font color='#0000FF'>else</font>
+                        rejects[k].<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>objs[j]<font face='Lucida Console'>)</font>;
+                <b>}</b>
+                object_locations[k] <font color='#5555FF'>=</font> good_rects;
+
+
+                <font color='#009900'>// Remap these rectangles to the ones that can come out of the scanner.  That
+</font>                <font color='#009900'>// way when we compare them to each other in the following loop we will know if
+</font>                <font color='#009900'>// any distinct truth rectangles get mapped to overlapping boxes.
+</font>                objs.<font color='#BB00BB'>resize</font><font face='Lucida Console'>(</font>good_rects.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> good_rects.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                    objs[i] <font color='#5555FF'>=</font> trainer.<font color='#BB00BB'>get_scanner</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>get_best_matching_rect</font><font face='Lucida Console'>(</font>good_rects[i]<font face='Lucida Console'>)</font>;
+
+                good_rects.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                <font color='#009900'>// now check for truth rects that are too close together.
+</font>                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> objs.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#009900'>// check if objs[i] hits another box
+</font>                    <font color='#0000FF'><u>bool</u></font> hit_box <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+                    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> j <font color='#5555FF'>=</font> i<font color='#5555FF'>+</font><font color='#979000'>1</font>; j <font color='#5555FF'>&lt;</font> objs.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>j<font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>boxes_overlap</font><font face='Lucida Console'>(</font>objs[i], objs[j]<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                        <b>{</b>
+                            hit_box <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+                            <font color='#0000FF'>break</font>;
+                        <b>}</b>
+                    <b>}</b>
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>hit_box<font face='Lucida Console'>)</font>
+                        rejects[k].<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>object_locations[k][i]<font face='Lucida Console'>)</font>;
+                    <font color='#0000FF'>else</font>
+                        good_rects.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>object_locations[k][i]<font face='Lucida Console'>)</font>;
+                <b>}</b>
+                object_locations[k] <font color='#5555FF'>=</font> good_rects;
+            <b>}</b>
+
+            <font color='#0000FF'>return</font> rejects;
+        <b>}</b>
+
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> image_array_type,
+        <font color='#0000FF'>typename</font> Pyramid_type,
+        <font color='#0000FF'>typename</font> Feature_extractor_type
+        <font color='#5555FF'>&gt;</font>
+    std::vector<font color='#5555FF'>&lt;</font>std::vector<font color='#5555FF'>&lt;</font>rectangle<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> <b><a name='remove_unobtainable_rectangles'></a>remove_unobtainable_rectangles</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> structural_object_detection_trainer<font color='#5555FF'>&lt;</font>scan_image_pyramid<font color='#5555FF'>&lt;</font>Pyramid_type, Feature_extractor_type<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> trainer,
+        <font color='#0000FF'>const</font> image_array_type<font color='#5555FF'>&amp;</font> images,
+        std::vector<font color='#5555FF'>&lt;</font>std::vector<font color='#5555FF'>&lt;</font>rectangle<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> object_locations
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>return</font> impl::<font color='#BB00BB'>pyramid_remove_unobtainable_rectangles</font><font face='Lucida Console'>(</font>trainer, images, object_locations<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> image_array_type,
+        <font color='#0000FF'>typename</font> Pyramid_type
+        <font color='#5555FF'>&gt;</font>
+    std::vector<font color='#5555FF'>&lt;</font>std::vector<font color='#5555FF'>&lt;</font>rectangle<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> <b><a name='remove_unobtainable_rectangles'></a>remove_unobtainable_rectangles</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> structural_object_detection_trainer<font color='#5555FF'>&lt;</font>scan_fhog_pyramid<font color='#5555FF'>&lt;</font>Pyramid_type<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> trainer,
+        <font color='#0000FF'>const</font> image_array_type<font color='#5555FF'>&amp;</font> images,
+        std::vector<font color='#5555FF'>&lt;</font>std::vector<font color='#5555FF'>&lt;</font>rectangle<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> object_locations
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>return</font> impl::<font color='#BB00BB'>pyramid_remove_unobtainable_rectangles</font><font face='Lucida Console'>(</font>trainer, images, object_locations<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>namespace</font> impl
+    <b>{</b>
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'>typename</font> image_array_type,
+            <font color='#0000FF'>typename</font> scanner_type, 
+            <font color='#0000FF'>typename</font> get_boxes_functor
+            <font color='#5555FF'>&gt;</font>
+        std::vector<font color='#5555FF'>&lt;</font>std::vector<font color='#5555FF'>&lt;</font>rectangle<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> <b><a name='remove_unobtainable_rectangles'></a>remove_unobtainable_rectangles</b> <font face='Lucida Console'>(</font>
+            get_boxes_functor<font color='#5555FF'>&amp;</font> bg,
+            <font color='#0000FF'>const</font> structural_object_detection_trainer<font color='#5555FF'>&lt;</font>scanner_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> trainer,
+            <font color='#0000FF'>const</font> image_array_type<font color='#5555FF'>&amp;</font> images,
+            std::vector<font color='#5555FF'>&lt;</font>std::vector<font color='#5555FF'>&lt;</font>rectangle<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> object_locations
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> dlib::impl;
+            <font color='#009900'>// make sure requires clause is not broken
+</font>            <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font>images.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> object_locations.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,
+                "<font color='#CC0000'>\t std::vector&lt;std::vector&lt;rectangle&gt;&gt; remove_unobtainable_rectangles()</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t Invalid inputs were given to this function.</font>"
+            <font face='Lucida Console'>)</font>;
+
+            std::vector<font color='#5555FF'>&lt;</font>rectangle<font color='#5555FF'>&gt;</font> rects;
+
+            std::vector<font color='#5555FF'>&lt;</font>std::vector<font color='#5555FF'>&lt;</font>rectangle<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> <font color='#BB00BB'>rejects</font><font face='Lucida Console'>(</font>images.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// If the trainer is setup to automatically fit the overlap tester to the data then
+</font>            <font color='#009900'>// we should use the loosest possible overlap tester here.  Otherwise we should use
+</font>            <font color='#009900'>// the tester the trainer will use.
+</font>            test_box_overlap <font color='#BB00BB'>boxes_overlap</font><font face='Lucida Console'>(</font><font color='#979000'>0.9999999</font>,<font color='#979000'>1</font><font face='Lucida Console'>)</font>; 
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font>trainer.<font color='#BB00BB'>auto_set_overlap_tester</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                boxes_overlap <font color='#5555FF'>=</font> trainer.<font color='#BB00BB'>get_overlap_tester</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> k <font color='#5555FF'>=</font> <font color='#979000'>0</font>; k <font color='#5555FF'>&lt;</font> images.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>k<font face='Lucida Console'>)</font>
+            <b>{</b>
+                std::vector<font color='#5555FF'>&lt;</font>rectangle<font color='#5555FF'>&gt;</font> objs <font color='#5555FF'>=</font> object_locations[k];
+                <font color='#009900'>// Don't even bother computing the candidate rectangles if there aren't any
+</font>                <font color='#009900'>// object locations for this image since there isn't anything to do anyway.
+</font>                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>objs.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                    <font color='#0000FF'>continue</font>;
+
+                <font color='#BB00BB'>bg</font><font face='Lucida Console'>(</font>images[k], rects<font face='Lucida Console'>)</font>;
+
+
+                <font color='#009900'>// First remove things that don't have any matches with the candidate object
+</font>                <font color='#009900'>// locations.
+</font>                std::vector<font color='#5555FF'>&lt;</font>rectangle<font color='#5555FF'>&gt;</font> good_rects;
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> j <font color='#5555FF'>=</font> <font color='#979000'>0</font>; j <font color='#5555FF'>&lt;</font> objs.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>j<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>matches_rect</font><font face='Lucida Console'>(</font>rects, objs[j], trainer.<font color='#BB00BB'>get_match_eps</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                        good_rects.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>objs[j]<font face='Lucida Console'>)</font>;
+                    <font color='#0000FF'>else</font>
+                        rejects[k].<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>objs[j]<font face='Lucida Console'>)</font>;
+                <b>}</b>
+                object_locations[k] <font color='#5555FF'>=</font> good_rects;
+
+
+                <font color='#009900'>// Remap these rectangles to the ones that can come out of the scanner.  That
+</font>                <font color='#009900'>// way when we compare them to each other in the following loop we will know if
+</font>                <font color='#009900'>// any distinct truth rectangles get mapped to overlapping boxes.
+</font>                objs.<font color='#BB00BB'>resize</font><font face='Lucida Console'>(</font>good_rects.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> good_rects.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                    objs[i] <font color='#5555FF'>=</font> <font color='#BB00BB'>get_best_matching_rect</font><font face='Lucida Console'>(</font>rects, good_rects[i]<font face='Lucida Console'>)</font>;
+
+                good_rects.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                <font color='#009900'>// now check for truth rects that are too close together.
+</font>                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> objs.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#009900'>// check if objs[i] hits another box
+</font>                    <font color='#0000FF'><u>bool</u></font> hit_box <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+                    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> j <font color='#5555FF'>=</font> i<font color='#5555FF'>+</font><font color='#979000'>1</font>; j <font color='#5555FF'>&lt;</font> objs.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>j<font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>boxes_overlap</font><font face='Lucida Console'>(</font>objs[i], objs[j]<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                        <b>{</b>
+                            hit_box <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+                            <font color='#0000FF'>break</font>;
+                        <b>}</b>
+                    <b>}</b>
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>hit_box<font face='Lucida Console'>)</font>
+                        rejects[k].<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>object_locations[k][i]<font face='Lucida Console'>)</font>;
+                    <font color='#0000FF'>else</font>
+                        good_rects.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>object_locations[k][i]<font face='Lucida Console'>)</font>;
+                <b>}</b>
+                object_locations[k] <font color='#5555FF'>=</font> good_rects;
+            <b>}</b>
+
+            <font color='#0000FF'>return</font> rejects;
+        <b>}</b>
+
+    <font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>struct</font> <b><a name='load_to_functor'></a>load_to_functor</b>
+        <b>{</b>
+            <b><a name='load_to_functor'></a>load_to_functor</b><font face='Lucida Console'>(</font>T<font color='#5555FF'>&amp;</font> obj_<font face='Lucida Console'>)</font> : obj<font face='Lucida Console'>(</font>obj_<font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+            T<font color='#5555FF'>&amp;</font> obj;
+
+            <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> U, <font color='#0000FF'>typename</font> V<font color='#5555FF'>&gt;</font>
+            <font color='#0000FF'><u>void</u></font> <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> U<font color='#5555FF'>&amp;</font> u, V<font color='#5555FF'>&amp;</font> v<font face='Lucida Console'>)</font> 
+            <b>{</b>
+                obj.<font color='#BB00BB'>load</font><font face='Lucida Console'>(</font>u,v<font face='Lucida Console'>)</font>;
+            <b>}</b>
+        <b>}</b>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> image_array_type,
+        <font color='#0000FF'>typename</font> feature_extractor, 
+        <font color='#0000FF'>typename</font> box_generator
+        <font color='#5555FF'>&gt;</font>
+    std::vector<font color='#5555FF'>&lt;</font>std::vector<font color='#5555FF'>&lt;</font>rectangle<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> <b><a name='remove_unobtainable_rectangles'></a>remove_unobtainable_rectangles</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> structural_object_detection_trainer<font color='#5555FF'>&lt;</font>scan_image_boxes<font color='#5555FF'>&lt;</font>feature_extractor, box_generator<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> trainer,
+        <font color='#0000FF'>const</font> image_array_type<font color='#5555FF'>&amp;</font> images,
+        std::vector<font color='#5555FF'>&lt;</font>std::vector<font color='#5555FF'>&lt;</font>rectangle<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> object_locations
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        box_generator bg <font color='#5555FF'>=</font> trainer.<font color='#BB00BB'>get_scanner</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>get_box_generator</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>return</font> impl::<font color='#BB00BB'>remove_unobtainable_rectangles</font><font face='Lucida Console'>(</font>bg, trainer, images, object_locations<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> image_array_type,
+        <font color='#0000FF'>typename</font> feature_extractor
+        <font color='#5555FF'>&gt;</font>
+    std::vector<font color='#5555FF'>&lt;</font>std::vector<font color='#5555FF'>&lt;</font>rectangle<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> <b><a name='remove_unobtainable_rectangles'></a>remove_unobtainable_rectangles</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> structural_object_detection_trainer<font color='#5555FF'>&lt;</font>scan_image_custom<font color='#5555FF'>&lt;</font>feature_extractor<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> trainer,
+        <font color='#0000FF'>const</font> image_array_type<font color='#5555FF'>&amp;</font> images,
+        std::vector<font color='#5555FF'>&lt;</font>std::vector<font color='#5555FF'>&lt;</font>rectangle<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> object_locations
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        feature_extractor fe;
+        fe.<font color='#BB00BB'>copy_configuration</font><font face='Lucida Console'>(</font>trainer.<font color='#BB00BB'>get_scanner</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>get_feature_extractor</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        impl::load_to_functor<font color='#5555FF'>&lt;</font>feature_extractor<font color='#5555FF'>&gt;</font> <font color='#BB00BB'>bg</font><font face='Lucida Console'>(</font>fe<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>return</font> impl::<font color='#BB00BB'>remove_unobtainable_rectangles</font><font face='Lucida Console'>(</font>bg, trainer, images, object_locations<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_REMOVE_UnOBTAINABLE_RECTANGLES_Hh_
+</font>
+
+</pre></body></html>

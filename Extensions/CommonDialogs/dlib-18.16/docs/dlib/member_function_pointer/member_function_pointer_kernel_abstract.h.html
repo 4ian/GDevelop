@@ -1,0 +1,486 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - member_function_pointer_kernel_abstract.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2005  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#undef</font> DLIB_MEMBER_FUNCTION_POINTER_KERNEl_ABSTRACT_
+<font color='#0000FF'>#ifdef</font> DLIB_MEMBER_FUNCTION_POINTER_KERNEl_ABSTRACT_
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> PARAM1 <font color='#5555FF'>=</font> <font color='#0000FF'><u>void</u></font>,
+        <font color='#0000FF'>typename</font> PARAM2 <font color='#5555FF'>=</font> <font color='#0000FF'><u>void</u></font>,
+        <font color='#0000FF'>typename</font> PARAM3 <font color='#5555FF'>=</font> <font color='#0000FF'><u>void</u></font>,
+        <font color='#0000FF'>typename</font> PARAM4 <font color='#5555FF'>=</font> <font color='#0000FF'><u>void</u></font>
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>class</font> member_function_pointer;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>class</font> <b><a name='member_function_pointer'></a>member_function_pointer</b><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>void</u></font>,<font color='#0000FF'><u>void</u></font>,<font color='#0000FF'><u>void</u></font>,<font color='#0000FF'><u>void</u></font><font color='#5555FF'>&gt;</font>
+    <b>{</b>
+        <font color='#009900'>/*!
+            INITIAL VALUE
+                is_set() == false
+
+            WHAT THIS OBJECT REPRESENTS
+                This object represents a member function pointer.  It is useful because
+                instances of this object can be created without needing to know the type
+                of object whose member function we will be calling.
+
+                There are five template specializations of this object.  The first 
+                represents a pointer to a member function taking no parameters, the
+                second represents a pointer to a member function taking one parameter, 
+                the third to one taking two parameters, and so on.
+
+                You specify the parameters to your member function pointer by filling in
+                the PARAM template parameters.  For example:
+
+                    To use a pointer to a function with no parameters you would say:
+                        member_function_pointer&lt;&gt; my_pointer;
+                    To use a pointer to a function that takes a single int you would say:
+                        member_function_pointer&lt;int&gt; my_pointer;
+                    To use a pointer to a function that takes an int and then a reference
+                    to a string you would say:
+                        member_function_pointer&lt;int,string&amp;&gt; my_pointer;
+
+                Also note that the formal comments are only present for the first 
+                template specialization.  They are all exactly the same except for the 
+                number of parameters each takes in its member function pointer.
+        !*/</font>
+
+    <font color='#0000FF'>public</font>:
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'><u>void</u></font> param1_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'><u>void</u></font> param2_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'><u>void</u></font> param3_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'><u>void</u></font> param4_type;
+
+        <b><a name='member_function_pointer'></a>member_function_pointer</b> <font face='Lucida Console'>(</font>  
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures                
+                - #*this is properly initialized
+        !*/</font>
+
+        <b><a name='member_function_pointer'></a>member_function_pointer</b><font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> member_function_pointer<font color='#5555FF'>&amp;</font> item
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - *this == item
+        !*/</font>
+
+        ~<b><a name='member_function_pointer'></a>member_function_pointer</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - any resources associated with *this have been released
+        !*/</font>
+
+        member_function_pointer<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>=</font><font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> member_function_pointer<font color='#5555FF'>&amp;</font> item
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - *this == item
+        !*/</font>
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='operator'></a>operator</b> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> member_function_pointer<font color='#5555FF'>&amp;</font> item
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - if (is_set() == false &amp;&amp; item.is_set() == false) then
+                    - returns true
+                - else if (both *this and item point to the same member function
+                  in the same object instance) then
+                    - returns true
+                - else
+                    - returns false
+        !*/</font>
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='operator'></a>operator</b> <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> member_function_pointer<font color='#5555FF'>&amp;</font> item
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns !(*this == item)
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='clear'></a>clear</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #*this has its initial value
+        !*/</font>
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='is_set'></a>is_set</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - if (this-&gt;set() has been called) then
+                    - returns true
+                - else
+                    - returns false
+        !*/</font>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'>typename</font> T
+            <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='set'></a>set</b> <font face='Lucida Console'>(</font>
+            T<font color='#5555FF'>&amp;</font> object,
+            <font color='#0000FF'><u>void</u></font> <font face='Lucida Console'>(</font>T::<font color='#5555FF'>*</font>cb<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - cb == a valid member function pointer for class T
+            ensures
+                - #is_set() == true
+                - calls to this-&gt;operator() will call (object.*cb)()
+        !*/</font>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'>typename</font> T
+            <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='set'></a>set</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> object,
+            <font color='#0000FF'><u>void</u></font> <font face='Lucida Console'>(</font>T::<font color='#5555FF'>*</font>cb<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#0000FF'>const</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - cb == a valid member function pointer for class T
+            ensures
+                - #is_set() == true
+                - calls to this-&gt;operator() will call (object.*cb)()
+        !*/</font>
+
+        <b><a name='operator'></a>operator</b> <b><a name='some_undefined_pointer_type'></a>some_undefined_pointer_type</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - if (is_set()) then
+                    - returns a non 0 value
+                - else
+                    - returns a 0 value
+        !*/</font>
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='operator'></a>operator</b><font color='#5555FF'>!</font> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns !is_set()
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='operator'></a>operator</b> <font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - is_set() == true
+            ensures
+                - calls the member function on the object specified by the last 
+                  call to this-&gt;set()
+            throws
+                - any exception thrown by the member function specified by
+                  the previous call to this-&gt;set().
+                    If any of these exceptions are thrown then the call to this 
+                    function will have no effect on *this.                  
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='swap'></a>swap</b> <font face='Lucida Console'>(</font>
+            member_function_pointer<font color='#5555FF'>&amp;</font> item
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - swaps *this and item
+        !*/</font> 
+
+    <b>}</b>;    
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> PARAM1
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>class</font> <b><a name='member_function_pointer'></a>member_function_pointer</b><font color='#5555FF'>&lt;</font>PARAM1,<font color='#0000FF'><u>void</u></font>,<font color='#0000FF'><u>void</u></font>,<font color='#0000FF'><u>void</u></font><font color='#5555FF'>&gt;</font>
+    <b>{</b>
+    <font color='#0000FF'>public</font>:
+        <font color='#0000FF'>typedef</font> PARAM1 param1_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'><u>void</u></font> param2_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'><u>void</u></font> param3_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'><u>void</u></font> param4_type;
+
+        <b><a name='member_function_pointer'></a>member_function_pointer</b> <font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+        <b><a name='member_function_pointer'></a>member_function_pointer</b><font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> member_function_pointer<font color='#5555FF'>&amp;</font> item
+        <font face='Lucida Console'>)</font>;
+
+        ~<b><a name='member_function_pointer'></a>member_function_pointer</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+
+        member_function_pointer<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>=</font><font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> member_function_pointer<font color='#5555FF'>&amp;</font> item
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='operator'></a>operator</b> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> member_function_pointer<font color='#5555FF'>&amp;</font> item
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='operator'></a>operator</b> <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> member_function_pointer<font color='#5555FF'>&amp;</font> item
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='clear'></a>clear</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='is_set'></a>is_set</b> <font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='set'></a>set</b> <font face='Lucida Console'>(</font>
+            T<font color='#5555FF'>&amp;</font> object,
+            <font color='#0000FF'><u>void</u></font> <font face='Lucida Console'>(</font>T::<font color='#5555FF'>*</font>cb<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>PARAM1<font face='Lucida Console'>)</font>
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='set'></a>set</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> object,
+            <font color='#0000FF'><u>void</u></font> <font face='Lucida Console'>(</font>T::<font color='#5555FF'>*</font>cb<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>PARAM1<font face='Lucida Console'>)</font><font color='#0000FF'>const</font>
+        <font face='Lucida Console'>)</font>;
+
+        <b><a name='operator'></a>operator</b> <b><a name='some_undefined_pointer_type'></a>some_undefined_pointer_type</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='operator'></a>operator</b><font color='#5555FF'>!</font> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='operator'></a>operator</b> <font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>
+            PARAM1 param1
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='swap'></a>swap</b> <font face='Lucida Console'>(</font>
+            member_function_pointer<font color='#5555FF'>&amp;</font> item
+        <font face='Lucida Console'>)</font>;
+
+    <b>}</b>;    
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> PARAM1,
+        <font color='#0000FF'>typename</font> PARAM2
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>class</font> <b><a name='member_function_pointer'></a>member_function_pointer</b><font color='#5555FF'>&lt;</font>PARAM1,PARAM2,<font color='#0000FF'><u>void</u></font>,<font color='#0000FF'><u>void</u></font><font color='#5555FF'>&gt;</font>
+    <b>{</b>
+    <font color='#0000FF'>public</font>:
+        <font color='#0000FF'>typedef</font> PARAM1 param1_type;
+        <font color='#0000FF'>typedef</font> PARAM2 param2_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'><u>void</u></font> param3_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'><u>void</u></font> param4_type;
+
+        <b><a name='member_function_pointer'></a>member_function_pointer</b> <font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+        <b><a name='member_function_pointer'></a>member_function_pointer</b><font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> member_function_pointer<font color='#5555FF'>&amp;</font> item
+        <font face='Lucida Console'>)</font>;
+
+        ~<b><a name='member_function_pointer'></a>member_function_pointer</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+
+        member_function_pointer<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>=</font><font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> member_function_pointer<font color='#5555FF'>&amp;</font> item
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='operator'></a>operator</b> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> member_function_pointer<font color='#5555FF'>&amp;</font> item
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='operator'></a>operator</b> <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> member_function_pointer<font color='#5555FF'>&amp;</font> item
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='clear'></a>clear</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='is_set'></a>is_set</b> <font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='set'></a>set</b> <font face='Lucida Console'>(</font>
+            T<font color='#5555FF'>&amp;</font> object,
+            <font color='#0000FF'><u>void</u></font> <font face='Lucida Console'>(</font>T::<font color='#5555FF'>*</font>cb<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>PARAM1,PARAM2<font face='Lucida Console'>)</font>
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='set'></a>set</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> object,
+            <font color='#0000FF'><u>void</u></font> <font face='Lucida Console'>(</font>T::<font color='#5555FF'>*</font>cb<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>PARAM1,PARAM2<font face='Lucida Console'>)</font><font color='#0000FF'>const</font>
+        <font face='Lucida Console'>)</font>;
+
+        <b><a name='operator'></a>operator</b> <b><a name='some_undefined_pointer_type'></a>some_undefined_pointer_type</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='operator'></a>operator</b><font color='#5555FF'>!</font> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='operator'></a>operator</b> <font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>
+            PARAM1 param1,
+            PARAM2 param2
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='swap'></a>swap</b> <font face='Lucida Console'>(</font>
+            member_function_pointer<font color='#5555FF'>&amp;</font> item
+        <font face='Lucida Console'>)</font>;
+
+    <b>}</b>;    
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> PARAM1,
+        <font color='#0000FF'>typename</font> PARAM2,
+        <font color='#0000FF'>typename</font> PARAM3
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>class</font> <b><a name='member_function_pointer'></a>member_function_pointer</b><font color='#5555FF'>&lt;</font>PARAM1,PARAM2,PARAM3,<font color='#0000FF'><u>void</u></font><font color='#5555FF'>&gt;</font>
+    <b>{</b>
+    <font color='#0000FF'>public</font>:
+        <font color='#0000FF'>typedef</font> PARAM1 param1_type;
+        <font color='#0000FF'>typedef</font> PARAM2 param2_type;
+        <font color='#0000FF'>typedef</font> PARAM3 param3_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'><u>void</u></font> param4_type;
+
+        <b><a name='member_function_pointer'></a>member_function_pointer</b> <font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+        <b><a name='member_function_pointer'></a>member_function_pointer</b><font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> member_function_pointer<font color='#5555FF'>&amp;</font> item
+        <font face='Lucida Console'>)</font>;
+
+        ~<b><a name='member_function_pointer'></a>member_function_pointer</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+
+        member_function_pointer<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>=</font><font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> member_function_pointer<font color='#5555FF'>&amp;</font> item
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='operator'></a>operator</b> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> member_function_pointer<font color='#5555FF'>&amp;</font> item
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='operator'></a>operator</b> <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> member_function_pointer<font color='#5555FF'>&amp;</font> item
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='clear'></a>clear</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='is_set'></a>is_set</b> <font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='set'></a>set</b> <font face='Lucida Console'>(</font>
+            T<font color='#5555FF'>&amp;</font> object,
+            <font color='#0000FF'><u>void</u></font> <font face='Lucida Console'>(</font>T::<font color='#5555FF'>*</font>cb<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>PARAM1,PARAM2,PARAM3<font face='Lucida Console'>)</font>
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='set'></a>set</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> object,
+            <font color='#0000FF'><u>void</u></font> <font face='Lucida Console'>(</font>T::<font color='#5555FF'>*</font>cb<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>PARAM1,PARAM2,PARAM3<font face='Lucida Console'>)</font><font color='#0000FF'>const</font>
+        <font face='Lucida Console'>)</font>;
+
+        <b><a name='operator'></a>operator</b> <b><a name='some_undefined_pointer_type'></a>some_undefined_pointer_type</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='operator'></a>operator</b><font color='#5555FF'>!</font> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='operator'></a>operator</b> <font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>
+            PARAM1 param1,
+            PARAM2 param2,
+            PARAM2 param3
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='swap'></a>swap</b> <font face='Lucida Console'>(</font>
+            member_function_pointer<font color='#5555FF'>&amp;</font> item
+        <font face='Lucida Console'>)</font>;
+
+    <b>}</b>;    
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> PARAM1,
+        <font color='#0000FF'>typename</font> PARAM2,
+        <font color='#0000FF'>typename</font> PARAM3,
+        <font color='#0000FF'>typename</font> PARAM4
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>class</font> <b><a name='member_function_pointer'></a>member_function_pointer</b>
+    <b>{</b>
+    <font color='#0000FF'>public</font>:
+        <font color='#0000FF'>typedef</font> PARAM1 param1_type;
+        <font color='#0000FF'>typedef</font> PARAM2 param2_type;
+        <font color='#0000FF'>typedef</font> PARAM3 param3_type;
+        <font color='#0000FF'>typedef</font> PARAM4 param4_type;
+
+        <b><a name='member_function_pointer'></a>member_function_pointer</b> <font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+        <b><a name='member_function_pointer'></a>member_function_pointer</b><font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> member_function_pointer<font color='#5555FF'>&amp;</font> item
+        <font face='Lucida Console'>)</font>;
+
+        ~<b><a name='member_function_pointer'></a>member_function_pointer</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+
+        member_function_pointer<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>=</font><font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> member_function_pointer<font color='#5555FF'>&amp;</font> item
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='operator'></a>operator</b> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> member_function_pointer<font color='#5555FF'>&amp;</font> item
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='operator'></a>operator</b> <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> member_function_pointer<font color='#5555FF'>&amp;</font> item
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='clear'></a>clear</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='is_set'></a>is_set</b> <font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='set'></a>set</b> <font face='Lucida Console'>(</font>
+            T<font color='#5555FF'>&amp;</font> object,
+            <font color='#0000FF'><u>void</u></font> <font face='Lucida Console'>(</font>T::<font color='#5555FF'>*</font>cb<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>PARAM1,PARAM2,PARAM3,PARAM4<font face='Lucida Console'>)</font>
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='set'></a>set</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> object,
+            <font color='#0000FF'><u>void</u></font> <font face='Lucida Console'>(</font>T::<font color='#5555FF'>*</font>cb<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>PARAM1,PARAM2,PARAM3,PARAM4<font face='Lucida Console'>)</font><font color='#0000FF'>const</font>
+        <font face='Lucida Console'>)</font>;
+
+        <b><a name='operator'></a>operator</b> <b><a name='some_undefined_pointer_type'></a>some_undefined_pointer_type</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='operator'></a>operator</b><font color='#5555FF'>!</font> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='operator'></a>operator</b> <font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>
+            PARAM1 param1,
+            PARAM2 param2,
+            PARAM2 param3,
+            PARAM2 param4
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='swap'></a>swap</b> <font face='Lucida Console'>(</font>
+            member_function_pointer<font color='#5555FF'>&amp;</font> item
+        <font face='Lucida Console'>)</font>;
+
+    <b>}</b>;    
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_MEMBER_FUNCTION_POINTER_KERNEl_ABSTRACT_
+</font>
+
+</pre></body></html>

@@ -1,0 +1,79 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - num_nonnegative_weights.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2012  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_NUM_NONNEGATIVE_WEIGHtS_Hh_
+<font color='#0000FF'>#define</font> DLIB_NUM_NONNEGATIVE_WEIGHtS_Hh_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../enable_if.h.html'>../enable_if.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+    <font color='#0000FF'>namespace</font> impl2
+    <b>{</b>
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'>typename</font> T,
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <font face='Lucida Console'>(</font>T::<font color='#5555FF'>*</font>funct<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#0000FF'>const</font>
+            <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>struct</font> <b><a name='hnnf_helper'></a>hnnf_helper</b>
+        <b>{</b>
+            <font color='#0000FF'>typedef</font> <font color='#0000FF'><u>char</u></font> type;
+        <b>}</b>;
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>char</u></font> <b><a name='has_num_nonnegative_weights_helper'></a>has_num_nonnegative_weights_helper</b><font face='Lucida Console'>(</font> <font color='#0000FF'>typename</font> hnnf_helper<font color='#5555FF'>&lt;</font>T,<font color='#5555FF'>&amp;</font>T::num_nonnegative_weights<font color='#5555FF'>&gt;</font>::type <font color='#5555FF'>=</font> <font color='#979000'>0</font> <font face='Lucida Console'>)</font> <b>{</b> <font color='#0000FF'>return</font> <font color='#979000'>0</font>;<b>}</b>
+
+        <font color='#0000FF'>struct</font> <b><a name='two_bytes'></a>two_bytes</b>
+        <b>{</b>
+            <font color='#0000FF'><u>char</u></font> a[<font color='#979000'>2</font>]; 
+        <b>}</b>;
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+        two_bytes <b><a name='has_num_nonnegative_weights_helper'></a>has_num_nonnegative_weights_helper</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font> <b>{</b> <font color='#0000FF'>return</font> <font color='#BB00BB'>two_bytes</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;<b>}</b>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>struct</font> <b><a name='work_around_visual_studio_bug'></a>work_around_visual_studio_bug</b>
+        <b>{</b>
+            <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> U <font color='#5555FF'>=</font> <font color='#0000FF'>sizeof</font><font face='Lucida Console'>(</font>has_num_nonnegative_weights_helper<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>'<font color='#FF0000'>a</font>'<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <b>}</b>;
+
+
+        <font color='#009900'>// This is a template to tell you if a feature_extractor has a num_nonnegative_weights function or not.
+</font>        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T, <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> U <font color='#5555FF'>=</font> work_around_visual_studio_bug<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font>::U <font color='#5555FF'>&gt;</font> 
+        <font color='#0000FF'>struct</font> <b><a name='has_num_nonnegative_weights'></a>has_num_nonnegative_weights</b> 
+        <b>{</b>
+            <font color='#0000FF'>static</font> <font color='#0000FF'>const</font> <font color='#0000FF'><u>bool</u></font> value <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+        <b>}</b>;
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>struct</font> <b><a name='has_num_nonnegative_weights'></a>has_num_nonnegative_weights</b> <font color='#5555FF'>&lt;</font>T,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font>
+        <b>{</b>
+            <font color='#0000FF'>static</font> <font color='#0000FF'>const</font> <font color='#0000FF'><u>bool</u></font> value <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+        <b>}</b>;
+
+
+    <b>}</b>
+
+    <font color='#009900'>// call fe.num_nonnegative_weights() if it exists, otherwise return 0.
+</font>    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> feature_extractor<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>typename</font> enable_if<font color='#5555FF'>&lt;</font>impl2::has_num_nonnegative_weights<font color='#5555FF'>&lt;</font>feature_extractor<font color='#5555FF'>&gt;</font>,<font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font>::type <b><a name='num_nonnegative_weights'></a>num_nonnegative_weights</b> <font face='Lucida Console'>(</font>
+    <font color='#0000FF'>const</font> feature_extractor<font color='#5555FF'>&amp;</font> fe
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>return</font> fe.<font color='#BB00BB'>num_nonnegative_weights</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> feature_extractor<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>typename</font> disable_if<font color='#5555FF'>&lt;</font>impl2::has_num_nonnegative_weights<font color='#5555FF'>&lt;</font>feature_extractor<font color='#5555FF'>&gt;</font>,<font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font>::type <b><a name='num_nonnegative_weights'></a>num_nonnegative_weights</b> <font face='Lucida Console'>(</font>
+    <font color='#0000FF'>const</font> feature_extractor<font color='#5555FF'>&amp;</font> <font color='#009900'>/*fe*/</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>return</font> <font color='#979000'>0</font>;
+    <b>}</b>
+
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_NUM_NONNEGATIVE_WEIGHtS_Hh_
+</font>
+
+</pre></body></html>

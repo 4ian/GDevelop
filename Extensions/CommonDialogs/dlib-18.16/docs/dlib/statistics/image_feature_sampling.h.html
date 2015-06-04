@@ -1,0 +1,85 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - image_feature_sampling.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2011  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_IMAGE_FEATURE_SaMPLING_Hh_
+<font color='#0000FF'>#define</font> DLIB_IMAGE_FEATURE_SaMPLING_Hh_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='image_feature_sampling_abstract.h.html'>image_feature_sampling_abstract.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../statistics.h.html'>../statistics.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> image_array_type,
+        <font color='#0000FF'>typename</font> feature_extractor_type,
+        <font color='#0000FF'>typename</font> pyramid_type
+        <font color='#5555FF'>&gt;</font>
+    random_subset_selector<font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> feature_extractor_type::descriptor_type<font color='#5555FF'>&gt;</font> <b><a name='randomly_sample_image_features'></a>randomly_sample_image_features</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> image_array_type<font color='#5555FF'>&amp;</font> images,
+        <font color='#0000FF'>const</font> pyramid_type<font color='#5555FF'>&amp;</font> pyr,
+        <font color='#0000FF'>const</font> feature_extractor_type<font color='#5555FF'>&amp;</font> fe_,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> num
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        feature_extractor_type fe;
+        fe.<font color='#BB00BB'>copy_configuration</font><font face='Lucida Console'>(</font>fe_<font face='Lucida Console'>)</font>;
+        random_subset_selector<font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> feature_extractor_type::descriptor_type<font color='#5555FF'>&gt;</font> basis;
+        basis.<font color='#BB00BB'>set_max_size</font><font face='Lucida Console'>(</font>num<font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> image_array_type::type image_type;
+        image_type temp_img, temp_img2;
+
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> images.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'><u>bool</u></font> at_pyramid_top <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+            <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font><font color='#979000'>true</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>at_pyramid_top<font face='Lucida Console'>)</font>
+                    fe.<font color='#BB00BB'>load</font><font face='Lucida Console'>(</font>images[i]<font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>else</font>
+                    fe.<font color='#BB00BB'>load</font><font face='Lucida Console'>(</font>temp_img<font face='Lucida Console'>)</font>;
+                
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>fe.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                    <font color='#0000FF'>break</font>;
+
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> r <font color='#5555FF'>=</font> <font color='#979000'>0</font>; r <font color='#5555FF'>&lt;</font> fe.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>r<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> c <font color='#5555FF'>=</font> <font color='#979000'>0</font>; c <font color='#5555FF'>&lt;</font> fe.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>c<font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>basis.<font color='#BB00BB'>next_add_accepts</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                        <b>{</b>
+                            basis.<font color='#BB00BB'>add</font><font face='Lucida Console'>(</font><font color='#BB00BB'>fe</font><font face='Lucida Console'>(</font>r,c<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                        <b>}</b>
+                        <font color='#0000FF'>else</font>
+                        <b>{</b>
+                            basis.<font color='#BB00BB'>add</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                        <b>}</b>
+                    <b>}</b>
+                <b>}</b>
+
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>at_pyramid_top<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    at_pyramid_top <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+                    <font color='#BB00BB'>pyr</font><font face='Lucida Console'>(</font>images[i], temp_img<font face='Lucida Console'>)</font>;
+                <b>}</b>
+                <font color='#0000FF'>else</font>
+                <b>{</b>
+                    <font color='#BB00BB'>pyr</font><font face='Lucida Console'>(</font>temp_img, temp_img2<font face='Lucida Console'>)</font>;
+                    <font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>temp_img2,temp_img<font face='Lucida Console'>)</font>;
+                <b>}</b>
+            <b>}</b>
+        <b>}</b>
+        <font color='#0000FF'>return</font> basis;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_IMAGE_FEATURE_SaMPLING_Hh_
+</font>
+
+</pre></body></html>

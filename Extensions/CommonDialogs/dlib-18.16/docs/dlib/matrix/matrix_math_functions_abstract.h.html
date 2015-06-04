@@ -1,0 +1,598 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - matrix_math_functions_abstract.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2006  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#undef</font> DLIB_MATRIx_MATH_FUNCTIONS_ABSTRACT_
+<font color='#0000FF'>#ifdef</font> DLIB_MATRIx_MATH_FUNCTIONS_ABSTRACT_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='matrix_abstract.h.html'>matrix_abstract.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>//                          Exponential Functions 
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>const</font> matrix_exp <b><a name='exp'></a>exp</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&amp;</font> m
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        ensures
+            - returns a matrix R such that:
+                - R::type == the same type that was in m
+                - R has the same dimensions as m
+                - for all valid r and c:
+                  R(r,c) == std::exp(m(r,c)) 
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>const</font> matrix_exp <b><a name='log10'></a>log10</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&amp;</font> m
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        ensures
+            - returns a matrix R such that:
+                - R::type == the same type that was in m
+                - R has the same dimensions as m
+                - for all valid r and c:
+                  R(r,c) == std::log10(m(r,c)) 
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>const</font> matrix_exp <b><a name='log'></a>log</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&amp;</font> m
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        ensures
+            - returns a matrix R such that:
+                - R::type == the same type that was in m
+                - R has the same dimensions as m
+                - for all valid r and c:
+                  R(r,c) == std::log(m(r,c)) 
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>const</font> matrix_exp <b><a name='sqrt'></a>sqrt</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&amp;</font> m
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        ensures
+            - returns a matrix R such that:
+                - R::type == the same type that was in m
+                - R has the same dimensions as m
+                - for all valid r and c:
+                  R(r,c) == sqrt(m(r,c)) 
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>const</font> matrix_exp <b><a name='pow'></a>pow</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&amp;</font> m,
+        <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> e
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - matrix_exp::type == float, double, or long double 
+        ensures
+            - returns a matrix R such that:
+                - R::type == the same type that was in m
+                - R has the same dimensions as m
+                - for all valid r and c:
+                  R(r,c) == pow(m(r,c),e) 
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>const</font> matrix_exp <b><a name='pow'></a>pow</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> b,
+        <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&amp;</font> m
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - matrix_exp::type == float, double, or long double 
+        ensures
+            - returns a matrix R such that:
+                - R::type == the same type that was in m
+                - R has the same dimensions as m
+                - for all valid r and c:
+                  R(r,c) == pow(b, m(r,c)) 
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>const</font> matrix_exp <b><a name='squared'></a>squared</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&amp;</font> m
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        ensures
+            - returns a matrix R such that:
+                - R::type == the same type that was in m
+                - R has the same dimensions as m
+                - for all valid r and c:
+                  R(r,c) == m(r,c)*m(r,c)
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>const</font> matrix_exp <b><a name='cubed'></a>cubed</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&amp;</font> m
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        ensures
+            - returns a matrix R such that:
+                - R::type == the same type that was in m
+                - R has the same dimensions as m
+                - for all valid r and c:
+                  R(r,c) == m(r,c)*m(r,c)*m(r,c)
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>//                               Miscellaneous
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>const</font> matrix_exp <b><a name='sign'></a>sign</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&amp;</font> m
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        ensures
+            - returns a matrix that tells the sign of each element in m. In particular:
+              returns a matrix R such that:
+                - R::type == the same type that was in m
+                - R has the same dimensions as m
+                - for all valid r and c:
+                    - if (m(r,c) &gt;= 0) then
+                        - R(r,c) == +1
+                    - else
+                        - R(r,c) == -1
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>const</font> matrix_exp <b><a name='sigmoid'></a>sigmoid</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&amp;</font> m
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        ensures
+            - returns a matrix R such that:
+                - R::type == the same type that was in m
+                - R has the same dimensions as m
+                - for all valid r and c:
+                  R(r,c) == 1/(1 + exp(-m(r,c))) 
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>const</font> matrix_exp <b><a name='abs'></a>abs</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&amp;</font> m
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        ensures
+            - returns a matrix R such that:
+                - if (m contains std::complex&lt;T&gt; objects) then
+                    - R::type == T 
+                - else
+                    - R::type == the same type that was in m
+                - R has the same dimensions as m
+                - for all valid r and c:
+                  R(r,c) == std::abs(m(r,c)) 
+                  (note that if m is complex then std::abs(val) performs sqrt(std::norm(val))
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>const</font> matrix_exp <b><a name='reciprocal'></a>reciprocal</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&amp;</font> m
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - matrix_exp::type == float, double, long double, std::complex&lt;float&gt;,
+              std::complex&lt;double&gt;, or std::complex&lt;long double&gt;
+        ensures
+            - returns a matrix R such that:
+                - R::type == the same type that was in m
+                - R has the same dimensions as m
+                - for all valid r and c:
+                    - if (m(r,c) != 0) then
+                        - R(r,c) == 1.0/m(r,c) 
+                    - else
+                        - R(r,c) == 0
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>const</font> matrix_exp <b><a name='reciprocal_max'></a>reciprocal_max</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&amp;</font> m
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - matrix_exp::type == float, double, long double
+        ensures
+            - returns a matrix R such that:
+                - R::type == the same type that was in m
+                - R has the same dimensions as m
+                - for all valid r and c:
+                    - if (m(r,c) != 0) then
+                        - R(r,c) == 1.0/m(r,c) 
+                    - else
+                        - R(r,c) == std::numeric_limits&lt;R::type&gt;::max() 
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>const</font> matrix_exp <b><a name='normalize'></a>normalize</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&amp;</font> m
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - matrix_exp::type == float, double, or long double 
+        ensures
+            - if (sqrt(sum(squared(m))) != 0) then
+                - returns m/sqrt(sum(squared(m)))
+            - else
+                - returns m
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>//                          Rounding numbers one way or another
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>const</font> matrix_exp <b><a name='round'></a>round</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&amp;</font> m
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - is_built_in_scalar_type&lt;matrix_exp::type&gt;::value == true
+              (i.e. m must contain a type like int, float, double, long, etc.)
+        ensures
+            - if (m contains integers) then
+                - returns m unmodified
+            - else
+                - returns a matrix R such that:
+                    - R::type == the same type that was in m
+                    - R has the same dimensions as m
+                    - for all valid r and c:
+                      R(r,c) == m(r,c) rounded to the nearest integral value
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>const</font> matrix_exp <b><a name='ceil'></a>ceil</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&amp;</font> m
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        ensures
+            - returns a matrix R such that:
+                - R::type == the same type that was in m
+                - R has the same dimensions as m
+                - for all valid r and c:
+                  R(r,c) == std::ceil(m(r,c)) 
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>const</font> matrix_exp <b><a name='floor'></a>floor</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&amp;</font> m
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        ensures
+            - returns a matrix R such that:
+                - R::type == the same type that was in m
+                - R has the same dimensions as m
+                - for all valid r and c:
+                  R(r,c) == std::floor(m(r,c)) 
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>const</font> matrix_exp <b><a name='round_zeros'></a>round_zeros</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&amp;</font> m
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - is_built_in_scalar_type&lt;matrix_exp::type&gt;::value == true
+              (i.e. m must contain a type like int, float, double, long, etc.)
+        ensures
+            - if (m contains integers) then
+                - returns m unmodified
+            - else
+                - returns a matrix R such that:
+                    - R::type == the same type that was in m
+                    - R has the same dimensions as m
+                    - let eps == 10*std::numeric_limits&lt;matrix_exp::type&gt;::epsilon()
+                    - for all valid r and c:
+                        - if (abs(m(r,c)) &gt;= eps) then
+                            - R(r,c) == m(r,c)
+                        - else
+                            - R(r,c) == 0
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>const</font> matrix_exp <b><a name='round_zeros'></a>round_zeros</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&amp;</font> m,
+        matrix_exp::type eps 
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - is_built_in_scalar_type&lt;matrix_exp::type&gt;::value == true
+              (i.e. m must contain a type like int, float, double, long, etc.)
+        ensures
+            - returns a matrix R such that:
+                - R::type == the same type that was in m
+                - R has the same dimensions as m
+                - for all valid r and c:
+                    - if (abs(m(r,c)) &gt;= eps) then
+                        - R(r,c) == m(r,c)
+                    - else
+                        - R(r,c) == 0
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>//                              Complex number utility functions
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>const</font> matrix_exp <b><a name='conj'></a>conj</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&amp;</font> m
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - matrix_exp::type == std::complex&lt;T&gt;
+        ensures
+            - returns a matrix R such that:
+                - R::type == std::complex&lt;T&gt;
+                - R has the same dimensions as m
+                - for all valid r and c:
+                  R(r,c) == std::conj(m(r,c))
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>const</font> matrix_exp <b><a name='norm'></a>norm</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&amp;</font> m
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - matrix_exp::type == std::complex&lt;T&gt;
+        ensures
+            - returns a matrix R such that:
+                - R::type == T
+                - R has the same dimensions as m
+                - for all valid r and c:
+                  R(r,c) == std::norm(m(r,c))
+                  (note that std::norm(val) == val.real()*val.real() + val.imag()*val.imag())
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>const</font> matrix_exp <b><a name='imag'></a>imag</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&amp;</font> m
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - matrix_exp::type == std::complex&lt;T&gt;
+        ensures
+            - returns a matrix R such that:
+                - R::type == T
+                - R has the same dimensions as m
+                - for all valid r and c:
+                  R(r,c) == std::imag(m(r,c))
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>const</font> matrix_exp <b><a name='real'></a>real</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&amp;</font> m
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - matrix_exp::type == std::complex&lt;T&gt;
+        ensures
+            - returns a matrix R such that:
+                - R::type == T
+                - R has the same dimensions as m
+                - for all valid r and c:
+                  R(r,c) == std::real(m(r,c))
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>const</font> matrix_exp <b><a name='complex_matrix'></a>complex_matrix</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&amp;</font> real_part
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        ensures
+            - returns a matrix R such that:
+                - R::type == std::complex&lt;T&gt; where T is whatever type real_part used.
+                - R has the same dimensions as real_part. 
+                - for all valid r and c:
+                  R(r,c) == std::complex(real_part(r,c), 0)
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>const</font> matrix_exp <b><a name='complex_matrix'></a>complex_matrix</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&amp;</font> real_part,
+        <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&amp;</font> imag_part
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - real_part.nr() == imag_part.nr()
+            - real_part.nc() == imag_part.nc()
+            - real_part and imag_part both contain the same type of element
+        ensures
+            - returns a matrix R such that:
+                - R::type == std::complex&lt;T&gt; where T is whatever type real_part and imag_part used.
+                - R has the same dimensions as real_part and imag_part
+                - for all valid r and c:
+                  R(r,c) == std::complex(real_part(r,c),imag_part(r,c))
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>//                              Trigonometric Functions 
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>const</font> matrix_exp <b><a name='sin'></a>sin</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&amp;</font> m
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - matrix_exp::type == float, double, or long double 
+        ensures
+            - returns a matrix R such that:
+                - R::type == the same type that was in m
+                - R has the same dimensions as m
+                - for all valid r and c:
+                  R(r,c) == std::sin(m(r,c)) 
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>const</font> matrix_exp <b><a name='cos'></a>cos</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&amp;</font> m
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - matrix_exp::type == float, double, or long double 
+        ensures
+            - returns a matrix R such that:
+                - R::type == the same type that was in m
+                - R has the same dimensions as m
+                - for all valid r and c:
+                  R(r,c) == std::cos(m(r,c)) 
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>const</font> matrix_exp <b><a name='tan'></a>tan</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&amp;</font> m
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - matrix_exp::type == float, double, or long double 
+        ensures
+            - returns a matrix R such that:
+                - R::type == the same type that was in m
+                - R has the same dimensions as m
+                - for all valid r and c:
+                  R(r,c) == std::tan(m(r,c)) 
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>const</font> matrix_exp <b><a name='asin'></a>asin</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&amp;</font> m
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - matrix_exp::type == float, double, or long double 
+        ensures
+            - returns a matrix R such that:
+                - R::type == the same type that was in m
+                - R has the same dimensions as m
+                - for all valid r and c:
+                  R(r,c) == std::asin(m(r,c)) 
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>const</font> matrix_exp <b><a name='acos'></a>acos</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&amp;</font> m
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - matrix_exp::type == float, double, or long double 
+        ensures
+            - returns a matrix R such that:
+                - R::type == the same type that was in m
+                - R has the same dimensions as m
+                - for all valid r and c:
+                  R(r,c) == std::acos(m(r,c)) 
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>const</font> matrix_exp <b><a name='atan'></a>atan</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&amp;</font> m
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - matrix_exp::type == float, double, or long double 
+        ensures
+            - returns a matrix R such that:
+                - R::type == the same type that was in m
+                - R has the same dimensions as m
+                - for all valid r and c:
+                  R(r,c) == std::atan(m(r,c)) 
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>const</font> matrix_exp <b><a name='sinh'></a>sinh</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&amp;</font> m
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - matrix_exp::type == float, double, or long double 
+        ensures
+            - returns a matrix R such that:
+                - R::type == the same type that was in m
+                - R has the same dimensions as m
+                - for all valid r and c:
+                  R(r,c) == std::sinh(m(r,c)) 
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>const</font> matrix_exp <b><a name='cosh'></a>cosh</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&amp;</font> m
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - matrix_exp::type == float, double, or long double 
+        ensures
+            - returns a matrix R such that:
+                - R::type == the same type that was in m
+                - R has the same dimensions as m
+                - for all valid r and c:
+                  R(r,c) == std::cosh(m(r,c)) 
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>const</font> matrix_exp <b><a name='tanh'></a>tanh</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&amp;</font> m
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - matrix_exp::type == float, double, or long double 
+        ensures
+            - returns a matrix R such that:
+                - R::type == the same type that was in m
+                - R has the same dimensions as m
+                - for all valid r and c:
+                  R(r,c) == std::tanh(m(r,c)) 
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_MATRIx_MATH_FUNCTIONS_ABSTRACT_
+</font>
+
+</pre></body></html>

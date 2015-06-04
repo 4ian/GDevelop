@@ -1,0 +1,1254 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - pixel.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2006  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_PIXEl_ 
+<font color='#0000FF'>#define</font> DLIB_PIXEl_
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>iostream<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='serialize.h.html'>serialize.h</a>"
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>cmath<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='algs.h.html'>algs.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='uintn.h.html'>uintn.h</a>"
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>limits<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>complex<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='enable_if.h.html'>enable_if.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#009900'>/*!
+        This file contains definitions of pixel objects and related classes and
+        functionality.
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>struct</font> pixel_traits;
+    <font color='#009900'>/*!
+        WHAT THIS OBJECT REPRESENTS
+            As the name implies, this is a traits class for pixel types.
+            It defines the properties of a pixel.
+
+        This traits class will define the following public static members:
+            - bool grayscale
+            - bool rgb
+            - bool rgb_alpha
+            - bool hsi
+
+            - bool has_alpha
+
+            - long num 
+
+            - basic_pixel_type
+            - basic_pixel_type min()
+            - basic_pixel_type max()
+            - is_unsigned
+
+        The above public constants are subject to the following constraints:
+            - only one of grayscale, rgb, rgb_alpha, or hsi is true
+            - if (rgb == true) then
+                - The type T will be a struct with 3 public members of type 
+                  unsigned char named "red" "green" and "blue".  
+                - This type of pixel represents the RGB color space.
+                - num == 3
+                - has_alpha == false
+                - basic_pixel_type == unsigned char
+                - min() == 0 
+                - max() == 255
+                - is_unsigned == true
+            - if (rgb_alpha == true) then
+                - The type T will be a struct with 4 public members of type 
+                  unsigned char named "red" "green" "blue" and "alpha".  
+                - This type of pixel represents the RGB color space with
+                  an alpha channel where an alpha of 0 represents a pixel
+                  that is totally transparent and 255 represents a pixel 
+                  with maximum opacity.
+                - num == 4
+                - has_alpha == true 
+                - basic_pixel_type == unsigned char
+                - min() == 0 
+                - max() == 255
+                - is_unsigned == true
+            - else if (hsi == true) then
+                - The type T will be a struct with 3 public members of type
+                  unsigned char named "h" "s" and "i".  
+                - This type of pixel represents the HSI color space.
+                - num == 3
+                - has_alpha == false 
+                - basic_pixel_type == unsigned char
+                - min() == 0 
+                - max() == 255
+                - is_unsigned == true
+            - else
+                - grayscale == true
+                - This type of pixel represents a grayscale color space.  T 
+                  will be some kind of basic scalar type such as unsigned int.
+                - num == 1
+                - has_alpha == false 
+                - basic_pixel_type == T 
+                - min() == the minimum obtainable value of objects of type T 
+                - max() == the maximum obtainable value of objects of type T 
+                - is_unsigned is true if min() == 0 and false otherwise
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>struct</font> <b><a name='rgb_pixel'></a>rgb_pixel</b>
+    <b>{</b>
+        <font color='#009900'>/*!
+            WHAT THIS OBJECT REPRESENTS
+                This is a simple struct that represents an RGB colored graphical pixel.
+        !*/</font>
+
+        <b><a name='rgb_pixel'></a>rgb_pixel</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+
+        <b><a name='rgb_pixel'></a>rgb_pixel</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> red_,
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> green_,
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> blue_
+        <font face='Lucida Console'>)</font> : red<font face='Lucida Console'>(</font>red_<font face='Lucida Console'>)</font>, green<font face='Lucida Console'>(</font>green_<font face='Lucida Console'>)</font>, blue<font face='Lucida Console'>(</font>blue_<font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> red;
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> green;
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> blue;
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>struct</font> <b><a name='bgr_pixel'></a>bgr_pixel</b>
+    <b>{</b>
+        <font color='#009900'>/*!
+            WHAT THIS OBJECT REPRESENTS
+                This is a simple struct that represents an BGR colored graphical pixel.
+                (the reason it exists in addition to the rgb_pixel is so you can lay
+                it down on top of a memory region that organizes its color data in the
+                BGR format and still be able to read it)
+        !*/</font>
+
+        <b><a name='bgr_pixel'></a>bgr_pixel</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+
+        <b><a name='bgr_pixel'></a>bgr_pixel</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> blue_,
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> green_,
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> red_
+        <font face='Lucida Console'>)</font> : blue<font face='Lucida Console'>(</font>blue_<font face='Lucida Console'>)</font>, green<font face='Lucida Console'>(</font>green_<font face='Lucida Console'>)</font>, red<font face='Lucida Console'>(</font>red_<font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> blue;
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> green;
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> red;
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>struct</font> <b><a name='rgb_alpha_pixel'></a>rgb_alpha_pixel</b>
+    <b>{</b>
+        <font color='#009900'>/*!
+            WHAT THIS OBJECT REPRESENTS
+                This is a simple struct that represents an RGB colored graphical pixel
+                with an alpha channel.
+        !*/</font>
+
+        <b><a name='rgb_alpha_pixel'></a>rgb_alpha_pixel</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+
+        <b><a name='rgb_alpha_pixel'></a>rgb_alpha_pixel</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> red_,
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> green_,
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> blue_,
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> alpha_
+        <font face='Lucida Console'>)</font> : red<font face='Lucida Console'>(</font>red_<font face='Lucida Console'>)</font>, green<font face='Lucida Console'>(</font>green_<font face='Lucida Console'>)</font>, blue<font face='Lucida Console'>(</font>blue_<font face='Lucida Console'>)</font>, alpha<font face='Lucida Console'>(</font>alpha_<font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> red;
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> green;
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> blue;
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> alpha;
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>struct</font> <b><a name='hsi_pixel'></a>hsi_pixel</b>
+    <b>{</b>
+        <font color='#009900'>/*!
+            WHAT THIS OBJECT REPRESENTS
+                This is a simple struct that represents an HSI colored graphical pixel.
+        !*/</font>
+
+        <b><a name='hsi_pixel'></a>hsi_pixel</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+
+        <b><a name='hsi_pixel'></a>hsi_pixel</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> h_,
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> s_,
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> i_
+        <font face='Lucida Console'>)</font> : h<font face='Lucida Console'>(</font>h_<font face='Lucida Console'>)</font>, s<font face='Lucida Console'>(</font>s_<font face='Lucida Console'>)</font>, i<font face='Lucida Console'>(</font>i_<font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> h;
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> s;
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> i;
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> P1,
+        <font color='#0000FF'>typename</font> P2  
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='assign_pixel'></a>assign_pixel</b> <font face='Lucida Console'>(</font>
+        P1<font color='#5555FF'>&amp;</font> dest,
+        <font color='#0000FF'>const</font> P2<font color='#5555FF'>&amp;</font> src
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - pixel_traits&lt;P1&gt; must be defined
+            - pixel_traits&lt;P2&gt; must be defined
+        ensures
+            - if (P1 and P2 are the same type of pixel) then
+                - simply copies the value of src into dest.  In other words,
+                  dest will be identical to src after this function returns.
+            - else if (P1 and P2 are not the same type of pixel) then
+                - assigns pixel src to pixel dest and does any necessary color space
+                  conversions.   
+                - When converting from a grayscale color space with more than 255 values the
+                  pixel intensity is saturated at pixel_traits&lt;P1&gt;::max() or pixel_traits&lt;P1&gt;::min()
+                  as appropriate.
+                - if (the dest pixel has an alpha channel and the src pixel doesn't) then
+                    - #dest.alpha == 255 
+                - else if (the src pixel has an alpha channel but the dest pixel doesn't) then
+                    - #dest == the original dest value blended with the src value according
+                      to the alpha channel in src.  
+                      (i.e.  #dest == src*(alpha/255) + dest*(1-alpha/255))
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> P
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>inline</font> <font color='#0000FF'>typename</font> pixel_traits<font color='#5555FF'>&lt;</font>P<font color='#5555FF'>&gt;</font>::basic_pixel_type <b><a name='get_pixel_intensity'></a>get_pixel_intensity</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> P<font color='#5555FF'>&amp;</font> src
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - pixel_traits&lt;P&gt; must be defined
+        ensures
+            - if (pixel_traits&lt;P&gt;::grayscale == true) then
+                - returns src
+            - else
+                - converts src to grayscale and returns the resulting value.
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> P,
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='assign_pixel_intensity'></a>assign_pixel_intensity</b> <font face='Lucida Console'>(</font>
+        P<font color='#5555FF'>&amp;</font> dest,
+        <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> new_intensity
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - pixel_traits&lt;P&gt; must be defined
+            - pixel_traits&lt;T&gt; must be defined
+        ensures
+            - This function changes the intensity of the dest pixel. So if the pixel in 
+              question is a grayscale pixel then it simply assigns that pixel with the 
+              value of get_pixel_intensity(new_intensity).  However, if the pixel is not 
+              a grayscale pixel then it converts the pixel to the HSI color space and sets 
+              the I channel to the given intensity and then converts this HSI value back to 
+              the original pixel's color space.
+            - Note that we don't necessarily have #get_pixel_intensity(dest) == get_pixel_intensity(new_intensity) 
+              due to vagaries of how converting to and from HSI works out.
+            - if (the dest pixel has an alpha channel) then
+                - #dest.alpha == dest.alpha
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='serialize'></a>serialize</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> rgb_pixel<font color='#5555FF'>&amp;</font> item, 
+        std::ostream<font color='#5555FF'>&amp;</font> out 
+    <font face='Lucida Console'>)</font>;   
+    <font color='#009900'>/*!
+        provides serialization support for the rgb_pixel struct
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='deserialize'></a>deserialize</b> <font face='Lucida Console'>(</font>
+        rgb_pixel<font color='#5555FF'>&amp;</font> item, 
+        std::istream<font color='#5555FF'>&amp;</font> in
+    <font face='Lucida Console'>)</font>;   
+    <font color='#009900'>/*!
+        provides deserialization support for the rgb_pixel struct
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='serialize'></a>serialize</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> bgr_pixel<font color='#5555FF'>&amp;</font> item, 
+        std::ostream<font color='#5555FF'>&amp;</font> out 
+    <font face='Lucida Console'>)</font>;   
+    <font color='#009900'>/*!
+        provides serialization support for the bgr_pixel struct
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='deserialize'></a>deserialize</b> <font face='Lucida Console'>(</font>
+        bgr_pixel<font color='#5555FF'>&amp;</font> item, 
+        std::istream<font color='#5555FF'>&amp;</font> in
+    <font face='Lucida Console'>)</font>;   
+    <font color='#009900'>/*!
+        provides deserialization support for the bgr_pixel struct
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='serialize'></a>serialize</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> rgb_alpha_pixel<font color='#5555FF'>&amp;</font> item, 
+        std::ostream<font color='#5555FF'>&amp;</font> out 
+    <font face='Lucida Console'>)</font>;   
+    <font color='#009900'>/*!
+        provides serialization support for the rgb_alpha_pixel struct
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='deserialize'></a>deserialize</b> <font face='Lucida Console'>(</font>
+        rgb_alpha_pixel<font color='#5555FF'>&amp;</font> item, 
+        std::istream<font color='#5555FF'>&amp;</font> in
+    <font face='Lucida Console'>)</font>;   
+    <font color='#009900'>/*!
+        provides deserialization support for the rgb_alpha_pixel struct
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='serialize'></a>serialize</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> hsi_pixel<font color='#5555FF'>&amp;</font> item, 
+        std::ostream<font color='#5555FF'>&amp;</font> out 
+    <font face='Lucida Console'>)</font>;   
+    <font color='#009900'>/*!
+        provides serialization support for the hsi_pixel struct
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='deserialize'></a>deserialize</b> <font face='Lucida Console'>(</font>
+        hsi_pixel<font color='#5555FF'>&amp;</font> item, 
+        std::istream<font color='#5555FF'>&amp;</font> in
+    <font face='Lucida Console'>)</font>;   
+    <font color='#009900'>/*!
+        provides deserialization support for the hsi_pixel struct
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>struct</font> <b><a name='pixel_traits'></a>pixel_traits</b><font color='#5555FF'>&lt;</font>rgb_pixel<font color='#5555FF'>&gt;</font>
+    <b>{</b>
+        <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>bool</u></font> rgb  <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+        <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>bool</u></font> rgb_alpha  <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+        <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>bool</u></font> grayscale <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+        <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>bool</u></font> hsi <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+        <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>long</u></font> num <font color='#5555FF'>=</font> <font color='#979000'>3</font>;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> basic_pixel_type;
+        <font color='#0000FF'>static</font> basic_pixel_type <b><a name='min'></a>min</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <b>{</b> <font color='#0000FF'>return</font> <font color='#979000'>0</font>;<b>}</b>
+        <font color='#0000FF'>static</font> basic_pixel_type <b><a name='max'></a>max</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <b>{</b> <font color='#0000FF'>return</font> <font color='#979000'>255</font>;<b>}</b>
+        <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>bool</u></font> is_unsigned <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+        <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>bool</u></font> has_alpha <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>struct</font> <b><a name='pixel_traits'></a>pixel_traits</b><font color='#5555FF'>&lt;</font>bgr_pixel<font color='#5555FF'>&gt;</font>
+    <b>{</b>
+        <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>bool</u></font> rgb  <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+        <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>bool</u></font> rgb_alpha  <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+        <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>bool</u></font> grayscale <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+        <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>bool</u></font> hsi <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+        <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>long</u></font> num <font color='#5555FF'>=</font> <font color='#979000'>3</font>;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> basic_pixel_type;
+        <font color='#0000FF'>static</font> basic_pixel_type <b><a name='min'></a>min</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <b>{</b> <font color='#0000FF'>return</font> <font color='#979000'>0</font>;<b>}</b>
+        <font color='#0000FF'>static</font> basic_pixel_type <b><a name='max'></a>max</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <b>{</b> <font color='#0000FF'>return</font> <font color='#979000'>255</font>;<b>}</b>
+        <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>bool</u></font> is_unsigned <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+        <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>bool</u></font> has_alpha <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>struct</font> <b><a name='pixel_traits'></a>pixel_traits</b><font color='#5555FF'>&lt;</font>rgb_alpha_pixel<font color='#5555FF'>&gt;</font>
+    <b>{</b>
+        <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>bool</u></font> rgb  <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+        <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>bool</u></font> rgb_alpha  <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+        <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>bool</u></font> grayscale <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+        <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>bool</u></font> hsi <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+        <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>long</u></font> num <font color='#5555FF'>=</font> <font color='#979000'>4</font>;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> basic_pixel_type;
+        <font color='#0000FF'>static</font> basic_pixel_type <b><a name='min'></a>min</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <b>{</b> <font color='#0000FF'>return</font> <font color='#979000'>0</font>;<b>}</b>
+        <font color='#0000FF'>static</font> basic_pixel_type <b><a name='max'></a>max</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <b>{</b> <font color='#0000FF'>return</font> <font color='#979000'>255</font>;<b>}</b>
+        <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>bool</u></font> is_unsigned <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+        <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>bool</u></font> has_alpha <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>struct</font> <b><a name='pixel_traits'></a>pixel_traits</b><font color='#5555FF'>&lt;</font>hsi_pixel<font color='#5555FF'>&gt;</font>
+    <b>{</b>
+        <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>bool</u></font> rgb  <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+        <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>bool</u></font> rgb_alpha  <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+        <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>bool</u></font> grayscale <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+        <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>bool</u></font> hsi <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+        <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>long</u></font> num <font color='#5555FF'>=</font> <font color='#979000'>3</font>;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> basic_pixel_type;
+        <font color='#0000FF'>static</font> basic_pixel_type <b><a name='min'></a>min</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <b>{</b> <font color='#0000FF'>return</font> <font color='#979000'>0</font>;<b>}</b>
+        <font color='#0000FF'>static</font> basic_pixel_type <b><a name='max'></a>max</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <b>{</b> <font color='#0000FF'>return</font> <font color='#979000'>255</font>;<b>}</b>
+        <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>bool</u></font> is_unsigned <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+        <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>bool</u></font> has_alpha <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>struct</font> <b><a name='grayscale_pixel_traits'></a>grayscale_pixel_traits</b>
+    <b>{</b>
+        <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>bool</u></font> rgb  <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+        <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>bool</u></font> rgb_alpha  <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+        <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>bool</u></font> grayscale <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+        <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>bool</u></font> hsi <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+        <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>long</u></font> num <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+        <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>bool</u></font> has_alpha <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+        <font color='#0000FF'>typedef</font> T basic_pixel_type;
+        <font color='#0000FF'>static</font> basic_pixel_type <b><a name='min'></a>min</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <b>{</b> <font color='#0000FF'>return</font> std::numeric_limits<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>min</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;<b>}</b>
+        <font color='#0000FF'>static</font> basic_pixel_type <b><a name='max'></a>max</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <b>{</b> <font color='#0000FF'>return</font> std::numeric_limits<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>max</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;<b>}</b>
+        <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>bool</u></font> is_unsigned <font color='#5555FF'>=</font> is_unsigned_type<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font>::value;
+    <b>}</b>;
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&gt;</font> <font color='#0000FF'>struct</font> <b><a name='pixel_traits'></a>pixel_traits</b><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font>  : <font color='#0000FF'>public</font> grayscale_pixel_traits<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font> <b>{</b><b>}</b>;
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&gt;</font> <font color='#0000FF'>struct</font> <b><a name='pixel_traits'></a>pixel_traits</b><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>short</u></font><font color='#5555FF'>&gt;</font> : <font color='#0000FF'>public</font> grayscale_pixel_traits<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>short</u></font><font color='#5555FF'>&gt;</font> <b>{</b><b>}</b>;
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&gt;</font> <font color='#0000FF'>struct</font> <b><a name='pixel_traits'></a>pixel_traits</b><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>int</u></font><font color='#5555FF'>&gt;</font>   : <font color='#0000FF'>public</font> grayscale_pixel_traits<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>int</u></font><font color='#5555FF'>&gt;</font> <b>{</b><b>}</b>;
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&gt;</font> <font color='#0000FF'>struct</font> <b><a name='pixel_traits'></a>pixel_traits</b><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font>  : <font color='#0000FF'>public</font> grayscale_pixel_traits<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font> <b>{</b><b>}</b>;
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&gt;</font> <font color='#0000FF'>struct</font> <b><a name='pixel_traits'></a>pixel_traits</b><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font>           : <font color='#0000FF'>public</font> grayscale_pixel_traits<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font> <b>{</b><b>}</b>;
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&gt;</font> <font color='#0000FF'>struct</font> <b><a name='pixel_traits'></a>pixel_traits</b><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>signed</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font>    : <font color='#0000FF'>public</font> grayscale_pixel_traits<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>signed</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font> <b>{</b><b>}</b>;
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&gt;</font> <font color='#0000FF'>struct</font> <b><a name='pixel_traits'></a>pixel_traits</b><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>short</u></font><font color='#5555FF'>&gt;</font>          : <font color='#0000FF'>public</font> grayscale_pixel_traits<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>short</u></font><font color='#5555FF'>&gt;</font> <b>{</b><b>}</b>;
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&gt;</font> <font color='#0000FF'>struct</font> <b><a name='pixel_traits'></a>pixel_traits</b><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>int</u></font><font color='#5555FF'>&gt;</font>            : <font color='#0000FF'>public</font> grayscale_pixel_traits<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>int</u></font><font color='#5555FF'>&gt;</font> <b>{</b><b>}</b>;
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&gt;</font> <font color='#0000FF'>struct</font> <b><a name='pixel_traits'></a>pixel_traits</b><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font>           : <font color='#0000FF'>public</font> grayscale_pixel_traits<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font> <b>{</b><b>}</b>;
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&gt;</font> <font color='#0000FF'>struct</font> <b><a name='pixel_traits'></a>pixel_traits</b><font color='#5555FF'>&lt;</font>int64<font color='#5555FF'>&gt;</font>          : <font color='#0000FF'>public</font> grayscale_pixel_traits<font color='#5555FF'>&lt;</font>int64<font color='#5555FF'>&gt;</font> <b>{</b><b>}</b>;
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&gt;</font> <font color='#0000FF'>struct</font> <b><a name='pixel_traits'></a>pixel_traits</b><font color='#5555FF'>&lt;</font>uint64<font color='#5555FF'>&gt;</font>         : <font color='#0000FF'>public</font> grayscale_pixel_traits<font color='#5555FF'>&lt;</font>uint64<font color='#5555FF'>&gt;</font> <b>{</b><b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>struct</font> <b><a name='float_grayscale_pixel_traits'></a>float_grayscale_pixel_traits</b>
+    <b>{</b>
+        <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>bool</u></font> rgb  <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+        <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>bool</u></font> rgb_alpha  <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+        <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>bool</u></font> grayscale <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+        <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>bool</u></font> hsi <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+        <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>long</u></font> num <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+        <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>bool</u></font> has_alpha <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+        <font color='#0000FF'>typedef</font> T basic_pixel_type;
+        <font color='#0000FF'>static</font> basic_pixel_type <b><a name='min'></a>min</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <b>{</b> <font color='#0000FF'>return</font> <font color='#5555FF'>-</font>std::numeric_limits<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>max</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;<b>}</b>
+        <font color='#0000FF'>static</font> basic_pixel_type <b><a name='max'></a>max</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <b>{</b> <font color='#0000FF'>return</font> std::numeric_limits<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>max</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;<b>}</b>
+        <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>bool</u></font> is_unsigned <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+    <b>}</b>;
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&gt;</font> <font color='#0000FF'>struct</font> <b><a name='pixel_traits'></a>pixel_traits</b><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>float</u></font><font color='#5555FF'>&gt;</font>          : <font color='#0000FF'>public</font> float_grayscale_pixel_traits<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>float</u></font><font color='#5555FF'>&gt;</font> <b>{</b><b>}</b>;
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&gt;</font> <font color='#0000FF'>struct</font> <b><a name='pixel_traits'></a>pixel_traits</b><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font>         : <font color='#0000FF'>public</font> float_grayscale_pixel_traits<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font> <b>{</b><b>}</b>;
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&gt;</font> <font color='#0000FF'>struct</font> <b><a name='pixel_traits'></a>pixel_traits</b><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>long</u></font> <font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font>    : <font color='#0000FF'>public</font> float_grayscale_pixel_traits<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>long</u></font> <font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font> <b>{</b><b>}</b>;
+
+    <font color='#009900'>// These are here mainly so you can easily copy images into complex arrays.  This is
+</font>    <font color='#009900'>// useful when you want to do a FFT on an image or some similar operation.
+</font>    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&gt;</font> <font color='#0000FF'>struct</font> <b><a name='pixel_traits'></a>pixel_traits</b><font color='#5555FF'>&lt;</font>std::complex<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>float</u></font><font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> :       <font color='#0000FF'>public</font> float_grayscale_pixel_traits<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>float</u></font><font color='#5555FF'>&gt;</font> <b>{</b><b>}</b>;
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&gt;</font> <font color='#0000FF'>struct</font> <b><a name='pixel_traits'></a>pixel_traits</b><font color='#5555FF'>&lt;</font>std::complex<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> :      <font color='#0000FF'>public</font> float_grayscale_pixel_traits<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font> <b>{</b><b>}</b>;
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&gt;</font> <font color='#0000FF'>struct</font> <b><a name='pixel_traits'></a>pixel_traits</b><font color='#5555FF'>&lt;</font>std::complex<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>long</u></font> <font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> : <font color='#0000FF'>public</font> float_grayscale_pixel_traits<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>long</u></font> <font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font> <b>{</b><b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#009900'>// The following is a bunch of conversion stuff for the assign_pixel function.
+</font>
+    <font color='#0000FF'>namespace</font> assign_pixel_helpers
+    <b>{</b>
+
+    <font color='#009900'>// -----------------------------
+</font>        <font color='#009900'>// all the same kind 
+</font>
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font> <font color='#0000FF'>typename</font> P <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>typename</font> enable_if_c<font color='#5555FF'>&lt;</font>pixel_traits<font color='#5555FF'>&lt;</font>P<font color='#5555FF'>&gt;</font>::grayscale<font color='#5555FF'>&gt;</font>::type
+        <b><a name='assign'></a>assign</b><font face='Lucida Console'>(</font>P<font color='#5555FF'>&amp;</font> dest, <font color='#0000FF'>const</font> P<font color='#5555FF'>&amp;</font> src<font face='Lucida Console'>)</font> 
+        <b>{</b> 
+            dest <font color='#5555FF'>=</font> src;
+        <b>}</b>
+
+    <font color='#009900'>// -----------------------------
+</font>
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>typename</font> unsigned_type<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font>::type <b><a name='make_unsigned'></a>make_unsigned</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> val
+        <font face='Lucida Console'>)</font> <b>{</b> <font color='#0000FF'>return</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> unsigned_type<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font>::type<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>val<font face='Lucida Console'>)</font>; <b>}</b>
+
+        <font color='#0000FF'>inline</font> <font color='#0000FF'><u>float</u></font> <b><a name='make_unsigned'></a>make_unsigned</b><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> <font color='#0000FF'><u>float</u></font><font color='#5555FF'>&amp;</font> val<font face='Lucida Console'>)</font> <b>{</b> <font color='#0000FF'>return</font> val; <b>}</b>
+        <font color='#0000FF'>inline</font> <font color='#0000FF'><u>double</u></font> <b><a name='make_unsigned'></a>make_unsigned</b><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font><font color='#5555FF'>&amp;</font> val<font face='Lucida Console'>)</font> <b>{</b> <font color='#0000FF'>return</font> val; <b>}</b>
+        <font color='#0000FF'>inline</font> <font color='#0000FF'><u>long</u></font> <font color='#0000FF'><u>double</u></font> <b><a name='make_unsigned'></a>make_unsigned</b><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> <font color='#0000FF'><u>double</u></font><font color='#5555FF'>&amp;</font> val<font face='Lucida Console'>)</font> <b>{</b> <font color='#0000FF'>return</font> val; <b>}</b>
+
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> P<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>typename</font> enable_if_c<font color='#5555FF'>&lt;</font>pixel_traits<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font>::is_unsigned <font color='#5555FF'>=</font><font color='#5555FF'>=</font> pixel_traits<font color='#5555FF'>&lt;</font>P<font color='#5555FF'>&gt;</font>::is_unsigned, <font color='#0000FF'><u>bool</u></font><font color='#5555FF'>&gt;</font>::type <b><a name='less_or_equal_to_max'></a>less_or_equal_to_max</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> P<font color='#5555FF'>&amp;</font> p
+        <font face='Lucida Console'>)</font> 
+        <font color='#009900'>/*!
+            ensures
+                - returns true if p is &lt;= max value of T
+        !*/</font>
+        <b>{</b> 
+            <font color='#0000FF'>return</font> p <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> pixel_traits<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>max</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;         
+        <b>}</b>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> P<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>typename</font> enable_if_c<font color='#5555FF'>&lt;</font>pixel_traits<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font>::is_unsigned <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> <font color='#5555FF'>!</font>pixel_traits<font color='#5555FF'>&lt;</font>P<font color='#5555FF'>&gt;</font>::is_unsigned, <font color='#0000FF'><u>bool</u></font><font color='#5555FF'>&gt;</font>::type <b><a name='less_or_equal_to_max'></a>less_or_equal_to_max</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> P<font color='#5555FF'>&amp;</font> p
+        <font face='Lucida Console'>)</font> 
+        <b>{</b> 
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>p <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                <font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+            <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>make_unsigned</font><font face='Lucida Console'>(</font>p<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> pixel_traits<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>max</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                <font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+            <font color='#0000FF'>else</font>
+                <font color='#0000FF'>return</font> <font color='#979000'>false</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> P<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>typename</font> enable_if_c<font color='#5555FF'>&lt;</font><font color='#5555FF'>!</font>pixel_traits<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font>::is_unsigned <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> pixel_traits<font color='#5555FF'>&lt;</font>P<font color='#5555FF'>&gt;</font>::is_unsigned, <font color='#0000FF'><u>bool</u></font><font color='#5555FF'>&gt;</font>::type <b><a name='less_or_equal_to_max'></a>less_or_equal_to_max</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> P<font color='#5555FF'>&amp;</font> p
+        <font face='Lucida Console'>)</font> 
+        <b>{</b> 
+            <font color='#0000FF'>return</font> p <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#BB00BB'>make_unsigned</font><font face='Lucida Console'>(</font>pixel_traits<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>max</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+    <font color='#009900'>// -----------------------------
+</font>
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> P<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>typename</font> enable_if_c<font color='#5555FF'>&lt;</font>pixel_traits<font color='#5555FF'>&lt;</font>P<font color='#5555FF'>&gt;</font>::is_unsigned, <font color='#0000FF'><u>bool</u></font> <font color='#5555FF'>&gt;</font>::type <b><a name='greater_or_equal_to_min'></a>greater_or_equal_to_min</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> P<font color='#5555FF'>&amp;</font> 
+        <font face='Lucida Console'>)</font> <b>{</b> <font color='#0000FF'>return</font> <font color='#979000'>true</font>; <b>}</b>
+        <font color='#009900'>/*!
+            ensures
+                - returns true if p is &gt;= min value of T
+        !*/</font>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> P<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>typename</font> enable_if_c<font color='#5555FF'>&lt;</font><font color='#5555FF'>!</font>pixel_traits<font color='#5555FF'>&lt;</font>P<font color='#5555FF'>&gt;</font>::is_unsigned <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> pixel_traits<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font>::is_unsigned, <font color='#0000FF'><u>bool</u></font> <font color='#5555FF'>&gt;</font>::type <b><a name='greater_or_equal_to_min'></a>greater_or_equal_to_min</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> P<font color='#5555FF'>&amp;</font> p
+        <font face='Lucida Console'>)</font> 
+        <b>{</b> 
+            <font color='#0000FF'>return</font> p <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> P<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>typename</font> enable_if_c<font color='#5555FF'>&lt;</font><font color='#5555FF'>!</font>pixel_traits<font color='#5555FF'>&lt;</font>P<font color='#5555FF'>&gt;</font>::is_unsigned <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> <font color='#5555FF'>!</font>pixel_traits<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font>::is_unsigned, <font color='#0000FF'><u>bool</u></font> <font color='#5555FF'>&gt;</font>::type <b><a name='greater_or_equal_to_min'></a>greater_or_equal_to_min</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> P<font color='#5555FF'>&amp;</font> p
+        <font face='Lucida Console'>)</font> 
+        <b>{</b> 
+            <font color='#0000FF'>return</font> p <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> pixel_traits<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>min</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+    <font color='#009900'>// -----------------------------
+</font>
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font> <font color='#0000FF'>typename</font> P1, <font color='#0000FF'>typename</font> P2 <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>typename</font> enable_if_c<font color='#5555FF'>&lt;</font>pixel_traits<font color='#5555FF'>&lt;</font>P1<font color='#5555FF'>&gt;</font>::grayscale <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> pixel_traits<font color='#5555FF'>&lt;</font>P2<font color='#5555FF'>&gt;</font>::grayscale<font color='#5555FF'>&gt;</font>::type
+        <b><a name='assign'></a>assign</b><font face='Lucida Console'>(</font>P1<font color='#5555FF'>&amp;</font> dest, <font color='#0000FF'>const</font> P2<font color='#5555FF'>&amp;</font> src<font face='Lucida Console'>)</font> 
+        <b>{</b> 
+            <font color='#009900'>/*
+                The reason for these weird comparison functions is to avoid getting compiler
+                warnings about comparing signed types to unsigned and stuff like that.  
+            */</font>
+
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>less_or_equal_to_max<font color='#5555FF'>&lt;</font>P1<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>src<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>greater_or_equal_to_min<font color='#5555FF'>&lt;</font>P1<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>src<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                    dest <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font>P1<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>src<font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>else</font>
+                    dest <font color='#5555FF'>=</font> pixel_traits<font color='#5555FF'>&lt;</font>P1<font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>min</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>else</font>
+                dest <font color='#5555FF'>=</font> pixel_traits<font color='#5555FF'>&lt;</font>P1<font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>max</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+    <font color='#009900'>// -----------------------------
+</font>    <font color='#009900'>// -----------------------------
+</font>    <font color='#009900'>// -----------------------------
+</font>
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font> <font color='#0000FF'>typename</font> P1, <font color='#0000FF'>typename</font> P2 <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>typename</font> enable_if_c<font color='#5555FF'>&lt;</font>pixel_traits<font color='#5555FF'>&lt;</font>P1<font color='#5555FF'>&gt;</font>::rgb <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> pixel_traits<font color='#5555FF'>&lt;</font>P2<font color='#5555FF'>&gt;</font>::rgb<font color='#5555FF'>&gt;</font>::type
+        <b><a name='assign'></a>assign</b><font face='Lucida Console'>(</font>P1<font color='#5555FF'>&amp;</font> dest, <font color='#0000FF'>const</font> P2<font color='#5555FF'>&amp;</font> src<font face='Lucida Console'>)</font> 
+        <b>{</b> 
+            dest.red <font color='#5555FF'>=</font> src.red; 
+            dest.green <font color='#5555FF'>=</font> src.green; 
+            dest.blue <font color='#5555FF'>=</font> src.blue; 
+        <b>}</b>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font> <font color='#0000FF'>typename</font> P1, <font color='#0000FF'>typename</font> P2 <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>typename</font> enable_if_c<font color='#5555FF'>&lt;</font>pixel_traits<font color='#5555FF'>&lt;</font>P1<font color='#5555FF'>&gt;</font>::rgb_alpha <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> pixel_traits<font color='#5555FF'>&lt;</font>P2<font color='#5555FF'>&gt;</font>::rgb_alpha<font color='#5555FF'>&gt;</font>::type
+        <b><a name='assign'></a>assign</b><font face='Lucida Console'>(</font>P1<font color='#5555FF'>&amp;</font> dest, <font color='#0000FF'>const</font> P2<font color='#5555FF'>&amp;</font> src<font face='Lucida Console'>)</font> 
+        <b>{</b> 
+            dest.red <font color='#5555FF'>=</font> src.red; 
+            dest.green <font color='#5555FF'>=</font> src.green; 
+            dest.blue <font color='#5555FF'>=</font> src.blue; 
+            dest.alpha <font color='#5555FF'>=</font> src.alpha; 
+        <b>}</b>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font> <font color='#0000FF'>typename</font> P1, <font color='#0000FF'>typename</font> P2 <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>typename</font> enable_if_c<font color='#5555FF'>&lt;</font>pixel_traits<font color='#5555FF'>&lt;</font>P1<font color='#5555FF'>&gt;</font>::hsi <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> pixel_traits<font color='#5555FF'>&lt;</font>P2<font color='#5555FF'>&gt;</font>::hsi<font color='#5555FF'>&gt;</font>::type
+        <b><a name='assign'></a>assign</b><font face='Lucida Console'>(</font>P1<font color='#5555FF'>&amp;</font> dest, <font color='#0000FF'>const</font> P2<font color='#5555FF'>&amp;</font> src<font face='Lucida Console'>)</font> 
+        <b>{</b> 
+            dest.h <font color='#5555FF'>=</font> src.h; 
+            dest.s <font color='#5555FF'>=</font> src.s; 
+            dest.i <font color='#5555FF'>=</font> src.i; 
+        <b>}</b>
+
+    <font color='#009900'>// -----------------------------
+</font>        <font color='#009900'>// dest is a grayscale
+</font>
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font> <font color='#0000FF'>typename</font> P1, <font color='#0000FF'>typename</font> P2 <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>typename</font> enable_if_c<font color='#5555FF'>&lt;</font>pixel_traits<font color='#5555FF'>&lt;</font>P1<font color='#5555FF'>&gt;</font>::grayscale <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> pixel_traits<font color='#5555FF'>&lt;</font>P2<font color='#5555FF'>&gt;</font>::rgb<font color='#5555FF'>&gt;</font>::type
+        <b><a name='assign'></a>assign</b><font face='Lucida Console'>(</font>P1<font color='#5555FF'>&amp;</font> dest, <font color='#0000FF'>const</font> P2<font color='#5555FF'>&amp;</font> src<font face='Lucida Console'>)</font> 
+        <b>{</b> 
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>int</u></font> temp <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>int</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>src.red<font face='Lucida Console'>)</font> <font color='#5555FF'>+</font>
+                                        <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>int</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>src.green<font face='Lucida Console'>)</font> <font color='#5555FF'>+</font>  
+                                        <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>int</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>src.blue<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font color='#5555FF'>/</font><font color='#979000'>3</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>assign_pixel</font><font face='Lucida Console'>(</font>dest, temp<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font> <font color='#0000FF'>typename</font> P1, <font color='#0000FF'>typename</font> P2 <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>typename</font> enable_if_c<font color='#5555FF'>&lt;</font>pixel_traits<font color='#5555FF'>&lt;</font>P1<font color='#5555FF'>&gt;</font>::grayscale <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> pixel_traits<font color='#5555FF'>&lt;</font>P2<font color='#5555FF'>&gt;</font>::rgb_alpha<font color='#5555FF'>&gt;</font>::type
+        <b><a name='assign'></a>assign</b><font face='Lucida Console'>(</font>P1<font color='#5555FF'>&amp;</font> dest, <font color='#0000FF'>const</font> P2<font color='#5555FF'>&amp;</font> src<font face='Lucida Console'>)</font> 
+        <b>{</b> 
+
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> avg <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>int</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>src.red<font face='Lucida Console'>)</font> <font color='#5555FF'>+</font>
+                                                                  <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>int</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>src.green<font face='Lucida Console'>)</font> <font color='#5555FF'>+</font>  
+                                                                  <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>int</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>src.blue<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font color='#5555FF'>/</font><font color='#979000'>3</font><font face='Lucida Console'>)</font>; 
+
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>src.alpha <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>255</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#BB00BB'>assign_pixel</font><font face='Lucida Console'>(</font>dest, avg<font face='Lucida Console'>)</font>;
+            <b>}</b>
+            <font color='#0000FF'>else</font>
+            <b>{</b>
+                <font color='#009900'>// perform this assignment using fixed point arithmetic: 
+</font>                <font color='#009900'>// dest = src*(alpha/255) + dest*(1 - alpha/255);
+</font>                <font color='#009900'>// dest = src*(alpha/255) + dest*1 - dest*(alpha/255);
+</font>                <font color='#009900'>// dest = dest*1 + src*(alpha/255) - dest*(alpha/255);
+</font>                <font color='#009900'>// dest = dest*1 + (src - dest)*(alpha/255);
+</font>                <font color='#009900'>// dest += (src - dest)*(alpha/255);
+</font>
+                <font color='#0000FF'><u>int</u></font> temp <font color='#5555FF'>=</font> avg;
+                <font color='#009900'>// copy dest into dest_copy using assign_pixel to avoid potential
+</font>                <font color='#009900'>// warnings about implicit float to int warnings.
+</font>                <font color='#0000FF'><u>int</u></font> dest_copy;
+                <font color='#BB00BB'>assign_pixel</font><font face='Lucida Console'>(</font>dest_copy, dest<font face='Lucida Console'>)</font>;
+
+                temp <font color='#5555FF'>-</font><font color='#5555FF'>=</font> dest_copy;
+
+                temp <font color='#5555FF'>*</font><font color='#5555FF'>=</font> src.alpha;
+
+                temp <font color='#5555FF'>/</font><font color='#5555FF'>=</font> <font color='#979000'>255</font>;
+
+                <font color='#BB00BB'>assign_pixel</font><font face='Lucida Console'>(</font>dest, temp<font color='#5555FF'>+</font>dest_copy<font face='Lucida Console'>)</font>;
+            <b>}</b>
+        <b>}</b>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font> <font color='#0000FF'>typename</font> P1, <font color='#0000FF'>typename</font> P2 <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>typename</font> enable_if_c<font color='#5555FF'>&lt;</font>pixel_traits<font color='#5555FF'>&lt;</font>P1<font color='#5555FF'>&gt;</font>::grayscale <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> pixel_traits<font color='#5555FF'>&lt;</font>P2<font color='#5555FF'>&gt;</font>::hsi<font color='#5555FF'>&gt;</font>::type
+        <b><a name='assign'></a>assign</b><font face='Lucida Console'>(</font>P1<font color='#5555FF'>&amp;</font> dest, <font color='#0000FF'>const</font> P2<font color='#5555FF'>&amp;</font> src<font face='Lucida Console'>)</font> 
+        <b>{</b> 
+            <font color='#BB00BB'>assign_pixel</font><font face='Lucida Console'>(</font>dest, src.i<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+
+    <font color='#009900'>// -----------------------------
+</font>
+        <font color='#0000FF'>struct</font> <b><a name='HSL'></a>HSL</b>
+        <b>{</b>
+            <font color='#0000FF'><u>double</u></font> h;
+            <font color='#0000FF'><u>double</u></font> s;
+            <font color='#0000FF'><u>double</u></font> l;
+        <b>}</b>;
+
+        <font color='#0000FF'>struct</font> <b><a name='COLOUR'></a>COLOUR</b>
+        <b>{</b>
+            <font color='#0000FF'><u>double</u></font> r;
+            <font color='#0000FF'><u>double</u></font> g;
+            <font color='#0000FF'><u>double</u></font> b;
+        <b>}</b>;
+
+        <font color='#009900'>/*
+            I found this excellent bit of code for dealing with HSL spaces at 
+            http://local.wasp.uwa.edu.au/~pbourke/colour/hsl/
+        */</font>
+        <font color='#009900'>/*
+            Calculate HSL from RGB
+            Hue is in degrees
+            Lightness is between 0 and 1
+            Saturation is between 0 and 1
+        */</font>
+        <font color='#0000FF'>inline</font> HSL <b><a name='RGB2HSL'></a>RGB2HSL</b><font face='Lucida Console'>(</font>COLOUR c1<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'><u>double</u></font> themin,themax,delta;
+            HSL c2;
+            <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> std;
+
+            themin <font color='#5555FF'>=</font> std::<font color='#BB00BB'>min</font><font face='Lucida Console'>(</font>c1.r,std::<font color='#BB00BB'>min</font><font face='Lucida Console'>(</font>c1.g,c1.b<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            themax <font color='#5555FF'>=</font> std::<font color='#BB00BB'>max</font><font face='Lucida Console'>(</font>c1.r,std::<font color='#BB00BB'>max</font><font face='Lucida Console'>(</font>c1.g,c1.b<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            delta <font color='#5555FF'>=</font> themax <font color='#5555FF'>-</font> themin;
+            c2.l <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>themin <font color='#5555FF'>+</font> themax<font face='Lucida Console'>)</font> <font color='#5555FF'>/</font> <font color='#979000'>2</font>;
+            c2.s <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>c2.l <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> c2.l <font color='#5555FF'>&lt;</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>
+                c2.s <font color='#5555FF'>=</font> delta <font color='#5555FF'>/</font> <font face='Lucida Console'>(</font>c2.l <font color='#5555FF'>&lt;</font> <font color='#979000'>0.5</font> ? <font face='Lucida Console'>(</font><font color='#979000'>2</font><font color='#5555FF'>*</font>c2.l<font face='Lucida Console'>)</font> : <font face='Lucida Console'>(</font><font color='#979000'>2</font><font color='#5555FF'>-</font><font color='#979000'>2</font><font color='#5555FF'>*</font>c2.l<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            c2.h <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>delta <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font> <b>{</b>
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>themax <font color='#5555FF'>=</font><font color='#5555FF'>=</font> c1.r <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> themax <font color='#5555FF'>!</font><font color='#5555FF'>=</font> c1.g<font face='Lucida Console'>)</font>
+                    c2.h <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>c1.g <font color='#5555FF'>-</font> c1.b<font face='Lucida Console'>)</font> <font color='#5555FF'>/</font> delta;
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>themax <font color='#5555FF'>=</font><font color='#5555FF'>=</font> c1.g <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> themax <font color='#5555FF'>!</font><font color='#5555FF'>=</font> c1.b<font face='Lucida Console'>)</font>
+                    c2.h <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#979000'>2</font> <font color='#5555FF'>+</font> <font face='Lucida Console'>(</font>c1.b <font color='#5555FF'>-</font> c1.r<font face='Lucida Console'>)</font> <font color='#5555FF'>/</font> delta<font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>themax <font color='#5555FF'>=</font><font color='#5555FF'>=</font> c1.b <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> themax <font color='#5555FF'>!</font><font color='#5555FF'>=</font> c1.r<font face='Lucida Console'>)</font>
+                    c2.h <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#979000'>4</font> <font color='#5555FF'>+</font> <font face='Lucida Console'>(</font>c1.r <font color='#5555FF'>-</font> c1.g<font face='Lucida Console'>)</font> <font color='#5555FF'>/</font> delta<font face='Lucida Console'>)</font>;
+                c2.h <font color='#5555FF'>*</font><font color='#5555FF'>=</font> <font color='#979000'>60</font>;
+            <b>}</b>
+            <font color='#0000FF'>return</font><font face='Lucida Console'>(</font>c2<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#009900'>/*
+            Calculate RGB from HSL, reverse of RGB2HSL()
+            Hue is in degrees
+            Lightness is between 0 and 1
+            Saturation is between 0 and 1
+        */</font>
+        <font color='#0000FF'>inline</font> COLOUR <b><a name='HSL2RGB'></a>HSL2RGB</b><font face='Lucida Console'>(</font>HSL c1<font face='Lucida Console'>)</font>
+        <b>{</b>
+            COLOUR c2,sat,ctmp;
+            <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> std;
+
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>c1.h <font color='#5555FF'>&lt;</font> <font color='#979000'>120</font><font face='Lucida Console'>)</font> <b>{</b>
+                sat.r <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#979000'>120</font> <font color='#5555FF'>-</font> c1.h<font face='Lucida Console'>)</font> <font color='#5555FF'>/</font> <font color='#979000'>60.0</font>;
+                sat.g <font color='#5555FF'>=</font> c1.h <font color='#5555FF'>/</font> <font color='#979000'>60.0</font>;
+                sat.b <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            <b>}</b> <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>c1.h <font color='#5555FF'>&lt;</font> <font color='#979000'>240</font><font face='Lucida Console'>)</font> <b>{</b>
+                sat.r <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                sat.g <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#979000'>240</font> <font color='#5555FF'>-</font> c1.h<font face='Lucida Console'>)</font> <font color='#5555FF'>/</font> <font color='#979000'>60.0</font>;
+                sat.b <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>c1.h <font color='#5555FF'>-</font> <font color='#979000'>120</font><font face='Lucida Console'>)</font> <font color='#5555FF'>/</font> <font color='#979000'>60.0</font>;
+            <b>}</b> <font color='#0000FF'>else</font> <b>{</b>
+                sat.r <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>c1.h <font color='#5555FF'>-</font> <font color='#979000'>240</font><font face='Lucida Console'>)</font> <font color='#5555FF'>/</font> <font color='#979000'>60.0</font>;
+                sat.g <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                sat.b <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#979000'>360</font> <font color='#5555FF'>-</font> c1.h<font face='Lucida Console'>)</font> <font color='#5555FF'>/</font> <font color='#979000'>60.0</font>;
+            <b>}</b>
+            sat.r <font color='#5555FF'>=</font> std::<font color='#BB00BB'>min</font><font face='Lucida Console'>(</font>sat.r,<font color='#979000'>1.0</font><font face='Lucida Console'>)</font>;
+            sat.g <font color='#5555FF'>=</font> std::<font color='#BB00BB'>min</font><font face='Lucida Console'>(</font>sat.g,<font color='#979000'>1.0</font><font face='Lucida Console'>)</font>;
+            sat.b <font color='#5555FF'>=</font> std::<font color='#BB00BB'>min</font><font face='Lucida Console'>(</font>sat.b,<font color='#979000'>1.0</font><font face='Lucida Console'>)</font>;
+
+            ctmp.r <font color='#5555FF'>=</font> <font color='#979000'>2</font> <font color='#5555FF'>*</font> c1.s <font color='#5555FF'>*</font> sat.r <font color='#5555FF'>+</font> <font face='Lucida Console'>(</font><font color='#979000'>1</font> <font color='#5555FF'>-</font> c1.s<font face='Lucida Console'>)</font>;
+            ctmp.g <font color='#5555FF'>=</font> <font color='#979000'>2</font> <font color='#5555FF'>*</font> c1.s <font color='#5555FF'>*</font> sat.g <font color='#5555FF'>+</font> <font face='Lucida Console'>(</font><font color='#979000'>1</font> <font color='#5555FF'>-</font> c1.s<font face='Lucida Console'>)</font>;
+            ctmp.b <font color='#5555FF'>=</font> <font color='#979000'>2</font> <font color='#5555FF'>*</font> c1.s <font color='#5555FF'>*</font> sat.b <font color='#5555FF'>+</font> <font face='Lucida Console'>(</font><font color='#979000'>1</font> <font color='#5555FF'>-</font> c1.s<font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>c1.l <font color='#5555FF'>&lt;</font> <font color='#979000'>0.5</font><font face='Lucida Console'>)</font> <b>{</b>
+                c2.r <font color='#5555FF'>=</font> c1.l <font color='#5555FF'>*</font> ctmp.r;
+                c2.g <font color='#5555FF'>=</font> c1.l <font color='#5555FF'>*</font> ctmp.g;
+                c2.b <font color='#5555FF'>=</font> c1.l <font color='#5555FF'>*</font> ctmp.b;
+            <b>}</b> <font color='#0000FF'>else</font> <b>{</b>
+                c2.r <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#979000'>1</font> <font color='#5555FF'>-</font> c1.l<font face='Lucida Console'>)</font> <font color='#5555FF'>*</font> ctmp.r <font color='#5555FF'>+</font> <font color='#979000'>2</font> <font color='#5555FF'>*</font> c1.l <font color='#5555FF'>-</font> <font color='#979000'>1</font>;
+                c2.g <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#979000'>1</font> <font color='#5555FF'>-</font> c1.l<font face='Lucida Console'>)</font> <font color='#5555FF'>*</font> ctmp.g <font color='#5555FF'>+</font> <font color='#979000'>2</font> <font color='#5555FF'>*</font> c1.l <font color='#5555FF'>-</font> <font color='#979000'>1</font>;
+                c2.b <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#979000'>1</font> <font color='#5555FF'>-</font> c1.l<font face='Lucida Console'>)</font> <font color='#5555FF'>*</font> ctmp.b <font color='#5555FF'>+</font> <font color='#979000'>2</font> <font color='#5555FF'>*</font> c1.l <font color='#5555FF'>-</font> <font color='#979000'>1</font>;
+            <b>}</b>
+
+            <font color='#0000FF'>return</font><font face='Lucida Console'>(</font>c2<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+
+    <font color='#009900'>// -----------------------------
+</font>        <font color='#009900'>// dest is a color rgb_pixel
+</font>
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font> <font color='#0000FF'>typename</font> P1 <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>typename</font> enable_if_c<font color='#5555FF'>&lt;</font>pixel_traits<font color='#5555FF'>&lt;</font>P1<font color='#5555FF'>&gt;</font>::rgb<font color='#5555FF'>&gt;</font>::type
+        <b><a name='assign'></a>assign</b><font face='Lucida Console'>(</font>P1<font color='#5555FF'>&amp;</font> dest, <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>&amp;</font> src<font face='Lucida Console'>)</font> 
+        <b>{</b> 
+            dest.red <font color='#5555FF'>=</font> src; 
+            dest.green <font color='#5555FF'>=</font> src; 
+            dest.blue <font color='#5555FF'>=</font> src; 
+        <b>}</b>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font> <font color='#0000FF'>typename</font> P1, <font color='#0000FF'>typename</font> P2 <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>typename</font> enable_if_c<font color='#5555FF'>&lt;</font>pixel_traits<font color='#5555FF'>&lt;</font>P1<font color='#5555FF'>&gt;</font>::rgb <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> pixel_traits<font color='#5555FF'>&lt;</font>P2<font color='#5555FF'>&gt;</font>::grayscale<font color='#5555FF'>&gt;</font>::type
+        <b><a name='assign'></a>assign</b><font face='Lucida Console'>(</font>P1<font color='#5555FF'>&amp;</font> dest, <font color='#0000FF'>const</font> P2<font color='#5555FF'>&amp;</font> src<font face='Lucida Console'>)</font> 
+        <b>{</b> 
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> p;
+            <font color='#BB00BB'>assign_pixel</font><font face='Lucida Console'>(</font>p, src<font face='Lucida Console'>)</font>;
+            dest.red <font color='#5555FF'>=</font> p; 
+            dest.green <font color='#5555FF'>=</font> p; 
+            dest.blue <font color='#5555FF'>=</font> p; 
+        <b>}</b>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font> <font color='#0000FF'>typename</font> P1, <font color='#0000FF'>typename</font> P2 <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>typename</font> enable_if_c<font color='#5555FF'>&lt;</font>pixel_traits<font color='#5555FF'>&lt;</font>P1<font color='#5555FF'>&gt;</font>::rgb <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> pixel_traits<font color='#5555FF'>&lt;</font>P2<font color='#5555FF'>&gt;</font>::rgb_alpha<font color='#5555FF'>&gt;</font>::type
+        <b><a name='assign'></a>assign</b><font face='Lucida Console'>(</font>P1<font color='#5555FF'>&amp;</font> dest, <font color='#0000FF'>const</font> P2<font color='#5555FF'>&amp;</font> src<font face='Lucida Console'>)</font> 
+        <b>{</b> 
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>src.alpha <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>255</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                dest.red <font color='#5555FF'>=</font> src.red;
+                dest.green <font color='#5555FF'>=</font> src.green;
+                dest.blue <font color='#5555FF'>=</font> src.blue;
+            <b>}</b>
+            <font color='#0000FF'>else</font>
+            <b>{</b>
+                <font color='#009900'>// perform this assignment using fixed point arithmetic: 
+</font>                <font color='#009900'>// dest = src*(alpha/255) + dest*(1 - alpha/255);
+</font>                <font color='#009900'>// dest = src*(alpha/255) + dest*1 - dest*(alpha/255);
+</font>                <font color='#009900'>// dest = dest*1 + src*(alpha/255) - dest*(alpha/255);
+</font>                <font color='#009900'>// dest = dest*1 + (src - dest)*(alpha/255);
+</font>                <font color='#009900'>// dest += (src - dest)*(alpha/255);
+</font>
+                <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>int</u></font> temp_r <font color='#5555FF'>=</font> src.red;
+                <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>int</u></font> temp_g <font color='#5555FF'>=</font> src.green;
+                <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>int</u></font> temp_b <font color='#5555FF'>=</font> src.blue;
+
+                temp_r <font color='#5555FF'>-</font><font color='#5555FF'>=</font> dest.red;
+                temp_g <font color='#5555FF'>-</font><font color='#5555FF'>=</font> dest.green;
+                temp_b <font color='#5555FF'>-</font><font color='#5555FF'>=</font> dest.blue;
+
+                temp_r <font color='#5555FF'>*</font><font color='#5555FF'>=</font> src.alpha;
+                temp_g <font color='#5555FF'>*</font><font color='#5555FF'>=</font> src.alpha;
+                temp_b <font color='#5555FF'>*</font><font color='#5555FF'>=</font> src.alpha;
+
+                temp_r <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#979000'>8</font>;
+                temp_g <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#979000'>8</font>;
+                temp_b <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#979000'>8</font>;
+
+                dest.red <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>temp_r<font color='#5555FF'>&amp;</font><font color='#979000'>0xFF</font><font face='Lucida Console'>)</font>;
+                dest.green <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>temp_g<font color='#5555FF'>&amp;</font><font color='#979000'>0xFF</font><font face='Lucida Console'>)</font>;
+                dest.blue <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>temp_b<font color='#5555FF'>&amp;</font><font color='#979000'>0xFF</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+        <b>}</b>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font> <font color='#0000FF'>typename</font> P1, <font color='#0000FF'>typename</font> P2 <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>typename</font> enable_if_c<font color='#5555FF'>&lt;</font>pixel_traits<font color='#5555FF'>&lt;</font>P1<font color='#5555FF'>&gt;</font>::rgb <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> pixel_traits<font color='#5555FF'>&lt;</font>P2<font color='#5555FF'>&gt;</font>::hsi<font color='#5555FF'>&gt;</font>::type
+        <b><a name='assign'></a>assign</b><font face='Lucida Console'>(</font>P1<font color='#5555FF'>&amp;</font> dest, <font color='#0000FF'>const</font> P2<font color='#5555FF'>&amp;</font> src<font face='Lucida Console'>)</font> 
+        <b>{</b> 
+            COLOUR c;
+            HSL h;
+            h.h <font color='#5555FF'>=</font> src.h;
+            h.h <font color='#5555FF'>=</font> h.h<font color='#5555FF'>/</font><font color='#979000'>255.0</font><font color='#5555FF'>*</font><font color='#979000'>360</font>;
+            h.s <font color='#5555FF'>=</font> src.s<font color='#5555FF'>/</font><font color='#979000'>255.0</font>;
+            h.l <font color='#5555FF'>=</font> src.i<font color='#5555FF'>/</font><font color='#979000'>255.0</font>;
+            c <font color='#5555FF'>=</font> <font color='#BB00BB'>HSL2RGB</font><font face='Lucida Console'>(</font>h<font face='Lucida Console'>)</font>;
+
+            dest.red <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>c.r<font color='#5555FF'>*</font><font color='#979000'>255.0</font> <font color='#5555FF'>+</font> <font color='#979000'>0.5</font><font face='Lucida Console'>)</font>;
+            dest.green <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>c.g<font color='#5555FF'>*</font><font color='#979000'>255.0</font> <font color='#5555FF'>+</font> <font color='#979000'>0.5</font><font face='Lucida Console'>)</font>;
+            dest.blue <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>c.b<font color='#5555FF'>*</font><font color='#979000'>255.0</font> <font color='#5555FF'>+</font> <font color='#979000'>0.5</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+    <font color='#009900'>// -----------------------------
+</font>    <font color='#009900'>// dest is a color rgb_alpha_pixel
+</font>
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font> <font color='#0000FF'>typename</font> P1 <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>typename</font> enable_if_c<font color='#5555FF'>&lt;</font>pixel_traits<font color='#5555FF'>&lt;</font>P1<font color='#5555FF'>&gt;</font>::rgb_alpha<font color='#5555FF'>&gt;</font>::type
+        <b><a name='assign'></a>assign</b><font face='Lucida Console'>(</font>P1<font color='#5555FF'>&amp;</font> dest, <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>&amp;</font> src<font face='Lucida Console'>)</font> 
+        <b>{</b> 
+            dest.red <font color='#5555FF'>=</font> src; 
+            dest.green <font color='#5555FF'>=</font> src; 
+            dest.blue <font color='#5555FF'>=</font> src; 
+            dest.alpha <font color='#5555FF'>=</font> <font color='#979000'>255</font>;
+        <b>}</b>
+
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font> <font color='#0000FF'>typename</font> P1, <font color='#0000FF'>typename</font> P2 <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>typename</font> enable_if_c<font color='#5555FF'>&lt;</font>pixel_traits<font color='#5555FF'>&lt;</font>P1<font color='#5555FF'>&gt;</font>::rgb_alpha <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> pixel_traits<font color='#5555FF'>&lt;</font>P2<font color='#5555FF'>&gt;</font>::grayscale<font color='#5555FF'>&gt;</font>::type
+        <b><a name='assign'></a>assign</b><font face='Lucida Console'>(</font>P1<font color='#5555FF'>&amp;</font> dest, <font color='#0000FF'>const</font> P2<font color='#5555FF'>&amp;</font> src<font face='Lucida Console'>)</font> 
+        <b>{</b> 
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> p;
+            <font color='#BB00BB'>assign_pixel</font><font face='Lucida Console'>(</font>p, src<font face='Lucida Console'>)</font>;
+
+            dest.red <font color='#5555FF'>=</font> p; 
+            dest.green <font color='#5555FF'>=</font> p; 
+            dest.blue <font color='#5555FF'>=</font> p; 
+            dest.alpha <font color='#5555FF'>=</font> <font color='#979000'>255</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font> <font color='#0000FF'>typename</font> P1, <font color='#0000FF'>typename</font> P2 <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>typename</font> enable_if_c<font color='#5555FF'>&lt;</font>pixel_traits<font color='#5555FF'>&lt;</font>P1<font color='#5555FF'>&gt;</font>::rgb_alpha <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> pixel_traits<font color='#5555FF'>&lt;</font>P2<font color='#5555FF'>&gt;</font>::rgb<font color='#5555FF'>&gt;</font>::type
+        <b><a name='assign'></a>assign</b><font face='Lucida Console'>(</font>P1<font color='#5555FF'>&amp;</font> dest, <font color='#0000FF'>const</font> P2<font color='#5555FF'>&amp;</font> src<font face='Lucida Console'>)</font> 
+        <b>{</b> 
+            dest.red <font color='#5555FF'>=</font> src.red;
+            dest.green <font color='#5555FF'>=</font> src.green;
+            dest.blue <font color='#5555FF'>=</font> src.blue;
+            dest.alpha <font color='#5555FF'>=</font> <font color='#979000'>255</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font> <font color='#0000FF'>typename</font> P1, <font color='#0000FF'>typename</font> P2 <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>typename</font> enable_if_c<font color='#5555FF'>&lt;</font>pixel_traits<font color='#5555FF'>&lt;</font>P1<font color='#5555FF'>&gt;</font>::rgb_alpha <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> pixel_traits<font color='#5555FF'>&lt;</font>P2<font color='#5555FF'>&gt;</font>::hsi<font color='#5555FF'>&gt;</font>::type
+        <b><a name='assign'></a>assign</b><font face='Lucida Console'>(</font>P1<font color='#5555FF'>&amp;</font> dest, <font color='#0000FF'>const</font> P2<font color='#5555FF'>&amp;</font> src<font face='Lucida Console'>)</font> 
+        <b>{</b> 
+            COLOUR c;
+            HSL h;
+            h.h <font color='#5555FF'>=</font> src.h;
+            h.h <font color='#5555FF'>=</font> h.h<font color='#5555FF'>/</font><font color='#979000'>255.0</font><font color='#5555FF'>*</font><font color='#979000'>360</font>;
+            h.s <font color='#5555FF'>=</font> src.s<font color='#5555FF'>/</font><font color='#979000'>255.0</font>;
+            h.l <font color='#5555FF'>=</font> src.i<font color='#5555FF'>/</font><font color='#979000'>255.0</font>;
+            c <font color='#5555FF'>=</font> <font color='#BB00BB'>HSL2RGB</font><font face='Lucida Console'>(</font>h<font face='Lucida Console'>)</font>;
+
+            dest.red <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>c.r<font color='#5555FF'>*</font><font color='#979000'>255.0</font> <font color='#5555FF'>+</font> <font color='#979000'>0.5</font><font face='Lucida Console'>)</font>;
+            dest.green <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>c.g<font color='#5555FF'>*</font><font color='#979000'>255.0</font> <font color='#5555FF'>+</font> <font color='#979000'>0.5</font><font face='Lucida Console'>)</font>;
+            dest.blue <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>c.b<font color='#5555FF'>*</font><font color='#979000'>255.0</font> <font color='#5555FF'>+</font> <font color='#979000'>0.5</font><font face='Lucida Console'>)</font>;
+            dest.alpha <font color='#5555FF'>=</font> <font color='#979000'>255</font>;
+        <b>}</b>
+
+    <font color='#009900'>// -----------------------------
+</font>        <font color='#009900'>// dest is an hsi pixel
+</font>
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font> <font color='#0000FF'>typename</font> P1<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>typename</font> enable_if_c<font color='#5555FF'>&lt;</font>pixel_traits<font color='#5555FF'>&lt;</font>P1<font color='#5555FF'>&gt;</font>::hsi<font color='#5555FF'>&gt;</font>::type
+        <b><a name='assign'></a>assign</b><font face='Lucida Console'>(</font>P1<font color='#5555FF'>&amp;</font> dest, <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>&amp;</font> src<font face='Lucida Console'>)</font> 
+        <b>{</b> 
+            dest.h <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            dest.s <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            dest.i <font color='#5555FF'>=</font> src;
+        <b>}</b>
+
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font> <font color='#0000FF'>typename</font> P1, <font color='#0000FF'>typename</font> P2 <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>typename</font> enable_if_c<font color='#5555FF'>&lt;</font>pixel_traits<font color='#5555FF'>&lt;</font>P1<font color='#5555FF'>&gt;</font>::hsi <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> pixel_traits<font color='#5555FF'>&lt;</font>P2<font color='#5555FF'>&gt;</font>::grayscale<font color='#5555FF'>&gt;</font>::type
+        <b><a name='assign'></a>assign</b><font face='Lucida Console'>(</font>P1<font color='#5555FF'>&amp;</font> dest, <font color='#0000FF'>const</font> P2<font color='#5555FF'>&amp;</font> src<font face='Lucida Console'>)</font> 
+        <b>{</b> 
+            dest.h <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            dest.s <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            <font color='#BB00BB'>assign_pixel</font><font face='Lucida Console'>(</font>dest.i, src<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font> <font color='#0000FF'>typename</font> P1, <font color='#0000FF'>typename</font> P2 <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>typename</font> enable_if_c<font color='#5555FF'>&lt;</font>pixel_traits<font color='#5555FF'>&lt;</font>P1<font color='#5555FF'>&gt;</font>::hsi <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> pixel_traits<font color='#5555FF'>&lt;</font>P2<font color='#5555FF'>&gt;</font>::rgb<font color='#5555FF'>&gt;</font>::type
+        <b><a name='assign'></a>assign</b><font face='Lucida Console'>(</font>P1<font color='#5555FF'>&amp;</font> dest, <font color='#0000FF'>const</font> P2<font color='#5555FF'>&amp;</font> src<font face='Lucida Console'>)</font> 
+        <b>{</b> 
+            COLOUR c1;
+            HSL c2;
+            c1.r <font color='#5555FF'>=</font> src.red<font color='#5555FF'>/</font><font color='#979000'>255.0</font>;
+            c1.g <font color='#5555FF'>=</font> src.green<font color='#5555FF'>/</font><font color='#979000'>255.0</font>;
+            c1.b <font color='#5555FF'>=</font> src.blue<font color='#5555FF'>/</font><font color='#979000'>255.0</font>;
+            c2 <font color='#5555FF'>=</font> <font color='#BB00BB'>RGB2HSL</font><font face='Lucida Console'>(</font>c1<font face='Lucida Console'>)</font>;
+
+            dest.h <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>c2.h<font color='#5555FF'>/</font><font color='#979000'>360.0</font><font color='#5555FF'>*</font><font color='#979000'>255.0</font> <font color='#5555FF'>+</font> <font color='#979000'>0.5</font><font face='Lucida Console'>)</font>;
+            dest.s <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>c2.s<font color='#5555FF'>*</font><font color='#979000'>255.0</font> <font color='#5555FF'>+</font> <font color='#979000'>0.5</font><font face='Lucida Console'>)</font>;
+            dest.i <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>c2.l<font color='#5555FF'>*</font><font color='#979000'>255.0</font> <font color='#5555FF'>+</font> <font color='#979000'>0.5</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font> <font color='#0000FF'>typename</font> P1, <font color='#0000FF'>typename</font> P2 <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>typename</font> enable_if_c<font color='#5555FF'>&lt;</font>pixel_traits<font color='#5555FF'>&lt;</font>P1<font color='#5555FF'>&gt;</font>::hsi <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> pixel_traits<font color='#5555FF'>&lt;</font>P2<font color='#5555FF'>&gt;</font>::rgb_alpha<font color='#5555FF'>&gt;</font>::type
+        <b><a name='assign'></a>assign</b><font face='Lucida Console'>(</font>P1<font color='#5555FF'>&amp;</font> dest, <font color='#0000FF'>const</font> P2<font color='#5555FF'>&amp;</font> src<font face='Lucida Console'>)</font> 
+        <b>{</b> 
+            rgb_pixel temp;
+            <font color='#009900'>// convert target hsi pixel to rgb
+</font>            assign_pixel_helpers::<font color='#BB00BB'>assign</font><font face='Lucida Console'>(</font>temp,dest<font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// now assign the rgb_alpha value to our temp rgb pixel
+</font>            assign_pixel_helpers::<font color='#BB00BB'>assign</font><font face='Lucida Console'>(</font>temp,src<font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// now we can just go assign the new rgb value to the
+</font>            <font color='#009900'>// hsi pixel
+</font>            assign_pixel_helpers::<font color='#BB00BB'>assign</font><font face='Lucida Console'>(</font>dest,temp<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+    <b>}</b>
+
+    <font color='#009900'>// -----------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font> <font color='#0000FF'>typename</font> P1, <font color='#0000FF'>typename</font> P2 <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='assign_pixel'></a>assign_pixel</b> <font face='Lucida Console'>(</font>
+        P1<font color='#5555FF'>&amp;</font> dest,
+        <font color='#0000FF'>const</font> P2<font color='#5555FF'>&amp;</font> src
+    <font face='Lucida Console'>)</font> <b>{</b> assign_pixel_helpers::<font color='#BB00BB'>assign</font><font face='Lucida Console'>(</font>dest,src<font face='Lucida Console'>)</font>; <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> P,
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>inline</font> <font color='#0000FF'>typename</font> enable_if_c<font color='#5555FF'>&lt;</font>pixel_traits<font color='#5555FF'>&lt;</font>P<font color='#5555FF'>&gt;</font>::grayscale<font color='#5555FF'>&gt;</font>::type <b><a name='assign_pixel_intensity_helper'></a>assign_pixel_intensity_helper</b> <font face='Lucida Console'>(</font>
+        P<font color='#5555FF'>&amp;</font> dest,
+        <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> new_intensity
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#BB00BB'>assign_pixel</font><font face='Lucida Console'>(</font>dest, new_intensity<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> P,
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>inline</font> <font color='#0000FF'>typename</font> enable_if_c<font color='#5555FF'>&lt;</font>pixel_traits<font color='#5555FF'>&lt;</font>P<font color='#5555FF'>&gt;</font>::grayscale <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font><font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font>
+                                pixel_traits<font color='#5555FF'>&lt;</font>P<font color='#5555FF'>&gt;</font>::has_alpha<font color='#5555FF'>&gt;</font>::type <b><a name='assign_pixel_intensity_helper'></a>assign_pixel_intensity_helper</b> <font face='Lucida Console'>(</font>
+        P<font color='#5555FF'>&amp;</font> dest,
+        <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> new_intensity
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        hsi_pixel p;
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> old_alpha <font color='#5555FF'>=</font> dest.alpha;
+        dest.alpha <font color='#5555FF'>=</font> <font color='#979000'>255</font>;
+        rgb_pixel temp;
+        <font color='#BB00BB'>assign_pixel</font><font face='Lucida Console'>(</font>temp, dest<font face='Lucida Console'>)</font>; <font color='#009900'>// put dest into an rgb_pixel to avoid the somewhat complicated assign_pixel(hsi,rgb_alpha).
+</font>        <font color='#BB00BB'>assign_pixel</font><font face='Lucida Console'>(</font>p,temp<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>assign_pixel</font><font face='Lucida Console'>(</font>p.i, new_intensity<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>assign_pixel</font><font face='Lucida Console'>(</font>dest,p<font face='Lucida Console'>)</font>;
+        dest.alpha <font color='#5555FF'>=</font> old_alpha;
+    <b>}</b>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> P,
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>inline</font> <font color='#0000FF'>typename</font> enable_if_c<font color='#5555FF'>&lt;</font>pixel_traits<font color='#5555FF'>&lt;</font>P<font color='#5555FF'>&gt;</font>::grayscale <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font><font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font>
+                                pixel_traits<font color='#5555FF'>&lt;</font>P<font color='#5555FF'>&gt;</font>::has_alpha <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font><font color='#5555FF'>&gt;</font>::type <b><a name='assign_pixel_intensity_helper'></a>assign_pixel_intensity_helper</b> <font face='Lucida Console'>(</font>
+        P<font color='#5555FF'>&amp;</font> dest,
+        <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> new_intensity
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        hsi_pixel p;
+        <font color='#BB00BB'>assign_pixel</font><font face='Lucida Console'>(</font>p,dest<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>assign_pixel</font><font face='Lucida Console'>(</font>p.i, new_intensity<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>assign_pixel</font><font face='Lucida Console'>(</font>dest,p<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> P,
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='assign_pixel_intensity'></a>assign_pixel_intensity</b> <font face='Lucida Console'>(</font>
+        P<font color='#5555FF'>&amp;</font> dest,
+        <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> new_intensity
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#BB00BB'>assign_pixel_intensity_helper</font><font face='Lucida Console'>(</font>dest, new_intensity<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> P
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>inline</font> <font color='#0000FF'>typename</font> enable_if_c<font color='#5555FF'>&lt;</font>pixel_traits<font color='#5555FF'>&lt;</font>P<font color='#5555FF'>&gt;</font>::grayscale, P<font color='#5555FF'>&gt;</font>::type <b><a name='get_pixel_intensity_helper'></a>get_pixel_intensity_helper</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> P<font color='#5555FF'>&amp;</font> src 
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>return</font> src;
+    <b>}</b>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> P
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>inline</font> <font color='#0000FF'>typename</font> enable_if_c<font color='#5555FF'>&lt;</font>pixel_traits<font color='#5555FF'>&lt;</font>P<font color='#5555FF'>&gt;</font>::grayscale <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font><font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font>
+                                pixel_traits<font color='#5555FF'>&lt;</font>P<font color='#5555FF'>&gt;</font>::has_alpha, 
+                                <font color='#0000FF'>typename</font> pixel_traits<font color='#5555FF'>&lt;</font>P<font color='#5555FF'>&gt;</font>::basic_pixel_type<font color='#5555FF'>&gt;</font>::type <b><a name='get_pixel_intensity_helper'></a>get_pixel_intensity_helper</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> P<font color='#5555FF'>&amp;</font> src
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        P temp <font color='#5555FF'>=</font> src;
+        temp.alpha <font color='#5555FF'>=</font> <font color='#979000'>255</font>;
+        <font color='#0000FF'>typename</font> pixel_traits<font color='#5555FF'>&lt;</font>P<font color='#5555FF'>&gt;</font>::basic_pixel_type p;
+        <font color='#BB00BB'>assign_pixel</font><font face='Lucida Console'>(</font>p,temp<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>return</font> p;
+    <b>}</b>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> P
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>inline</font> <font color='#0000FF'>typename</font> enable_if_c<font color='#5555FF'>&lt;</font>pixel_traits<font color='#5555FF'>&lt;</font>P<font color='#5555FF'>&gt;</font>::grayscale <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font><font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font>
+                                pixel_traits<font color='#5555FF'>&lt;</font>P<font color='#5555FF'>&gt;</font>::has_alpha <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font>, 
+                                <font color='#0000FF'>typename</font> pixel_traits<font color='#5555FF'>&lt;</font>P<font color='#5555FF'>&gt;</font>::basic_pixel_type<font color='#5555FF'>&gt;</font>::type <b><a name='get_pixel_intensity_helper'></a>get_pixel_intensity_helper</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> P<font color='#5555FF'>&amp;</font> src
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>typename</font> pixel_traits<font color='#5555FF'>&lt;</font>P<font color='#5555FF'>&gt;</font>::basic_pixel_type p;
+        <font color='#BB00BB'>assign_pixel</font><font face='Lucida Console'>(</font>p,src<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>return</font> p;
+    <b>}</b>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> P
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>inline</font> <font color='#0000FF'>typename</font> pixel_traits<font color='#5555FF'>&lt;</font>P<font color='#5555FF'>&gt;</font>::basic_pixel_type <b><a name='get_pixel_intensity'></a>get_pixel_intensity</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> P<font color='#5555FF'>&amp;</font> src
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>return</font> <font color='#BB00BB'>get_pixel_intensity_helper</font><font face='Lucida Console'>(</font>src<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='serialize'></a>serialize</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> rgb_alpha_pixel<font color='#5555FF'>&amp;</font> item, 
+        std::ostream<font color='#5555FF'>&amp;</font> out 
+    <font face='Lucida Console'>)</font>   
+    <b>{</b>
+        <font color='#0000FF'>try</font>
+        <b>{</b>
+            <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item.red,out<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item.green,out<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item.blue,out<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item.alpha,out<font face='Lucida Console'>)</font>;
+        <b>}</b>
+        <font color='#0000FF'>catch</font> <font face='Lucida Console'>(</font>serialization_error<font color='#5555FF'>&amp;</font> e<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>throw</font> <font color='#BB00BB'>serialization_error</font><font face='Lucida Console'>(</font>e.info <font color='#5555FF'>+</font> "<font color='#CC0000'>\n   while serializing object of type rgb_alpha_pixel</font>"<font face='Lucida Console'>)</font>; 
+        <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='deserialize'></a>deserialize</b> <font face='Lucida Console'>(</font>
+        rgb_alpha_pixel<font color='#5555FF'>&amp;</font> item, 
+        std::istream<font color='#5555FF'>&amp;</font> in
+    <font face='Lucida Console'>)</font>   
+    <b>{</b>
+        <font color='#0000FF'>try</font>
+        <b>{</b>
+            <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item.red,in<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item.green,in<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item.blue,in<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item.alpha,in<font face='Lucida Console'>)</font>;
+        <b>}</b>
+        <font color='#0000FF'>catch</font> <font face='Lucida Console'>(</font>serialization_error<font color='#5555FF'>&amp;</font> e<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>throw</font> <font color='#BB00BB'>serialization_error</font><font face='Lucida Console'>(</font>e.info <font color='#5555FF'>+</font> "<font color='#CC0000'>\n   while deserializing object of type rgb_alpha_pixel</font>"<font face='Lucida Console'>)</font>; 
+        <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='serialize'></a>serialize</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> rgb_pixel<font color='#5555FF'>&amp;</font> item, 
+        std::ostream<font color='#5555FF'>&amp;</font> out 
+    <font face='Lucida Console'>)</font>   
+    <b>{</b>
+        <font color='#0000FF'>try</font>
+        <b>{</b>
+            <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item.red,out<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item.green,out<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item.blue,out<font face='Lucida Console'>)</font>;
+        <b>}</b>
+        <font color='#0000FF'>catch</font> <font face='Lucida Console'>(</font>serialization_error<font color='#5555FF'>&amp;</font> e<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>throw</font> <font color='#BB00BB'>serialization_error</font><font face='Lucida Console'>(</font>e.info <font color='#5555FF'>+</font> "<font color='#CC0000'>\n   while serializing object of type rgb_pixel</font>"<font face='Lucida Console'>)</font>; 
+        <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='deserialize'></a>deserialize</b> <font face='Lucida Console'>(</font>
+        rgb_pixel<font color='#5555FF'>&amp;</font> item, 
+        std::istream<font color='#5555FF'>&amp;</font> in
+    <font face='Lucida Console'>)</font>   
+    <b>{</b>
+        <font color='#0000FF'>try</font>
+        <b>{</b>
+            <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item.red,in<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item.green,in<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item.blue,in<font face='Lucida Console'>)</font>;
+        <b>}</b>
+        <font color='#0000FF'>catch</font> <font face='Lucida Console'>(</font>serialization_error<font color='#5555FF'>&amp;</font> e<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>throw</font> <font color='#BB00BB'>serialization_error</font><font face='Lucida Console'>(</font>e.info <font color='#5555FF'>+</font> "<font color='#CC0000'>\n   while deserializing object of type rgb_pixel</font>"<font face='Lucida Console'>)</font>; 
+        <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='serialize'></a>serialize</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> bgr_pixel<font color='#5555FF'>&amp;</font> item, 
+        std::ostream<font color='#5555FF'>&amp;</font> out 
+    <font face='Lucida Console'>)</font>   
+    <b>{</b>
+        <font color='#0000FF'>try</font>
+        <b>{</b>
+            <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item.blue,out<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item.green,out<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item.red,out<font face='Lucida Console'>)</font>;
+        <b>}</b>
+        <font color='#0000FF'>catch</font> <font face='Lucida Console'>(</font>serialization_error<font color='#5555FF'>&amp;</font> e<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>throw</font> <font color='#BB00BB'>serialization_error</font><font face='Lucida Console'>(</font>e.info <font color='#5555FF'>+</font> "<font color='#CC0000'>\n   while serializing object of type bgr_pixel</font>"<font face='Lucida Console'>)</font>; 
+        <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='deserialize'></a>deserialize</b> <font face='Lucida Console'>(</font>
+        bgr_pixel<font color='#5555FF'>&amp;</font> item, 
+        std::istream<font color='#5555FF'>&amp;</font> in
+    <font face='Lucida Console'>)</font>   
+    <b>{</b>
+        <font color='#0000FF'>try</font>
+        <b>{</b>
+            <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item.blue,in<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item.green,in<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item.red,in<font face='Lucida Console'>)</font>;
+        <b>}</b>
+        <font color='#0000FF'>catch</font> <font face='Lucida Console'>(</font>serialization_error<font color='#5555FF'>&amp;</font> e<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>throw</font> <font color='#BB00BB'>serialization_error</font><font face='Lucida Console'>(</font>e.info <font color='#5555FF'>+</font> "<font color='#CC0000'>\n   while deserializing object of type bgr_pixel</font>"<font face='Lucida Console'>)</font>; 
+        <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='serialize'></a>serialize</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> hsi_pixel<font color='#5555FF'>&amp;</font> item, 
+        std::ostream<font color='#5555FF'>&amp;</font> out 
+    <font face='Lucida Console'>)</font>   
+    <b>{</b>
+        <font color='#0000FF'>try</font>
+        <b>{</b>
+            <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item.h,out<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item.s,out<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item.i,out<font face='Lucida Console'>)</font>;
+        <b>}</b>
+        <font color='#0000FF'>catch</font> <font face='Lucida Console'>(</font>serialization_error<font color='#5555FF'>&amp;</font> e<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>throw</font> <font color='#BB00BB'>serialization_error</font><font face='Lucida Console'>(</font>e.info <font color='#5555FF'>+</font> "<font color='#CC0000'>\n   while serializing object of type hsi_pixel</font>"<font face='Lucida Console'>)</font>; 
+        <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='deserialize'></a>deserialize</b> <font face='Lucida Console'>(</font>
+        hsi_pixel<font color='#5555FF'>&amp;</font> item, 
+        std::istream<font color='#5555FF'>&amp;</font> in
+    <font face='Lucida Console'>)</font>   
+    <b>{</b>
+        <font color='#0000FF'>try</font>
+        <b>{</b>
+            <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item.h,in<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item.s,in<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item.i,in<font face='Lucida Console'>)</font>;
+        <b>}</b>
+        <font color='#0000FF'>catch</font> <font face='Lucida Console'>(</font>serialization_error<font color='#5555FF'>&amp;</font> e<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>throw</font> <font color='#BB00BB'>serialization_error</font><font face='Lucida Console'>(</font>e.info <font color='#5555FF'>+</font> "<font color='#CC0000'>\n   while deserializing object of type hsi_pixel</font>"<font face='Lucida Console'>)</font>; 
+        <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_PIXEl_ 
+</font>
+
+</pre></body></html>

@@ -1,0 +1,625 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - entropy_decoder_model_kernel_4.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2005  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_ENTROPY_DECODER_MODEL_KERNEl_4_
+<font color='#0000FF'>#define</font> DLIB_ENTROPY_DECODER_MODEL_KERNEl_4_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../algs.h.html'>../algs.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='entropy_decoder_model_kernel_abstract.h.html'>entropy_decoder_model_kernel_abstract.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../assert.h.html'>../assert.h</a>"
+
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+    <font color='#0000FF'>namespace</font> edmk4
+    <b>{</b>
+        <font color='#0000FF'>struct</font> <b><a name='node'></a>node</b>
+        <b>{</b>            
+            node<font color='#5555FF'>*</font> next;
+            node<font color='#5555FF'>*</font> child_context;
+            node<font color='#5555FF'>*</font> parent_context;
+
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>short</u></font> symbol;
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>short</u></font> count;
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>short</u></font> total;
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>short</u></font> escapes;
+        <b>}</b>;
+    <b>}</b>
+
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> alphabet_size,
+        <font color='#0000FF'>typename</font> entropy_decoder,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> total_nodes,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> order
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>class</font> <b><a name='entropy_decoder_model_kernel_4'></a>entropy_decoder_model_kernel_4</b> 
+    <b>{</b>
+        <font color='#009900'>/*!
+            REQUIREMENTS ON total_nodes
+                - 4096 &lt; total_nodes
+                - this is the total number of nodes that we will use in the tree
+
+            REQUIREMENTS ON order
+                - 0 &lt;= order
+                - this is the maximum depth-1 the tree will be allowed to go (note 
+                  that the root level is depth 0).  
+
+
+            GENERAL NOTES
+                This implementation follows more or less the implementation 
+                strategy laid out by Alistair Moffat in his paper
+                Implementing the PPM data compression scheme.  Published in IEEE 
+                Transactions on Communications, 38(11):1917-1921, 1990.
+
+                The escape method used will be method D. 
+
+
+            INITIAL VALUE
+                - root == pointer to an array of total_nodes nodes
+                - next_node == 1
+                - cur == root
+                - cur_order = 0
+                - root-&gt;next == 0
+                - root-&gt;parent_context == 0
+                - root-&gt;child_context == 0
+                - root-&gt;escapes == 0
+                - root-&gt;total == 0
+                - stack_size == 0
+
+            CONVENTION
+                - pop() == stack[stack_size-1] 
+                - &amp;get_entropy_decoder() == coder
+                - root == pointer to an array of total_nodes nodes.
+                  this is also the root of the tree.
+
+                - if (next_node &lt; total_nodes) then
+                    - next_node == the next node in root that has not yet been allocated                                
+
+
+                - root-&gt;next == 0
+                - root-&gt;parent_context == 0
+              
+
+                - for every node in the tree:
+                  {
+                    - NOTATION: 
+                        - The "context" of a node is the string of symbols seen
+                          when you go from the root of the tree down (down though
+                          child context pointers) to the node, including the symbol at 
+                          the node itself.  (note that the context of the root node 
+                          is "" or the empty string)
+                        - A set of nodes is in the same "context set" if all the node's
+                          contexts are of length n and all the node's contexts share
+                          the same prefix of length n-1.
+                        - The "child context set" of a node is a set of nodes with
+                          contexts that are one symbol longer and prefixed by the node's 
+                          context.  For example, if a node has a context "abc" then the 
+                          nodes for contexts "abca", "abcb", "abcc", etc. are all in 
+                          the child context set of the node.
+                        - The "parent context" of a node is the context that is one 
+                          symbol shorter than the node's context and includes the 
+                          symbol in the node.  So the parent context of a node with 
+                          context "abcd" would be the context "bcd".
+
+
+                    - if (next != 0) then 
+                        - next == pointer to the next node in the same context set
+                    - if (child_context != 0) then
+                        - child_context == pointer to the first node of the child 
+                          context set for this node.
+                    - if (parent_context != 0) then
+                        - parent_context == pointer to the parent context of this node.
+                    - else
+                        - this node is the root node of the tree
+                  
+
+                    - if (this is not the root node) then
+                        - symbol == the symbol represented with this node
+                        - count == the number of times this symbol has been seen in its
+                          parent context.
+                    - else
+                        - the root doesn't have a symbol.  i.e. the context for the
+                          root node is "" or the empty string.
+
+                    - total == The sum of the counts of all the nodes 
+                      in the child context set + escapes. 
+                    - escapes == the escape count for the context represented
+                      by the node.
+                }
+
+
+                - cur_order &lt; order
+                - cur_order == the depth of the node cur in the tree.
+                  (note that the root node has depth 0)
+                - cur == pointer to the node in the tree who's context matches
+                  the most recent symbols we have seen.
+
+
+        !*/</font>
+
+        <font color='#0000FF'>typedef</font> edmk4::node node;
+
+    <font color='#0000FF'>public</font>:
+
+        <font color='#0000FF'>typedef</font> entropy_decoder entropy_decoder_type;
+
+        <b><a name='entropy_decoder_model_kernel_4'></a>entropy_decoder_model_kernel_4</b> <font face='Lucida Console'>(</font>
+            entropy_decoder<font color='#5555FF'>&amp;</font> coder
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>virtual</font> ~<b><a name='entropy_decoder_model_kernel_4'></a>entropy_decoder_model_kernel_4</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        
+        <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='clear'></a>clear</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='decode'></a>decode</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&amp;</font> symbol
+        <font face='Lucida Console'>)</font>;
+
+        entropy_decoder<font color='#5555FF'>&amp;</font> <b><a name='get_entropy_decoder'></a>get_entropy_decoder</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <b>{</b> <font color='#0000FF'>return</font> coder; <b>}</b>
+
+        <font color='#0000FF'>static</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='get_alphabet_size'></a>get_alphabet_size</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <b>{</b> <font color='#0000FF'>return</font> alphabet_size; <b>}</b>
+
+    <font color='#0000FF'>private</font>:
+
+
+        <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='push'></a>push</b> <font face='Lucida Console'>(</font>
+            edmk4::node<font color='#5555FF'>*</font> n
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - stack_size &lt;= order
+            ensures
+                - #pop() == n
+        !*/</font>
+
+        <font color='#0000FF'>inline</font> edmk4::node<font color='#5555FF'>*</font> <b><a name='pop'></a>pop</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - stack_size &gt; 0
+            ensures
+                - returns the node at the top of the stack
+        !*/</font>
+
+        <font color='#0000FF'>inline</font> edmk4::node<font color='#5555FF'>*</font> <b><a name='allocate_node'></a>allocate_node</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - space_left() == true
+            ensures
+                - returns a pointer to a new node
+        !*/</font>
+
+        <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='destroy_tree'></a>destroy_tree</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - deallocates all nodes except the root
+                - #root-&gt;child_context == 0
+                - #root-&gt;escapes == 0
+                - #root-&gt;total == 0
+                - #cur == root
+                - #cur_order == 0
+                - #stack_size == 0
+        !*/</font>
+
+
+        <font color='#0000FF'>inline</font> <font color='#0000FF'><u>bool</u></font> <b><a name='space_left'></a>space_left</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns true if there is at least 1 free node left.
+                - returns false otherwise
+        !*/</font>
+
+    
+        <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='scale_counts'></a>scale_counts</b> <font face='Lucida Console'>(</font>
+            node<font color='#5555FF'>*</font> n
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - divides all the counts in the child context set of n by 2.
+                - none of the nodes in the child context set will have a count of 0
+        !*/</font>
+
+
+        entropy_decoder<font color='#5555FF'>&amp;</font> coder;
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> next_node;        
+        node<font color='#5555FF'>*</font> root;
+        node<font color='#5555FF'>*</font> cur;
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> cur_order;
+        node<font color='#5555FF'>*</font> stack[order<font color='#5555FF'>+</font><font color='#979000'>1</font>];
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> stack_size;
+
+        <font color='#009900'>// restricted functions
+</font>        <b><a name='entropy_decoder_model_kernel_4'></a>entropy_decoder_model_kernel_4</b><font face='Lucida Console'>(</font>entropy_decoder_model_kernel_4<font color='#5555FF'>&lt;</font>alphabet_size,entropy_decoder,total_nodes,order<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font>;        <font color='#009900'>// copy constructor
+</font>        entropy_decoder_model_kernel_4<font color='#5555FF'>&lt;</font>alphabet_size,entropy_decoder,total_nodes,order<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>=</font><font face='Lucida Console'>(</font>entropy_decoder_model_kernel_4<font color='#5555FF'>&lt;</font>alphabet_size,entropy_decoder,total_nodes,order<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font>;    <font color='#009900'>// assignment operator
+</font>
+    <b>}</b>;   
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>    <font color='#009900'>// member function definitions
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> alphabet_size,
+        <font color='#0000FF'>typename</font> entropy_decoder,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> total_nodes,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> order
+        <font color='#5555FF'>&gt;</font>
+    entropy_decoder_model_kernel_4<font color='#5555FF'>&lt;</font>alphabet_size,entropy_decoder,total_nodes,order<font color='#5555FF'>&gt;</font>::
+    <b><a name='entropy_decoder_model_kernel_4'></a>entropy_decoder_model_kernel_4</b> <font face='Lucida Console'>(</font>
+        entropy_decoder<font color='#5555FF'>&amp;</font> coder_
+    <font face='Lucida Console'>)</font> : 
+        coder<font face='Lucida Console'>(</font>coder_<font face='Lucida Console'>)</font>,
+        next_node<font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>,
+        cur_order<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>,
+        stack_size<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#BB00BB'>COMPILE_TIME_ASSERT</font><font face='Lucida Console'>(</font> <font color='#979000'>1</font> <font color='#5555FF'>&lt;</font> alphabet_size <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> alphabet_size <font color='#5555FF'>&lt;</font> <font color='#979000'>65535</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>COMPILE_TIME_ASSERT</font><font face='Lucida Console'>(</font> <font color='#979000'>4096</font> <font color='#5555FF'>&lt;</font> total_nodes <font face='Lucida Console'>)</font>;
+
+        root <font color='#5555FF'>=</font> <font color='#0000FF'>new</font> node[total_nodes];  
+        cur <font color='#5555FF'>=</font> root;
+
+        root<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>child_context <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        root<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>escapes <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        root<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>next <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        root<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>parent_context <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        root<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>total <font color='#5555FF'>=</font> <font color='#979000'>0</font>; 
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> alphabet_size,
+        <font color='#0000FF'>typename</font> entropy_decoder,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> total_nodes,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> order
+        <font color='#5555FF'>&gt;</font>
+    entropy_decoder_model_kernel_4<font color='#5555FF'>&lt;</font>alphabet_size,entropy_decoder,total_nodes,order<font color='#5555FF'>&gt;</font>::
+    ~<b><a name='entropy_decoder_model_kernel_4'></a>entropy_decoder_model_kernel_4</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>delete</font> [] root;
+    <b>}</b>
+    
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> alphabet_size,
+        <font color='#0000FF'>typename</font> entropy_decoder,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> total_nodes,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> order
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> entropy_decoder_model_kernel_4<font color='#5555FF'>&lt;</font>alphabet_size,entropy_decoder,total_nodes,order<font color='#5555FF'>&gt;</font>::
+    <b><a name='clear'></a>clear</b><font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#BB00BB'>destroy_tree</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> alphabet_size,
+        <font color='#0000FF'>typename</font> entropy_decoder,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> total_nodes,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> order
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> entropy_decoder_model_kernel_4<font color='#5555FF'>&lt;</font>alphabet_size,entropy_decoder,total_nodes,order<font color='#5555FF'>&gt;</font>::
+    <b><a name='decode'></a>decode</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&amp;</font> symbol
+    <font face='Lucida Console'>)</font>
+    <b>{</b>        
+        node<font color='#5555FF'>*</font> temp <font color='#5555FF'>=</font> cur;
+        cur <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> low_count, high_count, total_count;
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> target;
+        node<font color='#5555FF'>*</font> new_node <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+
+        <font color='#009900'>// local_order will track the level of temp in the tree
+</font>        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> local_order <font color='#5555FF'>=</font> cur_order;
+
+
+        <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font><font color='#979000'>true</font><font face='Lucida Console'>)</font>
+        <b>{</b>            
+            high_count <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>space_left</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                total_count <font color='#5555FF'>=</font> temp<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>total;
+                
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>total_count <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#009900'>// check if we need to scale the counts
+</font>                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>total_count <font color='#5555FF'>&gt;</font> <font color='#979000'>10000</font><font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        <font color='#BB00BB'>scale_counts</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font>;
+                        total_count <font color='#5555FF'>=</font> temp<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>total;
+                    <b>}</b>
+
+                    target <font color='#5555FF'>=</font> coder.<font color='#BB00BB'>get_target</font><font face='Lucida Console'>(</font>total_count<font face='Lucida Console'>)</font>;
+
+                    <font color='#009900'>// find either the symbol we are looking for or the 
+</font>                    <font color='#009900'>// end of the context set
+</font>                    node<font color='#5555FF'>*</font> n <font color='#5555FF'>=</font> temp<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>child_context;
+                    node<font color='#5555FF'>*</font> last <font color='#5555FF'>=</font> <font color='#979000'>0</font>;   
+                    <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font><font color='#979000'>true</font><font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        high_count <font color='#5555FF'>+</font><font color='#5555FF'>=</font> n<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>count;
+                        
+                        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>high_count <font color='#5555FF'>&gt;</font> target <font color='#5555FF'>|</font><font color='#5555FF'>|</font> n<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>next <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                            <font color='#0000FF'>break</font>;
+                        last <font color='#5555FF'>=</font> n;
+                        n <font color='#5555FF'>=</font> n<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>next;
+                    <b>}</b>             
+
+                    low_count <font color='#5555FF'>=</font> high_count <font color='#5555FF'>-</font> n<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>count;
+             
+                    <font color='#009900'>// if we found the symbol
+</font>                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>high_count <font color='#5555FF'>&gt;</font> target<font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>new_node <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                        <b>{</b>
+                            new_node<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>parent_context <font color='#5555FF'>=</font> n;                            
+                        <b>}</b>
+
+                        symbol <font color='#5555FF'>=</font> n<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>symbol;
+            
+                        coder.<font color='#BB00BB'>decode</font><font face='Lucida Console'>(</font>low_count,high_count<font face='Lucida Console'>)</font>;
+                        n<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>count <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#979000'>8</font>;
+                        temp<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>total <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#979000'>8</font>;
+
+                        <font color='#009900'>// move this node to the front 
+</font>                        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>last<font face='Lucida Console'>)</font>
+                        <b>{</b>
+                            last<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>next <font color='#5555FF'>=</font> n<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>next;
+                            n<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>next <font color='#5555FF'>=</font> temp<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>child_context;
+                            temp<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>child_context <font color='#5555FF'>=</font> n;
+                        <b>}</b>
+
+
+                        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>cur <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                        <b>{</b>
+                            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>local_order <font color='#5555FF'>&lt;</font> order<font face='Lucida Console'>)</font>
+                            <b>{</b>
+                                cur_order <font color='#5555FF'>=</font> local_order<font color='#5555FF'>+</font><font color='#979000'>1</font>;
+                                cur <font color='#5555FF'>=</font> n;
+                            <b>}</b>  
+                            <font color='#0000FF'>else</font>
+                            <b>{</b>
+                                cur <font color='#5555FF'>=</font> n<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>parent_context;
+                                cur_order <font color='#5555FF'>=</font> local_order;
+                            <b>}</b>
+                        <b>}</b>
+
+                        <font color='#0000FF'>break</font>;                    
+                     
+                    <b>}</b>
+                    <font color='#009900'>// if we hit the end of the context set without finding the symbol
+</font>                    <font color='#0000FF'>else</font>
+                    <b>{</b>   
+                        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>new_node <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                        <b>{</b>
+                            new_node<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>parent_context <font color='#5555FF'>=</font> <font color='#BB00BB'>allocate_node</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                            new_node <font color='#5555FF'>=</font> new_node<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>parent_context;
+                        <b>}</b>
+                        <font color='#0000FF'>else</font>
+                        <b>{</b>
+                            new_node <font color='#5555FF'>=</font> <font color='#BB00BB'>allocate_node</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                        <b>}</b>
+
+                        n<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>next <font color='#5555FF'>=</font> new_node;
+
+                        <font color='#009900'>// get the escape code
+</font>                        coder.<font color='#BB00BB'>decode</font><font face='Lucida Console'>(</font>high_count,total_count<font face='Lucida Console'>)</font>;
+                    <b>}</b>
+                        
+                <b>}</b> 
+                <font color='#0000FF'>else</font> <font color='#009900'>// if (total_count == 0)
+</font>                <b>{</b>
+                    <font color='#009900'>// this means that temp-&gt;child_context == 0 so we should make
+</font>                    <font color='#009900'>// a new node here.
+</font>                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>new_node <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        new_node<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>parent_context <font color='#5555FF'>=</font> <font color='#BB00BB'>allocate_node</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                        new_node <font color='#5555FF'>=</font> new_node<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>parent_context;
+                    <b>}</b>
+                    <font color='#0000FF'>else</font>
+                    <b>{</b>
+                        new_node <font color='#5555FF'>=</font> <font color='#BB00BB'>allocate_node</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                    <b>}</b>
+
+                    temp<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>child_context <font color='#5555FF'>=</font> new_node;
+                <b>}</b>
+
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>cur <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> local_order <font color='#5555FF'>&lt;</font> order<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    cur <font color='#5555FF'>=</font> new_node;
+                    cur_order <font color='#5555FF'>=</font> local_order<font color='#5555FF'>+</font><font color='#979000'>1</font>;
+                <b>}</b>
+
+                <font color='#009900'>// fill out the new node
+</font>                new_node<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>child_context <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                new_node<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>count <font color='#5555FF'>=</font> <font color='#979000'>4</font>;
+                new_node<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>escapes <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                new_node<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>next <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                <font color='#BB00BB'>push</font><font face='Lucida Console'>(</font>new_node<font face='Lucida Console'>)</font>;
+                new_node<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>total <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                temp<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>escapes <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#979000'>4</font>;
+                temp<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>total <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#979000'>8</font>;
+
+              
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>temp <font color='#5555FF'>!</font><font color='#5555FF'>=</font> root<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    temp <font color='#5555FF'>=</font> temp<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>parent_context;
+                    <font color='#5555FF'>-</font><font color='#5555FF'>-</font>local_order;
+                    <font color='#0000FF'>continue</font>;
+                <b>}</b>
+
+                <font color='#009900'>// since this is the root we are going to the order-(-1) context
+</font>                <font color='#009900'>// so we can just take care of that here.
+</font>                target <font color='#5555FF'>=</font> coder.<font color='#BB00BB'>get_target</font><font face='Lucida Console'>(</font>alphabet_size<font face='Lucida Console'>)</font>;
+                new_node<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>parent_context <font color='#5555FF'>=</font> root;
+                coder.<font color='#BB00BB'>decode</font><font face='Lucida Console'>(</font>target,target<font color='#5555FF'>+</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+                symbol <font color='#5555FF'>=</font> target;
+
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>cur <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                <b>{</b>
+                    cur <font color='#5555FF'>=</font> root;
+                    cur_order <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                <b>}</b>                    
+                <font color='#0000FF'>break</font>;               
+            <b>}</b>
+            <font color='#0000FF'>else</font> 
+            <b>{</b>
+                <font color='#009900'>// there isn't enough space so we should rebuild the tree
+</font>                <font color='#BB00BB'>destroy_tree</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                temp <font color='#5555FF'>=</font> cur;
+                local_order <font color='#5555FF'>=</font> cur_order;
+                cur <font color='#5555FF'>=</font> <font color='#979000'>0</font>;        
+                new_node <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            <b>}</b>
+        <b>}</b> <font color='#009900'>// while (true)
+</font>
+        <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>stack_size <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#BB00BB'>pop</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>symbol <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>short</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>symbol<font face='Lucida Console'>)</font>;
+        <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>    <font color='#009900'>// private member function definitions
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> alphabet_size,
+        <font color='#0000FF'>typename</font> entropy_decoder,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> total_nodes,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> order
+        <font color='#5555FF'>&gt;</font>
+    edmk4::node<font color='#5555FF'>*</font> entropy_decoder_model_kernel_4<font color='#5555FF'>&lt;</font>alphabet_size,entropy_decoder,total_nodes,order<font color='#5555FF'>&gt;</font>::
+    <b><a name='allocate_node'></a>allocate_node</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font>    
+    <b>{</b>
+        node<font color='#5555FF'>*</font> temp;
+        temp <font color='#5555FF'>=</font> root <font color='#5555FF'>+</font> next_node;
+        <font color='#5555FF'>+</font><font color='#5555FF'>+</font>next_node;
+        <font color='#0000FF'>return</font> temp;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> alphabet_size,
+        <font color='#0000FF'>typename</font> entropy_decoder,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> total_nodes,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> order
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> entropy_decoder_model_kernel_4<font color='#5555FF'>&lt;</font>alphabet_size,entropy_decoder,total_nodes,order<font color='#5555FF'>&gt;</font>::
+    <b><a name='destroy_tree'></a>destroy_tree</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>        
+        next_node <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+        root<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>child_context <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        root<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>escapes <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        root<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>total <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        cur <font color='#5555FF'>=</font> root;
+        cur_order <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        stack_size <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> alphabet_size,
+        <font color='#0000FF'>typename</font> entropy_decoder,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> total_nodes,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> order
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>bool</u></font> entropy_decoder_model_kernel_4<font color='#5555FF'>&lt;</font>alphabet_size,entropy_decoder,total_nodes,order<font color='#5555FF'>&gt;</font>::
+    <b><a name='space_left'></a>space_left</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        <font color='#0000FF'>return</font> <font face='Lucida Console'>(</font>next_node <font color='#5555FF'>&lt;</font> total_nodes<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> alphabet_size,
+        <font color='#0000FF'>typename</font> entropy_decoder,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> total_nodes,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> order
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> entropy_decoder_model_kernel_4<font color='#5555FF'>&lt;</font>alphabet_size,entropy_decoder,total_nodes,order<font color='#5555FF'>&gt;</font>::
+    <b><a name='push'></a>push</b> <font face='Lucida Console'>(</font>
+        edmk4::node<font color='#5555FF'>*</font> n
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        stack[stack_size] <font color='#5555FF'>=</font> n;
+        <font color='#5555FF'>+</font><font color='#5555FF'>+</font>stack_size;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> alphabet_size,
+        <font color='#0000FF'>typename</font> entropy_decoder,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> total_nodes,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> order
+        <font color='#5555FF'>&gt;</font>
+    edmk4::node<font color='#5555FF'>*</font> entropy_decoder_model_kernel_4<font color='#5555FF'>&lt;</font>alphabet_size,entropy_decoder,total_nodes,order<font color='#5555FF'>&gt;</font>::
+    <b><a name='pop'></a>pop</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>   
+        <font color='#5555FF'>-</font><font color='#5555FF'>-</font>stack_size;
+        <font color='#0000FF'>return</font> stack[stack_size];
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> alphabet_size,
+        <font color='#0000FF'>typename</font> entropy_decoder,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> total_nodes,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> order
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> entropy_decoder_model_kernel_4<font color='#5555FF'>&lt;</font>alphabet_size,entropy_decoder,total_nodes,order<font color='#5555FF'>&gt;</font>::
+    <b><a name='scale_counts'></a>scale_counts</b> <font face='Lucida Console'>(</font>
+        node<font color='#5555FF'>*</font> temp
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>temp<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>escapes <font color='#5555FF'>&gt;</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>
+            temp<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>escapes <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+        temp<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>total <font color='#5555FF'>=</font> temp<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>escapes;
+
+        node<font color='#5555FF'>*</font> n <font color='#5555FF'>=</font> temp<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>child_context;
+        <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>n <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>n<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>count <font color='#5555FF'>&gt;</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>
+                n<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>count <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+
+            temp<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>total <font color='#5555FF'>+</font><font color='#5555FF'>=</font> n<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>count;
+            n <font color='#5555FF'>=</font> n<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>next;
+        <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_ENTROPY_DECODER_MODEL_KERNEl_4_
+</font>
+
+</pre></body></html>

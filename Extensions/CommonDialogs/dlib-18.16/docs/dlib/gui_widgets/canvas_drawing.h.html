@@ -1,0 +1,967 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - canvas_drawing.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2005  Davis E. King (davis@dlib.net), and Nils Labugt
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font>
+<font color='#0000FF'>#ifndef</font> DLIB_GUI_CANVAS_DRAWINg_
+<font color='#0000FF'>#define</font> DLIB_GUI_CANVAS_DRAWINg_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='canvas_drawing_abstract.h.html'>canvas_drawing_abstract.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../gui_core.h.html'>../gui_core.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../algs.h.html'>../algs.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../array2d.h.html'>../array2d.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../pixel.h.html'>../pixel.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../image_transforms/assign_image.h.html'>../image_transforms/assign_image.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../geometry.h.html'>../geometry.h</a>"
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>cmath<font color='#5555FF'>&gt;</font>
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> pixel_type<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='draw_line'></a>draw_line</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> canvas<font color='#5555FF'>&amp;</font> c,
+        <font color='#0000FF'>const</font> point<font color='#5555FF'>&amp;</font> p1,
+        <font color='#0000FF'>const</font> point<font color='#5555FF'>&amp;</font> p2,
+        <font color='#0000FF'>const</font> pixel_type<font color='#5555FF'>&amp;</font> pixel, 
+        <font color='#0000FF'>const</font> rectangle<font color='#5555FF'>&amp;</font> area <font color='#5555FF'>=</font> <font color='#BB00BB'>rectangle</font><font face='Lucida Console'>(</font>std::numeric_limits<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>min</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, std::numeric_limits<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>min</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,
+                                          std::numeric_limits<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>max</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, std::numeric_limits<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>max</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        rectangle <font color='#BB00BB'>valid_area</font><font face='Lucida Console'>(</font>c.<font color='#BB00BB'>intersect</font><font face='Lucida Console'>(</font>area<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'><u>long</u></font> x1 <font color='#5555FF'>=</font> p1.<font color='#BB00BB'>x</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'><u>long</u></font> y1 <font color='#5555FF'>=</font> p1.<font color='#BB00BB'>y</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'><u>long</u></font> x2 <font color='#5555FF'>=</font> p2.<font color='#BB00BB'>x</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'><u>long</u></font> y2 <font color='#5555FF'>=</font> p2.<font color='#BB00BB'>y</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>x1 <font color='#5555FF'>=</font><font color='#5555FF'>=</font> x2<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#009900'>// if the x coordinate is inside the canvas's area
+</font>            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>x1 <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> valid_area.<font color='#BB00BB'>right</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> x1 <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> valid_area.<font color='#BB00BB'>left</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#009900'>// make sure y1 comes before y2
+</font>                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>y1 <font color='#5555FF'>&gt;</font> y2<font face='Lucida Console'>)</font>
+                    <font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>y1,y2<font face='Lucida Console'>)</font>;
+
+                y1 <font color='#5555FF'>=</font> std::<font color='#BB00BB'>max</font><font face='Lucida Console'>(</font>y1,valid_area.<font color='#BB00BB'>top</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                y2 <font color='#5555FF'>=</font> std::<font color='#BB00BB'>min</font><font face='Lucida Console'>(</font>y2,valid_area.<font color='#BB00BB'>bottom</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                <font color='#009900'>// this is a vertical line
+</font>                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> y <font color='#5555FF'>=</font> y1; y <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> y2; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>y<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#BB00BB'>assign_pixel</font><font face='Lucida Console'>(</font>c[y<font color='#5555FF'>-</font>c.<font color='#BB00BB'>top</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>][x1<font color='#5555FF'>-</font>c.<font color='#BB00BB'>left</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>], pixel<font face='Lucida Console'>)</font>;
+                <b>}</b>
+            <b>}</b>
+        <b>}</b>
+        <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>y1 <font color='#5555FF'>=</font><font color='#5555FF'>=</font> y2<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#009900'>// if the y coordinate is inside the canvas's area
+</font>            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>y1 <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> valid_area.<font color='#BB00BB'>bottom</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> y1 <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> valid_area.<font color='#BB00BB'>top</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#009900'>// make sure x1 comes before x2
+</font>                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>x1 <font color='#5555FF'>&gt;</font> x2<font face='Lucida Console'>)</font>
+                    <font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>x1,x2<font face='Lucida Console'>)</font>;
+
+                x1 <font color='#5555FF'>=</font> std::<font color='#BB00BB'>max</font><font face='Lucida Console'>(</font>x1,valid_area.<font color='#BB00BB'>left</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                x2 <font color='#5555FF'>=</font> std::<font color='#BB00BB'>min</font><font face='Lucida Console'>(</font>x2,valid_area.<font color='#BB00BB'>right</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                <font color='#009900'>// this is a horizontal line
+</font>                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> x <font color='#5555FF'>=</font> x1; x <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> x2; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>x<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#BB00BB'>assign_pixel</font><font face='Lucida Console'>(</font>c[y1<font color='#5555FF'>-</font>c.<font color='#BB00BB'>top</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>][x<font color='#5555FF'>-</font>c.<font color='#BB00BB'>left</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>], pixel<font face='Lucida Console'>)</font>;
+                <b>}</b>
+            <b>}</b>
+        <b>}</b>
+        <font color='#0000FF'>else</font>
+        <b>{</b>
+            rgb_alpha_pixel alpha_pixel;
+            <font color='#BB00BB'>assign_pixel</font><font face='Lucida Console'>(</font>alpha_pixel, pixel<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> max_alpha <font color='#5555FF'>=</font> alpha_pixel.alpha;
+
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> rise <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font>y2<font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font>y1<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> run <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font>x2<font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font>x1<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>std::<font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font>rise<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> std::<font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font>run<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> slope <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>double</u></font><font face='Lucida Console'>)</font>rise<font face='Lucida Console'>)</font><font color='#5555FF'>/</font>run;
+
+                <font color='#0000FF'><u>double</u></font> first, last;
+
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>x1 <font color='#5555FF'>&gt;</font> x2<font face='Lucida Console'>)</font>                
+                <b>{</b>
+                    first <font color='#5555FF'>=</font> std::<font color='#BB00BB'>max</font><font face='Lucida Console'>(</font>x2,valid_area.<font color='#BB00BB'>left</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                    last <font color='#5555FF'>=</font> std::<font color='#BB00BB'>min</font><font face='Lucida Console'>(</font>x1,valid_area.<font color='#BB00BB'>right</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                <b>}</b>
+                <font color='#0000FF'>else</font>
+                <b>{</b>
+                    first <font color='#5555FF'>=</font> std::<font color='#BB00BB'>max</font><font face='Lucida Console'>(</font>x1,valid_area.<font color='#BB00BB'>left</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                    last <font color='#5555FF'>=</font> std::<font color='#BB00BB'>min</font><font face='Lucida Console'>(</font>x2,valid_area.<font color='#BB00BB'>right</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                <b>}</b>                             
+
+
+                <font color='#0000FF'><u>long</u></font> y;
+                <font color='#0000FF'><u>long</u></font> x;
+                <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> x1f <font color='#5555FF'>=</font> x1;
+                <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> y1f <font color='#5555FF'>=</font> y1;
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>double</u></font> i <font color='#5555FF'>=</font> first; i <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> last; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                <b>{</b>   
+                    <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> dy <font color='#5555FF'>=</font> slope<font color='#5555FF'>*</font><font face='Lucida Console'>(</font>i<font color='#5555FF'>-</font>x1f<font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> y1f;
+                    <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> dx <font color='#5555FF'>=</font> i;
+
+                    y <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>dy<font face='Lucida Console'>)</font>;
+                    x <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>dx<font face='Lucida Console'>)</font>;
+
+
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>y <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> valid_area.<font color='#BB00BB'>top</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> y <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> valid_area.<font color='#BB00BB'>bottom</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        alpha_pixel.alpha <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#979000'>1.0</font><font color='#5555FF'>-</font><font face='Lucida Console'>(</font>dy<font color='#5555FF'>-</font>y<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font color='#5555FF'>*</font>max_alpha<font face='Lucida Console'>)</font>;
+                        <font color='#BB00BB'>assign_pixel</font><font face='Lucida Console'>(</font>c[y<font color='#5555FF'>-</font>c.<font color='#BB00BB'>top</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>][x<font color='#5555FF'>-</font>c.<font color='#BB00BB'>left</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>], alpha_pixel<font face='Lucida Console'>)</font>;
+                    <b>}</b>
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>y<font color='#5555FF'>+</font><font color='#979000'>1</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> valid_area.<font color='#BB00BB'>top</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> y<font color='#5555FF'>+</font><font color='#979000'>1</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> valid_area.<font color='#BB00BB'>bottom</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        alpha_pixel.alpha <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>dy<font color='#5555FF'>-</font>y<font face='Lucida Console'>)</font><font color='#5555FF'>*</font>max_alpha<font face='Lucida Console'>)</font>;
+                        <font color='#BB00BB'>assign_pixel</font><font face='Lucida Console'>(</font>c[y<font color='#5555FF'>+</font><font color='#979000'>1</font><font color='#5555FF'>-</font>c.<font color='#BB00BB'>top</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>][x<font color='#5555FF'>-</font>c.<font color='#BB00BB'>left</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>], alpha_pixel<font face='Lucida Console'>)</font>;
+                    <b>}</b>
+                <b>}</b>         
+            <b>}</b>
+            <font color='#0000FF'>else</font>
+            <b>{</b>
+                <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> slope <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>double</u></font><font face='Lucida Console'>)</font>run<font face='Lucida Console'>)</font><font color='#5555FF'>/</font>rise;
+
+                <font color='#0000FF'><u>double</u></font> first, last;
+
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>y1 <font color='#5555FF'>&gt;</font> y2<font face='Lucida Console'>)</font>                
+                <b>{</b>
+                    first <font color='#5555FF'>=</font> std::<font color='#BB00BB'>max</font><font face='Lucida Console'>(</font>y2,valid_area.<font color='#BB00BB'>top</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                    last <font color='#5555FF'>=</font> std::<font color='#BB00BB'>min</font><font face='Lucida Console'>(</font>y1,valid_area.<font color='#BB00BB'>bottom</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                <b>}</b>
+                <font color='#0000FF'>else</font>
+                <b>{</b>
+                    first <font color='#5555FF'>=</font> std::<font color='#BB00BB'>max</font><font face='Lucida Console'>(</font>y1,valid_area.<font color='#BB00BB'>top</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                    last <font color='#5555FF'>=</font> std::<font color='#BB00BB'>min</font><font face='Lucida Console'>(</font>y2,valid_area.<font color='#BB00BB'>bottom</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                <b>}</b>                             
+
+                <font color='#0000FF'><u>long</u></font> x;
+                <font color='#0000FF'><u>long</u></font> y;
+                <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> x1f <font color='#5555FF'>=</font> x1;
+                <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> y1f <font color='#5555FF'>=</font> y1;
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>double</u></font> i <font color='#5555FF'>=</font> first; i <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> last; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                <b>{</b>   
+                    <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> dx <font color='#5555FF'>=</font> slope<font color='#5555FF'>*</font><font face='Lucida Console'>(</font>i<font color='#5555FF'>-</font>y1f<font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> x1f;
+                    <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> dy <font color='#5555FF'>=</font> i;
+
+                    y <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>dy<font face='Lucida Console'>)</font>;
+                    x <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>dx<font face='Lucida Console'>)</font>;
+
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>x <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> valid_area.<font color='#BB00BB'>left</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> x <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> valid_area.<font color='#BB00BB'>right</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        alpha_pixel.alpha <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#979000'>1.0</font><font color='#5555FF'>-</font><font face='Lucida Console'>(</font>dx<font color='#5555FF'>-</font>x<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font color='#5555FF'>*</font>max_alpha<font face='Lucida Console'>)</font>;
+                        <font color='#BB00BB'>assign_pixel</font><font face='Lucida Console'>(</font>c[y<font color='#5555FF'>-</font>c.<font color='#BB00BB'>top</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>][x<font color='#5555FF'>-</font>c.<font color='#BB00BB'>left</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>], alpha_pixel<font face='Lucida Console'>)</font>;
+                    <b>}</b>
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>x<font color='#5555FF'>+</font><font color='#979000'>1</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> valid_area.<font color='#BB00BB'>left</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> x<font color='#5555FF'>+</font><font color='#979000'>1</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> valid_area.<font color='#BB00BB'>right</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        alpha_pixel.alpha <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>dx<font color='#5555FF'>-</font>x<font face='Lucida Console'>)</font><font color='#5555FF'>*</font>max_alpha<font face='Lucida Console'>)</font>;
+                        <font color='#BB00BB'>assign_pixel</font><font face='Lucida Console'>(</font>c[y<font color='#5555FF'>-</font>c.<font color='#BB00BB'>top</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>][x<font color='#5555FF'>+</font><font color='#979000'>1</font><font color='#5555FF'>-</font>c.<font color='#BB00BB'>left</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>], alpha_pixel<font face='Lucida Console'>)</font>;
+                    <b>}</b>
+                <b>}</b> 
+            <b>}</b>
+        <b>}</b>
+
+    <b>}</b>
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='draw_line'></a>draw_line</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> canvas<font color='#5555FF'>&amp;</font> c,
+        <font color='#0000FF'>const</font> point<font color='#5555FF'>&amp;</font> p1,
+        <font color='#0000FF'>const</font> point<font color='#5555FF'>&amp;</font> p2
+    <font face='Lucida Console'>)</font><b>{</b> <font color='#BB00BB'>draw_line</font><font face='Lucida Console'>(</font>c,p1,p2,<font color='#979000'>0</font><font face='Lucida Console'>)</font>; <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='draw_sunken_rectangle'></a>draw_sunken_rectangle</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> canvas<font color='#5555FF'>&amp;</font> c,
+        <font color='#0000FF'>const</font> rectangle<font color='#5555FF'>&amp;</font> border,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> alpha <font color='#5555FF'>=</font> <font color='#979000'>255</font>
+    <font face='Lucida Console'>)</font>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> pixel_type<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='draw_pixel'></a>draw_pixel</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> canvas<font color='#5555FF'>&amp;</font> c,
+        <font color='#0000FF'>const</font> point<font color='#5555FF'>&amp;</font> p,
+        <font color='#0000FF'>const</font> pixel_type<font color='#5555FF'>&amp;</font> pixel 
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>c.<font color='#BB00BB'>contains</font><font face='Lucida Console'>(</font>p<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#BB00BB'>assign_pixel</font><font face='Lucida Console'>(</font>c[p.<font color='#BB00BB'>y</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font>c.<font color='#BB00BB'>top</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>][p.<font color='#BB00BB'>x</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font>c.<font color='#BB00BB'>left</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>],pixel<font face='Lucida Console'>)</font>;
+        <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> pixel_type<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='draw_checkered'></a>draw_checkered</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> canvas<font color='#5555FF'>&amp;</font> c,
+        <font color='#0000FF'>const</font> rectangle<font color='#5555FF'>&amp;</font> a,
+        <font color='#0000FF'>const</font> pixel_type<font color='#5555FF'>&amp;</font> pixel1,
+        <font color='#0000FF'>const</font> pixel_type<font color='#5555FF'>&amp;</font> pixel2
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        rectangle area <font color='#5555FF'>=</font> a.<font color='#BB00BB'>intersect</font><font face='Lucida Console'>(</font>c<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>area.<font color='#BB00BB'>is_empty</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+            <font color='#0000FF'>return</font>;
+
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> area.<font color='#BB00BB'>left</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; i <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> area.<font color='#BB00BB'>right</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> j <font color='#5555FF'>=</font> area.<font color='#BB00BB'>top</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; j <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> area.<font color='#BB00BB'>bottom</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>j<font face='Lucida Console'>)</font>
+            <b>{</b>
+                canvas::pixel<font color='#5555FF'>&amp;</font> p <font color='#5555FF'>=</font> c[j <font color='#5555FF'>-</font> c.<font color='#BB00BB'>top</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>][i <font color='#5555FF'>-</font> c.<font color='#BB00BB'>left</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>];
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>j<font color='#5555FF'>&amp;</font><font color='#979000'>0x1</font><font face='Lucida Console'>)</font> ^ <font face='Lucida Console'>(</font>i<font color='#5555FF'>&amp;</font><font color='#979000'>0x1</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#BB00BB'>assign_pixel</font><font face='Lucida Console'>(</font>p,pixel1<font face='Lucida Console'>)</font>;
+                <b>}</b>
+                <font color='#0000FF'>else</font>
+                <b>{</b>
+                    <font color='#BB00BB'>assign_pixel</font><font face='Lucida Console'>(</font>p,pixel2<font face='Lucida Console'>)</font>;
+                <b>}</b>
+            <b>}</b>
+        <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='draw_button_down'></a>draw_button_down</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> canvas<font color='#5555FF'>&amp;</font> c,
+        <font color='#0000FF'>const</font> rectangle<font color='#5555FF'>&amp;</font> btn,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> alpha <font color='#5555FF'>=</font> <font color='#979000'>255</font>
+    <font face='Lucida Console'>)</font>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='draw_button_up'></a>draw_button_up</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> canvas<font color='#5555FF'>&amp;</font> c,
+        <font color='#0000FF'>const</font> rectangle<font color='#5555FF'>&amp;</font> btn,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> alpha <font color='#5555FF'>=</font> <font color='#979000'>255</font>
+    <font face='Lucida Console'>)</font>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> pixel_type<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='draw_circle'></a>draw_circle</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> canvas<font color='#5555FF'>&amp;</font> c,
+        <font color='#0000FF'>const</font> point<font color='#5555FF'>&amp;</font> center_point,
+        <font color='#0000FF'><u>double</u></font> radius,
+        <font color='#0000FF'>const</font> pixel_type<font color='#5555FF'>&amp;</font> pixel,
+        <font color='#0000FF'>const</font> rectangle<font color='#5555FF'>&amp;</font> area <font color='#5555FF'>=</font> <font color='#BB00BB'>rectangle</font><font face='Lucida Console'>(</font>std::numeric_limits<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>min</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, std::numeric_limits<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>min</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,
+                                          std::numeric_limits<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>max</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, std::numeric_limits<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>max</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>using</font> std::sqrt;
+        rectangle <font color='#BB00BB'>valid_area</font><font face='Lucida Console'>(</font>c.<font color='#BB00BB'>intersect</font><font face='Lucida Console'>(</font>area<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> x <font color='#5555FF'>=</font> center_point.<font color='#BB00BB'>x</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> y <font color='#5555FF'>=</font> center_point.<font color='#BB00BB'>y</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>radius <font color='#5555FF'>&gt;</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'><u>long</u></font> first_x <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>x <font color='#5555FF'>-</font> radius <font color='#5555FF'>+</font> <font color='#979000'>0.5</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'><u>long</u></font> last_x <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>x <font color='#5555FF'>+</font> radius <font color='#5555FF'>+</font> <font color='#979000'>0.5</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> rs <font color='#5555FF'>=</font> radius<font color='#5555FF'>*</font>radius;
+
+            <font color='#009900'>// ensure that we only loop over the part of the x dimension that this
+</font>            <font color='#009900'>// canvas contains.
+</font>            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>first_x <font color='#5555FF'>&lt;</font> valid_area.<font color='#BB00BB'>left</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                first_x <font color='#5555FF'>=</font> valid_area.<font color='#BB00BB'>left</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>last_x <font color='#5555FF'>&gt;</font> valid_area.<font color='#BB00BB'>right</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                last_x <font color='#5555FF'>=</font> valid_area.<font color='#BB00BB'>right</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'><u>long</u></font> top, bottom;
+
+            top <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#BB00BB'>sqrt</font><font face='Lucida Console'>(</font>std::<font color='#BB00BB'>max</font><font face='Lucida Console'>(</font>rs <font color='#5555FF'>-</font> <font face='Lucida Console'>(</font>first_x<font color='#5555FF'>-</font>x<font color='#5555FF'>-</font><font color='#979000'>0.5</font><font face='Lucida Console'>)</font><font color='#5555FF'>*</font><font face='Lucida Console'>(</font>first_x<font color='#5555FF'>-</font>x<font color='#5555FF'>-</font><font color='#979000'>0.5</font><font face='Lucida Console'>)</font>,<font color='#979000'>0.0</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font color='#5555FF'>+</font><font color='#979000'>0.5</font><font face='Lucida Console'>)</font>;
+            top <font color='#5555FF'>+</font><font color='#5555FF'>=</font> y;
+            <font color='#0000FF'><u>long</u></font> last <font color='#5555FF'>=</font> top;
+
+            <font color='#009900'>// draw the left half of the circle
+</font>            <font color='#0000FF'><u>long</u></font> middle <font color='#5555FF'>=</font> std::<font color='#BB00BB'>min</font><font face='Lucida Console'>(</font>x<font color='#5555FF'>-</font><font color='#979000'>1</font>,last_x<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> first_x; i <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> middle; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'><u>double</u></font> a <font color='#5555FF'>=</font> i <font color='#5555FF'>-</font> x <font color='#5555FF'>+</font> <font color='#979000'>0.5</font>;
+                <font color='#009900'>// find the top of the arc
+</font>                top <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#BB00BB'>sqrt</font><font face='Lucida Console'>(</font>std::<font color='#BB00BB'>max</font><font face='Lucida Console'>(</font>rs <font color='#5555FF'>-</font> a<font color='#5555FF'>*</font>a,<font color='#979000'>0.0</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font color='#5555FF'>+</font><font color='#979000'>0.5</font><font face='Lucida Console'>)</font>;
+                top <font color='#5555FF'>+</font><font color='#5555FF'>=</font> y;
+                <font color='#0000FF'><u>long</u></font> temp <font color='#5555FF'>=</font> top;
+
+                <font color='#0000FF'>while</font><font face='Lucida Console'>(</font>top <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> last<font face='Lucida Console'>)</font> 
+                <b>{</b>
+                    bottom <font color='#5555FF'>=</font> y <font color='#5555FF'>-</font> top <font color='#5555FF'>+</font> y;
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>top <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> valid_area.<font color='#BB00BB'>top</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> top <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> valid_area.<font color='#BB00BB'>bottom</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        <font color='#BB00BB'>assign_pixel</font><font face='Lucida Console'>(</font>c[top<font color='#5555FF'>-</font>c.<font color='#BB00BB'>top</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>][i<font color='#5555FF'>-</font>c.<font color='#BB00BB'>left</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>],pixel<font face='Lucida Console'>)</font>;
+                    <b>}</b>
+
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>bottom <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> valid_area.<font color='#BB00BB'>top</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> bottom <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> valid_area.<font color='#BB00BB'>bottom</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        <font color='#BB00BB'>assign_pixel</font><font face='Lucida Console'>(</font>c[bottom<font color='#5555FF'>-</font>c.<font color='#BB00BB'>top</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>][i<font color='#5555FF'>-</font>c.<font color='#BB00BB'>left</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>],pixel<font face='Lucida Console'>)</font>;
+                    <b>}</b>
+                    <font color='#5555FF'>-</font><font color='#5555FF'>-</font>top;
+                <b>}</b>
+
+                last <font color='#5555FF'>=</font> temp;
+            <b>}</b>
+
+            middle <font color='#5555FF'>=</font> std::<font color='#BB00BB'>max</font><font face='Lucida Console'>(</font>x,first_x<font face='Lucida Console'>)</font>;
+            top <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#BB00BB'>sqrt</font><font face='Lucida Console'>(</font>std::<font color='#BB00BB'>max</font><font face='Lucida Console'>(</font>rs <font color='#5555FF'>-</font> <font face='Lucida Console'>(</font>last_x<font color='#5555FF'>-</font>x<font color='#5555FF'>+</font><font color='#979000'>0.5</font><font face='Lucida Console'>)</font><font color='#5555FF'>*</font><font face='Lucida Console'>(</font>last_x<font color='#5555FF'>-</font>x<font color='#5555FF'>+</font><font color='#979000'>0.5</font><font face='Lucida Console'>)</font>,<font color='#979000'>0.0</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font color='#5555FF'>+</font><font color='#979000'>0.5</font><font face='Lucida Console'>)</font>;
+            top <font color='#5555FF'>+</font><font color='#5555FF'>=</font> y;
+            last <font color='#5555FF'>=</font> top;
+            <font color='#009900'>// draw the right half of the circle
+</font>            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> last_x; i <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> middle; <font color='#5555FF'>-</font><font color='#5555FF'>-</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'><u>double</u></font> a <font color='#5555FF'>=</font> i <font color='#5555FF'>-</font> x <font color='#5555FF'>-</font> <font color='#979000'>0.5</font>;
+                <font color='#009900'>// find the top of the arc
+</font>                top <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#BB00BB'>sqrt</font><font face='Lucida Console'>(</font>std::<font color='#BB00BB'>max</font><font face='Lucida Console'>(</font>rs <font color='#5555FF'>-</font> a<font color='#5555FF'>*</font>a,<font color='#979000'>0.0</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font color='#5555FF'>+</font><font color='#979000'>0.5</font><font face='Lucida Console'>)</font>;
+                top <font color='#5555FF'>+</font><font color='#5555FF'>=</font> y;
+                <font color='#0000FF'><u>long</u></font> temp <font color='#5555FF'>=</font> top;
+
+                <font color='#0000FF'>while</font><font face='Lucida Console'>(</font>top <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> last<font face='Lucida Console'>)</font> 
+                <b>{</b>
+                    bottom <font color='#5555FF'>=</font> y <font color='#5555FF'>-</font> top <font color='#5555FF'>+</font> y;
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>top <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> valid_area.<font color='#BB00BB'>top</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> top <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> valid_area.<font color='#BB00BB'>bottom</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        <font color='#BB00BB'>assign_pixel</font><font face='Lucida Console'>(</font>c[top<font color='#5555FF'>-</font>c.<font color='#BB00BB'>top</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>][i<font color='#5555FF'>-</font>c.<font color='#BB00BB'>left</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>],pixel<font face='Lucida Console'>)</font>;
+                    <b>}</b>
+
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>bottom <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> valid_area.<font color='#BB00BB'>top</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> bottom <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> valid_area.<font color='#BB00BB'>bottom</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        <font color='#BB00BB'>assign_pixel</font><font face='Lucida Console'>(</font>c[bottom<font color='#5555FF'>-</font>c.<font color='#BB00BB'>top</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>][i<font color='#5555FF'>-</font>c.<font color='#BB00BB'>left</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>],pixel<font face='Lucida Console'>)</font>;
+                    <b>}</b>
+                    <font color='#5555FF'>-</font><font color='#5555FF'>-</font>top;
+                <b>}</b>
+
+                last <font color='#5555FF'>=</font> temp;
+            <b>}</b>
+        <b>}</b>
+        <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>radius <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>1</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font>
+                 x <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> valid_area.<font color='#BB00BB'>left</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> x <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> valid_area.<font color='#BB00BB'>right</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font>
+                 y <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> valid_area.<font color='#BB00BB'>top</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> y <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> valid_area.<font color='#BB00BB'>bottom</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#BB00BB'>assign_pixel</font><font face='Lucida Console'>(</font>c[y<font color='#5555FF'>-</font>c.<font color='#BB00BB'>top</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>][x<font color='#5555FF'>-</font>c.<font color='#BB00BB'>left</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>], pixel<font face='Lucida Console'>)</font>;
+        <b>}</b>
+    <b>}</b>
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='draw_circle'></a>draw_circle</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> canvas<font color='#5555FF'>&amp;</font> c,
+        <font color='#0000FF'>const</font> point<font color='#5555FF'>&amp;</font> center_point,
+        <font color='#0000FF'><u>double</u></font> radius
+    <font face='Lucida Console'>)</font><b>{</b> <font color='#BB00BB'>draw_circle</font><font face='Lucida Console'>(</font>c, center_point, radius, <font color='#979000'>0</font><font face='Lucida Console'>)</font>; <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> pixel_type<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='draw_solid_circle'></a>draw_solid_circle</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> canvas<font color='#5555FF'>&amp;</font> c,
+        <font color='#0000FF'>const</font> point<font color='#5555FF'>&amp;</font> center_point,
+        <font color='#0000FF'><u>double</u></font> radius,
+        <font color='#0000FF'>const</font> pixel_type<font color='#5555FF'>&amp;</font> pixel,
+        <font color='#0000FF'>const</font> rectangle<font color='#5555FF'>&amp;</font> area <font color='#5555FF'>=</font> <font color='#BB00BB'>rectangle</font><font face='Lucida Console'>(</font>std::numeric_limits<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>min</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, std::numeric_limits<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>min</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,
+                                          std::numeric_limits<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>max</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, std::numeric_limits<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>max</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>using</font> std::sqrt;
+        rectangle <font color='#BB00BB'>valid_area</font><font face='Lucida Console'>(</font>c.<font color='#BB00BB'>intersect</font><font face='Lucida Console'>(</font>area<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> x <font color='#5555FF'>=</font> center_point.<font color='#BB00BB'>x</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> y <font color='#5555FF'>=</font> center_point.<font color='#BB00BB'>y</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>radius <font color='#5555FF'>&gt;</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'><u>long</u></font> first_x <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>x <font color='#5555FF'>-</font> radius <font color='#5555FF'>+</font> <font color='#979000'>0.5</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'><u>long</u></font> last_x <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>x <font color='#5555FF'>+</font> radius <font color='#5555FF'>+</font> <font color='#979000'>0.5</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> rs <font color='#5555FF'>=</font> radius<font color='#5555FF'>*</font>radius;
+
+            <font color='#009900'>// ensure that we only loop over the part of the x dimension that this
+</font>            <font color='#009900'>// canvas contains.
+</font>            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>first_x <font color='#5555FF'>&lt;</font> valid_area.<font color='#BB00BB'>left</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                first_x <font color='#5555FF'>=</font> valid_area.<font color='#BB00BB'>left</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>last_x <font color='#5555FF'>&gt;</font> valid_area.<font color='#BB00BB'>right</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                last_x <font color='#5555FF'>=</font> valid_area.<font color='#BB00BB'>right</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'><u>long</u></font> top, bottom;
+
+            top <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#BB00BB'>sqrt</font><font face='Lucida Console'>(</font>std::<font color='#BB00BB'>max</font><font face='Lucida Console'>(</font>rs <font color='#5555FF'>-</font> <font face='Lucida Console'>(</font>first_x<font color='#5555FF'>-</font>x<font color='#5555FF'>-</font><font color='#979000'>0.5</font><font face='Lucida Console'>)</font><font color='#5555FF'>*</font><font face='Lucida Console'>(</font>first_x<font color='#5555FF'>-</font>x<font color='#5555FF'>-</font><font color='#979000'>0.5</font><font face='Lucida Console'>)</font>,<font color='#979000'>0.0</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font color='#5555FF'>+</font><font color='#979000'>0.5</font><font face='Lucida Console'>)</font>;
+            top <font color='#5555FF'>+</font><font color='#5555FF'>=</font> y;
+            <font color='#0000FF'><u>long</u></font> last <font color='#5555FF'>=</font> top;
+
+            <font color='#009900'>// draw the left half of the circle
+</font>            <font color='#0000FF'><u>long</u></font> middle <font color='#5555FF'>=</font> std::<font color='#BB00BB'>min</font><font face='Lucida Console'>(</font>x<font color='#5555FF'>-</font><font color='#979000'>1</font>,last_x<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> first_x; i <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> middle; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'><u>double</u></font> a <font color='#5555FF'>=</font> i <font color='#5555FF'>-</font> x <font color='#5555FF'>+</font> <font color='#979000'>0.5</font>;
+                <font color='#009900'>// find the top of the arc
+</font>                top <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#BB00BB'>sqrt</font><font face='Lucida Console'>(</font>std::<font color='#BB00BB'>max</font><font face='Lucida Console'>(</font>rs <font color='#5555FF'>-</font> a<font color='#5555FF'>*</font>a,<font color='#979000'>0.0</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font color='#5555FF'>+</font><font color='#979000'>0.5</font><font face='Lucida Console'>)</font>;
+                top <font color='#5555FF'>+</font><font color='#5555FF'>=</font> y;
+                <font color='#0000FF'><u>long</u></font> temp <font color='#5555FF'>=</font> top;
+
+                <font color='#0000FF'>while</font><font face='Lucida Console'>(</font>top <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> last<font face='Lucida Console'>)</font> 
+                <b>{</b>
+                    bottom <font color='#5555FF'>=</font> y <font color='#5555FF'>-</font> top <font color='#5555FF'>+</font> y;
+                    <font color='#BB00BB'>draw_line</font><font face='Lucida Console'>(</font>c, <font color='#BB00BB'>point</font><font face='Lucida Console'>(</font>i,top<font face='Lucida Console'>)</font>,<font color='#BB00BB'>point</font><font face='Lucida Console'>(</font>i,bottom<font face='Lucida Console'>)</font>,pixel,area<font face='Lucida Console'>)</font>;
+                    <font color='#5555FF'>-</font><font color='#5555FF'>-</font>top;
+                <b>}</b>
+
+                last <font color='#5555FF'>=</font> temp;
+            <b>}</b>
+
+            middle <font color='#5555FF'>=</font> std::<font color='#BB00BB'>max</font><font face='Lucida Console'>(</font>x,first_x<font face='Lucida Console'>)</font>;
+            top <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#BB00BB'>sqrt</font><font face='Lucida Console'>(</font>std::<font color='#BB00BB'>max</font><font face='Lucida Console'>(</font>rs <font color='#5555FF'>-</font> <font face='Lucida Console'>(</font>last_x<font color='#5555FF'>-</font>x<font color='#5555FF'>+</font><font color='#979000'>0.5</font><font face='Lucida Console'>)</font><font color='#5555FF'>*</font><font face='Lucida Console'>(</font>last_x<font color='#5555FF'>-</font>x<font color='#5555FF'>+</font><font color='#979000'>0.5</font><font face='Lucida Console'>)</font>,<font color='#979000'>0.0</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font color='#5555FF'>+</font><font color='#979000'>0.5</font><font face='Lucida Console'>)</font>;
+            top <font color='#5555FF'>+</font><font color='#5555FF'>=</font> y;
+            last <font color='#5555FF'>=</font> top;
+            <font color='#009900'>// draw the right half of the circle
+</font>            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> last_x; i <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> middle; <font color='#5555FF'>-</font><font color='#5555FF'>-</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'><u>double</u></font> a <font color='#5555FF'>=</font> i <font color='#5555FF'>-</font> x <font color='#5555FF'>-</font> <font color='#979000'>0.5</font>;
+                <font color='#009900'>// find the top of the arc
+</font>                top <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#BB00BB'>sqrt</font><font face='Lucida Console'>(</font>std::<font color='#BB00BB'>max</font><font face='Lucida Console'>(</font>rs <font color='#5555FF'>-</font> a<font color='#5555FF'>*</font>a,<font color='#979000'>0.0</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font color='#5555FF'>+</font><font color='#979000'>0.5</font><font face='Lucida Console'>)</font>;
+                top <font color='#5555FF'>+</font><font color='#5555FF'>=</font> y;
+                <font color='#0000FF'><u>long</u></font> temp <font color='#5555FF'>=</font> top;
+
+                <font color='#0000FF'>while</font><font face='Lucida Console'>(</font>top <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> last<font face='Lucida Console'>)</font> 
+                <b>{</b>
+                    bottom <font color='#5555FF'>=</font> y <font color='#5555FF'>-</font> top <font color='#5555FF'>+</font> y;
+                    <font color='#BB00BB'>draw_line</font><font face='Lucida Console'>(</font>c, <font color='#BB00BB'>point</font><font face='Lucida Console'>(</font>i,top<font face='Lucida Console'>)</font>,<font color='#BB00BB'>point</font><font face='Lucida Console'>(</font>i,bottom<font face='Lucida Console'>)</font>,pixel,area<font face='Lucida Console'>)</font>;
+                    <font color='#5555FF'>-</font><font color='#5555FF'>-</font>top;
+                <b>}</b>
+
+                last <font color='#5555FF'>=</font> temp;
+            <b>}</b>
+        <b>}</b>
+        <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>radius <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>1</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font>
+                 x <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> valid_area.<font color='#BB00BB'>left</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> x <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> valid_area.<font color='#BB00BB'>right</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font>
+                 y <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> valid_area.<font color='#BB00BB'>top</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> y <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> valid_area.<font color='#BB00BB'>bottom</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#BB00BB'>assign_pixel</font><font face='Lucida Console'>(</font>c[y<font color='#5555FF'>-</font>c.<font color='#BB00BB'>top</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>][x<font color='#5555FF'>-</font>c.<font color='#BB00BB'>left</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>], pixel<font face='Lucida Console'>)</font>;
+        <b>}</b>
+    <b>}</b>
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='draw_solid_circle'></a>draw_solid_circle</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> canvas<font color='#5555FF'>&amp;</font> c,
+        <font color='#0000FF'>const</font> point<font color='#5555FF'>&amp;</font> center_point,
+        <font color='#0000FF'><u>double</u></font> radius
+    <font face='Lucida Console'>)</font> <b>{</b> <font color='#BB00BB'>draw_solid_circle</font><font face='Lucida Console'>(</font>c, center_point, radius, <font color='#979000'>0</font><font face='Lucida Console'>)</font>; <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>namespace</font> impl
+    <b>{</b>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> alloc<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='get_convex_polygon_shape'></a>get_convex_polygon_shape</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>point<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> points,
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> top,
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> bottom,
+            std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,alloc<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> left_boundary,
+            std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,alloc<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> right_boundary
+        <font face='Lucida Console'>)</font>
+        <font color='#009900'>/*!
+            requires
+                - 0 &lt;= top &lt;= bottom 
+            ensures
+                - interprets points as the coordinates defining a convex polygon.  In
+                  particular, we interpret points as a list of the vertices of the polygon
+                  and assume they are ordered in clockwise order.
+                - #left_boundary.size() == bottom-top+1
+                - #right_boundary.size() == bottom-top+1
+                - for all top &lt;= y &lt;= bottom:
+                    - #left_boundary[y-top] == the x coordinate for the left most side of
+                      the polygon at coordinate y.
+                    - #right_boundary[y-top] == the x coordinate for the right most side of
+                      the polygon at coordinate y.
+        !*/</font>
+        <b>{</b>
+            <font color='#0000FF'>using</font> std::min;
+            <font color='#0000FF'>using</font> std::max;
+
+            left_boundary.<font color='#BB00BB'>assign</font><font face='Lucida Console'>(</font>bottom<font color='#5555FF'>-</font>top<font color='#5555FF'>+</font><font color='#979000'>1</font>, std::numeric_limits<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>infinity</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            right_boundary.<font color='#BB00BB'>assign</font><font face='Lucida Console'>(</font>bottom<font color='#5555FF'>-</font>top<font color='#5555FF'>+</font><font color='#979000'>1</font>, <font color='#5555FF'>-</font>std::numeric_limits<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>infinity</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// trace out the points along the edge of the polynomial and record them
+</font>            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> points.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>const</font> point p1 <font color='#5555FF'>=</font> points[i];
+                <font color='#0000FF'>const</font> point p2 <font color='#5555FF'>=</font> points[<font face='Lucida Console'>(</font>i<font color='#5555FF'>+</font><font color='#979000'>1</font><font face='Lucida Console'>)</font><font color='#5555FF'>%</font>points.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>];
+
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>p1.<font color='#BB00BB'>y</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> p2.<font color='#BB00BB'>y</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>top <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> p1.<font color='#BB00BB'>y</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> p1.<font color='#BB00BB'>y</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> bottom<font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> y <font color='#5555FF'>=</font> p1.<font color='#BB00BB'>y</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> top;
+                        <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> xmin <font color='#5555FF'>=</font> <font color='#BB00BB'>min</font><font face='Lucida Console'>(</font>p1.<font color='#BB00BB'>x</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, p2.<font color='#BB00BB'>x</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                        <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> xmax <font color='#5555FF'>=</font> <font color='#BB00BB'>min</font><font face='Lucida Console'>(</font>p1.<font color='#BB00BB'>x</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, p2.<font color='#BB00BB'>x</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                        left_boundary[y]  <font color='#5555FF'>=</font> <font color='#BB00BB'>min</font><font face='Lucida Console'>(</font>left_boundary[y], xmin<font face='Lucida Console'>)</font>;
+                        right_boundary[y] <font color='#5555FF'>=</font> <font color='#BB00BB'>max</font><font face='Lucida Console'>(</font>right_boundary[y], xmax<font face='Lucida Console'>)</font>;
+                    <b>}</b>
+                <b>}</b>
+                <font color='#0000FF'>else</font>
+                <b>{</b>
+                    <font color='#009900'>// Here we trace out the line from p1 to p2 and record where it hits.  
+</font>
+                    <font color='#009900'>// x = m*y + b
+</font>                    <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> m <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>p2.<font color='#BB00BB'>x</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> p1.<font color='#BB00BB'>x</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font color='#5555FF'>/</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>double</u></font><font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>p2.<font color='#BB00BB'>y</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font>p1.<font color='#BB00BB'>y</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                    <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> b <font color='#5555FF'>=</font> p1.<font color='#BB00BB'>x</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> m<font color='#5555FF'>*</font>p1.<font color='#BB00BB'>y</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#009900'>// because: x1 = m*y1 + b
+</font>
+                    <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> ymin <font color='#5555FF'>=</font> <font color='#BB00BB'>max</font><font face='Lucida Console'>(</font>top,<font color='#BB00BB'>min</font><font face='Lucida Console'>(</font>p1.<font color='#BB00BB'>y</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, p2.<font color='#BB00BB'>y</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                    <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> ymax <font color='#5555FF'>=</font> <font color='#BB00BB'>min</font><font face='Lucida Console'>(</font>bottom,<font color='#BB00BB'>max</font><font face='Lucida Console'>(</font>p1.<font color='#BB00BB'>y</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, p2.<font color='#BB00BB'>y</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> y <font color='#5555FF'>=</font> ymin; y <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> ymax; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>y<font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> x <font color='#5555FF'>=</font> m<font color='#5555FF'>*</font>y <font color='#5555FF'>+</font> b;
+                        <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> idx <font color='#5555FF'>=</font> y<font color='#5555FF'>-</font>top;
+                        left_boundary[idx]  <font color='#5555FF'>=</font> <font color='#BB00BB'>min</font><font face='Lucida Console'>(</font>left_boundary[idx], x<font face='Lucida Console'>)</font>;
+                        right_boundary[idx] <font color='#5555FF'>=</font> <font color='#BB00BB'>max</font><font face='Lucida Console'>(</font>right_boundary[idx], x<font face='Lucida Console'>)</font>;
+                    <b>}</b>
+                <b>}</b>
+            <b>}</b>
+        <b>}</b>
+
+    <font color='#009900'>// ------------------------------------------------------------------------------------
+</font>
+    <b>}</b>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> pixel_type<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='draw_solid_convex_polygon'></a>draw_solid_convex_polygon</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> canvas<font color='#5555FF'>&amp;</font> c,
+        <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>point<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> polygon,
+        <font color='#0000FF'>const</font> pixel_type<font color='#5555FF'>&amp;</font> pixel,
+        <font color='#0000FF'>const</font> rectangle<font color='#5555FF'>&amp;</font> area <font color='#5555FF'>=</font> <font color='#BB00BB'>rectangle</font><font face='Lucida Console'>(</font>std::numeric_limits<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>min</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, std::numeric_limits<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>min</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,
+                                          std::numeric_limits<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>max</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, std::numeric_limits<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>max</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>using</font> std::max;
+        <font color='#0000FF'>using</font> std::min;
+        <font color='#0000FF'>const</font> rectangle <font color='#BB00BB'>valid_area</font><font face='Lucida Console'>(</font>c.<font color='#BB00BB'>intersect</font><font face='Lucida Console'>(</font>area<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+        rectangle bounding_box;
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> polygon.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            bounding_box <font color='#5555FF'>+</font><font color='#5555FF'>=</font> polygon[i];
+
+        <font color='#009900'>// Don't do anything if the polygon is totally outside the area we can draw in
+</font>        <font color='#009900'>// right now.
+</font>        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>bounding_box.<font color='#BB00BB'>intersect</font><font face='Lucida Console'>(</font>valid_area<font face='Lucida Console'>)</font>.<font color='#BB00BB'>is_empty</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+            <font color='#0000FF'>return</font>;
+
+        rgb_alpha_pixel alpha_pixel;
+        <font color='#BB00BB'>assign_pixel</font><font face='Lucida Console'>(</font>alpha_pixel, pixel<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> max_alpha <font color='#5555FF'>=</font> alpha_pixel.alpha;
+
+        <font color='#009900'>// we will only want to loop over the part of left_boundary that is part of the
+</font>        <font color='#009900'>// valid_area.
+</font>        <font color='#0000FF'><u>long</u></font> top <font color='#5555FF'>=</font> <font color='#BB00BB'>max</font><font face='Lucida Console'>(</font>valid_area.<font color='#BB00BB'>top</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,bounding_box.<font color='#BB00BB'>top</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'><u>long</u></font> bottom <font color='#5555FF'>=</font> <font color='#BB00BB'>min</font><font face='Lucida Console'>(</font>valid_area.<font color='#BB00BB'>bottom</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,bounding_box.<font color='#BB00BB'>bottom</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// Since we look at the adjacent rows of boundary information when doing the alpha
+</font>        <font color='#009900'>// blending, we want to make sure we always have some boundary information unless
+</font>        <font color='#009900'>// we are at the absolute edge of the polygon.
+</font>        <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> top_offset <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>top <font color='#5555FF'>=</font><font color='#5555FF'>=</font> bounding_box.<font color='#BB00BB'>top</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> ? <font color='#979000'>0</font> : <font color='#979000'>1</font>;
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> bottom_offset <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>bottom <font color='#5555FF'>=</font><font color='#5555FF'>=</font> bounding_box.<font color='#BB00BB'>bottom</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> ? <font color='#979000'>0</font> : <font color='#979000'>1</font>;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>top <font color='#5555FF'>!</font><font color='#5555FF'>=</font> bounding_box.<font color='#BB00BB'>top</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+            top <font color='#5555FF'>-</font><font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>bottom <font color='#5555FF'>!</font><font color='#5555FF'>=</font> bounding_box.<font color='#BB00BB'>bottom</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+            bottom <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+
+        std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font> left_boundary;
+        std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font> right_boundary;
+        impl::<font color='#BB00BB'>get_convex_polygon_shape</font><font face='Lucida Console'>(</font>polygon, top, bottom, left_boundary, right_boundary<font face='Lucida Console'>)</font>;
+
+
+        <font color='#009900'>// draw the polygon row by row
+</font>        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> top_offset; i <font color='#5555FF'>&lt;</font> left_boundary.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'><u>long</u></font> left_x <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>std::<font color='#BB00BB'>ceil</font><font face='Lucida Console'>(</font>left_boundary[i]<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'><u>long</u></font> right_x <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>std::<font color='#BB00BB'>floor</font><font face='Lucida Console'>(</font>right_boundary[i]<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+            left_x <font color='#5555FF'>=</font> <font color='#BB00BB'>max</font><font face='Lucida Console'>(</font>left_x, valid_area.<font color='#BB00BB'>left</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            right_x <font color='#5555FF'>=</font> <font color='#BB00BB'>min</font><font face='Lucida Console'>(</font>right_x, valid_area.<font color='#BB00BB'>right</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>i <font color='#5555FF'>&lt;</font> left_boundary.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font>bottom_offset<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#009900'>// draw the main body of the polygon
+</font>                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> x <font color='#5555FF'>=</font> left_x; x <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> right_x; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>x<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> y <font color='#5555FF'>=</font> i<font color='#5555FF'>+</font>top;
+                    <font color='#BB00BB'>assign_pixel</font><font face='Lucida Console'>(</font>c[y<font color='#5555FF'>-</font>c.<font color='#BB00BB'>top</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>][x<font color='#5555FF'>-</font>c.<font color='#BB00BB'>left</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>], pixel<font face='Lucida Console'>)</font>;
+                <b>}</b>
+            <b>}</b>
+
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>i <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                <font color='#0000FF'>continue</font>;
+
+            <font color='#009900'>// Now draw anti-aliased edges so they don't look all pixely.
+</font>
+            <font color='#009900'>// Alpha blend the edges on the left side.
+</font>            <font color='#0000FF'><u>double</u></font> delta <font color='#5555FF'>=</font> left_boundary[i<font color='#5555FF'>-</font><font color='#979000'>1</font>] <font color='#5555FF'>-</font> left_boundary[i];
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>std::<font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font>delta<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>std::<font color='#BB00BB'>floor</font><font face='Lucida Console'>(</font>left_boundary[i]<font face='Lucida Console'>)</font> <font color='#5555FF'>!</font><font color='#5555FF'>=</font> left_x<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#0000FF'>const</font> point <font color='#BB00BB'>p</font><font face='Lucida Console'>(</font><font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>std::<font color='#BB00BB'>floor</font><font face='Lucida Console'>(</font>left_boundary[i]<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>, i<font color='#5555FF'>+</font>top<font face='Lucida Console'>)</font>;
+                    rgb_alpha_pixel temp <font color='#5555FF'>=</font> alpha_pixel;
+                    temp.alpha <font color='#5555FF'>=</font> max_alpha<font color='#5555FF'>-</font><font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>left_boundary[i]<font color='#5555FF'>-</font>p.<font color='#BB00BB'>x</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font color='#5555FF'>*</font>max_alpha<font face='Lucida Console'>)</font>;
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>valid_area.<font color='#BB00BB'>contains</font><font face='Lucida Console'>(</font>p<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                        <font color='#BB00BB'>assign_pixel</font><font face='Lucida Console'>(</font>c[p.<font color='#BB00BB'>y</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font>c.<font color='#BB00BB'>top</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>][p.<font color='#BB00BB'>x</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font>c.<font color='#BB00BB'>left</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>],temp<font face='Lucida Console'>)</font>;
+                <b>}</b>
+            <b>}</b>
+            <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>delta <font color='#5555FF'>&lt;</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>  <font color='#009900'>// on the bottom side
+</font>            <b>{</b>
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> x <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>std::<font color='#BB00BB'>ceil</font><font face='Lucida Console'>(</font>left_boundary[i<font color='#5555FF'>-</font><font color='#979000'>1</font>]<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>; x <font color='#5555FF'>&lt;</font> left_x; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>x<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#0000FF'>const</font> point <font color='#BB00BB'>p</font><font face='Lucida Console'>(</font>x, i<font color='#5555FF'>+</font>top<font face='Lucida Console'>)</font>;
+                    rgb_alpha_pixel temp <font color='#5555FF'>=</font> alpha_pixel;
+                    temp.alpha <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>x<font color='#5555FF'>-</font>left_boundary[i<font color='#5555FF'>-</font><font color='#979000'>1</font>]<font face='Lucida Console'>)</font><font color='#5555FF'>/</font>std::<font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font>delta<font face='Lucida Console'>)</font><font color='#5555FF'>*</font>max_alpha<font face='Lucida Console'>)</font>;
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>valid_area.<font color='#BB00BB'>contains</font><font face='Lucida Console'>(</font>p<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                        <font color='#BB00BB'>assign_pixel</font><font face='Lucida Console'>(</font>c[p.<font color='#BB00BB'>y</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font>c.<font color='#BB00BB'>top</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>][p.<font color='#BB00BB'>x</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font>c.<font color='#BB00BB'>left</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>],temp<font face='Lucida Console'>)</font>;
+                <b>}</b>
+            <b>}</b>
+            <font color='#0000FF'>else</font> <font color='#009900'>// on the top side
+</font>            <b>{</b>
+                <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> old_left_x <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>std::<font color='#BB00BB'>ceil</font><font face='Lucida Console'>(</font>left_boundary[i<font color='#5555FF'>-</font><font color='#979000'>1</font>]<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> x <font color='#5555FF'>=</font> left_x; x <font color='#5555FF'>&lt;</font> old_left_x; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>x<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#0000FF'>const</font> point <font color='#BB00BB'>p</font><font face='Lucida Console'>(</font>x, i<font color='#5555FF'>+</font>top<font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+                    rgb_alpha_pixel temp <font color='#5555FF'>=</font> alpha_pixel;
+                    temp.alpha <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>x<font color='#5555FF'>-</font>left_boundary[i]<font face='Lucida Console'>)</font><font color='#5555FF'>/</font>delta<font color='#5555FF'>*</font>max_alpha<font face='Lucida Console'>)</font>;
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>valid_area.<font color='#BB00BB'>contains</font><font face='Lucida Console'>(</font>p<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                        <font color='#BB00BB'>assign_pixel</font><font face='Lucida Console'>(</font>c[p.<font color='#BB00BB'>y</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font>c.<font color='#BB00BB'>top</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>][p.<font color='#BB00BB'>x</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font>c.<font color='#BB00BB'>left</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>],temp<font face='Lucida Console'>)</font>;
+                <b>}</b>
+            <b>}</b>
+
+
+            <font color='#009900'>// Alpha blend the edges on the right side
+</font>            delta <font color='#5555FF'>=</font> right_boundary[i<font color='#5555FF'>-</font><font color='#979000'>1</font>] <font color='#5555FF'>-</font> right_boundary[i];
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>std::<font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font>delta<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>std::<font color='#BB00BB'>ceil</font><font face='Lucida Console'>(</font>right_boundary[i]<font face='Lucida Console'>)</font> <font color='#5555FF'>!</font><font color='#5555FF'>=</font> right_x<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#0000FF'>const</font> point <font color='#BB00BB'>p</font><font face='Lucida Console'>(</font><font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>std::<font color='#BB00BB'>ceil</font><font face='Lucida Console'>(</font>right_boundary[i]<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>, i<font color='#5555FF'>+</font>top<font face='Lucida Console'>)</font>;
+                    rgb_alpha_pixel temp <font color='#5555FF'>=</font> alpha_pixel;
+                    temp.alpha <font color='#5555FF'>=</font> max_alpha<font color='#5555FF'>-</font><font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>p.<font color='#BB00BB'>x</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font>right_boundary[i]<font face='Lucida Console'>)</font><font color='#5555FF'>*</font>max_alpha<font face='Lucida Console'>)</font>;
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>valid_area.<font color='#BB00BB'>contains</font><font face='Lucida Console'>(</font>p<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                        <font color='#BB00BB'>assign_pixel</font><font face='Lucida Console'>(</font>c[p.<font color='#BB00BB'>y</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font>c.<font color='#BB00BB'>top</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>][p.<font color='#BB00BB'>x</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font>c.<font color='#BB00BB'>left</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>],temp<font face='Lucida Console'>)</font>;
+                <b>}</b>
+            <b>}</b>
+            <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>delta <font color='#5555FF'>&lt;</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font> <font color='#009900'>// on the top side
+</font>            <b>{</b>
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> x <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>std::<font color='#BB00BB'>floor</font><font face='Lucida Console'>(</font>right_boundary[i<font color='#5555FF'>-</font><font color='#979000'>1</font>]<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font color='#5555FF'>+</font><font color='#979000'>1</font>; x <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> right_x; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>x<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#0000FF'>const</font> point <font color='#BB00BB'>p</font><font face='Lucida Console'>(</font>x, i<font color='#5555FF'>+</font>top<font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+                    rgb_alpha_pixel temp <font color='#5555FF'>=</font> alpha_pixel;
+                    temp.alpha <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>right_boundary[i]<font color='#5555FF'>-</font>x<font face='Lucida Console'>)</font><font color='#5555FF'>/</font>std::<font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font>delta<font face='Lucida Console'>)</font><font color='#5555FF'>*</font>max_alpha<font face='Lucida Console'>)</font>;
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>valid_area.<font color='#BB00BB'>contains</font><font face='Lucida Console'>(</font>p<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                        <font color='#BB00BB'>assign_pixel</font><font face='Lucida Console'>(</font>c[p.<font color='#BB00BB'>y</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font>c.<font color='#BB00BB'>top</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>][p.<font color='#BB00BB'>x</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font>c.<font color='#BB00BB'>left</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>],temp<font face='Lucida Console'>)</font>;
+                <b>}</b>
+            <b>}</b>
+            <font color='#0000FF'>else</font> <font color='#009900'>// on the bottom side
+</font>            <b>{</b>
+                <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> old_right_x <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>std::<font color='#BB00BB'>floor</font><font face='Lucida Console'>(</font>right_boundary[i<font color='#5555FF'>-</font><font color='#979000'>1</font>]<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> x <font color='#5555FF'>=</font> right_x<font color='#5555FF'>+</font><font color='#979000'>1</font>; x <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> old_right_x; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>x<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#0000FF'>const</font> point <font color='#BB00BB'>p</font><font face='Lucida Console'>(</font>x, i<font color='#5555FF'>+</font>top<font face='Lucida Console'>)</font>;
+                    rgb_alpha_pixel temp <font color='#5555FF'>=</font> alpha_pixel;
+                    temp.alpha <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>right_boundary[i<font color='#5555FF'>-</font><font color='#979000'>1</font>]<font color='#5555FF'>-</font>x<font face='Lucida Console'>)</font><font color='#5555FF'>/</font>delta<font color='#5555FF'>*</font>max_alpha<font face='Lucida Console'>)</font>;
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>valid_area.<font color='#BB00BB'>contains</font><font face='Lucida Console'>(</font>p<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                        <font color='#BB00BB'>assign_pixel</font><font face='Lucida Console'>(</font>c[p.<font color='#BB00BB'>y</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font>c.<font color='#BB00BB'>top</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>][p.<font color='#BB00BB'>x</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font>c.<font color='#BB00BB'>left</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>],temp<font face='Lucida Console'>)</font>;
+                <b>}</b>
+            <b>}</b>
+        <b>}</b>
+    <b>}</b>
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='draw_solid_convex_polygon'></a>draw_solid_convex_polygon</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> canvas<font color='#5555FF'>&amp;</font> c,
+        <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>point<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> polygon
+    <font face='Lucida Console'>)</font> <b>{</b> <font color='#BB00BB'>draw_solid_convex_polygon</font><font face='Lucida Console'>(</font>c, polygon, <font color='#979000'>0</font><font face='Lucida Console'>)</font>; <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> image_type 
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='draw_image'></a>draw_image</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> canvas<font color='#5555FF'>&amp;</font> c,
+        <font color='#0000FF'>const</font> point<font color='#5555FF'>&amp;</font> p,
+        <font color='#0000FF'>const</font> image_type<font color='#5555FF'>&amp;</font> img,
+        <font color='#0000FF'>const</font> rectangle<font color='#5555FF'>&amp;</font> area_ <font color='#5555FF'>=</font> <font color='#BB00BB'>rectangle</font><font face='Lucida Console'>(</font>std::numeric_limits<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>min</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, std::numeric_limits<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>min</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,
+                                          std::numeric_limits<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>max</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, std::numeric_limits<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>max</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> x <font color='#5555FF'>=</font> p.<font color='#BB00BB'>x</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> y <font color='#5555FF'>=</font> p.<font color='#BB00BB'>y</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        rectangle <font color='#BB00BB'>rect</font><font face='Lucida Console'>(</font>x,y,img.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>+</font>x<font color='#5555FF'>-</font><font color='#979000'>1</font>,img.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>+</font>y<font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+        rectangle area <font color='#5555FF'>=</font> c.<font color='#BB00BB'>intersect</font><font face='Lucida Console'>(</font>rect<font face='Lucida Console'>)</font>.<font color='#BB00BB'>intersect</font><font face='Lucida Console'>(</font>area_<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>area.<font color='#BB00BB'>is_empty</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+            <font color='#0000FF'>return</font>;
+
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> row <font color='#5555FF'>=</font> area.<font color='#BB00BB'>top</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; row <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> area.<font color='#BB00BB'>bottom</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>row<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> col <font color='#5555FF'>=</font> area.<font color='#BB00BB'>left</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; col <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> area.<font color='#BB00BB'>right</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>col<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#BB00BB'>assign_pixel</font><font face='Lucida Console'>(</font>c[row<font color='#5555FF'>-</font>c.<font color='#BB00BB'>top</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>][col<font color='#5555FF'>-</font>c.<font color='#BB00BB'>left</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>], img[row<font color='#5555FF'>-</font>rect.<font color='#BB00BB'>top</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>][col<font color='#5555FF'>-</font>rect.<font color='#BB00BB'>left</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>]<font face='Lucida Console'>)</font>;
+            <b>}</b>
+        <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> image_type 
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='draw_image'></a>draw_image</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> canvas<font color='#5555FF'>&amp;</font> c,
+        <font color='#0000FF'>const</font> rectangle<font color='#5555FF'>&amp;</font> rect,
+        <font color='#0000FF'>const</font> image_type<font color='#5555FF'>&amp;</font> img,
+        <font color='#0000FF'>const</font> rectangle<font color='#5555FF'>&amp;</font> area_ <font color='#5555FF'>=</font> <font color='#BB00BB'>rectangle</font><font face='Lucida Console'>(</font>std::numeric_limits<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>min</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, std::numeric_limits<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>min</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,
+                                          std::numeric_limits<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>max</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, std::numeric_limits<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>max</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>const</font> rectangle area <font color='#5555FF'>=</font> c.<font color='#BB00BB'>intersect</font><font face='Lucida Console'>(</font>rect<font face='Lucida Console'>)</font>.<font color='#BB00BB'>intersect</font><font face='Lucida Console'>(</font>area_<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>area.<font color='#BB00BB'>is_empty</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>|</font><font color='#5555FF'>|</font> img.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+            <font color='#0000FF'>return</font>;
+
+        <font color='#0000FF'>const</font> matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>long</u></font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> x <font color='#5555FF'>=</font> matrix_cast<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#BB00BB'>round</font><font face='Lucida Console'>(</font><font color='#BB00BB'>linspace</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>, img.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#979000'>1</font>, rect.<font color='#BB00BB'>width</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>const</font> matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>long</u></font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> y <font color='#5555FF'>=</font> matrix_cast<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#BB00BB'>round</font><font face='Lucida Console'>(</font><font color='#BB00BB'>linspace</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>, img.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#979000'>1</font>, rect.<font color='#BB00BB'>height</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> row <font color='#5555FF'>=</font> area.<font color='#BB00BB'>top</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; row <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> area.<font color='#BB00BB'>bottom</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>row<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> r <font color='#5555FF'>=</font> <font color='#BB00BB'>y</font><font face='Lucida Console'>(</font>row<font color='#5555FF'>-</font>rect.<font color='#BB00BB'>top</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'><u>long</u></font> cc <font color='#5555FF'>=</font> area.<font color='#BB00BB'>left</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> rect.<font color='#BB00BB'>left</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> col <font color='#5555FF'>=</font> area.<font color='#BB00BB'>left</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; col <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> area.<font color='#BB00BB'>right</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>col<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#BB00BB'>assign_pixel</font><font face='Lucida Console'>(</font>c[row<font color='#5555FF'>-</font>c.<font color='#BB00BB'>top</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>][col<font color='#5555FF'>-</font>c.<font color='#BB00BB'>left</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>], img[r][<font color='#BB00BB'>x</font><font face='Lucida Console'>(</font>cc<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font>]<font face='Lucida Console'>)</font>;
+            <b>}</b>
+        <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> pixel_type<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='draw_rounded_rectangle'></a>draw_rounded_rectangle</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> canvas<font color='#5555FF'>&amp;</font> c,
+        <font color='#0000FF'>const</font> rectangle<font color='#5555FF'>&amp;</font> rect,
+        <font color='#0000FF'><u>unsigned</u></font> radius,
+        <font color='#0000FF'>const</font> pixel_type<font color='#5555FF'>&amp;</font> color,
+        <font color='#0000FF'>const</font> rectangle<font color='#5555FF'>&amp;</font> area_ <font color='#5555FF'>=</font> <font color='#BB00BB'>rectangle</font><font face='Lucida Console'>(</font>std::numeric_limits<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>min</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, std::numeric_limits<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>min</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,
+                                          std::numeric_limits<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>max</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, std::numeric_limits<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>max</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> rect.<font color='#BB00BB'>intersect</font> <font face='Lucida Console'>(</font> c <font face='Lucida Console'>)</font>.<font color='#BB00BB'>is_empty</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>)</font>
+            <font color='#0000FF'>return</font>;
+
+        <font color='#BB00BB'>draw_line</font> <font face='Lucida Console'>(</font> c, <font color='#BB00BB'>point</font><font face='Lucida Console'>(</font>rect.<font color='#BB00BB'>left</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> radius <font color='#5555FF'>+</font> <font color='#979000'>1</font>, rect.<font color='#BB00BB'>bottom</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>, 
+                    <font color='#BB00BB'>point</font><font face='Lucida Console'>(</font>rect.<font color='#BB00BB'>right</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> radius <font color='#5555FF'>-</font> <font color='#979000'>1</font>, rect.<font color='#BB00BB'>bottom</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>, color,area_ <font face='Lucida Console'>)</font>;
+
+        <font color='#BB00BB'>draw_line</font> <font face='Lucida Console'>(</font> c, <font color='#BB00BB'>point</font><font face='Lucida Console'>(</font>rect.<font color='#BB00BB'>left</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> radius <font color='#5555FF'>+</font> <font color='#979000'>1</font>, rect.<font color='#BB00BB'>top</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>, 
+                    <font color='#BB00BB'>point</font><font face='Lucida Console'>(</font>rect.<font color='#BB00BB'>right</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> radius <font color='#5555FF'>-</font> <font color='#979000'>1</font>, rect.<font color='#BB00BB'>top</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>, color,area_ <font face='Lucida Console'>)</font>;
+
+        <font color='#BB00BB'>draw_line</font> <font face='Lucida Console'>(</font> c, <font color='#BB00BB'>point</font><font face='Lucida Console'>(</font>rect.<font color='#BB00BB'>left</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, rect.<font color='#BB00BB'>top</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> radius <font color='#5555FF'>+</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>, 
+                    <font color='#BB00BB'>point</font><font face='Lucida Console'>(</font>rect.<font color='#BB00BB'>left</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, rect.<font color='#BB00BB'>bottom</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> radius <font color='#5555FF'>-</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>, color,area_ <font face='Lucida Console'>)</font>;
+
+        <font color='#BB00BB'>draw_line</font> <font face='Lucida Console'>(</font> c, <font color='#BB00BB'>point</font><font face='Lucida Console'>(</font>rect.<font color='#BB00BB'>right</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, rect.<font color='#BB00BB'>top</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> radius <font color='#5555FF'>+</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>, 
+                    <font color='#BB00BB'>point</font><font face='Lucida Console'>(</font>rect.<font color='#BB00BB'>right</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, rect.<font color='#BB00BB'>bottom</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> radius <font color='#5555FF'>-</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>, color,area_ <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'><u>unsigned</u></font> x <font color='#5555FF'>=</font> radius, y <font color='#5555FF'>=</font> <font color='#979000'>0</font>, old_x <font color='#5555FF'>=</font> x;
+
+        point p;
+        <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font> x <font color='#5555FF'>&gt;</font> y <font face='Lucida Console'>)</font>
+        <b>{</b>
+            p <font color='#5555FF'>=</font> <font color='#BB00BB'>point</font><font face='Lucida Console'>(</font>rect.<font color='#BB00BB'>left</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> radius <font color='#5555FF'>-</font> y, rect.<font color='#BB00BB'>top</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> radius <font color='#5555FF'>-</font> x<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>area_.<font color='#BB00BB'>contains</font><font face='Lucida Console'>(</font>p<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#BB00BB'>draw_pixel</font> <font face='Lucida Console'>(</font>c, p , color <font face='Lucida Console'>)</font>;
+            p <font color='#5555FF'>=</font> <font color='#BB00BB'>point</font><font face='Lucida Console'>(</font>rect.<font color='#BB00BB'>right</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> radius <font color='#5555FF'>+</font> y, rect.<font color='#BB00BB'>top</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> radius <font color='#5555FF'>-</font> x<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>area_.<font color='#BB00BB'>contains</font><font face='Lucida Console'>(</font>p<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#BB00BB'>draw_pixel</font> <font face='Lucida Console'>(</font>c, p , color <font face='Lucida Console'>)</font>;
+            p <font color='#5555FF'>=</font> <font color='#BB00BB'>point</font><font face='Lucida Console'>(</font>rect.<font color='#BB00BB'>right</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> radius <font color='#5555FF'>+</font> y, rect.<font color='#BB00BB'>bottom</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> radius <font color='#5555FF'>+</font> x<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>area_.<font color='#BB00BB'>contains</font><font face='Lucida Console'>(</font>p<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#BB00BB'>draw_pixel</font> <font face='Lucida Console'>(</font>c, p , color <font face='Lucida Console'>)</font>;
+            p <font color='#5555FF'>=</font> <font color='#BB00BB'>point</font><font face='Lucida Console'>(</font>rect.<font color='#BB00BB'>left</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> radius <font color='#5555FF'>-</font> y, rect.<font color='#BB00BB'>bottom</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> radius <font color='#5555FF'>+</font> x<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>area_.<font color='#BB00BB'>contains</font><font face='Lucida Console'>(</font>p<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#BB00BB'>draw_pixel</font> <font face='Lucida Console'>(</font>c, p , color <font face='Lucida Console'>)</font>;
+            p <font color='#5555FF'>=</font> <font color='#BB00BB'>point</font><font face='Lucida Console'>(</font>rect.<font color='#BB00BB'>left</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> radius <font color='#5555FF'>-</font> x, rect.<font color='#BB00BB'>top</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> radius <font color='#5555FF'>-</font> y<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>area_.<font color='#BB00BB'>contains</font><font face='Lucida Console'>(</font>p<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#BB00BB'>draw_pixel</font> <font face='Lucida Console'>(</font>c, p , color <font face='Lucida Console'>)</font>;
+            p <font color='#5555FF'>=</font> <font color='#BB00BB'>point</font><font face='Lucida Console'>(</font>rect.<font color='#BB00BB'>right</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> radius <font color='#5555FF'>+</font> x, rect.<font color='#BB00BB'>top</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> radius <font color='#5555FF'>-</font> y<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>area_.<font color='#BB00BB'>contains</font><font face='Lucida Console'>(</font>p<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#BB00BB'>draw_pixel</font> <font face='Lucida Console'>(</font>c, p , color <font face='Lucida Console'>)</font>;
+            p <font color='#5555FF'>=</font> <font color='#BB00BB'>point</font><font face='Lucida Console'>(</font>rect.<font color='#BB00BB'>right</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> radius <font color='#5555FF'>+</font> x, rect.<font color='#BB00BB'>bottom</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> radius <font color='#5555FF'>+</font> y<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>area_.<font color='#BB00BB'>contains</font><font face='Lucida Console'>(</font>p<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#BB00BB'>draw_pixel</font> <font face='Lucida Console'>(</font>c, p , color <font face='Lucida Console'>)</font>;
+            p <font color='#5555FF'>=</font> <font color='#BB00BB'>point</font><font face='Lucida Console'>(</font>rect.<font color='#BB00BB'>left</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> radius <font color='#5555FF'>-</font> x, rect.<font color='#BB00BB'>bottom</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> radius <font color='#5555FF'>+</font> y<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>area_.<font color='#BB00BB'>contains</font><font face='Lucida Console'>(</font>p<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#BB00BB'>draw_pixel</font> <font face='Lucida Console'>(</font>c, p , color <font face='Lucida Console'>)</font>;
+            y<font color='#5555FF'>+</font><font color='#5555FF'>+</font>;
+            old_x <font color='#5555FF'>=</font> x;
+            x <font color='#5555FF'>=</font> <font color='#BB00BB'>square_root</font> <font face='Lucida Console'>(</font> <font face='Lucida Console'>(</font> radius <font color='#5555FF'>*</font> radius <font color='#5555FF'>-</font> y <font color='#5555FF'>*</font> y <font face='Lucida Console'>)</font> <font color='#5555FF'>*</font> <font color='#979000'>4</font> <font face='Lucida Console'>)</font> <font color='#5555FF'>/</font> <font color='#979000'>2</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> x <font color='#5555FF'>=</font><font color='#5555FF'>=</font> y <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> old_x <font color='#5555FF'>!</font><font color='#5555FF'>=</font> x <font face='Lucida Console'>)</font>
+        <b>{</b>
+            p <font color='#5555FF'>=</font> <font color='#BB00BB'>point</font><font face='Lucida Console'>(</font>rect.<font color='#BB00BB'>left</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> radius <font color='#5555FF'>-</font> y, rect.<font color='#BB00BB'>top</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> radius <font color='#5555FF'>-</font> x<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>area_.<font color='#BB00BB'>contains</font><font face='Lucida Console'>(</font>p<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#BB00BB'>draw_pixel</font> <font face='Lucida Console'>(</font>c, p , color <font face='Lucida Console'>)</font>;
+            p <font color='#5555FF'>=</font> <font color='#BB00BB'>point</font><font face='Lucida Console'>(</font>rect.<font color='#BB00BB'>right</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> radius <font color='#5555FF'>+</font> y, rect.<font color='#BB00BB'>top</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> radius <font color='#5555FF'>-</font> x<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>area_.<font color='#BB00BB'>contains</font><font face='Lucida Console'>(</font>p<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#BB00BB'>draw_pixel</font> <font face='Lucida Console'>(</font>c, p , color <font face='Lucida Console'>)</font>;
+            p <font color='#5555FF'>=</font> <font color='#BB00BB'>point</font><font face='Lucida Console'>(</font>rect.<font color='#BB00BB'>right</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> radius <font color='#5555FF'>+</font> y, rect.<font color='#BB00BB'>bottom</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> radius <font color='#5555FF'>+</font> x<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>area_.<font color='#BB00BB'>contains</font><font face='Lucida Console'>(</font>p<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#BB00BB'>draw_pixel</font> <font face='Lucida Console'>(</font>c, p , color <font face='Lucida Console'>)</font>;
+            p <font color='#5555FF'>=</font> <font color='#BB00BB'>point</font><font face='Lucida Console'>(</font>rect.<font color='#BB00BB'>left</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> radius <font color='#5555FF'>-</font> y, rect.<font color='#BB00BB'>bottom</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> radius <font color='#5555FF'>+</font> x<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>area_.<font color='#BB00BB'>contains</font><font face='Lucida Console'>(</font>p<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#BB00BB'>draw_pixel</font> <font face='Lucida Console'>(</font>c, p , color <font face='Lucida Console'>)</font>;
+        <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> pixel_type<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='fill_gradient_rounded'></a>fill_gradient_rounded</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> canvas<font color='#5555FF'>&amp;</font> c,
+        <font color='#0000FF'>const</font> rectangle<font color='#5555FF'>&amp;</font> rect,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> radius,
+        <font color='#0000FF'>const</font> pixel_type<font color='#5555FF'>&amp;</font> top_color,
+        <font color='#0000FF'>const</font> pixel_type<font color='#5555FF'>&amp;</font> bottom_color,
+        <font color='#0000FF'>const</font> rectangle<font color='#5555FF'>&amp;</font> area <font color='#5555FF'>=</font> <font color='#BB00BB'>rectangle</font><font face='Lucida Console'>(</font>std::numeric_limits<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>min</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, std::numeric_limits<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>min</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,
+                                          std::numeric_limits<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>max</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, std::numeric_limits<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>max</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        rectangle <font color='#BB00BB'>valid_area</font><font face='Lucida Console'>(</font>c.<font color='#BB00BB'>intersect</font><font face='Lucida Console'>(</font>area.<font color='#BB00BB'>intersect</font><font face='Lucida Console'>(</font>rect<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> valid_area.<font color='#BB00BB'>is_empty</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>)</font>
+            <font color='#0000FF'>return</font>;
+
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> m_prev <font color='#5555FF'>=</font> <font color='#979000'>0</font>, m <font color='#5555FF'>=</font> radius, c_div <font color='#5555FF'>=</font> valid_area.<font color='#BB00BB'>height</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> <font color='#979000'>1</font>;
+
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> c_top <font color='#5555FF'>=</font> valid_area.<font color='#BB00BB'>top</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> c_bottom <font color='#5555FF'>=</font> valid_area.<font color='#BB00BB'>bottom</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font> <font color='#0000FF'><u>long</u></font> y <font color='#5555FF'>=</font> c_top; y <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> c_bottom;y<font color='#5555FF'>+</font><font color='#5555FF'>+</font> <font face='Lucida Console'>)</font>
+        <b>{</b>
+
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> c_s <font color='#5555FF'>=</font> y <font color='#5555FF'>-</font> c_top;
+
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> c_t <font color='#5555FF'>=</font> c_bottom <font color='#5555FF'>-</font> y;
+
+
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> c_div <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font> <font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#009900'>// only a single round, just take the average color
+</font>                c_div <font color='#5555FF'>=</font> <font color='#979000'>2</font>;
+                c_s <font color='#5555FF'>=</font> c_t <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+            <b>}</b>
+
+            rgb_alpha_pixel color;
+            <font color='#BB00BB'>vector_to_pixel</font><font face='Lucida Console'>(</font>color,
+                            <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>pixel_to_vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>top_color<font face='Lucida Console'>)</font><font color='#5555FF'>*</font>c_t <font color='#5555FF'>+</font> pixel_to_vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>bottom_color<font face='Lucida Console'>)</font><font color='#5555FF'>*</font>c_s<font face='Lucida Console'>)</font><font color='#5555FF'>/</font>c_div<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> s <font color='#5555FF'>=</font> y <font color='#5555FF'>-</font> rect.<font color='#BB00BB'>top</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> t <font color='#5555FF'>=</font> rect.<font color='#BB00BB'>bottom</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> y;
+
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> s <font color='#5555FF'>&lt;</font> radius <font face='Lucida Console'>)</font>
+            <b>{</b>
+                m <font color='#5555FF'>=</font> radius <font color='#5555FF'>-</font> <font color='#BB00BB'>square_root</font> <font face='Lucida Console'>(</font> <font face='Lucida Console'>(</font> radius <font color='#5555FF'>*</font> radius <font color='#5555FF'>-</font> <font face='Lucida Console'>(</font> radius <font color='#5555FF'>-</font> s <font face='Lucida Console'>)</font> <font color='#5555FF'>*</font> <font face='Lucida Console'>(</font> radius <font color='#5555FF'>-</font> s <font face='Lucida Console'>)</font> <font face='Lucida Console'>)</font> <font color='#5555FF'>*</font> <font color='#979000'>4</font> <font face='Lucida Console'>)</font> <font color='#5555FF'>/</font> <font color='#979000'>2</font>;
+
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> s <font color='#5555FF'>=</font><font color='#5555FF'>=</font> m <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> m <font color='#5555FF'>+</font> <font color='#979000'>1</font> <font color='#5555FF'>&lt;</font> m_prev <font face='Lucida Console'>)</font>  <font color='#009900'>// these are hacks to remove distracting artefacts at small radii
+</font>                    m<font color='#5555FF'>+</font><font color='#5555FF'>+</font>;
+            <b>}</b>
+            <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> t <font color='#5555FF'>&lt;</font> radius <font face='Lucida Console'>)</font>
+            <b>{</b>
+                m <font color='#5555FF'>=</font> radius <font color='#5555FF'>-</font> <font color='#BB00BB'>square_root</font> <font face='Lucida Console'>(</font> <font face='Lucida Console'>(</font> radius <font color='#5555FF'>*</font> radius <font color='#5555FF'>-</font> <font face='Lucida Console'>(</font> radius <font color='#5555FF'>-</font> t <font face='Lucida Console'>)</font> <font color='#5555FF'>*</font> <font face='Lucida Console'>(</font> radius <font color='#5555FF'>-</font> t <font face='Lucida Console'>)</font> <font face='Lucida Console'>)</font> <font color='#5555FF'>*</font> <font color='#979000'>4</font> <font face='Lucida Console'>)</font> <font color='#5555FF'>/</font> <font color='#979000'>2</font>;
+
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> t <font color='#5555FF'>=</font><font color='#5555FF'>=</font> m <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> m <font color='#5555FF'>=</font><font color='#5555FF'>=</font> m_prev <font face='Lucida Console'>)</font>
+                    m<font color='#5555FF'>+</font><font color='#5555FF'>+</font>;
+            <b>}</b>
+            <font color='#0000FF'>else</font>
+            <b>{</b>
+                m <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            <b>}</b>
+
+            m_prev <font color='#5555FF'>=</font> m;
+
+            <font color='#BB00BB'>draw_line</font> <font face='Lucida Console'>(</font> c, <font color='#BB00BB'>point</font><font face='Lucida Console'>(</font>rect.<font color='#BB00BB'>left</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> m, y<font face='Lucida Console'>)</font>, 
+                        <font color='#BB00BB'>point</font><font face='Lucida Console'>(</font>rect.<font color='#BB00BB'>right</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> m, y<font face='Lucida Console'>)</font>, color, valid_area <font face='Lucida Console'>)</font>;
+        <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> pixel_type<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='draw_rectangle'></a>draw_rectangle</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> canvas<font color='#5555FF'>&amp;</font> c,
+        rectangle rect,
+        <font color='#0000FF'>const</font> pixel_type<font color='#5555FF'>&amp;</font> pixel,
+        <font color='#0000FF'>const</font> rectangle<font color='#5555FF'>&amp;</font> area <font color='#5555FF'>=</font> <font color='#BB00BB'>rectangle</font><font face='Lucida Console'>(</font>std::numeric_limits<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>min</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, std::numeric_limits<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>min</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,
+                                          std::numeric_limits<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>max</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, std::numeric_limits<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>max</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#009900'>// top line
+</font>        <font color='#BB00BB'>draw_line</font><font face='Lucida Console'>(</font>c, <font color='#BB00BB'>point</font><font face='Lucida Console'>(</font>rect.<font color='#BB00BB'>left</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,rect.<font color='#BB00BB'>top</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>,
+                  <font color='#BB00BB'>point</font><font face='Lucida Console'>(</font>rect.<font color='#BB00BB'>right</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,rect.<font color='#BB00BB'>top</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>,
+                  pixel, area<font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// bottom line
+</font>        <font color='#BB00BB'>draw_line</font><font face='Lucida Console'>(</font>c, <font color='#BB00BB'>point</font><font face='Lucida Console'>(</font>rect.<font color='#BB00BB'>left</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,rect.<font color='#BB00BB'>bottom</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>,
+                  <font color='#BB00BB'>point</font><font face='Lucida Console'>(</font>rect.<font color='#BB00BB'>right</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,rect.<font color='#BB00BB'>bottom</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>,
+                  pixel, area<font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// left line
+</font>        <font color='#BB00BB'>draw_line</font><font face='Lucida Console'>(</font>c, <font color='#BB00BB'>point</font><font face='Lucida Console'>(</font>rect.<font color='#BB00BB'>left</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,rect.<font color='#BB00BB'>top</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>,
+                  <font color='#BB00BB'>point</font><font face='Lucida Console'>(</font>rect.<font color='#BB00BB'>left</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,rect.<font color='#BB00BB'>bottom</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>,
+                  pixel, area<font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// right line
+</font>        <font color='#BB00BB'>draw_line</font><font face='Lucida Console'>(</font>c, <font color='#BB00BB'>point</font><font face='Lucida Console'>(</font>rect.<font color='#BB00BB'>right</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,rect.<font color='#BB00BB'>top</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>,
+                  <font color='#BB00BB'>point</font><font face='Lucida Console'>(</font>rect.<font color='#BB00BB'>right</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,rect.<font color='#BB00BB'>bottom</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>,
+                  pixel, area<font face='Lucida Console'>)</font>;
+    <b>}</b>
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='draw_rectangle'></a>draw_rectangle</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> canvas<font color='#5555FF'>&amp;</font> c,
+        rectangle rect
+    <font face='Lucida Console'>)</font><b>{</b> <font color='#BB00BB'>draw_rectangle</font><font face='Lucida Console'>(</font>c, rect, <font color='#979000'>0</font><font face='Lucida Console'>)</font>; <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> pixel_type<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='fill_rect'></a>fill_rect</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> canvas<font color='#5555FF'>&amp;</font> c,
+        <font color='#0000FF'>const</font> rectangle<font color='#5555FF'>&amp;</font> rect,
+        <font color='#0000FF'>const</font> pixel_type<font color='#5555FF'>&amp;</font> pixel
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        rectangle area <font color='#5555FF'>=</font> rect.<font color='#BB00BB'>intersect</font><font face='Lucida Console'>(</font>c<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> y <font color='#5555FF'>=</font> area.<font color='#BB00BB'>top</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; y <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> area.<font color='#BB00BB'>bottom</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>y<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> x <font color='#5555FF'>=</font> area.<font color='#BB00BB'>left</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; x <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> area.<font color='#BB00BB'>right</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>x<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#BB00BB'>assign_pixel</font><font face='Lucida Console'>(</font>c[y<font color='#5555FF'>-</font>c.<font color='#BB00BB'>top</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>][x<font color='#5555FF'>-</font>c.<font color='#BB00BB'>left</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>], pixel<font face='Lucida Console'>)</font>;
+            <b>}</b>
+        <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> pixel_type<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='fill_rect_with_vertical_gradient'></a>fill_rect_with_vertical_gradient</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> canvas<font color='#5555FF'>&amp;</font> c,
+        <font color='#0000FF'>const</font> rectangle<font color='#5555FF'>&amp;</font> rect,
+        <font color='#0000FF'>const</font> pixel_type<font color='#5555FF'>&amp;</font> pixel_top,
+        <font color='#0000FF'>const</font> pixel_type<font color='#5555FF'>&amp;</font> pixel_bottom,
+        <font color='#0000FF'>const</font> rectangle<font color='#5555FF'>&amp;</font> area_ <font color='#5555FF'>=</font> <font color='#BB00BB'>rectangle</font><font face='Lucida Console'>(</font>std::numeric_limits<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>min</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, std::numeric_limits<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>min</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,
+                                          std::numeric_limits<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>max</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, std::numeric_limits<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>max</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        rectangle area <font color='#5555FF'>=</font> rect.<font color='#BB00BB'>intersect</font><font face='Lucida Console'>(</font>c<font face='Lucida Console'>)</font>.<font color='#BB00BB'>intersect</font><font face='Lucida Console'>(</font>area_<font face='Lucida Console'>)</font>;
+        pixel_type pixel;
+
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> s <font color='#5555FF'>=</font> rect.<font color='#BB00BB'>bottom</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font>rect.<font color='#BB00BB'>top</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> y <font color='#5555FF'>=</font> area.<font color='#BB00BB'>top</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; y <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> area.<font color='#BB00BB'>bottom</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>y<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> t <font color='#5555FF'>=</font> rect.<font color='#BB00BB'>bottom</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font>y;
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> b <font color='#5555FF'>=</font> y<font color='#5555FF'>-</font>rect.<font color='#BB00BB'>top</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>vector_to_pixel</font><font face='Lucida Console'>(</font>pixel,
+                    <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>pixel_to_vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>pixel_top<font face='Lucida Console'>)</font><font color='#5555FF'>*</font>t <font color='#5555FF'>+</font> 
+                      pixel_to_vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>pixel_bottom<font face='Lucida Console'>)</font><font color='#5555FF'>*</font>b<font face='Lucida Console'>)</font><font color='#5555FF'>/</font>s<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> x <font color='#5555FF'>=</font> area.<font color='#BB00BB'>left</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; x <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> area.<font color='#BB00BB'>right</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>x<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#BB00BB'>assign_pixel</font><font face='Lucida Console'>(</font>c[y<font color='#5555FF'>-</font>c.<font color='#BB00BB'>top</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>][x<font color='#5555FF'>-</font>c.<font color='#BB00BB'>left</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>], pixel<font face='Lucida Console'>)</font>;
+            <b>}</b>
+        <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#ifdef</font> NO_MAKEFILE
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='canvas_drawing.cpp.html'>canvas_drawing.cpp</a>"
+<font color='#0000FF'>#endif</font>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_GUI_CANVAS_DRAWINg_
+</font>
+
+</pre></body></html>

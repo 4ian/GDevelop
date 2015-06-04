@@ -1,0 +1,104 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - http_client.h</title></head><body bgcolor='white'><pre>
+<font color='#0000FF'>#ifndef</font> DLIB_BROWSERhH
+<font color='#0000FF'>#define</font> DLIB_BROWSERhH
+
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>map<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>string<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>vector<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='http_client_abstract.h.html'>http_client_abstract.h</a>"
+
+
+<font color='#009900'>// Default timeout after 60 seconds
+</font><font color='#0000FF'>#define</font> DEFAULT_TIMEOUT <font color='#979000'>60000</font>
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+    <font color='#009900'>// Function which is called when there is data available.
+</font>    <font color='#009900'>//   Return false to stop the download process...
+</font>    <font color='#0000FF'>typedef</font> <font color='#0000FF'><u>bool</u></font> <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>fnOnDownload<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> already_downloaded, <font color='#0000FF'><u>long</u></font> total_to_download, <font color='#0000FF'><u>void</u></font> <font color='#5555FF'>*</font> userInfo<font face='Lucida Console'>)</font>;
+
+
+    <font color='#0000FF'>class</font> <b><a name='http_client'></a>http_client</b>
+    <b>{</b>
+    <font color='#0000FF'>public</font>:
+        <b><a name='http_client'></a>http_client</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>typedef</font> std::map<font color='#5555FF'>&lt;</font> std::string, std::string <font color='#5555FF'>&gt;</font> stringmap;
+        <font color='#0000FF'>typedef</font> std::map<font color='#5555FF'>&lt;</font> std::string, stringmap   <font color='#5555FF'>&gt;</font> string_to_stringmap;
+        <font color='#0000FF'>typedef</font> std::map<font color='#5555FF'>&lt;</font> std::string, std::vector<font color='#5555FF'>&lt;</font>std::string<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> string_to_stringvector;
+
+        <font color='#009900'>// Header functions
+</font>        <font color='#0000FF'><u>void</u></font>        <b><a name='set_header'></a>set_header</b><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> header_name, <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> header_value<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'><u>void</u></font>        <b><a name='set_header'></a>set_header</b><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> header_name, <font color='#0000FF'><u>long</u></font> header_value<font face='Lucida Console'>)</font>;
+        std::string <b><a name='get_header'></a>get_header</b><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> header_name<font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#0000FF'><u>void</u></font>        <b><a name='remove_header'></a>remove_header</b><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> header_name<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'><u>bool</u></font>        <b><a name='is_header_set'></a>is_header_set</b><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> header_name<font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+        <font color='#009900'>// This function will clear out all cookies &amp; headers set until now
+</font>        <font color='#0000FF'><u>void</u></font> <b><a name='clear'></a>clear</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <font color='#009900'>// This function will clear out the Content-Type header
+</font>        <font color='#0000FF'><u>void</u></font> <b><a name='prepare_for_next_url'></a>prepare_for_next_url</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_callback_function'></a>set_callback_function</b><font face='Lucida Console'>(</font> fnOnDownload od, <font color='#0000FF'><u>void</u></font> <font color='#5555FF'>*</font> _user_info <font face='Lucida Console'>)</font> <b>{</b> OnDownload <font color='#5555FF'>=</font> od; user_info <font color='#5555FF'>=</font> _user_info; <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_cookie'></a>set_cookie</b><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> cookie_name, <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> cookie_value<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_cookie'></a>set_cookie</b><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> cookie_name, <font color='#0000FF'><u>long</u></font> cookie_value<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'><u>void</u></font> <b><a name='remove_cookie'></a>remove_cookie</b><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> cookie_name<font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_user_agent'></a>set_user_agent</b><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> new_agent<font face='Lucida Console'>)</font> <b>{</b> <font color='#BB00BB'>set_header</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>User-Agent</font>", new_agent<font face='Lucida Console'>)</font>; <b>}</b>
+
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_timeout'></a>set_timeout</b><font face='Lucida Console'>(</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>int</u></font> milliseconds <font color='#5555FF'>=</font> DEFAULT_TIMEOUT <font face='Lucida Console'>)</font> <b>{</b> timeout <font color='#5555FF'>=</font> milliseconds; <b>}</b>
+
+
+        string_to_stringvector <b><a name='get_returned_headers'></a>get_returned_headers</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> returned_headers; <b>}</b>
+        <font color='#0000FF'><u>short</u></font>                  <b><a name='get_http_return'></a>get_http_return</b>     <font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> http_return; <b>}</b>
+        <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font>     <b><a name='get_body'></a>get_body</b>            <font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> returned_body; <b>}</b>
+
+        <font color='#009900'>// POST
+</font>        <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> <b><a name='post_url'></a>post_url</b> <font face='Lucida Console'>(</font><font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> url, <font color='#0000FF'>const</font> string_to_stringmap<font color='#5555FF'>&amp;</font> postvars, <font color='#0000FF'>const</font> string_to_stringmap<font color='#5555FF'>&amp;</font> filenames <font color='#5555FF'>=</font> <font color='#BB00BB'>string_to_stringmap</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> <b><a name='post_url'></a>post_url</b> <font face='Lucida Console'>(</font><font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> url, <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> postbuffer<font face='Lucida Console'>)</font>;
+        <font color='#009900'>// GET
+</font>        <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> <b><a name='get_url'></a>get_url</b>  <font face='Lucida Console'>(</font><font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> url<font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='has_error'></a>has_error</b><font face='Lucida Console'>(</font> <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> <font color='#5555FF'>!</font>error_field.<font color='#BB00BB'>empty</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <b>}</b>
+        <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> <b><a name='get_error'></a>get_error</b><font face='Lucida Console'>(</font> <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> error_field; <b>}</b>
+
+        <font color='#0000FF'>static</font> std::string <b><a name='urlencode'></a>urlencode</b><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> in, <font color='#0000FF'><u>bool</u></font> post_encode <font color='#5555FF'>=</font> <font color='#979000'>false</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>static</font> std::string <b><a name='urldecode'></a>urldecode</b><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> in<font face='Lucida Console'>)</font>;
+    <font color='#0000FF'>private</font>:
+        <font color='#0000FF'><u>bool</u></font> <b><a name='grab_url'></a>grab_url</b><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> url, <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> method <font color='#5555FF'>=</font> "<font color='#CC0000'>GET</font>", <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> post_body <font color='#5555FF'>=</font> "<font color='#CC0000'></font>"<font face='Lucida Console'>)</font>;
+        std::string <b><a name='build_post'></a>build_post</b><font face='Lucida Console'>(</font>std::string<font color='#5555FF'>&amp;</font> content_type, <font color='#0000FF'>const</font> string_to_stringmap<font color='#5555FF'>&amp;</font> postvars, <font color='#0000FF'>const</font> string_to_stringmap<font color='#5555FF'>&amp;</font> filenames<font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+        std::string <b><a name='get_random_string'></a>get_random_string</b><font face='Lucida Console'>(</font> <font color='#0000FF'><u>size_t</u></font> length <font color='#5555FF'>=</font> <font color='#979000'>32</font> <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        std::string <b><a name='get_basename'></a>get_basename</b><font face='Lucida Console'>(</font> <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> filename <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        std::string <b><a name='strtolower'></a>strtolower</b><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> in<font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        std::string <b><a name='strtoupper'></a>strtoupper</b><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> in<font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='parse_url'></a>parse_url</b><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> url, std::string<font color='#5555FF'>&amp;</font> scheme, std::string<font color='#5555FF'>&amp;</font> user, std::string<font color='#5555FF'>&amp;</font> pass, std::string<font color='#5555FF'>&amp;</font> host, <font color='#0000FF'><u>short</u></font><font color='#5555FF'>&amp;</font> port, std::string<font color='#5555FF'>&amp;</font> path<font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+        stringmap headers;
+        stringmap cookies;
+
+        string_to_stringvector returned_headers;
+        <font color='#0000FF'><u>short</u></font> http_return;
+        std::string returned_body, error_field;
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>int</u></font> timeout;
+
+        fnOnDownload OnDownload;
+        <font color='#0000FF'><u>void</u></font> <font color='#5555FF'>*</font>       user_info;
+    <b>}</b>;
+
+<b>}</b>
+
+<font color='#0000FF'>#ifdef</font> NO_MAKEFILE
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='http_client.cpp.html'>http_client.cpp</a>"
+<font color='#0000FF'>#endif</font>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_BROWSERhH
+</font>
+
+</pre></body></html>

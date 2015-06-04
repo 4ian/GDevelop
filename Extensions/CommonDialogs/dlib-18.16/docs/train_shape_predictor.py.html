@@ -1,0 +1,180 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN"
+   "http://www.w3.org/TR/html4/strict.dtd">
+
+<html>
+<head>
+  <title></title>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+  <style type="text/css">
+td.linenos { background-color: #f0f0f0; padding-right: 10px; }
+span.lineno { background-color: #f0f0f0; padding: 0 5px 0 5px; }
+pre { line-height: 125%; }
+body .hll { background-color: #ffffcc }
+body  { background: #ffffff; }
+body .c { color: #008000 } /* Comment */
+body .err { border: 1px solid #FF0000 } /* Error */
+body .k { color: #0000ff } /* Keyword */
+body .cm { color: #008000 } /* Comment.Multiline */
+body .cp { color: #0000ff } /* Comment.Preproc */
+body .c1 { color: #008000 } /* Comment.Single */
+body .cs { color: #008000 } /* Comment.Special */
+body .ge { font-style: italic } /* Generic.Emph */
+body .gh { font-weight: bold } /* Generic.Heading */
+body .gp { font-weight: bold } /* Generic.Prompt */
+body .gs { font-weight: bold } /* Generic.Strong */
+body .gu { font-weight: bold } /* Generic.Subheading */
+body .kc { color: #0000ff } /* Keyword.Constant */
+body .kd { color: #0000ff } /* Keyword.Declaration */
+body .kn { color: #0000ff } /* Keyword.Namespace */
+body .kp { color: #0000ff } /* Keyword.Pseudo */
+body .kr { color: #0000ff } /* Keyword.Reserved */
+body .kt { color: #2b91af } /* Keyword.Type */
+body .s { color: #a31515 } /* Literal.String */
+body .nc { color: #2b91af } /* Name.Class */
+body .ow { color: #0000ff } /* Operator.Word */
+body .sb { color: #a31515 } /* Literal.String.Backtick */
+body .sc { color: #a31515 } /* Literal.String.Char */
+body .sd { color: #a31515 } /* Literal.String.Doc */
+body .s2 { color: #a31515 } /* Literal.String.Double */
+body .se { color: #a31515 } /* Literal.String.Escape */
+body .sh { color: #a31515 } /* Literal.String.Heredoc */
+body .si { color: #a31515 } /* Literal.String.Interpol */
+body .sx { color: #a31515 } /* Literal.String.Other */
+body .sr { color: #a31515 } /* Literal.String.Regex */
+body .s1 { color: #a31515 } /* Literal.String.Single */
+body .ss { color: #a31515 } /* Literal.String.Symbol */
+
+  </style>
+</head>
+<body>
+<h2></h2>
+
+<div class="highlight"><pre><span class="c">#!/usr/bin/python</span>
+<span class="c"># The contents of this file are in the public domain. See LICENSE_FOR_EXAMPLE_PROGRAMS.txt</span>
+<span class="c">#</span>
+<span class="c">#   This example program shows how to use dlib&#39;s implementation of the paper:</span>
+<span class="c">#   One Millisecond Face Alignment with an Ensemble of Regression Trees by</span>
+<span class="c">#   Vahid Kazemi and Josephine Sullivan, CVPR 2014</span>
+<span class="c">#</span>
+<span class="c">#   In particular, we will train a face landmarking model based on a small</span>
+<span class="c">#   dataset and then evaluate it.  If you want to visualize the output of the</span>
+<span class="c">#   trained model on some images then you can run the</span>
+<span class="c">#   <a href="face_landmark_detection.py.html">face_landmark_detection.py</a> example program with predictor.dat as the input</span>
+<span class="c">#   model.</span>
+<span class="c">#</span>
+<span class="c">#   It should also be noted that this kind of model, while often used for face</span>
+<span class="c">#   landmarking, is quite general and can be used for a variety of shape</span>
+<span class="c">#   prediction tasks.  But here we demonstrate it only on a simple face</span>
+<span class="c">#   landmarking task.</span>
+<span class="c">#</span>
+<span class="c"># COMPILING THE DLIB PYTHON INTERFACE</span>
+<span class="c">#   Dlib comes with a compiled python interface for python 2.7 on MS Windows. If</span>
+<span class="c">#   you are using another python version or operating system then you need to</span>
+<span class="c">#   compile the dlib python interface before you can use this file.  To do this,</span>
+<span class="c">#   run compile_dlib_python_module.bat.  This should work on any operating</span>
+<span class="c">#   system so long as you have CMake and boost-python installed.</span>
+<span class="c">#   On Ubuntu, this can be done easily by running the command:</span>
+<span class="c">#       sudo apt-get install libboost-python-dev cmake</span>
+<span class="c">#</span>
+<span class="c">#   Also note that this example requires scikit-image which can be installed</span>
+<span class="c">#   via the command:</span>
+<span class="c">#       pip install -U scikit-image</span>
+<span class="c">#   Or downloaded from http://scikit-image.org/download.html. </span>
+
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">glob</span>
+
+<span class="kn">import</span> <span class="nn">dlib</span>
+<span class="kn">from</span> <span class="nn">skimage</span> <span class="kn">import</span> <span class="n">io</span>
+
+
+<span class="c"># In this example we are going to train a face detector based on the small</span>
+<span class="c"># faces dataset in the examples/faces directory.  This means you need to supply</span>
+<span class="c"># the path to this faces folder as a command line argument so we will know</span>
+<span class="c"># where it is.</span>
+<span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">2</span><span class="p">:</span>
+    <span class="k">print</span><span class="p">(</span>
+        <span class="s">&quot;Give the path to the examples/faces directory as the argument to this &quot;</span>
+        <span class="s">&quot;program. For example, if you are in the python_examples folder then &quot;</span>
+        <span class="s">&quot;execute this program by running:</span><span class="se">\n</span><span class="s">&quot;</span>
+        <span class="s">&quot;    ./<a href="train_shape_predictor.py.html">train_shape_predictor.py</a> ../examples/faces&quot;</span><span class="p">)</span>
+    <span class="nb">exit</span><span class="p">()</span>
+<span class="n">faces_folder</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
+<span class="n">options</span> <span class="o">=</span> <span class="n">dlib</span><span class="o">.</span><span class="n">shape_predictor_training_options</span><span class="p">()</span>
+<span class="c"># Now make the object responsible for training the model.</span>
+<span class="c"># This algorithm has a bunch of parameters you can mess with.  The</span>
+<span class="c"># documentation for the shape_predictor_trainer explains all of them.</span>
+<span class="c"># You should also read Kazemi&#39;s paper which explains all the parameters</span>
+<span class="c"># in great detail.  However, here I&#39;m just setting three of them</span>
+<span class="c"># differently than their default values.  I&#39;m doing this because we</span>
+<span class="c"># have a very small dataset.  In particular, setting the oversampling</span>
+<span class="c"># to a high amount (300) effectively boosts the training set size, so</span>
+<span class="c"># that helps this example.</span>
+<span class="n">options</span><span class="o">.</span><span class="n">oversampling_amount</span> <span class="o">=</span> <span class="mi">300</span>
+<span class="c"># I&#39;m also reducing the capacity of the model by explicitly increasing</span>
+<span class="c"># the regularization (making nu smaller) and by using trees with</span>
+<span class="c"># smaller depths.</span>
+<span class="n">options</span><span class="o">.</span><span class="n">nu</span> <span class="o">=</span> <span class="mf">0.05</span>
+<span class="n">options</span><span class="o">.</span><span class="n">tree_depth</span> <span class="o">=</span> <span class="mi">2</span>
+<span class="n">options</span><span class="o">.</span><span class="n">be_verbose</span> <span class="o">=</span> <span class="bp">True</span>
+
+<span class="c"># dlib.train_shape_predictor() does the actual training.  It will save the</span>
+<span class="c"># final predictor to predictor.dat.  The input is an XML file that lists the</span>
+<span class="c"># images in the training dataset and also contains the positions of the face</span>
+<span class="c"># parts.</span>
+<span class="n">training_xml_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">faces_folder</span><span class="p">,</span> <span class="s">&quot;training_with_face_landmarks.xml&quot;</span><span class="p">)</span>
+<span class="n">dlib</span><span class="o">.</span><span class="n">train_shape_predictor</span><span class="p">(</span><span class="n">training_xml_path</span><span class="p">,</span> <span class="s">&quot;predictor.dat&quot;</span><span class="p">,</span> <span class="n">options</span><span class="p">)</span>
+
+<span class="c"># Now that we have a model we can test it.  dlib.test_shape_predictor()</span>
+<span class="c"># measures the average distance between a face landmark output by the</span>
+<span class="c"># shape_predictor and where it should be according to the truth data.</span>
+<span class="k">print</span><span class="p">(</span><span class="s">&quot;</span><span class="se">\n</span><span class="s">Training accuracy: {}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+    <span class="n">dlib</span><span class="o">.</span><span class="n">test_shape_predictor</span><span class="p">(</span><span class="n">training_xml_path</span><span class="p">,</span> <span class="s">&quot;predictor.dat&quot;</span><span class="p">)))</span>
+<span class="c"># The real test is to see how well it does on data it wasn&#39;t trained on.  We</span>
+<span class="c"># trained it on a very small dataset so the accuracy is not extremely high, but</span>
+<span class="c"># it&#39;s still doing quite good.  Moreover, if you train it on one of the large</span>
+<span class="c"># face landmarking datasets you will obtain state-of-the-art results, as shown</span>
+<span class="c"># in the Kazemi paper.</span>
+<span class="n">testing_xml_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">faces_folder</span><span class="p">,</span> <span class="s">&quot;testing_with_face_landmarks.xml&quot;</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="s">&quot;Testing accuracy: {}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+    <span class="n">dlib</span><span class="o">.</span><span class="n">test_shape_predictor</span><span class="p">(</span><span class="n">testing_xml_path</span><span class="p">,</span> <span class="s">&quot;predictor.dat&quot;</span><span class="p">)))</span>
+
+<span class="c"># Now let&#39;s use it as you would in a normal application.  First we will load it</span>
+<span class="c"># from disk. We also need to load a face detector to provide the initial</span>
+<span class="c"># estimate of the facial location.</span>
+<span class="n">predictor</span> <span class="o">=</span> <span class="n">dlib</span><span class="o">.</span><span class="n">shape_predictor</span><span class="p">(</span><span class="s">&quot;predictor.dat&quot;</span><span class="p">)</span>
+<span class="n">detector</span> <span class="o">=</span> <span class="n">dlib</span><span class="o">.</span><span class="n">get_frontal_face_detector</span><span class="p">()</span>
+
+<span class="c"># Now let&#39;s run the detector and shape_predictor over the images in the faces</span>
+<span class="c"># folder and display the results.</span>
+<span class="k">print</span><span class="p">(</span><span class="s">&quot;Showing detections and predictions on the images in the faces folder...&quot;</span><span class="p">)</span>
+<span class="n">win</span> <span class="o">=</span> <span class="n">dlib</span><span class="o">.</span><span class="n">image_window</span><span class="p">()</span>
+<span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">faces_folder</span><span class="p">,</span> <span class="s">&quot;*.jpg&quot;</span><span class="p">)):</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">&quot;Processing file: {}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">f</span><span class="p">))</span>
+    <span class="n">img</span> <span class="o">=</span> <span class="n">io</span><span class="o">.</span><span class="n">imread</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+
+    <span class="n">win</span><span class="o">.</span><span class="n">clear_overlay</span><span class="p">()</span>
+    <span class="n">win</span><span class="o">.</span><span class="n">set_image</span><span class="p">(</span><span class="n">img</span><span class="p">)</span>
+
+    <span class="c"># Ask the detector to find the bounding boxes of each face. The 1 in the</span>
+    <span class="c"># second argument indicates that we should upsample the image 1 time. This</span>
+    <span class="c"># will make everything bigger and allow us to detect more faces.</span>
+    <span class="n">dets</span> <span class="o">=</span> <span class="n">detector</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">&quot;Number of faces detected: {}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">dets</span><span class="p">)))</span>
+    <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">d</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">dets</span><span class="p">):</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;Detection {}: Left: {} Top: {} Right: {} Bottom: {}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+            <span class="n">k</span><span class="p">,</span> <span class="n">d</span><span class="o">.</span><span class="n">left</span><span class="p">(),</span> <span class="n">d</span><span class="o">.</span><span class="n">top</span><span class="p">(),</span> <span class="n">d</span><span class="o">.</span><span class="n">right</span><span class="p">(),</span> <span class="n">d</span><span class="o">.</span><span class="n">bottom</span><span class="p">()))</span>
+        <span class="c"># Get the landmarks/parts for the face in box d.</span>
+        <span class="n">shape</span> <span class="o">=</span> <span class="n">predictor</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">d</span><span class="p">)</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;Part 0: {}, Part 1: {} ...&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">shape</span><span class="o">.</span><span class="n">part</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span>
+                                                  <span class="n">shape</span><span class="o">.</span><span class="n">part</span><span class="p">(</span><span class="mi">1</span><span class="p">)))</span>
+        <span class="c"># Draw the face landmarks on the screen.</span>
+        <span class="n">win</span><span class="o">.</span><span class="n">add_overlay</span><span class="p">(</span><span class="n">shape</span><span class="p">)</span>
+
+    <span class="n">win</span><span class="o">.</span><span class="n">add_overlay</span><span class="p">(</span><span class="n">dets</span><span class="p">)</span>
+    <span class="n">dlib</span><span class="o">.</span><span class="n">hit_enter_to_continue</span><span class="p">()</span>
+</pre></div>
+</body>
+</html>

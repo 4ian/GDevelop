@@ -1,0 +1,217 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - logger_config_file.cpp</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2007  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_LOGGER_CONFIg_FILE_CPP
+<font color='#0000FF'>#define</font> DLIB_LOGGER_CONFIg_FILE_CPP
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='logger_config_file.h.html'>logger_config_file.h</a>"
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>string<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../config_reader.h.html'>../config_reader.h</a>"
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>fstream<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>sstream<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../error.h.html'>../error.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../map.h.html'>../map.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../string.h.html'>../string.h</a>"
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+    <font color='#0000FF'>namespace</font> logger_config_file_helpers 
+    <b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+        std::ostream<font color='#5555FF'>&amp;</font> <b><a name='get_file_stream'></a>get_file_stream</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> file_name
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> std;
+            <font color='#0000FF'>static</font> dlib::mutex m;
+            auto_mutex <font color='#BB00BB'>M</font><font face='Lucida Console'>(</font>m<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>static</font> dlib::map<font color='#5555FF'>&lt;</font>string,ostream<font color='#5555FF'>*</font><font color='#5555FF'>&gt;</font>::kernel_1a_c file_map;
+
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>file_map.<font color='#BB00BB'>is_in_domain</font><font face='Lucida Console'>(</font>file_name<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#009900'>// We won't ever delete this output stream.  It should be around for the
+</font>                <font color='#009900'>// entire life of the program so just let the OS take care of it.
+</font>                ostream<font color='#5555FF'>*</font> fout <font color='#5555FF'>=</font> <font color='#0000FF'>new</font> <font color='#BB00BB'>ofstream</font><font face='Lucida Console'>(</font>file_name.<font color='#BB00BB'>c_str</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font>fout<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#0000FF'>delete</font> fout;
+                    <font color='#0000FF'>throw</font> <font color='#BB00BB'>error</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>logger_config: unable to open output file </font>" <font color='#5555FF'>+</font> file_name<font face='Lucida Console'>)</font>;
+                <b>}</b>
+
+                <font color='#009900'>// add this file to our file map
+</font>                string <font color='#BB00BB'>temp</font><font face='Lucida Console'>(</font>file_name<font face='Lucida Console'>)</font>;
+                file_map.<font color='#BB00BB'>add</font><font face='Lucida Console'>(</font>temp,fout<font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+            <font color='#0000FF'>return</font> <font color='#5555FF'>*</font>file_map[file_name];
+        <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+        log_level <b><a name='string_to_log_level'></a>string_to_log_level</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> level 
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> std;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>level <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'>LALL</font>" <font color='#5555FF'>|</font><font color='#5555FF'>|</font> level <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'>ALL</font>" <font color='#5555FF'>|</font><font color='#5555FF'>|</font> level <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'>all</font>"<font face='Lucida Console'>)</font>
+                <font color='#0000FF'>return</font> LALL;
+            <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>level <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'>LNONE</font>" <font color='#5555FF'>|</font><font color='#5555FF'>|</font> level <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'>NONE</font>" <font color='#5555FF'>|</font><font color='#5555FF'>|</font> level <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'>none</font>"<font face='Lucida Console'>)</font>
+                <font color='#0000FF'>return</font> LNONE;
+            <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>level <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'>LTRACE</font>" <font color='#5555FF'>|</font><font color='#5555FF'>|</font> level <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'>TRACE</font>" <font color='#5555FF'>|</font><font color='#5555FF'>|</font> level <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'>trace</font>"<font face='Lucida Console'>)</font>
+                <font color='#0000FF'>return</font> LTRACE;
+            <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>level <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'>LDEBUG</font>" <font color='#5555FF'>|</font><font color='#5555FF'>|</font> level <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'>DEBUG</font>" <font color='#5555FF'>|</font><font color='#5555FF'>|</font> level <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'>debug</font>"<font face='Lucida Console'>)</font>
+                <font color='#0000FF'>return</font> LDEBUG;
+            <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>level <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'>LINFO</font>" <font color='#5555FF'>|</font><font color='#5555FF'>|</font> level <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'>INFO</font>" <font color='#5555FF'>|</font><font color='#5555FF'>|</font> level <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'>info</font>"<font face='Lucida Console'>)</font>
+                <font color='#0000FF'>return</font> LINFO;
+            <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>level <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'>LWARN</font>" <font color='#5555FF'>|</font><font color='#5555FF'>|</font> level <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'>WARN</font>" <font color='#5555FF'>|</font><font color='#5555FF'>|</font> level <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'>warn</font>"<font face='Lucida Console'>)</font>
+                <font color='#0000FF'>return</font> LWARN;
+            <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>level <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'>LERROR</font>" <font color='#5555FF'>|</font><font color='#5555FF'>|</font> level <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'>ERROR</font>" <font color='#5555FF'>|</font><font color='#5555FF'>|</font> level <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'>error</font>"<font face='Lucida Console'>)</font>
+                <font color='#0000FF'>return</font> LERROR;
+            <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>level <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'>LFATAL</font>" <font color='#5555FF'>|</font><font color='#5555FF'>|</font> level <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'>FATAL</font>" <font color='#5555FF'>|</font><font color='#5555FF'>|</font> level <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'>fatal</font>"<font face='Lucida Console'>)</font>
+                <font color='#0000FF'>return</font> LFATAL;
+            <font color='#0000FF'>else</font>
+            <b>{</b>
+                <font color='#0000FF'>const</font> <font color='#0000FF'><u>int</u></font> priority <font color='#5555FF'>=</font> string_cast<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>int</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>level<font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>return</font> <font color='#BB00BB'>log_level</font><font face='Lucida Console'>(</font>priority,"<font color='#CC0000'>CONFIG_FILE_DEFINED</font>"<font face='Lucida Console'>)</font>;
+            <b>}</b>
+        <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>        
+        <font color='#0000FF'><u>void</u></font> <b><a name='configure_sub_blocks'></a>configure_sub_blocks</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> config_reader<font color='#5555FF'>&amp;</font> cr,
+            <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> name 
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> std;
+
+            logger <font color='#BB00BB'>dlog</font><font face='Lucida Console'>(</font>name.<font color='#BB00BB'>c_str</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>cr.<font color='#BB00BB'>is_key_defined</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>logging_level</font>"<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                dlog.<font color='#BB00BB'>set_level</font><font face='Lucida Console'>(</font><font color='#BB00BB'>string_to_log_level</font><font face='Lucida Console'>(</font>cr["<font color='#CC0000'>logging_level</font>"]<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>cr.<font color='#BB00BB'>is_key_defined</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>output</font>"<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                string output <font color='#5555FF'>=</font> cr["<font color='#CC0000'>output</font>"];
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>output <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'>cout</font>"<font face='Lucida Console'>)</font>
+                    dlog.<font color='#BB00BB'>set_output_stream</font><font face='Lucida Console'>(</font>cout<font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>output <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'>cerr</font>"<font face='Lucida Console'>)</font>
+                    dlog.<font color='#BB00BB'>set_output_stream</font><font face='Lucida Console'>(</font>cerr<font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>output <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'>clog</font>"<font face='Lucida Console'>)</font>
+                    dlog.<font color='#BB00BB'>set_output_stream</font><font face='Lucida Console'>(</font>clog<font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>else</font>
+                <b>{</b>
+                    istringstream <font color='#BB00BB'>sin</font><font face='Lucida Console'>(</font>output<font face='Lucida Console'>)</font>;
+                    string one, two, three;
+                    sin <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font> one;
+                    sin <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font> two;
+                    sin <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font> three;
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>one <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'>file</font>" <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> three.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                        dlog.<font color='#BB00BB'>set_output_stream</font><font face='Lucida Console'>(</font><font color='#BB00BB'>get_file_stream</font><font face='Lucida Console'>(</font>two<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                    <font color='#0000FF'>else</font>
+                        <font color='#0000FF'>throw</font> <font color='#BB00BB'>error</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>logger_config: invalid argument to output option: </font>" <font color='#5555FF'>+</font> output<font face='Lucida Console'>)</font>;
+                <b>}</b>
+
+            <b>}</b> <font color='#009900'>// if (cr.is_key_defined("output"))
+</font>
+            <font color='#009900'>// now configure all the sub-blocks
+</font>            std_vector_c<font color='#5555FF'>&lt;</font>std::string<font color='#5555FF'>&gt;</font> blocks;
+            cr.<font color='#BB00BB'>get_blocks</font><font face='Lucida Console'>(</font>blocks<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> blocks.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#BB00BB'>configure_sub_blocks</font><font face='Lucida Console'>(</font>cr.<font color='#BB00BB'>block</font><font face='Lucida Console'>(</font>blocks[i]<font face='Lucida Console'>)</font>, name <font color='#5555FF'>+</font> "<font color='#CC0000'>.</font>" <font color='#5555FF'>+</font> blocks[i]<font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+        <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <b>}</b> <font color='#009900'>// namespace
+</font>
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='configure_loggers_from_file'></a>configure_loggers_from_file</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> file_name 
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        std::ifstream <font color='#BB00BB'>fin</font><font face='Lucida Console'>(</font>file_name.<font color='#BB00BB'>c_str</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font>fin<font face='Lucida Console'>)</font>
+            <font color='#0000FF'>throw</font> <font color='#BB00BB'>logger_config_file_error</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>logger_config: unable to open config file </font>" <font color='#5555FF'>+</font> file_name<font face='Lucida Console'>)</font>;
+
+        config_reader <font color='#BB00BB'>temp</font><font face='Lucida Console'>(</font>fin<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>configure_loggers_from_file</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='configure_loggers_from_file'></a>configure_loggers_from_file</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> config_reader<font color='#5555FF'>&amp;</font> main_cr 
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> logger_config_file_helpers;
+        <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> std;
+
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>main_cr.<font color='#BB00BB'>is_block_defined</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>logger_config</font>"<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>const</font> config_reader<font color='#5555FF'>&amp;</font> cr <font color='#5555FF'>=</font> main_cr.<font color='#BB00BB'>block</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>logger_config</font>"<font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>cr.<font color='#BB00BB'>is_key_defined</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>logging_level</font>"<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#BB00BB'>set_all_logging_levels</font><font face='Lucida Console'>(</font><font color='#BB00BB'>string_to_log_level</font><font face='Lucida Console'>(</font>cr["<font color='#CC0000'>logging_level</font>"]<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>cr.<font color='#BB00BB'>is_key_defined</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>output</font>"<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                string output <font color='#5555FF'>=</font> cr["<font color='#CC0000'>output</font>"];
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>output <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'>cout</font>"<font face='Lucida Console'>)</font>
+                    <font color='#BB00BB'>set_all_logging_output_streams</font><font face='Lucida Console'>(</font>cout<font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>output <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'>cerr</font>"<font face='Lucida Console'>)</font>
+                    <font color='#BB00BB'>set_all_logging_output_streams</font><font face='Lucida Console'>(</font>cerr<font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>output <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'>clog</font>"<font face='Lucida Console'>)</font>
+                    <font color='#BB00BB'>set_all_logging_output_streams</font><font face='Lucida Console'>(</font>clog<font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>else</font>
+                <b>{</b>
+                    istringstream <font color='#BB00BB'>sin</font><font face='Lucida Console'>(</font>output<font face='Lucida Console'>)</font>;
+                    string one, two, three;
+                    sin <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font> one;
+                    sin <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font> two;
+                    sin <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font> three;
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>one <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'>file</font>" <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> three.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                        <font color='#BB00BB'>set_all_logging_output_streams</font><font face='Lucida Console'>(</font><font color='#BB00BB'>get_file_stream</font><font face='Lucida Console'>(</font>two<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                    <font color='#0000FF'>else</font>
+                        <font color='#0000FF'>throw</font> <font color='#BB00BB'>logger_config_file_error</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>logger_config: invalid argument to output option: </font>" <font color='#5555FF'>+</font> output<font face='Lucida Console'>)</font>;
+                <b>}</b>
+
+            <b>}</b> <font color='#009900'>// if (cr.is_key_defined("output"))
+</font>
+            <font color='#009900'>// now configure all the sub-blocks
+</font>            std_vector_c<font color='#5555FF'>&lt;</font>std::string<font color='#5555FF'>&gt;</font> blocks;
+            cr.<font color='#BB00BB'>get_blocks</font><font face='Lucida Console'>(</font>blocks<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> blocks.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#BB00BB'>configure_sub_blocks</font><font face='Lucida Console'>(</font>cr.<font color='#BB00BB'>block</font><font face='Lucida Console'>(</font>blocks[i]<font face='Lucida Console'>)</font>, blocks[i]<font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+        <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_LOGGER_CONFIg_FILE_CPP
+</font>
+
+
+
+</pre></body></html>

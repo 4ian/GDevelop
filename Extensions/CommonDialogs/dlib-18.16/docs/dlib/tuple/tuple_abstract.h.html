@@ -1,0 +1,305 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - tuple_abstract.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2007  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#undef</font> DLIB_TUPLe_ABSTRACT_H_
+<font color='#0000FF'>#ifdef</font> DLIB_TUPLe_ABSTRACT_H_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../algs.h.html'>../algs.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../serialize.h.html'>../serialize.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='tuple_abstract.h.html'>tuple_abstract.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>struct</font> <b><a name='null_type'></a>null_type</b>
+    <b>{</b>
+        <font color='#009900'>/*!
+            WHAT THIS OBJECT REPRESENTS
+                This object is the default type used as the default
+                template argument to the tuple object's template arguments. 
+
+                Also note that it has no state associated with it.
+        !*/</font>
+    <b>}</b>;
+
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='serialize'></a>serialize</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> null_type<font color='#5555FF'>&amp;</font> ,
+        std::ostream<font color='#5555FF'>&amp;</font>
+    <font face='Lucida Console'>)</font><b>{</b><b>}</b>
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='deserialize'></a>deserialize</b> <font face='Lucida Console'>(</font>
+        null_type<font color='#5555FF'>&amp;</font> ,
+        std::istream<font color='#5555FF'>&amp;</font>
+    <font face='Lucida Console'>)</font><b>{</b><b>}</b>
+    <font color='#009900'>/*!
+        Serialization support is provided for null_type because in some cases 
+        it makes your code a little more concise and easier to deal with
+        when using tuple objects and serialization.  The serialization literally
+        does nothing though.
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font> 
+        <font color='#0000FF'>typename</font> T0 <font color='#5555FF'>=</font> null_type, 
+        <font color='#0000FF'>typename</font> T1 <font color='#5555FF'>=</font> null_type, 
+        <font color='#0000FF'>typename</font> T2 <font color='#5555FF'>=</font> null_type, 
+        <font color='#0000FF'>typename</font> T3 <font color='#5555FF'>=</font> null_type, 
+           ... 
+        <font color='#0000FF'>typename</font> T31 <font color='#5555FF'>=</font> null_type
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>class</font> <b><a name='tuple'></a>tuple</b>
+    <b>{</b>
+        <font color='#009900'>/*!
+            INITIAL VALUE
+                Each object in the tuple is default initialized by its own constructor.
+                The tuple object itself does not modify them or add any additional
+                state.
+
+            WHAT THIS OBJECT REPRESENTS
+                This object represents a container of between 0 and 31 objects 
+                where the objects contained are specified in the template
+                arguments.
+
+            EXAMPLE
+                We can declare a tuple that contains an int, a float, and a char like so:
+                tuple&lt;int,float,char&gt; ex;
+
+                Then we can access each of these by their index number.  The index number
+                is just the order each type has in the template argument list.  So we have:
+                ex.get&lt;0&gt;() = 5;     // assign the int the value 5 
+                ex.get&lt;1&gt;() = 3.14;  // assign the float the value 3.14
+                ex.get&lt;2&gt;() = 'c';   // assign the char the value 'c'
+
+                Also, since we only have one of each type in this example tuple we can
+                unambiguously access each field in the tuple by their types.  So for
+                example, we can use this syntax to access our fields:
+                ex.get&lt;int&gt;()   // returns 5
+                ex.get&lt;float&gt;() // returns 3.14
+                ex.get&lt;char&gt;()  // returns 'c'
+
+                We can also get the indexes of each of these fields like so:
+                ex.index&lt;int&gt;()   // returns 0 
+                ex.index&lt;float&gt;() // returns 1 
+                ex.index&lt;char&gt;()  // returns 2 
+        !*/</font>
+
+    <font color='#0000FF'>public</font>:
+        <font color='#009900'>// the maximum number of items this tuple template can contain
+</font>        <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>long</u></font> max_fields <font color='#5555FF'>=</font> <font color='#979000'>32</font>;
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'><u>long</u></font> index<font color='#5555FF'>&gt;</font> 
+        <font color='#0000FF'>struct</font> <b><a name='get_type'></a>get_type</b> 
+        <b>{</b> 
+            <font color='#0000FF'>typedef</font> <font face='Lucida Console'>(</font>the type of the Tindex <font color='#0000FF'>template</font> argument<font face='Lucida Console'>)</font> type;
+        <b>}</b>;
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'><u>long</u></font> index<font color='#5555FF'>&gt;</font> 
+        <font color='#0000FF'>const</font> get_type<font color='#5555FF'>&lt;</font>index<font color='#5555FF'>&gt;</font>::type<font color='#5555FF'>&amp;</font> <b><a name='get'></a>get</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - 0 &lt;= index &lt;= 31
+            ensures
+                - returns a const reference to the index(th) object contained
+                  inside this tuple
+        !*/</font>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'><u>long</u></font> index<font color='#5555FF'>&gt;</font>       
+        get_type<font color='#5555FF'>&lt;</font>index<font color='#5555FF'>&gt;</font>::type<font color='#5555FF'>&amp;</font> <b><a name='get'></a>get</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - 0 &lt;= index &lt;= 31
+            ensures
+                - returns a non-const reference to the index(th) object contained
+                  inside this tuple
+        !*/</font>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> Q<font color='#5555FF'>&gt;</font>  
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> <b><a name='index'></a>index</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - Q is a type of object contained in this tuple and there is
+                  only one object of that type in the tuple
+            ensures
+                - returns the index of the object in this tuple with type Q
+        !*/</font>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> Q<font color='#5555FF'>&gt;</font>  
+        <font color='#0000FF'>const</font> Q<font color='#5555FF'>&amp;</font> <b><a name='get'></a>get</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - Q is a type of object contained in this tuple and there is
+                  only one object of that type in the tuple
+            ensures
+                - returns a const reference to the object in this tuple
+                  with type Q 
+        !*/</font>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> Q<font color='#5555FF'>&gt;</font> 
+        Q<font color='#5555FF'>&amp;</font> <b><a name='get'></a>get</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>; 
+        <font color='#009900'>/*!
+            requires
+                - Q is a type of object contained in this tuple and there is
+                  only one object of that type in the tuple
+            ensures
+                - returns a non-const reference to the object in this tuple
+                  with type Q 
+        !*/</font>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> F<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='for_each'></a>for_each</b> <font face='Lucida Console'>(</font>
+            F<font color='#5555FF'>&amp;</font> funct
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - funct is a templated function object 
+            ensures
+                - for each item X in this tuple that isn't a null_type object: 
+                    - calls funct(X);
+        !*/</font>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> F<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='for_each'></a>for_each</b> <font face='Lucida Console'>(</font>
+            F<font color='#5555FF'>&amp;</font> funct
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - funct is a templated function object 
+            ensures
+                - for each item X in this tuple that isn't a null_type object: 
+                    - calls funct(X);
+        !*/</font>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> F<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='for_each'></a>for_each</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> F<font color='#5555FF'>&amp;</font> funct
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - funct is a templated function object 
+            ensures
+                - for each item X in this tuple that isn't a null_type object: 
+                    - calls funct(X);
+        !*/</font>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> F<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='for_each'></a>for_each</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> F<font color='#5555FF'>&amp;</font> funct
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - funct is a templated function object 
+            ensures
+                - for each item X in this tuple that isn't a null_type object: 
+                    - calls funct(X);
+        !*/</font>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> F<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='for_index'></a>for_index</b> <font face='Lucida Console'>(</font>
+            F<font color='#5555FF'>&amp;</font> funct,
+            <font color='#0000FF'><u>long</u></font> idx
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - funct is a templated function object 
+                - 0 &lt;= idx &lt; max_fields &amp;&amp; get_type&lt;idx&gt;::type != null_type
+                  (i.e. idx must be the index of a non-null_type object in this tuple)
+            ensures
+                - calls funct(this-&gt;get&lt;idx&gt;());
+        !*/</font>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> F<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='for_index'></a>for_index</b> <font face='Lucida Console'>(</font>
+            F<font color='#5555FF'>&amp;</font> funct,
+            <font color='#0000FF'><u>long</u></font> idx
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - funct is a templated function object 
+                - 0 &lt;= idx &lt; max_fields &amp;&amp; get_type&lt;idx&gt;::type != null_type
+                  (i.e. idx must be the index of a non-null_type object in this tuple)
+            ensures
+                - calls funct(this-&gt;get&lt;idx&gt;());
+        !*/</font>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> F<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='for_index'></a>for_index</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> F<font color='#5555FF'>&amp;</font> funct,
+            <font color='#0000FF'><u>long</u></font> idx
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - funct is a templated function object 
+                - 0 &lt;= idx &lt; max_fields &amp;&amp; get_type&lt;idx&gt;::type != null_type
+                  (i.e. idx must be the index of a non-null_type object in this tuple)
+            ensures
+                - calls funct(this-&gt;get&lt;idx&gt;());
+        !*/</font>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> F<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='for_index'></a>for_index</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> F<font color='#5555FF'>&amp;</font> funct,
+            <font color='#0000FF'><u>long</u></font> idx
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - funct is a templated function object 
+                - 0 &lt;= idx &lt; max_fields &amp;&amp; get_type&lt;idx&gt;::type != null_type
+                  (i.e. idx must be the index of a non-null_type object in this tuple)
+            ensures
+                - calls funct(this-&gt;get&lt;idx&gt;());
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='swap'></a>swap</b> <font face='Lucida Console'>(</font>
+            tuple<font color='#5555FF'>&amp;</font> item
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - swaps *this and item
+        !*/</font> 
+
+        <font color='#009900'>// -------------------------------------------------
+</font>        <font color='#009900'>//        global functions for tuple objects
+</font>        <font color='#009900'>// -------------------------------------------------
+</font>
+        <font color='#0000FF'>friend</font> <font color='#0000FF'><u>void</u></font> <b><a name='swap'></a>swap</b> <font face='Lucida Console'>(</font>
+            tuple<font color='#5555FF'>&amp;</font> a, 
+            tuple<font color='#5555FF'>&amp;</font> b 
+        <font face='Lucida Console'>)</font> <b>{</b> a.<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>b<font face='Lucida Console'>)</font>; <b>}</b>   
+        <font color='#009900'>/*!
+            provides a global swap function
+        !*/</font>
+
+        <font color='#0000FF'>friend</font> <font color='#0000FF'><u>void</u></font> <b><a name='serialize'></a>serialize</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> tuple<font color='#5555FF'>&amp;</font> item, 
+            std::ostream<font color='#5555FF'>&amp;</font> out 
+        <font face='Lucida Console'>)</font>;   
+        <font color='#009900'>/*!
+            provides serialization support 
+        !*/</font>
+
+        <font color='#0000FF'>friend</font> <font color='#0000FF'><u>void</u></font> <b><a name='deserialize'></a>deserialize</b> <font face='Lucida Console'>(</font>
+            tuple<font color='#5555FF'>&amp;</font> item, 
+            std::istream<font color='#5555FF'>&amp;</font> in
+        <font face='Lucida Console'>)</font>;   
+        <font color='#009900'>/*!
+            provides deserialization support 
+        !*/</font>
+
+    <b>}</b>;
+    
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_TUPLe_ABSTRACT_H_
+</font>
+
+
+</pre></body></html>

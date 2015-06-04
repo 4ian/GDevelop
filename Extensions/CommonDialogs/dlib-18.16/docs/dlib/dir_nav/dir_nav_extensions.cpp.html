@@ -1,0 +1,90 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - dir_nav_extensions.cpp</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2009  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_DIR_NAV_EXTENSIONs_CPP_
+<font color='#0000FF'>#define</font> DLIB_DIR_NAV_EXTENSIONs_CPP_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='dir_nav_extensions.h.html'>dir_nav_extensions.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>namespace</font> implementation_details
+    <b>{</b>
+        <font color='#0000FF'><u>void</u></font> <b><a name='get_all_sub_dirs'></a>get_all_sub_dirs</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> directory<font color='#5555FF'>&amp;</font> top_of_tree,
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> max_depth,
+            std::vector<font color='#5555FF'>&lt;</font>directory<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> result,
+            std::vector<font color='#5555FF'>&lt;</font>directory<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> temp
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>max_depth <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                top_of_tree.<font color='#BB00BB'>get_dirs</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> start <font color='#5555FF'>=</font> result.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                result.<font color='#BB00BB'>insert</font><font face='Lucida Console'>(</font>result.<font color='#BB00BB'>end</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, temp.<font color='#BB00BB'>begin</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, temp.<font color='#BB00BB'>end</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> end <font color='#5555FF'>=</font> start <font color='#5555FF'>+</font> temp.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> start; i <font color='#5555FF'>&lt;</font> end; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#BB00BB'>get_all_sub_dirs</font><font face='Lucida Console'>(</font>result[i], max_depth<font color='#5555FF'>-</font><font color='#979000'>1</font>, result, temp<font face='Lucida Console'>)</font>;
+                <b>}</b>
+            <b>}</b>
+        <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>bool</u></font> <b><a name='file_exists'></a>file_exists</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> filename
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>try</font>
+        <b>{</b>
+            dlib::file <font color='#BB00BB'>temp</font><font face='Lucida Console'>(</font>filename<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+        <b>}</b>
+        <font color='#0000FF'>catch</font> <font face='Lucida Console'>(</font>file::file_not_found<font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>return</font> <font color='#979000'>false</font>;
+        <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    directory <b><a name='get_parent_directory'></a>get_parent_directory</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> directory<font color='#5555FF'>&amp;</font> dir
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>return</font> dir.<font color='#BB00BB'>get_parent</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    directory <b><a name='get_parent_directory'></a>get_parent_directory</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> file<font color='#5555FF'>&amp;</font> f
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>f.<font color='#BB00BB'>full_name</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+            <font color='#0000FF'>return</font> <font color='#BB00BB'>directory</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+        std::string::size_type pos <font color='#5555FF'>=</font> f.<font color='#BB00BB'>full_name</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>find_last_of</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>\\/</font>"<font face='Lucida Console'>)</font>;
+        
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>pos <font color='#5555FF'>=</font><font color='#5555FF'>=</font> std::string::npos<font face='Lucida Console'>)</font>
+            <font color='#0000FF'>return</font> <font color='#BB00BB'>directory</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>return</font> <font color='#BB00BB'>directory</font><font face='Lucida Console'>(</font>f.<font color='#BB00BB'>full_name</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>substr</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>,pos<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_DIR_NAV_EXTENSIONs_CPP_
+</font>
+
+
+
+</pre></body></html>

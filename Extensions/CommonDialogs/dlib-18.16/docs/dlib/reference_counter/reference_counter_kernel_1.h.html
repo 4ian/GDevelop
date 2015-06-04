@@ -1,0 +1,301 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - reference_counter_kernel_1.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2003  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_REFERENCE_COUNTER_KERNEl_1_
+<font color='#0000FF'>#define</font> DLIB_REFERENCE_COUNTER_KERNEl_1_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='reference_counter_kernel_abstract.h.html'>reference_counter_kernel_abstract.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../algs.h.html'>../algs.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T,
+        <font color='#0000FF'>typename</font> copy <font color='#5555FF'>=</font> copy_functor<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font>
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>class</font> <b><a name='reference_counter_kernel_1'></a>reference_counter_kernel_1</b> 
+    <b>{</b>
+
+        <font color='#009900'>/*!
+                INITIAL VALUE
+                    *data = item of type T with its initial value
+                    *count = 1
+
+                CONVENTION
+                    *data = pointer to item of type T
+                    *count = number of references to *data
+
+                    if clear() threw an exception then count = 0 and data is not a 
+                    valid pointer
+        !*/</font>
+
+        <font color='#0000FF'>public</font>:
+
+            <font color='#0000FF'>typedef</font> T type;
+
+
+            <b><a name='reference_counter_kernel_1'></a>reference_counter_kernel_1</b> <font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>inline</font> <b><a name='reference_counter_kernel_1'></a>reference_counter_kernel_1</b> <font face='Lucida Console'>(</font> 
+                <font color='#0000FF'>const</font> reference_counter_kernel_1<font color='#5555FF'>&amp;</font> item
+            <font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>virtual</font> ~<b><a name='reference_counter_kernel_1'></a>reference_counter_kernel_1</b> <font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font>; 
+
+            <font color='#0000FF'><u>void</u></font> <b><a name='clear'></a>clear</b> <font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font>;
+
+            T<font color='#5555FF'>&amp;</font> <b><a name='modify'></a>modify</b> <font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>inline</font> <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> <b><a name='access'></a>access</b> <font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+            <font color='#0000FF'>inline</font> reference_counter_kernel_1<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>
+                <font color='#0000FF'>const</font> reference_counter_kernel_1<font color='#5555FF'>&amp;</font> rhs
+            <font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='swap'></a>swap</b> <font face='Lucida Console'>(</font>
+                reference_counter_kernel_1<font color='#5555FF'>&amp;</font> item
+            <font face='Lucida Console'>)</font>;
+
+
+        <font color='#0000FF'>private</font>:
+
+            T<font color='#5555FF'>*</font> data;
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>*</font> count;
+            <font color='#0000FF'>mutable</font> copy copy_item;
+    <b>}</b>;
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T,
+        <font color='#0000FF'>typename</font> copy
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='swap'></a>swap</b> <font face='Lucida Console'>(</font>
+        reference_counter_kernel_1<font color='#5555FF'>&lt;</font>T,copy<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> a, 
+        reference_counter_kernel_1<font color='#5555FF'>&lt;</font>T,copy<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> b 
+    <font face='Lucida Console'>)</font> <b>{</b> a.<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>b<font face='Lucida Console'>)</font>; <b>}</b>   
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>    <font color='#009900'>// member function definitions
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T,
+        <font color='#0000FF'>typename</font> copy
+        <font color='#5555FF'>&gt;</font>
+    reference_counter_kernel_1<font color='#5555FF'>&lt;</font>T,copy<font color='#5555FF'>&gt;</font>::
+    <b><a name='reference_counter_kernel_1'></a>reference_counter_kernel_1</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font> 
+    <b>{</b>
+        data <font color='#5555FF'>=</font> <font color='#0000FF'>new</font> T;
+        <font color='#0000FF'>try</font> <b>{</b> count <font color='#5555FF'>=</font> <font color='#0000FF'>new</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font>; <b>}</b>
+        <font color='#0000FF'>catch</font> <font face='Lucida Console'>(</font>...<font face='Lucida Console'>)</font> <b>{</b> <font color='#0000FF'>delete</font> data; <font color='#0000FF'>throw</font>; <b>}</b>
+
+        <font color='#5555FF'>*</font>count <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+    <b>}</b>
+    
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T,
+        <font color='#0000FF'>typename</font> copy
+        <font color='#5555FF'>&gt;</font>
+    reference_counter_kernel_1<font color='#5555FF'>&lt;</font>T,copy<font color='#5555FF'>&gt;</font>::
+    <b><a name='reference_counter_kernel_1'></a>reference_counter_kernel_1</b> <font face='Lucida Console'>(</font> 
+        <font color='#0000FF'>const</font> reference_counter_kernel_1<font color='#5555FF'>&lt;</font>T,copy<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> item
+    <font face='Lucida Console'>)</font> : 
+        data<font face='Lucida Console'>(</font>item.data<font face='Lucida Console'>)</font>,
+        count<font face='Lucida Console'>(</font>item.count<font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font>count<font face='Lucida Console'>)</font>;
+    <b>}</b>
+    
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T,
+        <font color='#0000FF'>typename</font> copy
+        <font color='#5555FF'>&gt;</font>
+    reference_counter_kernel_1<font color='#5555FF'>&lt;</font>T,copy<font color='#5555FF'>&gt;</font>::
+    ~<b><a name='reference_counter_kernel_1'></a>reference_counter_kernel_1</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>count <font color='#5555FF'>&gt;</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#009900'>// if there are other references to this data
+</font>            <font color='#5555FF'>-</font><font color='#5555FF'>-</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font>count<font face='Lucida Console'>)</font>;
+        <b>}</b>
+        <font color='#0000FF'>else</font>
+        <b>{</b>
+            <font color='#009900'>// if there are no other references to this data
+</font>            <font color='#0000FF'>delete</font> count;
+            <font color='#0000FF'>delete</font> data;
+        <b>}</b>
+    <b>}</b>
+    
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T,
+        <font color='#0000FF'>typename</font> copy
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> reference_counter_kernel_1<font color='#5555FF'>&lt;</font>T,copy<font color='#5555FF'>&gt;</font>::
+    <b><a name='clear'></a>clear</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#009900'>// if an exception was thrown last time clear() was called then do this
+</font>        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>count <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            data <font color='#5555FF'>=</font> <font color='#0000FF'>new</font> T;
+            <font color='#0000FF'>try</font> <b>{</b> count <font color='#5555FF'>=</font> <font color='#0000FF'>new</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font>; <b>}</b>
+            <font color='#0000FF'>catch</font> <font face='Lucida Console'>(</font>...<font face='Lucida Console'>)</font> <b>{</b> <font color='#0000FF'>delete</font> data; <font color='#0000FF'>throw</font>; <b>}</b>
+
+            <font color='#5555FF'>*</font>count <font color='#5555FF'>=</font> <font color='#979000'>1</font>;            
+        <b>}</b>
+        <font color='#009900'>// if there are other references to the data then do this
+</font>        <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>count <font color='#5555FF'>&gt;</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#5555FF'>-</font><font color='#5555FF'>-</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font>count<font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>try</font> <b>{</b> data <font color='#5555FF'>=</font> <font color='#0000FF'>new</font> T; <b>}</b>               
+            <font color='#0000FF'>catch</font> <font face='Lucida Console'>(</font>...<font face='Lucida Console'>)</font> <b>{</b> count <font color='#5555FF'>=</font> <font color='#979000'>0</font>; <font color='#0000FF'>throw</font>; <b>}</b>
+
+            <font color='#0000FF'>try</font> <b>{</b> count <font color='#5555FF'>=</font> <font color='#0000FF'>new</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font>; <b>}</b>  
+            <font color='#0000FF'>catch</font> <font face='Lucida Console'>(</font>...<font face='Lucida Console'>)</font> <b>{</b> <font color='#0000FF'>delete</font> data; count <font color='#5555FF'>=</font> <font color='#979000'>0</font>; <font color='#0000FF'>throw</font>; <b>}</b>
+
+            <font color='#5555FF'>*</font>count <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+
+        <b>}</b>
+        <font color='#0000FF'>else</font>
+        <b>{</b>
+            <font color='#009900'>// if there are no other references to this data
+</font>            <font color='#5555FF'>*</font>count <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+            <font color='#0000FF'>delete</font> data;
+            <font color='#0000FF'>try</font> <b>{</b> data <font color='#5555FF'>=</font> <font color='#0000FF'>new</font> T; <b>}</b> <font color='#0000FF'>catch</font> <font face='Lucida Console'>(</font>...<font face='Lucida Console'>)</font> <b>{</b> <font color='#0000FF'>delete</font> count; count <font color='#5555FF'>=</font> <font color='#979000'>0</font>; <font color='#0000FF'>throw</font>; <b>}</b>
+        <b>}</b>
+    <b>}</b>
+    
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T,
+        <font color='#0000FF'>typename</font> copy
+        <font color='#5555FF'>&gt;</font>
+    T<font color='#5555FF'>&amp;</font> reference_counter_kernel_1<font color='#5555FF'>&lt;</font>T,copy<font color='#5555FF'>&gt;</font>::
+    <b><a name='modify'></a>modify</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#009900'>// if this is not the only reference then make a new copy
+</font>        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> <font color='#5555FF'>*</font>count <font color='#5555FF'>&gt;</font> <font color='#979000'>1</font> <font face='Lucida Console'>)</font>
+        <b>{</b>
+            T<font color='#5555FF'>&amp;</font>              old_data    <font color='#5555FF'>=</font> <font color='#5555FF'>*</font>data;
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&amp;</font>  old_count   <font color='#5555FF'>=</font> <font color='#5555FF'>*</font>count;
+
+
+            <font color='#009900'>// get memory for the new copy
+</font>            <font color='#0000FF'>try</font> <b>{</b> data <font color='#5555FF'>=</font> <font color='#0000FF'>new</font> T; <b>}</b>               
+            <font color='#0000FF'>catch</font> <font face='Lucida Console'>(</font>...<font face='Lucida Console'>)</font> <b>{</b> data <font color='#5555FF'>=</font> <font color='#5555FF'>&amp;</font>old_data; <font color='#0000FF'>throw</font>; <b>}</b>
+
+            <font color='#0000FF'>try</font> <b>{</b> count <font color='#5555FF'>=</font> <font color='#0000FF'>new</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font>; <b>}</b>  
+            <font color='#0000FF'>catch</font> <font face='Lucida Console'>(</font>...<font face='Lucida Console'>)</font> <b>{</b><font color='#0000FF'>delete</font> data; data <font color='#5555FF'>=</font> <font color='#5555FF'>&amp;</font>old_data; count <font color='#5555FF'>=</font> <font color='#5555FF'>&amp;</font>old_count; <font color='#0000FF'>throw</font>;<b>}</b>
+
+            <font color='#009900'>// decrement the number of references to old_data
+</font>            <font color='#5555FF'>-</font><font color='#5555FF'>-</font><font face='Lucida Console'>(</font>old_count<font face='Lucida Console'>)</font>;
+
+            <font color='#5555FF'>*</font>count <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+
+            <font color='#009900'>// make a copy of the old data
+</font>            <font color='#0000FF'>try</font> <b>{</b> <font color='#BB00BB'>copy_item</font><font face='Lucida Console'>(</font>old_data,<font color='#5555FF'>*</font>data<font face='Lucida Console'>)</font>; <b>}</b>  
+            <font color='#0000FF'>catch</font> <font face='Lucida Console'>(</font>...<font face='Lucida Console'>)</font> 
+            <b>{</b> <font color='#0000FF'>delete</font> data; <font color='#0000FF'>delete</font> count; data <font color='#5555FF'>=</font> <font color='#5555FF'>&amp;</font>old_data; count <font color='#5555FF'>=</font> <font color='#5555FF'>&amp;</font>old_count; <b>}</b>
+
+        <b>}</b>
+
+        <font color='#0000FF'>return</font> <font color='#5555FF'>*</font>data;
+
+    <b>}</b>
+    
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T,
+        <font color='#0000FF'>typename</font> copy
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> reference_counter_kernel_1<font color='#5555FF'>&lt;</font>T,copy<font color='#5555FF'>&gt;</font>::
+    <b><a name='access'></a>access</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        <font color='#0000FF'>return</font> <font color='#5555FF'>*</font>data;
+    <b>}</b>
+    
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T,
+        <font color='#0000FF'>typename</font> copy
+        <font color='#5555FF'>&gt;</font>
+    reference_counter_kernel_1<font color='#5555FF'>&lt;</font>T,copy<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> reference_counter_kernel_1<font color='#5555FF'>&lt;</font>T,copy<font color='#5555FF'>&gt;</font>::
+    <b><a name='operator'></a>operator</b><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> reference_counter_kernel_1<font color='#5555FF'>&lt;</font>T,copy<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> rhs
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#0000FF'>this</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#5555FF'>&amp;</font>rhs<font face='Lucida Console'>)</font>
+            <font color='#0000FF'>return</font> <font color='#5555FF'>*</font><font color='#0000FF'>this</font>;
+
+        <font color='#009900'>// delete the current data if this is the last reference to it
+</font>        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>count <font color='#5555FF'>&gt;</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#009900'>// if there are other references to this data
+</font>            <font color='#5555FF'>-</font><font color='#5555FF'>-</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font>count<font face='Lucida Console'>)</font>;
+        <b>}</b>
+        <font color='#0000FF'>else</font>
+        <b>{</b>
+            <font color='#009900'>// if there are no other references to this data
+</font>            <font color='#0000FF'>delete</font> count;
+            <font color='#0000FF'>delete</font> data;
+        <b>}</b>        
+
+        <font color='#009900'>// copy the pointers
+</font>        count <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>rhs.count<font face='Lucida Console'>)</font>;
+        data <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>rhs.data<font face='Lucida Console'>)</font>;
+        <font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font>count<font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>return</font> <font color='#5555FF'>*</font><font color='#0000FF'>this</font>;
+
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T,
+        <font color='#0000FF'>typename</font> copy
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> reference_counter_kernel_1<font color='#5555FF'>&lt;</font>T,copy<font color='#5555FF'>&gt;</font>::
+    <b><a name='swap'></a>swap</b> <font face='Lucida Console'>(</font>
+        reference_counter_kernel_1<font color='#5555FF'>&lt;</font>T,copy<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> item
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        T<font color='#5555FF'>*</font> data_temp                <font color='#5555FF'>=</font> data;
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>*</font> count_temp   <font color='#5555FF'>=</font> count;
+
+        data    <font color='#5555FF'>=</font> item.data;
+        count   <font color='#5555FF'>=</font> item.count;
+
+        item.data   <font color='#5555FF'>=</font> data_temp;
+        item.count  <font color='#5555FF'>=</font> count_temp;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_REFERENCE_COUNTER_KERNEl_1_
+</font>
+
+</pre></body></html>

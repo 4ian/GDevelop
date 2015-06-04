@@ -1,0 +1,113 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - structural_svm_sequence_labeling_problem_abstract.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2011  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#undef</font> DLIB_STRUCTURAL_SVM_SEQUENCE_LaBELING_PROBLEM_ABSTRACT_Hh_
+<font color='#0000FF'>#ifdef</font> DLIB_STRUCTURAL_SVM_SEQUENCE_LaBELING_PROBLEM_ABSTRACT_Hh_
+
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../matrix.h.html'>../matrix.h</a>"
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>vector<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='structural_svm_problem_threaded_abstract.h.html'>structural_svm_problem_threaded_abstract.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='sequence_labeler_abstract.h.html'>sequence_labeler_abstract.h</a>"
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> feature_extractor
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>class</font> <b><a name='structural_svm_sequence_labeling_problem'></a>structural_svm_sequence_labeling_problem</b> : noncopyable,
+                                                     <font color='#0000FF'>public</font> structural_svm_problem_threaded<font color='#5555FF'>&lt;</font>matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>0</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font>, 
+                                                            std::vector<font color='#5555FF'>&lt;</font>std::pair<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font>,<font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font>
+    <b>{</b>
+        <font color='#009900'>/*!
+            REQUIREMENTS ON feature_extractor
+                It must be an object that implements an interface compatible with 
+                the example_feature_extractor defined in dlib/svm/sequence_labeler_abstract.h.
+
+            WHAT THIS OBJECT REPRESENTS
+                This object is a tool for learning the weight vector needed to use
+                a sequence_labeler object.  
+
+                It learns the parameter vector by formulating the problem as a structural 
+                SVM problem.  The general approach is discussed in the paper:
+                    Hidden Markov Support Vector Machines by 
+                    Y. Altun, I. Tsochantaridis, T. Hofmann
+                While the particular optimization strategy used is the method from: 
+                    T. Joachims, T. Finley, Chun-Nam Yu, Cutting-Plane Training of 
+                    Structural SVMs, Machine Learning, 77(1):27-59, 2009.
+        !*/</font>
+
+    <font color='#0000FF'>public</font>:
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> feature_extractor::sequence_type sequence_type;
+
+        <b><a name='structural_svm_sequence_labeling_problem'></a>structural_svm_sequence_labeling_problem</b><font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>sequence_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> samples,
+            <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> labels,
+            <font color='#0000FF'>const</font> feature_extractor<font color='#5555FF'>&amp;</font> fe,
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> num_threads <font color='#5555FF'>=</font> <font color='#979000'>2</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - is_sequence_labeling_problem(samples, labels) == true
+                - contains_invalid_labeling(fe, samples, labels) == false
+                - for all valid i and j: labels[i][j] &lt; fe.num_labels()
+            ensures
+                - This object attempts to learn a mapping from the given samples to the 
+                  given labels.  In particular, it attempts to learn to predict labels[i] 
+                  based on samples[i].  Or in other words, this object can be used to learn 
+                  a parameter vector, w, such that a sequence_labeler declared as:
+                    sequence_labeler&lt;feature_extractor&gt; labeler(w,fe)
+                  results in a labeler object which attempts to compute the following mapping:
+                    labels[i] == labeler(samples[i])
+                - This object will use num_threads threads during the optimization 
+                  procedure.  You should set this parameter equal to the number of 
+                  available processing cores on your machine.
+                - #num_labels() == fe.num_labels()
+                - for all valid i: #get_loss(i) == 1
+        !*/</font>
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='num_labels'></a>num_labels</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the number of possible labels in this learning problem
+        !*/</font>
+
+        <font color='#0000FF'><u>double</u></font> <b><a name='get_loss'></a>get_loss</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> label
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - label &lt; num_labels()
+            ensures
+                - returns the loss incurred when a sequence element with the given
+                  label is misclassified.  This value controls how much we care about
+                  correctly classifying this type of label.  Larger loss values indicate
+                  that we care more strongly than smaller values.
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_loss'></a>set_loss</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> label,
+            <font color='#0000FF'><u>double</u></font> value
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - label &lt; num_labels()
+                - value &gt;= 0
+            ensures
+                - #get_loss(label) == value
+        !*/</font>
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_STRUCTURAL_SVM_SEQUENCE_LaBELING_PROBLEM_ABSTRACT_Hh_
+</font>
+
+
+</pre></body></html>

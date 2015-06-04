@@ -1,0 +1,396 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - sockets_kernel_2.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2003  Davis E. King (davis@dlib.net), Miguel Grinberg
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_SOCKETS_KERNEl_2_
+<font color='#0000FF'>#define</font> DLIB_SOCKETS_KERNEl_2_
+
+<font color='#0000FF'>#ifdef</font> DLIB_ISO_CPP_ONLY
+<font color='#0000FF'>#error</font> "<font color='#CC0000'>DLIB_ISO_CPP_ONLY is defined so you can't use this OS dependent code.  Turn DLIB_ISO_CPP_ONLY off if you want to use it.</font>"
+<font color='#0000FF'>#endif</font>
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../platform.h.html'>../platform.h</a>"
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='sockets_kernel_abstract.h.html'>sockets_kernel_abstract.h</a>"
+
+<font color='#0000FF'>#define</font> _BSD_SOCKLEN_T_
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>sys<font color='#5555FF'>/</font>types.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>sys<font color='#5555FF'>/</font>socket.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>errno.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>ctime<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#ifndef</font> HPUX
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>sys<font color='#5555FF'>/</font>select.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#endif</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>arpa<font color='#5555FF'>/</font>inet.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>signal.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>inttypes.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>netdb.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>unistd.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>sys<font color='#5555FF'>/</font>param.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>string<font color='#5555FF'>&gt;</font>
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>netinet<font color='#5555FF'>/</font>in.h<font color='#5555FF'>&gt;</font>
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../threads.h.html'>../threads.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../algs.h.html'>../algs.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../smart_pointers.h.html'>../smart_pointers.h</a>"
+
+
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#009900'>// forward declarations
+</font>    <font color='#0000FF'>class</font> socket_factory;
+    <font color='#0000FF'>class</font> listener;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#009900'>// lookup functions
+</font>
+    <font color='#0000FF'><u>int</u></font>
+    <b><a name='get_local_hostname'></a>get_local_hostname</b> <font face='Lucida Console'>(</font>
+        std::string<font color='#5555FF'>&amp;</font> hostname
+    <font face='Lucida Console'>)</font>;
+
+<font color='#009900'>// -----------------
+</font>
+    <font color='#0000FF'><u>int</u></font> 
+    <b><a name='hostname_to_ip'></a>hostname_to_ip</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> hostname,
+        std::string<font color='#5555FF'>&amp;</font> ip,
+        <font color='#0000FF'><u>int</u></font> n <font color='#5555FF'>=</font> <font color='#979000'>0</font>
+    <font face='Lucida Console'>)</font>;
+
+<font color='#009900'>// -----------------
+</font>
+    <font color='#0000FF'><u>int</u></font>
+    <b><a name='ip_to_hostname'></a>ip_to_hostname</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> ip,
+        std::string<font color='#5555FF'>&amp;</font> hostname
+    <font face='Lucida Console'>)</font>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>    <font color='#009900'>// connection object
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>class</font> <b><a name='connection'></a>connection</b>
+    <b>{</b>
+        <font color='#009900'>/*!
+            INITIAL_VALUE
+                sd                      == false
+                sdo                     == false
+                sdr                     == 0
+
+
+            CONVENTION
+                connection_socket       == the socket handle for this connection.  
+                connection_foreign_port == the port that foreign host is using for 
+                                           this connection
+                connection_foreign_ip   == a string containing the IP address of the 
+                                           foreign host
+                connection_local_port   == the port that the local host is using for 
+                                           this connection
+                connection_local_ip     == a string containing the IP address of the 
+                                           local interface being used by this connection
+
+                sd                      == if shutdown() has been called then true
+                                           else false
+                sdo                     == if shutdown_outgoing() has been called then true
+                                           else false
+                sdr                     == the return value of shutdown() if it has been
+                                           called.  if it hasn't been called then 0
+
+
+        !*/</font>
+
+        <font color='#0000FF'>friend</font> <font color='#0000FF'>class</font> listener;                <font color='#009900'>// make listener a friend of connection
+</font>        <font color='#009900'>// make create_connection a friend of connection
+</font>        <font color='#0000FF'>friend</font> <font color='#0000FF'><u>int</u></font> <b><a name='create_connection'></a>create_connection</b> <font face='Lucida Console'>(</font> 
+            connection<font color='#5555FF'>*</font><font color='#5555FF'>&amp;</font> new_connection,
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>short</u></font> foreign_port, 
+            <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> foreign_ip, 
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>short</u></font> local_port,
+            <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> local_ip
+        <font face='Lucida Console'>)</font>;
+
+    <font color='#0000FF'>public</font>:
+
+        ~<b><a name='connection'></a>connection</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'><u>void</u></font><font color='#5555FF'>*</font> user_data;
+
+        <font color='#0000FF'><u>long</u></font> <b><a name='write'></a>write</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>*</font> buf, 
+            <font color='#0000FF'><u>long</u></font> num
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'><u>long</u></font> <b><a name='read'></a>read</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>char</u></font><font color='#5555FF'>*</font> buf, 
+            <font color='#0000FF'><u>long</u></font> num
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'><u>long</u></font> <b><a name='read'></a>read</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>char</u></font><font color='#5555FF'>*</font> buf, 
+            <font color='#0000FF'><u>long</u></font> num,
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> timeout
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'><u>int</u></font> <b><a name='get_local_port'></a>get_local_port</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> connection_local_port; <b>}</b>
+
+        <font color='#0000FF'><u>int</u></font> <b><a name='get_foreign_port'></a>get_foreign_port</b> <font face='Lucida Console'>(</font> 
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> connection_foreign_port; <b>}</b>
+
+        <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> <b><a name='get_local_ip'></a>get_local_ip</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> connection_local_ip; <b>}</b>
+
+        <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> <b><a name='get_foreign_ip'></a>get_foreign_ip</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> connection_foreign_ip; <b>}</b>
+
+        <font color='#0000FF'><u>int</u></font> <b><a name='shutdown_outgoing'></a>shutdown_outgoing</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> 
+        <b>{</b>
+            sd_mutex.<font color='#BB00BB'>lock</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>sdo <font color='#5555FF'>|</font><font color='#5555FF'>|</font> sd<font face='Lucida Console'>)</font>
+            <b>{</b>
+                sd_mutex.<font color='#BB00BB'>unlock</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>return</font> sdr;
+            <b>}</b>
+            sdo <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+            sdr <font color='#5555FF'>=</font> ::<font color='#BB00BB'>shutdown</font><font face='Lucida Console'>(</font>connection_socket,SHUT_WR<font face='Lucida Console'>)</font>; 
+            <font color='#0000FF'><u>int</u></font> temp <font color='#5555FF'>=</font> sdr;
+            sd_mutex.<font color='#BB00BB'>unlock</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>return</font> temp;  
+        <b>}</b>
+
+        <font color='#0000FF'><u>int</u></font> <b><a name='shutdown'></a>shutdown</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> 
+        <b>{</b>
+            sd_mutex.<font color='#BB00BB'>lock</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>sd<font face='Lucida Console'>)</font>
+            <b>{</b>
+                sd_mutex.<font color='#BB00BB'>unlock</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>return</font> sdr;
+            <b>}</b>
+            sd <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+            sdr <font color='#5555FF'>=</font> ::<font color='#BB00BB'>shutdown</font><font face='Lucida Console'>(</font>connection_socket,SHUT_RDWR<font face='Lucida Console'>)</font>; 
+            <font color='#0000FF'><u>int</u></font> temp <font color='#5555FF'>=</font> sdr;
+            sd_mutex.<font color='#BB00BB'>unlock</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;            
+            <font color='#0000FF'>return</font> temp;
+        <b>}</b>
+
+        <font color='#0000FF'><u>int</u></font> <b><a name='disable_nagle'></a>disable_nagle</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'><u>int</u></font> socket_descriptor_type;
+
+        socket_descriptor_type <b><a name='get_socket_descriptor'></a>get_socket_descriptor</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> connection_socket; <b>}</b>
+
+    <font color='#0000FF'>private</font>:
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='readable'></a>readable</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> timeout 
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*! 
+            requires 
+                - timeout &lt; 2000000  
+            ensures 
+                - returns true if a read call on this connection will not block. 
+                - returns false if a read call on this connection will block or if 
+                  there was an error. 
+        !*/</font> 
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='sd_called'></a>sd_called</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font><font color='#0000FF'>const</font>
+        <font color='#009900'>/*!
+            ensures
+                - returns true if shutdown() has been called else
+                - returns false
+        !*/</font>
+        <b>{</b>
+            sd_mutex.<font color='#BB00BB'>lock</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'><u>bool</u></font> temp <font color='#5555FF'>=</font> sd;
+            sd_mutex.<font color='#BB00BB'>unlock</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>return</font> temp;
+        <b>}</b>
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='sdo_called'></a>sdo_called</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font><font color='#0000FF'>const</font>
+        <font color='#009900'>/*!
+            ensures
+                - returns true if shutdown_outgoing() or shutdown() has been called
+                  else returns false
+        !*/</font>
+        <b>{</b>
+            sd_mutex.<font color='#BB00BB'>lock</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'><u>bool</u></font> temp <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>sdo <font color='#5555FF'>|</font><font color='#5555FF'>|</font> sd<font face='Lucida Console'>)</font>
+                temp <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+            sd_mutex.<font color='#BB00BB'>unlock</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>return</font> temp;
+        <b>}</b>
+
+
+        <font color='#009900'>// data members
+</font>        <font color='#0000FF'><u>int</u></font> connection_socket;
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>int</u></font> connection_foreign_port;
+        <font color='#0000FF'>const</font> std::string connection_foreign_ip; 
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>int</u></font> connection_local_port;
+        <font color='#0000FF'>const</font> std::string connection_local_ip;
+
+        <font color='#0000FF'><u>bool</u></font> sd;  <font color='#009900'>// called shutdown
+</font>        <font color='#0000FF'><u>bool</u></font> sdo; <font color='#009900'>// called shutdown_outgoing
+</font>        <font color='#0000FF'><u>int</u></font> sdr; <font color='#009900'>// return value for shutdown 
+</font>        mutex sd_mutex; <font color='#009900'>// a lock for the three above vars
+</font>
+        <b><a name='connection'></a>connection</b><font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>int</u></font> sock,
+            <font color='#0000FF'><u>int</u></font> foreign_port, 
+            <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> foreign_ip, 
+            <font color='#0000FF'><u>int</u></font> local_port,
+            <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> local_ip
+        <font face='Lucida Console'>)</font>; 
+        <font color='#009900'>/*!
+            requires
+                - sock is a socket handle 
+                - sock is the handle for the connection between foreign_ip:foreign_port 
+                  and local_ip:local_port
+            ensures
+                - *this is initialized correctly with the above parameters
+        !*/</font>
+
+
+        <font color='#009900'>// restricted functions
+</font>        <b><a name='connection'></a>connection</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <b><a name='connection'></a>connection</b><font face='Lucida Console'>(</font>connection<font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font>;        <font color='#009900'>// copy constructor
+</font>        connection<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>=</font><font face='Lucida Console'>(</font>connection<font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font>;    <font color='#009900'>// assignement opertor
+</font>    <b>}</b>; 
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>    <font color='#009900'>// listener object
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>class</font> <b><a name='listener'></a>listener</b>
+    <b>{</b>
+        <font color='#009900'>/*!
+            CONVENTION
+                if (inaddr_any == false)
+                {
+                    listening_ip == a string containing the address the listener is 
+                                    listening on
+                }
+                else
+                {
+                    the listener is listening on all interfaces
+                }
+                
+                listening_port == the port the listener is listening on
+                listening_socket == the listening socket handle for this object
+        !*/</font>
+
+        <font color='#009900'>// make the create_listener a friend of listener
+</font>        <font color='#0000FF'>friend</font> <font color='#0000FF'><u>int</u></font> <b><a name='create_listener'></a>create_listener</b> <font face='Lucida Console'>(</font>
+            listener<font color='#5555FF'>*</font><font color='#5555FF'>&amp;</font> new_listener,
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>short</u></font> port,
+            <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> ip
+        <font face='Lucida Console'>)</font>;
+
+    <font color='#0000FF'>public</font>:
+
+        ~<b><a name='listener'></a>listener</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'><u>int</u></font> <b><a name='accept'></a>accept</b> <font face='Lucida Console'>(</font>
+            connection<font color='#5555FF'>*</font><font color='#5555FF'>&amp;</font> new_connection,
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> timeout <font color='#5555FF'>=</font> <font color='#979000'>0</font>
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'><u>int</u></font> <b><a name='accept'></a>accept</b> <font face='Lucida Console'>(</font>
+            scoped_ptr<font color='#5555FF'>&lt;</font>connection<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> new_connection,
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> timeout <font color='#5555FF'>=</font> <font color='#979000'>0</font>
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'><u>int</u></font> <b><a name='get_listening_port'></a>get_listening_port</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> listening_port; <b>}</b>
+
+        <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> <b><a name='get_listening_ip'></a>get_listening_ip</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> listening_ip; <b>}</b>
+
+    <font color='#0000FF'>private</font>:
+
+        <font color='#009900'>// data members
+</font>        <font color='#0000FF'><u>int</u></font> listening_socket;
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>int</u></font> listening_port;
+        <font color='#0000FF'>const</font> std::string listening_ip;
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>bool</u></font> inaddr_any;
+
+        <b><a name='listener'></a>listener</b><font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>int</u></font> sock,
+            <font color='#0000FF'><u>int</u></font> port,
+            <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> ip
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - sock is a socket handle 
+                - sock is listening on the port and ip(may be "") indicated in the above 
+                  parameters
+            ensures
+                - *this is initialized correctly with the above parameters
+        !*/</font>
+
+
+        <font color='#009900'>// restricted functions
+</font>        <b><a name='listener'></a>listener</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <b><a name='listener'></a>listener</b><font face='Lucida Console'>(</font>listener<font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font>;        <font color='#009900'>// copy constructor
+</font>        listener<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>=</font><font face='Lucida Console'>(</font>listener<font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font>;    <font color='#009900'>// assignement opertor
+</font>    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>int</u></font> <b><a name='create_listener'></a>create_listener</b> <font face='Lucida Console'>(</font>
+        listener<font color='#5555FF'>*</font><font color='#5555FF'>&amp;</font> new_listener,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>short</u></font> port,
+        <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> ip <font color='#5555FF'>=</font> "<font color='#CC0000'></font>"
+    <font face='Lucida Console'>)</font>;
+
+    <font color='#0000FF'><u>int</u></font> <b><a name='create_connection'></a>create_connection</b> <font face='Lucida Console'>(</font> 
+        connection<font color='#5555FF'>*</font><font color='#5555FF'>&amp;</font> new_connection,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>short</u></font> foreign_port, 
+        <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> foreign_ip, 
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>short</u></font> local_port <font color='#5555FF'>=</font> <font color='#979000'>0</font>,
+        <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> local_ip <font color='#5555FF'>=</font> "<font color='#CC0000'></font>"
+    <font face='Lucida Console'>)</font>;
+
+    <font color='#0000FF'><u>int</u></font> <b><a name='create_listener'></a>create_listener</b> <font face='Lucida Console'>(</font>
+        scoped_ptr<font color='#5555FF'>&lt;</font>listener<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> new_listener,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>short</u></font> port,
+        <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> ip <font color='#5555FF'>=</font> "<font color='#CC0000'></font>"
+    <font face='Lucida Console'>)</font>;
+
+    <font color='#0000FF'><u>int</u></font> <b><a name='create_connection'></a>create_connection</b> <font face='Lucida Console'>(</font> 
+        scoped_ptr<font color='#5555FF'>&lt;</font>connection<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> new_connection,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>short</u></font> foreign_port, 
+        <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> foreign_ip, 
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>short</u></font> local_port <font color='#5555FF'>=</font> <font color='#979000'>0</font>,
+        <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> local_ip <font color='#5555FF'>=</font> "<font color='#CC0000'></font>"
+    <font face='Lucida Console'>)</font>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#ifdef</font> NO_MAKEFILE
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='sockets_kernel_2.cpp.html'>sockets_kernel_2.cpp</a>"
+<font color='#0000FF'>#endif</font>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_SOCKETS_KERNEl_2_
+</font>
+
+</pre></body></html>

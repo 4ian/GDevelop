@@ -1,0 +1,156 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - multithreaded_object_extension.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2007  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_MULTITHREADED_OBJECT_EXTENSIOn_
+<font color='#0000FF'>#define</font> DLIB_MULTITHREADED_OBJECT_EXTENSIOn_ 
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='multithreaded_object_extension_abstract.h.html'>multithreaded_object_extension_abstract.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='threads_kernel.h.html'>threads_kernel.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='auto_mutex_extension.h.html'>auto_mutex_extension.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='rmutex_extension.h.html'>rmutex_extension.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='rsignaler_extension.h.html'>rsignaler_extension.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../algs.h.html'>../algs.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../assert.h.html'>../assert.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../map.h.html'>../map.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../member_function_pointer.h.html'>../member_function_pointer.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>class</font> <b><a name='multithreaded_object'></a>multithreaded_object</b>
+    <b>{</b>
+        <font color='#009900'>/*!
+            INITIAL VALUE
+                - is_running_ == false
+                - should_stop_ == false
+                - thread_ids.size() == 0
+                - dead_threads.size() == 0
+                - threads_started == 0
+
+            CONVENTION
+                - number_of_threads_registered() == thread_ids.size() + dead_threads.size()
+                - number_of_threads_alive() == threads_started 
+
+                - is_running() == is_running_
+                - should_stop() == should_stop_
+
+                - thread_ids == a map of current thread ids to the member function
+                  pointers that that thread runs.  
+                - threads_started == the number of threads that have been spawned to run 
+                  thread_helper but haven't ended yet.
+                  
+                - dead_threads == a queue that contains all the member function pointers
+                  for threads that are currently registered but not running
+
+                - m_ == the mutex used to protect all our variables
+                - s == the signaler for m_
+        !*/</font>
+
+    <font color='#0000FF'>public</font>:
+
+        <b><a name='multithreaded_object'></a>multithreaded_object</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>virtual</font> ~<b><a name='multithreaded_object'></a>multithreaded_object</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='clear'></a>clear</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='is_running'></a>is_running</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='number_of_threads_alive'></a>number_of_threads_alive</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='number_of_threads_registered'></a>number_of_threads_registered</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='wait'></a>wait</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='start'></a>start</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='pause'></a>pause</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='stop'></a>stop</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+
+    <font color='#0000FF'>protected</font>:
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='should_stop'></a>should_stop</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'>typename</font> T
+            <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='register_thread'></a>register_thread</b> <font face='Lucida Console'>(</font>
+            T<font color='#5555FF'>&amp;</font> object,
+            <font color='#0000FF'><u>void</u></font> <font face='Lucida Console'>(</font>T::<font color='#5555FF'>*</font>thread<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            auto_mutex <font color='#BB00BB'>M</font><font face='Lucida Console'>(</font>m_<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>try</font>
+            <b>{</b>
+                mfp mf;
+                mf.<font color='#BB00BB'>set</font><font face='Lucida Console'>(</font>object,thread<font face='Lucida Console'>)</font>;
+                dead_threads.<font color='#BB00BB'>enqueue</font><font face='Lucida Console'>(</font>mf<font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>is_running_<font face='Lucida Console'>)</font>
+                    <font color='#BB00BB'>start</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+            <font color='#0000FF'>catch</font> <font face='Lucida Console'>(</font>...<font face='Lucida Console'>)</font>
+            <b>{</b>
+                is_running_ <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+                should_stop_ <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+                s.<font color='#BB00BB'>broadcast</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>throw</font>;
+            <b>}</b>
+        <b>}</b>
+
+    <font color='#0000FF'>private</font>:
+
+        <font color='#0000FF'>class</font> <b><a name='raii_thread_helper'></a>raii_thread_helper</b>
+        <b>{</b>
+        <font color='#0000FF'>public</font>:
+            <b><a name='raii_thread_helper'></a>raii_thread_helper</b><font face='Lucida Console'>(</font>multithreaded_object<font color='#5555FF'>&amp;</font> self_, thread_id_type id_<font face='Lucida Console'>)</font>;
+            ~<b><a name='raii_thread_helper'></a>raii_thread_helper</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+            multithreaded_object<font color='#5555FF'>&amp;</font> self;
+            thread_id_type id;
+        <b>}</b>;
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='thread_helper'></a>thread_helper</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>typedef</font> member_function_pointer<font color='#5555FF'>&lt;</font><font color='#5555FF'>&gt;</font> mfp;
+
+        rmutex m_;
+        rsignaler s;
+        map<font color='#5555FF'>&lt;</font>thread_id_type,mfp,memory_manager<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font>::kernel_2a<font color='#5555FF'>&gt;</font>::kernel_1a thread_ids;
+        queue<font color='#5555FF'>&lt;</font>mfp,memory_manager<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font>::kernel_2a<font color='#5555FF'>&gt;</font>::kernel_1a dead_threads;
+
+        <font color='#0000FF'><u>bool</u></font> is_running_;
+        <font color='#0000FF'><u>bool</u></font> should_stop_;
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> threads_started;
+
+        <font color='#009900'>// restricted functions
+</font>        <b><a name='multithreaded_object'></a>multithreaded_object</b><font face='Lucida Console'>(</font>multithreaded_object<font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font>;        <font color='#009900'>// copy constructor
+</font>        multithreaded_object<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>=</font><font face='Lucida Console'>(</font>multithreaded_object<font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font>;    <font color='#009900'>// assignment operator
+</font>    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#ifdef</font> NO_MAKEFILE
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='multithreaded_object_extension.cpp.html'>multithreaded_object_extension.cpp</a>"
+<font color='#0000FF'>#endif</font>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_MULTITHREADED_OBJECT_EXTENSIOn_
+</font>
+
+</pre></body></html>

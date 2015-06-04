@@ -1,0 +1,237 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - any_trainer_abstract.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2010  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#undef</font> DLIB_AnY_TRAINER_ABSTRACT_H_
+<font color='#0000FF'>#ifdef</font> DLIB_AnY_TRAINER_ABSTRACT_H_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='any_abstract.h.html'>any_abstract.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../algs.h.html'>../algs.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='any_decision_function_abstract.h.html'>any_decision_function_abstract.h</a>"
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>vector<font color='#5555FF'>&gt;</font>
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> sample_type_,
+        <font color='#0000FF'>typename</font> scalar_type_ <font color='#5555FF'>=</font> <font color='#0000FF'><u>double</u></font>
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>class</font> <b><a name='any_trainer'></a>any_trainer</b>
+    <b>{</b>
+        <font color='#009900'>/*!
+            INITIAL VALUE
+                - is_empty() == true
+                - for all T: contains&lt;T&gt;() == false
+
+            WHAT THIS OBJECT REPRESENTS
+                This object is a version of dlib::any that is restricted to containing 
+                elements which are some kind of object with a .train() method compatible 
+                with the following signature: 
+
+                    decision_function train(
+                        const std::vector&lt;sample_type&gt;&amp; samples,
+                        const std::vector&lt;scalar_type&gt;&amp; labels
+                    ) const
+
+                    Where decision_function is a type capable of being stored in an
+                    any_decision_function&lt;sample_type,scalar_type&gt; object.
+
+                any_trainer is intended to be used to contain objects such as the svm_nu_trainer
+                and other similar types which represent supervised machine learning algorithms.   
+                It allows you to write code which contains and processes these trainer objects 
+                without needing to know the specific types of trainer objects used.
+        !*/</font>
+
+    <font color='#0000FF'>public</font>:
+
+        <font color='#0000FF'>typedef</font> sample_type_ sample_type;
+        <font color='#0000FF'>typedef</font> scalar_type_ scalar_type;
+        <font color='#0000FF'>typedef</font> default_memory_manager mem_manager_type;
+        <font color='#0000FF'>typedef</font> any_decision_function<font color='#5555FF'>&lt;</font>sample_type, scalar_type<font color='#5555FF'>&gt;</font> trained_function_type;
+
+        <b><a name='any_trainer'></a>any_trainer</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - this object is properly initialized
+        !*/</font>
+
+        <b><a name='any_trainer'></a>any_trainer</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> any_trainer<font color='#5555FF'>&amp;</font> item
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - copies the state of item into *this.  
+                - Note that *this and item will contain independent copies of the
+                  contents of item.  That is, this function performs a deep
+                  copy and therefore does not result in *this containing
+                  any kind of reference to item.
+        !*/</font>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font> <font color='#0000FF'>typename</font> T <font color='#5555FF'>&gt;</font>
+        <b><a name='any_trainer'></a>any_trainer</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> item
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #contains&lt;T&gt;() == true
+                - #cast_to&lt;T&gt;() == item
+                  (i.e. a copy of item will be stored in *this)
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='clear'></a>clear</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #*this will have its default value.  I.e. #is_empty() == true
+        !*/</font>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>bool</u></font> <b><a name='contains'></a>contains</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - if (this object currently contains an object of type T) then
+                    - returns true
+                - else
+                    - returns false
+        !*/</font>
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='is_empty'></a>is_empty</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - if (this object contains any kind of object) then
+                    - returns false 
+                - else
+                    - returns true
+        !*/</font>
+
+        trained_function_type <b><a name='train'></a>train</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>sample_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> samples,
+            <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>scalar_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> labels
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <font color='#009900'>/*!
+            requires
+                - is_empty() == false
+            ensures
+                - Let TRAINER denote the object contained within *this.  Then
+                  this function performs:
+                    return TRAINER.train(samples, labels)
+        !*/</font>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+        T<font color='#5555FF'>&amp;</font> <b><a name='cast_to'></a>cast_to</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - if (contains&lt;T&gt;() == true) then
+                    - returns a non-const reference to the object contained within *this
+                - else
+                    - throws bad_any_cast
+        !*/</font>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> <b><a name='cast_to'></a>cast_to</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - if (contains&lt;T&gt;() == true) then
+                    - returns a const reference to the object contained within *this
+                - else
+                    - throws bad_any_cast
+        !*/</font>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+        T<font color='#5555FF'>&amp;</font> <b><a name='get'></a>get</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #is_empty() == false
+                - #contains&lt;T&gt;() == true
+                - if (contains&lt;T&gt;() == true)
+                    - returns a non-const reference to the object contained in *this.
+                - else
+                    - Constructs an object of type T inside *this
+                    - Any previous object stored in this any_trainer object is destructed and its
+                      state is lost.
+                    - returns a non-const reference to the newly created T object.
+        !*/</font>
+
+        any_trainer<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> any_trainer<font color='#5555FF'>&amp;</font> item
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - copies the state of item into *this.  
+                - Note that *this and item will contain independent copies of the
+                  contents of item.  That is, this function performs a deep
+                  copy and therefore does not result in *this containing
+                  any kind of reference to item.
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='swap'></a>swap</b> <font face='Lucida Console'>(</font>
+            any_trainer<font color='#5555FF'>&amp;</font> item
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - swaps *this and item
+        !*/</font>
+
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> sample_type,
+        <font color='#0000FF'>typename</font> scalar_type
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='swap'></a>swap</b> <font face='Lucida Console'>(</font>
+        any_trainer<font color='#5555FF'>&lt;</font>sample_type,scalar_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> a,
+        any_trainer<font color='#5555FF'>&lt;</font>sample_type,scalar_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> b
+    <font face='Lucida Console'>)</font> <b>{</b> a.<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>b<font face='Lucida Console'>)</font>; <b>}</b>
+    <font color='#009900'>/*!
+        provides a global swap function
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T,
+        <font color='#0000FF'>typename</font> sample_type,
+        <font color='#0000FF'>typename</font> scalar_type
+        <font color='#5555FF'>&gt;</font> 
+    T<font color='#5555FF'>&amp;</font> <b><a name='any_cast'></a>any_cast</b><font face='Lucida Console'>(</font>
+        any_trainer<font color='#5555FF'>&lt;</font>sample_type,scalar_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> a
+    <font face='Lucida Console'>)</font> <b>{</b> <font color='#0000FF'>return</font> a.cast_to<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <b>}</b>
+    <font color='#009900'>/*!
+        ensures
+            - returns a.cast_to&lt;T&gt;()
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T,
+        <font color='#0000FF'>typename</font> sample_type,
+        <font color='#0000FF'>typename</font> scalar_type
+        <font color='#5555FF'>&gt;</font> 
+    <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> <b><a name='any_cast'></a>any_cast</b><font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> any_trainer<font color='#5555FF'>&lt;</font>sample_type,scalar_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> a
+    <font face='Lucida Console'>)</font> <b>{</b> <font color='#0000FF'>return</font> a.cast_to<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <b>}</b>
+    <font color='#009900'>/*!
+        ensures
+            - returns a.cast_to&lt;T&gt;()
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_AnY_TRAINER_ABSTRACT_H_
+</font>
+
+
+</pre></body></html>

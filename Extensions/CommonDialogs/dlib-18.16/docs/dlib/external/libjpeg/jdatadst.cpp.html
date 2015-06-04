@@ -1,0 +1,154 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - jdatadst.cpp</title></head><body bgcolor='white'><pre>
+<font color='#009900'>/*
+ * jdatadst.c
+ *
+ * Copyright (C) 1994-1996, Thomas G. Lane.
+ * This file is part of the Independent JPEG Group's software.
+ * For conditions of distribution and use, see the accompanying README file.
+ *
+ * This file contains compression data destination routines for the case of
+ * emitting JPEG data to a file (or any stdio stream).  While these routines
+ * are sufficient for most applications, some will want to use a different
+ * destination manager.
+ * IMPORTANT: we assume that fwrite() will correctly transcribe an array of
+ * JOCTETs into 8-bit-wide elements on external storage.  If char is wider
+ * than 8 bits on your machine, you may need to do some tweaking.
+ */</font>
+
+<font color='#009900'>/* this is not a core library module, so it doesn't define JPEG_INTERNALS */</font>
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='jinclude.h.html'>jinclude.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='jpeglib.h.html'>jpeglib.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='jerror.h.html'>jerror.h</a>"
+
+
+<font color='#009900'>/* Expanded data destination object for stdio output */</font>
+
+<font color='#0000FF'>typedef</font> <font color='#0000FF'>struct</font> <b>{</b>
+  <font color='#0000FF'>struct</font> jpeg_destination_mgr pub; <font color='#009900'>/* public fields */</font>
+
+  FILE <font color='#5555FF'>*</font> outfile;		<font color='#009900'>/* target stream */</font>
+  JOCTET <font color='#5555FF'>*</font> buffer;		<font color='#009900'>/* start of buffer */</font>
+<b>}</b> my_destination_mgr;
+
+<font color='#0000FF'>typedef</font> my_destination_mgr <font color='#5555FF'>*</font> my_dest_ptr;
+
+<font color='#0000FF'>#define</font> OUTPUT_BUF_SIZE  <font color='#979000'>4096</font>	<font color='#009900'>/* choose an efficiently fwrite'able size */</font>
+
+
+<font color='#009900'>/*
+ * Initialize destination --- called by jpeg_start_compress
+ * before any data is actually written.
+ */</font>
+
+<b><a name='METHODDEF'></a>METHODDEF</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font>
+<b><a name='init_destination'></a>init_destination</b> <font face='Lucida Console'>(</font>j_compress_ptr cinfo<font face='Lucida Console'>)</font>
+<b>{</b>
+  my_dest_ptr dest <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>my_dest_ptr<font face='Lucida Console'>)</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>dest;
+
+  <font color='#009900'>/* Allocate the output buffer --- it will be released when done with image */</font>
+  dest<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>buffer <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>JOCTET <font color='#5555FF'>*</font><font face='Lucida Console'>)</font>
+      <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>mem<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>alloc_small<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>j_common_ptr<font face='Lucida Console'>)</font> cinfo, JPOOL_IMAGE,
+				  OUTPUT_BUF_SIZE <font color='#5555FF'>*</font> <font color='#BB00BB'>SIZEOF</font><font face='Lucida Console'>(</font>JOCTET<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+  dest<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>pub.next_output_byte <font color='#5555FF'>=</font> dest<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>buffer;
+  dest<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>pub.free_in_buffer <font color='#5555FF'>=</font> OUTPUT_BUF_SIZE;
+<b>}</b>
+
+
+<font color='#009900'>/*
+ * Empty the output buffer --- called whenever buffer fills up.
+ *
+ * In typical applications, this should write the entire output buffer
+ * (ignoring the current state of next_output_byte &amp; free_in_buffer),
+ * reset the pointer &amp; count to the start of the buffer, and return TRUE
+ * indicating that the buffer has been dumped.
+ *
+ * In applications that need to be able to suspend compression due to output
+ * overrun, a FALSE return indicates that the buffer cannot be emptied now.
+ * In this situation, the compressor will return to its caller (possibly with
+ * an indication that it has not accepted all the supplied scanlines).  The
+ * application should resume compression after it has made more room in the
+ * output buffer.  Note that there are substantial restrictions on the use of
+ * suspension --- see the documentation.
+ *
+ * When suspending, the compressor will back up to a convenient restart point
+ * (typically the start of the current MCU). next_output_byte &amp; free_in_buffer
+ * indicate where the restart point will be if the current call returns FALSE.
+ * Data beyond this point will be regenerated after resumption, so do not
+ * write it out when emptying the buffer externally.
+ */</font>
+
+<b><a name='METHODDEF'></a>METHODDEF</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font>
+<b><a name='empty_output_buffer'></a>empty_output_buffer</b> <font face='Lucida Console'>(</font>j_compress_ptr cinfo<font face='Lucida Console'>)</font>
+<b>{</b>
+  my_dest_ptr dest <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>my_dest_ptr<font face='Lucida Console'>)</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>dest;
+
+  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>JFWRITE</font><font face='Lucida Console'>(</font>dest<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>outfile, dest<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>buffer, OUTPUT_BUF_SIZE<font face='Lucida Console'>)</font> <font color='#5555FF'>!</font><font color='#5555FF'>=</font>
+      <font face='Lucida Console'>(</font><font color='#0000FF'><u>size_t</u></font><font face='Lucida Console'>)</font> OUTPUT_BUF_SIZE<font face='Lucida Console'>)</font>
+    <font color='#BB00BB'>ERREXIT</font><font face='Lucida Console'>(</font>cinfo, JERR_FILE_WRITE<font face='Lucida Console'>)</font>;
+
+  dest<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>pub.next_output_byte <font color='#5555FF'>=</font> dest<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>buffer;
+  dest<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>pub.free_in_buffer <font color='#5555FF'>=</font> OUTPUT_BUF_SIZE;
+
+  <font color='#0000FF'>return</font> TRUE;
+<b>}</b>
+
+
+<font color='#009900'>/*
+ * Terminate destination --- called by jpeg_finish_compress
+ * after all data has been written.  Usually needs to flush buffer.
+ *
+ * NB: *not* called by jpeg_abort or jpeg_destroy; surrounding
+ * application must deal with any cleanup that should happen even
+ * for error exit.
+ */</font>
+
+<b><a name='METHODDEF'></a>METHODDEF</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font>
+<b><a name='term_destination'></a>term_destination</b> <font face='Lucida Console'>(</font>j_compress_ptr cinfo<font face='Lucida Console'>)</font>
+<b>{</b>
+  my_dest_ptr dest <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>my_dest_ptr<font face='Lucida Console'>)</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>dest;
+  <font color='#0000FF'><u>size_t</u></font> datacount <font color='#5555FF'>=</font> OUTPUT_BUF_SIZE <font color='#5555FF'>-</font> dest<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>pub.free_in_buffer;
+
+  <font color='#009900'>/* Write any data remaining in the buffer */</font>
+  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>datacount <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font> <b>{</b>
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>JFWRITE</font><font face='Lucida Console'>(</font>dest<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>outfile, dest<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>buffer, datacount<font face='Lucida Console'>)</font> <font color='#5555FF'>!</font><font color='#5555FF'>=</font> datacount<font face='Lucida Console'>)</font>
+      <font color='#BB00BB'>ERREXIT</font><font face='Lucida Console'>(</font>cinfo, JERR_FILE_WRITE<font face='Lucida Console'>)</font>;
+  <b>}</b>
+  <font color='#BB00BB'>fflush</font><font face='Lucida Console'>(</font>dest<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>outfile<font face='Lucida Console'>)</font>;
+  <font color='#009900'>/* Make sure we wrote the output file OK */</font>
+  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>ferror</font><font face='Lucida Console'>(</font>dest<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>outfile<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+    <font color='#BB00BB'>ERREXIT</font><font face='Lucida Console'>(</font>cinfo, JERR_FILE_WRITE<font face='Lucida Console'>)</font>;
+<b>}</b>
+
+
+<font color='#009900'>/*
+ * Prepare for output to a stdio stream.
+ * The caller must have already opened the stream, and is responsible
+ * for closing it after finishing compression.
+ */</font>
+
+<b><a name='GLOBAL'></a>GLOBAL</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font>
+<b><a name='jpeg_stdio_dest'></a>jpeg_stdio_dest</b> <font face='Lucida Console'>(</font>j_compress_ptr cinfo, FILE <font color='#5555FF'>*</font> outfile<font face='Lucida Console'>)</font>
+<b>{</b>
+  my_dest_ptr dest;
+
+  <font color='#009900'>/* The destination object is made permanent so that multiple JPEG images
+   * can be written to the same file without re-executing jpeg_stdio_dest.
+   * This makes it dangerous to use this manager and a different destination
+   * manager serially with the same JPEG object, because their private object
+   * sizes may be different.  Caveat programmer.
+   */</font>
+  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>dest <font color='#5555FF'>=</font><font color='#5555FF'>=</font> NULL<font face='Lucida Console'>)</font> <b>{</b>	<font color='#009900'>/* first time for this JPEG object? */</font>
+    cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>dest <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'>struct</font> jpeg_destination_mgr <font color='#5555FF'>*</font><font face='Lucida Console'>)</font>
+      <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>mem<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>alloc_small<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>j_common_ptr<font face='Lucida Console'>)</font> cinfo, JPOOL_PERMANENT,
+				  <font color='#BB00BB'>SIZEOF</font><font face='Lucida Console'>(</font>my_destination_mgr<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+  <b>}</b>
+
+  dest <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>my_dest_ptr<font face='Lucida Console'>)</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>dest;
+  dest<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>pub.init_destination <font color='#5555FF'>=</font> init_destination;
+  dest<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>pub.empty_output_buffer <font color='#5555FF'>=</font> empty_output_buffer;
+  dest<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>pub.term_destination <font color='#5555FF'>=</font> term_destination;
+  dest<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>outfile <font color='#5555FF'>=</font> outfile;
+<b>}</b>
+
+</pre></body></html>

@@ -1,0 +1,121 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - pngrio.c</title></head><body bgcolor='white'><pre>
+
+<font color='#009900'>/* pngrio.c - functions for data input
+ *
+ * Last changed in libpng 1.6.0 [February 14, 2013]
+ * Copyright (c) 1998-2013 Glenn Randers-Pehrson
+ * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
+ * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
+ *
+ * This code is released under the libpng license.
+ * For conditions of distribution and use, see the disclaimer
+ * and license in png.h
+ *
+ * This file provides a location for all input.  Users who need
+ * special handling are expected to write a function that has the same
+ * arguments as this and performs a similar function, but that possibly
+ * has a different input method.  Note that you shouldn't change this
+ * function, but rather write a replacement function and then make
+ * libpng use it at run time with png_set_read_fn(...).
+ */</font>
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='pngpriv.h.html'>pngpriv.h</a>"
+
+<font color='#0000FF'>#ifdef</font> PNG_READ_SUPPORTED
+
+<font color='#009900'>/* Read the data from whatever input you are using.  The default routine
+ * reads from a file pointer.  Note that this routine sometimes gets called
+ * with very small lengths, so you should implement some kind of simple
+ * buffering if you are using unbuffered reads.  This should never be asked
+ * to read more then 64K on a 16 bit machine.
+ */</font>
+<font color='#0000FF'><u>void</u></font> <font color='#009900'>/* PRIVATE */</font>
+<b><a name='png_read_data'></a>png_read_data</b><font face='Lucida Console'>(</font>png_structrp png_ptr, png_bytep data, png_size_t length<font face='Lucida Console'>)</font>
+<b>{</b>
+   <font color='#BB00BB'>png_debug1</font><font face='Lucida Console'>(</font><font color='#979000'>4</font>, "<font color='#CC0000'>reading %d bytes</font>", <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font>length<font face='Lucida Console'>)</font>;
+
+   <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>read_data_fn <font color='#5555FF'>!</font><font color='#5555FF'>=</font> NULL<font face='Lucida Console'>)</font>
+      <font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font face='Lucida Console'>(</font>png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>read_data_fn<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>png_ptr, data, length<font face='Lucida Console'>)</font>;
+
+   <font color='#0000FF'>else</font>
+      <font color='#BB00BB'>png_error</font><font face='Lucida Console'>(</font>png_ptr, "<font color='#CC0000'>Call to NULL read function</font>"<font face='Lucida Console'>)</font>;
+<b>}</b>
+
+<font color='#0000FF'>#ifdef</font> PNG_STDIO_SUPPORTED
+<font color='#009900'>/* This is the function that does the actual reading of data.  If you are
+ * not reading from a standard C stream, you should create a replacement
+ * read_data function and use it at run time with png_set_read_fn(), rather
+ * than changing the library.
+ */</font>
+<font color='#0000FF'><u>void</u></font> PNGCBAPI
+<b><a name='png_default_read_data'></a>png_default_read_data</b><font face='Lucida Console'>(</font>png_structp png_ptr, png_bytep data, png_size_t length<font face='Lucida Console'>)</font>
+<b>{</b>
+   png_size_t check;
+
+   <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>png_ptr <font color='#5555FF'>=</font><font color='#5555FF'>=</font> NULL<font face='Lucida Console'>)</font>
+      <font color='#0000FF'>return</font>;
+
+   <font color='#009900'>/* fread() returns 0 on error, so it is OK to store this in a png_size_t
+    * instead of an int, which is what fread() actually returns.
+    */</font>
+   check <font color='#5555FF'>=</font> <font color='#BB00BB'>fread</font><font face='Lucida Console'>(</font>data, <font color='#979000'>1</font>, length, <font color='#BB00BB'>png_voidcast</font><font face='Lucida Console'>(</font>png_FILE_p, png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>io_ptr<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+   <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>check <font color='#5555FF'>!</font><font color='#5555FF'>=</font> length<font face='Lucida Console'>)</font>
+      <font color='#BB00BB'>png_error</font><font face='Lucida Console'>(</font>png_ptr, "<font color='#CC0000'>Read Error</font>"<font face='Lucida Console'>)</font>;
+<b>}</b>
+<font color='#0000FF'>#endif</font>
+
+<font color='#009900'>/* This function allows the application to supply a new input function
+ * for libpng if standard C streams aren't being used.
+ *
+ * This function takes as its arguments:
+ *
+ * png_ptr      - pointer to a png input data structure
+ *
+ * io_ptr       - pointer to user supplied structure containing info about
+ *                the input functions.  May be NULL.
+ *
+ * read_data_fn - pointer to a new input function that takes as its
+ *                arguments a pointer to a png_struct, a pointer to
+ *                a location where input data can be stored, and a 32-bit
+ *                unsigned int that is the number of bytes to be read.
+ *                To exit and output any fatal error messages the new write
+ *                function should call png_error(png_ptr, "Error msg").
+ *                May be NULL, in which case libpng's default function will
+ *                be used.
+ */</font>
+<font color='#0000FF'><u>void</u></font> PNGAPI
+<b><a name='png_set_read_fn'></a>png_set_read_fn</b><font face='Lucida Console'>(</font>png_structrp png_ptr, png_voidp io_ptr,
+   png_rw_ptr read_data_fn<font face='Lucida Console'>)</font>
+<b>{</b>
+   <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>png_ptr <font color='#5555FF'>=</font><font color='#5555FF'>=</font> NULL<font face='Lucida Console'>)</font>
+      <font color='#0000FF'>return</font>;
+
+   png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>io_ptr <font color='#5555FF'>=</font> io_ptr;
+
+<font color='#0000FF'>#ifdef</font> PNG_STDIO_SUPPORTED
+   <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>read_data_fn <font color='#5555FF'>!</font><font color='#5555FF'>=</font> NULL<font face='Lucida Console'>)</font>
+      png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>read_data_fn <font color='#5555FF'>=</font> read_data_fn;
+
+   <font color='#0000FF'>else</font>
+      png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>read_data_fn <font color='#5555FF'>=</font> png_default_read_data;
+<font color='#0000FF'>#else</font>
+   png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>read_data_fn <font color='#5555FF'>=</font> read_data_fn;
+<font color='#0000FF'>#endif</font>
+
+   <font color='#009900'>/* It is an error to write to a read device */</font>
+   <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>write_data_fn <font color='#5555FF'>!</font><font color='#5555FF'>=</font> NULL<font face='Lucida Console'>)</font>
+   <b>{</b>
+      png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>write_data_fn <font color='#5555FF'>=</font> NULL;
+      <font color='#BB00BB'>png_warning</font><font face='Lucida Console'>(</font>png_ptr,
+          "<font color='#CC0000'>Can't set both read_data_fn and write_data_fn in the</font>"
+          "<font color='#CC0000'> same structure</font>"<font face='Lucida Console'>)</font>;
+   <b>}</b>
+
+<font color='#0000FF'>#ifdef</font> PNG_WRITE_FLUSH_SUPPORTED
+   png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>output_flush_fn <font color='#5555FF'>=</font> NULL;
+<font color='#0000FF'>#endif</font>
+<b>}</b>
+<font color='#0000FF'>#endif</font> <font color='#009900'>/* PNG_READ_SUPPORTED */</font>
+
+</pre></body></html>

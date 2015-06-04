@@ -1,0 +1,178 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - tester.cpp</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2006  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>string<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='tester.h.html'>tester.h</a>"
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>cstdlib<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>threads.h<font color='#5555FF'>&gt;</font>
+
+<font color='#0000FF'>namespace</font> test
+<b>{</b>
+<font color='#009900'>// -----------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>bool</u></font> be_verbose <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+
+<font color='#009900'>// -----------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>static</font> dlib::mutex spinner_mutex;
+    <font color='#0000FF'>static</font> dlib::mutex test_count_mutex;
+    dlib::uint64 test_count <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+
+<font color='#009900'>// -----------------------------------------------------------------------------
+</font>
+    dlib::uint64 <b><a name='number_of_testing_statements_executed'></a>number_of_testing_statements_executed</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        dlib::auto_mutex <font color='#BB00BB'>lock</font><font face='Lucida Console'>(</font>test_count_mutex<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>return</font> test_count;
+    <b>}</b>
+
+    <font color='#0000FF'><u>void</u></font> <b><a name='increment_test_count'></a>increment_test_count</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        test_count_mutex.<font color='#BB00BB'>lock</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <font color='#5555FF'>+</font><font color='#5555FF'>+</font>test_count;
+        test_count_mutex.<font color='#BB00BB'>unlock</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// -----------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='check_test'></a>check_test</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'><u>bool</u></font> _exp,
+        <font color='#0000FF'><u>long</u></font> line,
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>*</font> file,
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>*</font> _exp_str
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        test_count_mutex.<font color='#BB00BB'>lock</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <font color='#5555FF'>+</font><font color='#5555FF'>+</font>test_count;
+        test_count_mutex.<font color='#BB00BB'>unlock</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> <font color='#5555FF'>!</font><font face='Lucida Console'>(</font>_exp<font face='Lucida Console'>)</font> <font face='Lucida Console'>)</font>                                                         
+        <b>{</b>                                                                       
+            std::ostringstream dlib_o_out;                                       
+            dlib_o_out <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\nError occurred at line </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> line <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>.\n</font>";    
+            dlib_o_out <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>Error occurred in file </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> file <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>.\n</font>";      
+            dlib_o_out <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>Failing expression was </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> _exp_str <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>.\n</font>";           
+            <font color='#0000FF'>throw</font> dlib::<font color='#BB00BB'>error</font><font face='Lucida Console'>(</font>dlib_o_out.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;      
+        <b>}</b>
+    <b>}</b>                                                                      
+
+<font color='#009900'>// -----------------------------------------------------------------------------
+</font>
+    map_of_testers<font color='#5555FF'>&amp;</font> <b><a name='testers'></a>testers</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>static</font> map_of_testers t;
+        <font color='#0000FF'>return</font> t;
+    <b>}</b>
+
+<font color='#009900'>// -----------------------------------------------------------------------------
+</font>
+    tester::
+    <b><a name='tester'></a>tester</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> switch_name_x,
+        <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> description_x,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> num_of_args_x
+    <font face='Lucida Console'>)</font> :
+        switch_name<font face='Lucida Console'>(</font>switch_name_x<font face='Lucida Console'>)</font>,
+        description_<font face='Lucida Console'>(</font>description_x<font face='Lucida Console'>)</font>,
+        num_of_args_<font face='Lucida Console'>(</font>num_of_args_x<font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> std;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>testers</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>is_in_domain</font><font face='Lucida Console'>(</font>switch_name<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            cerr <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>ERROR: More than one tester has been defined with the switch '</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> switch_name <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>'.</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+            <font color='#BB00BB'>exit</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        string <font color='#BB00BB'>temp</font><font face='Lucida Console'>(</font>switch_name<font face='Lucida Console'>)</font>;
+        tester<font color='#5555FF'>*</font> t <font color='#5555FF'>=</font> <font color='#0000FF'>this</font>;
+        <font color='#BB00BB'>testers</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>add</font><font face='Lucida Console'>(</font>temp,t<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// -----------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> tester::
+    <b><a name='cmd_line_switch'></a>cmd_line_switch</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        <font color='#0000FF'>return</font> switch_name;
+    <b>}</b>
+
+<font color='#009900'>// -----------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> tester::
+    <b><a name='description'></a>description</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        <font color='#0000FF'>return</font> description_;
+    <b>}</b>
+
+<font color='#009900'>// -----------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> tester::
+    <b><a name='num_of_args'></a>num_of_args</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        <font color='#0000FF'>return</font> num_of_args_;
+    <b>}</b>
+
+<font color='#009900'>// -----------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>void</u></font> tester::
+    <b><a name='perform_test'></a>perform_test</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+    <b>}</b>
+
+<font color='#009900'>// -----------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>void</u></font> tester::
+    <b><a name='perform_test'></a>perform_test</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font>  
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+    <b>}</b>
+
+<font color='#009900'>// -----------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>void</u></font> tester::
+    <b><a name='perform_test'></a>perform_test</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font>, 
+        <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> 
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+    <b>}</b>
+
+<font color='#009900'>// -----------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='print_spinner'></a>print_spinner</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>be_verbose<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> std;
+            dlib::auto_mutex <font color='#BB00BB'>M</font><font face='Lucida Console'>(</font>spinner_mutex<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>static</font> <font color='#0000FF'><u>int</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\b\b</font>";
+            <font color='#0000FF'>switch</font> <font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>case</font> <font color='#979000'>0</font>: cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> '<font color='#FF0000'>|</font>'; <font color='#0000FF'>break</font>;
+                <font color='#0000FF'>case</font> <font color='#979000'>1</font>: cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> '<font color='#FF0000'>/</font>'; <font color='#0000FF'>break</font>;
+                <font color='#0000FF'>case</font> <font color='#979000'>2</font>: cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> '<font color='#FF0000'>-</font>'; <font color='#0000FF'>break</font>;
+                <font color='#0000FF'>case</font> <font color='#979000'>3</font>: cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> '<font color='#FF0000'>\\</font>'; <font color='#0000FF'>break</font>;
+            <b>}</b>
+            cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'> </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> flush;
+            i <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>i<font color='#5555FF'>+</font><font color='#979000'>1</font><font face='Lucida Console'>)</font><font color='#5555FF'>%</font><font color='#979000'>4</font>;
+        <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// -----------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+
+
+
+</pre></body></html>

@@ -1,0 +1,517 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - pegasos_abstract.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2009  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#undef</font> DLIB_PEGASoS_ABSTRACT_
+<font color='#0000FF'>#ifdef</font> DLIB_PEGASoS_ABSTRACT_
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>cmath<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../algs.h.html'>../algs.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='function_abstract.h.html'>function_abstract.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='kernel_abstract.h.html'>kernel_abstract.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> kern_type
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>class</font> <b><a name='svm_pegasos'></a>svm_pegasos</b>
+    <b>{</b>
+        <font color='#009900'>/*!
+            REQUIREMENTS ON kern_type
+                is a kernel function object as defined in dlib/svm/kernel_abstract.h 
+
+            WHAT THIS OBJECT REPRESENTS
+                This object implements an online algorithm for training a support 
+                vector machine for solving binary classification problems.  
+
+                The implementation of the Pegasos algorithm used by this object is based
+                on the following excellent paper:
+                    Pegasos: Primal estimated sub-gradient solver for SVM (2007)
+                    by Shai Shalev-Shwartz, Yoram Singer, Nathan Srebro 
+                    In ICML 
+
+                This SVM training algorithm has two interesting properties.  First, the 
+                pegasos algorithm itself converges to the solution in an amount of time
+                unrelated to the size of the training set (in addition to being quite fast
+                to begin with).  This makes it an appropriate algorithm for learning from
+                very large datasets.  Second, this object uses the dlib::kcentroid object 
+                to maintain a sparse approximation of the learned decision function.  
+                This means that the number of support vectors in the resulting decision 
+                function is also unrelated to the size of the dataset (in normal SVM
+                training algorithms, the number of support vectors grows approximately 
+                linearly with the size of the training set).  
+        !*/</font>
+
+    <font color='#0000FF'>public</font>:
+        <font color='#0000FF'>typedef</font> kern_type kernel_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> kernel_type::scalar_type scalar_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> kernel_type::sample_type sample_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> kernel_type::mem_manager_type mem_manager_type;
+        <font color='#0000FF'>typedef</font> decision_function<font color='#5555FF'>&lt;</font>kernel_type<font color='#5555FF'>&gt;</font> trained_function_type;
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> K_<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>struct</font> <b><a name='rebind'></a>rebind</b> <b>{</b>
+            <font color='#0000FF'>typedef</font> svm_pegasos<font color='#5555FF'>&lt;</font>K_<font color='#5555FF'>&gt;</font> other;
+        <b>}</b>;
+
+        <b><a name='svm_pegasos'></a>svm_pegasos</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - this object is properly initialized 
+                - #get_lambda_class1() == 0.0001
+                - #get_lambda_class2() == 0.0001
+                - #get_tolerance() == 0.01
+                - #get_train_count() == 0
+                - #get_max_num_sv() == 40
+        !*/</font>
+
+        <b><a name='svm_pegasos'></a>svm_pegasos</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> kernel_type<font color='#5555FF'>&amp;</font> kernel_, 
+            <font color='#0000FF'>const</font> scalar_type<font color='#5555FF'>&amp;</font> lambda_,
+            <font color='#0000FF'>const</font> scalar_type<font color='#5555FF'>&amp;</font> tolerance_,
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> max_num_sv
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - lambda_ &gt; 0
+                - tolerance_ &gt; 0
+                - max_num_sv &gt; 0
+            ensures
+                - this object is properly initialized 
+                - #get_lambda_class1() == lambda_ 
+                - #get_lambda_class2() == lambda_ 
+                - #get_tolerance() == tolerance_
+                - #get_kernel() == kernel_
+                - #get_train_count() == 0
+                - #get_max_num_sv() == max_num_sv
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='clear'></a>clear</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #get_train_count() == 0
+                - clears out any memory of previous calls to train()
+                - doesn't change any of the algorithm parameters.  I.e.
+                    - #get_lambda_class1()  == get_lambda_class1()
+                    - #get_lambda_class2()  == get_lambda_class2()
+                    - #get_tolerance()      == get_tolerance()
+                    - #get_kernel()         == get_kernel()
+                    - #get_max_num_sv()     == get_max_num_sv()
+        !*/</font>
+
+        <font color='#0000FF'>const</font> scalar_type <b><a name='get_lambda_class1'></a>get_lambda_class1</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the SVM regularization term for the +1 class.  It is the 
+                  parameter that determines the trade off between trying to fit the 
+                  +1 training data exactly or allowing more errors but hopefully 
+                  improving the generalization ability of the resulting classifier.  
+                  Smaller values encourage exact fitting while larger values may 
+                  encourage better generalization. It is also worth noting that the 
+                  number of iterations it takes for this algorithm to converge is 
+                  proportional to 1/lambda.  So smaller values of this term cause 
+                  the running time of this algorithm to increase.  For more 
+                  information you should consult the paper referenced above.
+        !*/</font>
+
+        <font color='#0000FF'>const</font> scalar_type <b><a name='get_lambda_class2'></a>get_lambda_class2</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the SVM regularization term for the -1 class.  It has
+                  the same properties as the get_lambda_class1() parameter except that
+                  it applies to the -1 class.
+        !*/</font>
+
+        <font color='#0000FF'>const</font> scalar_type <b><a name='get_tolerance'></a>get_tolerance</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the tolerance used by the internal kcentroid object to 
+                  represent the learned decision function.  Smaller values of this 
+                  tolerance will result in a more accurate representation of the 
+                  decision function but will use more support vectors (up to
+                  a max of get_max_num_sv()).  
+        !*/</font>
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='get_max_num_sv'></a>get_max_num_sv</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the maximum number of support vectors this object is
+                  allowed to use.
+        !*/</font>
+
+        <font color='#0000FF'>const</font> kernel_type <b><a name='get_kernel'></a>get_kernel</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the kernel used by this object
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_kernel'></a>set_kernel</b> <font face='Lucida Console'>(</font>
+            kernel_type k
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #get_kernel() == k
+                - #get_train_count() == 0
+                  (i.e. clears any memory of previous training)
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_tolerance'></a>set_tolerance</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>double</u></font> tol
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - tol &gt; 0
+            ensures
+                - #get_tolerance() == tol
+                - #get_train_count() == 0
+                  (i.e. clears any memory of previous training)
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_max_num_sv'></a>set_max_num_sv</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> max_num_sv
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - max_num_sv &gt; 0
+            ensures
+                - #get_max_num_sv() == max_num_sv 
+                - #get_train_count() == 0
+                  (i.e. clears any memory of previous training)
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_lambda'></a>set_lambda</b> <font face='Lucida Console'>(</font>
+            scalar_type lambda_
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - lambda_ &gt; 0
+            ensures
+                - #get_lambda_class1() == lambda_
+                - #get_lambda_class2() == lambda_
+                - #get_train_count() == 0
+                  (i.e. clears any memory of previous training)
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_lambda_class1'></a>set_lambda_class1</b> <font face='Lucida Console'>(</font>
+            scalar_type lambda_
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - lambda_ &gt; 0
+            ensures
+                - #get_lambda_class1() == lambda_ 
+                  #get_train_count() == 0
+                  (i.e. clears any memory of previous training)
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_lambda_class2'></a>set_lambda_class2</b> <font face='Lucida Console'>(</font>
+            scalar_type lambda_
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - lambda_ &gt; 0
+            ensures
+                - #get_lambda_class2() == lambda_ 
+                  #get_train_count() == 0
+                  (i.e. clears any memory of previous training)
+        !*/</font>
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='get_train_count'></a>get_train_count</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns how many times this-&gt;train() has been called
+                  since this object was constructed or last cleared.  
+        !*/</font>
+
+        scalar_type <b><a name='train'></a>train</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> sample_type<font color='#5555FF'>&amp;</font> x,
+            <font color='#0000FF'>const</font> scalar_type<font color='#5555FF'>&amp;</font> y
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - y == 1 || y == -1
+            ensures
+                - trains this svm using the given sample x and label y
+                - #get_train_count() == get_train_count() + 1
+                - returns the current learning rate
+                  (i.e. 1/(get_train_count()*min(get_lambda_class1(),get_lambda_class2())) )
+        !*/</font>
+
+        scalar_type <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> sample_type<font color='#5555FF'>&amp;</font> x
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - classifies the given x sample using the decision function
+                  this object has learned so far.  
+                - if (x is a sample predicted have +1 label) then
+                    - returns a number &gt;= 0 
+                - else
+                    - returns a number &lt; 0
+        !*/</font>
+
+        <font color='#0000FF'>const</font> decision_function<font color='#5555FF'>&lt;</font>kernel_type<font color='#5555FF'>&gt;</font> <b><a name='get_decision_function'></a>get_decision_function</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns a decision function F that represents the function learned 
+                  by this object so far.  I.e. it is the case that:
+                    - for all x: F(x) == (*this)(x)
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='swap'></a>swap</b> <font face='Lucida Console'>(</font>
+            svm_pegasos<font color='#5555FF'>&amp;</font> item
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - swaps *this and item
+        !*/</font>
+
+    <b>}</b>; 
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> kern_type 
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='swap'></a>swap</b><font face='Lucida Console'>(</font>
+        svm_pegasos<font color='#5555FF'>&lt;</font>kern_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> a, 
+        svm_pegasos<font color='#5555FF'>&lt;</font>kern_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> b
+    <font face='Lucida Console'>)</font> <b>{</b> a.<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>b<font face='Lucida Console'>)</font>; <b>}</b>
+    <font color='#009900'>/*!
+        provides a global swap function
+    !*/</font>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> kern_type
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='serialize'></a>serialize</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> svm_pegasos<font color='#5555FF'>&lt;</font>kern_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> item,
+        std::ostream<font color='#5555FF'>&amp;</font> out
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        provides serialization support for svm_pegasos objects
+    !*/</font>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> kern_type 
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='deserialize'></a>deserialize</b> <font face='Lucida Console'>(</font>
+        svm_pegasos<font color='#5555FF'>&lt;</font>kern_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> item,
+        std::istream<font color='#5555FF'>&amp;</font> in 
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        provides serialization support for svm_pegasos objects
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T,
+        <font color='#0000FF'>typename</font> U
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='replicate_settings'></a>replicate_settings</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> svm_pegasos<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> source,
+        svm_pegasos<font color='#5555FF'>&lt;</font>U<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> dest
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        ensures
+            - copies all the parameters from the source trainer to the dest trainer.
+            - #dest.get_tolerance() == source.get_tolerance()
+            - #dest.get_lambda_class1() == source.get_lambda_class1()
+            - #dest.get_lambda_class2() == source.get_lambda_class2()
+            - #dest.get_max_num_sv() == source.get_max_num_sv()
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> trainer_type
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>class</font> <b><a name='batch_trainer'></a>batch_trainer</b> 
+    <b>{</b>
+        <font color='#009900'>/*!
+            REQUIREMENTS ON trainer_type
+                - trainer_type == some kind of online trainer object (e.g. svm_pegasos)
+                  replicate_settings() must also be defined for the type.
+
+            WHAT THIS OBJECT REPRESENTS
+                This is a trainer object that is meant to wrap online trainer objects 
+                that create decision_functions. It turns an online learning algorithm 
+                such as svm_pegasos into a batch learning object.  This allows you to 
+                use objects like svm_pegasos with functions (e.g. cross_validate_trainer) 
+                that expect batch mode training objects.
+        !*/</font>
+
+    <font color='#0000FF'>public</font>:
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> trainer_type::kernel_type kernel_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> trainer_type::scalar_type scalar_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> trainer_type::sample_type sample_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> trainer_type::mem_manager_type mem_manager_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> trainer_type::trained_function_type trained_function_type;
+
+
+        <b><a name='batch_trainer'></a>batch_trainer</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - This object is in an uninitialized state.  You must
+                  construct a real one with the other constructor and assign it
+                  to this instance before you use this object.
+        !*/</font>
+
+        <b><a name='batch_trainer'></a>batch_trainer</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> trainer_type<font color='#5555FF'>&amp;</font> online_trainer, 
+            <font color='#0000FF'>const</font> scalar_type min_learning_rate_,
+            <font color='#0000FF'><u>bool</u></font> verbose_,
+            <font color='#0000FF'><u>bool</u></font> use_cache_,
+            <font color='#0000FF'><u>long</u></font> cache_size_ <font color='#5555FF'>=</font> <font color='#979000'>100</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - min_learning_rate_ &gt; 0
+                - cache_size_ &gt; 0
+            ensures
+                - returns a batch trainer object that uses the given online_trainer object
+                  to train a decision function.
+                - #get_min_learning_rate() == min_learning_rate_
+                - if (verbose_ == true) then
+                    - this object will output status messages to standard out while
+                      training is under way.
+                - if (use_cache_ == true) then
+                    - this object will cache up to cache_size_ columns of the kernel 
+                      matrix during the training process.
+        !*/</font>
+
+        <font color='#0000FF'>const</font> scalar_type <b><a name='get_min_learning_rate'></a>get_min_learning_rate</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the min learning rate that the online trainer must reach
+                  before this object considers training to be complete.
+        !*/</font>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'>typename</font> in_sample_vector_type,
+            <font color='#0000FF'>typename</font> in_scalar_vector_type
+            <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>const</font> decision_function<font color='#5555FF'>&lt;</font>kernel_type<font color='#5555FF'>&gt;</font> <b><a name='train'></a>train</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> in_sample_vector_type<font color='#5555FF'>&amp;</font> x,
+            <font color='#0000FF'>const</font> in_scalar_vector_type<font color='#5555FF'>&amp;</font> y
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - trains and returns a decision_function using the trainer that was 
+                  supplied to this object's constructor.
+                - training continues until the online training object indicates that
+                  its learning rate has dropped below get_min_learning_rate().
+            throws
+                - std::bad_alloc
+                - any exceptions thrown by the trainer_type object
+        !*/</font>
+
+    <b>}</b>; 
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> trainer_type
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>const</font> batch_trainer<font color='#5555FF'>&lt;</font>trainer_type<font color='#5555FF'>&gt;</font> <b><a name='batch'></a>batch</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> trainer_type<font color='#5555FF'>&amp;</font> trainer,
+        <font color='#0000FF'>const</font> <font color='#0000FF'>typename</font> trainer_type::scalar_type min_learning_rate <font color='#5555FF'>=</font> <font color='#979000'>0.1</font>
+    <font face='Lucida Console'>)</font> <b>{</b> <font color='#0000FF'>return</font> batch_trainer<font color='#5555FF'>&lt;</font>trainer_type<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>trainer, min_learning_rate, <font color='#979000'>false</font>, <font color='#979000'>false</font><font face='Lucida Console'>)</font>; <b>}</b>
+    <font color='#009900'>/*!
+        requires
+            - min_learning_rate &gt; 0
+            - trainer_type == some kind of online trainer object that creates decision_function
+              objects (e.g. svm_pegasos).  replicate_settings() must also be defined for the type.
+        ensures
+            - returns a batch_trainer object that has been instantiated with the 
+              given arguments.
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> trainer_type
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>const</font> batch_trainer<font color='#5555FF'>&lt;</font>trainer_type<font color='#5555FF'>&gt;</font> <b><a name='verbose_batch'></a>verbose_batch</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> trainer_type<font color='#5555FF'>&amp;</font> trainer,
+        <font color='#0000FF'>const</font> <font color='#0000FF'>typename</font> trainer_type::scalar_type min_learning_rate <font color='#5555FF'>=</font> <font color='#979000'>0.1</font>
+    <font face='Lucida Console'>)</font> <b>{</b> <font color='#0000FF'>return</font> batch_trainer<font color='#5555FF'>&lt;</font>trainer_type<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>trainer, min_learning_rate, <font color='#979000'>true</font>, <font color='#979000'>false</font><font face='Lucida Console'>)</font>; <b>}</b>
+    <font color='#009900'>/*!
+        requires
+            - min_learning_rate &gt; 0
+            - trainer_type == some kind of online trainer object that creates decision_function
+              objects (e.g. svm_pegasos).  replicate_settings() must also be defined for the type.
+        ensures
+            - returns a batch_trainer object that has been instantiated with the 
+              given arguments (and is verbose).
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> trainer_type
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>const</font> batch_trainer<font color='#5555FF'>&lt;</font>trainer_type<font color='#5555FF'>&gt;</font> <b><a name='batch_cached'></a>batch_cached</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> trainer_type<font color='#5555FF'>&amp;</font> trainer,
+        <font color='#0000FF'>const</font> <font color='#0000FF'>typename</font> trainer_type::scalar_type min_learning_rate <font color='#5555FF'>=</font> <font color='#979000'>0.1</font>,
+        <font color='#0000FF'><u>long</u></font> cache_size <font color='#5555FF'>=</font> <font color='#979000'>100</font>
+    <font face='Lucida Console'>)</font> <b>{</b> <font color='#0000FF'>return</font> batch_trainer<font color='#5555FF'>&lt;</font>trainer_type<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>trainer, min_learning_rate, <font color='#979000'>false</font>, <font color='#979000'>true</font>, cache_size<font face='Lucida Console'>)</font>; <b>}</b>
+    <font color='#009900'>/*!
+        requires
+            - min_learning_rate &gt; 0
+            - cache_size &gt; 0
+            - trainer_type == some kind of online trainer object that creates decision_function
+              objects (e.g. svm_pegasos).  replicate_settings() must also be defined for the type.
+        ensures
+            - returns a batch_trainer object that has been instantiated with the 
+              given arguments (uses a kernel cache).
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> trainer_type
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>const</font> batch_trainer<font color='#5555FF'>&lt;</font>trainer_type<font color='#5555FF'>&gt;</font> <b><a name='verbose_batch_cached'></a>verbose_batch_cached</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> trainer_type<font color='#5555FF'>&amp;</font> trainer,
+        <font color='#0000FF'>const</font> <font color='#0000FF'>typename</font> trainer_type::scalar_type min_learning_rate <font color='#5555FF'>=</font> <font color='#979000'>0.1</font>,
+        <font color='#0000FF'><u>long</u></font> cache_size <font color='#5555FF'>=</font> <font color='#979000'>100</font>
+    <font face='Lucida Console'>)</font> <b>{</b> <font color='#0000FF'>return</font> batch_trainer<font color='#5555FF'>&lt;</font>trainer_type<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>trainer, min_learning_rate, <font color='#979000'>true</font>, <font color='#979000'>true</font>, cache_size<font face='Lucida Console'>)</font>; <b>}</b>
+    <font color='#009900'>/*!
+        requires
+            - min_learning_rate &gt; 0
+            - cache_size &gt; 0
+            - trainer_type == some kind of online trainer object that creates decision_function
+              objects (e.g. svm_pegasos).  replicate_settings() must also be defined for the type.
+        ensures
+            - returns a batch_trainer object that has been instantiated with the 
+              given arguments (is verbose and uses a kernel cache).
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_PEGASoS_ABSTRACT_
+</font>
+
+
+</pre></body></html>

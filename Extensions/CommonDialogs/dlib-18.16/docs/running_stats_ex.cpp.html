@@ -1,0 +1,61 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - running_stats_ex.cpp</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// The contents of this file are in the public domain. See LICENSE_FOR_EXAMPLE_PROGRAMS.txt
+</font><font color='#009900'>/*
+    This is an example illustrating the use of the running_stats object from the dlib C++
+    Library.  It is a simple tool for computing basic statistics on a stream of numbers.
+    In this example, we sample 100 points from the sinc function and then then compute the
+    unbiased sample mean, variance, skewness, and excess kurtosis.
+
+*/</font>    
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>iostream<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>vector<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>statistics.h<font color='#5555FF'>&gt;</font>
+
+<font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> std;
+<font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> dlib;
+
+<font color='#009900'>// Here we define the sinc function so that we may generate sample data. We compute the mean,
+</font><font color='#009900'>// variance, skewness, and excess kurtosis of this sample data.
+</font>
+<font color='#0000FF'><u>double</u></font> <b><a name='sinc'></a>sinc</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>double</u></font> x<font face='Lucida Console'>)</font>
+<b>{</b>
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>x <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+        <font color='#0000FF'>return</font> <font color='#979000'>1</font>;
+    <font color='#0000FF'>return</font> <font color='#BB00BB'>sin</font><font face='Lucida Console'>(</font>x<font face='Lucida Console'>)</font><font color='#5555FF'>/</font>x;
+<b>}</b>
+
+<font color='#0000FF'><u>int</u></font> <b><a name='main'></a>main</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+<b>{</b>
+    running_stats<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font> rs;
+
+    <font color='#0000FF'><u>double</u></font> tp1 <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+    <font color='#0000FF'><u>double</u></font> tp2 <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+
+    <font color='#009900'>// We first generate the data and add it sequentially to our running_stats object.  We
+</font>    <font color='#009900'>// then print every fifth data point.
+</font>    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> x <font color='#5555FF'>=</font> <font color='#979000'>1</font>; x <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#979000'>100</font>; x<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font>
+    <b>{</b>
+        tp1 <font color='#5555FF'>=</font> x<font color='#5555FF'>/</font><font color='#979000'>100.0</font>;
+        tp2 <font color='#5555FF'>=</font> <font color='#BB00BB'>sinc</font><font face='Lucida Console'>(</font>pi<font color='#5555FF'>*</font>x<font color='#5555FF'>/</font><font color='#979000'>100.0</font><font face='Lucida Console'>)</font>;
+        rs.<font color='#BB00BB'>add</font><font face='Lucida Console'>(</font>tp2<font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>if</font><font face='Lucida Console'>(</font>x <font color='#5555FF'>%</font> <font color='#979000'>5</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'> x = </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> tp1 <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'> sinc(x) = </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> tp2 <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+        <b>}</b>
+    <b>}</b>
+
+    <font color='#009900'>// Finally, we compute and print the mean, variance, skewness, and excess kurtosis of
+</font>    <font color='#009900'>// our data.
+</font>
+    cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+    cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>Mean:           </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> rs.<font color='#BB00BB'>mean</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+    cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>Variance:       </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> rs.<font color='#BB00BB'>variance</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+    cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>Skewness:       </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> rs.<font color='#BB00BB'>skewness</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+    cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>Excess Kurtosis </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> rs.<font color='#BB00BB'>ex_kurtosis</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+
+    <font color='#0000FF'>return</font> <font color='#979000'>0</font>;
+<b>}</b>
+
+
+</pre></body></html>

@@ -1,0 +1,498 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - scan_image_pyramid_abstract.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2011  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#undef</font> DLIB_SCAN_IMaGE_PYRAMID_ABSTRACT_Hh_
+<font color='#0000FF'>#ifdef</font> DLIB_SCAN_IMaGE_PYRAMID_ABSTRACT_Hh_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../matrix.h.html'>../matrix.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../geometry.h.html'>../geometry.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../image_processing.h.html'>../image_processing.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../array2d.h.html'>../array2d.h</a>"
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>vector<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='full_object_detection_abstract.h.html'>full_object_detection_abstract.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> Pyramid_type,
+        <font color='#0000FF'>typename</font> Feature_extractor_type
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>class</font> <b><a name='scan_image_pyramid'></a>scan_image_pyramid</b> : noncopyable
+    <b>{</b>
+        <font color='#009900'>/*!
+            REQUIREMENTS ON Pyramid_type
+                - must be one of the pyramid_down objects defined in 
+                  dlib/image_transforms/image_pyramid_abstract.h or an object with
+                  a compatible interface
+
+            REQUIREMENTS ON Feature_extractor_type
+                - must be an object with an interface compatible with the hashed_feature_image 
+                  object defined in dlib/image_keypoint/hashed_feature_image_abstract.h or 
+                  with the nearest_neighbor_feature_image object defined in 
+                  dlib/image_keypoint/nearest_neighbor_feature_image_abstract.h
+
+            INITIAL VALUE
+                - get_num_detection_templates() == 0
+                - is_loaded_with_image() == false
+                - get_max_detections_per_template() == 10000
+                - get_max_pyramid_levels() == 1000
+                - get_min_pyramid_layer_width() == 20
+                - get_min_pyramid_layer_height() == 20
+
+            WHAT THIS OBJECT REPRESENTS
+                This object is a tool for running a sliding window classifier over
+                an image pyramid.  This object can also be understood as a general 
+                tool for implementing the spatial pyramid models described in the paper:
+                    Beyond Bags of Features: Spatial Pyramid Matching for Recognizing 
+                    Natural Scene Categories by Svetlana Lazebnik, Cordelia Schmid, 
+                    and Jean Ponce
+                It also includes the ability to represent movable part models.
+
+                
+
+
+                The sliding window classifiers used by this object have three parts: 
+                   1. The underlying feature extraction provided by Feature_extractor_type
+                      objects, which associate a vector with each location in an image.
+
+                   2. A detection template.  This is a rectangle which defines the shape of a 
+                      sliding window (i.e. the object_box), as well as a set of rectangular feature 
+                      extraction regions inside it.  This set of regions defines the spatial 
+                      structure of the overall feature extraction within a sliding window.  In 
+                      particular, each location of a sliding window has a feature vector 
+                      associated with it.  This feature vector is defined as follows:
+                        - Let N denote the number of feature extraction zones.
+                        - Let M denote the dimensionality of the vectors output by Feature_extractor_type
+                          objects.
+                        - Let F(i) == the M dimensional vector which is the sum of all vectors 
+                          given by our Feature_extractor_type object inside the i-th feature extraction
+                          zone.
+                        - Then the feature vector for a sliding window is an M*N dimensional vector
+                          [F(1) F(2) F(3) ... F(N)] (i.e. it is a concatenation of the N vectors).
+                          This feature vector can be thought of as a collection of N "bags of features",
+                          each bag coming from a spatial location determined by one of the rectangular
+                          feature extraction zones.
+                          
+                   3. A weight vector and a threshold value.  The dot product between the weight
+                      vector and the feature vector for a sliding window location gives the score 
+                      of the window.  If this score is greater than the threshold value then the 
+                      window location is output as a detection.
+
+                Finally, the sliding window classifiers described above are applied to every level of
+                an image pyramid.  Moreover, some of the feature extraction zones are allowed to move
+                freely within the object box.  This means that when we are sliding the classifier over
+                an image, some feature extraction zones are stationary (i.e. always in the same place
+                relative to the object box) while others are allowed to move anywhere within the object
+                box.  In particular, the movable regions are placed at the locations that maximize the
+                score of the classifier.  Note further that each of the movable feature extraction
+                zones must pass a threshold test for it to be included.  That is, if the score that a
+                movable zone would contribute to the overall score for a sliding window location is not
+                positive then that zone is not included in the feature vector (i.e.  its part of the
+                feature vector is set to zero.  This way the length of the feature vector stays
+                constant).  This movable region construction allows us to represent objects with parts
+                that move around relative to the object box.  For example, a human has hands but they
+                aren't always in the same place relative to a person's bounding box.  
+
+            THREAD SAFETY
+                Concurrent access to an instance of this object is not safe and should be protected
+                by a mutex lock except for the case where you are copying the configuration 
+                (via copy_configuration()) of a scan_image_pyramid object to many other threads.  
+                In this case, it is safe to copy the configuration of a shared object so long
+                as no other operations are performed on it.
+        !*/</font>
+    <font color='#0000FF'>public</font>:
+
+        <font color='#0000FF'>typedef</font> matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>0</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> feature_vector_type;
+
+        <font color='#0000FF'>typedef</font> Pyramid_type pyramid_type;
+        <font color='#0000FF'>typedef</font> Feature_extractor_type feature_extractor_type;
+
+        <b><a name='scan_image_pyramid'></a>scan_image_pyramid</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;  
+        <font color='#009900'>/*!
+            ensures
+                - this object is properly initialized
+        !*/</font>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'>typename</font> image_type
+            <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='load'></a>load</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> image_type<font color='#5555FF'>&amp;</font> img
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - image_type must be a type with the following properties:
+                    - image_type is default constructable.
+                    - image_type is swappable by the global swap() function.
+                    - image_type logically represents some kind of image and therefore its
+                      number of rows and columns can be queried via num_rows(img) and
+                      num_columns(img) respectively.
+                    - image_type objects can be loaded into Feature_extractor_type
+                      objects via Feature_extractor_type::load().
+                    - image_type objects can be used with Pyramid_type.  That is,
+                      if pyr is an object of type Pyramid_type while img1 and img2
+                      are objects of image_type, then pyr(img1,img2) should be
+                      a valid expression which downsamples img1 into img2.
+            ensures
+                - #is_loaded_with_image() == true
+                - This object is ready to run sliding window classifiers over img.  Call
+                  detect() to do this.
+        !*/</font>
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='is_loaded_with_image'></a>is_loaded_with_image</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns true if this object has been loaded with an image to process
+                  and false otherwise.
+        !*/</font>
+
+        <font color='#0000FF'>const</font> feature_extractor_type<font color='#5555FF'>&amp;</font> <b><a name='get_feature_extractor'></a>get_feature_extractor</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns a const reference to the feature_extractor_type object used 
+                  internally for local feature extraction.  
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='copy_configuration'></a>copy_configuration</b><font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> feature_extractor_type<font color='#5555FF'>&amp;</font> fe
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - This function performs the equivalent of
+                  get_feature_extractor().copy_configuration(fe) (i.e. this function allows
+                  you to configure the parameters of the underlying feature extractor used
+                  by a scan_image_pyramid object)
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='copy_configuration'></a>copy_configuration</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> scan_image_pyramid<font color='#5555FF'>&amp;</font> item
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - copies all the state information of item into *this, except for state 
+                  information populated by load().  More precisely, given two scan_image_pyramid 
+                  objects S1 and S2, the following sequence of instructions should always 
+                  result in both of them having the exact same state.
+                    S2.copy_configuration(S1);
+                    S1.load(img);
+                    S2.load(img);
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='add_detection_template'></a>add_detection_template</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> rectangle<font color='#5555FF'>&amp;</font> object_box,
+            <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>rectangle<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> stationary_feature_extraction_regions,
+            <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>rectangle<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> movable_feature_extraction_regions
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - center(object_box) == point(0,0)
+                - for all valid i:
+                    - center(movable_feature_extraction_regions[i]) == point(0,0)
+                - if (get_num_detection_templates() &gt; 0) then
+                    - get_num_stationary_components_per_detection_template() == stationary_feature_extraction_regions.size() 
+                    - get_num_movable_components_per_detection_template() == movable_feature_extraction_regions.size() 
+                      (i.e. if you already have detection templates in this object, then
+                      any new detection template must declare a consistent number of 
+                      feature extraction regions)
+            ensures
+                - Adds another detection template to this object.  In particular, object_box 
+                  defines the size and shape of a sliding window while stationary_feature_extraction_regions 
+                  and movable_feature_extraction_regions defines the locations for feature extraction as 
+                  discussed in the WHAT THIS OBJECT REPRESENTS section above.  Note also that the locations of 
+                  the stationary feature extraction regions are relative to the object_box.  
+                - #get_num_detection_templates() == get_num_detection_templates() + 1
+                - The order of rectangles in stationary_feature_extraction_regions and
+                  movable_feature_extraction_regions matters.  Recall that each rectangle
+                  gets its own set of features.  So given two different templates, their
+                  i-th rectangles will both share the same part of the weight vector (i.e. the w
+                  supplied to detect()).  So there should be some reasonable correspondence
+                  between the rectangle ordering in different detection templates.  For,
+                  example, different detection templates should place corresponding feature
+                  extraction regions in roughly the same part of the object_box.
+                - #get_num_stationary_components_per_detection_template() = stationary_feature_extraction_regions.size() 
+                - #get_num_movable_components_per_detection_template()    = movable_feature_extraction_regions.size() 
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='add_detection_template'></a>add_detection_template</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> rectangle<font color='#5555FF'>&amp;</font> object_box,
+            <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>rectangle<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> stationary_feature_extraction_regions
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - calls add_detection_template(object_box, stationary_feature_extraction_regions, empty_list)
+                  where empty_list is a vector of size 0.  I.e. this function is just a convenience
+                  routine for adding detection templates with no movable regions.
+        !*/</font>
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='get_num_detection_templates'></a>get_num_detection_templates</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the number of detection templates in this object
+        !*/</font>
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='get_num_stationary_components_per_detection_template'></a>get_num_stationary_components_per_detection_template</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - get_num_detection_templates() &gt; 0
+            ensures
+                - A detection template is a rectangle which defines the shape of a sliding
+                  window (the object_box), as well as a set of rectangles which define
+                  feature extraction zones.  This function returns the number of stationary
+                  feature extraction zones in the detection templates used by this object. 
+        !*/</font>
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='get_num_movable_components_per_detection_template'></a>get_num_movable_components_per_detection_template</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - get_num_detection_templates() &gt; 0
+            ensures
+                - A detection template is a rectangle which defines the shape of a sliding
+                  window (the object_box), as well as a set of rectangles which define
+                  feature extraction zones.  This function returns the number of movable 
+                  feature extraction zones in the detection templates used by this object. 
+        !*/</font>
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='get_num_components_per_detection_template'></a>get_num_components_per_detection_template</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - get_num_detection_templates() &gt; 0
+            ensures
+                - returns the total number of feature extraction zones in the detection
+                  templates used by this object.  That is, returns the following:
+                    - get_num_movable_components_per_detection_template() + 
+                      get_num_stationary_components_per_detection_template()
+        !*/</font>
+
+        <font color='#0000FF'><u>long</u></font> <b><a name='get_num_dimensions'></a>get_num_dimensions</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - get_num_detection_templates() &gt; 0
+            ensures
+                - returns the number of dimensions in the feature vector for a sliding window
+                  location.  This value is the dimensionality of the underlying feature vectors 
+                  produced by Feature_extractor_type times (get_num_stationary_components_per_detection_template() + 
+                  get_num_movable_components_per_detection_template()).
+        !*/</font>
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='get_max_pyramid_levels'></a>get_max_pyramid_levels</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the maximum number of image pyramid levels this object will use.
+                  Note that #get_max_pyramid_levels() == 1 indicates that no image pyramid
+                  will be used at all.  That is, only the original image will be processed
+                  and no lower scale versions will be created.  
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_max_pyramid_levels'></a>set_max_pyramid_levels</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> max_levels
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - max_levels &gt; 0
+            ensures
+                - #get_max_pyramid_levels() == max_levels
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_min_pyramid_layer_size'></a>set_min_pyramid_layer_size</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> width,
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> height 
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - width &gt; 0
+                - height &gt; 0
+            ensures
+                - #get_min_pyramid_layer_width() == width
+                - #get_min_pyramid_layer_height() == height
+        !*/</font>
+
+        <font color='#0000FF'>inline</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='get_min_pyramid_layer_width'></a>get_min_pyramid_layer_width</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the smallest allowable width of an image in the image pyramid.
+                  All pyramids will always include the original input image, however, no
+                  pyramid levels will be created which have a width smaller than the
+                  value returned by this function.
+        !*/</font>
+
+        <font color='#0000FF'>inline</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='get_min_pyramid_layer_height'></a>get_min_pyramid_layer_height</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the smallest allowable height of an image in the image pyramid.
+                  All pyramids will always include the original input image, however, no
+                  pyramid levels will be created which have a height smaller than the
+                  value returned by this function.
+        !*/</font>
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='get_max_detections_per_template'></a>get_max_detections_per_template</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - For each image pyramid layer and detection template, this object scans a sliding
+                  window classifier over an image and produces a number of detections.  This
+                  function returns a number which defines a hard upper limit on the number of
+                  detections allowed by a single scan.  This means that the total number of
+                  possible detections produced by detect() is get_max_detections_per_template()*
+                  get_num_detection_templates()*(number of image pyramid layers).  Additionally, 
+                  if the maximum number of detections is reached during a scan then this object 
+                  will return a random subsample of all detections which are above the detection 
+                  threshold.
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_max_detections_per_template'></a>set_max_detections_per_template</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> max_dets
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - max_dets &gt; 0
+            ensures
+                - #get_max_detections_per_template() == max_dets
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='detect'></a>detect</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> feature_vector_type<font color='#5555FF'>&amp;</font> w,
+            std::vector<font color='#5555FF'>&lt;</font>std::pair<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>, rectangle<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> dets,
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> thresh
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - w.size() &gt;= get_num_dimensions()
+                - is_loaded_with_image() == true
+                - get_num_detection_templates() &gt; 0
+            ensures
+                - Scans all the detection templates over all pyramid layers as discussed in the 
+                  WHAT THIS OBJECT REPRESENTS section and stores all detections into #dets.
+                - for all valid i:
+                    - #dets[i].second == The object box which produced this detection.  This rectangle gives
+                      the location of the detection.  Note that the rectangle will have been converted back into
+                      the original image input space.  That is, if this detection was made at a low level in the
+                      image pyramid then the object box will have been automatically mapped up the pyramid layers
+                      to the original image space.  Or in other words, if you plot #dets[i].second on top of the 
+                      image given to load() it will show up in the right place.
+                    - #dets[i].first == The score for this detection.  This value is equal to dot(w, feature vector
+                      for this sliding window location).
+                    - #dets[i].first &gt;= thresh
+                - #dets will be sorted in descending order. (i.e.  #dets[i].first &gt;= #dets[j].first for all i, and j&gt;i)
+                - Elements of w beyond index get_num_dimensions()-1 are ignored.  I.e. only the first
+                  get_num_dimensions() are used.
+                - Note that no form of non-max suppression is performed.  If a window has a score &gt;= thresh
+                  then it is reported in #dets (assuming the limit imposed by get_max_detections_per_template() hasn't 
+                  been reached).
+        !*/</font>
+
+        <font color='#0000FF'>const</font> rectangle <b><a name='get_best_matching_rect'></a>get_best_matching_rect</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> rectangle<font color='#5555FF'>&amp;</font> rect
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - get_num_detection_templates() &gt; 0
+            ensures
+                - Since scan_image_pyramid is a sliding window classifier system, not all possible rectangles 
+                  can be represented.  Therefore, this function allows you to supply a rectangle and obtain the
+                  nearest possible sliding window rectangle.
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='get_feature_vector'></a>get_feature_vector</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> full_object_detection<font color='#5555FF'>&amp;</font> obj,
+            feature_vector_type<font color='#5555FF'>&amp;</font> psi
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - all_parts_in_rect(obj) == true
+                - obj.num_parts() == get_num_movable_components_per_detection_template()
+                - is_loaded_with_image() == true
+                - get_num_detection_templates() &gt; 0
+                - psi.size() &gt;= get_num_dimensions()
+                  (i.e. psi must have preallocated its memory before this function is called)
+            ensures
+                - This function allows you to determine the feature vector used for a
+                  sliding window location.  Note that this vector is added to psi.  Note
+                  also that you must use get_full_object_detection() to convert a rect from
+                  detect() into the needed full_object_detection.
+                - The dimensionality of the vector added to psi is get_num_dimensions().  This
+                  means that elements of psi after psi(get_num_dimensions()-1) are not modified.
+                - Since scan_image_pyramid is a sliding window classifier system, not all
+                  possible rectangles can be output by detect().  So in the case where
+                  obj.get_rect() could not arise from a call to detect(), this function
+                  will map obj.get_rect() to the nearest possible object box and then add
+                  the feature vector for the mapped rectangle into #psi.
+                - get_best_matching_rect(obj.get_rect()) == the rectangle obj.get_rect()
+                  gets mapped to for feature extraction.
+        !*/</font>
+
+        full_object_detection <b><a name='get_full_object_detection'></a>get_full_object_detection</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> rectangle<font color='#5555FF'>&amp;</font> rect,
+            <font color='#0000FF'>const</font> feature_vector_type<font color='#5555FF'>&amp;</font> w
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - w.size() &gt;= get_num_dimensions()
+                - is_loaded_with_image() == true
+                - get_num_detection_templates() &gt; 0
+            ensures
+                - This function allows you to determine the full_object_detection
+                  corresponding to a sliding window location.  Note that the detect()
+                  routine doesn't return the locations of the movable parts in a detected
+                  object.  Therefore, if you are using any movable parts in your model you
+                  must use get_full_object_detection() to find out where the movable parts
+                  were detected.  To do this, you supply the w and detected rectangle.
+                  Then the corresponding fully populated full_object_detection will be
+                  returned.
+                - returns a full_object_detection, OBJ, such that: 
+                    - OBJ.get_rect() == rect
+                    - OBJ.num_parts() == get_num_movable_components_per_detection_template()
+                    - OBJ.part(i) == the location of the i-th movable part inside this detection,
+                      or OBJECT_PART_NOT_PRESENT if the part was not found.
+        !*/</font>
+
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> Pyramid_type,
+        <font color='#0000FF'>typename</font> Feature_extractor_type
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='serialize'></a>serialize</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> scan_image_pyramid<font color='#5555FF'>&lt;</font>Pyramid_type,Feature_extractor_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> item,
+        std::ostream<font color='#5555FF'>&amp;</font> out
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        provides serialization support 
+    !*/</font>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> Pyramid_type,
+        <font color='#0000FF'>typename</font> Feature_extractor_type
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='deserialize'></a>deserialize</b> <font face='Lucida Console'>(</font>
+        scan_image_pyramid<font color='#5555FF'>&lt;</font>Pyramid_type,Feature_extractor_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> item,
+        std::istream<font color='#5555FF'>&amp;</font> in 
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        provides deserialization support 
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_SCAN_IMaGE_PYRAMID_ABSTRACT_Hh_
+</font>
+
+
+</pre></body></html>

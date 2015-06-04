@@ -1,0 +1,1230 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - graph_utils.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2007  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_GRAPH_UTILs_
+<font color='#0000FF'>#define</font> DLIB_GRAPH_UTILs_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../algs.h.html'>../algs.h</a>"
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>vector<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='graph_utils_abstract.h.html'>graph_utils_abstract.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../is_kind.h.html'>../is_kind.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../enable_if.h.html'>../enable_if.h</a>"
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>algorithm<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../set.h.html'>../set.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../memory_manager.h.html'>../memory_manager.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../set_utils.h.html'>../set_utils.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>typename</font> enable_if<font color='#5555FF'>&lt;</font>is_graph<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font>,<font color='#0000FF'>typename</font> T::edge_type<font color='#5555FF'>&gt;</font>::type<font color='#5555FF'>&amp;</font> <b><a name='edge'></a>edge</b><font face='Lucida Console'>(</font>
+        T<font color='#5555FF'>&amp;</font> g, 
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> idx_i, 
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> idx_j
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#009900'>// make sure requires clause is not broken
+</font>        <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font>g.<font color='#BB00BB'>has_edge</font><font face='Lucida Console'>(</font>idx_i,idx_j<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>true</font>,
+            "<font color='#CC0000'>\tT::edge_type&amp; edge(g, idx_i, idx_j)</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t you have requested an invalid edge</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t idx_i: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> idx_i
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t idx_j: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> idx_j 
+            <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> g.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font>idx_i<font face='Lucida Console'>)</font>.<font color='#BB00BB'>number_of_neighbors</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>g.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font>idx_i<font face='Lucida Console'>)</font>.<font color='#BB00BB'>neighbor</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>.<font color='#BB00BB'>index</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> idx_j<font face='Lucida Console'>)</font>
+                <font color='#0000FF'>return</font> g.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font>idx_i<font face='Lucida Console'>)</font>.<font color='#BB00BB'>edge</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#009900'>// put this here just so compilers don't complain about a lack of
+</font>        <font color='#009900'>// a return here
+</font>        <font color='#BB00BB'>DLIB_CASSERT</font><font face='Lucida Console'>(</font><font color='#979000'>false</font>,
+            "<font color='#CC0000'>\tT::edge_type&amp; edge(g, idx_i, idx_j)</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t you have requested an invalid edge</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t idx_i: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> idx_i
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t idx_j: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> idx_j 
+            <font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>const</font> <font color='#0000FF'>typename</font> enable_if<font color='#5555FF'>&lt;</font>is_graph<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font>,<font color='#0000FF'>typename</font> T::edge_type<font color='#5555FF'>&gt;</font>::type<font color='#5555FF'>&amp;</font> <b><a name='edge'></a>edge</b><font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> g,  
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> idx_i,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> idx_j
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#009900'>// make sure requires clause is not broken
+</font>        <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font>g.<font color='#BB00BB'>has_edge</font><font face='Lucida Console'>(</font>idx_i,idx_j<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>true</font>,
+            "<font color='#CC0000'>\tT::edge_type&amp; edge(g, idx_i, idx_j)</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t you have requested an invalid edge</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t idx_i: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> idx_i
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t idx_j: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> idx_j 
+            <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> g.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font>idx_i<font face='Lucida Console'>)</font>.<font color='#BB00BB'>number_of_neighbors</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>g.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font>idx_i<font face='Lucida Console'>)</font>.<font color='#BB00BB'>neighbor</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>.<font color='#BB00BB'>index</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> idx_j<font face='Lucida Console'>)</font>
+                <font color='#0000FF'>return</font> g.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font>idx_i<font face='Lucida Console'>)</font>.<font color='#BB00BB'>edge</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#009900'>// put this here just so compilers don't complain about a lack of
+</font>        <font color='#009900'>// a return here
+</font>        <font color='#BB00BB'>DLIB_CASSERT</font><font face='Lucida Console'>(</font><font color='#979000'>false</font>,
+            "<font color='#CC0000'>\tT::edge_type&amp; edge(g, idx_i, idx_j)</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t you have requested an invalid edge</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t idx_i: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> idx_i
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t idx_j: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> idx_j 
+            <font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>    
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>typename</font> enable_if<font color='#5555FF'>&lt;</font>is_directed_graph<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font>,<font color='#0000FF'>typename</font> T::edge_type<font color='#5555FF'>&gt;</font>::type<font color='#5555FF'>&amp;</font> <b><a name='edge'></a>edge</b><font face='Lucida Console'>(</font>
+        T<font color='#5555FF'>&amp;</font> g, 
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> parent_idx, 
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> child_idx 
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#009900'>// make sure requires clause is not broken
+</font>        <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font>g.<font color='#BB00BB'>has_edge</font><font face='Lucida Console'>(</font>parent_idx,child_idx<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>true</font>,
+            "<font color='#CC0000'>\t T::edge_type&amp; edge(g, parent_idx, child_idx)</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t you have requested an invalid edge</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t parent_idx: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> parent_idx
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t child_idx: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> child_idx 
+            <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> g.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font>parent_idx<font face='Lucida Console'>)</font>.<font color='#BB00BB'>number_of_children</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>g.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font>parent_idx<font face='Lucida Console'>)</font>.<font color='#BB00BB'>child</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>.<font color='#BB00BB'>index</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> child_idx<font face='Lucida Console'>)</font>
+                <font color='#0000FF'>return</font> g.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font>parent_idx<font face='Lucida Console'>)</font>.<font color='#BB00BB'>child_edge</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#009900'>// put this here just so compilers don't complain about a lack of
+</font>        <font color='#009900'>// a return here
+</font>        <font color='#BB00BB'>DLIB_CASSERT</font><font face='Lucida Console'>(</font><font color='#979000'>false</font>,
+            "<font color='#CC0000'>\t T::edge_type&amp; edge(g, parent_idx, child_idx)</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t you have requested an invalid edge</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t parent_idx: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> parent_idx
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t child_idx: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> child_idx 
+            <font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>const</font> <font color='#0000FF'>typename</font> enable_if<font color='#5555FF'>&lt;</font>is_directed_graph<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font>,<font color='#0000FF'>typename</font> T::edge_type<font color='#5555FF'>&gt;</font>::type<font color='#5555FF'>&amp;</font> <b><a name='edge'></a>edge</b><font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> g,  
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> parent_idx, 
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> child_idx 
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#009900'>// make sure requires clause is not broken
+</font>        <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font>g.<font color='#BB00BB'>has_edge</font><font face='Lucida Console'>(</font>parent_idx,child_idx<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>true</font>,
+            "<font color='#CC0000'>\t T::edge_type&amp; edge(g, parent_idx, child_idx)</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t you have requested an invalid edge</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t parent_idx: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> parent_idx
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t child_idx: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> child_idx 
+            <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> g.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font>parent_idx<font face='Lucida Console'>)</font>.<font color='#BB00BB'>number_of_children</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>g.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font>parent_idx<font face='Lucida Console'>)</font>.<font color='#BB00BB'>child</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>.<font color='#BB00BB'>index</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> child_idx<font face='Lucida Console'>)</font>
+                <font color='#0000FF'>return</font> g.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font>parent_idx<font face='Lucida Console'>)</font>.<font color='#BB00BB'>child_edge</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#009900'>// put this here just so compilers don't complain about a lack of
+</font>        <font color='#009900'>// a return here
+</font>        <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font><font color='#979000'>false</font>,
+            "<font color='#CC0000'>\t T::edge_type&amp; edge(g, parent_idx, child_idx)</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t you have requested an invalid edge</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t parent_idx: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> parent_idx
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t child_idx: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> child_idx 
+            <font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>    
+    <font color='#0000FF'>namespace</font> graph_helpers 
+    <b>{</b>
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> U<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>inline</font> <font color='#0000FF'><u>bool</u></font> <b><a name='is_same_object'></a>is_same_object</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> a,
+            <font color='#0000FF'>const</font> U<font color='#5555FF'>&amp;</font> b
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>is_same_type<font color='#5555FF'>&lt;</font><font color='#0000FF'>const</font> T,<font color='#0000FF'>const</font> U<font color='#5555FF'>&gt;</font>::value <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font><font face='Lucida Console'>)</font>
+                <font color='#0000FF'>return</font> <font color='#979000'>false</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font color='#5555FF'>*</font><font face='Lucida Console'>)</font><font color='#5555FF'>&amp;</font>a <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font color='#5555FF'>*</font><font face='Lucida Console'>)</font><font color='#5555FF'>&amp;</font>b<font face='Lucida Console'>)</font>
+                <font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+            <font color='#0000FF'>else</font>
+                <font color='#0000FF'>return</font> <font color='#979000'>false</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'>typename</font> T
+            <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>bool</u></font> <b><a name='search_for_directed_cycles'></a>search_for_directed_cycles</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> node,
+            std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>bool</u></font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> visited,
+            std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>bool</u></font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> temp
+        <font face='Lucida Console'>)</font>
+        <font color='#009900'>/*!
+            requires
+                - visited.size() &gt;= number of nodes in the graph that contains the given node 
+                - temp.size() &gt;= number of nodes in the graph that contains the given node 
+                - for all i in temp: 
+                    - temp[i] == false
+            ensures
+                - checks the connected subgraph containing the given node for directed cycles
+                  and returns true if any are found and false otherwise.
+                - for all nodes N in the connected subgraph containing the given node:
+                    - #visited[N.index()] == true
+                - for all i in temp: 
+                    - #temp[i] == false
+        !*/</font>
+        <b>{</b>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>temp[node.<font color='#BB00BB'>index</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>true</font><font face='Lucida Console'>)</font>
+                <font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+
+            visited[node.<font color='#BB00BB'>index</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>] <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+            temp[node.<font color='#BB00BB'>index</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>] <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> node.<font color='#BB00BB'>number_of_children</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>search_for_directed_cycles</font><font face='Lucida Console'>(</font>node.<font color='#BB00BB'>child</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>, visited, temp<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                    <font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+            <b>}</b>
+                
+            temp[node.<font color='#BB00BB'>index</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>] <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+
+            <font color='#0000FF'>return</font> <font color='#979000'>false</font>;
+        <b>}</b>
+
+    <font color='#009900'>// ------------------------------------------------------------------------------------
+</font>
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'>typename</font> T
+            <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>typename</font> enable_if<font color='#5555FF'>&lt;</font>is_directed_graph<font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T::graph_type<font color='#5555FF'>&gt;</font>,<font color='#0000FF'><u>bool</u></font><font color='#5555FF'>&gt;</font>::type <b><a name='search_for_undirected_cycles'></a>search_for_undirected_cycles</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> node,
+            std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>bool</u></font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> visited,
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> prev <font color='#5555FF'>=</font> std::numeric_limits<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>max</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+        <font face='Lucida Console'>)</font>
+        <font color='#009900'>/*!
+            requires
+                - visited.size() &gt;= number of nodes in the graph that contains the given node 
+                - for all nodes N in the connected subgraph containing the given node:
+                    - visited[N.index] == false
+            ensures
+                - checks the connected subgraph containing the given node for directed cycles
+                  and returns true if any are found and false otherwise.
+                - for all nodes N in the connected subgraph containing the given node:
+                    - #visited[N.index()] == true
+        !*/</font>
+        <b>{</b>
+            <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> std;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>visited[node.<font color='#BB00BB'>index</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>true</font><font face='Lucida Console'>)</font>
+                <font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+
+            visited[node.<font color='#BB00BB'>index</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>] <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> node.<font color='#BB00BB'>number_of_children</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>node.<font color='#BB00BB'>child</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>.<font color='#BB00BB'>index</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>!</font><font color='#5555FF'>=</font> prev <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> 
+                    <font color='#BB00BB'>search_for_undirected_cycles</font><font face='Lucida Console'>(</font>node.<font color='#BB00BB'>child</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>, visited, node.<font color='#BB00BB'>index</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                    <font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+            <b>}</b>
+                
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> node.<font color='#BB00BB'>number_of_parents</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>node.<font color='#BB00BB'>parent</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>.<font color='#BB00BB'>index</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>!</font><font color='#5555FF'>=</font> prev <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> 
+                    <font color='#BB00BB'>search_for_undirected_cycles</font><font face='Lucida Console'>(</font>node.<font color='#BB00BB'>parent</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>, visited, node.<font color='#BB00BB'>index</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                    <font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+            <b>}</b>
+
+            <font color='#0000FF'>return</font> <font color='#979000'>false</font>;
+        <b>}</b>
+
+    <font color='#009900'>// ------------------------------------------------------------------------------------
+</font>
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'>typename</font> T
+            <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>typename</font> enable_if<font color='#5555FF'>&lt;</font>is_graph<font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T::graph_type<font color='#5555FF'>&gt;</font>,<font color='#0000FF'><u>bool</u></font><font color='#5555FF'>&gt;</font>::type <b><a name='search_for_undirected_cycles'></a>search_for_undirected_cycles</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> node,
+            std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>bool</u></font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> visited,
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> prev <font color='#5555FF'>=</font> std::numeric_limits<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>max</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+        <font face='Lucida Console'>)</font>
+        <font color='#009900'>/*!
+            requires
+                - visited.size() &gt;= number of nodes in the graph that contains the given node 
+                - for all nodes N in the connected subgraph containing the given node:
+                    - visited[N.index] == false
+            ensures
+                - checks the connected subgraph containing the given node for directed cycles
+                  and returns true if any are found and false otherwise.
+                - for all nodes N in the connected subgraph containing the given node:
+                    - #visited[N.index()] == true
+        !*/</font>
+        <b>{</b>
+            <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> std;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>visited[node.<font color='#BB00BB'>index</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>true</font><font face='Lucida Console'>)</font>
+                <font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+
+            visited[node.<font color='#BB00BB'>index</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>] <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> node.<font color='#BB00BB'>number_of_neighbors</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>node.<font color='#BB00BB'>neighbor</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>.<font color='#BB00BB'>index</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>!</font><font color='#5555FF'>=</font> prev <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> 
+                    <font color='#BB00BB'>search_for_undirected_cycles</font><font face='Lucida Console'>(</font>node.<font color='#BB00BB'>neighbor</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>, visited, node.<font color='#BB00BB'>index</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                    <font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+            <b>}</b>
+                
+            <font color='#0000FF'>return</font> <font color='#979000'>false</font>;
+        <b>}</b>
+
+    <b>}</b>
+
+<font color='#009900'>// ------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> graph_type1,
+        <font color='#0000FF'>typename</font> graph_type2
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>typename</font> enable_if<font color='#5555FF'>&lt;</font>is_graph<font color='#5555FF'>&lt;</font>graph_type1<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font>::type <b><a name='copy_graph_structure'></a>copy_graph_structure</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> graph_type1<font color='#5555FF'>&amp;</font> src,
+        graph_type2<font color='#5555FF'>&amp;</font> dest
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#BB00BB'>COMPILE_TIME_ASSERT</font><font face='Lucida Console'>(</font>is_graph<font color='#5555FF'>&lt;</font>graph_type1<font color='#5555FF'>&gt;</font>::value<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>COMPILE_TIME_ASSERT</font><font face='Lucida Console'>(</font>is_graph<font color='#5555FF'>&lt;</font>graph_type2<font color='#5555FF'>&gt;</font>::value<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>graph_helpers::<font color='#BB00BB'>is_same_object</font><font face='Lucida Console'>(</font>src,dest<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+            <font color='#0000FF'>return</font>;
+
+        dest.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        dest.<font color='#BB00BB'>set_number_of_nodes</font><font face='Lucida Console'>(</font>src.<font color='#BB00BB'>number_of_nodes</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// copy all the edges from src into dest 
+</font>        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> src.<font color='#BB00BB'>number_of_nodes</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> j <font color='#5555FF'>=</font> <font color='#979000'>0</font>; j <font color='#5555FF'>&lt;</font> src.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>.<font color='#BB00BB'>number_of_neighbors</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>j<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> nidx <font color='#5555FF'>=</font> src.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>.<font color='#BB00BB'>neighbor</font><font face='Lucida Console'>(</font>j<font face='Lucida Console'>)</font>.<font color='#BB00BB'>index</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>nidx <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> i<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    dest.<font color='#BB00BB'>add_edge</font><font face='Lucida Console'>(</font>i,nidx<font face='Lucida Console'>)</font>;
+                <b>}</b>
+            <b>}</b>
+        <b>}</b>
+    <b>}</b>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> graph_type1,
+        <font color='#0000FF'>typename</font> graph_type2
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>typename</font> enable_if<font color='#5555FF'>&lt;</font>is_directed_graph<font color='#5555FF'>&lt;</font>graph_type1<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font>::type <b><a name='copy_graph_structure'></a>copy_graph_structure</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> graph_type1<font color='#5555FF'>&amp;</font> src,
+        graph_type2<font color='#5555FF'>&amp;</font> dest
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#BB00BB'>COMPILE_TIME_ASSERT</font><font face='Lucida Console'>(</font>is_directed_graph<font color='#5555FF'>&lt;</font>graph_type1<font color='#5555FF'>&gt;</font>::value<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>COMPILE_TIME_ASSERT</font><font face='Lucida Console'>(</font>is_directed_graph<font color='#5555FF'>&lt;</font>graph_type2<font color='#5555FF'>&gt;</font>::value <font color='#5555FF'>|</font><font color='#5555FF'>|</font> is_graph<font color='#5555FF'>&lt;</font>graph_type2<font color='#5555FF'>&gt;</font>::value <font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>graph_helpers::<font color='#BB00BB'>is_same_object</font><font face='Lucida Console'>(</font>src,dest<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+            <font color='#0000FF'>return</font>;
+
+        dest.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        dest.<font color='#BB00BB'>set_number_of_nodes</font><font face='Lucida Console'>(</font>src.<font color='#BB00BB'>number_of_nodes</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// copy all the edges from src into dest 
+</font>        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> src.<font color='#BB00BB'>number_of_nodes</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> j <font color='#5555FF'>=</font> <font color='#979000'>0</font>; j <font color='#5555FF'>&lt;</font> src.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>.<font color='#BB00BB'>number_of_children</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>j<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> nidx <font color='#5555FF'>=</font> src.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>.<font color='#BB00BB'>child</font><font face='Lucida Console'>(</font>j<font face='Lucida Console'>)</font>.<font color='#BB00BB'>index</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>dest.<font color='#BB00BB'>has_edge</font><font face='Lucida Console'>(</font>i,nidx<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font><font face='Lucida Console'>)</font>
+                <b>{</b>
+                    dest.<font color='#BB00BB'>add_edge</font><font face='Lucida Console'>(</font>i,nidx<font face='Lucida Console'>)</font>;
+                <b>}</b>
+            <b>}</b>
+        <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> graph_type1,
+        <font color='#0000FF'>typename</font> graph_type2
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>typename</font> enable_if<font color='#5555FF'>&lt;</font>is_graph<font color='#5555FF'>&lt;</font>graph_type1<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font>::type <b><a name='copy_graph'></a>copy_graph</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> graph_type1<font color='#5555FF'>&amp;</font> src,
+        graph_type2<font color='#5555FF'>&amp;</font> dest
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#BB00BB'>COMPILE_TIME_ASSERT</font><font face='Lucida Console'>(</font>is_graph<font color='#5555FF'>&lt;</font>graph_type1<font color='#5555FF'>&gt;</font>::value<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>COMPILE_TIME_ASSERT</font><font face='Lucida Console'>(</font>is_graph<font color='#5555FF'>&lt;</font>graph_type2<font color='#5555FF'>&gt;</font>::value<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>graph_helpers::<font color='#BB00BB'>is_same_object</font><font face='Lucida Console'>(</font>src,dest<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+            <font color='#0000FF'>return</font>;
+
+        <font color='#BB00BB'>copy_graph_structure</font><font face='Lucida Console'>(</font>src,dest<font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// copy all the node and edge content 
+</font>        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> src.<font color='#BB00BB'>number_of_nodes</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+        <b>{</b>
+            dest.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>.data <font color='#5555FF'>=</font> src.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>.data;
+
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> j <font color='#5555FF'>=</font> <font color='#979000'>0</font>; j <font color='#5555FF'>&lt;</font> src.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>.<font color='#BB00BB'>number_of_neighbors</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>j<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> nidx <font color='#5555FF'>=</font> src.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>.<font color='#BB00BB'>neighbor</font><font face='Lucida Console'>(</font>j<font face='Lucida Console'>)</font>.<font color='#BB00BB'>index</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>nidx <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> i<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    dest.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>.<font color='#BB00BB'>edge</font><font face='Lucida Console'>(</font>j<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> src.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>.<font color='#BB00BB'>edge</font><font face='Lucida Console'>(</font>j<font face='Lucida Console'>)</font>;
+                <b>}</b>
+            <b>}</b>
+        <b>}</b>
+    <b>}</b>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> graph_type1,
+        <font color='#0000FF'>typename</font> graph_type2
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>typename</font> enable_if<font color='#5555FF'>&lt;</font>is_directed_graph<font color='#5555FF'>&lt;</font>graph_type1<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font>::type <b><a name='copy_graph'></a>copy_graph</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> graph_type1<font color='#5555FF'>&amp;</font> src,
+        graph_type2<font color='#5555FF'>&amp;</font> dest
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#BB00BB'>COMPILE_TIME_ASSERT</font><font face='Lucida Console'>(</font>is_directed_graph<font color='#5555FF'>&lt;</font>graph_type1<font color='#5555FF'>&gt;</font>::value<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>COMPILE_TIME_ASSERT</font><font face='Lucida Console'>(</font>is_directed_graph<font color='#5555FF'>&lt;</font>graph_type2<font color='#5555FF'>&gt;</font>::value<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>graph_helpers::<font color='#BB00BB'>is_same_object</font><font face='Lucida Console'>(</font>src,dest<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+            <font color='#0000FF'>return</font>;
+
+        <font color='#BB00BB'>copy_graph_structure</font><font face='Lucida Console'>(</font>src,dest<font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// copy all the node and edge content 
+</font>        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> src.<font color='#BB00BB'>number_of_nodes</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+        <b>{</b>
+            dest.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>.data <font color='#5555FF'>=</font> src.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>.data;
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> j <font color='#5555FF'>=</font> <font color='#979000'>0</font>; j <font color='#5555FF'>&lt;</font> src.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>.<font color='#BB00BB'>number_of_children</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>j<font face='Lucida Console'>)</font>
+            <b>{</b>
+                dest.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>.<font color='#BB00BB'>child_edge</font><font face='Lucida Console'>(</font>j<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> src.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>.<font color='#BB00BB'>child_edge</font><font face='Lucida Console'>(</font>j<font face='Lucida Console'>)</font>;
+            <b>}</b>
+        <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T,
+        <font color='#0000FF'>typename</font> S
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>typename</font> enable_if<font color='#5555FF'>&lt;</font>is_graph<font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T::graph_type<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font>::type <b><a name='find_connected_nodes'></a>find_connected_nodes</b> <font face='Lucida Console'>(</font>
+    <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> n,
+    S<font color='#5555FF'>&amp;</font> visited
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>visited.<font color='#BB00BB'>is_member</font><font face='Lucida Console'>(</font>n.<font color='#BB00BB'>index</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> temp <font color='#5555FF'>=</font> n.<font color='#BB00BB'>index</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            visited.<font color='#BB00BB'>add</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> n.<font color='#BB00BB'>number_of_neighbors</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                <font color='#BB00BB'>find_connected_nodes</font><font face='Lucida Console'>(</font>n.<font color='#BB00BB'>neighbor</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>, visited<font face='Lucida Console'>)</font>;
+        <b>}</b>
+    <b>}</b>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T,
+        <font color='#0000FF'>typename</font> S
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>typename</font> enable_if<font color='#5555FF'>&lt;</font>is_directed_graph<font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T::graph_type<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font>::type <b><a name='find_connected_nodes'></a>find_connected_nodes</b> <font face='Lucida Console'>(</font>
+    <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> n,
+    S<font color='#5555FF'>&amp;</font> visited
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>visited.<font color='#BB00BB'>is_member</font><font face='Lucida Console'>(</font>n.<font color='#BB00BB'>index</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> temp <font color='#5555FF'>=</font> n.<font color='#BB00BB'>index</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            visited.<font color='#BB00BB'>add</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> n.<font color='#BB00BB'>number_of_parents</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                <font color='#BB00BB'>find_connected_nodes</font><font face='Lucida Console'>(</font>n.<font color='#BB00BB'>parent</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>, visited<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> n.<font color='#BB00BB'>number_of_children</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                <font color='#BB00BB'>find_connected_nodes</font><font face='Lucida Console'>(</font>n.<font color='#BB00BB'>child</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>, visited<font face='Lucida Console'>)</font>;
+        <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T 
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>bool</u></font> <b><a name='graph_is_connected'></a>graph_is_connected</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> g
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>g.<font color='#BB00BB'>number_of_nodes</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+            <font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+
+        set<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font>::kernel_1b_c visited;
+        <font color='#BB00BB'>find_connected_nodes</font><font face='Lucida Console'>(</font>g.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>, visited<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>return</font> <font face='Lucida Console'>(</font>visited.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> g.<font color='#BB00BB'>number_of_nodes</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>bool</u></font> <b><a name='graph_has_symmetric_edges'></a>graph_has_symmetric_edges</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> graph
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> graph.<font color='#BB00BB'>number_of_nodes</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> j <font color='#5555FF'>=</font> <font color='#979000'>0</font>; j <font color='#5555FF'>&lt;</font> graph.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>.<font color='#BB00BB'>number_of_children</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>j<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> jj <font color='#5555FF'>=</font> graph.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>.<font color='#BB00BB'>child</font><font face='Lucida Console'>(</font>j<font face='Lucida Console'>)</font>.<font color='#BB00BB'>index</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                <font color='#009900'>// make sure every edge from a parent to a child has an edge linking back
+</font>                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>graph.<font color='#BB00BB'>has_edge</font><font face='Lucida Console'>(</font>jj,i<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font><font face='Lucida Console'>)</font>
+                    <font color='#0000FF'>return</font> <font color='#979000'>false</font>;
+            <b>}</b>
+
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> j <font color='#5555FF'>=</font> <font color='#979000'>0</font>; j <font color='#5555FF'>&lt;</font> graph.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>.<font color='#BB00BB'>number_of_parents</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>j<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> jj <font color='#5555FF'>=</font> graph.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>.<font color='#BB00BB'>parent</font><font face='Lucida Console'>(</font>j<font face='Lucida Console'>)</font>.<font color='#BB00BB'>index</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                <font color='#009900'>// make sure every edge from a child to a parent has an edge linking back
+</font>                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>graph.<font color='#BB00BB'>has_edge</font><font face='Lucida Console'>(</font>i,jj<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font><font face='Lucida Console'>)</font>
+                    <font color='#0000FF'>return</font> <font color='#979000'>false</font>;
+            <b>}</b>
+        <b>}</b>
+
+        <font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>    
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>bool</u></font> <b><a name='graph_contains_directed_cycle'></a>graph_contains_directed_cycle</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> graph
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> std;
+        <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> graph_helpers;
+        std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>bool</u></font><font color='#5555FF'>&gt;</font> <font color='#BB00BB'>visited</font><font face='Lucida Console'>(</font>graph.<font color='#BB00BB'>number_of_nodes</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, <font color='#979000'>false</font><font face='Lucida Console'>)</font>;
+        std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>bool</u></font><font color='#5555FF'>&gt;</font> <font color='#BB00BB'>temp</font><font face='Lucida Console'>(</font>graph.<font color='#BB00BB'>number_of_nodes</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, <font color='#979000'>false</font><font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font><font color='#979000'>true</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#009900'>// find the first node that hasn't been visited yet
+</font>            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i;
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> visited.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>visited[i] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font><font face='Lucida Console'>)</font>
+                    <font color='#0000FF'>break</font>;
+            <b>}</b>
+
+            <font color='#009900'>// if we didn't find any non-visited nodes then we are done
+</font>            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>i <font color='#5555FF'>=</font><font color='#5555FF'>=</font> visited.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                <font color='#0000FF'>return</font> <font color='#979000'>false</font>;
+
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>search_for_directed_cycles</font><font face='Lucida Console'>(</font>graph.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>, visited, temp<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                <font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+        <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>bool</u></font> <b><a name='graph_contains_undirected_cycle'></a>graph_contains_undirected_cycle</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> graph
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> std;
+        <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> graph_helpers;
+        std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>bool</u></font><font color='#5555FF'>&gt;</font> <font color='#BB00BB'>visited</font><font face='Lucida Console'>(</font>graph.<font color='#BB00BB'>number_of_nodes</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, <font color='#979000'>false</font><font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font><font color='#979000'>true</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#009900'>// find the first node that hasn't been visited yet
+</font>            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i;
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> visited.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>visited[i] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font><font face='Lucida Console'>)</font>
+                    <font color='#0000FF'>break</font>;
+            <b>}</b>
+
+            <font color='#009900'>// if we didn't find any non-visited nodes then we are done
+</font>            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>i <font color='#5555FF'>=</font><font color='#5555FF'>=</font> visited.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                <font color='#0000FF'>return</font> <font color='#979000'>false</font>;
+
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>search_for_undirected_cycles</font><font face='Lucida Console'>(</font>graph.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>, visited<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                <font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+        <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> directed_graph_type,
+        <font color='#0000FF'>typename</font> graph_type
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='create_moral_graph'></a>create_moral_graph</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> directed_graph_type<font color='#5555FF'>&amp;</font> g,
+        graph_type<font color='#5555FF'>&amp;</font> moral_graph
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#009900'>// make sure requires clause is not broken
+</font>        <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font><font color='#BB00BB'>graph_contains_directed_cycle</font><font face='Lucida Console'>(</font>g<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font>,
+            "<font color='#CC0000'>\tvoid create_moral_graph(g, moral_graph)</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tYou can only make moral graphs if g doesn't have directed cycles</font>"
+            <font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>COMPILE_TIME_ASSERT</font><font face='Lucida Console'>(</font>is_graph<font color='#5555FF'>&lt;</font>graph_type<font color='#5555FF'>&gt;</font>::value<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>COMPILE_TIME_ASSERT</font><font face='Lucida Console'>(</font>is_directed_graph<font color='#5555FF'>&lt;</font>directed_graph_type<font color='#5555FF'>&gt;</font>::value<font face='Lucida Console'>)</font>;
+
+        <font color='#BB00BB'>copy_graph_structure</font><font face='Lucida Console'>(</font>g, moral_graph<font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// now marry all the parents (i.e. add edges between parent nodes)
+</font>        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> g.<font color='#BB00BB'>number_of_nodes</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#009900'>// loop over all combinations of parents of g.node(i)
+</font>            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> j <font color='#5555FF'>=</font> <font color='#979000'>0</font>; j <font color='#5555FF'>&lt;</font> g.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>.<font color='#BB00BB'>number_of_parents</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>j<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> k <font color='#5555FF'>=</font> <font color='#979000'>0</font>; k <font color='#5555FF'>&lt;</font> g.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>.<font color='#BB00BB'>number_of_parents</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>k<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> p1 <font color='#5555FF'>=</font> g.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>.<font color='#BB00BB'>parent</font><font face='Lucida Console'>(</font>j<font face='Lucida Console'>)</font>.<font color='#BB00BB'>index</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                    <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> p2 <font color='#5555FF'>=</font> g.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>.<font color='#BB00BB'>parent</font><font face='Lucida Console'>(</font>k<font face='Lucida Console'>)</font>.<font color='#BB00BB'>index</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>p1 <font color='#5555FF'>=</font><font color='#5555FF'>=</font> p2<font face='Lucida Console'>)</font>
+                        <font color='#0000FF'>continue</font>;
+
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>moral_graph.<font color='#BB00BB'>has_edge</font><font face='Lucida Console'>(</font>p1,p2<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font><font face='Lucida Console'>)</font>
+                        moral_graph.<font color='#BB00BB'>add_edge</font><font face='Lucida Console'>(</font>p1,p2<font face='Lucida Console'>)</font>;
+                <b>}</b>
+            <b>}</b>
+        <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> graph_type,
+        <font color='#0000FF'>typename</font> sets_of_int
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>bool</u></font> <b><a name='is_clique'></a>is_clique</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> graph_type<font color='#5555FF'>&amp;</font> g,
+        <font color='#0000FF'>const</font> sets_of_int<font color='#5555FF'>&amp;</font> clique
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#009900'>// make sure requires clause is not broken
+</font>        <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font><font color='#BB00BB'>graph_contains_length_one_cycle</font><font face='Lucida Console'>(</font>g<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font>,
+            "<font color='#CC0000'>\tvoid is_clique(g, clique)</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tinvalid graph</font>"
+            <font face='Lucida Console'>)</font>;
+<font color='#0000FF'>#ifdef</font> ENABLE_ASSERTS
+        clique.<font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>clique.<font color='#BB00BB'>move_next</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> x <font color='#5555FF'>=</font> clique.<font color='#BB00BB'>element</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font> x <font color='#5555FF'>&lt;</font> g.<font color='#BB00BB'>number_of_nodes</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, 
+                "<font color='#CC0000'>\tvoid is_clique(g, clique)</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tthe clique set contained an invalid node index</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tx:                   </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> x 
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tg.number_of_nodes(): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> g.<font color='#BB00BB'>number_of_nodes</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+                <font face='Lucida Console'>)</font>;
+        <b>}</b>
+<font color='#0000FF'>#endif</font>
+
+        <font color='#BB00BB'>COMPILE_TIME_ASSERT</font><font face='Lucida Console'>(</font>is_graph<font color='#5555FF'>&lt;</font>graph_type<font color='#5555FF'>&gt;</font>::value<font face='Lucida Console'>)</font>;
+
+        std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font> v;
+        v.<font color='#BB00BB'>reserve</font><font face='Lucida Console'>(</font>clique.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        clique.<font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>clique.<font color='#BB00BB'>move_next</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            v.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>clique.<font color='#BB00BB'>element</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> v.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> j <font color='#5555FF'>=</font> <font color='#979000'>0</font>; j <font color='#5555FF'>&lt;</font> v.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>j<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>v[i] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> v[j]<font face='Lucida Console'>)</font>
+                    <font color='#0000FF'>continue</font>;
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>g.<font color='#BB00BB'>has_edge</font><font face='Lucida Console'>(</font>v[i], v[j]<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font><font face='Lucida Console'>)</font>
+                    <font color='#0000FF'>return</font> <font color='#979000'>false</font>;
+            <b>}</b>
+        <b>}</b>
+
+        <font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> graph_type,
+        <font color='#0000FF'>typename</font> sets_of_int
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>bool</u></font> <b><a name='is_maximal_clique'></a>is_maximal_clique</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> graph_type<font color='#5555FF'>&amp;</font> g,
+        <font color='#0000FF'>const</font> sets_of_int<font color='#5555FF'>&amp;</font> clique
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#009900'>// make sure requires clause is not broken
+</font>        <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font><font color='#BB00BB'>graph_contains_length_one_cycle</font><font face='Lucida Console'>(</font>g<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font>,
+            "<font color='#CC0000'>\tvoid is_maximal_clique(g, clique)</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tinvalid graph</font>"
+            <font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font><font color='#BB00BB'>is_clique</font><font face='Lucida Console'>(</font>g,clique<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>true</font>,
+            "<font color='#CC0000'>\tvoid is_maximal_clique(g, clique)</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tinvalid graph</font>"
+            <font face='Lucida Console'>)</font>;
+<font color='#0000FF'>#ifdef</font> ENABLE_ASSERTS
+        clique.<font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>clique.<font color='#BB00BB'>move_next</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> x <font color='#5555FF'>=</font> clique.<font color='#BB00BB'>element</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font> x <font color='#5555FF'>&lt;</font> g.<font color='#BB00BB'>number_of_nodes</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, 
+                "<font color='#CC0000'>\tvoid is_maximal_clique(g, clique)</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tthe clique set contained an invalid node index</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tx:                   </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> x 
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tg.number_of_nodes(): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> g.<font color='#BB00BB'>number_of_nodes</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+                <font face='Lucida Console'>)</font>;
+        <b>}</b>
+<font color='#0000FF'>#endif</font>
+
+        <font color='#BB00BB'>COMPILE_TIME_ASSERT</font><font face='Lucida Console'>(</font>is_graph<font color='#5555FF'>&lt;</font>graph_type<font color='#5555FF'>&gt;</font>::value<font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>clique.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+            <font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+
+        <font color='#009900'>// get an element in the clique and make sure that
+</font>        <font color='#009900'>// none of its neighbors that aren't in the clique are connected 
+</font>        <font color='#009900'>// to all the elements of the clique.
+</font>        clique.<font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        clique.<font color='#BB00BB'>move_next</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> idx <font color='#5555FF'>=</font> clique.<font color='#BB00BB'>element</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> g.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font>idx<font face='Lucida Console'>)</font>.<font color='#BB00BB'>number_of_neighbors</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> n <font color='#5555FF'>=</font> g.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font>idx<font face='Lucida Console'>)</font>.<font color='#BB00BB'>neighbor</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>.<font color='#BB00BB'>index</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>clique.<font color='#BB00BB'>is_member</font><font face='Lucida Console'>(</font>n<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                <font color='#0000FF'>continue</font>;
+
+            <font color='#009900'>// now loop over all the clique members and make sure they don't all
+</font>            <font color='#009900'>// share an edge with node n
+</font>            <font color='#0000FF'><u>bool</u></font> all_share_edge <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+            clique.<font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>clique.<font color='#BB00BB'>move_next</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>g.<font color='#BB00BB'>has_edge</font><font face='Lucida Console'>(</font>clique.<font color='#BB00BB'>element</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, n<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font><font face='Lucida Console'>)</font>
+                <b>{</b>
+                    all_share_edge <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+                    <font color='#0000FF'>break</font>;
+                <b>}</b>
+            <b>}</b>
+
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>all_share_edge <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>true</font><font face='Lucida Console'>)</font>
+                <font color='#0000FF'>return</font> <font color='#979000'>false</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>typename</font> enable_if<font color='#5555FF'>&lt;</font>is_directed_graph<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font>,<font color='#0000FF'><u>bool</u></font><font color='#5555FF'>&gt;</font>::type <b><a name='graph_contains_length_one_cycle'></a>graph_contains_length_one_cycle</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> graph
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> graph.<font color='#BB00BB'>number_of_nodes</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#009900'>// make sure none of this guys children are actually itself
+</font>            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> n <font color='#5555FF'>=</font> <font color='#979000'>0</font>; n <font color='#5555FF'>&lt;</font> graph.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>.<font color='#BB00BB'>number_of_children</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>n<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>graph.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>.<font color='#BB00BB'>child</font><font face='Lucida Console'>(</font>n<font face='Lucida Console'>)</font>.<font color='#BB00BB'>index</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> i<font face='Lucida Console'>)</font>
+                    <font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+            <b>}</b>
+        <b>}</b>
+
+        <font color='#0000FF'>return</font> <font color='#979000'>false</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>typename</font> enable_if<font color='#5555FF'>&lt;</font>is_graph<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font>,<font color='#0000FF'><u>bool</u></font><font color='#5555FF'>&gt;</font>::type <b><a name='graph_contains_length_one_cycle'></a>graph_contains_length_one_cycle</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> graph
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> graph.<font color='#BB00BB'>number_of_nodes</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#009900'>// make sure none of this guys neighbors are actually itself
+</font>            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> n <font color='#5555FF'>=</font> <font color='#979000'>0</font>; n <font color='#5555FF'>&lt;</font> graph.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>.<font color='#BB00BB'>number_of_neighbors</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>n<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>graph.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>.<font color='#BB00BB'>neighbor</font><font face='Lucida Console'>(</font>n<font face='Lucida Console'>)</font>.<font color='#BB00BB'>index</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> i<font face='Lucida Console'>)</font>
+                    <font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+            <b>}</b>
+        <b>}</b>
+
+        <font color='#0000FF'>return</font> <font color='#979000'>false</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>namespace</font> graph_helpers
+    <b>{</b>
+        <font color='#0000FF'>struct</font> <b><a name='pair'></a>pair</b>
+        <b>{</b>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> index;
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> num_neighbors;
+
+            <font color='#0000FF'><u>bool</u></font> <b><a name='operator'></a>operator</b><font color='#5555FF'>&lt;</font> <font face='Lucida Console'>(</font><font color='#0000FF'>const</font> pair<font color='#5555FF'>&amp;</font> p<font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> num_neighbors <font color='#5555FF'>&lt;</font> p.num_neighbors; <b>}</b>
+        <b>}</b>;
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'>typename</font> T,
+            <font color='#0000FF'>typename</font> S,
+            <font color='#0000FF'>typename</font> V
+            <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='search_graph_for_triangulate'></a>search_graph_for_triangulate</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> n,
+            S<font color='#5555FF'>&amp;</font> visited,
+            V<font color='#5555FF'>&amp;</font> order_visited
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#009900'>// base case of recursion.  stop when we hit a node we have
+</font>            <font color='#009900'>// already visited.
+</font>            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>visited.<font color='#BB00BB'>is_member</font><font face='Lucida Console'>(</font>n.<font color='#BB00BB'>index</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                <font color='#0000FF'>return</font>;
+
+            <font color='#009900'>// record that we have visited this node
+</font>            order_visited.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>n.<font color='#BB00BB'>index</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> temp <font color='#5555FF'>=</font> n.<font color='#BB00BB'>index</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            visited.<font color='#BB00BB'>add</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// we want to visit all the neighbors of this node but do
+</font>            <font color='#009900'>// so by visiting the nodes with the most neighbors first.  So
+</font>            <font color='#009900'>// lets make a vector that lists the nodes in the order we 
+</font>            <font color='#009900'>// want to visit them
+</font>            std::vector<font color='#5555FF'>&lt;</font>pair<font color='#5555FF'>&gt;</font> neighbors;
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> n.<font color='#BB00BB'>number_of_neighbors</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                pair p;
+                p.index <font color='#5555FF'>=</font> i;
+                p.num_neighbors <font color='#5555FF'>=</font> n.<font color='#BB00BB'>neighbor</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>.<font color='#BB00BB'>number_of_neighbors</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                neighbors.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>p<font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+            <font color='#009900'>// now sort the neighbors array so that the neighbors with the
+</font>            <font color='#009900'>// most neighbors come first.
+</font>            std::<font color='#BB00BB'>sort</font><font face='Lucida Console'>(</font>neighbors.<font color='#BB00BB'>rbegin</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, neighbors.<font color='#BB00BB'>rend</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// now visit all the nodes
+</font>            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> neighbors.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#BB00BB'>search_graph_for_triangulate</font><font face='Lucida Console'>(</font>n.<font color='#BB00BB'>neighbor</font><font face='Lucida Console'>(</font>neighbors[i].index<font face='Lucida Console'>)</font>, visited, order_visited<font face='Lucida Console'>)</font>;
+            <b>}</b>
+        <b>}</b>
+    <b>}</b> <font color='#009900'>// end namespace graph_helpers
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> graph_type,
+        <font color='#0000FF'>typename</font> set_of_sets_of_int
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='triangulate_graph_and_find_cliques'></a>triangulate_graph_and_find_cliques</b> <font face='Lucida Console'>(</font>
+        graph_type<font color='#5555FF'>&amp;</font> g,
+        set_of_sets_of_int<font color='#5555FF'>&amp;</font> cliques
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+
+        <font color='#009900'>// make sure requires clause is not broken
+</font>        <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font><font color='#BB00BB'>graph_contains_length_one_cycle</font><font face='Lucida Console'>(</font>g<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font>,
+            "<font color='#CC0000'>\tvoid triangulate_graph_and_find_cliques(g, cliques)</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tInvalid graph</font>"
+            <font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font><font color='#BB00BB'>graph_is_connected</font><font face='Lucida Console'>(</font>g<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>true</font>,
+            "<font color='#CC0000'>\tvoid triangulate_graph_and_find_cliques(g, cliques)</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tInvalid graph</font>"
+            <font face='Lucida Console'>)</font>;
+
+        <font color='#BB00BB'>COMPILE_TIME_ASSERT</font><font face='Lucida Console'>(</font>is_graph<font color='#5555FF'>&lt;</font>graph_type<font color='#5555FF'>&gt;</font>::value<font face='Lucida Console'>)</font>;
+
+
+        <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> graph_helpers;
+        <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> std;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> set_of_sets_of_int::type set_of_int;
+
+        cliques.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// first we find the node with the most neighbors
+</font>        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> max_index <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> num_neighbors <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> g.<font color='#BB00BB'>number_of_nodes</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>g.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>.<font color='#BB00BB'>number_of_neighbors</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> num_neighbors<font face='Lucida Console'>)</font>
+            <b>{</b>
+                max_index <font color='#5555FF'>=</font> i;
+                num_neighbors <font color='#5555FF'>=</font> g.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>.<font color='#BB00BB'>number_of_neighbors</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+        <b>}</b>
+
+        <font color='#009900'>// now we do a depth first search of the entire graph starting
+</font>        <font color='#009900'>// with the node we just found.  We record the order in which
+</font>        <font color='#009900'>// we visit each node in the vector order_visited.
+</font>        std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font> order_visited;
+        set_of_int visited;
+        <font color='#BB00BB'>search_graph_for_triangulate</font><font face='Lucida Console'>(</font>g.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font>max_index<font face='Lucida Console'>)</font>, visited, order_visited<font face='Lucida Console'>)</font>;
+
+        set_of_int clique;
+
+        <font color='#009900'>// now add edges to the graph to make it triangulated  
+</font>        <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>visited.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#009900'>// we are going to enumerate over the nodes in the reverse of the
+</font>            <font color='#009900'>// order in which they were visited.  So get the last node out.
+</font>            <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> idx <font color='#5555FF'>=</font> order_visited.<font color='#BB00BB'>back</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            order_visited.<font color='#BB00BB'>pop_back</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            visited.<font color='#BB00BB'>destroy</font><font face='Lucida Console'>(</font>idx<font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// as a start add this node to our current clique
+</font>            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> temp <font color='#5555FF'>=</font> idx;
+            clique.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            clique.<font color='#BB00BB'>add</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// now we want to make a clique that contains node g.node(idx) and
+</font>            <font color='#009900'>// all of its neighbors that are still recorded in the visited set 
+</font>            <font color='#009900'>// (except for neighbors that have only one edge).
+</font>            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> g.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font>idx<font face='Lucida Console'>)</font>.<font color='#BB00BB'>number_of_neighbors</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#009900'>// get the index of the i'th neighbor
+</font>                <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> nidx <font color='#5555FF'>=</font> g.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font>idx<font face='Lucida Console'>)</font>.<font color='#BB00BB'>neighbor</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>.<font color='#BB00BB'>index</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+                <font color='#009900'>// add it to the clique if it is still in visited and it isn't
+</font>                <font color='#009900'>// a node with only one neighbor
+</font>                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>visited.<font color='#BB00BB'>is_member</font><font face='Lucida Console'>(</font>nidx<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>true</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> 
+                    g.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font>nidx<font face='Lucida Console'>)</font>.<font color='#BB00BB'>number_of_neighbors</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#009900'>// add edges between this new node and all the nodes 
+</font>                    <font color='#009900'>// that are already in the clique
+</font>                    clique.<font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                    <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>clique.<font color='#BB00BB'>move_next</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>g.<font color='#BB00BB'>has_edge</font><font face='Lucida Console'>(</font>nidx, clique.<font color='#BB00BB'>element</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font><font face='Lucida Console'>)</font>
+                            g.<font color='#BB00BB'>add_edge</font><font face='Lucida Console'>(</font>nidx, clique.<font color='#BB00BB'>element</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                    <b>}</b>
+
+                    <font color='#009900'>// now also record that we added this node to the clique
+</font>                    clique.<font color='#BB00BB'>add</font><font face='Lucida Console'>(</font>nidx<font face='Lucida Console'>)</font>;
+                <b>}</b>
+            <b>}</b>
+
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>cliques.<font color='#BB00BB'>is_member</font><font face='Lucida Console'>(</font>clique<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> <font color='#BB00BB'>is_maximal_clique</font><font face='Lucida Console'>(</font>g,clique<font face='Lucida Console'>)</font> <font face='Lucida Console'>)</font>
+            <b>{</b>
+                cliques.<font color='#BB00BB'>add</font><font face='Lucida Console'>(</font>clique<font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+            <font color='#009900'>// now it is possible that we are missing some cliques of size 2 since
+</font>            <font color='#009900'>// above we didn't add nodes with only one edge to any of our cliques.
+</font>            <font color='#009900'>// Now lets make sure all these nodes are accounted for
+</font>            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> g.<font color='#BB00BB'>number_of_nodes</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                clique.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>g.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>.<font color='#BB00BB'>number_of_neighbors</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> temp <font color='#5555FF'>=</font> i;
+                    clique.<font color='#BB00BB'>add</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font>;
+                    temp <font color='#5555FF'>=</font> g.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>.<font color='#BB00BB'>neighbor</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>index</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                    clique.<font color='#BB00BB'>add</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font>;
+
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>cliques.<font color='#BB00BB'>is_member</font><font face='Lucida Console'>(</font>clique<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font><font face='Lucida Console'>)</font>
+                        cliques.<font color='#BB00BB'>add</font><font face='Lucida Console'>(</font>clique<font face='Lucida Console'>)</font>;
+                <b>}</b>
+            <b>}</b>
+        <b>}</b>
+
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> graph_type,
+        <font color='#0000FF'>typename</font> join_tree_type
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='create_join_tree'></a>create_join_tree</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> graph_type<font color='#5555FF'>&amp;</font> g,
+        join_tree_type<font color='#5555FF'>&amp;</font> join_tree
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#009900'>// make sure requires clause is not broken
+</font>        <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font><font color='#BB00BB'>graph_contains_length_one_cycle</font><font face='Lucida Console'>(</font>g<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font>,
+            "<font color='#CC0000'>\tvoid create_join_tree(g, join_tree)</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tInvalid graph</font>"
+            <font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font><font color='#BB00BB'>graph_is_connected</font><font face='Lucida Console'>(</font>g<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>true</font>,
+            "<font color='#CC0000'>\tvoid create_join_tree(g, join_tree)</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tInvalid graph</font>"
+            <font face='Lucida Console'>)</font>;
+
+        <font color='#BB00BB'>COMPILE_TIME_ASSERT</font><font face='Lucida Console'>(</font>is_graph<font color='#5555FF'>&lt;</font>graph_type<font color='#5555FF'>&gt;</font>::value<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>COMPILE_TIME_ASSERT</font><font face='Lucida Console'>(</font>is_graph<font color='#5555FF'>&lt;</font>join_tree_type<font color='#5555FF'>&gt;</font>::value<font face='Lucida Console'>)</font>;
+
+
+
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> join_tree_type::type set_of_int;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> join_tree_type::edge_type set_of_int_edge;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> set<font color='#5555FF'>&lt;</font>set_of_int<font color='#5555FF'>&gt;</font>::kernel_1b_c set_of_sets_of_int;
+
+        <font color='#BB00BB'>copy_graph_structure</font><font face='Lucida Console'>(</font>g, join_tree<font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// don't even bother in this case
+</font>        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>g.<font color='#BB00BB'>number_of_nodes</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+            <font color='#0000FF'>return</font>;
+
+        set_of_sets_of_int cliques;
+        set_of_int s;
+
+        <font color='#BB00BB'>triangulate_graph_and_find_cliques</font><font face='Lucida Console'>(</font>join_tree, cliques<font face='Lucida Console'>)</font>;
+
+        join_tree.<font color='#BB00BB'>set_number_of_nodes</font><font face='Lucida Console'>(</font>cliques.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// copy the cliques into each of the nodes of tree
+</font>        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> join_tree.<font color='#BB00BB'>number_of_nodes</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+        <b>{</b>
+            cliques.<font color='#BB00BB'>remove_any</font><font face='Lucida Console'>(</font>s<font face='Lucida Console'>)</font>;
+            s.<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>join_tree.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>.data<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        set_of_int_edge e;
+
+        <font color='#009900'>// add all possible edges to the join_tree
+</font>        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> join_tree.<font color='#BB00BB'>number_of_nodes</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> j <font color='#5555FF'>=</font> i<font color='#5555FF'>+</font><font color='#979000'>1</font>; j <font color='#5555FF'>&lt;</font> join_tree.<font color='#BB00BB'>number_of_nodes</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>j<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#BB00BB'>set_intersection</font><font face='Lucida Console'>(</font>
+                    join_tree.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>.data,
+                    join_tree.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font>j<font face='Lucida Console'>)</font>.data,
+                    e<font face='Lucida Console'>)</font>;
+
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>e.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                <b>{</b>
+                    join_tree.<font color='#BB00BB'>add_edge</font><font face='Lucida Console'>(</font>i,j<font face='Lucida Console'>)</font>;
+                    <font color='#BB00BB'>edge</font><font face='Lucida Console'>(</font>join_tree,i,j<font face='Lucida Console'>)</font>.<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>e<font face='Lucida Console'>)</font>;
+                <b>}</b>
+            <b>}</b>
+        <b>}</b>
+
+        <font color='#009900'>// now we just need to remove the unnecessary edges so that we get a 
+</font>        <font color='#009900'>// proper join tree
+</font>        s.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        set_of_int<font color='#5555FF'>&amp;</font> good <font color='#5555FF'>=</font> s; <font color='#009900'>// rename s to something slightly more meaningful
+</font>        <font color='#009900'>// good will contain nodes that have been "approved"
+</font>        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> n <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        good.<font color='#BB00BB'>add</font><font face='Lucida Console'>(</font>n<font face='Lucida Console'>)</font>;
+
+        std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font> vtemp;
+
+        <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>good.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> join_tree.<font color='#BB00BB'>number_of_nodes</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#009900'>// figure out which of the neighbors of nodes in good has the best edge
+</font>            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> best_bad_idx <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> best_good_idx <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> best_overlap <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            good.<font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>good.<font color='#BB00BB'>move_next</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#009900'>// loop over all the neighbors of the current node in good
+</font>                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> join_tree.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font>good.<font color='#BB00BB'>element</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>number_of_neighbors</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> idx <font color='#5555FF'>=</font> join_tree.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font>good.<font color='#BB00BB'>element</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>neighbor</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>.<font color='#BB00BB'>index</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font>good.<font color='#BB00BB'>is_member</font><font face='Lucida Console'>(</font>idx<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> overlap <font color='#5555FF'>=</font> join_tree.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font>good.<font color='#BB00BB'>element</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>edge</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+                        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>overlap <font color='#5555FF'>&gt;</font> best_overlap<font face='Lucida Console'>)</font>
+                        <b>{</b>
+                            best_overlap <font color='#5555FF'>=</font> overlap;
+                            best_bad_idx <font color='#5555FF'>=</font> idx;
+                            best_good_idx <font color='#5555FF'>=</font> good.<font color='#BB00BB'>element</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                        <b>}</b>
+                    <b>}</b>
+                <b>}</b>
+            <b>}</b>
+
+            <font color='#009900'>// now remove all the edges from best_bad_idx to the nodes in good except for the
+</font>            <font color='#009900'>// edge to best_good_idx.
+</font>            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> join_tree.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font>best_bad_idx<font face='Lucida Console'>)</font>.<font color='#BB00BB'>number_of_neighbors</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> idx <font color='#5555FF'>=</font> join_tree.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font>best_bad_idx<font face='Lucida Console'>)</font>.<font color='#BB00BB'>neighbor</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>.<font color='#BB00BB'>index</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>idx <font color='#5555FF'>!</font><font color='#5555FF'>=</font> best_good_idx <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> good.<font color='#BB00BB'>is_member</font><font face='Lucida Console'>(</font>idx<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                <b>{</b>
+                    vtemp.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>idx<font face='Lucida Console'>)</font>;
+                <b>}</b>
+            <b>}</b>
+
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> vtemp.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                join_tree.<font color='#BB00BB'>remove_edge</font><font face='Lucida Console'>(</font>vtemp[i], best_bad_idx<font face='Lucida Console'>)</font>;
+
+            vtemp.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+
+            <font color='#009900'>// and finally add this bad index into the good set
+</font>            good.<font color='#BB00BB'>add</font><font face='Lucida Console'>(</font>best_bad_idx<font face='Lucida Console'>)</font>;
+        <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>namespace</font> graph_helpers
+    <b>{</b>
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'>typename</font> T,
+            <font color='#0000FF'>typename</font> U
+            <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>bool</u></font> <b><a name='validate_join_tree'></a>validate_join_tree</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> n,
+            U<font color='#5555FF'>&amp;</font> deads,
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> parent <font color='#5555FF'>=</font> <font color='#979000'>0xffffffff</font>
+        <font face='Lucida Console'>)</font>
+        <font color='#009900'>/*!
+            this function makes sure that a join tree satisfies the following criterion for paths starting at the given node:
+                - for all valid i and j such that i and j are both &lt; #join_tree.number_of_nodes()
+                    - let X be the set of numbers that is contained in both #join_tree.node(i).data
+                      and #join_tree.node(j).data
+                    - It is the case that all nodes on the unique path between #join_tree.node(i)
+                      and #join_tree.node(j) contain the numbers from X in their sets.
+
+            returns true if validation passed and false if there is a problem with the tree
+        !*/</font>
+        <b>{</b>
+            n.data.<font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>n.data.<font color='#BB00BB'>move_next</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>deads.<font color='#BB00BB'>is_member</font><font face='Lucida Console'>(</font>n.data.<font color='#BB00BB'>element</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                    <font color='#0000FF'>return</font> <font color='#979000'>false</font>;
+            <b>}</b>
+
+
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> n.<font color='#BB00BB'>number_of_neighbors</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>n.<font color='#BB00BB'>neighbor</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>.<font color='#BB00BB'>index</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> parent<font face='Lucida Console'>)</font>
+                    <font color='#0000FF'>continue</font>;
+
+                <font color='#009900'>// add anything to dead stuff
+</font>                n.data.<font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>n.data.<font color='#BB00BB'>move_next</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>n.<font color='#BB00BB'>neighbor</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>.data.<font color='#BB00BB'>is_member</font><font face='Lucida Console'>(</font>n.data.<font color='#BB00BB'>element</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font><font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> temp <font color='#5555FF'>=</font> n.data.<font color='#BB00BB'>element</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                        deads.<font color='#BB00BB'>add</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font>;
+                    <b>}</b>
+                <b>}</b>
+
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>validate_join_tree</font><font face='Lucida Console'>(</font>n.<font color='#BB00BB'>neighbor</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>, deads, n.<font color='#BB00BB'>index</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font><font face='Lucida Console'>)</font>
+                    <font color='#0000FF'>return</font> <font color='#979000'>false</font>;
+
+                <font color='#009900'>// remove this nodes stuff from dead stuff
+</font>                n.data.<font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>n.data.<font color='#BB00BB'>move_next</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>n.<font color='#BB00BB'>neighbor</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>.data.<font color='#BB00BB'>is_member</font><font face='Lucida Console'>(</font>n.data.<font color='#BB00BB'>element</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font><font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> temp <font color='#5555FF'>=</font> n.data.<font color='#BB00BB'>element</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                        deads.<font color='#BB00BB'>destroy</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font>;
+                    <b>}</b>
+                <b>}</b>
+            <b>}</b>
+
+            <font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+        <b>}</b>
+    <b>}</b>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> graph_type,
+        <font color='#0000FF'>typename</font> join_tree_type
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>bool</u></font> <b><a name='is_join_tree'></a>is_join_tree</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> graph_type<font color='#5555FF'>&amp;</font> g,
+        <font color='#0000FF'>const</font> join_tree_type<font color='#5555FF'>&amp;</font> join_tree
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+
+        <font color='#009900'>// make sure requires clause is not broken
+</font>        <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font><font color='#BB00BB'>graph_contains_length_one_cycle</font><font face='Lucida Console'>(</font>g<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font>,
+            "<font color='#CC0000'>\tvoid create_join_tree(g, join_tree)</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tInvalid graph</font>"
+            <font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font><font color='#BB00BB'>graph_is_connected</font><font face='Lucida Console'>(</font>g<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>true</font>,
+            "<font color='#CC0000'>\tvoid create_join_tree(g, join_tree)</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tInvalid graph</font>"
+            <font face='Lucida Console'>)</font>;
+
+        <font color='#BB00BB'>COMPILE_TIME_ASSERT</font><font face='Lucida Console'>(</font>is_graph<font color='#5555FF'>&lt;</font>graph_type<font color='#5555FF'>&gt;</font>::value <font color='#5555FF'>|</font><font color='#5555FF'>|</font> is_directed_graph<font color='#5555FF'>&lt;</font>graph_type<font color='#5555FF'>&gt;</font>::value<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>COMPILE_TIME_ASSERT</font><font face='Lucida Console'>(</font>is_graph<font color='#5555FF'>&lt;</font>join_tree_type<font color='#5555FF'>&gt;</font>::value<font face='Lucida Console'>)</font>;
+
+
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>graph_contains_undirected_cycle</font><font face='Lucida Console'>(</font>join_tree<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+            <font color='#0000FF'>return</font> <font color='#979000'>false</font>;
+
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>graph_is_connected</font><font face='Lucida Console'>(</font>join_tree<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font><font face='Lucida Console'>)</font>
+            <font color='#0000FF'>return</font> <font color='#979000'>false</font>;
+
+        <font color='#009900'>// verify that the path condition of the join tree is valid
+</font>        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> join_tree.<font color='#BB00BB'>number_of_nodes</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>typename</font> join_tree_type::type deads;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>graph_helpers::<font color='#BB00BB'>validate_join_tree</font><font face='Lucida Console'>(</font>join_tree.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>, deads<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font><font face='Lucida Console'>)</font>
+                <font color='#0000FF'>return</font> <font color='#979000'>false</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>typename</font> join_tree_type::edge_type e;
+        <font color='#0000FF'>typename</font> join_tree_type::edge_type all;
+        <font color='#009900'>// now make sure that the edges contain correct intersections
+</font>        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> join_tree.<font color='#BB00BB'>number_of_nodes</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#BB00BB'>set_union</font><font face='Lucida Console'>(</font>all,join_tree.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>.data, all<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> j <font color='#5555FF'>=</font> <font color='#979000'>0</font>; j <font color='#5555FF'>&lt;</font> join_tree.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>.<font color='#BB00BB'>number_of_neighbors</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>j<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#BB00BB'>set_intersection</font><font face='Lucida Console'>(</font>join_tree.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>.data,
+                                 join_tree.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>.<font color='#BB00BB'>neighbor</font><font face='Lucida Console'>(</font>j<font face='Lucida Console'>)</font>.data,
+                                 e<font face='Lucida Console'>)</font>;
+
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font><font face='Lucida Console'>(</font>e <font color='#5555FF'>=</font><font color='#5555FF'>=</font> join_tree.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>.<font color='#BB00BB'>edge</font><font face='Lucida Console'>(</font>j<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                    <font color='#0000FF'>return</font> <font color='#979000'>false</font>;
+            <b>}</b>
+        <b>}</b>
+
+        <font color='#009900'>// and finally check that all the nodes in g show up in the join tree 
+</font>        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>all.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>!</font><font color='#5555FF'>=</font> g.<font color='#BB00BB'>number_of_nodes</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+            <font color='#0000FF'>return</font> <font color='#979000'>false</font>;
+        all.<font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>all.<font color='#BB00BB'>move_next</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>all.<font color='#BB00BB'>element</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> g.<font color='#BB00BB'>number_of_nodes</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                <font color='#0000FF'>return</font> <font color='#979000'>false</font>;
+        <b>}</b>
+
+
+        <font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_GRAPH_UTILs_
+</font>
+
+
+</pre></body></html>

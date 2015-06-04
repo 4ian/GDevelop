@@ -1,0 +1,83 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - compress.c</title></head><body bgcolor='white'><pre>
+<font color='#009900'>/* compress.c -- compress a memory buffer
+ * Copyright (C) 1995-2005 Jean-loup Gailly.
+ * For conditions of distribution and use, see copyright notice in zlib.h
+ */</font>
+
+<font color='#009900'>/* @(#) $Id$ */</font>
+
+<font color='#0000FF'>#define</font> ZLIB_INTERNAL
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='zlib.h.html'>zlib.h</a>"
+
+<font color='#009900'>/* ===========================================================================
+     Compresses the source buffer into the destination buffer. The level
+   parameter has the same meaning as in deflateInit.  sourceLen is the byte
+   length of the source buffer. Upon entry, destLen is the total size of the
+   destination buffer, which must be at least 0.1% larger than sourceLen plus
+   12 bytes. Upon exit, destLen is the actual size of the compressed buffer.
+
+     compress2 returns Z_OK if success, Z_MEM_ERROR if there was not enough
+   memory, Z_BUF_ERROR if there was not enough room in the output buffer,
+   Z_STREAM_ERROR if the level parameter is invalid.
+*/</font>
+<font color='#0000FF'><u>int</u></font> ZEXPORT <b><a name='compress2'></a>compress2</b> <font face='Lucida Console'>(</font>dest, destLen, source, sourceLen, level<font face='Lucida Console'>)</font>
+    Bytef <font color='#5555FF'>*</font>dest;
+    uLongf <font color='#5555FF'>*</font>destLen;
+    <font color='#0000FF'>const</font> Bytef <font color='#5555FF'>*</font>source;
+    uLong sourceLen;
+    <font color='#0000FF'><u>int</u></font> level;
+<b>{</b>
+    z_stream stream;
+    <font color='#0000FF'><u>int</u></font> err;
+
+    stream.next_in <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>z_const Bytef <font color='#5555FF'>*</font><font face='Lucida Console'>)</font>source;
+    stream.avail_in <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>uInt<font face='Lucida Console'>)</font>sourceLen;
+<font color='#0000FF'>#ifdef</font> MAXSEG_64K
+    <font color='#009900'>/* Check for source &gt; 64K on 16-bit machine: */</font>
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>uLong<font face='Lucida Console'>)</font>stream.avail_in <font color='#5555FF'>!</font><font color='#5555FF'>=</font> sourceLen<font face='Lucida Console'>)</font> <font color='#0000FF'>return</font> Z_BUF_ERROR;
+<font color='#0000FF'>#endif</font>
+    stream.next_out <font color='#5555FF'>=</font> dest;
+    stream.avail_out <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>uInt<font face='Lucida Console'>)</font><font color='#5555FF'>*</font>destLen;
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>uLong<font face='Lucida Console'>)</font>stream.avail_out <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#5555FF'>*</font>destLen<font face='Lucida Console'>)</font> <font color='#0000FF'>return</font> Z_BUF_ERROR;
+
+    stream.zalloc <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>alloc_func<font face='Lucida Console'>)</font><font color='#979000'>0</font>;
+    stream.zfree <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>free_func<font face='Lucida Console'>)</font><font color='#979000'>0</font>;
+    stream.opaque <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>voidpf<font face='Lucida Console'>)</font><font color='#979000'>0</font>;
+
+    err <font color='#5555FF'>=</font> <font color='#BB00BB'>deflateInit</font><font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>stream, level<font face='Lucida Console'>)</font>;
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>err <font color='#5555FF'>!</font><font color='#5555FF'>=</font> Z_OK<font face='Lucida Console'>)</font> <font color='#0000FF'>return</font> err;
+
+    err <font color='#5555FF'>=</font> <font color='#BB00BB'>deflate</font><font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>stream, Z_FINISH<font face='Lucida Console'>)</font>;
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>err <font color='#5555FF'>!</font><font color='#5555FF'>=</font> Z_STREAM_END<font face='Lucida Console'>)</font> <b>{</b>
+        <font color='#BB00BB'>deflateEnd</font><font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>stream<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>return</font> err <font color='#5555FF'>=</font><font color='#5555FF'>=</font> Z_OK ? Z_BUF_ERROR : err;
+    <b>}</b>
+    <font color='#5555FF'>*</font>destLen <font color='#5555FF'>=</font> stream.total_out;
+
+    err <font color='#5555FF'>=</font> <font color='#BB00BB'>deflateEnd</font><font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>stream<font face='Lucida Console'>)</font>;
+    <font color='#0000FF'>return</font> err;
+<b>}</b>
+
+<font color='#009900'>/* ===========================================================================
+ */</font>
+<font color='#0000FF'><u>int</u></font> ZEXPORT <b><a name='compress'></a>compress</b> <font face='Lucida Console'>(</font>dest, destLen, source, sourceLen<font face='Lucida Console'>)</font>
+    Bytef <font color='#5555FF'>*</font>dest;
+    uLongf <font color='#5555FF'>*</font>destLen;
+    <font color='#0000FF'>const</font> Bytef <font color='#5555FF'>*</font>source;
+    uLong sourceLen;
+<b>{</b>
+    <font color='#0000FF'>return</font> <font color='#BB00BB'>compress2</font><font face='Lucida Console'>(</font>dest, destLen, source, sourceLen, Z_DEFAULT_COMPRESSION<font face='Lucida Console'>)</font>;
+<b>}</b>
+
+<font color='#009900'>/* ===========================================================================
+     If the default memLevel or windowBits for deflateInit() is changed, then
+   this function needs to be updated.
+ */</font>
+uLong ZEXPORT <b><a name='compressBound'></a>compressBound</b> <font face='Lucida Console'>(</font>sourceLen<font face='Lucida Console'>)</font>
+    uLong sourceLen;
+<b>{</b>
+    <font color='#0000FF'>return</font> sourceLen <font color='#5555FF'>+</font> <font face='Lucida Console'>(</font>sourceLen <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font> <font color='#979000'>12</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> <font face='Lucida Console'>(</font>sourceLen <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font> <font color='#979000'>14</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font>
+           <font face='Lucida Console'>(</font>sourceLen <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font> <font color='#979000'>25</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> <font color='#979000'>13</font>;
+<b>}</b>
+
+</pre></body></html>

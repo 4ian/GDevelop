@@ -1,0 +1,3332 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html xmlns:gcse="googleCustomSearch"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><link rel="shortcut icon" href="dlib-icon.ico"><meta name="verify-v1" content="02MiiaFNVzS5/u0eQhsy3/knioFHsia1X3DXRpHkE6I="><meta name="google-site-verification" content="DGSSJMKDomaDaDTIRJ8jDkv0YMx9Cz7OESbXHjjr6Jw"><title>dlib C++ Library
+   - Old Release Notes</title><script language="JavaScript">
+
+// ---------------------------------------------
+// --- Name:    Easy DHTML Treeview           --
+// --- Author:  D.D. de Kerf                  --
+// --- Version: 0.2          Date: 13-6-2001  --
+// ---------------------------------------------
+function Toggle(node)
+{
+   // Unfold the branch if it isn't visible
+   var next_node = node.nextSibling;
+   if (next_node.style.display == 'none')
+   {
+      // Change the image (if there is an image)
+      if (node.childNodes.length > 0)
+      {
+         if (node.childNodes.length > 0)
+         { 
+            if (node.childNodes.item(0).nodeName == "IMG")
+            {
+               node.childNodes.item(0).src = "minus.gif";
+            }
+         }
+      }
+
+      next_node.style.display = 'block';
+   }
+   // Collapse the branch if it IS visible
+   else
+   {
+      // Change the image (if there is an image)
+      if (node.childNodes.length > 0)
+      {
+         if (node.childNodes.length > 0)
+         { 
+            if (node.childNodes.item(0).nodeName == "IMG")
+            {
+               node.childNodes.item(0).src = "plus.gif";
+            }
+         }
+      }
+
+      next_node.style.display = 'none';
+   }
+
+}
+function BigToggle(node)
+{
+   // Unfold the branch if it isn't visible
+   var next_node = node.nextSibling;
+   if (next_node.style.display == 'none')
+   {
+      // Change the image (if there is an image)
+      if (node.childNodes.length > 0)
+      {
+         if (node.childNodes.length > 0)
+         { 
+            if (node.childNodes.item(0).nodeName == "IMG")
+            {
+               node.childNodes.item(0).src = "bigminus.gif";
+            }
+         }
+      }
+
+      next_node.style.display = 'block';
+   }
+   // Collapse the branch if it IS visible
+   else
+   {
+      // Change the image (if there is an image)
+      if (node.childNodes.length > 0)
+      {
+         if (node.childNodes.length > 0)
+         { 
+            if (node.childNodes.item(0).nodeName == "IMG")
+            {
+               node.childNodes.item(0).src = "bigplus.gif";
+            }
+         }
+      }
+
+      next_node.style.display = 'none';
+   }
+
+}
+</script><style type="text/css">
+   body {margin:0px;}
+   pre {margin:0px;}
+
+   ul.tree  li { list-style: none;  margin-left:10px;} 
+   ul.tree  { margin:0px; padding:0px; margin-left:5px; font-size:0.95em; }
+   ul.tree  li ul { margin-left:10px; padding:0px; }
+
+   li#term { list-style: none; }
+
+   div.component {
+      background-color:white; 
+      border: 2px solid rgb(102,102,102); 
+      text-align:left;
+      margin-top: 1.5em;
+      padding: 0.7em;
+   }
+
+   div.question {
+      background-color:white; 
+      border: 2px solid rgb(102,102,102); 
+      text-align:left;
+      margin-top: 1.5em;
+      margin-bottom: 90%;
+      padding: 0.7em;
+   }
+
+   div.function {
+      background-color:white; 
+      border: 2px solid rgb(102,102,255); 
+      text-align:left;
+      margin-top: 0.3em;
+      padding: 0.3em;
+   }
+
+   div.class {
+      background-color:white; 
+      border: 2px solid rgb(255,102,102); 
+      text-align:left;
+      margin-top: 0.3em;
+      padding: 0.3em;
+   }
+
+   div.extension {
+      background-color:#FDFDFD; 
+      border: 1px solid rgb(102,102,102); 
+      text-align:left;
+      margin-top: 1.0em;
+      padding: 0.7em;
+   }
+
+   div.logb {
+      text-align:left;
+      padding: 0.0em;
+      float: left;
+      background-color:#c0c0c0; 
+      border: double ; 
+      margin: 0.5em;
+   }
+
+   div.name {
+      float: left;
+   }
+   div.line1 {
+      float:left;
+      width:100%;
+      background-color:#dfdfdf; 
+   }
+   div.line2 {
+      float:left;
+      width:100%;
+   }
+   div.inc {
+      float: right;
+   }
+
+
+   .code_box
+   {
+      color: black;
+      margin: 1em 0.25in;
+      padding: 0.5em;
+      background: rgb(240,240,240);
+      border-top: black dotted 1px;
+      border-left: black dotted 1px;
+      border-right: black solid 2px;
+      border-bottom: black solid 2px;
+   }
+
+
+
+   .bdotted {border-bottom: 1px dotted}
+   .bdashed {border-bottom: 1px dashed}
+   .bsolid {border-bottom: 1px solid}
+   .bdouble {border-bottom: 1px double}
+   .bgroove {border-bottom: 1px groove}
+   .bridge {border-bottom: 1px ridge}
+   .binset {border-bottom: 1px inset}
+   .boutset {border-bottom: 1px outset}
+
+   div.row1 {
+      background-color:#dfdfdf; 
+   }
+   div.row2 {
+      background-color:#f2f2f2; 
+   }
+
+   div.typedefs {
+      margin-left: 1.5em;
+      margin-top: 0.2em;
+      border: 1px dotted;
+      width: 52em;
+   }
+
+   div.tdn {
+      width: 10em;
+   }
+
+   .fullhr {
+      clear: both;
+   }
+
+   body {
+      text-align: center;
+   }
+
+   div.entire_page_header {
+      width:62.5em;  
+      text-align: left;
+      margin-top: 0.4em;
+      margin-left: auto;
+      margin-right: auto;
+   }
+   div.entire_page {
+      width:62.5em;  
+      text-align: left;
+      margin-left: auto;
+      margin-right: auto;
+      clear:both;
+   }
+</style></head><body bgcolor="#EDF3EE"><a name="top"></a><div class="entire_page_header"><a href="http://dlib.net"><img src="dlib-logo.png"></a></div><div class="entire_page"><table bgcolor="white" height="100%" bordercolor="#EDF3EE" CELLSPACING="0" CELLPADDING="10" style="border:0px;margin-top:2px"><tr height="100%"><td BGCOLOR="#F5F5F5" style="padding:7px; border: 1px solid rgb(102,102,102);" VALIGN="TOP" height="100%"><br><table WIDTH="145" height="100%"><tr><td VALIGN="TOP"><b>The Library</b><ul class="tree"><li><a href="algorithms.html">Algorithms</a></li><li><a href="api.html">API Wrappers</a></li><li><a href="bayes.html">Bayesian Nets</a></li><li><a href="compression.html">Compression</a></li><li><a href="containers.html">Containers</a></li><li><a href="graph_tools.html">Graph Tools</a></li><li><a href="imaging.html">Image Processing</a></li><li><a href="linear_algebra.html">Linear Algebra</a></li><li><a href="ml.html">Machine Learning</a></li><li><a href="metaprogramming.html">Metaprogramming</a></li><li><a href="other.html">Miscellaneous</a></li><li><a href="network.html">Networking</a></li><li><a href="optimization.html">Optimization</a></li><li><a href="parsing.html">Parsing</a></li></ul><br><b>Help/Info</b><ul class="tree"><li><a onclick="Toggle(this)" style="cursor: pointer;margin-left:-9px"><img src="plus.gif"><font color="green"><u>Examples: C++</u></font></a><ul style="display:none;"><li><a href="3d_point_cloud_ex.cpp.html">3D_Point_Cloud</a></li><li><a href="assignment_learning_ex.cpp.html">Assignment_Learning</a></li><li><a href="file_to_code_ex.cpp.html">Base64_Encoder</a></li><li><a href="bayes_net_ex.cpp.html">Bayesian_Network</a></li><li><a href="bayes_net_from_disk_ex.cpp.html">Bayesian_Network_From_Disk</a></li><li><a href="bayes_net_gui_ex.cpp.html">Bayesian_Network_GUI</a></li><li><a href="bridge_ex.cpp.html">Bridge</a></li><li><a href="bsp_ex.cpp.html">BSP</a></li><li><a href="svm_c_ex.cpp.html">C-Support_Vector_Machine</a></li><li><a href="compress_stream_ex.cpp.html#_top">Cmd_Line_Parser</a></li><li><a href="compress_stream_ex.cpp.html">Compress_Stream</a></li><li><a href="config_reader_ex.cpp.html">Config_File_Reader</a></li><li><a href="custom_trainer_ex.cpp.html">Custom_Trainers</a></li><li><a href="dir_nav_ex.cpp.html">Directory_Navigation</a></li><li><a href="empirical_kernel_map_ex.cpp.html">Empirical_Kernel_Map</a></li><li><a href="face_detection_ex.cpp.html">Face_Detection</a></li><li><a href="face_landmark_detection_ex.cpp.html">Face_Landmark_Detection</a></li><li><a href="fhog_ex.cpp.html">FHOG_Feature_Extraction</a></li><li><a href="fhog_object_detector_ex.cpp.html">FHOG_Object_Detection</a></li><li><a href="graph_labeling_ex.cpp.html">Graph_Labeling</a></li><li><a href="gui_api_ex.cpp.html">GUI</a></li><li><a href="hough_transform_ex.cpp.html">Hough_Transform</a></li><li><a href="server_http_ex.cpp.html">HTTP_Server</a></li><li><a href="image_ex.cpp.html">Image</a></li><li><a href="iosockstream_ex.cpp.html">IO Socket Streams</a></li><li><a href="server_iostream_ex.cpp.html">IO Streams Server</a></li><li><a href="kcentroid_ex.cpp.html">Kernel_Centroid</a></li><li><a href="kkmeans_ex.cpp.html">Kernel_K-Means_Clustering</a></li><li><a href="krr_regression_ex.cpp.html">Kernel_Ridge_Regression</a></li><li><a href="krls_filter_ex.cpp.html">Kernel_RLS_Filtering</a></li><li><a href="krls_ex.cpp.html">Kernel_RLS_Regression</a></li><li><a href="krr_classification_ex.cpp.html">KRR_Classification</a></li><li><a href="learning_to_track_ex.cpp.html">Learning_to_Track</a></li><li><a href="max_cost_assignment_ex.cpp.html">Linear_Assignment_Problems</a></li><li><a href="linear_manifold_regularizer_ex.cpp.html">Linear_Manifold_Regularizer</a></li><li><a href="mpc_ex.cpp.html">Linear_Model_Predictive_Control</a></li><li><a href="logger_ex.cpp.html">Logger</a></li><li><a href="logger_ex_2.cpp.html">Logger_Advanced</a></li><li><a href="logger_custom_output_ex.cpp.html">Logger_Custom_Output</a></li><li><a href="matrix_ex.cpp.html">Matrix</a></li><li><a href="matrix_expressions_ex.cpp.html">Matrix_Expressions</a></li><li><a href="member_function_pointer_ex.cpp.html">Member_Function_Pointer</a></li><li><a href="model_selection_ex.cpp.html">Model_Selection</a></li><li><a href="multiclass_classification_ex.cpp.html">Multiclass_Classification</a></li><li><a href="multithreaded_object_ex.cpp.html">Multithreaded_Object</a></li><li><a href="mlp_ex.cpp.html">Neural_Network</a></li><li><a href="least_squares_ex.cpp.html">Non-Linear Least Squares</a></li><li><a href="svm_ex.cpp.html">Nu-Support_Vector_Machine</a></li><li><a href="integrate_function_adapt_simp_ex.cpp.html">Numerical_Integration</a></li><li><a href="object_detector_ex.cpp.html">Object_Detector</a></li><li><a href="object_detector_advanced_ex.cpp.html">Object_Detector_Advanced</a></li><li><a href="one_class_classifiers_ex.cpp.html">One_Class_Classifiers</a></li><li><a href="svm_pegasos_ex.cpp.html">Online_SVM</a></li><li><a href="optimization_ex.cpp.html">Optimization</a></li><li><a href="parallel_for_ex.cpp.html">Parallel_For_Loops</a></li><li><a href="pipe_ex.cpp.html">Pipe</a></li><li><a href="pipe_ex_2.cpp.html">Pipe_2</a></li><li><a href="quantum_computing_ex.cpp.html">Quantum_Computing</a></li><li><a href="queue_ex.cpp.html">Queue</a></li><li><a href="rank_features_ex.cpp.html">Rank_Features</a></li><li><a href="rvm_ex.cpp.html">Relevance_Vector_Classification</a></li><li><a href="rvm_regression_ex.cpp.html">Relevance_Vector_Regression</a></li><li><a href="running_stats_ex.cpp.html">Running_Stats</a></li><li><a href="sequence_labeler_ex.cpp.html">Sequence_Labeling</a></li><li><a href="sequence_segmenter_ex.cpp.html">Sequence_Segmentation</a></li><li><a href="sockets_ex.cpp.html">Sockets</a></li><li><a href="sockstreambuf_ex.cpp.html">Sockstreambuf</a></li><li><a href="svm_sparse_ex.cpp.html">Sparse_Vectors</a></li><li><a href="sqlite_ex.cpp.html">SQLite</a></li><li><a href="std_allocator_ex.cpp.html">Std_C++_Allocator</a></li><li><a href="svm_struct_ex.cpp.html">Structural_Support_Vector_Machines</a></li><li><a href="svr_ex.cpp.html">Support_Vector_Regression</a></li><li><a href="surf_ex.cpp.html">SURF</a></li><li><a href="svm_rank_ex.cpp.html">SVM-Rank</a></li><li><a href="threaded_object_ex.cpp.html">Threaded_Object</a></li><li><a href="threads_ex.cpp.html">Threads</a></li><li><a href="thread_function_ex.cpp.html">Thread_Function</a></li><li><a href="thread_pool_ex.cpp.html">Thread_Pool</a></li><li><a href="timer_ex.cpp.html">Timer</a></li><li><a href="train_object_detector.cpp.html">Train_Object_Detector</a></li><li><a href="train_shape_predictor_ex.cpp.html">Train_Shape_Predictor</a></li><li><a href="using_custom_kernels_ex.cpp.html">Using_Custom_Kernels</a></li><li><a href="video_tracking_ex.cpp.html">Video_Object_Tracking</a></li><li><a href="webcam_face_pose_ex.cpp.html">Webcam_Face_Pose_Estimation</a></li><li><a href="xml_parser_ex.cpp.html">XML_Parser</a></li></ul></li><li><a onclick="Toggle(this)" style="cursor: pointer;margin-left:-9px"><img src="plus.gif"><font color="green"><u>Examples: Python</u></font></a><ul style="display:none;"><li><a href="face_detector.py.html">Face_Detector</a></li><li><a href="face_landmark_detection.py.html">Face_Landmark_Detection</a></li><li><a href="find_candidate_object_locations.py.html">find_candidate_object_locations</a></li><li><a href="max_cost_assignment.py.html">Linear_Assignment_Problems</a></li><li><a href="sequence_segmenter.py.html">Sequence_Segmenter</a></li><li><a href="svm_struct.py.html">Structural_Support_Vector_Machines</a></li><li><a href="svm_rank.py.html">SVM-Rank</a></li><li><a href="train_object_detector.py.html">Train_Object_Detector</a></li><li><a href="train_shape_predictor.py.html">Train_Shape_Predictor</a></li><li><a href="correlation_tracker.py.html">Video_Object_Tracking</a></li></ul></li><li><a href="faq.html">FAQ</a></li><li><a href="index.html">Home</a></li><li><a href="compile.html">How to compile</a></li><li><a href="howto_contribute.html">How to contribute</a></li><li><a href="term_index.html">Index</a></li><li><a href="intro.html">Introduction</a></li><li><a href="license.html">License</a></li><li><a href="python/index.html">Python API</a></li><li><a href="books.html">Suggested Books</a></li></ul><br><b>Current Release</b><ul class="tree"><li><a href="change_log.html">Change Log</a></li><li><a href="release_notes.html">Release Notes</a></li><li>Version: 18.16</li></ul><br></td><td width="1"></td></tr><tr><td valign="bottom"><br><br><br><br><br><br><br><br><br>
+      Last Modified:<br>Jun 03, 2015<br><br></td></tr></table></td><td VALIGN="TOP" width="100%" style="border: 1px solid rgb(102,102,102);"><center><h1>Old Release Notes</h1></center><h1 style="margin:0px;">Release 18.6</h1><u>Release date</u>: Feb 03, 2014<br><u>Major Changes in this Release</u>:
+            <table cellspacing="5" cellpadding="0" width="100%"><tr><td width="15"></td><td><pre>
+New Features:
+   - Object Detection Tools:
+      - Added scan_fhog_pyramid, a tool for creating Histogram of Oriented Gradient (HOG)
+        based object detectors. 
+      - Added get_frontal_face_detector(), a HOG based face detector.  
+      - Added an option to include "ignore/don't care" truth boxes to the
+        structural_object_detection_trainer.  This allows a user to tell the trainer that
+        they don't care if certain objects are detected or not detected.  
+   - Image Processing Tools:
+      - Added extract_image_chips()
+      - Added a version of draw_rectangle() for drawing on images.
+      - The spatial filtering routines now support even sized filters.
+      - Added flip_image_dataset_left_right(), upsample_image_dataset(), and
+        rotate_image_dataset().
+   - Machine Learning Tools:
+      - Added a nuclear norm regularization option to the structural SVM solver.
+      - Added the option to learn only non-negative weights to the
+        svm_multiclass_linear_trainer.
+   - Speed Improvements:
+      - The svm_multiclass_linear_trainer, one_vs_one_trainer, and one_vs_all_trainer
+        objects are now multithreaded.  This also means you have to #include
+        dlib/svm_threaded.h instead of dlib/svm.h to use these tools. 
+      - A number of image processing tools can now optionally use SSE and AVX instructions
+        and are therefore considerably faster.  In particular, the following tools have been
+        accelerated: extract_fhog_features, resize_image, pyramid_down, pyramid_up,
+        spatially_filter_image_separable, and spatially_filter_image.
+   - Added an inv() routine that inverts point transformation functions.
+   - Added a sign() routine for matrix objects.
+
+Non-Backwards Compatible Changes:
+   - The spatial image filtering functions have the following changes:
+      - They no longer zero the image borders when you set the add_to parameter to true.  
+      - The spatially_filter_image_separable_down() routine now only allows grayscale
+        output images.
+   - Changed the default parameters of the test_box_overlap object. Now it defaults to
+     using exactly the PASCAL VOC match criterion.
+   - To use the svm_multiclass_linear_trainer, one_vs_one_trainer, or one_vs_all_trainer
+     objects you now have to #include dlib/svm_threaded.h instead of dlib/svm.h. 
+   - pyramid_up() no longer has a levels option.
+
+Bug fixes:
+   - Fixed a compile time bug that could occur when wide character strings were
+     serialized.
+   - Fixed a compile time bug occurring in gcc 4.7.1 on SUSE Linux.  Thanks to Volker
+     Härtel for finding this.
+   - Fixed compile time errors that occurred when using gcc on cygwin.
+   - Fixed a compile time bug that could occur when serializing mlp objects.
+   - Fixed a bug in the bigint object that caused division to sometimes produce incorrect
+     results.
+   - Fixed a bug which sometimes caused load_image_dataset() to erroneously report that
+     the dataset file could not be found.
+   - Fixed a bug in the structural_object_detection_trainer that caused it to erroneously
+     throw a impossible_labeling_error exception in certain rare cases.
+   - Updated find_max_factor_graph_nmplp() to use the improved version of the algorithm
+     from the 2011 paper Introduction to dual decomposition for inference by David Sontag,
+     Amir Globerson, and Tommi Jaakkola.  The original algorithm presented in their 2008
+     paper had an error that negatively affected its convergence.  Thanks to James Gunning
+     for pointing this out.
+
+Other:
+   - Fixed many compiler warnings in gcc 4.8.
+   - Made many of the mat() converters bind the resulting matrix expressions into BLAS
+     functions.
+   - libpng and libjpeg are now included in the dlib/external folder to enable easy static
+     linking to these libraries on platforms that typically don't have them (e.g. Windows).
+     Moreover, dlib's cmake files will automatically perform this static linking when no
+     copy of these libraries is found on the system. 
+</pre></td></tr></table><hr><h1 style="margin:0px;">Release 18.5</h1><u>Release date</u>: Oct 22, 2013<br><u>Major Changes in this Release</u>:
+            <table cellspacing="5" cellpadding="0" width="100%"><tr><td width="15"></td><td><pre>
+New Features:
+   - Added routines for performing BFGS and L-BFGS optimization with box constraints.  
+     See the new find_min_box_constrained() and find_max_box_constrained() routines.
+   - Added vector_normalizer_frobmetric.  This is a tool for learning a
+     Mahalanobis distance metric.
+   - The user can now set different loss values for false alarming vs. getting a
+     correct detection when using the structural_sequence_segmentation_trainer.
+   - Added an overload of clamp() that lets you use matrix valued lower/upper bounds.
+   - New image processing tools:
+      - Added the scan_image_custom object, split_array(), and add_image_left_right_flips().
+      - Added extract_fhog_features(), this is a function for computing
+        Felzenszwalb's 31 channel HOG image representation.  
+
+Non-Backwards Compatible Changes:
+   - Refactored the image pyramid code. Now there is just one templated object called
+     pyramid_down and you give it the downsampling amount as a template argument.  To make
+     old code work with this change use the following substitutions:
+       change pyramid_down to pyramid_down&lt;2&gt;
+       change pyramid_down_3_2 to pyramid_down&lt;3&gt;
+       change pyramid_down_4_3 to pyramid_down&lt;4&gt;
+       change pyramid_down_5_4 to pyramid_down&lt;5&gt;
+
+Bug fixes:
+
+Other:
+   - Made the structural SVM solver slightly faster.
+   - Moved the python C++ utility headers from tools/python/src into dlib/python.
+   - The PNG loader is now able to load grayscale images with an alpha channel.
+   - Removed checks that prevented users from using references to functions with the
+     optimization code and forced the use of function pointers. This was to avoid
+     triggering a bug in gcc 4.0.  Since that compiler is no longer officially supported
+     by dlib I've removed these checks to increase usability.
+   - Made resize_image() use bilinear interpolation by default and also added a special
+     version of it that is optimized for this case.
+   - Dlib's cmake files will now automatically link to the Intel MKL on MS Windows
+     platforms if the MKL is installed.
+</pre></td></tr></table><hr><h1 style="margin:0px;">Release 18.4</h1><u>Release date</u>: Aug 14, 2013<br><u>Major Changes in this Release</u>:
+            <table cellspacing="5" cellpadding="0" width="100%"><tr><td width="15"></td><td><pre>
+New Features:
+   - Added Python interfaces to dlib's structural support vector machine solver and
+     Hungarian algorithm implementation.
+   - Added running_cross_covariance
+   - Added order_by_descending_distance()
+   - Added is_finite()
+   - Added the csv IO manipulator that lets you print a matrix in comma separated value
+     format.
+
+Non-Backwards Compatible Changes:
+   - Changed the object detector testing functions to output average precision instead of
+     mean average precision.
+   - Added an option to weight the features from a hashed_feature_image relative to the
+     number of times they occur in an image.  I also made it the default behavior to use
+     this relative weighting and changed the serialization format to accommodate this.
+
+Bug fixes:
+   - Fixed typo in learn_platt_scaling(). The method wasn't using the exact prior
+     suggested by Platt's paper.
+   - Fixed a bug in running_scalar_covariance that caused the covariance() and
+     correlation() methods to output the wrong answer if the covariance was negative.
+
+Other:
+   - Gave the image_window the ability to tie the mouse and keyboard events together such
+     that it is possible for a user to listen for both simultaneously.
+   - A number of changes were made to the structural_svm_problem's code which make it 
+     significantly faster in some cases.
+   - Added Steven Van Ingelgem's patch to the HTTP server which makes operations on HTTP
+     headers case-insensitive.
+
+</pre></td></tr></table><hr><h1 style="margin:0px;">Release 18.3</h1><u>Release date</u>: June 21, 2013<br><u>Major Changes in this Release</u>:
+            <table cellspacing="5" cellpadding="0" width="100%"><tr><td width="15"></td><td><pre>
+New Features:
+   - Machine Learning:
+      - Added the svr_linear_trainer, a tool for solving large scale support vector 
+        regression problems.
+      - Added a tool for working with BIO and BILOU style sequence taggers/segmenters.  
+        This is the new sequence_segmenter object and its associated 
+        structural_sequence_segmentation_trainer object.
+      - Added a python interface to some of the machine learning tools.  These
+        include the svm_c_trainer, svm_c_linear_trainer, svm_rank_trainer, and
+        structural_sequence_segmentation_trainer objects as well as the cca()
+        routine.  
+   - Added point_transform_projective and find_projective_transform().
+   - Added a function for numerically integrating arbitrary functions, this is the 
+     new integrate_function_adapt_simpson() routine which was contributed by 
+     Steve Taylor
+   - Added jet(), a routine for coloring images with the jet color scheme.
+
+Non-Backwards Compatible Changes:
+
+Bug fixes:
+   - Fixed a bug in hysteresis_threshold() that caused it to produce incorrect
+     outputs in some cases.
+   - Fixed a segmentation fault in the eigenvalue_decomposition object which
+     could occur when NaN valued inputs were given.
+
+Other:
+   - Made image saving routines work on matrix objects in addition to array2d objects.
+   - The machine learning page now contains a flow chart to help new users
+     select a machine learning tool appropriate for their task.
+
+</pre></td></tr></table><hr><h1 style="margin:0px;">Release 18.2</h1><u>Release date</u>: May 30, 2013<br><u>Major Changes in this Release</u>:
+            <table cellspacing="5" cellpadding="0" width="100%"><tr><td width="15"></td><td><pre>
+New Features:
+   - Object Detection Tools:
+      - Added another image scanning tool similar to scan_image_pyramid.  This
+        is the new scan_image_boxes object.  It allows a user to easily specify
+        an arbitrary set of object boxes which should be checked by an object
+        detector rather than scanning a fixed sized window over the image as is
+        done by the scan_image_pyramid tool.  This allows more flexible scanning 
+        strategies.  For example, it is now possible to use the selective search 
+        method implemented by the new find_candidate_object_locations() routine.  
+      - Added the binned_vector_feature_image.
+      - Upgraded the object_detector so that you can use the adjust_threshold
+        argument for all versions of the operator() method.
+      - Added remove_unobtainable_rectangles()
+   - Hashing Tools:
+      - Added a set of new locality sensitive hashing functions meant for use
+        with larger vectors and higher bit sizes than the current LSH tools.
+        These are the new hash_similar_angles_xxx objects.
+      - Added find_k_nearest_neighbors_lsh() and hash_samples()
+      - Added create_max_margin_projection_hash()
+   - New Matrix Routines: linpiece(), fft(), and ifft()
+   - Added numeric constants and additional statistics to the running_stats
+     object.  This code was contributed by Steve Taylor.
+   - Added the image_window::get_next_keypress() routine.  This tool allows a
+     user to easily find out which keyboard key the user is pressing.
+
+Non-Backwards Compatible Changes:
+   - Changed the object_detector interface slightly.  In particular, it no
+     longer adds the adjust_threshold argument to the output scores.    
+   - The object detector testing functions now output mean average precision in
+     addition to precision and recall.
+   - Changed how dlib does serialization in a number of ways:
+      - The running_stats and scan_image_pyramid objects have had their
+        serialization format changed in a way that breaks backwards
+        compatibility.  This means serialized versions of these objects can't be
+        loaded by the new version of dlib.
+      - Changed the format dlib uses when it serializes floating point values.
+        Previously, we used an ASCII based format.  Dlib now uses a much more
+        efficient binary format. However, the deserialization routines have
+        been made backwards compatible with the previous format. So dlib can
+        still deserialize older data but older software won't be able to read
+        the new format.
+      - Changed the serialization formats for the matrix and array2d objects so
+        that either object can be deserialized into the other. This was done in a
+        way that is backwards compatible with previous versions of dlib. That is,
+        we can still load data serialized by previous dlib versions. However,
+        older versions of dlib can't load the new serialization format.
+
+Bug fixes:
+   - Fixed a bug in save_dng() that happened sometimes when saving images with
+     unsigned char pixels.
+   - The test_ranking_function() and cross_validate_ranking_trainer() routines
+     computed incorrect MAP scores when the learned function output a constant
+     value for all samples.  This has been fixed.
+
+Other:
+   - Gave load_image_dataset() the ability to skip images that don't have any
+     ground truth boxes.
+   - Changed average_precision() to use interpolated precision. So now it uses
+     the same metric as the one used by the Pascal VOC challenge.
+   - Upgraded the dng image format so it can natively store floating point
+     pixel types without any information loss.
+
+</pre></td></tr></table><hr><h1 style="margin:0px;">Release 18.1</h1><u>Release date</u>: Mar 25, 2013<br><u>Major Changes in this Release</u>:
+            <table cellspacing="5" cellpadding="0" width="100%"><tr><td width="15"></td><td><pre>
+New Features:
+   - Added svd_fast(), a routine for computing a singular value decomposition of very 
+     large matrices.
+   - Added cca(), a routine for doing canonical correlation analysis on very large 
+     and high-dimensional datasets.
+   - Added tools for creating parallel for loops, see parallel_for().
+   - Added some features to the image display widgets to let the user easily
+     get information about where the user is clicking.  This is the new 
+     get_next_double_click() routine.
+   - Added an operator&gt;&gt; for matrix objects which allows you to read in ASCII
+     matrices using the format used by operator&lt;&lt;.
+   - Added serialization support for std::vector&lt;bool&gt;.
+   - Added the following new minor objects and routines: average_precision(), 
+     make_sparse_vector_inplace(), orthogonalize(), count_bits(), draw_surf_points(),
+     hamming_distance(), cosine_distance, and negative_dot_product_distance.
+
+Non-Backwards Compatible Changes:
+   - Changed ranking evaluation functions to return the mean average precision
+     in addition to just raw ranking accuracy. This changes their return types
+     from double to matrix&lt;double,1,2&gt;.
+   - Generalized segment_image() so it works on any pixel type or array of
+     vectors.  I also changed its interface slightly.  In particular, I removed
+     the min_diff parameter and replaced it with an explicit min_size parameter.
+   - Changed how the SURF descriptor is computed slightly to improve its
+     accuracy.  The interface to the user has not been changed, however, the
+     number and position of detected SURF points might be different than in
+     previous dlib versions.
+
+Bug fixes:
+   - Fixed an endianness bug in the PNG I/O functions which occurred when 16bit
+     grayscale PNGs were used. 
+   - Fixed a bug which could potentially occur when empty std::vector&lt;char&gt; or
+     std::vector&lt;unsigned char&gt; were serialized.
+   - There was a bug in the version of draw_line() that draws directly onto an
+     array2d type image (not the one that draws onto a GUI canvas object). The
+     bug triggered whenever a perfectly horizontal or vertical line that extended
+     outside the image was drawn. This has been fixed.
+   - Fixed a bug in the Windows implementation of the signaler object, which
+     was found by Isaac Peterson. The bug caused the program to deadlock if
+     signal() or broadcast() was called at exactly the same time a
+     wait_or_timeout() function timed out.
+   - Fixed a bug in the image_window and image_display GUI tools which caused
+     them to not redraw overlay lines correctly in certain cases involving
+     non-default zoom levels.
+   - Switched randomly_color_image() to use the non-pointer based version of
+     murmur_hash3() to avoid violation of the strict aliasing rule. In
+     particular, the previous version didn't work correctly in gcc 4.7.2 when
+     optimizations were enabled.
+   - Visual Studio 2012's iostreams library has a bug which caused the
+     iosockstream to crash on use.  This version of dlib has been changed to
+     avoid triggering this bug.
+
+Other:
+   - Refactored the Platt scaling code a little. Now there is a function,
+     learn_platt_scaling(), that allows you to directly call the Platt scaling
+     code without supplying a trainer object.
+   - Optimized the oca and structural SVM solvers.  They are now a little bit faster 
+     than in previous dlib releases.
+
+</pre></td></tr></table><hr><h1 style="margin:0px;">Release 18.0</h1><u>Release date</u>: Feb 04, 2013<br><u>Major Changes in this Release</u>:
+            <table cellspacing="5" cellpadding="0" width="100%"><tr><td width="15"></td><td><pre>
+New Features:
+   - Machine Learning
+      - Added svm_rank_trainer, an optimized implementation of the SVM-Rank algorithm.
+      - Added rank_unlabeled_training_samples(), an implementation of the SVM Active
+        Learning algorithm.
+      - Added svm_c_linear_dcd_trainer, a warm-startable SVM solver using the dual 
+        coordinate descent algorithm used by liblinear.
+      - Added the ability to force the last element of a weight vector to 1 to the
+        following objects: svm_c_linear_trainer, svm_c_linear_dcd_trainer,
+        svm_rank_trainer, and oca.
+      - Added the ability to learn non-negative weight vectors to the
+        structural_sequence_labeling_trainer object.
+   - Networking
+      - Added an iosockstream object.
+      - Added a method to the server object that lets a user set the graceful close timeout
+        time to something other than the default of 500ms.
+   - Linear Algebra
+      - Added the gaussian_randm() function.
+      - Added the find_affine_transform() function.
+      - Added the mat() function.  It combines the array_to_matrix(), vector_to_matrix(),
+        pointer_to_column_vector(), and pointer_to_matrix() methods all into one convenient
+        interface.   mat() also works for Armadillo and Eigen matrices.
+      - Added STL style begin() and end() methods to matrix and matrix_exp.
+      - Added an overload of sparse_matrix_vector_multiply() that multiplies a dense matrix
+        with a sparse vector.
+      - Made toMat() work with the matrix object in addition to array2d style images.
+   - Graphical User Interface Tools
+      - Added draw_solid_convex_polygon().
+      - Added an overload of draw_image() that's useful for drawing images and doing
+        interpolation at the same time.
+      - Added the on_view_changed() callback to zoomable_region and scrollable_region widgets.
+   - Added parse_trees_to_string() and parse_trees_to_string_tagged().
+   - Added lambda function support to the timeout object.
+   - Added the vectorstream object.
+   - Added the parse_xml() routines.
+   - Added a group name feature to the command line parser.  Now it is possible to make
+     print_options() print related options in named groups. 
+   - Added the following new hashing functions: murmur_hash3_128bit_3(),
+     murmur_hash3_2(), murmur_hash3_3(), uniform_random_hash(), gaussian_random_hash() 
+     as well as hash() overloads for uint32, uint64, and std::pair.
+
+Non-Backwards Compatible Changes:
+   - Made the svm_c_linear_trainer use the risk gap to decide when to stop.  This was done
+     because it is how all the other OCA based SVM tools in dlib decide when to stop.  
+     However, it might cause the outputs to be slightly different in this version of dlib.  
+   - It is now illegal to call unlock() on a mutex when the mutex is not owned by the
+     calling thread.  The most likely reason for doing this was to unlock early in an area
+     locked by an auto_mutex.  Old code that does this can be fixed by calling auto_mutex's
+     unlock() function instead.  
+   - Removed the structural_assignment_trainer::learns_nonnegative_weights() routine 
+     and moved its functionality into the feature extraction interface used by this object. 
+
+Bug fixes:
+   - Fixed a bug in find_max_factor_graph_nmplp() which caused it to not work properly on
+     some compilers.
+   - Fixed a bug pointed out by Joel Nelson in the version of md5() that took an istream.
+     The bug caused the function to crash on strings longer than 56 characters.
+
+Other:
+   - dlib now has an excellent new logo thanks to Yasser Asmi. 
+   - Added a new documentation page for the various linear algebra tools.
+   - The following objects were turned into single implementation components:
+     sockstreambuf, timeout, member_function_pointer, xml_parser, linker,
+     bound_function_pointer, and timer.
+
+</pre></td></tr></table><hr><h1 style="margin:0px;">Release 17.49</h1><u>Release date</u>: Dec 18, 2012<br><u>Major Changes in this Release</u>:
+            <table cellspacing="5" cellpadding="0" width="100%"><tr><td width="15"></td><td><pre>
+New Features:
+   - Machine Learning
+      - Added the ability to learn non-negative weight vectors to the
+        structural_assignment_trainer object.
+      - Added two new graph clustering algorithms: Chinese Whispers and Newman's modularity
+        clustering.
+      - Added a number of new graph manipulation tools: sparse_matrix_vector_multiply(),
+        is_ordered_by_index(), find_neighbor_ranges(), convert_unordered_to_ordered(),
+        remove_duplicate_edges(), and the ordered_sample_pair object.
+   - Networking
+      - Added a set of tools for creating applications using the Bulk Synchronous Parallel
+        computing model.  See the new bsp_ex.cpp example program for an introduction.
+      - Added a routine that lets a user disable Nagle's algorithm on a TCP connection.
+      - Added an asynchronous start routine to the server object.  This is the new
+        start_async() method.
+      - Added the network_address object.
+      - Added connect_to() to the bridge interface.
+   - Added find_max_parse_cky(), a method implementing the well known CKY algorithm for
+     parsing probabilistic context free grammars.
+   - Added the ability to label parts of objects with the mouse to the image_display
+     widget.
+   - Added the ability to put overlay circles and full_object_detections into the
+     image_window widget.
+   - Added a stddev() for matrix objects.
+   - Added operator+() for running_stats and running_scalar_covariance.
+   - Added an overload of murmur_hash3_128bit() that takes 4 integers instead of a block of
+     memory.
+   - Added rand::get_random_64bit_number().
+
+Non-Backwards Compatible Changes:
+   - Changed the image_dataset_metadata XML reading tools to use a map of strings to points
+     to represent object parts. This change removes the old head point from a box since
+     this information can now be represented in the parts map.
+   - The syntax for passing order_by_distance and order_by_index to std::sort() is now
+     slightly different since these functions are now templates.  However, this change
+     allows them to work on any kind of sample_pair or ordered_sample_pair object.
+   - The default distance value of a sample_pair is now initialized to 1 instead of
+     infinity.
+
+Bug fixes:
+   - Added a patch, contributed by Martin Müllenhaupt, to fix a minor bug in the SQLite
+     bindings.
+   - Fixed a typo which would prevent code that called running_stats::max_n() from
+     compiling.
+
+Other:
+   - Added a new documentation page for the various graph tools in dlib.
+   - Added support for Visual Studio 2012.
+   - Switched the sample_pair object to use double to store its distance value instead of
+     float.
+   - Added William Sobel's patch to the web server that improves its flexibility and
+     security.
+   - Changed the server object so you don't have to use the server::kernel_1a syntax to
+     declare it anymore.  Now you just say server, server_iostream, or server_http
+     depending on which one you want.
+   - Changed the cmd_line_parser so you don't have to use the ::kernel_1a syntax anymore.
+     Now it is declared like a normal single implementation object.
+   - Set the default max number of connections a server will accept at a time to 1000
+     rather than the previous default of infinity.
+
+</pre></td></tr></table><hr><h1 style="margin:0px;">Release 17.48</h1><u>Release date</u>: Oct 18, 2012<br><u>Major Changes in this Release</u>:
+            <table cellspacing="5" cellpadding="0" width="100%"><tr><td width="15"></td><td><pre>
+New Features:
+  - Added more overloads of find_max_factor_graph_potts() to make applying it 
+    over a Markov random field of image pixels really simple.
+  - Added overloads of serialize()/deserialize() so that they can serialize
+    Google protocol buffer objects.
+  - Image Processing:
+      - Added find_points_above_thresh()
+      - Added max_filter() 
+      - Added scan_image_movable_parts()
+      - Added sum_filter_assign()
+      - Added the full_object_detection object.
+      - Added the ability to model objects with movable parts into the
+        scan_image_pyramid object.  This update also includes all the needed tools
+        to train movable part models using the structural_object_detection_trainer.
+  - Machine Learning:
+      - Added a per node loss option to the structural_svm_graph_labeling_problem's
+        interface.
+      - Added Emanuele Cesena's implementation of Sammon's nonlinear dimensionality
+        reduction method.
+
+Non-Backwards Compatible Changes:
+  - To support movable part models, the serialization format of scan_image_pyramid
+    objects was modified.  This breaks backwards compatibility with the previous
+    format for scan_image_pyramid objects as well as object_detector instances
+    that use the scan_image_pyramid.
+
+Bug fixes:
+  - Fixed a bug in auto_threshold_image() that caused it to give bad outputs 
+    when used with very large images.
+
+Other:
+  - Updated find_max_factor_graph_potts() to correctly say you can use infinite
+    weights for the factor_value_disagreement() values since the code actually
+    supports this.
+  - Made integer serialization about 3 times faster.
+
+</pre></td></tr></table><hr><h1 style="margin:0px;">Release 17.47</h1><u>Release date</u>: Jun 15, 2012<br><u>Major Changes in this Release</u>:
+            <table cellspacing="5" cellpadding="0" width="100%"><tr><td width="15"></td><td><pre>
+New Features:
+   - Improvements to linear algebra tools:
+      - Added the lowerbound() and upperbound() routines for thresholding dense 
+        matrices.
+      - Refined the tools for working with sparse vectors.  In particular, 
+        the following functions were added: min(), max(), make_sparse_vector(),
+        add(), and subtract().  A number of existing routines were also updated
+        to work with both sparse and dense vectors so that templated code which 
+        works on both vector types is simpler to write.
+      - Added the += and -= operators to the set_subm(), set_rowm(), and set_colm()
+        tools for operating on submatrices.
+   - Optimization:
+      - Added a new quadratic program solver, solve_qp4_using_smo().  This new
+        solver is useful for solving quadratic programs corresponding to
+        non-negative constrained primal quadratic programs.
+      - Added an optional non-negativity constraint to the oca optimizer.
+      - Added the min_cut object.  It provides a method to find the minimum weight 
+        cut on a graph.  
+      - Added tools for finding the maximum probability assignment in a Potts 
+        style Markov random field.  See the find_max_factor_graph_potts() routine 
+        for details.
+   - Machine Learning:
+      - Added structural SVM tools for learning the parameters of a Potts style
+        Markov random field.  See the structural_graph_labeling_trainer and
+        graph_labeler objects as well as their associated example program for 
+        details.
+      - Added the ability to learn only non-negative weights to the 
+        svm_c_linear_trainer.
+   - Improved Integration with OpenCV: 
+      - Updated the cv_image object so it works with cv::Mat as well as IplImage.
+      - Added the toMat() routine for converting from a dlib style image to an
+        OpenCV cv::Mat image.
+
+Non-Backwards Compatible Changes:
+   - Removed the dlib::sparse_vector namespace.  Everything from this namespace 
+     was moved into the normal dlib:: namespace so that code which works with 
+     both sparse and dense vectors is more cohesive.
+
+Bug fixes:
+   - Fixed a bug in find_max_factor_graph_viterbi() which sometimes occurred when 
+     the model order was larger than the number of variables.
+   - Fixed a bug which caused a compiler error if you tried to call dot() on two 
+     1x1 matrices which were statically dimensioned.
+
+Other:
+   - Improved existing documentation: added pictures of the gui widgets, 
+     added documentation of the dlib::bridge protocol, and other minor 
+     usability improvements.
+</pre></td></tr></table><hr><h1 style="margin:0px;">Release 17.46</h1><u>Release date</u>: Apr 11, 2012<br><u>Major Changes in this Release</u>:
+            <table cellspacing="5" cellpadding="0" width="100%"><tr><td width="15"></td><td><pre>
+New Features:
+   - Image Processing:
+      - Added the option to make the features generated by poly_image rotationally 
+        invariant. 
+      - Added a set of routines for warping, scaling, and resizing images.
+        See the new "Scaling and Rotating" section of the image processing
+        documentation for details.
+      - Added the heatmap() routine for converting an image into a heatmap.
+   - Machine Learning
+      - Updated the sequence labeling trainer to allow the user to set different 
+        loss values for different labels.
+      - Added the rls object.  It is an implementation of the linear recursive 
+        least squares algorithm.
+   - Added the get_option() routines which slightly simplify option parsing 
+     from the command line and config files.
+   - Added the 128bit version of Murmur hash.
+   - Added the kalman_filter and rls_filter objects.  These are tools for 
+     performing Kalman filtering and recursive least squares filtering.
+   - Added the circular_buffer object. 
+
+Non-Backwards Compatible Changes:
+   - The poly_image generates slightly different features in this new release.
+     Therefore, classifiers trained using the previous version will need to be
+     retrained if they are switched to the new version of poly_image.
+   - Changed the xcorr() functions so they take the complex conjugate of the right
+     hand arguments if they are complex numbers.  This way they do a proper
+     cross-correlation and also mirror the behavior of MATLAB.  However, this
+     breaks backwards compatibility with the previous behavior of xcorr().
+   - Previously, dlib included two versions of dlib::array.  However, to
+     simplify the user interface, dlib now includes only the contiguous
+     memory implementation of dlib::array.  This change should only affect
+     you if you wrote code which assumed dlib::array::set_max_size() only
+     allocated a small amount of RAM.  The new behavior is similar to the
+     std::vector::reserve() routine.  That is, dlib::array::set_max_size()
+     will allocate the requested amount of memory immediately.
+
+Bug fixes:
+   - Fixed a bug which caused certain matrix expressions to not compile
+     when the BLAS bindings were enabled.  In particular, expressions which
+     involved a 1x1 matrix sometimes didn't compile.
+
+Other:
+   - Made the matrix routines min(), max(), sum() and mean() work with 
+     complex numbers. 
+   - Turned the array object into a single implementation object.  Now arrays 
+     can be created using the normal array&lt;type&gt; obj; syntax.  Additionally, 
+     all extensions were merged into the array object. 
+   - Added an example program which better documents how to create training
+     data for the object detection tools as well as how this data can be used.
+     See the train_object_detector.cpp example for details.
+
+</pre></td></tr></table><hr><h1 style="margin:0px;">Release 17.45</h1><u>Release date</u>: Jan 29, 2012<br><u>Major Changes in this Release</u>:
+            <table cellspacing="5" cellpadding="0" width="100%"><tr><td width="15"></td><td><pre>
+New Features:
+   - Added tools for timing blocks of code
+   - Machine Learning
+      - Added a set of tools for learning to solve the assignment problem.
+        See the structural_assignment_trainer and its associated example
+        program for an introduction.
+      - Added random projection based locality sensitive hashing tools.
+      - Added tools to simplify the creation of scan_image_pyramid objects.  
+        See the object_detector_ex.cpp example program for details.
+   - Image Processing
+      - Added sum_filter() and spatially_filter_image_separable_down()
+      - New feature extractors: poly_image, nearest_neighbor_feature_image, and
+        fine_hog_image
+ 
+Non-Backwards Compatible Changes:
+   - Changed the serialization format for rand objects.
+   - Changed the order of arguments for the sequence_labeler's constructor.
+   - Object Detection Changes
+      - Some parts of the object detection tools have been refactored.  In particular, 
+        the interfaces of the scan_image_pyramid and structural_object_detection_trainer 
+        have been changed slightly to improve usability.
+      - Made the test_box_overlap a little more flexible.  This change breaks
+        backwards compatibility with the previous version though.
+      - The hashed_feature_image object has been made more general.  It now 
+        uses a user supplied hashing function rather than its own hashing 
+        implementation.
+      - Removed constness from the operator() member functions of the 
+        object_detector.
+   - Fixed improper normalization in the gaussian() functions.  The
+     normalization constant was being computed incorrectly.
+   - Sequence labeling feature extractors must now define a sequence_type
+     typedef instead of sample_type.  This change allows the user to use any 
+     type of sequence, not just std::vector objects.
+
+Bug fixes:
+   - Changed the add_probability() method of joint_probability_table so
+     it does a saturating add rather than a normal add.  This ensures the
+     probability value stays exactly &lt;= 1.  Previously, floating point
+     rounding error could cause it to be slightly above 1 and would therefore
+     cause some asserts to misfire during debugging mode.
+   - The object_detector had code in it which limited the number of outputs
+     to 100 rectangles.  This has been removed.
+   - Fixed improper normalization in the gaussian() functions.  The
+     normalization constant was being computed incorrectly.
+
+Other:
+   - dlib::rand can now generate Gaussian random numbers.
+   - The structural_object_detection_trainer will now automatically setup
+     appropriate non-max suppression parameters if the user doesn't supply them. 
+   - The structural_object_detection_trainer has been optimized and now runs
+     significantly faster than in previous dlib releases.
+   - The tools folder containing htmlify, imglab, and mltool is now included
+     in the dlib release archive files.  Previously, these tools were only 
+     available directly from source control.
+
+</pre></td></tr></table><hr><h1 style="margin:0px;">Release 17.44</h1><u>Release date</u>: Nov 21, 2011<br><u>Major Changes in this Release</u>:
+            <table cellspacing="5" cellpadding="0" width="100%"><tr><td width="15"></td><td><pre>
+New Features:
+   - Machine Learning
+      - Added the histogram intersection kernel for sparse and dense vectors.
+      - Added a set of tools to allow a user to easily learn to do sequence
+        labeling using dlib's structural SVM implementation.  See the new
+        sequence_labeler object and its associated example program for an 
+        introduction.
+   - Image processing:  
+      - Added segment_image()
+      - Added randomly_color_image()
+      - Added the border_enumerator
+   - Added the disjoint_subsets object, it is an implementation of the 
+     union-find algorithm/disjoint-set data structure.
+   - Added new matrix routines: conv(), conv_same(), conv_valid(), xcorr(),
+     xcorr_same(), xcorr_valid(), and flip().
+ 
+Non-Backwards Compatible Changes:
+   - Changed find_max_factor_graph_viterbi() so you can use run-time
+     defined order and num_states parameters.
+
+Bug fixes:
+   - The last dlib release added a max_iterations parameter to the
+     svm_c_linear_trainer and svm_c_ekm_trainer objects.  However,
+     there was a bug which made them only do at most 16 iterations,
+     which is too few to solve many problems.  This has been fixed.
+   - Fixed a bug in is_const_type.  It didn't work for reference types.
+   - Fixed a bug in the SQLite binding routine statement::get_column_as_text().  
+     It didn't work correctly if the column contained a NULL.
+   - Fixed a bug in find_max_factor_graph_viterbi() which occurred when a
+     zero order model had negative factor values.
+
+Other:
+
+</pre></td></tr></table><hr><h1 style="margin:0px;">Release 17.43</h1><u>Release date</u>: Oct 21, 2011<br><u>Major Changes in this Release</u>:
+            <table cellspacing="5" cellpadding="0" width="100%"><tr><td width="15"></td><td><pre>
+New Features:
+   - Two new routines for performing MAP inference in factor graphs:
+      - For chain-structured graphs: find_max_factor_graph_viterbi()
+      - For general graphs:          find_max_factor_graph_nmplp()
+   - Image Processing
+      - Added more tools for creating image pyramids.  See pyramid_down_5_4, 
+        pyramid_down_4_3, and pyramid_down_3_2.
+      - Added more image filtering and morphology functions.
+      - Added a set of tools for creating sliding window classifiers:
+         - Added the scan_image() routine.  It is a tool for sliding a set of 
+           rectangles over an image space and finding the locations where the sum 
+           of pixels in the rectangles exceeds a threshold.  Also added
+           scan_image_pyramid, which is a tool for running scan_image() over an 
+           image pyramid.
+         - Added the structural_object_detection_trainer.  This is a tool which 
+           formulates the sliding window classifier learning problem as an
+           instance of structural SVM learning.
+         - Added a variety of supporting tools and two object detection example 
+           programs.
+   - Added the following functions for computing statistics on vectors:
+     mean_sign_agreement(), correlation(), covariance(), r_squared(),
+     and mean_squared_error()
+   - Added a C++ wrapper for SQLite (see the new database and statement objects)
+ 
+Non-Backwards Compatible Changes:
+   - Changed the interface to the ridge regression trainer objects so that they 
+     report the entire set of leave-one-out prediction values rather than a 
+     summary statistic like mean squared error.
+   - Changed the serialization routine for bgr_pixels to store the pixels in BGR 
+     order rather than RGB.
+   - Changed the interface for the spatially_filter_image() routine to take the 
+     filter as a matrix rather than C-array.  Also, now it won't force signed pixel 
+     values to 0 if they go negative. 
+   - Changed the test_regression_function() and cross_validate_regression_trainer()
+     routines so they return both the MSE and R-squared values rather than just the
+     MSE.
+   - Changed suppress_non_maximum_edges() to use the L2 norm instead of L1 norm
+     for measuring the strength of an edge since this produces a slightly better
+     result.
+
+Bug fixes:
+   - The image_display didn't display overlay rectangles quite right.  If you zoomed
+     in you could see that some of the pixels which are inside the rectangle were
+     outside the overlay.  Specifically, the right column and bottom row was outside
+     the overlay rectangle.  This has been fixed.  Now all pixels which are supposed
+     to be part of a rectangle are drawn as being inside the overlay rectangle.
+   - Fixed a bug pointed out by Martin Müllenhaupt which caused the windows socket
+     code to not compile when used with the mingw-cross-env project.
+   - Fixed a bug in the png_loader.  If you loaded an image with an alpha channel 
+     into something without an alpha channel there were uninitialized values being 
+     alpha blended into the image.
+   - Fixed a bug in the cpp_tokenizer that only shows up on newer versions of gcc.  
+     It wasn't tokenizing double quoted strings right.
+   - Fixed a bug in spatially_filter_image() which showed up when using non-square 
+     filters.  The bug would cause the edges of the output image to be incorrect.
+   - Fixed a bug in the matrix class.  Expressions of the form mat *= mat(0) would
+     evaluate incorrectly because the *= operator took the right hand side by reference
+     and thus experienced an aliasing problem.  The other op= operators had similar
+     problems and have also been fixed.
+   - Fixed a bug pointed out by Justin Solomon which could cause the svr_trainer and
+     svm_c_trainer to produce incorrect results in certain unusual cases.  
+
+Other:
+   - Added a more complete set of methods for converting between image space and 
+     the downsampled hog grid used by hog_image.  Now you can convert from image 
+     to hog in addition to hog to image.
+   - Made the integral_image more general by making it templated on the type of 
+     scalar used to store the sums.
+
+</pre></td></tr></table><hr><h1 style="margin:0px;">Release 17.42</h1><u>Release date</u>: Jun 24, 2011<br><u>Major Changes in this Release</u>:
+            <table cellspacing="5" cellpadding="0" width="100%"><tr><td width="15"></td><td><pre>
+New Features:
+   - Added the check_sub_option() method to the command line parser check
+     object.
+   - Added match_endings to the dir_nav utils.
+   - Added a set_current_dir() function.
+   - Added the distance_to_rect_edge() routine.
+   - Added support for user drawn rectangle overlays and selectable overlays 
+     to the image_display widget.
+ 
+Non-Backwards Compatible Changes:
+
+Bug fixes:
+   - Fixed a bug in the image_display widget.  If you switched it between
+     images of a different size while any kind of zoom was in effect
+     it could cause a segmentation fault.
+
+Other:
+
+</pre></td></tr></table><hr><h1 style="margin:0px;">Release 17.41</h1><u>Release date</u>: Jun 12, 2011<br><u>Major Changes in this Release</u>:
+            <table cellspacing="5" cellpadding="0" width="100%"><tr><td width="15"></td><td><pre>
+New Features:
+   - You can now add tasks to a thread_pool by value, using the new 
+     add_task_by_value() method.
+ 
+Non-Backwards Compatible Changes:
+
+Bug fixes:
+   - Fixed a bug which caused multiply defined symbol errors during linking
+     if the PNG saving routine was #included.
+
+Other:
+   - Optimized the threaded and distributed structural svm solvers for the 
+     case where there are many data samples and the separation oracle is 
+     quick to evaluate.
+
+</pre></td></tr></table><hr><h1 style="margin:0px;">Release 17.40</h1><u>Release date</u>: Jun 05, 2011<br><u>Major Changes in this Release</u>:
+            <table cellspacing="5" cellpadding="0" width="100%"><tr><td width="15"></td><td><pre>
+New Features:
+   - Added a function for saving to the PNG image format.
+   - Added Austin Appleby's excellent MurmurHash3 hashing code and setup some
+     additional convenience functions.  These functions are murmur_hash3() and
+     various overloads of hash().
+ 
+Non-Backwards Compatible Changes:
+   - Made get_pixel_intensity() more efficient.  However, the value returned
+     is slightly different than it used to be for RGB pixel types.
+
+Bug fixes:
+   - Setup proper error handling for libpng in the png_loader.  Now if the PNG
+     file is corrupted in the middle it won't just print a message and abort
+     the program.
+   - Fixed a bug in assign_pixel_intensity() that happened when the target pixel 
+     was an RGB pixel with an alpha channel.
+
+Other:
+   - Added a Frequently Asked Questions page
+   - Changed the array2d object so you don't have to say array2d&lt;type&gt;::kernel_1a
+     anymore to declare it.  Now you just say array2d&lt;type&gt;.
+
+</pre></td></tr></table><hr><h1 style="margin:0px;">Release 17.39</h1><u>Release date</u>: May 22, 2011<br><u>Major Changes in this Release</u>:
+            <table cellspacing="5" cellpadding="0" width="100%"><tr><td width="15"></td><td><pre>
+New Features:
+   - Added tools for distributing the work involved in solving a structured
+     SVM problem over many computers and CPUs. 
+   - Added the bridge.  It allows a dlib::pipe to be used for networked
+     communication.
+ 
+Non-Backwards Compatible Changes:
+   - Removed the DLIB_REVISION macro and replaced it with DLIB_MAJOR_VERSION and
+     DLIB_MINOR_VERSION.
+
+Bug fixes:
+
+Other:
+   - dlib's version control system has switched from Subversion to Mercurial.
+
+</pre></td></tr></table><hr><h1 style="margin:0px;">Release 17.38</h1><u>Release date</u>: May 7, 2011<br><u>Major Changes in this Release</u>:
+            <table cellspacing="5" cellpadding="0" width="100%"><tr><td width="15"></td><td><pre>
+New Features:
+   - Added the max_sum_submatrix() function to the optimization tools.
+   - Upgraded the pyramid_down function object so it can create color pyramids.  
+     Also, added some functions which define the coordinate transforms between 
+     different layers in an image pyramid.  
+ 
+Non-Backwards Compatible Changes:
+   - Changed the oca_problem interface to the oca optimizer.  Now the 
+     optimization_status() function reports back the current risk and risk gap 
+     in addition to the overall objective value and objective gap. 
+   - Changed the stopping condition for the structured svm to the one suggested
+     by the Joachims paper.  Now it stops when the risk gap is below a user
+     supplied epsilon. 
+
+Bug fixes:
+
+Other:
+   - Various usability improvements.
+   - Improved the feature vector caching in the structural_svm_problem object.
+   - Some objects were setup as multi-implementation objects but only had one 
+     implementation.  I went through dlib and switched these to single implementation 
+     objects.  So for example, to use the dlib crc32 module you used to declare an 
+     object of type "crc32::kernel_1a" but now you can just say "crc32".  Note that 
+     I did this change in a way that maintains backwards compatibility with previous 
+     versions.  So crc32::kernel_1a is still allowed but that form is officially 
+     deprecated.  The modified objects are as follows:
+      - base64
+      - byte_orderer
+      - config_reader
+      - crc32
+      - pipe
+      - rand
+
+</pre></td></tr></table><hr><h1 style="margin:0px;">Release 17.37</h1><u>Release date</u>: Mar 24, 2011<br><u>Major Changes in this Release</u>:
+            <table cellspacing="5" cellpadding="0" width="100%"><tr><td width="15"></td><td><pre>
+New Features:
+   - Added a multiclass support vector machine.
+   - Added a tool for solving the optimization problem associated with
+     structural support vector machines.
+   - Added new functions for dealing with sparse vectors: add_to(), 
+     subtract_from(), max_index_plus_one(), fix_nonzero_indexing(), a
+     more flexible dot(), and I renamed assign_dense_to_sparse() to assign() 
+     and made it more flexible.
+ 
+Non-Backwards Compatible Changes:
+   - Renamed max_index_value_plus_one() (a function for working with graphs) to 
+     max_index_plus_one() so that it uses the same name as the essentially 
+     identical function for working with sparse vectors.
+   - I simplified the cross_validate_multiclass_trainer(), cross_validate_trainer(), 
+     test_binary_decision_function(), and test_multiclass_decision_function()
+     routines.  They now always return double matrices regardless of any other 
+     consideration.  This only breaks previous code if you had been assigning
+     the result into a float or long double matrix.
+   - Renamed assign_dense_to_sparse() to assign()
+
+Bug fixes:
+   - Fixed a bug in load_libsvm_formatted_data().  I had forgotten to clear the 
+     contents of the labels output vector before adding the loaded label data.  
+   - Fixed a bug in the kernel_matrix() function.  It didn't compile when used 
+     with sparse samples which were of type std::vector&lt;std::pair&lt;&gt; &gt;.  
+     Moreover, some of the trainers have a dependency on kernel_matrix() so this 
+     fix makes those trainers also work with this kind of sparse sample.
+
+Other:
+   - Added a value_type typedef to matrix_exp so it's easier to write templates
+     which operate on STL containers and matrix objects.
+</pre></td></tr></table><hr><h1 style="margin:0px;">Release 17.36</h1><u>Release date</u>: Mar 2, 2011<br><u>Major Changes in this Release</u>:
+            <table cellspacing="5" cellpadding="0" width="100%"><tr><td width="15"></td><td><pre>
+New Features:
+   - Added an implementation of the Hungarian algorithm for solving the optimal 
+     assignment problem (in the new max_cost_assignment() routine).
+ 
+Non-Backwards Compatible Changes:
+
+Bug fixes:
+   - Fixed a problem which prevented the any_function unit test from compiling 
+     in visual studio 2008.
+
+Other:
+   - Changed the oca optimizer so that it warm starts the QP subproblem
+     rather than resolving it from scratch during each iteration. This 
+     improves the speed and stability of the algorithm.
+</pre></td></tr></table><hr><h1 style="margin:0px;">Release 17.35</h1><u>Release date</u>: Feb 10, 2011<br><u>Major Changes in this Release</u>:
+            <table cellspacing="5" cellpadding="0" width="100%"><tr><td width="15"></td><td><pre>
+New Features:
+   - Added the rr_trainer.  It is a version of krr_trainer which is optimized
+     for use with the linear_kernel.
+   - Added the approximate_distance_function() routine.  It is the core optimizer
+     behind the reduced2() trainer adapter.  
+   - Added an any_function which supports the same functionality as std::function 
+     from the upcoming C++0x standard.  I added this so dlib can be modified to 
+     easily support lambda functions while still being compilable with compilers 
+     which don't support the new std::function.
+   - Added overloads of all the GUI event handlers so you can use general functions 
+     as callbacks (via any_function).  This way, if you have a C++0x compiler, you 
+     can use lambda functions with the event handlers.
+   - Added the split() function for splitting up strings.
+ 
+Non-Backwards Compatible Changes:
+   - Improved the distance_function object by turning it into a properly 
+     encapsulated class rather than just a simple struct.  I also added 
+     overloaded +, -, *, and / operators for this object so you can do the 
+     kind of arithmetic you would expect on an object which represents a 
+     point in a vector space.  This breaks backwards compatibility with 
+     the previous interface though as the member variables are now private.
+
+Bug fixes:
+   - Fixed a compile-time error in the kernel_matrix().
+   - Fixed a bug in an assert in the spatially_filter_image() function.
+   - Applied a patch from Nils Labugt which fixes a runtime bug in the gui_core 
+     component.  The bug caused a crash when using X11 and Ubuntu 10.10 in
+     certain cases.
+   - Updated code so that it compiles with the clang compiler.
+
+Other:
+   - Updated the image_display widget so you can zoom in and out using the 
+     mouse wheel.
+</pre></td></tr></table><hr><h1 style="margin:0px;">Release 17.34</h1><u>Release date</u>: Jan 03, 2011<br><u>Major Changes in this Release</u>:
+            <table cellspacing="5" cellpadding="0" width="100%"><tr><td width="15"></td><td><pre>
+New Features:
+   - General Stuff 
+      - Added the promote template
+      - Added the basic_type template
+      - Added the assign_image_scaled() function
+      - Added the unordered_pair object.
+      - Added the symmetric_matrix_cache() function
+      - Added two new quadratic program solvers.  The solve_qp2_using_smo
+        and solve_qp3_using_smo objects.
+
+   - Machine Learning Stuff
+      - Added the svm_c_trainer object.  It implements C-SVM classification and
+        allows the user to set different C values for each class.
+      - Added the svm_one_class_trainer object. 
+      - Added the svr_trainer object.  It implements epsilon-insensitive
+        support vector regression.
+      - Added two new any objects.  The any_decision_function for containing 
+        decision function style objects and the any_trainer for trainers.
+      - Added cross_validate_regression_trainer()
+      - Added test_regression_function()
+      - Added the probabilistic() function.  It is a trainer adapter that
+        simply calls train_probabilistic_decision_function().
+      - Added tools for multiclass classification 
+         - Added one_vs_one_trainer
+         - Added one_vs_all_trainer
+         - Added cross_validate_multiclass_trainer()
+         - Added test_multiclass_decision_function()
+ 
+Non-Backwards Compatible Changes:
+  - invalid_svm_nu_error has been renamed to invalid_nu_error.
+  - Changed the pixel_traits so that signed grayscale pixel types are allowed.  
+    This involved adding a few new fields to pixel_traits.  I also changed the 
+    get_pixel_intensity() function so that its return value is of the same type 
+    as the basic pixel type rather than always being unsigned long.
+  - Removed the kernel_type typedef from the normalized function since this
+    meta-object should be capable of working with non-kernel decision functions.
+  - train_probabilistic_decision_function() no longer accepts column vectors of 
+    samples and labels.  Now it only accepts std::vectors of samples and labels.  
+
+Bug fixes:
+  - Fixed a bug in the deserialization code for the sparse kernels.  The bug
+    prevented code which used the deserialize() routine from compiling.
+
+Other:
+  - Changed the image display GUI widgets to use the assign_image_scaled() 
+    function internally.  Now they will accept just about any image and 
+    do the right thing.
+  - Modified the type_safe_union so that you can call apply_to_contents() on const
+    type_safe_unions.
+  - Added serialization support for std::pair objects.
+  - Made the train_probabilistic_decision_function() more general by making it work 
+    with any kind of trainer object rather than only ones which produce 
+    dlib::decision_function objects.  I also made it work with trainers that only 
+    take std::vectors.
+  - Added overloads to the config_reader's methods to allow it to load directly 
+    from a file name given as a string in addition to taking istream objects.
+</pre></td></tr></table><hr><h1 style="margin:0px;">Release 17.33</h1><u>Release date</u>: Dec 05, 2010<br><u>Major Changes in this Release</u>:
+            <table cellspacing="5" cellpadding="0" width="100%"><tr><td width="15"></td><td><pre>
+New Features:
+  - Added the ability to add/subtract scalar values to/from all the elements 
+    of a matrix using the - and + operators.
+  - Added a trust region optimizer. 
+  - Added Levenberg-Marquardt and LM/quasi-newton hybrid methods for solving
+    non-linear least squares problems.
+  - Added an any container object.
+
+Non-Backwards Compatible Changes:
+
+Bug fixes:
+  - Fixed a compiler warning and also a runtime bug in sort_basis_vectors().  
+    The bug triggered when all the basis vectors were included in the final
+    answer.
+
+Other:
+  - Added a bunch of overloads to catch operations on diagonal matrices
+    and use more efficient code paths for them.  For example, inv(diagm(d))
+    turns into diagm(reciprocal(d)).  Multiplication by a diagonal matrix
+    is now also handled efficiently.
+
+</pre></td></tr></table><hr><h1 style="margin:0px;">Release 17.32</h1><u>Release date</u>: Nov 13, 2010<br><u>Major Changes in this Release</u>:
+            <table cellspacing="5" cellpadding="0" width="100%"><tr><td width="15"></td><td><pre>
+New Features:
+  - Added a class for reading JPEG image files.
+  - Added scale_rows(), flipud() and fliplr() matrix functions.
+  - Added console_progress_indicator.  It is a tool for measuring how long a 
+    task will take.
+  - Added sort_basis_vectors().  It is a function for performing supervised 
+    basis selection.
+
+Non-Backwards Compatible Changes:
+   - Renamed the linearly_independent_subset_finder's dictionary_size() member 
+     function to size().  This way, linearly_independent_subset_finder objects 
+     can be used in many templated functions which expect objects which look 
+     like arrays. 
+
+Bug fixes:
+  - Changed the assert macros so that they don't use __PRETTY_FUNCTION__
+    with gcc 4.4.5 since, on Ubuntu at least, this version of gcc segfaults
+    when __PRETTY_FUNCTION__ is used within certain template constructs.
+  - Improved the alias detection capability of kernel_matrix() expressions.  
+    Now statements of the form: sample = kernel_matrix(kern, *, sample) can 
+    be used since the aliasing of sample will be handled.
+
+Other:
+  - Generally tried to make things more usable.
+  - Optimized matrix expressions such as mat*diagm(vect)
+  - Made the code in chol() more robust to indefinite matrices.
+
+</pre></td></tr></table><hr><h1 style="margin:0px;">Release 17.31</h1><u>Release date</u>: Sep 15, 2010<br><u>Major Changes in this Release</u>:
+            <table cellspacing="5" cellpadding="0" width="100%"><tr><td width="15"></td><td><pre>
+New Features:
+   - Added the running_scalar_covariance object.
+   - All the matrix decomposition routines now use LAPACK when DLIB_USE_LAPACK
+     is #defined.   
+
+Non-Backwards Compatible Changes:
+   - Removed the dlib::EOTHER constant since it conflicts with visual
+     studio 2010.
+   - Changed the svd functions so you can't supply output matrices which use 
+     both column and row major layouts.  Now all the output matrices need to 
+     use the same memory layout.
+   - Removed the qr_decomposition::get_householder() function.
+
+Bug fixes:
+   - Minor fixes so that dlib compiles in Visual Studio 2010
+
+Other:
+   - Added an overloaded matrix_assign() that handles symmetric kernel_matrix()
+     expressions more efficiently by only evaluating the upper triangular part
+     of the matrix.
+
+</pre></td></tr></table><hr><h1 style="margin:0px;">Release 17.30</h1><u>Release date</u>: Jul 28, 2010<br><u>Major Changes in this Release</u>:
+            <table cellspacing="5" cellpadding="0" width="100%"><tr><td width="15"></td><td><pre>
+New Features:
+
+Non-Backwards Compatible Changes:
+
+Bug fixes:
+   - Fixed a compile-time bug in the matrix related to multiplication by 
+     subm() expressions when the BLAS bindings were enabled.
+   - Fixed a bug in train_probabilistic_decision_function() which could 
+     cause it to go into an infinite loop when working with very large 
+     datasets.
+
+Other:
+
+</pre></td></tr></table><hr><h1 style="margin:0px;">Release 17.29</h1><u>Release date</u>: Jul 25, 2010<br><u>Major Changes in this Release</u>:
+            <table cellspacing="5" cellpadding="0" width="100%"><tr><td width="15"></td><td><pre>
+New Features:
+  - Added a reference_wrapper implementation and modified the thread_function 
+    slightly so it works with it.
+  - Added an implementation of kernel ridge regression.
+  - Added a simple newton search strategy for optimizing functions.
+
+Non-Backwards Compatible Changes:
+  - If you have created your own matrix expressions then its possible this
+    new release will cause them to not compile.  
+
+Bug fixes:
+  - Fixed a bug in scale_columns.  It said it didn't have any destructive aliasing 
+    when in fact it destructively aliased its second argument.
+  - Fixed a bug in the random number generator where setting the seed back to ""
+    didn't result in the object going back to its initial state.
+
+Other:
+  - Reorganized the matrix expression code.  It's now much simpler and the
+    library includes a new example program which details the steps needed to
+    create new matrix expressions.
+  - Changed the train_probabilistic_decision_function() routine so that it uses
+    a more numerically stable method to perform its maximum likelihood optimization.
+  - Added missing get/set epsilon functions to the RVM training objects.
+    I also changed the default epsilon from 0.0005 to 0.001.
+</pre></td></tr></table><hr><h1 style="margin:0px;">Release 17.28</h1><u>Release date</u>: Jun 14, 2010<br><u>Major Changes in this Release</u>:
+            <table cellspacing="5" cellpadding="0" width="100%"><tr><td width="15"></td><td><pre>
+New Features:
+   - Added the simplify_linear_decision_function() routines.
+   - Added the find_approximate_k_nearest_neighbors() function.
+   - Added the fill_lisf() function.
+
+Non-Backwards Compatible Changes:
+   - Made the sample_pair have a default distance of infinity instead of
+     the max floating point value.  I also reworked the graph creation functions 
+     to make them a little more versatile.  Now you can use infinite distances to 
+     indicate that certain nodes are not connected at all.
+   - Changed the linear_manifold_regularizer to normalize the regularization
+     parameter by the sum of edge weights instead of the sum of edges.
+
+Bug fixes:
+   - Fixed a bug in the timer_kernel_2 object.  In certain rare cases it would 
+     stop calling the action function and essentially shut down without being 
+     told to do so.
+
+Other:
+   - Made the reduced() and reduced2() functions more efficient.
+   - Many small usability improvements here and there.
+
+</pre></td></tr></table><hr><h1 style="margin:0px;">Release 17.27</h1><u>Release date</u>: May 16, 2010<br><u>Major Changes in this Release</u>:
+            <table cellspacing="5" cellpadding="0" width="100%"><tr><td width="15"></td><td><pre>
+New Features:
+   - Added the svm_c_ekm_trainer.  It is a kernelized version of the fast
+     linear trainer svm_c_linear_trainer.
+   - Added the linear_manifold_regularizer and some supporting tools.
+   - Added the sum_rows(), sum_cols(), join_rows(), join_cols(), reshape(), 
+     and pointer_to_matrix() functions.
+   - Added the randomly_subsample() function.
+
+Non-Backwards Compatible Changes:
+
+Bug fixes:
+   - Fixed some minor compile time bugs on certain older compilers.
+
+Other:
+   - Updated the += and -= matrix operators to be a little more flexible.  Now
+     if you try to apply them to a matrix of the wrong size it will automatically
+     resize the target matrix and just do a normal assignment.
+   - Removed the requirement that you load dng files into an image of the exact
+     pixel type that created the file.  Now you can use any pixel type.  I also
+     changed the code so that grayscale pixels with more than 16 bits get saved as
+     16 bit grayscale images instead of 8 bit images.
+
+</pre></td></tr></table><hr><h1 style="margin:0px;">Release 17.26</h1><u>Release date</u>: Mar 07, 2010<br><u>Major Changes in this Release</u>:
+            <table cellspacing="5" cellpadding="0" width="100%"><tr><td width="15"></td><td><pre>
+New Features:
+   - Added the solve_qp_using_smo() function to solve certain quadratic
+     programs.
+   - Added the oca object.  It is an implementation of the Optimized Cutting 
+     Plane Algorithm.
+   - Added a linear SVM trainer that uses oca.
+   - Added an implementation of the Histogram of Oriented Gradients algorithm
+   - Added a simple tool for making image pyramids
+   - Added the running_covariance object 
+   - Added a simple linear (i.e. non-kernelized) kmeans implementation
+   - Added support for serializing dlib::int64
+   - Added some functions to load and save LIBSVM formatted data files.
+
+Non-Backwards Compatible Changes:
+   - Changed the definition of dlib's sparse vector format to require
+     unsigned integral keys.  Having this requirement is nice because it 
+     creates a simple correspondence between dense vector index values and 
+     sparse vector keys.  The previous sparse vector definition was  
+     excessively generic.
+   - Renamed sparse_vector::dot_product() to sparse_vector::dot() so that 
+     both dense and sparse vectors have a global function with the same 
+     name (i.e. dot()).
+
+Bug fixes:
+   - Fixed a bug discovered by Mitchell Peabody.  In some instances trying to
+     deserialize a std::vector would fail to compile.  
+
+Other:
+   - Increased the number of template arguments of the type_safe_union from 10 
+     to 20.  Additionally, I made the get_id() function public and renamed it 
+     to get_type_id().  I also added a comment explaining the serialization 
+     format of type_safe_union objects.
+   - Moved the optimization algorithms into their own page in the documentation.
+   - Added a Suggested Books page to the documentation
+
+</pre></td></tr></table><hr><h1 style="margin:0px;">Release 17.25</h1><u>Release date</u>: Feb 05, 2010<br><u>Major Changes in this Release</u>:
+            <table cellspacing="5" cellpadding="0" width="100%"><tr><td width="15"></td><td><pre>
+New Features:
+   - Added the ability to compute transformation matrices that map between
+     the representations used by different empirical_kernel_maps.  Also added
+     the ability to compute projection error.
+   - Added the random_subset_selector object.
+   - Added the compute_mean_squared_distance() function.
+
+Non-Backwards Compatible Changes:
+   - Modified the logger's hook implementation so that it uses a special stream  
+     buffer instead of an std::ostringstream.  This way logging doesn't cause 
+     memory allocations.  This breaks backwards compatibility with the previous
+     hook function API but only slightly.  The new hook functions must take a
+     const char* instead of std::string.
+   - Added the const_ret_type typedef to the matrix_exp.  It is now required that 
+     all matrix expressions define this type.  This enables the expressions to 
+     return elements by constant reference when appropriate rather than always 
+     returning by value.  
+
+Bug fixes:
+   - Fixed a bug in the matrix BLAS bindings that caused BLAS to return an invalid
+     argument error.  The error occurred when general matrix multiply expressions
+     were transposed and didn't result in a square matrix.  E.g. mat = trans(a*b)
+     where mat isn't square.
+   - Fixed potential compile time bugs in the comparison operators for futures.
+   - Added a missing check for division by zero in the SURF feature extractor.
+   - Modified the find_min_single_variable() function so that it is more 
+     robust when working with functions that are made up of a bunch of
+     constant value strips.  Previously, these kinds of functions could
+     cause the optimization to fail.
+
+Other:
+   - Changed the regression test suite so that when it sets the logging level 
+     it now sets it for all loggers.  Not just ones that start with "test."
+
+
+</pre></td></tr></table><hr><h1 style="margin:0px;">Release 17.24</h1><u>Release date</u>: Jan 04, 2010<br><u>Major Changes in this Release</u>:
+            <table cellspacing="5" cellpadding="0" width="100%"><tr><td width="15"></td><td><pre>
+New Features:
+   - Added some MATLAB style thresholding relational operators to the matrix.
+   - Added the kernel_matrix() functions.
+   - Added the empirical_kernel_map object.
+   - Added the discriminant_pca object.
+   - Added the read_write_mutex object.
+
+Non-Backwards Compatible Changes:
+   - Renamed the support_vectors member of the decision_function and
+     distance_function classes to basis_vectors.  This name more appropriately 
+     reflects how these two classes are used within the library.
+   - Changed the matrix_exp interface slightly.  This could only impact users
+     who created their own custom matrix expressions.  If you don't get a 
+     compiler error then you don't have to worry about it.
+
+Bug fixes:
+   - Fixed a minor error in the LBFGS code.
+   - Added a missing check for division by zero to the kcentroid, krls,  
+     and linearly_independent_subset_finder classes.  If someone added
+     the zero vector to them as the first training example a division by zero 
+     could result.
+   - There were a few cases where the code wouldn't compile when using
+     matrices of complex numbers.  There was also a runtime bug that triggered 
+     when a rank 1 update was performed where one of the vectors was conjugated
+     and two or more transposes were used in certain positions.  This bug
+     caused the wrong output to be computed if the BLAS bindings were used.  
+     Both of these bugs have been fixed.
+   - Fixed a bug in the http server that affected cookies with certain kinds of 
+     data.  The result was invalid data being sent back to the web browser.
+
+Other:
+   - Generally improved the BLAS bindings for the matrix object.
+
+</pre></td></tr></table><hr><h1 style="margin:0px;">Release 17.23</h1><u>Release date</u>: Oct 20, 2009<br><u>Major Changes in this Release</u>:
+            <table cellspacing="5" cellpadding="0" width="100%"><tr><td width="15"></td><td><pre>
+New Features:
+   - Added the pointer_to_column_vector function.
+   - Added the BOBYQA algorithm for derivative-free optimization.
+   - Added some functions to make it easy to do a line search on a function
+     of a single variable when derivatives are not available.
+
+Non-Backwards Compatible Changes:
+
+Bug fixes:
+   - Fixed a bug in the cpp pretty printer.  It wasn't parsing 
+     exponentiated numbers like 1e100 correctly.
+
+Other:
+   - Added a model selection example program using grid search
+     and the new BOBYQA algorithm.
+
+</pre></td></tr></table><hr><h1 style="margin:0px;">Release 17.22</h1><u>Release date</u>: Sep 10, 2009<br><u>Major Changes in this Release</u>:
+            <table cellspacing="5" cellpadding="0" width="100%"><tr><td width="15"></td><td><pre>
+New Features:
+   - Added an implementation of the L-BFGS algorithm for unconstrained non-linear
+     optimization. 
+
+Non-Backwards Compatible Changes:
+   - Refactored the optimization code.  It is now much more flexible but
+     this resulted in changes to the API.  See the optimization example program 
+     for a discussion of the new API.
+
+Bug fixes:
+   - Fixed a bug in the get_filesystem_roots() roots function that
+     prevented it from compiling.
+
+Other:
+
+</pre></td></tr></table><hr><h1 style="margin:0px;">Release 17.21</h1><u>Release date</u>: Aug 30, 2009<br><u>Major Changes in this Release</u>:
+            <table cellspacing="5" cellpadding="0" width="100%"><tr><td width="15"></td><td><pre>
+New Features:
+   - Added the ability to use a kernel cache to the batch_trainer object.  
+   - svm_pegasos can now be configured to use two different lambda arguments
+     for use with unbalanced data.
+   - Added the reciprocal_max() and dot() matrix functions.
+   - Added the bgr_pixel and cv_image objects so that OpenCV images can
+     be easily used with dlib routines.
+
+Non-Backwards Compatible Changes:
+   - I changed the batch trainers so that they always call clear() on the 
+     trainer being used before training begins.  
+   - Modified the svm_pegasos class so that the user can set independent lambda
+     parameters for each class.  This breaks backwards compatibility with 
+     the previous interface slightly and changes the serialization format
+     of this class.
+   - Split the vector_normalizer into a normal normalizer and a pca normalizer
+     version. 
+   - The zoomable_region widget now uses exponential rather than linear 
+     zoom scaling since this is much more pleasing to use.  There is now 
+     a new requirement on the zoom increment that it must be between 0 
+     and 1.
+
+Bug fixes:
+   - Fixed a bug in the cross_validate_trainer_threaded() function.  It could 
+     deadlock if more than about 10 folds were requested.
+   - Fixed the serialization functions for the normalized_function object.  
+     They will now work with custom normalizer function objects.
+   - Fixed a minor bug in the zoomable_region::set_min_zoom_scale() function.
+     It didn't always end up zooming in a smooth sensible manner after this
+     function was called.
+
+Other:
+   - Made the thread_function object more general.   It can now handle
+     arbitrary functions of up to four arguments.
+
+</pre></td></tr></table><hr><h1 style="margin:0px;">Release 17.20</h1><u>Release date</u>: Jul 11, 2009<br><u>Major Changes in this Release</u>:
+            <table cellspacing="5" cellpadding="0" width="100%"><tr><td width="15"></td><td><pre>
+New Features:
+   - Added the reshape_to_column_vector() function.
+   - Added a hook to the logger object that lets you set a different kind of
+     output logging destination (in addition to the std::ostream supported 
+     already).
+   - Upgraded the scoped_ptr so that it can handle array pointers as well
+     as customer deleter functions.
+   - Added overloads of the kernel_derivative object for all the kernels 
+     in dlib.
+
+Non-Backwards Compatible Changes:
+   - Reworked the config_reader interface a little to make it easier to use.  
+     In particular, I removed the enumerator over blocks in favor of a simple 
+     get_blocks() function that just returns a std::vector of all the blocks.  
+     I also removed the requires clauses on the block and key accessor functions 
+     and instead made a request for a non-existent key/block result in a non-fatal 
+     exception.  This way users can let the config reader perform a more natural 
+     role in config file validation (by catching this exception and acting 
+     accordingly).
+   - It is now illegal to multiply matrices of size zero together. 
+
+Bug fixes:
+   - Fixed the gaussian() function used by the SURF code.  It wasn't computing 
+     a properly weighted Gaussian function.
+   - Fixed a few things in various parts of the code to avoid compiler errors 
+     in certain use-cases.
+   - Added a missing rethrow statement.  The xml parser would eat exceptions 
+     thrown by event handlers rather than letting them propagate out as 
+     documented in the specification.
+
+Other:
+
+</pre></td></tr></table><hr><h1 style="margin:0px;">Release 17.19</h1><u>Release date</u>: May 25, 2009<br><u>Major Changes in this Release</u>:
+            <table cellspacing="5" cellpadding="0" width="100%"><tr><td width="15"></td><td><pre>
+New Features:
+    - Added an implementation of the SURF algorithm which includes the
+      following new objects and functions:  integral_image, hessian_pyramid, 
+      interest_point, surf_point, compute_dominant_angle(), 
+      compute_surf_descriptor(), haar_x(), haar_y(), get_interest_points(), 
+      and get_surf_points().
+    - Added the zeros_matrix() and ones_matrix() functions.
+    - Added serialization support to the type_safe_union object.
+    - Added the grow_rect() and shrink_rect() functions.
+    - Added the get_files_in_directory_tree() function.
+    - Added the null_trainer_type object.
+    - Added the roc_trainer_type object.
+
+Non-Backwards Compatible Changes:
+    - Removed some extraneous get_kernel() functions from some of the 
+      trainer adapter classes since they really aren't needed.  
+
+Bug fixes:
+    - Changed the socket read/write code so that it can handle a large 
+      number ( &gt; 2 billion) of bytes in I/O calls.
+    - Added a missing type cast to the reciprocal() function to fix a compile
+      time error you get when you use it with complex&lt;float&gt; type matrices.
+    - Fixed a bug in the assign_border_pixels() and zero_border_pixels() functions.  
+      Their contracts said there was no upper limit on the size of the border that 
+      could be assigned/zeroed but the implementations failed to handle the case 
+      where the border was bigger than the image.
+
+Other:
+    - Generally cleaned up the code and documentation here and there.
+    - Added in Steven Van Ingelgem's patches to improve the usability of the
+      HTTP server object.
+    - Updated the load_bmp() function so that it is capable of reading BMP
+      files that have been compressed with the RLE compression sometimes
+      used for 8bit BMP files.
+    - Merged in Miguel Grinberg's patch to add a non-blocking read() function to the
+      connection object.
+</pre></td></tr></table><hr><h1 style="margin:0px;">Release 17.18</h1><u>Release date</u>: Apr 5, 2009<br><u>Major Changes in this Release</u>:
+            <table cellspacing="5" cellpadding="0" width="100%"><tr><td width="15"></td><td><pre>
+New Features:
+   - Added a set of kernels that can operate on sparse vectors.
+   - Added the image_window and image_display objects.
+   - Added the rotate_point() function and the point_rotator object.
+
+Non-Backwards Compatible Changes:
+   - Added Steven Van Ingelgem's patch to add the body of data posted 
+     back to the server into the incoming data object given to the 
+     server_http::on_request() handler.  This removes the content_length 
+     field and replaces it with a string that contains the body of content
+     data.
+
+Bug fixes:
+   - Fixed a compile time bug in the offset_kernel.
+
+Other:
+   - Added optimized overloads of the kcentroid object for various 
+     linear kernels.
+   - Changed all the tests in the dlib test suite to use a new DLIB_TEST 
+     macro instead of DLIB_CASSERT since the tests really aren't 
+     technically assertions
+
+</pre></td></tr></table><hr><h1 style="margin:0px;">Release 17.17</h1><u>Release date</u>: Mar 16, 2009<br><u>Major Changes in this Release</u>:
+            <table cellspacing="5" cellpadding="0" width="100%"><tr><td width="15"></td><td><pre>
+New Features:
+   - Added the strings_equal_ignore_case() functions
+
+Non-Backwards Compatible Changes:
+   - Changed the on_request() function in the http server
+   - Changed the serialization format of the kcentroid and svm_pegasos
+     objects
+   - By default, the kcentroid now keeps the most linearly independent 
+     dictionary vectors rather than the newest
+
+Bug fixes:
+
+Other:
+   - Split the algorithms documentation page into three pages, algorithms,
+     machine learning, and bayes nets.
+   - Merged in Steven Van Ingelgem's patch to cleanup the HTTP server and
+     add new functionality.  This breaks backwards compatibility with the
+     previous on_request() interface but it is easy to update old code and
+     it is now much cleaner and easier to use.
+   - Changed the kcentroid so that you can tell it to keep the most linearly 
+     independent vectors rather than the newest vectors.  I then changed the
+     svm_pegasos object so that it has a max number of support vector setting
+     so that the user can supply an upper limit on the number of support 
+     vectors to use.  
+
+</pre></td></tr></table><hr><h1 style="margin:0px;">Release 17.16</h1><u>Release date</u>: Mar 08, 2009<br><u>Major Changes in this Release</u>:
+            <table cellspacing="5" cellpadding="0" width="100%"><tr><td width="15"></td><td><pre>
+New Features:
+   - Matrix related
+      - Added the find_min_and_max(), index_of_min(), index_of_max(), trace(),
+        randm(), linspace(), logspace(), and cartesian_product() functions.
+   - Machine learning related
+      - Added the offset_kernel
+      - Added some functions to the kcentroid to allow the user to compute 
+        the inner_product of kcentroids as well as a few other useful things.
+      - Added a kernelized version of the Pegasos SVM training algorithm.
+
+Non-Backwards Compatible Changes:
+   - Changed the range() function so that it returns row vectors
+     instead of column vectors.  
+
+Bug fixes:
+   - Changed threading code to avoid a potential race condition during 
+     program termination.
+   - Fixed a few incorrect DLIB_ASSERT statements
+   - Fixed a bug in the way Content-type was handled in HTTP posts.
+   - Fixed a bug in subm() that showed up when statically dimensioned row 
+     vectors were used to select a sub matrix.
+
+Other:
+   - Added some functions to the rectangle to make it easy
+     to get the corner points.
+   - The cross validation functions no longer allow invalid_svm_nu_error 
+     exceptions to escape.  Instead, they are assigned low CV scores.
+   - Made std_vector_c able to copy directly from std::vector objects.
+   - Added a get_socket_descriptor() function to the connection class.
+
+</pre></td></tr></table><hr><h1 style="margin:0px;">Release 17.15</h1><u>Release date</u>: Feb 03, 2009<br><u>Major Changes in this Release</u>:
+            <table cellspacing="5" cellpadding="0" width="100%"><tr><td width="15"></td><td><pre>
+New Features:
+   - Matrix related
+      - Added QR, LU, Cholesky, and eigenvalue decomposition class objects
+      - Added overloads for rowm() and colm() that allow you to pick out
+        less than an entire vector
+      - Added the lowerm() and upperm() functions
+      - Added the const_temp_matrix class
+
+Non-Backwards Compatible Changes:
+   - Renamed the cholesky_decomposition() function to chol()
+
+Bug fixes:
+   - Fixed some errors in the requirements for calling the new rowm() and 
+     colm() functions.
+   - Fixed dlib::abs() so that it returns the right type when used
+     with complex matrices.
+   - Fixed a race condition in the logger object.  It was missing a needed call
+     to unregister_thread_end_handler().  What could happen in some scenarios is,
+     during program termination, a global part of the logger object could be destructed
+     when it still had outstanding thread end handlers registered to it.  
+
+Other:
+   - Added an example program that shows how to use the optimization 
+     functions.
+   - Gave the matrix object the ability to factor expressions containing
+     trans() function calls into more efficient forms.
+   - Generally cleaned up the matrix code 
+</pre></td></tr></table><hr><h1 style="margin:0px;">Release 17.14</h1><u>Release date</u>: Jan 18, 2009<br><u>Major Changes in this Release</u>:
+            <table cellspacing="5" cellpadding="0" width="100%"><tr><td width="15"></td><td><pre>
+New Features:
+   - Added the multi-line text_box GUI widget.
+   - Added the type_safe_union object
+
+Non-Backwards Compatible Changes:
+   - Renamed the array::expand() function to array::resize() since it does 
+     basically the same thing as std::vector::resize() and more than one
+     user has told me they found the name "expand" to be confusing.
+
+Bug fixes:
+
+Other:
+   - Added an example showing how to use the type_safe_union and pipe
+     together.
+   - Added a page to the documentation that discusses the dlib coding
+     standards and how to contribute to the project.
+</pre></td></tr></table><hr><h1 style="margin:0px;">Release 17.13</h1><u>Release date</u>: Jan 05, 2009<br><u>Major Changes in this Release</u>:
+            <table cellspacing="5" cellpadding="0" width="100%"><tr><td width="15"></td><td><pre>
+New Features:
+   - Added the bound_function_pointer object.
+   - Added support for futures to the thread_pool object.
+   - Added a set of objects that makes it possible to create simulations
+     of quantum computing algorithms.
+   - Added copy and paste support to the text_field.
+   - matrix object stuff
+      - Added the range() function as well as overloads of all the various 
+        sub-matrix selection functions so that you can pick out slices of 
+        matrices like in Matlab.
+      - Added a new template argument to the matrix object that allows the
+        user to select the memory layout.  Also added a row_major_layout 
+        and column_major_layout.
+      - The matrix object can now be initialized using a comma separated
+        list of values.
+
+Non-Backwards Compatible Changes:
+   - Changed the fatal_error exception class so that it aborts your program
+     and prints a message if you try to construct it more than once since 
+     doing so indicates that you ignored the first fatal error.
+   - The way matrix expressions work in the library has been changed
+     since the last release.  So if you created custom matrix expressions 
+     then they will need to be updated to use the new matrix expression stuff.
+
+Bug fixes:
+   - Fixed a minor bug in how the zoomable_region widget drew itself after 
+     a resize in some cases.
+   - Fixed a problem with draw_line where it didn't always redraw the line 
+     properly.
+
+Other:
+   - A lot of the matrix code has been refactored and optimized.  The matrix
+     object will now introduce temporary objects when doing so results in
+     better performance.  I also added a simple system for binding 
+     arbitrary matrix expressions to optimized BLAS routines. 
+   - Cleaned up the vector and point classes.  Now there is only one class, 
+     the vector class, and it is capable of representing everything the old 
+     vector and point class could.  I also added code to make sure the 
+     vector class does the appropriate type promotions when vector objects
+     with different types are used together.
+   - Made the vector class inherit from matrix
+</pre></td></tr></table><hr><h1 style="margin:0px;">Release 17.12</h1><u>Release date</u>: Nov 10, 2008<br><u>Major Changes in this Release</u>:
+            <table cellspacing="5" cellpadding="0" width="100%"><tr><td width="15"></td><td><pre>
+New Features:
+   - Added user settable styles to most of the gui widgets
+   - Added the diagm(), svd2() and svd3() matrix functions
+   - Added the thread_pool object
+
+Non-Backwards Compatible Changes:
+   - Removed the arrow_button widget and moved its functionality into the 
+     button widget. 
+   - Renamed the dragable class to draggable 
+   - Removed the confusing and unnecessary hidden bool argument to the 
+     gui widget style drawing functions.
+   - Changed some of the events that are about the mouse leaving a widget so 
+     that they still trigger even if the widget has been disabled or hidden.  
+
+Bug fixes:
+   - Added some missing mutex locks to the scroll_bar widget
+   - Fixed a bug in the fill_gradient_rounded() function. It didn't always
+     draw the entire rectangle.
+   - Fixed a compile time bug in the pinv() function.  It didn't compile 
+     when used on statically sized matrices when they weren't square.
+
+Other:
+   - The member_function_pointer object now never calls new or delete. 
+     So it is safe to use in a real time environment.
+
+</pre></td></tr></table><hr><h1 style="margin:0px;">Release 17.11</h1><u>Release date</u>: Oct 20, 2008<br><u>Major Changes in this Release</u>:
+            <table cellspacing="5" cellpadding="0" width="100%"><tr><td width="15"></td><td><pre>
+New Features:
+   - Added the sort_columns() and rsort_columns() functions
+   - Added the vector_normalizer object
+   - Added the normalized_function object.
+   - Added a tensor_product() function for the matrix object.
+
+Non-Backwards Compatible Changes:
+
+Bug fixes:
+   - Made it so that the gui event handler thread isn't created at all 
+     unless some part of an application calls some of the gui_core code. 
+     In the previous release the event handler thread was executed
+     briefly during program termination and could cause problems if no
+     windowing environment was available.
+   - Fixed an #include statement in the matrix utilities so that it works 
+     even if you don't specify an include path argument to your compiler.
+
+Other:
+
+</pre></td></tr></table><hr><h1 style="margin:0px;">Release 17.10</h1><u>Release date</u>: Oct 09, 2008<br><u>Major Changes in this Release</u>:
+            <table cellspacing="5" cellpadding="0" width="100%"><tr><td width="15"></td><td><pre>
+New Features:
+   - Added a thread safe shared pointer object
+   - Added the popup_menu_region widget.
+
+Non-Backwards Compatible Changes:
+   - The on_wheel_up() and on_wheel_down() gui events now take an unsigned long
+     argument.  
+   - Removed the register_program_ending_handler() function from the threading
+     API and also changed the dlib thread pool so that it no longer causes
+     a terminating program to wait for any outstanding threads to finish
+     before allowing the application to end.
+   - Changed the serialization format of the linearly_independent_subset_finder
+     class.
+   - Changed all the font pointers in the gui API's interfaces
+     to shared_ptr_thread_safe objects.
+
+Bug fixes:
+   - Made the kkmeans class actually use the min_change parameter.
+   - Fixed a bug in the linearly_independent_subset_finder object.  Also
+     added a way to set a minimum tolerance.  
+   - Fixed a bug in the scrollable_region widget that caused it to scroll in an
+     unpleasant way when the horizontal and vertical scroll increments weren't 
+     set to the same value.
+   - Made one of the arguments to font::draw_string() not be a reference because
+     some versions of gcc don't end up doing the right thing when -O3 is 
+     supplied.
+   - Fixed a bug in the covariance() function that prevented it from compiling
+     sometimes.
+
+Other:
+   - Changed the gui core code around so that it should be safe to make window 
+     objects at the global scope.
+   - Added more control over how the scrollable_region scrolls its region.
+     You can now adjust how much it scrolls when the mouse wheel is scrolled 
+     as well as enabling scrolling via a mouse drag.
+   - Modified the library so that it compiles with the Intel compiler.
+   - Added some example programs that use the relevance vector machine
+
+</pre></td></tr></table><hr><h1 style="margin:0px;">Release 17.9</h1><u>Release date</u>: Sep 06, 2008<br><u>Major Changes in this Release</u>:
+            <table cellspacing="5" cellpadding="0" width="100%"><tr><td width="15"></td><td><pre>
+New Features:
+
+Non-Backwards Compatible Changes:
+
+Bug fixes:
+   - Fixed a bug in the tooltip widget
+   - Fixed the cmake option to toggle the ENABLE_ASSERTS macro
+   - Fixed some bugs in the rvm
+   - Fixed the serialization code for the kkmeans object so that it actually 
+     works
+   - Fixed a bug that can trigger when the thread_specific_data object is 
+     destructed
+   - Fixed a bug in the directory navigation gui.  If you tried to go
+     into a drive on windows that wasn't mounted you got an error.
+     This is now fixed.
+
+Other:
+   - Made the dir_nav stuff work with std::vector and dlib::std_vector_c 
+     as well as dlib::queue objects.
+   - Generally cleaned up a bunch of things
+
+</pre></td></tr></table><hr><h1 style="margin:0px;">Release 17.8</h1><u>Release date</u>: Aug 14, 2008<br><u>Major Changes in this Release</u>:
+            <table cellspacing="5" cellpadding="0" width="100%"><tr><td width="15"></td><td><pre>
+New Features:
+   - Added relevance vector machine regression and classification support.
+   - Added the cross_validate_trainer_threaded() function
+   - Added the length and length_squared matrix functions.
+
+Non-Backwards Compatible Changes:
+
+Bug fixes:
+   - Changed gui code a little so that windows don't popup in funny 
+     places when used with the cygwin X windows system.
+
+Other:
+   - Made it easier to use the scoped_ptr with the TCP connection object
+   - Optimized the matrix object a little
+
+</pre></td></tr></table><hr><h1 style="margin:0px;">Release 17.7</h1><u>Release date</u>: Jul 25, 2008<br><u>Major Changes in this Release</u>:
+            <table cellspacing="5" cellpadding="0" width="100%"><tr><td width="15"></td><td><pre>
+New Features:
+   - Machine Learning
+      - Added the ability to compare kcentroid objects to each other
+      - Added the rank_features() function
+      - Added the distance_function object
+      - Added the reduced_decision_function_trainer object and 
+        reduced() function
+      - Added the reduced_decision_function_trainer2 object and 
+        reduced2() function
+      - Added a radial basis function network trainer
+      - Added the linearly_independent_subset_finder object
+      - Added the sigmoid_kernel
+   - Matrix Utilities
+      - Added the inv_upper_triangular() and inv_upper_triangular()
+        functions.
+
+Non-Backwards Compatible Changes:
+   - Refactored a bunch of the kernel learning code into a much cleaner form.
+     But this does change the interface to all the training functions.  
+
+Bug fixes:
+   - Fixed a bug in the min and max calculation in the running_stats object
+   - Removed a bug in the sum() and variance() functions that
+     caused them to seg fault when they were used on certain 
+     matrix of matrix objects.
+   - Added a missing check for division by zero to the conjugate gradient
+     optimization functions.
+   - Added some missing member variables to the .swap and serialization 
+     functions for the kcentroid object.  So now they should work right.
+
+Other:
+   - Added an option to the cmake file to toggle the DLIB_ASSERT macro
+   - Added an option to the cmake file to toggle the dlib stack trace macros
+   - Made the library compile in Cygwin
+
+</pre></td></tr></table><hr><h1 style="margin:0px;">Release 17.6</h1><u>Release date</u>: Jun 22, 2008<br><u>Major Changes in this Release</u>:
+            <table cellspacing="5" cellpadding="0" width="100%"><tr><td width="15"></td><td><pre>
+New Features:
+   - Merged in Keita Mochizuki's unicode patches to the GUI components.  So
+     the dlib GUI now has better unicode support.
+   - Added the remove_row and remove_col matrix functions.  Also made all
+     three of the above functions capable of taking arguments at run time 
+     as well as compile time.
+   - Added the ability to cap the number of dictionary vectors used by the krls
+     and kcentroid object at a user specified number.   
+   - Added the pick_initial_centers() function
+   - Added the running_stats object
+
+Non-Backwards Compatible Changes:
+   - Changed the interface to the krls and kcentroid objects somewhat.
+   - All of the style objects in the GUI part of the library now use 
+     dlib::ustring instead of std::string.  This only matters to you if 
+     you have made your own style objects.
+   - Changed the serialization format of the krls, kcentroid, and
+     directed_graph_drawer objects.  Note that is also means that the
+     files saved by previous versions of the bayes_net_gui_ex program
+     won't load with the current version.
+
+Bug fixes:
+   - Fixed an aliasing bug in the set_subm(), set_rowm(), and set_colm() 
+     functions.  It was possible that you could get incorrect results
+     if you used these functions to copy one part of a matrix to another
+     part of the same matrix if the two areas overlapped.
+   - Fixed a minor numerical error in the krls code so now it gets slightly 
+     better results.
+
+Other:
+   - Made the types generated by the matrix operations a lot shorter.  This
+     avoids some compiler warnings from visual studio and even some potential
+     internal compiler errors in some instances.
+
+</pre></td></tr></table><hr><h1 style="margin:0px;">Release 17.5</h1><u>Release date</u>: Jun 2, 2008<br><u>Major Changes in this Release</u>:
+            <table cellspacing="5" cellpadding="0" width="100%"><tr><td width="15"></td><td><pre>
+New Features:
+   - Added some macros that allow dlib to create a stack trace
+   - Added the wrap_function and is_function templates.
+   - Added two new events to the text_field object.  One for detecting when the 
+     user hits enter and another for detecting when input focus is lost.
+   - Machine Learning
+      - Added a kernel based centroid estimator/novelty detector
+      - Added a kernel based k-means clustering algorithm
+   - Numerical
+      - Added an identity_matrix() function that can take a runtime defined size.
+      - Added a bunch of unconstrained optimization stuff to the library. 
+        It now has a conjugate gradient optimization algorithm as well as
+        a quasi-newton algorithm.
+      - Added the set_subm, set_rowm, and set_colm functions.
+
+Non-Backwards Compatible Changes:
+   - In the krls object:  Added a requires clause to the set_tolerance() member 
+     function and renamed clear() to clear_dictionary().
+
+Bug fixes:
+   - Fixed a bug in the requires clause of the subm() function.  It was 
+     more restrictive than it should have been.
+
+Other:
+   - Added example programs for the krls object as well as the new
+     kcentroid and kkmeans objects.
+
+</pre></td></tr></table><hr><h1 style="margin:0px;">Release 17.4</h1><u>Release date</u>: May 12, 2008<br><u>Major Changes in this Release</u>:
+            <table cellspacing="5" cellpadding="0" width="100%"><tr><td width="15"></td><td><pre>
+New Features:
+   - Added an implementation of the kernel recursive least squares algorithm
+
+Non-Backwards Compatible Changes:
+   - Broke backwards compatibility in the directed_graph_drawer's serialization
+     format when I fixed the bug below.  
+
+Bug fixes:
+   - Fixed two bugs in the directed_graph_drawer widget.  First, it sometimes 
+     threw a dlib::fatal_error due to a race condition.  Second, the color of 
+     the nodes wasn't being serialized when save_graph() was called.  
+   - Made vector_to_matrix() work for std::vector objects that have non-default 
+     allocators.
+
+Other:
+   - Added some stuff to make people get a really obvious error message
+     when they set up the include path incorrectly.
+
+</pre></td></tr></table><hr><h1 style="margin:0px;">Release 17.3</h1><u>Release date</u>: Apr 28, 2008<br><u>Major Changes in this Release</u>:
+            <table cellspacing="5" cellpadding="0" width="100%"><tr><td width="15"></td><td><pre>
+New Features:
+   - Added the vector_to_matrix() function.
+   - Added a cholesky_decomposition() function.
+   - Added the toggle_button GUI widget
+      - Added a default toggle button style as well as check box and 
+        radio button styles.
+   - Added a single click event to list_box
+   - Added a save_file_box() and open_existing_file_box() function.  
+
+Non-Backwards Compatible Changes:
+   - Changed the check_box and radio_button widgets to be specializations of 
+     the new toggle_button object.  This is a nearly backwards compatible 
+     change except that the events registered to check_box and radio_button 
+     clicks must now take the form void event(toggle_button&amp;) or 
+     void event(void) instead of the previous void event(check_box&amp;) and 
+     void event(radio_button&amp;).
+   - Removed the is_mouse_over bool from the button_style::draw_button()
+     function.
+
+Bug fixes:
+   - Fixed a compiler error in mingw.
+   - Changed the preprocessor checks for the wchar_t overload of 
+     is_built_in_scalar_type so that it works properly with visual studio.
+
+Other:
+   - Added a Bayesian Network GUI that allows you to create a network
+     and serialize it to disk.
+</pre></td></tr></table><hr><h1 style="margin:0px;">Release 17.2</h1><u>Release date</u>: Apr 21, 2008<br><u>Major Changes in this Release</u>:
+            <table cellspacing="5" cellpadding="0" width="100%"><tr><td width="15"></td><td><pre>
+New Features:
+   - GUI Related
+      - Added the scrollable_region widget
+      - Added the text_grid widget
+      - Added an event to the text_field so you can tell when the
+        user modifies it.
+      - Added the fit_to_contents() function to the tabbed_display 
+        widget.
+   - Bayesian Network Related
+      - Added the node_first_parent_assignment(), node_next_parent_assignment(), 
+        and node_cpt_filled_out() functions.
+
+Non-Backwards Compatible Changes:
+   - Reverted the change in 17.0 where I made drawable::lastx and 
+     drawable::lasty not match the current location of the mouse inside
+     the on_mouse_move() event.  I changed this back to how it was before,
+     so now lastx and lasty represent the most current record of where
+     the mouse is in *all* events.
+   - Changed the functions that control text color in the label and text_field
+     widgets to use rgb_pixel objects.  Also added a function to set the
+     background color of a text_field.
+
+Bug fixes:
+   - Fixed a bug in the bayesian_network_join_tree object that caused it to
+     compute incorrect results for some networks.
+   - GUI Related
+      - Fixed a minor bug in the cursor drawing of the text_field
+        gui widget.
+      - Fixed a bug in the compute_cursor_rect() function.  It would return an
+        incorrectly positioned rectangle for 0 length strings.
+      - Changed the way wchar_t is handled in the serialize.h file.  Now
+        everything should compile correctly in visual studio regardless of how
+        you set the /Zc:wchar_t compiler option.
+      - Fixed a bug in the menu_bar widget.  One of the members wasn't being 
+        initialized when it needed to be.
+      - Fixed a bug in the tabbed_display where it didn't redraw itself
+        correctly after it was moved by set_pos()
+
+Other:
+   - Changed the xml parser so that it counts line numbers
+     from the start of the input stream instead of from the
+     root tag.
+   - Changed the xml parser so that you will only get the fatal_error
+     event once if it occurs. 
+</pre></td></tr></table><hr><h1 style="margin:0px;">Release 17.1</h1><u>Release date</u>: Apr 13, 2008<br><u>Major Changes in this Release</u>:
+            <table cellspacing="5" cellpadding="0" width="100%"><tr><td width="15"></td><td><pre>
+New Features:
+   - Added a zoomable_region widget
+   - Added a directed_graph_drawer widget
+
+Non-Backwards Compatible Changes:
+   - Changed the first_pixel argument of the draw_string() function 
+     to be a rectangle like all the other draw functions now use.
+
+Bug fixes:
+   - Fixed a bug in the tooltip widget that was triggered when calling
+     its member functions without calling set_tooltip_text().  This also 
+     fixed a bug in the button object that triggered when calling some button
+     functions that referenced the tooltip widget.
+   - Fixed a problem in the draw_circle and draw_solid_circle functions.
+     They didn't draw themselves quite correctly in all cases.
+
+Other:
+</pre></td></tr></table><hr><h1 style="margin:0px;">Release 17.0</h1><u>Release date</u>: Apr 07, 2008<br><u>Major Changes in this Release</u>:
+            <table cellspacing="5" cellpadding="0" width="100%"><tr><td width="15"></td><td><pre>
+New Features:
+  - Added a png_loader object
+  - GUI related
+    - Added a popup_menu widget
+    - Added a menu_bar widget
+    - Added a tooltip widget
+    - Added a user selectable style to the gui button.
+    - Added the draw_rounded_rectangle() and fill_gradient_rounded() functions
+    - Added the mouse_over_event object to the base_widgets and made the 
+      button_action inherit from it.
+    - Added the drawable::next_free_user_event_number() function 
+  - matrix and geometry:
+    - Added a size() function to matrix_exp and matrix_ref objects.
+    - Added a class that represents 2D points 
+    - Added the following matrix functions:
+      - squared(), cubed(), get_rect(), a subm() function that takes 
+        rectangles, and normalize() 
+    - Added the following rectangle functions:
+      - area(), centered_rect(), translate_rect(), move_rect(), resize_rect(),
+        resize_rect_height(), resize_rect_width(), and nearest_point() 
+
+Non-Backwards Compatible Changes:
+  - Renamed atom() to array_to_matrix()
+  - Moved the rectangle object from the gui_core into a new geometry folder  
+    (only matters if you were directly including the rectangle file)
+  - Moved the vector object into the geometry folder.  Also removed the kernel_1a
+    stuff.  So there is now only one possible vector implementation.
+  - Changed the default position for a rectangle to (0,0) instead of (1,1)
+  - Added edge data to the directed_graph.  This breaks backwards compatibility 
+    with the previous serialization format for directed_graphs.
+  - GUI related:
+    - Changed the base_window::on_keydown event signature so that it now
+      reports more keyboard modifier keys (e.g. alt)
+    - Made the functions for drawing on canvas objects take points and pixels 
+      instead of just a bunch of integers.  Also changed the order of the
+      arguments so that the canvas comes first, followed by the location
+      to draw on, then what to draw.
+    - Moved the canvas drawing functions into the gui_widgets/canvas_drawing.h 
+      file.
+    - Modified the drawable_window so that the drawable::lastx and drawable::lasty
+      fields are updated after calls to on_mouse_move.  This way the x and y that
+      go into the on_mouse_move actually tell you something.
+
+Bug fixes:
+  - Fixed a bug in the floating point serialization code.  It 
+    didn't handle NaN or infinities correctly.
+  - Fixed a bug in the win32 version of the gui_core component.  It was 
+    possible that calling set_size(), set_pos(), or set_title() could cause 
+    the program to deadlock.
+  - Made the load_bmp() function more robust in the face of weirdly 
+    written BMP files.
+  - Modified the draw_circle() and draw_solid_circle() functions so that they
+    only touch each canvas pixel once.  This avoids messing up alpha blending
+    if an rgb_alpha_pixel is used.  
+
+Other:
+  - Removed the old win32 only gui code in the dlib/gui folder. 
+  - Changed the default GUI font to a nicer Sans Serif font 
+</pre></td></tr></table><hr><h1 style="margin:0px;">Release 16.5</h1><u>Release date</u>: Mar 04, 2008<br><u>Major Changes in this Release</u>:
+            <table cellspacing="5" cellpadding="0" width="100%"><tr><td width="15"></td><td><pre>
+New Features:
+   - Added another constructor to the thread_function object.  
+     Now it can take proper function objects as well as normal function
+     pointers.
+   - Added the probabilistic_decision_function object and svm_nu_train_prob() 
+     function.
+
+Non-Backwards Compatible Changes:
+   - Changed the svm train functions so that the cache_size argument
+     now measures the max number of megabytes of memory to use rather
+     than number of kernel matrix rows to cache.  It's default
+     value is now 200MB.
+   - changed the type typedef in the SVM kernel function objects to
+     be named sample_type instead of type. 
+
+Bug fixes:
+   - Fixed a bug in the trim, rtrim, and ltrim functions.  They
+     didn't return empty strings when the input string contained all
+     trim characters.
+   - Fixed a bug in the decision_function's copy constructor
+
+Other:
+   - Added an optimization to the working set selection for the svm training code.
+     Now the algorithm will prefer to select indices that are in the kernel 
+     matrix cache when possible.
+   - Fixed a problem with the chm documentation file where many of the links
+     didn't work.
+   - Made the support vector functions capable of operating with floats, doubles,
+     and long doubles instead of just the double type.
+</pre></td></tr></table><hr><h1 style="margin:0px;">Release 16.4</h1><u>Release date</u>: Feb 22, 2008<br><u>Major Changes in this Release</u>:
+            <table cellspacing="5" cellpadding="0" width="100%"><tr><td width="15"></td><td><pre>
+New Features:
+   - Added aversion of the draw_line() function for images.
+   - Added the atom(), rowm(), colm(), and subm() matrix functions.
+   - Added some push/pop_back() functions to the array object that are similar
+     to the ones in the std::vector.
+   - Added the std_vector_c class that wraps std::vector and checks its 
+     function's preconditions.
+   - Added the polynomial_kernel object for use with the svm algorithm.
+
+Non-Backwards Compatible Changes:
+   - Changed the svm_nu_cross_validate() function to return a vector
+     of both the +1 and -1 cross validation accuracies.
+
+Bug fixes:
+   - Fixed a bug in the list_box that caused it to not hide itself properly
+     when told to do so.
+   - Fixed canvas::fill() gui function so that it should work right
+     on 64 bit platforms.
+
+Other:
+</pre></td></tr></table><hr><h1 style="margin:0px;">Release 16.3</h1><u>Release date</u>: Feb 12, 2008<br><u>Major Changes in this Release</u>:
+            <table cellspacing="5" cellpadding="0" width="100%"><tr><td width="15"></td><td><pre>
+New Features:
+   - Added memory manager support to the matrix object.
+
+Non-Backwards Compatible Changes:
+   - Made the assign_pixel() function saturate grayscale values bigger
+     than the target pixel type can handle.  Previously it would just 
+     truncate the numbers.
+   - Removed rand_kernel_1 and rand_kernel_2 because they gave very 
+     inferior results compared to rand_kernel_3.  I then renamed
+     rand_kernel_3 to rand_kernel_1.
+   - Renamed rand::get_random_number() to get_random_8bit_number() and also 
+     added a get_random_16bit_number() and get_random_32bit_number()
+   - Added a checksum to compress_stream_kernel_1 and kernel_2.  This 
+     breaks backwards compatibility with the previous versions.  That is,
+     the new implementations will complain that decompression fails if 
+     you give them data compressed with the old non-checksum version of
+     the compression routines. 
+   - Removed the width() and height() functions from the array2d object.  
+     Now only the equivalent nc() and nr() member functions remain.
+   - Changed array2d::set_size(width,height) to set_size(num_rows, num_cols).  
+     That is, I switched the order of the two arguments to this function.
+     The reason for doing this is to make it have the same form as the
+     set_size() member of the matrix object.  This way the usage of the
+     set_size() member for these two very similar data structures is 
+     the same.  Hopefully this will reduce confusion rather than 
+     make things worse.
+
+Bug fixes:
+   - Fixed a bug in the image_widget.  It didn't repaint the screen
+     all the way if you gave it a smaller image to display.
+   - Fixed a bug in the cat() function that caused the state of the queue
+     to be broken if you called cat with an empty queue.
+   - Made the queue_sort_1 use a better sorting algorithm.  In particular, it 
+     will not sort slowly for nearly sorted data.
+   - Fixed a bug in the queue_kernel_2 object that caused it to not work 
+     correctly with the non-default memory managers.
+
+Other:
+   - Added example code for the member_function_pointer as well as the matrix 
+     object.
+   - Added some more regression tests and made some of the longer running 
+     ones execute a lot quicker.
+   - Made the unit test suite easier to use.  Now tests just throw an exception 
+     to indicate an error rather than returning an error code.
+   - Added an example program for the multi-layer perceptron neural network.
+</pre></td></tr></table><hr><h1 style="margin:0px;">Release 16.2</h1><u>Release date</u>: Jan 25, 2008<br><u>Major Changes in this Release</u>:
+            <table cellspacing="5" cellpadding="0" width="100%"><tr><td width="15"></td><td><pre>
+New Features:
+   - Added the is_signed_type and is_unsigned_type templates
+   - Image Processing stuff
+      - Added the assign_all_pixels() function
+      - Added the assign_border_pixels() function
+      - Added the assign_pixel_intensity() function
+      - Added the auto_threshold_image() function
+      - Added the binary_union() function
+      - Added the edge_orientation() function
+      - Added the get_histogram() function
+      - Added the get_pixel_intensity() function
+      - Added the hysteresis_threshold() function
+      - Added the sobel_edge_detector() function
+      - Added the suppress_non_maximum_edges() function
+      - Added the zero_border_pixels() function
+      - Changed the pixel_traits structure so that it can support 8, 16, and 32 
+        bit grayscale pixels. 
+
+Non-Backwards Compatible Changes:
+   - Added more fields to the pixel_traits template so if you had defined your 
+     own pixel types you will need to update them.
+
+Bug fixes:
+   - Fixed some compiler errors in Visual Studio 2008
+
+Other:
+   - Generally tried to clean up the documentation and code in this release
+
+</pre></td></tr></table><hr><h1 style="margin:0px;">Release 16.1</h1><u>Release date</u>: Jan 1, 2008<br><u>Major Changes in this Release</u>:
+            <table cellspacing="5" cellpadding="0" width="100%"><tr><td width="15"></td><td><pre>
+New Features:
+   - Added the randomize_samples() function
+   - Added the set_main_font() and main_font() functions to the drawable object.
+     So now the drawable widgets can use a user provided font.  
+
+Non-Backwards Compatible Changes:
+   - Made the named_rectangle object a little easier to use.  It now won't
+     let you size it so small that it doesn't display its entire name.
+
+Bug fixes:
+   - Fixed a bug in the svm_nu_train() function that caused a crash with 
+     some inputs.
+   - Fixed a compile time error that occurred when compiling the bayesian
+     network code in Mac OS X.
+   - Fixed a bug in the compute_cursor_pos() function where it would 
+     return the incorrect value.
+     
+Other:
+   - Added an example showing how to use the svm functions.
+
+</pre></td></tr></table><hr><h1 style="margin:0px;">Release 16.0</h1><u>Release date</u>: Dec 10, 2007<br><u>Major Changes in this Release</u>:
+            <table cellspacing="5" cellpadding="0" width="100%"><tr><td width="15"></td><td><pre>
+New Features:
+   - Added the left_substr() and right_substr() functions
+   - Added the zero_extend_cast() function
+   - Added the unsigned_type template
+   - Added the uint8 typedef
+   - Bayesian Network related
+      - Added the assignment object
+      - Added the bayes_node object
+      - Added the joint_probability_table object
+      - Added the conditional_probability_table object
+      - Added the bayesian_network_gibbs_sampler object
+        This object implements an algorithm that performs approximate inference
+        in a Bayesian Network.
+      - Added the bayesian_network_join_tree object
+        This object implements an algorithm that performs exact inference
+        in a Bayesian Network.
+   - Set related
+      - Added the set_intersection_size() function
+      - Added the set_union() function
+      - Added the set_intersection() function
+      - Added the set_difference() function
+   - Graph related
+      - Added the graph object
+      - Added the is_graph template
+      - Added the is_directed_graph template
+      - Added the create_moral_graph() function
+      - Added the triangulate_graph_and_find_cliques() function
+      - Added the graph_contains_length_one_cycle() function
+      - Added the find_connected_nodes() function
+      - Added the graph_is_connected() function
+      - Added the is_clique() function
+      - Added the is_maximal_clique() function
+      - Added the copy_graph_structure() function
+      - Added the create_join_tree() function
+      - Added the is_join_tree() function
+      - Added the edge() function
+   - GUI related
+      - Added the base_window::get_display_size() function
+      - Added message_box_blocking()
+      - Added the bdf_font object which is capable of loading BDF font files into
+        the font object used by the gui_widgets
+   - Better Unicode support
+      - Added the basic_utf8_ifstream: An input stream that can read UTF-8 files
+      - Added serialization support for wchar_t and std::wstring
+      - Added the is_combining_char() function
+      - Added the convert_utf8_to_utf32() function
+      - Modified most of the string manipulation functions in dlib/string.h
+        to work with any kind of character type
+      - The gui widgets' font object now works with Unicode text (i.e. wchar_t 
+        and unichar strings) as well as with normal char data.
+
+Non-Backwards Compatible Changes:
+   - The dlib/all_console.cpp and dlib/all_gui.cpp files have been deprecated
+     in favor of a new file.  Now to build with dlib you simply add 
+     dlib/all/source.cpp to your project regardless of what type of project
+     you are building.
+   - The GUI program entry point, winmain(), has been removed.  You can now use 
+     the normal main() entry point or some other non-standard entry point 
+     provided by your compiler.
+   - Renamed directed_graph::node::item to directed_graph::node::data
+
+Bug fixes:
+   - Fixed some build issues in gcc 4.2 involving some uses of the std_allocator
+   - Fixed some build issues in Visual Studio involving the dir_nav component
+     and building with NO_MAKEFILE #defined.
+   - Moved the #define that disables the old WinSock API into the sockets cpp 
+     file.  This should avoid conflicts with people who are using the old WinSock
+     API.
+   - Changed the tuple template slightly to avoid a bug in Visual Studio 7.1 
+     that caused a compile time error in some instances.
+     
+Other:
+
+</pre></td></tr></table><hr><h1 style="margin:0px;">Release 15.12</h1><u>Release date</u>: Nov 18, 2007<br><u>Major Changes in this Release</u>:
+            <table cellspacing="5" cellpadding="0" width="100%"><tr><td width="15"></td><td><pre>
+New Features:
+   - Added a destroy() function to the map, set, hash_map, and hash_set objects.
+   - Added the tuple object
+   - Added an overload of connect() that has a timeout
+   - Added rand_kernel_3 as a random number generator that uses the Mersenne Twister 
+     algorithm.
+   - Added the directed_graph object
+   - Added the graph_contains_undirected_cycle() and graph_contains_directed_cycle()
+     functions.
+   - Added the std_allocator object.   It is a STL style allocator that can use 
+     the dlib memory manager objects.
+   - std::string manipulation functions:
+      - Added the cast_to_string() function.
+      - Added the tolower() function
+      - Added the toupper() function
+      - Added the ltrim() function
+      - Added the rtrim() function
+      - Added the trim() function
+      - Added the lpad() function  
+      - Added the rpad() function  
+      - Added the pad() function  
+
+Non-Backwards Compatible Changes:
+   - Changed the default logging level from LNONE to LERROR
+   - Renamed the ASSERT macro to DLIB_ASSERT and CASSERT to DLIB_CASSERT.  
+     This rename avoids a conflict with a macro inside MFC.
+   - Changed the logger so that settings are inherited when a new logger
+     is instantiated rather than just having the new logger use the 
+     default settings.
+   - Removed the logger::clear() function since it no longer really
+     makes sense given the above change.
+   - Removed the get_main_thread_id() function and replaced it with the
+     is_dlib_thread() function.
+
+Bug fixes:
+   - Pushed some things into cpp files because doing so avoids build and/or 
+     runtime errors on some platforms.   
+
+Other:
+   - Changed the string_cast() function so that it will recognize the words true 
+     and false as boolean values.  Also improved the error message inside the 
+     string_cast_error exception object.
+
+</pre></td></tr></table><hr><h1 style="margin:0px;">Release 15.11</h1><u>Release date</u>: Oct 25, 2007<br><u>Major Changes in this Release</u>:
+            <table cellspacing="5" cellpadding="0" width="100%"><tr><td width="15"></td><td><pre>
+New Features:
+   - Added the covariance() function
+   - Added the rgb_alpha_pixel pixel type and modified all relevant functions to
+     support it.
+
+Non-Backwards Compatible Changes:
+  - The GUI changes that are non-backwards compatible:
+       - The alpha parameter is now an unsigned char instead of unsigned int
+         and its range is now 0 to 255 instead of 0 to 256.
+       - The image_widget no longer has any member functions dealing with
+         alpha values.  If you want to use alpha blending you just give it an
+         image that has an alpha channel.  The same goes for draw_image().
+  - There are now more fields in the pixel_traits template.  So if you were 
+    defining your own pixels before you will need to update your pixel_traits 
+    specializations.
+
+Bug fixes:
+  - Made some functions non-inline and put some things on the stack 
+    instead of heap.  Doing this avoids some problems with certain 
+    kinds of builds in visual studio.
+
+Other:
+  - Modified the message_box() function so that it is safe to call end_program() 
+    from within its callback event.
+
+</pre></td></tr></table><hr><h1 style="margin:0px;">Release 15.10</h1><u>Release date</u>: Oct 09, 2007<br><u>Major Changes in this Release</u>:
+            <table cellspacing="5" cellpadding="0" width="100%"><tr><td width="15"></td><td><pre>
+New Features:
+   - Modified the GUI drawing functions to take an alpha argument to allow
+     alpha blending.
+   - Added the svm_nu_cross_validate() function to perform k-fold
+     cross validation using the svm_nu_train() function.
+   - Added the boost enable_if templates
+   - Added the rand_float extension to the rand object.
+   - New matrix features:
+      - Added the pinv() function
+      - Changed round_zeros() to use the machine epsilon instead of 1e-6 as 
+        its default epsilon.
+      - Modified the matrix object so that you can declare them with 
+        a static dimension and a dynamic dimension.  E.g. matrix&lt;float,0,10&gt;
+        is now legal and declares a matrix with a fixed number of columns(10) 
+        and a variable number of rows.
+      - Added the equal() function to compare two matrices of floating
+        point numbers for near equality.
+      - Changed the matrix so that operator(long) works for both
+        column vectors and now also for row vectors.
+      - Added a set_size() and constructor that takes a single long for use in
+        sizing row and column vectors.
+      - Added the scale_columns() function
+
+Non-Backwards Compatible Changes:
+
+Bug fixes:
+   - Fixed an error in svm_nu_train() where it would incorrectly
+     complain of incorrect nu values for some datasets.
+   - Added a missing std:: qualifier at two points in the dlib/vector code that
+     could cause a compiler error in some instances. 
+
+Other:
+   - Added a term index to the documentation.
+
+</pre></td></tr></table><hr><h1 style="margin:0px;">Release 15.9</h1><u>Release date</u>: Sep 25, 2007<br><u>Major Changes in this Release</u>:
+            <table cellspacing="5" cellpadding="0" width="100%"><tr><td width="15"></td><td><pre>
+New Features:
+   - Added a nu support vector classifier training function.
+   - Added a multilayer neural network object.
+   - Added the "destructive aliasing" checks into the matrix code.  Now temporary 
+     matrices are only created during assignment if the right hand side aliases 
+     the left hand side in a destructive way.  This removes many of the previous
+     uses of temporary matrices.
+   - Made the sum() matrix function be able to sum matrices of matrices
+   - New matrix functions:
+      - acos(), asin(), atan(), ceil(), cos(), cosh(), exp(), floor(), log(), 
+        log10(), mean(), norm(), pow(), reciprocal(), round_zeros(), sin(),
+        sinh(), sqrt(), tan(), tanh(), variance(), and more overloads of 
+        uniform_matrix().
+
+Non-Backwards Compatible Changes:
+
+Bug fixes:
+   - Added missing nr() and nc() functions to the uniform_matrix() and 
+     identity_matrix() functions.
+   - Forgot to add a destructor for the dynamically sized matrix resulting in a 
+     memory leak.  This is now fixed.
+   - Fixed various potential compile time errors
+
+Other:
+
+</pre></td></tr></table><hr><h1 style="margin:0px;">Release 15.8</h1><u>Release date</u>: Sep 11, 2007<br><u>Major Changes in this Release</u>:
+            <table cellspacing="5" cellpadding="0" width="100%"><tr><td width="15"></td><td><pre>
+New Features:
+   - Added a copy of the boost noncopyable base class.
+   - added some smart pointers:
+      - added shared_ptr
+      - added weak_ptr
+      - added scoped_ptr
+
+Non-Backwards Compatible Changes:
+
+Bug fixes:
+
+Other:
+   - Cleaned up the assert code and removed the need for the dlib/error.ccp file
+   - Made the matrix take better advantage of the compile time sized
+     dimensions when it can.  
+
+</pre></td></tr></table><hr><h1 style="margin:0px;">Release 15.7</h1><u>Release date</u>: Aug 26, 2007<br><u>Major Changes in this Release</u>:
+            <table cellspacing="5" cellpadding="0" width="100%"><tr><td width="15"></td><td><pre>
+New Features:
+   - Made it so that command line options have a default conversion to bool
+     and the bool tells you if they are on the command line or not.
+   - Added an implicit conversion to a scalar to the matrix object 
+     when it is of dimension 1x1.
+   - Added the thread_function object
+   - Added a function to compute the singular value decomposition of a matrix.
+
+Non-Backwards Compatible Changes:
+   - Added two new arguments to the on_request() function.  They allow you to
+     see what HTTP headers the client sends you and to control which ones 
+     you send back.
+
+Bug fixes:
+
+Other:
+
+</pre></td></tr></table><hr><h1 style="margin:0px;">Release 15.6</h1><u>Release date</u>: Aug 18, 2007<br><u>Major Changes in this Release</u>:
+            <table cellspacing="5" cellpadding="0" width="100%"><tr><td width="15"></td><td><pre>
+New Features:
+  - matrix object additions:
+     - Added some functions to convert between matrix and pixel objects.
+     - Added the clamp() function that operates on matrix objects.
+     - Added the sigmoid function.
+     - Made the matrix object capable of being sized at runtime in addition 
+       to its original compile time static sizing capability.
+     - Added 3 and 4 argument versions of pointwise_multiply()
+     - Added the +=, -=, *= and /= operators to the matrix object.
+
+Non-Backwards Compatible Changes:
+
+Bug fixes:
+  - Fixed the line numbering in the color pretty printer.  Wasn't being
+    done correctly.
+  - Fixed a bug in the matrix round() function.
+  - Fixed some miscellaneous compile time errors
+  - Fixed a bug in the matrix removerc() function.
+  - Added some missing checks to catch invalid negative index inputs to
+    matrix objects.
+  - Fixed a bug in the matrix inv() function.  It could sometimes 
+    segfault if used on certain singular matrices 
+
+Other:
+  - string_cast() can now convert hex strings to integers
+  - You can now say myarray2d.set_size(0,0) and have it do what
+    you would naturally expect.
+  - Added some #pragma statements that tell visual studio
+    to link the right system libraries automatically.  
+    So now you don't have to add these things in the 
+    project settings anymore. 
+
+</pre></td></tr></table><hr><h1 style="margin:0px;">Release 15.5</h1><u>Release date</u>: Jul 12, 2007<br><u>Major Changes in this Release</u>:
+            <table cellspacing="5" cellpadding="0" width="100%"><tr><td width="15"></td><td><pre>
+New Features:
+  - Added the set_all_logging_levels(), set_all_logging_output_streams() 
+    functions
+  - Added the configure_loggers_from_file() function which allows you to
+    easily configure all logger objects using a textual configuration
+    file.
+
+Non-Backwards Compatible Changes:
+
+Bug fixes:
+   - Added a workaround into the code that avoids a potential compilation
+     error on Mac OS X systems.
+
+Other:
+
+</pre></td></tr></table><hr><h1 style="margin:0px;">Release 15.4</h1><u>Release date</u>: Jun 30, 2007<br><u>Major Changes in this Release</u>:
+            <table cellspacing="5" cellpadding="0" width="100%"><tr><td width="15"></td><td><pre>
+New Features:
+
+Non-Backwards Compatible Changes:
+
+Bug fixes:
+   - Fixed a bug in the POSIX version of the hostname_to_ip() function. It was
+     screwy if you asked for more than the first IP address (the same address
+     might be returned more than once).
+   - Fixed a bug in the pipe object's timeout functions.  The timeouts weren't
+     working correctly.
+
+Other:
+
+</pre></td></tr></table><hr><h1 style="margin:0px;">Release 15.3</h1><u>Release date</u>: Jun 25, 2007<br><u>Major Changes in this Release</u>:
+            <table cellspacing="5" cellpadding="0" width="100%"><tr><td width="15"></td><td><pre>
+New Features:
+   - Added the wait_for_num_blocked_dequeues(), enable_enqueue(), 
+     disable_enqueue(), and is_enqueue_enabled() functions to the pipe object.
+   - The pipe object can now be used with a zero length buffer.
+
+Non-Backwards Compatible Changes:
+   - There is no longer a pipe::kernel_1a_c typedef since the pipe 
+     no longer has any requirements to check (due to the change of allowing
+     zero length buffer sizes)
+
+Bug fixes:
+
+Other:
+   - Made the ASSERT and CASSERT macros call dlib_assert_breakpoint() when they 
+     fail.  This way you can easily set a breakpoint on them in a debugging
+     tool by breaking on calls to this new function.
+   - Fixed some typos and unclear parts of the pipe spec. 
+
+</pre></td></tr></table><hr><h1 style="margin:0px;">Release 15.2</h1><u>Release date</u>: Jun 11, 2007<br><u>Major Changes in this Release</u>:
+            <table cellspacing="5" cellpadding="0" width="100%"><tr><td width="15"></td><td><pre>
+New Features:
+   - Added a thread safe version of the config_reader object (in the form of an 
+     extension to the config_reader)
+   - Added the wait_until_empty() function to the pipe object.
+
+Non-Backwards Compatible Changes:
+   - Removed the connection::close() and listener::close() functions.  They have
+     been replaced by destructors.  To upgrade old code all you have to do is 
+     replace statements of the form "object-&gt;close();" with "delete object;".  
+     Both statements do exactly the same thing.  However, for connection objects, 
+     you should probably be using the close_gracefully() function instead.
+
+Bug fixes:
+   - Removed a potential compile time error in the dng image format handling code.
+   - Fixed a bug in the bigint object.  The destructor was using "delete" 
+     when it should have been using "delete []"
+   - Fixed a resource leak in the POSIX version hostname_to_ip()
+   - Fixed a significant memory leak in memory_manager_kernel_1
+   - Fixed a memory leak that could occur in memory_manager_kernel_2
+     and memory_manager_kernel_3 when the constructor for the object
+     being constructed threw an exception.
+   - Added a missing delete statement to plug a memory leak
+     in the md5 computation code.
+   - Fixed an uninitialized variable warning from valgrind 
+     (in lz77_buffer/lz77_buffer_kernel_2.h).  I think this could
+     also potentially result in an error when decoding data but I'm not totally
+     sure.  But either way it is fixed now.
+   - Changed a call to memcpy to memmove in the sockstreambuf_kernel_2 
+     implementation since the copy could potentially be of overlapped memory.  
+
+Other:
+   - Changed the connection::read() and connection::write() functions to take
+     longs instead of unsigned longs as the buffer sizes.  They also now 
+     return longs instead of ints.  This should be a backwards compatible change.
+   - Started using the valgrind tool to check for memory errors in the project and
+     found a few things.  Very nice tool :)
+
+</pre></td></tr></table><hr><h1 style="margin:0px;">Release 15.1</h1><u>Release date</u>: Jun 04, 2007<br><u>Major Changes in this Release</u>:
+            <table cellspacing="5" cellpadding="0" width="100%"><tr><td width="15"></td><td><pre>
+New Features:
+   - Added the multithreaded_object extension to the threads API
+   - Added the load_dng() and save_dng() functions which can load and store
+     the DNG lossless compressed image format (which I just made up).
+
+Non-Backwards Compatible Changes:
+   - Changed the serialization format for bool to use a 1 byte code rather than 2 
+     bytes.  So this breaks compatibility with the old format.
+
+Bug fixes:
+   - The serialization for bool didn't always work right.  This is now fixed. 
+
+Other:
+
+</pre></td></tr></table><hr><h1 style="margin:0px;">Release 15.0</h1><u>Release date</u>: May 16, 2007<br><u>Major Changes in this Release</u>:
+            <table cellspacing="5" cellpadding="0" width="100%"><tr><td width="15"></td><td><pre>
+New Features:
+   - New faster version of the bigint object (bigint_kernel_2) that uses
+     the Fast Fourier Transform to perform multiplications.
+   - The base_window can now be an "undecorated" window.  This new type is suitable
+     for making things like popup menus and the like.
+   - Added the on_focus_lost() event to the base_window object
+   - Added the on_focus_gained() event to the base_window object
+   - Added the on_window_moved() event to the base_window object
+   - Added the get_pos() function to the base_window object
+   - Updated the gui_widgets's drawable interface stuff to support the three
+     new event types and the new window type.
+   - Added the drawable::draw_rectangle() function
+   - Added serialization support for std::complex.
+   - Added the assign_image() function
+
+Non-Backwards Compatible Changes:
+   - Removed the color arguments from the drawable_window object's constructor and
+     added a new boolean argument (if it is an undecorated window or not).  This
+     probably won't break any code but if it does you should get a compiler error
+     about it.
+   - Made it so you must disable the events in the destructor for your
+     drawable gui widgets.  Doing so avoids potential race conditions when
+     destructing drawable objects.
+   - Made it so that you are required to call close_window() in a window object's 
+     destructor.  This avoids a potential race condition.
+
+Bug fixes:
+   - Added a workaround for a bug in MinGW that caused the regression test suite
+     to crash when compiled with -O3.
+   - Fixed a potential bug in the X Windows version of the gui_core component. 
+      Added an extra XFlush() to end_program() because without it a 
+      program can crash when calling end_program() in certain instances.
+   - The spec for the pipe object said that objects you enqueue into it
+     had an "initial value for their type" after the function completes. This
+     is incorrect, they are swapped into the pipe so they have an undefined
+     value afterwards.  I fixed the spec for the pipe to say this.
+   - Fixed a bug in the font rendering functions in the gui_widgets
+     component.  It could cause a segmentation fault sometimes.
+   - Fixed some potential deadlocks in the windows version of the gui_core
+     component.
+   - Fixed a bug in the rsignaler object.  When you called wait() or 
+     wait_or_timeout() it only unlocked the associated rmutex once (it could be 
+     locked more than once and thus might cause a deadlock since the thread
+     calling wait() wouldn't actually unlock the mutex in this case).  
+   - Fixed the initialize_array() function in memory_manger_kernel_3 to be 
+     exception safe.  Previously if an exception occurred while creating
+     an array then a resource leak was created.
+
+Other:
+   - Changed the package format for the library somewhat.  The examples are now 
+     located in their own top level folder.  Additionally, the HTML version of the 
+     documentation also comes in the same archive as the source rather than in a 
+     separate download.
+   - Started using major and minor version numbers rather than just major ones.
+
+</pre></td></tr></table><hr><h1 style="margin:0px;">Release 14</h1><u>Release date</u>: Apr 11, 2007<br><u>Major Changes in this Release</u>:
+            <table cellspacing="5" cellpadding="0" width="100%"><tr><td width="15"></td><td><pre>
+New Features:
+   - Added operator&lt;&lt; and operator&gt;&gt; iostream operators to the vector object. 
+
+Non-Backwards Compatible Changes:
+   - Changed the xml_parser's document_handler interface:  
+     made empty element tags (&lt;like_this/&gt;) trigger the end_element() callback
+     and removed the is_empty bool from start_element().
+
+Bug fixes:
+   - Fixed a potential race condition between the destruction of the thread pool
+     and the "program ending handlers" stuff.
+
+Other:
+   - Made the xml parser more robust to different types of new line characters.
+   - Modified the source slightly so that it works with mingw.
+
+</pre></td></tr></table><hr><h1 style="margin:0px;">Release 13</h1><u>Release date</u>: Mar 01, 2007<br><u>Major Changes in this Release</u>:
+            <table cellspacing="5" cellpadding="0" width="100%"><tr><td width="15"></td><td><pre>
+New Features:
+   - The config_reader is now enumerable.  
+   - Added the image_widget gui object.
+   - Added nr() and nc() to the array2d object.
+   - Added the shutdown_connection() function to the iostream extension
+     to the server object.
+   - Added the timer_kernel_2 implementation which is a version of the timer object
+     that is more efficient in its allocation of threads.
+   - Added the timeout object.
+   - There is now a CMakeLists.txt file located in the dlib folder.  See
+     dlib/examples/CMakeLists.txt and dlib/test/CMakeLists.txt for examples 
+     that use CMake to build projects using this library.
+   - Added the register_program_ending_handler() function to the threading API.
+
+Non-Backwards Compatible Changes:
+   - Removed the config_reader::get_blocks() function.  Use the
+     new enumerable interface for the config_reader instead.
+   - The array2d object now uses longs instead of unsigned longs to report
+     its dimensions and access its elements.  
+   - Added a uint64 to the on_connect() callback in the iostream 
+     extension to the server object.
+   - timer::set_delay_time() now throws and timer::start() now may throw 
+     std::bad_alloc.
+
+Bug fixes:
+   - Fixed a bug in end_program().  In X Windows it might not cause the
+     program to end right away if it was called from outside the event
+     handling thread.
+   - Fixed a bug in the implementation of the timeout part of the
+     close_gracefully() function.
+
+Other:
+   - The library now works on HP-UX
+   - The regression test suite now has command line arguments that
+     enable tests to send debug messages to a file.
+
+</pre></td></tr></table><hr><h1 style="margin:0px;">Release 12</h1><u>Release date</u>: Feb 07, 2007<br><u>Major Changes in this Release</u>:
+            <table cellspacing="5" cellpadding="0" width="100%"><tr><td width="15"></td><td><pre>
+New Features:
+   - The http server extension now supports the POST HTTP method.
+   - The attribute list object in the xml_parser is now enumerable.
+   - Added the threaded object extension
+   - Added the uintn.h file which defines fixed sized unsigned integral types.
+
+Non-Backwards Compatible Changes:
+   - Renamed the on_get() callback in the http extension to the server object to
+     on_request()
+   - Removed the network byte order functions from the sockets api.  (They are still 
+     really there though since they come from actual OS header files.  But 
+     officially they have been replaced by the byte_orderer component).
+   - Renamed dlib/uint64.h to dlib/uintn.h
+
+Bug fixes:
+
+Other:
+   - The command line parser will now let you declare long named options with - 
+     characters in them.
+   - Made it so you can use the COMPILE_TIME_ASSERT macros anywhere rather than
+     just inside functions.
+
+</pre></td></tr></table><hr><h1 style="margin:0px;">Release 11</h1><u>Release date</u>: Dec 27, 2006<br><u>Major Changes in this Release</u>:
+            <table cellspacing="5" cellpadding="0" width="100%"><tr><td width="15"></td><td><pre>
+New Features:
+   - For dlib::matrix
+      - Added the tmp() function
+      - Added optimized specializations of inv() and det() for 1x1, 2x2, 3x3 and 
+        4x4 matrices.
+      - Added the removerc() function 
+   - Sockets related
+      - Added the connect() function
+      - Added the is_ip_address() function.
+      - Added the close_gracefully() function
+      - Added the iostream extension to the server object.
+      - Added the http extension to the server object.
+
+Non-Backwards Compatible Changes:
+   - Changed the cpp_tokenizer to not convert characters to their html form.
+
+Bug fixes:
+   - Removed some potential compile time errors.  See the change log for details.
+
+Other:
+   - Improved the web site
+   - Added some more example code
+   - Added more colors to cpp_pretty_printer_kernel_1.
+</pre></td></tr></table><hr><h1 style="margin:0px;">Release 10</h1><u>Release date</u>: Nov 28, 2006<br><u>Major Changes in this Release</u>:
+            <table cellspacing="5" cellpadding="0" width="100%"><tr><td width="15"></td><td><pre>
+New Features:
+   - std::map is now serializable
+   - Added the matrix object and a bunch of supporting code.  
+   - Added the list_box graphical widget
+   - Added the fill_rect_with_vertical_gradient() function to the
+     drawable interfaces list of drawing helpers.
+   - Added the open_file_box() function which provides a simple file chooser.
+
+Non-Backwards Compatible Changes:
+
+Bug fixes:
+   - Made timestamper::get_timestamp() be a const function like it should.  Fixes 
+     some compile errors.
+   - Fixed a bug in the font::draw_string() function.  It didn't redraw
+     multi-line strings right.
+   - Fixed a bug in the scroll_bar object that would cause a compile
+     error if you tried to call its width() function.
+   - Fixed a bug in the array_kernel_1 object.  It would cause a segmentation fault 
+     when used sometimes.
+
+Other:
+</pre></td></tr></table><hr><h1 style="margin:0px;">Release 9</h1><u>Release date</u>: Oct 23, 2006<br><u>Major Changes in this Release</u>:
+            <table cellspacing="5" cellpadding="0" width="100%"><tr><td width="15"></td><td><pre>
+New Features:
+   - Added the following image transformation functions:
+      - Added the equalize_histogram() function
+      - Added the spatially_filter_image() function
+      - Added the threshold_image() function
+      - Added the binary_dilation() function
+      - Added the binary_erosion() function
+      - Added the binary_open() function
+      - Added the binary_close() function
+      - Added the binary_intersection() function
+      - Added the binary_difference() function
+      - Added the binary_complement() function
+   - Added the clear(), load_from() and default constructor back into the 
+     config_reader. 
+   - Made the member_function_pointer copyable and also added operator== and != 
+     to it.
+
+Non-Backwards Compatible Changes:
+   - Made the vector object templated so you can use types other than double with it.
+     But now you 
+     have to specify what type you want to use which is slightly different.
+   - The asc_pair_remover and asc_remover abstract classes now take a third template 
+     argument.  I highly doubt this effects any code outside the library but it is 
+     possible.
+ 
+Bug fixes:
+   - Fixed a bug in the base_window::set_size() function.  If you specified a size
+     of (0,0) it caused your program to error out.  This has now been fixed.
+   - Fixed a bug in the scroll_bar widget.
+   - Fixed a bug in save_bmp().  For some image sizes it would output a goofy 
+     looking skewed image.
+
+Other:
+   - Switched everything that used to call operator&lt; directly to instead use 
+     std::less or to take a template argument that provides a compare functor that
+     defaults to std::less.
+</pre></td></tr></table><hr><h1 style="margin:0px;">Release 8</h1><u>Release date</u>: Oct 03, 2006<br><u>Major Changes in this Release</u>:
+            <table cellspacing="5" cellpadding="0" width="100%"><tr><td width="15"></td><td><pre>
+New Features:
+   - Added the assign_pixel() function
+   - Added the hsi pixel type 
+   - Added the save_bmp() function
+   - Added the static_switch template
+
+Non-Backwards Compatible Changes:
+   - Changed how the config_reader works.  It now has a more powerful syntax and 
+     improved interface.  Converting any old code to use the new version should be 
+     simple since the new file syntax is very nearly backwards compatible with the 
+     old syntax.  (i.e. You probably won't have to change anything about your 
+     config files)
+   - Renamed the dlib/image_loader.h file to dlib/image_io.h since it now includes
+     the image saver stuff.
+   - Renamed the pixel struct to rgb_pixel
+   - Renamed pixel_traits::color to pixel_traits::rgb
+   - Renamed pixel_traits::scalar to pixel_traits::grayscale
+ 
+Bug fixes:
+   - Fixed a bug in the load_bmp() function.  It would load 24bit bmp files 
+     incorrectly.
+   - Changed the logger so that it won't deadlock if you write something similar to
+     my_log &lt;&lt; LINFO &lt;&lt; function_that_also_logs();.  Although this is a
+     dumb thing to do.  But even so, it shouldn't deadlock.
+   - Fixed a potential linking problem with the vector object.
+
+Other:
+   - I decided I'm not going to support Borland v5.5.1 anymore.  There are just too 
+     many bugs in this compiler.  It is very old at this point so I don't see this 
+     being a big deal. 
+   - Made the drawable::draw_image() and load_bmp() functions able to handle images
+     of any type of pixel.
+   - Pulled the imaging, algorithmic and metaprogramming stuff out of the 
+     miscellaneous section of the web page and gave them all their own sections.
+</pre></td></tr></table><hr><h1 style="margin:0px;">Release 7</h1><u>Release date</u>: Sep 18, 2006<br><u>Major Changes in this Release</u>:
+            <table cellspacing="5" cellpadding="0" width="100%"><tr><td width="15"></td><td><pre>
+New Features:
+   - Added a logger header that prints the date and time.
+   - Added the LTRACE logging level
+   - Added a buffered implementation of sockstreambuf. 
+
+Non-Backwards Compatible Changes:
+   - Changed the specs to say that sockstreambuf may be buffered.  
+     sockstreambuf_kernel_1 is still just as it always has been though.  So all old 
+     code will still work just as it always has.  But all the same, the specs have 
+     been changed and now allow for an implementation that is not 100% backwards 
+     compatible.
+   - rand_kernel_2 now emits a different string of random numbers.  
+ 
+Bug fixes:
+   - Changed the logger object's implementation to not try to register
+     a thread end handler for the main program thread anymore.  This was 
+     technically a bug according to the spec but it actually did end up
+     working the way it was supposed to.  But even so, it shouldn't have 
+     been doing that.
+   - Changed binary_search_tree_kernel_1 so that it avoids a bug in the version of
+     gcc on SuSE Enterprise Linux 9.
+   - Fixed a bug in the rand_kernel_2 implementation.  It wasn't giving good 
+     random numbers. 
+
+Other:
+   - Modified the code so that you don't get any warnings when -Wall is used with 
+     GCC.
+</pre></td></tr></table><hr><h1 style="margin:0px;">Release 6</h1><u>Release date</u>: Aug 30, 2006<br><u>Major Changes in this Release</u>:
+            <table cellspacing="5" cellpadding="0" width="100%"><tr><td width="15"></td><td><pre>
+New Features:
+   - Added the ASSERT_ARE_SAME_TYPE macro
+   - Added the is_same_type template
+   - Added the get_main_thread_id() function to the threading API
+   - Added the thread_specific_data extension to the threading API
+   - Added the logger object.
+   - Added the auto_unlock object to the threading API.
+
+Non-Backwards Compatible Changes:
+ 
+Bug fixes:
+
+Other:
+   - Added an example that is specifically about using threads
+   - Added two examples about using the logger object
+</pre></td></tr></table><hr><h1 style="margin:0px;">Release 5</h1><u>Release date</u>: Aug 18, 2006<br><u>Major Changes in this Release</u>:
+            <table cellspacing="5" cellpadding="0" width="100%"><tr><td width="15"></td><td><pre>
+New Features:
+   - Added the memory_manager_stateless object and two implementations of it. 
+   - Added the MACOSX macro to dlib/platform.h
+   - Added a templated version of create_new_thread() that allow you to start
+     a thread with a member function.
+   - Added the register_thread_end_handler() function to the threading kernel API. 
+   - Added memory_manager_kernel_3
+
+Non-Backwards Compatible Changes:
+   - Changed the meaning of the memory_manager_global::get_number_of_allocations() 
+     function because the previous definition of it didn't really make sense for 
+     this object.
+   - Changed the threading API to wait for all outstanding threads to terminate 
+     before allowing the program to end.  It used to just let the OS trash those 
+     threads when main() ended but this isn't a safe or portable thing to do.  I 
+     used to assume the user would make sure all their threads were done and had 
+     cleaned up whatever they were doing before main() ended but this is too much 
+     of a burden on the end user.  So now the library will wait for your threads to
+     end.  You still need to have some way of telling them it is time to stop though.
+ 
+Bug fixes:
+   - Fixed a minor bug in dlib/timer/timer_kernel_1.h.  Its implementation was 
+     slightly off according to the specification of a timer object.
+
+Other:
+   - The byte_order object is now capable of flipping entire arrays.
+   - Made it so that the ENABLE_ASSERTS macro is defined whenever ASSERT is
+     on.
+   - Made the array container use the memory managers.
+
+</pre></td></tr></table><hr><h1 style="margin:0px;">Release 4</h1><u>Release date</u>: Jul 18, 2006<br><u>Major Changes in this Release</u>:
+            <table cellspacing="5" cellpadding="0" width="100%"><tr><td width="15"></td><td><pre>
+New Features:
+   - Added functions to explicitly convert to/from little and big endian to the 
+     byte_order object.
+   - Added the allocate_array() and deallocate_array() functions to the 
+     memory_manager.
+   - Created the memory_manager_global object
+   - Added the remove_last_in_order(), position_enumerator() and 
+     remove_current_element() functions to the binary_search_tree object.
+
+Non-Backwards Compatible Changes:
+   - I put an #error directive in the old GUI component to notify anyone
+     trying to use it that it is deprecated.  I will be removing it from the
+     library in a few months.
+   - Switched the reference_counter object back to not using the memory_manager.
+     I realized it isn't safe for this object to use the memory_manager since 
+     it could result in memory_managers freeing each other's allocations.
+   - I redefined the pixel_traits template.  It is now a lot simpler and more 
+     convenient.
+ 
+Bug fixes:
+   - Fixed a minor bug in dlib/rand/rand_kernel_2.cpp
+
+Other:
+   - Added some more compile time checks to the byte_orderer object.
+   - Changed some includes and preprocessor macros around a little so now
+     everything but the GUI stuff compiles in mac OS X.
+   - Added inclusion guards to all the .cpp files
+   - Added the all_gui.cpp and all_console.cpp files.  They 
+     include all the .cpp files you need to make gui and
+     console applications respectively into one file.
+   - Made more containers use the memory_manager.
+
+</pre></td></tr></table><hr><h1 style="margin:0px;">Release 3</h1><u>Release date</u>: May 06, 2006<br><u>Major Changes in this Release</u>:
+            <table cellspacing="5" cellpadding="0" width="100%"><tr><td width="15"></td><td><pre>
+New Features:
+   - Added the enqueue_or_timeout() and dequeue_or_timeout() functions
+     to the pipe object.
+   - Gave the mouse_tracker the ability to display the mouse position
+     relative to a user selected point.
+   - Added the message_box() function to the gui_widgets component.
+   - Gave the label widget the ability to draw newlines in strings.
+   - added the close_window() and is_closed() methods to the base_window
+     object.
+   - Added the rsignaler extension to the threading API.
+   - You can now control the thread pool timeout time by setting the
+     DLIB_THREAD_POOL_TIMEOUT #define.
+   - Added the get_from_clipboard() and put_on_clipboard() functions
+     to the gui_core component.
+   - Added the stop_and_wait() function to the timer object.
+   - Added the trigger_user_event() function and on_user_event() event
+     to the base_window object.  This new event is also forwarded 
+     to drawable interfaces inside the receiving window.
+   - Added the wrap_around() function to the named_rectangle widget.
+   - Added the top(), left(), right(), bottom(), width() and height() 
+     functions to the drawable interface. 
+
+Non-Backwards Compatible Changes:
+   - Made the radio_button and check_box widgets pass references to themselves
+     when they call their click handlers.  
+   - Switched the sync_extension to use the rmutex and rsignaler objects
+     rather than the normal non-reentrant ones. ( Chances are that old
+     code that used this will still compile fine anyway. )
+   - Changed the return type of rand::get_random_number() to be an 
+     unsigned char.  I also changed both the implementations of 
+     rand because they weren't very good at all. 
+   - Changed the functions related to drawing strings in the font class.
+   - Changed the drawable's rectangle to default to being empty
+     rather than being a single point.  Most code should not notice
+     the difference.
+ 
+Bug fixes:
+   - The event handlers in gui_widgets/drawable.h were private.  They
+     should be protected.  This is now fixed.
+   - Fixed a bug in the way the scroll_bar was drawn when it was
+     the HORIZONTAL type.
+   - Changed how the thread pool destructs itself when the program 
+     is ending.  Previously it was possible to get an error on
+     NetBSD when the program was ending.  This is now fixed.
+   - The functions related to setting the jump size in the scroll_bar
+     widget were private.  They are now public.
+   - There was a bug in the MS Windows version of the gui_core component
+     where the members of the base_window would not work if called from
+     within the on_window_close() event.  This has now been fixed.
+   - Made the set_pos() function work right for the mouse_tracker widget.
+   - Fixed a bug in the base64 object where the string "" could potentially 
+     be decoded incorrectly.
+   - Made the global swap function for crc32_kernel_1 inline.  This fixes a
+     potential linker error.
+   - Fixed some potential deadlocking that could occur while using the
+     gui widgets.  
+
+Other:
+   - I moved all the regression tests into the dlib/test folder and
+     made a nice driver program to run all of them.  
+   - I have been using the sourceforge compile farms to test the library
+     on various platforms.  It now works for Solaris and some of the BSDs 
+     in addition to Linux and Windows.
+</pre></td></tr></table><hr><h1 style="margin:0px;">Release 2</h1><u>Release date</u>: Apr 08, 2006<br><u>Major Changes in this Release</u>:
+            <table cellspacing="5" cellpadding="0" width="100%"><tr><td width="15"></td><td><pre>
+New Features:
+   - Added the array_expand extension to the array object.
+   - Added the cmd_line_parser_check extension to the command line parser.
+   - Added the pipe object.
+   - All applicable container classes now use the memory_manager component for
+     their memory allocation.
+   - New implementations of the memory_manager object. 
+   - Added the copy_functor class.
+
+Non-Backwards Compatible Changes:
+   - Moved the wrap_string, narrow, and string_cast functions
+     to a new file.  You now have to include dlib/string.h to get
+     them.  (This makes a bunch of other things work right in gcc 2.95)
+   - Renamed the _L macro to _dT
+   - Removed the scopy class
+   - Simplified the interface to the memory manager.  It is basically the same
+     though.  
+   - Removed the max_size() methods from the hash_table and binary_search_tree 
+     objects.
+   - Removed the T_is_POD template arguments from the hash_table and 
+     binary_search_tree objects.
+   - Simplified the template arguments to all checking components and extensions. 
+     They now take the class they are to extend or check as their only template
+     argument.  This only affects you if you haven't been using the kernel_nx 
+     typedefs.
+ 
+Bug fixes:
+
+Other:
+   - I changed a few things around and now a majority of the library
+     again compiles under gcc 2.95.  But some things don't and I currently
+     don't plan on making them work because it involves hackish workarounds
+     of 2.95's bugs. 
+   - Changed the compress_stream_kernel_1 object so that it will detect data
+     corruptions better.  This change will prevent it from correctly decompressing
+     data that was compressed with a previous version and has an uncompressed size
+     greater than about 20,000 bytes.
+   - There is a new cpp file you need to compile:  dlib/error.cpp
+   - Moved all the regression testing stuff into the dlib/test folder and made
+     a nicer test driver to run them.
+</pre></td></tr></table><hr><h1 style="margin:0px;">Release 1</h1><u>Release date</u>: Mar 19, 2006<br><u>Major Changes in this Release</u>:
+            <table cellspacing="5" cellpadding="0" width="100%"><tr><td width="15"></td><td><pre>
+New Features:
+    - Created the byte_orderer object.
+    - Created the mouse_tracker gui widget.
+    - The sliding_buffer object is now enumerable and serializable.
+    - Added the get_filesystem_roots() function to the dir_nar component.
+    - Added the create_directory() function to the misc_api component.
+
+Non-Backwards Compatible Changes:
+    - The ASSERT macro is now only enabled if DEBUG or ENABLE_ASSERTS
+      is defined.
+ 
+Bug fixes:
+    - Fixed a minor bug in the cmd_line_parser object.  If you gave
+      an option such as --option=arg when option didn't take any 
+      arguments it could hang your program.
+    - Fixed a bug in wait_or_timeout() in the posix version of the threading 
+      api.  The time to wait for was being calculated incorrectly and could 
+      result in an excessive number of spurious returns.
+    - Fixed a minor bug in the on_keydown() event for windows.
+      I had it set such that the shift and ctrl bools would be false
+      if they were the actual keys being pressed.  This isn't what the
+      specs say should happen but I had a comment in the windows code
+      that made it clear that I did it on purpose.  Go figure :)
+      This is now fixed. 
+
+Other:
+    - Improved the cpp_tokenizer object's ability to recognize numerical 
+      constants.
+    - Improved the text_field gui widget.
+    - There are now two assert macros.  One called ASSERT
+      and another CASSERT.  They both do the same thing but ASSERT
+      is only enabled when DEBUG or ENABLE_ASSERTS is defined.
+      All the old ASSERT statements were changed to CASSERT statements.
+</pre></td></tr></table><hr><h1 style="margin:0px;">Release 2006-02-23.01</h1><br><u>Major Changes in this Release</u>:
+            <table cellspacing="5" cellpadding="0" width="100%"><tr><td width="15"></td><td><pre>
+New Features:
+    - Added array_kernel_2 which is a simple layer on top of a C array.
+    - Added the tabbed_display GUI widget 
+    - Added the widget_group GUI widget 
+    - Added the named_rectangle GUI widget 
+    - Added the pixel_traits template
+
+Non-Backwards Compatible Changes:
+    - The default maximum size for an array object is now 0 rather than 
+      20,000.
+Bug fixes:
+
+Other:
+    - made the cpp_pretty_printer a little better about how it handles
+      C style code.  Also added support for /*!A html_anchor_name !*/ 
+      style comments.
+</pre></td></tr></table><hr><h1 style="margin:0px;">Release 2006-01-31.02</h1><br><u>Major Changes in this Release</u>:
+            <table cellspacing="5" cellpadding="0" width="100%"><tr><td width="15"></td><td><pre>
+New Features:
+    - Created the array2d object.
+    - Created the base64 object.
+    - Created the pixel struct.
+    - Created the load_bmp() function which can load a BMP image file
+      into an array2d object of pixels.
+    - Created the drawable::draw_image() function
+
+Non-Backwards Compatible Changes:
+    - In the drawable interface I made the z order a long rather
+      than unsigned long.
+    - The cpp_tokenizer object now has a NUMBER token type.
+    - removed the get_ prefix from functions in the cmd_line_parser 
+      and cmd_line_parser_option objects.  Also changed the 
+      cmd_line_parser_option::operator[] function to a normal member 
+      function called argument(). 
+ 
+Bug fixes:
+
+Other:
+    - cpp_pretty_printer now colors numeric literals a shade of yellow.
+</pre></td></tr></table><hr><h1 style="margin:0px;">Release 2006-01-15.03</h1><br><u>Major Changes in this Release</u>:
+            <table cellspacing="5" cellpadding="0" width="100%"><tr><td width="15"></td><td><pre>
+New Features:
+    - Created the member_function_pointer object.
+    - Created the button_action object.
+    - Created the arrow_button object.
+    - Created the check_box object.
+    - Created the radio_button object.
+    - Created the scroll_bar object.
+    - More drawing functions to draw various things
+      onto a canvas object.
+    - Added enable/disable functions to the 
+      drawable interface.
+  
+Non-Backwards Compatible Changes:
+    - The gui widgets are no longer templated at the 
+      class level.
+    - The drawable object's constructor now takes a 
+      bit set rather than a bunch of bools to tell it
+      which events to enable.
+    - I changed the names of some of the functions in the
+      gui_widgets component so that they all reflected a 
+      uniform naming style.
+ 
+Bug fixes:
+    - Fixed a minor bug in the cpp_tokenizer.  
+    - Minor bug in the timer object. See change log for 
+      details.
+
+Other:
+    - Made the timer object a little more robust
+</pre></td></tr></table></td></tr></table></div></body></html>

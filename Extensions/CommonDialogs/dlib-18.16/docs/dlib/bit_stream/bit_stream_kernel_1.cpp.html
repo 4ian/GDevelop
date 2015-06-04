@@ -1,0 +1,203 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - bit_stream_kernel_1.cpp</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2003  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_BIT_STREAM_KERNEL_1_CPp_
+<font color='#0000FF'>#define</font> DLIB_BIT_STREAM_KERNEL_1_CPp_
+
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='bit_stream_kernel_1.h.html'>bit_stream_kernel_1.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../algs.h.html'>../algs.h</a>"
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>iostream<font color='#5555FF'>&gt;</font>
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='swap'></a>swap</b> <font face='Lucida Console'>(</font>
+        bit_stream_kernel_1<font color='#5555FF'>&amp;</font> a, 
+        bit_stream_kernel_1<font color='#5555FF'>&amp;</font> b
+    <font face='Lucida Console'>)</font> <b>{</b> a.<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>b<font face='Lucida Console'>)</font>; <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>    <font color='#009900'>// member function definitions
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>void</u></font> bit_stream_kernel_1::
+    <b><a name='clear'></a>clear</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>write_mode<font face='Lucida Console'>)</font>
+        <b>{</b>
+            write_mode <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+
+            <font color='#009900'>// flush output buffer
+</font>            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>buffer_size <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                buffer <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#979000'>8</font> <font color='#5555FF'>-</font> buffer_size;
+                osp<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>write</font><font face='Lucida Console'>(</font><font color='#0000FF'>reinterpret_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>char</u></font><font color='#5555FF'>*</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>buffer<font face='Lucida Console'>)</font>,<font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+        <b>}</b>
+        <font color='#0000FF'>else</font>
+            read_mode <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>void</u></font> bit_stream_kernel_1::
+    <b><a name='set_input_stream'></a>set_input_stream</b> <font face='Lucida Console'>(</font>
+        std::istream<font color='#5555FF'>&amp;</font> is
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        isp <font color='#5555FF'>=</font> <font color='#5555FF'>&amp;</font>is;
+        read_mode <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+
+        buffer_size <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>void</u></font> bit_stream_kernel_1::
+    <b><a name='set_output_stream'></a>set_output_stream</b> <font face='Lucida Console'>(</font>
+        std::ostream<font color='#5555FF'>&amp;</font> os
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        osp <font color='#5555FF'>=</font> <font color='#5555FF'>&amp;</font>os;
+        write_mode <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+
+        buffer_size <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>void</u></font> bit_stream_kernel_1::
+    <b><a name='close'></a>close</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>write_mode<font face='Lucida Console'>)</font>
+        <b>{</b>
+            write_mode <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+
+            <font color='#009900'>// flush output buffer
+</font>            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>buffer_size <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                buffer <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#979000'>8</font> <font color='#5555FF'>-</font> buffer_size;
+                osp<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>write</font><font face='Lucida Console'>(</font><font color='#0000FF'>reinterpret_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>char</u></font><font color='#5555FF'>*</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>buffer<font face='Lucida Console'>)</font>,<font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+        <b>}</b>
+        <font color='#0000FF'>else</font>
+            read_mode <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>bool</u></font> bit_stream_kernel_1::
+    <b><a name='is_in_write_mode'></a>is_in_write_mode</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        <font color='#0000FF'>return</font> write_mode;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>bool</u></font> bit_stream_kernel_1::
+    <b><a name='is_in_read_mode'></a>is_in_read_mode</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        <font color='#0000FF'>return</font> read_mode;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>void</u></font> bit_stream_kernel_1::
+    <b><a name='write'></a>write</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'><u>int</u></font> bit
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#009900'>// flush buffer if necessary
+</font>        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>buffer_size <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>8</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            buffer <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#979000'>8</font> <font color='#5555FF'>-</font> buffer_size;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>osp<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>rdbuf</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>sputn</font><font face='Lucida Console'>(</font><font color='#0000FF'>reinterpret_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>char</u></font><font color='#5555FF'>*</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>buffer<font face='Lucida Console'>)</font>,<font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>throw</font> std::ios_base::<font color='#BB00BB'>failure</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>error occured in the bit_stream object</font>"<font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+            buffer_size <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <b>}</b>
+
+        <font color='#5555FF'>+</font><font color='#5555FF'>+</font>buffer_size;
+        buffer <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+        buffer <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>bit<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>bool</u></font> bit_stream_kernel_1::
+    <b><a name='read'></a>read</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'><u>int</u></font><font color='#5555FF'>&amp;</font> bit
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#009900'>// get new byte if necessary
+</font>        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>buffer_size <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>isp<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>rdbuf</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>sgetn</font><font face='Lucida Console'>(</font><font color='#0000FF'>reinterpret_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>char</u></font><font color='#5555FF'>*</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>buffer<font face='Lucida Console'>)</font>, <font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#009900'>// if we didn't read anything then return false
+</font>                <font color='#0000FF'>return</font> <font color='#979000'>false</font>;
+            <b>}</b>
+
+            buffer_size <font color='#5555FF'>=</font> <font color='#979000'>8</font>;
+        <b>}</b>
+
+        <font color='#009900'>// put the most significant bit from buffer into bit
+</font>        bit <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>int</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>buffer <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font> <font color='#979000'>7</font><font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// shift out the bit that was just read
+</font>        buffer <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+        <font color='#5555FF'>-</font><font color='#5555FF'>-</font>buffer_size;
+
+        <font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>void</u></font> bit_stream_kernel_1::
+    <b><a name='swap'></a>swap</b> <font face='Lucida Console'>(</font>
+        bit_stream_kernel_1<font color='#5555FF'>&amp;</font> item
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+
+        std::istream<font color='#5555FF'>*</font>   isp_temp            <font color='#5555FF'>=</font> item.isp;
+        std::ostream<font color='#5555FF'>*</font>   osp_temp            <font color='#5555FF'>=</font> item.osp;
+        <font color='#0000FF'><u>bool</u></font>            write_mode_temp     <font color='#5555FF'>=</font> item.write_mode;
+        <font color='#0000FF'><u>bool</u></font>            read_mode_temp      <font color='#5555FF'>=</font> item.read_mode;
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font>   buffer_temp         <font color='#5555FF'>=</font> item.buffer;
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>short</u></font>  buffer_size_temp    <font color='#5555FF'>=</font> item.buffer_size;
+
+        item.isp            <font color='#5555FF'>=</font> isp;
+        item.osp            <font color='#5555FF'>=</font> osp;
+        item.write_mode     <font color='#5555FF'>=</font> write_mode;
+        item.read_mode      <font color='#5555FF'>=</font> read_mode;
+        item.buffer         <font color='#5555FF'>=</font> buffer;
+        item.buffer_size    <font color='#5555FF'>=</font> buffer_size;
+
+
+        isp             <font color='#5555FF'>=</font> isp_temp;
+        osp             <font color='#5555FF'>=</font> osp_temp;
+        write_mode      <font color='#5555FF'>=</font> write_mode_temp;
+        read_mode       <font color='#5555FF'>=</font> read_mode_temp;
+        buffer          <font color='#5555FF'>=</font> buffer_temp;
+        buffer_size     <font color='#5555FF'>=</font> buffer_size_temp;
+
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_BIT_STREAM_KERNEL_1_CPp_
+</font>
+
+</pre></body></html>

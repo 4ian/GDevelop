@@ -1,0 +1,512 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - config_reader.cpp</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2007  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font>
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>sstream<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>string<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>cstdlib<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>ctime<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>config_reader.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>cmd_line_parser.h<font color='#5555FF'>&gt;</font>
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='tester.h.html'>tester.h</a>"
+
+<font color='#009900'>// This is called an unnamed-namespace and it has the effect of making everything inside this file "private"
+</font><font color='#009900'>// so that everything you declare will have static linkage.  Thus we won't have any multiply
+</font><font color='#009900'>// defined symbol errors coming out of the linker when we try to compile the test suite.
+</font><font color='#0000FF'>namespace</font>  
+<b>{</b>
+
+    <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> test;
+    <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> dlib;
+    <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> std;
+
+    <font color='#009900'>// Declare the logger we will use in this test.  The name of the tester 
+</font>    <font color='#009900'>// should start with "test."
+</font>    logger <b><a name='dlog'></a>dlog</b><font face='Lucida Console'>(</font>"<font color='#CC0000'>test.config_reader</font>"<font face='Lucida Console'>)</font>;
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> config_reader
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='do_the_tests'></a>do_the_tests</b> <font face='Lucida Console'>(</font>
+        config_reader<font color='#5555FF'>&amp;</font> cr
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>cr.<font color='#BB00BB'>is_key_defined</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>global</font>"<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>cr.<font color='#BB00BB'>is_block_defined</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>all</font>"<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>cr.<font color='#BB00BB'>is_key_defined</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>globalasfd</font>"<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>cr.<font color='#BB00BB'>is_block_defined</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>all!</font>"<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>cr["<font color='#CC0000'>global</font>"] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'>hmm</font>"<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>cr["<font color='#CC0000'>global2</font>"] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'>hmm2</font>"<font face='Lucida Console'>)</font>;
+
+        std_vector_c<font color='#5555FF'>&lt;</font>string<font color='#5555FF'>&gt;</font> blocks;
+        cr.<font color='#BB00BB'>block</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>all</font>"<font face='Lucida Console'>)</font>.<font color='#BB00BB'>get_blocks</font><font face='Lucida Console'>(</font>blocks<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>blocks.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>4</font><font face='Lucida Console'>)</font>; 
+        cr.<font color='#BB00BB'>block</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>all</font>"<font face='Lucida Console'>)</font>.<font color='#BB00BB'>block</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>block1</font>"<font face='Lucida Console'>)</font>.<font color='#BB00BB'>get_blocks</font><font face='Lucida Console'>(</font>blocks<font face='Lucida Console'>)</font>; <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>blocks.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>; 
+        cr.<font color='#BB00BB'>block</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>all</font>"<font face='Lucida Console'>)</font>.<font color='#BB00BB'>block</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>block2</font>"<font face='Lucida Console'>)</font>.<font color='#BB00BB'>get_blocks</font><font face='Lucida Console'>(</font>blocks<font face='Lucida Console'>)</font>; <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>blocks.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>; 
+        cr.<font color='#BB00BB'>block</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>all</font>"<font face='Lucida Console'>)</font>.<font color='#BB00BB'>block</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>block3</font>"<font face='Lucida Console'>)</font>.<font color='#BB00BB'>get_blocks</font><font face='Lucida Console'>(</font>blocks<font face='Lucida Console'>)</font>; <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>blocks.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>; 
+        cr.<font color='#BB00BB'>block</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>all</font>"<font face='Lucida Console'>)</font>.<font color='#BB00BB'>block</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>block4</font>"<font face='Lucida Console'>)</font>.<font color='#BB00BB'>get_blocks</font><font face='Lucida Console'>(</font>blocks<font face='Lucida Console'>)</font>; <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>blocks.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>; 
+
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>cr.<font color='#BB00BB'>block</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>all</font>"<font face='Lucida Console'>)</font>.<font color='#BB00BB'>block</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>block1</font>"<font face='Lucida Console'>)</font>.<font color='#BB00BB'>is_key_defined</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>name</font>"<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>; 
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>cr.<font color='#BB00BB'>block</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>all</font>"<font face='Lucida Console'>)</font>.<font color='#BB00BB'>block</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>block2</font>"<font face='Lucida Console'>)</font>.<font color='#BB00BB'>is_key_defined</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>name</font>"<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>; 
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>cr.<font color='#BB00BB'>block</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>all</font>"<font face='Lucida Console'>)</font>.<font color='#BB00BB'>block</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>block3</font>"<font face='Lucida Console'>)</font>.<font color='#BB00BB'>is_key_defined</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>name</font>"<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>; 
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>cr.<font color='#BB00BB'>block</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>all</font>"<font face='Lucida Console'>)</font>.<font color='#BB00BB'>block</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>block4</font>"<font face='Lucida Console'>)</font>.<font color='#BB00BB'>is_key_defined</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>name</font>"<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>; 
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>cr.<font color='#BB00BB'>block</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>all</font>"<font face='Lucida Console'>)</font>.<font color='#BB00BB'>block</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>block1</font>"<font face='Lucida Console'>)</font>.<font color='#BB00BB'>is_key_defined</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>age</font>"<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>; 
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>cr.<font color='#BB00BB'>block</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>all</font>"<font face='Lucida Console'>)</font>.<font color='#BB00BB'>block</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>block2</font>"<font face='Lucida Console'>)</font>.<font color='#BB00BB'>is_key_defined</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>age</font>"<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>; 
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>cr.<font color='#BB00BB'>block</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>all</font>"<font face='Lucida Console'>)</font>.<font color='#BB00BB'>block</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>block3</font>"<font face='Lucida Console'>)</font>.<font color='#BB00BB'>is_key_defined</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>age</font>"<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>; 
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>cr.<font color='#BB00BB'>block</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>all</font>"<font face='Lucida Console'>)</font>.<font color='#BB00BB'>block</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>block4</font>"<font face='Lucida Console'>)</font>.<font color='#BB00BB'>is_key_defined</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>age</font>"<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>; 
+
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>cr.<font color='#BB00BB'>block</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>all</font>"<font face='Lucida Console'>)</font>.<font color='#BB00BB'>block</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>block1</font>"<font face='Lucida Console'>)</font>["<font color='#CC0000'>name</font>"] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'>davis king</font>"<font face='Lucida Console'>)</font>; 
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>cr.<font color='#BB00BB'>block</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>all</font>"<font face='Lucida Console'>)</font>.<font color='#BB00BB'>block</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>block2</font>"<font face='Lucida Console'>)</font>["<font color='#CC0000'>name</font>"] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'>joel</font>"<font face='Lucida Console'>)</font>; 
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>cr.<font color='#BB00BB'>block</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>all</font>"<font face='Lucida Console'>)</font>.<font color='#BB00BB'>block</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>block3</font>"<font face='Lucida Console'>)</font>["<font color='#CC0000'>name</font>"] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'>john</font>"<font face='Lucida Console'>)</font>; 
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>cr.<font color='#BB00BB'>block</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>all</font>"<font face='Lucida Console'>)</font>.<font color='#BB00BB'>block</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>block4</font>"<font face='Lucida Console'>)</font>["<font color='#CC0000'>name</font>"] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'>dude</font>"<font face='Lucida Console'>)</font>; 
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>cr.<font color='#BB00BB'>block</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>all</font>"<font face='Lucida Console'>)</font>.<font color='#BB00BB'>block</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>block1</font>"<font face='Lucida Console'>)</font>["<font color='#CC0000'>age</font>"] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'>24</font>"<font face='Lucida Console'>)</font>; 
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>cr.<font color='#BB00BB'>block</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>all</font>"<font face='Lucida Console'>)</font>.<font color='#BB00BB'>block</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>block2</font>"<font face='Lucida Console'>)</font>["<font color='#CC0000'>age</font>"] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'>24</font>"<font face='Lucida Console'>)</font>; 
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>cr.<font color='#BB00BB'>block</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>all</font>"<font face='Lucida Console'>)</font>.<font color='#BB00BB'>block</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>block3</font>"<font face='Lucida Console'>)</font>["<font color='#CC0000'>age</font>"] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'>24</font>"<font face='Lucida Console'>)</font>; 
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>cr.<font color='#BB00BB'>block</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>all</font>"<font face='Lucida Console'>)</font>.<font color='#BB00BB'>block</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>block4</font>"<font face='Lucida Console'>)</font>["<font color='#CC0000'>age</font>"] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'>53</font>"<font face='Lucida Console'>)</font>; 
+
+
+        <font color='#0000FF'><u>int</u></font> count2 <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        cr.<font color='#BB00BB'>get_blocks</font><font face='Lucida Console'>(</font>blocks<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>blocks.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>blocks[<font color='#979000'>0</font>] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'>all</font>"<font face='Lucida Console'>)</font>;
+
+
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>cr.<font color='#BB00BB'>block</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>all</font>"<font face='Lucida Console'>)</font>.<font color='#BB00BB'>is_key_defined</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>global</font>"<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>cr.<font color='#BB00BB'>block</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>all</font>"<font face='Lucida Console'>)</font>.<font color='#BB00BB'>is_key_defined</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>global2</font>"<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>cr.<font color='#BB00BB'>block</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>all</font>"<font face='Lucida Console'>)</font>.<font color='#BB00BB'>is_key_defined</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>name</font>"<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>cr.<font color='#BB00BB'>block</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>all</font>"<font face='Lucida Console'>)</font>.<font color='#BB00BB'>is_key_defined</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>age</font>"<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font><font face='Lucida Console'>)</font>;
+
+        cr.<font color='#BB00BB'>block</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>all</font>"<font face='Lucida Console'>)</font>.<font color='#BB00BB'>get_blocks</font><font face='Lucida Console'>(</font>blocks<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>blocks.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>4</font><font face='Lucida Console'>)</font>;
+        std::vector<font color='#5555FF'>&lt;</font>string<font color='#5555FF'>&gt;</font> temp_blocks;
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> blocks.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#5555FF'>+</font><font color='#5555FF'>+</font>count2;
+            ostringstream sout;
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>block</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> count2;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>blocks[i] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> sout.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+            cr.<font color='#BB00BB'>block</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>all</font>"<font face='Lucida Console'>)</font>.<font color='#BB00BB'>block</font><font face='Lucida Console'>(</font>blocks[i]<font face='Lucida Console'>)</font>.<font color='#BB00BB'>get_blocks</font><font face='Lucida Console'>(</font>temp_blocks<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>temp_blocks.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>cr.<font color='#BB00BB'>block</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>all</font>"<font face='Lucida Console'>)</font>.<font color='#BB00BB'>block</font><font face='Lucida Console'>(</font>blocks[i]<font face='Lucida Console'>)</font>.<font color='#BB00BB'>is_key_defined</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>name</font>"<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>cr.<font color='#BB00BB'>block</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>all</font>"<font face='Lucida Console'>)</font>.<font color='#BB00BB'>block</font><font face='Lucida Console'>(</font>blocks[i]<font face='Lucida Console'>)</font>.<font color='#BB00BB'>is_key_defined</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>age</font>"<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+
+
+        <font color='#0000FF'><u>bool</u></font> found_error <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+        <font color='#0000FF'>try</font>
+        <b>{</b>
+            cr.<font color='#BB00BB'>block</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>bogus_block</font>"<font face='Lucida Console'>)</font>;
+        <b>}</b>
+        <font color='#0000FF'>catch</font> <font face='Lucida Console'>(</font><font color='#0000FF'>typename</font> config_reader::config_reader_access_error<font color='#5555FF'>&amp;</font> e<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>e.block_name <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'>bogus_block</font>"<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>e.key_name <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'></font>"<font face='Lucida Console'>)</font>;
+            found_error <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+        <b>}</b>
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>found_error<font face='Lucida Console'>)</font>;
+
+        found_error <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+        <font color='#0000FF'>try</font>
+        <b>{</b>
+            cr["<font color='#CC0000'>bogus_key</font>"];
+        <b>}</b>
+        <font color='#0000FF'>catch</font> <font face='Lucida Console'>(</font><font color='#0000FF'>typename</font> config_reader::config_reader_access_error<font color='#5555FF'>&amp;</font> e<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>e.block_name <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'></font>"<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>e.key_name <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'>bogus_key</font>"<font face='Lucida Console'>)</font>;
+            found_error <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+        <b>}</b>
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>found_error<font face='Lucida Console'>)</font>;
+
+
+        found_error <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+        <font color='#0000FF'>try</font>
+        <b>{</b>
+            cr.<font color='#BB00BB'>block</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>all</font>"<font face='Lucida Console'>)</font>.<font color='#BB00BB'>block</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>block10</font>"<font face='Lucida Console'>)</font>;
+        <b>}</b>
+        <font color='#0000FF'>catch</font> <font face='Lucida Console'>(</font><font color='#0000FF'>typename</font> config_reader::config_reader_access_error<font color='#5555FF'>&amp;</font> e<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>e.block_name <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'>block10</font>"<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>e.key_name <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'></font>"<font face='Lucida Console'>)</font>;
+            found_error <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+        <b>}</b>
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>found_error<font face='Lucida Console'>)</font>;
+
+        found_error <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+        <font color='#0000FF'>try</font>
+        <b>{</b>
+            cr.<font color='#BB00BB'>block</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>all</font>"<font face='Lucida Console'>)</font>["<font color='#CC0000'>msdofg</font>"];
+        <b>}</b>
+        <font color='#0000FF'>catch</font> <font face='Lucida Console'>(</font><font color='#0000FF'>typename</font> config_reader::config_reader_access_error<font color='#5555FF'>&amp;</font> e<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>e.block_name <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'></font>"<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>e.key_name <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'>msdofg</font>"<font face='Lucida Console'>)</font>;
+            found_error <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+        <b>}</b>
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>found_error<font face='Lucida Console'>)</font>;
+
+    <b>}</b>
+
+
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> config_reader
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='config_reader_test'></a>config_reader_test</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font>
+    <font color='#009900'>/*!
+        requires
+            - config_reader is an implementation of config_reader/config_reader_kernel_abstract.h 
+              is instantiated with int
+        ensures
+            - runs tests on config_reader for compliance with the specs
+    !*/</font>
+    <b>{</b>        
+
+
+
+        ostringstream sout;
+
+        sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>all#comment { { } \n</font>";
+        sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>{ \n</font>";
+        sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>    block1 \n</font>";
+        sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>    { \n</font>";
+        sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>        name = davis king \n</font>";
+        sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>        age = 24 \n</font>";
+        sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>    } \n</font>";
+        sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'> \n</font>";
+        sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>    block2 \n</font>";
+        sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>    { \n</font>";
+        sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>        name= joel \n</font>";
+        sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>        age =24 \n</font>";
+        sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>    } \n</font>";
+        sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'> \n</font>";
+        sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>    block3 \n</font>";
+        sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>    { \n</font>";
+        sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>        name = john \n</font>";
+        sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>        age = 24 \n</font>";
+        sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>    } \n</font>";
+        sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>  #comment \n</font>";
+        sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>#comment \n</font>";
+        sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>    block4{  # comment</font>";
+        sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>     \n</font>";
+        sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>        name = dude \n</font>";
+        sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>        age = 53}\n</font>";
+        sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>     \n</font>";
+        sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>} \n</font>";
+        sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'> \n</font>";
+        sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'> \n</font>";
+        sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>global=hmm#comment \n</font>";
+        sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>global2=hmm2 \n</font>";
+        sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'> # comment \n</font>";
+
+        string data <font color='#5555FF'>=</font> sout.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+        config_reader cr2;
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> <font color='#979000'>3</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+        <b>{</b>
+            istringstream sin;
+
+            sin.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            sin.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font>data<font face='Lucida Console'>)</font>;
+
+            config_reader <font color='#BB00BB'>cr</font><font face='Lucida Console'>(</font>sin<font face='Lucida Console'>)</font>;
+            sin.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            sin.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font>data<font face='Lucida Console'>)</font>;
+
+            cr2.<font color='#BB00BB'>load_from</font><font face='Lucida Console'>(</font>sin<font face='Lucida Console'>)</font>;
+
+            <font color='#BB00BB'>do_the_tests</font><font face='Lucida Console'>(</font>cr<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>do_the_tests</font><font face='Lucida Console'>(</font>cr2<font face='Lucida Console'>)</font>;
+
+            cr.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>cr.<font color='#BB00BB'>is_key_defined</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>global</font>"<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+
+        sout.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        sout.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font>"<font color='#CC0000'></font>"<font face='Lucida Console'>)</font>;
+
+        <b>{</b>
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>all#comment { { } \n</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>{ \n</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>    block1 \n</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>    { \n</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>        name = davis king \n</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>        age = 24 \n</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>    } \n</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'> \n</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>    block2 \n</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>    { \n</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>        name= joel \n</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>        age =24 \n</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>    } \n</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'> \n</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>    block3 \n</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>    {{ \n</font>";  <font color='#009900'>// error on this line
+</font>            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>        name = john \n</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>        age = 24 \n</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>    } \n</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>  #comment \n</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>#comment \n</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>    block4{  # comment</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>     \n</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>        name = dude \n</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>        age = 53}\n</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>     \n</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>} \n</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'> \n</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'> \n</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>global=hmm#comment \n</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>global2=hmm2 \n</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'> # comment \n</font>";
+
+            istringstream <font color='#BB00BB'>sin</font><font face='Lucida Console'>(</font>sout.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'><u>bool</u></font> error_found <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+            <font color='#0000FF'>try</font>
+            <b>{</b>
+                cr2.<font color='#BB00BB'>load_from</font><font face='Lucida Console'>(</font>sin<font face='Lucida Console'>)</font>;
+            <b>}</b>
+            <font color='#0000FF'>catch</font> <font face='Lucida Console'>(</font><font color='#0000FF'>typename</font> config_reader::config_reader_error<font color='#5555FF'>&amp;</font> e<font face='Lucida Console'>)</font>
+            <b>{</b>
+                error_found <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+                <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>e.line_number <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>16</font><font face='Lucida Console'>)</font>;
+                <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>e.redefinition <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>error_found<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <b>{</b>
+            sout.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font>"<font color='#CC0000'></font>"<font face='Lucida Console'>)</font>;
+            sout.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>all#comment { { } \n</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>{ \n</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>    block1 \n</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>    { \n</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>        name = davis king \n</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>        age = 24 \n</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>    } \n</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'> \n</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>    block2 \n</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>    { \n</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>        name= joel \n</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>        age =24 \n</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>    } \n</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'> \n</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>    block3 \n</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>    { \n</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>        name = john \n</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>        age = 24 \n</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>    } \n</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>  #comment \n</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>#comment \n</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>    block4{  # comment</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>     \n</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>        name = dude \n</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>        age = 53}\n</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>     \n</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>} \n</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'> \n</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'> \n</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>global=hmm#comment \n</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'> \n</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>global=hmm2 \n</font>";  <font color='#009900'>// error on this line
+</font>            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'> # comment \n</font>";
+
+            istringstream <font color='#BB00BB'>sin</font><font face='Lucida Console'>(</font>sout.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'><u>bool</u></font> error_found <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+            <font color='#0000FF'>try</font>
+            <b>{</b>
+                cr2.<font color='#BB00BB'>load_from</font><font face='Lucida Console'>(</font>sin<font face='Lucida Console'>)</font>;
+            <b>}</b>
+            <font color='#0000FF'>catch</font> <font face='Lucida Console'>(</font><font color='#0000FF'>typename</font> config_reader::config_reader_error<font color='#5555FF'>&amp;</font> e<font face='Lucida Console'>)</font>
+            <b>{</b>
+                error_found <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+                <font color='#BB00BB'>DLIB_TEST_MSG</font><font face='Lucida Console'>(</font>e.line_number <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>31</font>,e.line_number<font face='Lucida Console'>)</font>;
+                <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>e.redefinition <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>true</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>error_found<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+
+        <b>{</b>
+            sout.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font>"<font color='#CC0000'></font>"<font face='Lucida Console'>)</font>;
+            sout.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>all#comment { { } \n</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>{ \n</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>    block1 \n</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>    { \n</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>        name = davis king \n</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>        age = 24 \n</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>    } \n</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'> \n</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>    block2 \n</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>    { \n</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>        name= joel \n</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>        age =24 \n</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>    } block2{} \n</font>";  <font color='#009900'>// error on this line
+</font>            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'> \n</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>    block3 \n</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>    { \n</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>        name = john \n</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>        age = 24 \n</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>    } \n</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>  #comment \n</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>#comment \n</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>    block4{  # comment</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>     \n</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>        name = dude \n</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>        age = 53}\n</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>     \n</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>} \n</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'> \n</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'> \n</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>global=hmm#comment \n</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'> \n</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'> # comment \n</font>";
+
+            istringstream <font color='#BB00BB'>sin</font><font face='Lucida Console'>(</font>sout.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'><u>bool</u></font> error_found <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+            <font color='#0000FF'>try</font>
+            <b>{</b>
+                cr2.<font color='#BB00BB'>load_from</font><font face='Lucida Console'>(</font>sin<font face='Lucida Console'>)</font>;
+            <b>}</b>
+            <font color='#0000FF'>catch</font> <font face='Lucida Console'>(</font><font color='#0000FF'>typename</font> config_reader::config_reader_error<font color='#5555FF'>&amp;</font> e<font face='Lucida Console'>)</font>
+            <b>{</b>
+                error_found <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+                <font color='#BB00BB'>DLIB_TEST_MSG</font><font face='Lucida Console'>(</font>e.line_number <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>13</font>,e.line_number<font face='Lucida Console'>)</font>;
+                <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>e.redefinition <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>true</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>error_found<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+
+
+    <b>}</b>
+
+
+    <font color='#0000FF'><u>void</u></font> <b><a name='test_get_option'></a>test_get_option</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>*</font> argv[<font color='#979000'>100</font>];            
+        <font color='#0000FF'><u>int</u></font> argc;
+
+        <font color='#009900'>// program --opt 4 -d dude 
+</font>        argv[<font color='#979000'>0</font>] <font color='#5555FF'>=</font> "<font color='#CC0000'>program</font>";
+        argv[<font color='#979000'>1</font>] <font color='#5555FF'>=</font> "<font color='#CC0000'>--opt</font>";
+        argv[<font color='#979000'>2</font>] <font color='#5555FF'>=</font> "<font color='#CC0000'>4</font>";
+        argv[<font color='#979000'>3</font>] <font color='#5555FF'>=</font> "<font color='#CC0000'>-d</font>";
+        argv[<font color='#979000'>4</font>] <font color='#5555FF'>=</font> "<font color='#CC0000'>dude</font>";
+        argc <font color='#5555FF'>=</font> <font color='#979000'>5</font>;
+
+        std::ostringstream sout;
+        sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>block#comment { { } \n</font>";
+        sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>{ \n</font>";
+        sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>  opt = 5 \n</font>";
+        sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>  a = 6 \n</font>";
+        sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>  d = joel \n</font>";
+        sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>  subblock {} \n</font>";
+        sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>} \n</font>";
+        sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'> \n</font>";
+        sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'> \n</font>";
+        sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>opt = 8 \n</font>";
+        sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>d = davis \n</font>";
+        sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>a = 50 \n</font>";
+        sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'> # comment \n</font>";
+
+        std::istringstream <font color='#BB00BB'>sin</font><font face='Lucida Console'>(</font>sout.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+        config_reader <font color='#BB00BB'>cr</font><font face='Lucida Console'>(</font>sin<font face='Lucida Console'>)</font>;
+
+        dlib::cmd_line_parser<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font>::kernel_1a_c parser;
+
+        parser.<font color='#BB00BB'>add_option</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>opt</font>","<font color='#CC0000'></font>",<font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+        parser.<font color='#BB00BB'>add_option</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>d</font>","<font color='#CC0000'></font>",<font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+        parser.<font color='#BB00BB'>add_option</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>a</font>","<font color='#CC0000'></font>",<font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+        parser.<font color='#BB00BB'>add_option</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>b</font>","<font color='#CC0000'></font>",<font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+        parser.<font color='#BB00BB'>parse</font><font face='Lucida Console'>(</font>argc, argv<font face='Lucida Console'>)</font>;
+
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>get_option</font><font face='Lucida Console'>(</font>cr, "<font color='#CC0000'>d</font>", "<font color='#CC0000'>default</font>"<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'>davis</font>"<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>get_option</font><font face='Lucida Console'>(</font>cr, "<font color='#CC0000'>opt</font>", "<font color='#CC0000'>default</font>"<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'>8</font>"<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>get_option</font><font face='Lucida Console'>(</font>cr, "<font color='#CC0000'>opt</font>", <font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>8</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>get_option</font><font face='Lucida Console'>(</font>cr, "<font color='#CC0000'>optasdf</font>", <font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>get_option</font><font face='Lucida Console'>(</font>cr, "<font color='#CC0000'>optasdf</font>", <font color='#979000'>1.1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>1.1</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>get_option</font><font face='Lucida Console'>(</font>cr.<font color='#BB00BB'>block</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>block</font>"<font face='Lucida Console'>)</font>, "<font color='#CC0000'>d</font>", "<font color='#CC0000'>default</font>"<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'>joel</font>"<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>get_option</font><font face='Lucida Console'>(</font>cr.<font color='#BB00BB'>block</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>block</font>"<font face='Lucida Console'>)</font>, "<font color='#CC0000'>opt</font>", "<font color='#CC0000'>default</font>"<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'>5</font>"<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>get_option</font><font face='Lucida Console'>(</font>cr.<font color='#BB00BB'>block</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>block</font>"<font face='Lucida Console'>)</font>, "<font color='#CC0000'>opt</font>", <font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>5</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>get_option</font><font face='Lucida Console'>(</font>cr.<font color='#BB00BB'>block</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>block</font>"<font face='Lucida Console'>)</font>.<font color='#BB00BB'>block</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>subblock</font>"<font face='Lucida Console'>)</font>, "<font color='#CC0000'>d</font>", "<font color='#CC0000'>default</font>"<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'>default</font>"<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>get_option</font><font face='Lucida Console'>(</font>cr.<font color='#BB00BB'>block</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>block</font>"<font face='Lucida Console'>)</font>.<font color='#BB00BB'>block</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>subblock</font>"<font face='Lucida Console'>)</font>, "<font color='#CC0000'>opt</font>", "<font color='#CC0000'>default</font>"<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'>default</font>"<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>get_option</font><font face='Lucida Console'>(</font>cr.<font color='#BB00BB'>block</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>block</font>"<font face='Lucida Console'>)</font>.<font color='#BB00BB'>block</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>subblock</font>"<font face='Lucida Console'>)</font>, "<font color='#CC0000'>opt</font>", <font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>get_option</font><font face='Lucida Console'>(</font>cr, "<font color='#CC0000'>block.d</font>", "<font color='#CC0000'>default</font>"<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'>joel</font>"<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>get_option</font><font face='Lucida Console'>(</font>cr, "<font color='#CC0000'>block.opt</font>", "<font color='#CC0000'>default</font>"<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'>5</font>"<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>get_option</font><font face='Lucida Console'>(</font>cr, "<font color='#CC0000'>block.opt</font>", <font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>5</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>get_option</font><font face='Lucida Console'>(</font>cr, "<font color='#CC0000'>block.asdf.d</font>", "<font color='#CC0000'>default</font>"<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'>default</font>"<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>get_option</font><font face='Lucida Console'>(</font>cr, "<font color='#CC0000'>block.asdf.opt</font>", "<font color='#CC0000'>default</font>"<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'>default</font>"<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>get_option</font><font face='Lucida Console'>(</font>cr, "<font color='#CC0000'>block.asdf.opt</font>", <font color='#979000'>2</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>get_option</font><font face='Lucida Console'>(</font>cr, "<font color='#CC0000'>block.subblock.d</font>", "<font color='#CC0000'>default</font>"<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'>default</font>"<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>get_option</font><font face='Lucida Console'>(</font>cr, "<font color='#CC0000'>block.subblock.opt</font>", "<font color='#CC0000'>default</font>"<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'>default</font>"<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>get_option</font><font face='Lucida Console'>(</font>cr, "<font color='#CC0000'>block.subblock.opt</font>", <font color='#979000'>2</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>get_option</font><font face='Lucida Console'>(</font>parser, "<font color='#CC0000'>opt</font>", <font color='#979000'>99</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>4</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>get_option</font><font face='Lucida Console'>(</font>parser, "<font color='#CC0000'>d</font>", "<font color='#CC0000'>stuff</font>"<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'>dude</font>"<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>get_option</font><font face='Lucida Console'>(</font>parser, "<font color='#CC0000'>a</font>", "<font color='#CC0000'>stuff</font>"<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'>stuff</font>"<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>get_option</font><font face='Lucida Console'>(</font>parser, "<font color='#CC0000'>a</font>", <font color='#979000'>99</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>99</font><font face='Lucida Console'>)</font>;
+
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>get_option</font><font face='Lucida Console'>(</font>parser, cr, "<font color='#CC0000'>d</font>", "<font color='#CC0000'>default</font>"<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'>dude</font>"<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>get_option</font><font face='Lucida Console'>(</font>cr, parser, "<font color='#CC0000'>d</font>", "<font color='#CC0000'>default</font>"<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'>dude</font>"<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>get_option</font><font face='Lucida Console'>(</font>parser, cr, "<font color='#CC0000'>a</font>", <font color='#979000'>2</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>50</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>get_option</font><font face='Lucida Console'>(</font>cr, parser, "<font color='#CC0000'>a</font>", <font color='#979000'>2</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>50</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>get_option</font><font face='Lucida Console'>(</font>parser, cr, "<font color='#CC0000'>opt</font>", <font color='#979000'>2</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>4</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>get_option</font><font face='Lucida Console'>(</font>cr, parser, "<font color='#CC0000'>opt</font>", <font color='#979000'>2</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>4</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>get_option</font><font face='Lucida Console'>(</font>parser, cr, "<font color='#CC0000'>b</font>", <font color='#979000'>2</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>get_option</font><font face='Lucida Console'>(</font>cr, parser, "<font color='#CC0000'>b</font>", <font color='#979000'>2</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>get_option</font><font face='Lucida Console'>(</font>parser, cr.<font color='#BB00BB'>block</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>block</font>"<font face='Lucida Console'>)</font>, "<font color='#CC0000'>a</font>", <font color='#979000'>2</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>6</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>get_option</font><font face='Lucida Console'>(</font>cr.<font color='#BB00BB'>block</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>block</font>"<font face='Lucida Console'>)</font>, parser, "<font color='#CC0000'>a</font>", <font color='#979000'>2</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>6</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+
+    <font color='#0000FF'>class</font> <b><a name='config_reader_tester'></a>config_reader_tester</b> : <font color='#0000FF'>public</font> tester
+    <b>{</b>
+        <font color='#009900'>/*!
+            WHAT THIS OBJECT REPRESENTS
+                This object represents a test for the config_reader object.  When it is constructed
+                it adds itself into the testing framework.  The command line switch is
+                specified as test_config_reader by passing that string to the tester constructor.
+        !*/</font>
+    <font color='#0000FF'>public</font>:
+        <b><a name='config_reader_tester'></a>config_reader_tester</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> :
+            tester <font face='Lucida Console'>(</font>"<font color='#CC0000'>test_config_reader</font>",
+                    "<font color='#CC0000'>Runs tests on the config_reader component.</font>"<font face='Lucida Console'>)</font>
+        <b>{</b><b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='perform_test'></a>perform_test</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>testing config_reader</font>";
+            <font color='#BB00BB'>print_spinner</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            config_reader_test<font color='#5555FF'>&lt;</font>config_reader<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+            dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>testing config_reader_thread_safe</font>";
+            <font color='#BB00BB'>print_spinner</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            config_reader_test<font color='#5555FF'>&lt;</font>config_reader_thread_safe<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+            dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>testing get_option()</font>";
+            <font color='#BB00BB'>print_spinner</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>test_get_option</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+    <b>}</b> a;
+
+<b>}</b>
+
+
+
+</pre></body></html>

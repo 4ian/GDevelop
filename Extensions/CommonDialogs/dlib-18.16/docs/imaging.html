@@ -1,0 +1,1003 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html xmlns:gcse="googleCustomSearch"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><link rel="shortcut icon" href="dlib-icon.ico"><meta name="verify-v1" content="02MiiaFNVzS5/u0eQhsy3/knioFHsia1X3DXRpHkE6I="><meta name="google-site-verification" content="DGSSJMKDomaDaDTIRJ8jDkv0YMx9Cz7OESbXHjjr6Jw"><title>dlib C++ Library
+   - Image Processing</title><script language="JavaScript">
+
+// ---------------------------------------------
+// --- Name:    Easy DHTML Treeview           --
+// --- Author:  D.D. de Kerf                  --
+// --- Version: 0.2          Date: 13-6-2001  --
+// ---------------------------------------------
+function Toggle(node)
+{
+   // Unfold the branch if it isn't visible
+   var next_node = node.nextSibling;
+   if (next_node.style.display == 'none')
+   {
+      // Change the image (if there is an image)
+      if (node.childNodes.length > 0)
+      {
+         if (node.childNodes.length > 0)
+         { 
+            if (node.childNodes.item(0).nodeName == "IMG")
+            {
+               node.childNodes.item(0).src = "minus.gif";
+            }
+         }
+      }
+
+      next_node.style.display = 'block';
+   }
+   // Collapse the branch if it IS visible
+   else
+   {
+      // Change the image (if there is an image)
+      if (node.childNodes.length > 0)
+      {
+         if (node.childNodes.length > 0)
+         { 
+            if (node.childNodes.item(0).nodeName == "IMG")
+            {
+               node.childNodes.item(0).src = "plus.gif";
+            }
+         }
+      }
+
+      next_node.style.display = 'none';
+   }
+
+}
+function BigToggle(node)
+{
+   // Unfold the branch if it isn't visible
+   var next_node = node.nextSibling;
+   if (next_node.style.display == 'none')
+   {
+      // Change the image (if there is an image)
+      if (node.childNodes.length > 0)
+      {
+         if (node.childNodes.length > 0)
+         { 
+            if (node.childNodes.item(0).nodeName == "IMG")
+            {
+               node.childNodes.item(0).src = "bigminus.gif";
+            }
+         }
+      }
+
+      next_node.style.display = 'block';
+   }
+   // Collapse the branch if it IS visible
+   else
+   {
+      // Change the image (if there is an image)
+      if (node.childNodes.length > 0)
+      {
+         if (node.childNodes.length > 0)
+         { 
+            if (node.childNodes.item(0).nodeName == "IMG")
+            {
+               node.childNodes.item(0).src = "bigplus.gif";
+            }
+         }
+      }
+
+      next_node.style.display = 'none';
+   }
+
+}
+</script><style type="text/css">
+   body {margin:0px;}
+   pre {margin:0px;}
+
+   ul.tree  li { list-style: none;  margin-left:10px;} 
+   ul.tree  { margin:0px; padding:0px; margin-left:5px; font-size:0.95em; }
+   ul.tree  li ul { margin-left:10px; padding:0px; }
+
+   li#term { list-style: none; }
+
+   div.component {
+      background-color:white; 
+      border: 2px solid rgb(102,102,102); 
+      text-align:left;
+      margin-top: 1.5em;
+      padding: 0.7em;
+   }
+
+   div.question {
+      background-color:white; 
+      border: 2px solid rgb(102,102,102); 
+      text-align:left;
+      margin-top: 1.5em;
+      margin-bottom: 90%;
+      padding: 0.7em;
+   }
+
+   div.function {
+      background-color:white; 
+      border: 2px solid rgb(102,102,255); 
+      text-align:left;
+      margin-top: 0.3em;
+      padding: 0.3em;
+   }
+
+   div.class {
+      background-color:white; 
+      border: 2px solid rgb(255,102,102); 
+      text-align:left;
+      margin-top: 0.3em;
+      padding: 0.3em;
+   }
+
+   div.extension {
+      background-color:#FDFDFD; 
+      border: 1px solid rgb(102,102,102); 
+      text-align:left;
+      margin-top: 1.0em;
+      padding: 0.7em;
+   }
+
+   div.logb {
+      text-align:left;
+      padding: 0.0em;
+      float: left;
+      background-color:#c0c0c0; 
+      border: double ; 
+      margin: 0.5em;
+   }
+
+   div.name {
+      float: left;
+   }
+   div.line1 {
+      float:left;
+      width:100%;
+      background-color:#dfdfdf; 
+   }
+   div.line2 {
+      float:left;
+      width:100%;
+   }
+   div.inc {
+      float: right;
+   }
+
+
+   .code_box
+   {
+      color: black;
+      margin: 1em 0.25in;
+      padding: 0.5em;
+      background: rgb(240,240,240);
+      border-top: black dotted 1px;
+      border-left: black dotted 1px;
+      border-right: black solid 2px;
+      border-bottom: black solid 2px;
+   }
+
+
+
+   .bdotted {border-bottom: 1px dotted}
+   .bdashed {border-bottom: 1px dashed}
+   .bsolid {border-bottom: 1px solid}
+   .bdouble {border-bottom: 1px double}
+   .bgroove {border-bottom: 1px groove}
+   .bridge {border-bottom: 1px ridge}
+   .binset {border-bottom: 1px inset}
+   .boutset {border-bottom: 1px outset}
+
+   div.row1 {
+      background-color:#dfdfdf; 
+   }
+   div.row2 {
+      background-color:#f2f2f2; 
+   }
+
+   div.typedefs {
+      margin-left: 1.5em;
+      margin-top: 0.2em;
+      border: 1px dotted;
+      width: 52em;
+   }
+
+   div.tdn {
+      width: 10em;
+   }
+
+   .fullhr {
+      clear: both;
+   }
+
+   body {
+      text-align: center;
+   }
+
+   div.entire_page_header {
+      width:62.5em;  
+      text-align: left;
+      margin-top: 0.4em;
+      margin-left: auto;
+      margin-right: auto;
+   }
+   div.entire_page {
+      width:62.5em;  
+      text-align: left;
+      margin-left: auto;
+      margin-right: auto;
+      clear:both;
+   }
+</style></head><body bgcolor="#EDF3EE"><a name="top"></a><div class="entire_page_header"><a href="http://dlib.net"><img src="dlib-logo.png"></a></div><div class="entire_page"><table bgcolor="white" height="100%" bordercolor="#EDF3EE" CELLSPACING="0" CELLPADDING="10" style="border:0px;margin-top:2px"><tr height="100%"><td BGCOLOR="#F5F5F5" style="padding:7px; border: 1px solid rgb(102,102,102);" VALIGN="TOP" height="100%"><br><table WIDTH="145" height="100%"><tr><td VALIGN="TOP"><b>The Library</b><ul class="tree"><li><a href="algorithms.html">Algorithms</a></li><li><a href="api.html">API Wrappers</a></li><li><a href="bayes.html">Bayesian Nets</a></li><li><a href="compression.html">Compression</a></li><li><a href="containers.html">Containers</a></li><li><a href="graph_tools.html">Graph Tools</a></li><li><a href="imaging.html">Image Processing</a></li><li><a href="linear_algebra.html">Linear Algebra</a></li><li><a href="ml.html">Machine Learning</a></li><li><a href="metaprogramming.html">Metaprogramming</a></li><li><a href="other.html">Miscellaneous</a></li><li><a href="network.html">Networking</a></li><li><a href="optimization.html">Optimization</a></li><li><a href="parsing.html">Parsing</a></li></ul><br><b>Help/Info</b><ul class="tree"><li><a onclick="Toggle(this)" style="cursor: pointer;margin-left:-9px"><img src="plus.gif"><font color="green"><u>Examples: C++</u></font></a><ul style="display:none;"><li><a href="3d_point_cloud_ex.cpp.html">3D_Point_Cloud</a></li><li><a href="assignment_learning_ex.cpp.html">Assignment_Learning</a></li><li><a href="file_to_code_ex.cpp.html">Base64_Encoder</a></li><li><a href="bayes_net_ex.cpp.html">Bayesian_Network</a></li><li><a href="bayes_net_from_disk_ex.cpp.html">Bayesian_Network_From_Disk</a></li><li><a href="bayes_net_gui_ex.cpp.html">Bayesian_Network_GUI</a></li><li><a href="bridge_ex.cpp.html">Bridge</a></li><li><a href="bsp_ex.cpp.html">BSP</a></li><li><a href="svm_c_ex.cpp.html">C-Support_Vector_Machine</a></li><li><a href="compress_stream_ex.cpp.html#_top">Cmd_Line_Parser</a></li><li><a href="compress_stream_ex.cpp.html">Compress_Stream</a></li><li><a href="config_reader_ex.cpp.html">Config_File_Reader</a></li><li><a href="custom_trainer_ex.cpp.html">Custom_Trainers</a></li><li><a href="dir_nav_ex.cpp.html">Directory_Navigation</a></li><li><a href="empirical_kernel_map_ex.cpp.html">Empirical_Kernel_Map</a></li><li><a href="face_detection_ex.cpp.html">Face_Detection</a></li><li><a href="face_landmark_detection_ex.cpp.html">Face_Landmark_Detection</a></li><li><a href="fhog_ex.cpp.html">FHOG_Feature_Extraction</a></li><li><a href="fhog_object_detector_ex.cpp.html">FHOG_Object_Detection</a></li><li><a href="graph_labeling_ex.cpp.html">Graph_Labeling</a></li><li><a href="gui_api_ex.cpp.html">GUI</a></li><li><a href="hough_transform_ex.cpp.html">Hough_Transform</a></li><li><a href="server_http_ex.cpp.html">HTTP_Server</a></li><li><a href="image_ex.cpp.html">Image</a></li><li><a href="iosockstream_ex.cpp.html">IO Socket Streams</a></li><li><a href="server_iostream_ex.cpp.html">IO Streams Server</a></li><li><a href="kcentroid_ex.cpp.html">Kernel_Centroid</a></li><li><a href="kkmeans_ex.cpp.html">Kernel_K-Means_Clustering</a></li><li><a href="krr_regression_ex.cpp.html">Kernel_Ridge_Regression</a></li><li><a href="krls_filter_ex.cpp.html">Kernel_RLS_Filtering</a></li><li><a href="krls_ex.cpp.html">Kernel_RLS_Regression</a></li><li><a href="krr_classification_ex.cpp.html">KRR_Classification</a></li><li><a href="learning_to_track_ex.cpp.html">Learning_to_Track</a></li><li><a href="max_cost_assignment_ex.cpp.html">Linear_Assignment_Problems</a></li><li><a href="linear_manifold_regularizer_ex.cpp.html">Linear_Manifold_Regularizer</a></li><li><a href="mpc_ex.cpp.html">Linear_Model_Predictive_Control</a></li><li><a href="logger_ex.cpp.html">Logger</a></li><li><a href="logger_ex_2.cpp.html">Logger_Advanced</a></li><li><a href="logger_custom_output_ex.cpp.html">Logger_Custom_Output</a></li><li><a href="matrix_ex.cpp.html">Matrix</a></li><li><a href="matrix_expressions_ex.cpp.html">Matrix_Expressions</a></li><li><a href="member_function_pointer_ex.cpp.html">Member_Function_Pointer</a></li><li><a href="model_selection_ex.cpp.html">Model_Selection</a></li><li><a href="multiclass_classification_ex.cpp.html">Multiclass_Classification</a></li><li><a href="multithreaded_object_ex.cpp.html">Multithreaded_Object</a></li><li><a href="mlp_ex.cpp.html">Neural_Network</a></li><li><a href="least_squares_ex.cpp.html">Non-Linear Least Squares</a></li><li><a href="svm_ex.cpp.html">Nu-Support_Vector_Machine</a></li><li><a href="integrate_function_adapt_simp_ex.cpp.html">Numerical_Integration</a></li><li><a href="object_detector_ex.cpp.html">Object_Detector</a></li><li><a href="object_detector_advanced_ex.cpp.html">Object_Detector_Advanced</a></li><li><a href="one_class_classifiers_ex.cpp.html">One_Class_Classifiers</a></li><li><a href="svm_pegasos_ex.cpp.html">Online_SVM</a></li><li><a href="optimization_ex.cpp.html">Optimization</a></li><li><a href="parallel_for_ex.cpp.html">Parallel_For_Loops</a></li><li><a href="pipe_ex.cpp.html">Pipe</a></li><li><a href="pipe_ex_2.cpp.html">Pipe_2</a></li><li><a href="quantum_computing_ex.cpp.html">Quantum_Computing</a></li><li><a href="queue_ex.cpp.html">Queue</a></li><li><a href="rank_features_ex.cpp.html">Rank_Features</a></li><li><a href="rvm_ex.cpp.html">Relevance_Vector_Classification</a></li><li><a href="rvm_regression_ex.cpp.html">Relevance_Vector_Regression</a></li><li><a href="running_stats_ex.cpp.html">Running_Stats</a></li><li><a href="sequence_labeler_ex.cpp.html">Sequence_Labeling</a></li><li><a href="sequence_segmenter_ex.cpp.html">Sequence_Segmentation</a></li><li><a href="sockets_ex.cpp.html">Sockets</a></li><li><a href="sockstreambuf_ex.cpp.html">Sockstreambuf</a></li><li><a href="svm_sparse_ex.cpp.html">Sparse_Vectors</a></li><li><a href="sqlite_ex.cpp.html">SQLite</a></li><li><a href="std_allocator_ex.cpp.html">Std_C++_Allocator</a></li><li><a href="svm_struct_ex.cpp.html">Structural_Support_Vector_Machines</a></li><li><a href="svr_ex.cpp.html">Support_Vector_Regression</a></li><li><a href="surf_ex.cpp.html">SURF</a></li><li><a href="svm_rank_ex.cpp.html">SVM-Rank</a></li><li><a href="threaded_object_ex.cpp.html">Threaded_Object</a></li><li><a href="threads_ex.cpp.html">Threads</a></li><li><a href="thread_function_ex.cpp.html">Thread_Function</a></li><li><a href="thread_pool_ex.cpp.html">Thread_Pool</a></li><li><a href="timer_ex.cpp.html">Timer</a></li><li><a href="train_object_detector.cpp.html">Train_Object_Detector</a></li><li><a href="train_shape_predictor_ex.cpp.html">Train_Shape_Predictor</a></li><li><a href="using_custom_kernels_ex.cpp.html">Using_Custom_Kernels</a></li><li><a href="video_tracking_ex.cpp.html">Video_Object_Tracking</a></li><li><a href="webcam_face_pose_ex.cpp.html">Webcam_Face_Pose_Estimation</a></li><li><a href="xml_parser_ex.cpp.html">XML_Parser</a></li></ul></li><li><a onclick="Toggle(this)" style="cursor: pointer;margin-left:-9px"><img src="plus.gif"><font color="green"><u>Examples: Python</u></font></a><ul style="display:none;"><li><a href="face_detector.py.html">Face_Detector</a></li><li><a href="face_landmark_detection.py.html">Face_Landmark_Detection</a></li><li><a href="find_candidate_object_locations.py.html">find_candidate_object_locations</a></li><li><a href="max_cost_assignment.py.html">Linear_Assignment_Problems</a></li><li><a href="sequence_segmenter.py.html">Sequence_Segmenter</a></li><li><a href="svm_struct.py.html">Structural_Support_Vector_Machines</a></li><li><a href="svm_rank.py.html">SVM-Rank</a></li><li><a href="train_object_detector.py.html">Train_Object_Detector</a></li><li><a href="train_shape_predictor.py.html">Train_Shape_Predictor</a></li><li><a href="correlation_tracker.py.html">Video_Object_Tracking</a></li></ul></li><li><a href="faq.html">FAQ</a></li><li><a href="index.html">Home</a></li><li><a href="compile.html">How to compile</a></li><li><a href="howto_contribute.html">How to contribute</a></li><li><a href="term_index.html">Index</a></li><li><a href="intro.html">Introduction</a></li><li><a href="license.html">License</a></li><li><a href="python/index.html">Python API</a></li><li><a href="books.html">Suggested Books</a></li></ul><br><b>Current Release</b><ul class="tree"><li><a href="change_log.html">Change Log</a></li><li><a href="release_notes.html">Release Notes</a></li><li>Version: 18.16</li></ul><br></td><td width="1"></td></tr><tr><td valign="bottom"><br><br><br><br><br><br><br><br><br>
+      Last Modified:<br>Jun 03, 2015<br><br></td></tr></table></td><td VALIGN="TOP" width="100%" style="border: 1px solid rgb(102,102,102);"><center><h1>Image Processing</h1></center><br><br><p>
+            This page documents the functionality present in this library that deals with the
+            management and manipulation of images.  One thing to note is that there is no 
+            explicit image object.  Instead, everything deals with <a href="containers.html#array2d">
+            array2d</a> objects that contain various kinds of pixels or user defined <a href="dlib/image_processing/generic_image.h.html">
+            generic image</a> objects.  
+         </p><p><a name="Pixel%20Types"></a><h2>Pixel Types</h2>
+            Most image handling routines in dlib will accept images containing any pixel type. 
+            This is made possible by defining a traits class, <a href="#pixel_traits">pixel_traits</a>, for 
+            each possible pixel type.  This traits class enables image processing routines to determine
+            how to handle each kind of pixel and therefore only pixels which have a pixel_traits definition
+            may be used.  The following list defines all the pixel types which come with pixel_traits definitions.  
+            <ul><li><b>RGB</b><ul> There are two RGB pixel types in dlib, <a href="#rgb_pixel">rgb_pixel</a> and <a href="#bgr_pixel">bgr_pixel</a>.  
+                  Each defines a 24bit RGB pixel type.  The bgr_pixel is identical to rgb_pixel except that it lays
+                  the color channels down in memory in BGR order rather than RGB order and is therefore useful
+                  for interfacing with other image processing tools which expect this format (e.g. <a href="#cv_image">OpenCV</a>). </ul></li><li><b>RGB Alpha</b><ul>The <a href="#rgb_alpha_pixel">rgb_alpha_pixel</a> is an 8bit per channel RGB pixel with an 8bit alpha channel.</ul></li><li><b>HSI</b><ul>The <a href="#hsi_pixel">hsi_pixel</a> is a 24bit pixel which represents a point in the Hue Saturation Intensity 
+                  (HSI) color space. </ul></li><li><b>Grayscale</b><ul>Any built in scalar type may be used as a grayscale pixel type.  For example, unsigned char, int, double, etc.</ul></li></ul></p><p><a name="Object%20Detection"></a><h2>Object Detection</h2>
+            If you want to create object detectors then try the 
+            <a href="#scan_fhog_pyramid">scan_fhog_pyramid</a> tool first.  It is quite
+            easy to use and train and will, in many cases, give excellent results.
+         </p></td><td BGCOLOR="#F5F5F5" style="padding:7px; border: 1px solid rgb(102,102,102);" VALIGN="TOP" height="100%"><br><table WIDTH="150" height="100%"><tr><td VALIGN="TOP"><b>Pixels</b><ul class="tree"><li><a href="#assign_pixel">assign_pixel</a></li><li><a href="#assign_pixel_intensity">assign_pixel_intensity</a></li><li><a href="#bgr_pixel">bgr_pixel</a></li><li><a href="#get_pixel_intensity">get_pixel_intensity</a></li><li><a href="#hsi_pixel">hsi_pixel</a></li><li><a href="#pixel_traits">pixel_traits</a></li><li><a href="#rgb_alpha_pixel">rgb_alpha_pixel</a></li><li><a href="#rgb_pixel">rgb_pixel</a></li></ul><br><b>Image I/O</b><ul class="tree"><li><a href="#jpeg_loader">jpeg_loader</a></li><li><a href="#load_bmp">load_bmp</a></li><li><a href="#load_dng">load_dng</a></li><li><a href="#load_image">load_image</a></li><li><a href="#load_jpeg">load_jpeg</a></li><li><a href="#load_png">load_png</a></li><li><a href="#png_loader">png_loader</a></li><li><a href="#save_bmp">save_bmp</a></li><li><a href="#save_dng">save_dng</a></li><li><a href="#save_jpeg">save_jpeg</a></li><li><a href="#save_png">save_png</a></li></ul><br><b>Object Detection</b><ul class="tree"><li><a href="#correlation_tracker">correlation_tracker</a></li><li><a href="#evaluate_detectors">evaluate_detectors</a></li><li><a href="#find_candidate_object_locations">find_candidate_object_locations</a></li><li><a href="#find_points_above_thresh">find_points_above_thresh</a></li><li><a href="#full_object_detection">full_object_detection</a></li><li><a href="#get_frontal_face_detector">get_frontal_face_detector</a></li><li><a href="#object_detector">object_detector</a></li><li><a href="#remove_unobtainable_rectangles">remove_unobtainable_rectangles</a></li><li><a onclick="Toggle(this)" style="cursor: pointer;margin-left:-9px"><img src="plus.gif"><font color="green"><u>Scan Image Pyramid Tools</u></font></a><ul style="display:none;"><li><a href="#compute_box_dimensions">compute_box_dimensions</a></li><li><a href="#create_grid_detection_template">create_grid_detection_template</a></li><li><a href="#create_overlapped_2x2_detection_template">create_overlapped_2x2_detection_template</a></li><li><a href="#create_single_box_detection_template">create_single_box_detection_template</a></li><li><a href="#determine_object_boxes">determine_object_boxes</a></li><li><a href="#setup_grid_detection_templates">setup_grid_detection_templates</a></li><li><a href="#setup_grid_detection_templates_verbose">setup_grid_detection_templates_verbose</a></li></ul></li><li><a href="#scan_fhog_pyramid">scan_fhog_pyramid</a></li><li><a href="#scan_image">scan_image</a></li><li><a href="#scan_image_boxes">scan_image_boxes</a></li><li><a href="#scan_image_custom">scan_image_custom</a></li><li><a href="#scan_image_movable_parts">scan_image_movable_parts</a></li><li><a href="#scan_image_pyramid">scan_image_pyramid</a></li><li><a href="#setup_hashed_features">setup_hashed_features</a></li><li><a href="#test_box_overlap">test_box_overlap</a></li></ul><br><b>Feature Extraction</b><ul class="tree"><li><a href="#binned_vector_feature_image">binned_vector_feature_image</a></li><li><a href="#extract_fhog_features">extract_fhog_features</a></li><li><a href="#extract_highdim_face_lbp_descriptors">extract_highdim_face_lbp_descriptors</a></li><li><a href="#extract_histogram_descriptors">extract_histogram_descriptors</a></li><li><a href="#extract_uniform_lbp_descriptors">extract_uniform_lbp_descriptors</a></li><li><a href="#fine_hog_image">fine_hog_image</a></li><li><a href="#get_surf_points">get_surf_points</a></li><li><a href="#hashed_feature_image">hashed_feature_image</a></li><li><a href="#hog_image">hog_image</a></li><li><a href="#make_uniform_lbp_image">make_uniform_lbp_image</a></li><li><a href="#nearest_neighbor_feature_image">nearest_neighbor_feature_image</a></li><li><a href="#poly_image">poly_image</a></li><li><a href="#randomly_sample_image_features">randomly_sample_image_features</a></li><li><a href="#shape_predictor">shape_predictor</a></li><li><a onclick="Toggle(this)" style="cursor: pointer;margin-left:-9px"><img src="plus.gif"><font color="green"><u>SURF Tools</u></font></a><ul style="display:none;"><li><a href="#compute_dominant_angle">compute_dominant_angle</a></li><li><a href="#compute_surf_descriptor">compute_surf_descriptor</a></li><li><a href="#draw_surf_points">draw_surf_points</a></li><li><a href="#get_interest_points">get_interest_points</a></li><li><a href="#haar_x">haar_x</a></li><li><a href="#haar_y">haar_y</a></li><li><a href="#hessian_pyramid">hessian_pyramid</a></li><li><a href="#interest_point">interest_point</a></li><li><a href="#surf_point">surf_point</a></li></ul></li></ul><br><b>Edges and Thresholds</b><ul class="tree"><li><a href="#auto_threshold_image">auto_threshold_image</a></li><li><a href="#edge_orientation">edge_orientation</a></li><li><a href="#hough_transform">hough_transform</a></li><li><a href="#hysteresis_threshold">hysteresis_threshold</a></li><li><a href="#sobel_edge_detector">sobel_edge_detector</a></li><li><a href="#suppress_non_maximum_edges">suppress_non_maximum_edges</a></li><li><a href="#threshold_image">threshold_image</a></li></ul><br><b>Morphology</b><ul class="tree"><li><a href="#binary_close">binary_close</a></li><li><a href="#binary_complement">binary_complement</a></li><li><a href="#binary_difference">binary_difference</a></li><li><a href="#binary_dilation">binary_dilation</a></li><li><a href="#binary_erosion">binary_erosion</a></li><li><a href="#binary_intersection">binary_intersection</a></li><li><a href="#binary_open">binary_open</a></li><li><a href="#binary_union">binary_union</a></li><li><a href="#label_connected_blobs">label_connected_blobs</a></li><li><a href="#segment_image">segment_image</a></li><li><a href="#skeleton">skeleton</a></li></ul><br><b>Filtering</b><ul class="tree"><li><a href="#float_spatially_filter_image_separable">float_spatially_filter_image_separable</a></li><li><a href="#gaussian_blur">gaussian_blur</a></li><li><a href="#max_filter">max_filter</a></li><li><a href="#separable_3x3_filter_block_grayscale">separable_3x3_filter_block_grayscale</a></li><li><a href="#separable_3x3_filter_block_rgb">separable_3x3_filter_block_rgb</a></li><li><a href="#spatially_filter_image">spatially_filter_image</a></li><li><a href="#spatially_filter_image_separable">spatially_filter_image_separable</a></li><li><a href="#spatially_filter_image_separable_down">spatially_filter_image_separable_down</a></li><li><a href="#sum_filter">sum_filter</a></li><li><a href="#sum_filter_assign">sum_filter_assign</a></li></ul><br><b>Scaling and Rotating</b><ul class="tree"><li><a href="#add_image_left_right_flips">add_image_left_right_flips</a></li><li><a href="#add_image_rotations">add_image_rotations</a></li><li><a href="#extract_image_chips">extract_image_chips</a></li><li><a href="#flip_image_dataset_left_right">flip_image_dataset_left_right</a></li><li><a href="#flip_image_left_right">flip_image_left_right</a></li><li><a href="#flip_image_up_down">flip_image_up_down</a></li><li><a href="#interpolate_bilinear">interpolate_bilinear</a></li><li><a href="#interpolate_nearest_neighbor">interpolate_nearest_neighbor</a></li><li><a href="#interpolate_quadratic">interpolate_quadratic</a></li><li><a href="#pyramid_disable">pyramid_disable</a></li><li><a href="#pyramid_down">pyramid_down</a></li><li><a href="#pyramid_up">pyramid_up</a></li><li><a href="#resize_image">resize_image</a></li><li><a href="#rotate_image">rotate_image</a></li><li><a href="#rotate_image_dataset">rotate_image_dataset</a></li><li><a href="#sub_image">sub_image</a></li><li><a href="#transform_image">transform_image</a></li><li><a href="#upsample_image_dataset">upsample_image_dataset</a></li></ul><br><b>Visualization</b><ul class="tree"><li><a href="#draw_fhog">draw_fhog</a></li><li><a href="#draw_line">draw_line</a></li><li><a href="#draw_rectangle">draw_rectangle</a></li><li><a href="#draw_solid_circle">draw_solid_circle</a></li><li><a href="#draw_surf_points">draw_surf_points</a></li><li><a href="#fill_rect">fill_rect</a></li><li><a href="#heatmap">heatmap</a></li><li><a href="#jet">jet</a></li><li><a href="#randomly_color_image">randomly_color_image</a></li><li><a href="#render_face_detections">render_face_detections</a></li><li><a href="#tile_images">tile_images</a></li></ul><br><b>Miscellaneous</b><ul class="tree"><li><a href="#assign_all_pixels">assign_all_pixels</a></li><li><a href="#assign_border_pixels">assign_border_pixels</a></li><li><a href="#assign_image">assign_image</a></li><li><a href="#assign_image_scaled">assign_image_scaled</a></li><li><a href="#cv_image">cv_image</a></li><li><a href="#equalize_histogram">equalize_histogram</a></li><li><a href="#get_histogram">get_histogram</a></li><li><a href="#integral_image">integral_image</a></li><li><a href="#integral_image_generic">integral_image_generic</a></li><li><a href="#toMat">toMat</a></li><li><a href="#zero_border_pixels">zero_border_pixels</a></li></ul><br></td><td width="1"></td></tr><tr><td valign="bottom"></td></tr></table></td></tr></table><a name="add_image_left_right_flips"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">add_image_left_right_flips</h1><BR><BR>        
+            This routine takes a set of images and bounding boxes within those
+            images and doubles the size of the dataset by adding left/right
+            flipped copies of each image as well as the corresponding bounding
+            boxes.  Therefore, this function is useful if you are training and
+            object detector and your objects have a left/right symmetry.  
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/image_transforms.h&gt;</tt></font></B><BR><b><a href="dlib/image_transforms/interpolation_abstract.h.html#add_image_left_right_flips"><font style="font-size:1.4em">Detailed Documentation</font></a></b><BR>C++ Example Programs: <a href="fhog_object_detector_ex.cpp.html">fhog_object_detector_ex.cpp</a><br><br><center></center></div></a><a name="add_image_rotations"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">add_image_rotations</h1><BR><BR>        
+            This routine takes a set of images and bounding boxes within those images and
+            grows the dataset by computing many different rotations of each image.  It will
+            also adjust the positions of the bounding boxes so that they still fall on the
+            same objects in each rotated image.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/image_transforms.h&gt;</tt></font></B><BR><b><a href="dlib/image_transforms/interpolation_abstract.h.html#add_image_rotations"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="assign_all_pixels"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">assign_all_pixels</h1><BR><BR>        
+            This global function assigns all the pixels in an image a specific value.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/image_transforms.h&gt;</tt></font></B><BR><b><a href="dlib/image_transforms/assign_image_abstract.h.html#assign_all_pixels"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="assign_border_pixels"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">assign_border_pixels</h1><BR><BR>        
+            This global function assigns all the pixels in the border of an image to 
+            a specific value.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/image_transforms.h&gt;</tt></font></B><BR><b><a href="dlib/image_transforms/assign_image_abstract.h.html#assign_border_pixels"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="assign_image"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">assign_image</h1><BR><BR>        
+            This global function copies one image into another and performs any
+            necessary color space conversions to make it work right. 
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/image_transforms.h&gt;</tt></font></B><BR><b><a href="dlib/image_transforms/assign_image_abstract.h.html#assign_image"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="assign_image_scaled"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">assign_image_scaled</h1><BR><BR>        
+            This global function copies one image into another and performs any
+            necessary color space conversions to make it work right.  Additionally,
+            if the dynamic range of the source image is too big to fit into the destination image
+            then it will attempt to perform the appropriate scaling.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/image_transforms.h&gt;</tt></font></B><BR><b><a href="dlib/image_transforms/assign_image_abstract.h.html#assign_image_scaled"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="assign_pixel"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">assign_pixel</h1><BR><BR>
+            assign_pixel() is a templated function that can assign any pixel type to another pixel type.
+            It will perform whatever conversion is necessary to make the assignment work.  (E.g. color to 
+            grayscale conversion)
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/pixel.h&gt;</tt></font></B><BR><b><a href="dlib/pixel.h.html#assign_pixel"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="assign_pixel_intensity"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">assign_pixel_intensity</h1><BR><BR>
+            assign_pixel_intensity() is a templated function that can change the
+            intensity of a pixel.  So if the pixel in question is a grayscale pixel
+            then it simply assigns that pixel the given value.  However, if the
+            pixel is not a grayscale pixel then it converts the pixel to the
+            HSI color space and sets the I channel to the given intensity
+            and then converts this HSI value back to the original pixel's 
+            color space.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/pixel.h&gt;</tt></font></B><BR><b><a href="dlib/pixel.h.html#assign_pixel_intensity"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="auto_threshold_image"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">auto_threshold_image</h1><BR><BR>        
+            This global function performs a simple binary thresholding on an image.  
+            Instead of taking a user supplied threshold
+            it computes one from the image using k-means clustering.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/image_transforms.h&gt;</tt></font></B><BR><b><a href="dlib/image_transforms/thresholding_abstract.h.html#auto_threshold_image"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="bgr_pixel"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">bgr_pixel</h1><BR><BR>
+            This is a simple struct that represents a BGR colored graphical pixel.  
+            <p>
+            The difference between this object and the <a href="#rgb_pixel">rgb_pixel</a>
+            is just that this struct lays its pixels down in memory in BGR order rather
+            than RGB order.  You only care about this if you are doing something like
+            using the <a href="#cv_image">cv_image</a> object to map an OpenCV image
+            into a more object oriented form.
+            </p><BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/pixel.h&gt;</tt></font></B><BR><b><a href="dlib/pixel.h.html#bgr_pixel"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="binary_close"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">binary_close</h1><BR><BR>        
+            This global function performs a morphological closing on an image. 
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/image_transforms.h&gt;</tt></font></B><BR><b><a href="dlib/image_transforms/morphological_operations_abstract.h.html#binary_close"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="binary_complement"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">binary_complement</h1><BR><BR>        
+            This global function computes the complement of a binary image. 
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/image_transforms.h&gt;</tt></font></B><BR><b><a href="dlib/image_transforms/morphological_operations_abstract.h.html#binary_complement"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="binary_difference"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">binary_difference</h1><BR><BR>        
+            This global function computes the difference of two binary images. 
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/image_transforms.h&gt;</tt></font></B><BR><b><a href="dlib/image_transforms/morphological_operations_abstract.h.html#binary_difference"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="binary_dilation"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">binary_dilation</h1><BR><BR>        
+            This global function performs the morphological operation of dilation on an image. 
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/image_transforms.h&gt;</tt></font></B><BR><b><a href="dlib/image_transforms/morphological_operations_abstract.h.html#binary_dilation"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="binary_erosion"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">binary_erosion</h1><BR><BR>        
+            This global function performs the morphological operation of erosion on an image. 
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/image_transforms.h&gt;</tt></font></B><BR><b><a href="dlib/image_transforms/morphological_operations_abstract.h.html#binary_erosion"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="binary_intersection"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">binary_intersection</h1><BR><BR>        
+            This global function computes the intersection of two binary images. 
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/image_transforms.h&gt;</tt></font></B><BR><b><a href="dlib/image_transforms/morphological_operations_abstract.h.html#binary_intersection"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="binary_open"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">binary_open</h1><BR><BR>        
+            This global function performs a morphological opening on an image. 
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/image_transforms.h&gt;</tt></font></B><BR><b><a href="dlib/image_transforms/morphological_operations_abstract.h.html#binary_open"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="binary_union"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">binary_union</h1><BR><BR>        
+            This global function computes the union of two binary images. 
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/image_transforms.h&gt;</tt></font></B><BR><b><a href="dlib/image_transforms/morphological_operations_abstract.h.html#binary_union"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="binned_vector_feature_image"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">binned_vector_feature_image</h1><BR><BR>
+                This object is a tool for performing image feature extraction.  In
+                particular, it wraps another image feature extractor and converts the
+                wrapped image feature vectors into a high dimensional sparse vector.  For
+                example, if the lower level feature extractor outputs the vector [3,4,5]
+                and this vector is hashed into the second bin of four bins then the output
+                sparse vector is:
+                <blockquote>
+                    [0,0,0,0, 3,4,5,1, 0,0,0,0, 0,0,0,0]. 
+                </blockquote>
+                That is, the output vector has a dimensionality that is equal to the number
+                of hash bins times the dimensionality of the lower level vector plus one.
+                The value in the extra dimension concatenated onto the end of the vector is
+                always a constant value of of 1 and serves as a bias value.  This means
+                that, if there are N hash bins, these vectors are capable of representing N
+                different linear functions, each operating on the vectors that fall into
+                their corresponding hash bin.
+
+               <br><br>
+                The following feature extractors can be wrapped by the binned_vector_feature_image:
+               <ul style="margin-top:0em"><li><a href="#hog_image">hog_image</a></li><li><a href="#fine_hog_image">fine_hog_image</a></li><li><a href="#poly_image">poly_image</a></li></ul><BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/image_keypoint.h&gt;</tt></font></B><BR><b><a href="dlib/image_keypoint/binned_vector_feature_image_abstract.h.html#binned_vector_feature_image"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="compute_box_dimensions"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">compute_box_dimensions</h1><BR><BR>        
+            This function is a tool for computing a rectangle with a particular 
+            width/height ratio and area.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/image_processing.h&gt;</tt></font></B><BR><b><a href="dlib/image_processing/detection_template_tools_abstract.h.html#compute_box_dimensions"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="compute_dominant_angle"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">compute_dominant_angle</h1><BR><BR>
+            Computes and returns the dominant angle (i.e. the angle of the dominant gradient)
+            at a given point and scale in an image.   This function is part of the
+            main processing of the SURF algorithm.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/image_keypoint.h&gt;</tt></font></B><BR><b><a href="dlib/image_keypoint/surf_abstract.h.html#compute_dominant_angle"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="compute_surf_descriptor"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">compute_surf_descriptor</h1><BR><BR>
+            Computes the 64 dimensional SURF descriptor vector of a box centered
+              at a given center point, tilted at a given angle, and sized according to 
+              a given scale.  
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/image_keypoint.h&gt;</tt></font></B><BR><b><a href="dlib/image_keypoint/surf_abstract.h.html#compute_surf_descriptor"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="correlation_tracker"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">correlation_tracker</h1><BR><BR>        
+                This is a tool for tracking moving objects in a video stream.  You give it
+                the bounding box of an object in the first frame and it attempts to track the
+                object in the box from frame to frame.  
+
+                <p>
+                  This tool is an implementation of the method described in the following paper:
+                  <blockquote>
+                     Danelljan, Martin, et al. "Accurate scale estimation for robust visual
+                     tracking." Proceedings of the British Machine Vision Conference BMVC. 2014.
+                  </blockquote></p><BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/image_processing.h&gt;</tt></font></B><BR><b><a href="dlib/image_processing/correlation_tracker_abstract.h.html#correlation_tracker"><font style="font-size:1.4em">Detailed Documentation</font></a></b><BR>C++ Example Programs: <a href="video_tracking_ex.cpp.html">video_tracking_ex.cpp</a><BR>Python Example Programs: <a href="correlation_tracker.py.html">correlation_tracker.py</a><br><br><center></center></div></a><a name="create_grid_detection_template"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">create_grid_detection_template</h1><BR><BR>        
+            This function is a tool for creating a detection template usable by 
+            the <a href="#scan_image_pyramid">scan_image_pyramid</a> object.  This
+            particular function creates a detection template with a grid of feature
+            extraction regions.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/image_processing.h&gt;</tt></font></B><BR><b><a href="dlib/image_processing/detection_template_tools_abstract.h.html#create_grid_detection_template"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="create_overlapped_2x2_detection_template"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">create_overlapped_2x2_detection_template</h1><BR><BR>        
+            This function is a tool for creating a detection template usable by 
+            the <a href="#scan_image_pyramid">scan_image_pyramid</a> object.  This
+            particular function creates a detection template with four overlapping feature
+            extraction regions.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/image_processing.h&gt;</tt></font></B><BR><b><a href="dlib/image_processing/detection_template_tools_abstract.h.html#create_overlapped_2x2_detection_template"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="create_single_box_detection_template"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">create_single_box_detection_template</h1><BR><BR>        
+            This function is a tool for creating a detection template usable by 
+            the <a href="#scan_image_pyramid">scan_image_pyramid</a> object.  This
+            particular function creates a detection template with exactly one feature
+            extraction region.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/image_processing.h&gt;</tt></font></B><BR><b><a href="dlib/image_processing/detection_template_tools_abstract.h.html#create_single_box_detection_template"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="cv_image"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">cv_image</h1><BR><BR>
+                This object is meant to be used as a simple wrapper around the OpenCV
+                IplImage struct or Mat object.  Using this class template you can turn
+                an OpenCV image into something that looks like a normal dlib style 
+                image object.
+
+               <p>
+                So you should be able to use cv_image objects with many of the image
+                processing functions in dlib as well as the GUI tools for displaying
+                images on the screen.
+               </p><p>
+                  Note that you can do the reverse conversion, from dlib to OpenCV,
+                  using the <a href="#toMat">toMat</a> routine.  
+               </p><BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/opencv.h&gt;</tt></font></B><BR><b><a href="dlib/opencv/cv_image_abstract.h.html#cv_image"><font style="font-size:1.4em">Detailed Documentation</font></a></b><BR>C++ Example Programs: <a href="webcam_face_pose_ex.cpp.html">webcam_face_pose_ex.cpp</a><br><br><center></center></div></a><a name="determine_object_boxes"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">determine_object_boxes</h1><BR><BR>        
+            The <a href="#scan_image_pyramid">scan_image_pyramid</a> object represents a sliding
+            window classifier system.  For it to work correctly it needs to be given a set of
+            object boxes which define the size and shape of each sliding window and these windows
+            need to be able to match the sizes and shapes of targets the user wishes to detect.
+            Therefore, the determine_object_boxes() routine is a tool for computing a set of object boxes
+            which can meet this requirement.
+
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/image_processing.h&gt;</tt></font></B><BR><b><a href="dlib/image_processing/scan_image_pyramid_tools_abstract.h.html#determine_object_boxes"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="draw_fhog"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">draw_fhog</h1><BR><BR>        
+            This function takes a FHOG feature map which was created by 
+            <a href="#extract_fhog_features">extract_fhog_features</a> and
+              converts it into an image suitable for display on the screen.  In
+              particular, we draw all the hog cells into a grayscale image in a
+              way that shows the magnitude and orientation of the gradient
+              energy in each cell.  
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/image_transforms.h&gt;</tt></font></B><BR><b><a href="dlib/image_transforms/fhog_abstract.h.html#draw_fhog"><font style="font-size:1.4em">Detailed Documentation</font></a></b><BR>C++ Example Programs: <a href="fhog_ex.cpp.html">fhog_ex.cpp</a>,
+               <a href="fhog_object_detector_ex.cpp.html">fhog_object_detector_ex.cpp</a><br><br><center></center></div></a><a name="draw_line"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">draw_line</h1><BR><BR>        
+            This global function draws a line on an image.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/image_transforms.h&gt;</tt></font></B><BR><b><a href="dlib/image_transforms/draw_abstract.h.html#draw_line"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="draw_rectangle"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">draw_rectangle</h1><BR><BR>        
+            This global function draws a rectangle on an image.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/image_transforms.h&gt;</tt></font></B><BR><b><a href="dlib/image_transforms/draw_abstract.h.html#draw_rectangle"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="draw_solid_circle"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">draw_solid_circle</h1><BR><BR>        
+            This global function draws a solid circle on an image.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/image_transforms.h&gt;</tt></font></B><BR><b><a href="dlib/image_transforms/draw_abstract.h.html#draw_solid_circle"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="draw_surf_points"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">draw_surf_points</h1><BR><BR>
+            This routine adds a bunch of <a href="#surf_point">surf_point</a> objects onto
+            an <a href="dlib/gui_widgets/widgets_abstract.h.html#image_window">image_window</a>
+            object so they can be visualized.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/image_keypoint/draw_surf_points.h&gt;</tt></font></B><BR><b><a href="dlib/image_keypoint/draw_surf_points_abstract.h.html#draw_surf_points"><font style="font-size:1.4em">Detailed Documentation</font></a></b><BR>C++ Example Programs: <a href="surf_ex.cpp.html">surf_ex.cpp</a><br><br><center></center></div></a><a name="edge_orientation"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">edge_orientation</h1><BR><BR>        
+            This global function takes horizontal and vertical gradient magnitude
+            values and returns the orientation of the gradient. 
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/image_transforms.h&gt;</tt></font></B><BR><b><a href="dlib/image_transforms/edge_detector_abstract.h.html#edge_orientation"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="equalize_histogram"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">equalize_histogram</h1><BR><BR>        
+            This global function performs histogram equalization on an image. 
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/image_transforms.h&gt;</tt></font></B><BR><b><a href="dlib/image_transforms/equalize_histogram_abstract.h.html#equalize_histogram"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="evaluate_detectors"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">evaluate_detectors</h1><BR><BR>        
+            This function allows you to efficiently run a bunch of
+            <a href="#scan_fhog_pyramid">scan_fhog_pyramid</a> based 
+            <a href="#object_detector">object_detectors</a>
+            over an image.  Importantly, this function is faster than running
+            each detector individually because it computes the HOG features
+            only once and then reuses them for each detector.  
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/image_processing.h&gt;</tt></font></B><BR><b><a href="dlib/image_processing/scan_fhog_pyramid_abstract.h.html#evaluate_detectors"><font style="font-size:1.4em">Detailed Documentation</font></a></b><BR>C++ Example Programs: <a href="fhog_object_detector_ex.cpp.html">fhog_object_detector_ex.cpp</a><br><br><center></center></div></a><a name="extract_fhog_features"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">extract_fhog_features</h1><BR><BR>
+              This function implements the HOG feature extraction method described in 
+              the paper:
+                <blockquote>
+                  Object Detection with Discriminatively Trained Part Based Models by
+                  P. Felzenszwalb, R. Girshick, D. McAllester, D. Ramanan
+                  in IEEE Transactions on Pattern Analysis and Machine Intelligence, Vol. 32, No. 9, Sep. 2010
+                </blockquote>
+              This means that it takes an input image and outputs Felzenszwalb's
+              31 dimensional version of HOG features.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/image_transforms.h&gt;</tt></font></B><BR><b><a href="dlib/image_transforms/fhog_abstract.h.html#extract_fhog_features"><font style="font-size:1.4em">Detailed Documentation</font></a></b><BR>C++ Example Programs: <a href="fhog_ex.cpp.html">fhog_ex.cpp</a><br><br><center></center></div></a><a name="extract_highdim_face_lbp_descriptors"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">extract_highdim_face_lbp_descriptors</h1><BR><BR>
+              This function extracts the high-dimensional LBP feature described in the
+              paper:
+              <blockquote>
+                Blessing of Dimensionality: High-dimensional Feature and Its Efficient
+                Compression for Face Verification by Dong Chen, Xudong Cao, Fang Wen, and
+                Jian Sun
+              </blockquote><BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/image_transforms.h&gt;</tt></font></B><BR><b><a href="dlib/image_transforms/lbp_abstract.h.html#extract_highdim_face_lbp_descriptors"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="extract_histogram_descriptors"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">extract_histogram_descriptors</h1><BR><BR>
+              This function extracts histograms of pixel values from a set of windows in an
+              image and returns the histograms.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/image_transforms.h&gt;</tt></font></B><BR><b><a href="dlib/image_transforms/lbp_abstract.h.html#extract_histogram_descriptors"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="extract_image_chips"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">extract_image_chips</h1><BR><BR>        
+              This function extracts "chips" from an image.  That is, it takes a list of
+              rectangular sub-windows (i.e. chips) within an image and extracts those
+              sub-windows, storing each into its own image.  It also allows the user to
+              specify the scale and rotation for the chip.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/image_transforms.h&gt;</tt></font></B><BR><b><a href="dlib/image_transforms/interpolation_abstract.h.html#extract_image_chips"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="extract_uniform_lbp_descriptors"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">extract_uniform_lbp_descriptors</h1><BR><BR>
+              Extracts histograms of uniform local-binary-patterns from an image.  The
+              histograms are from densely tiled windows that do not overlap and cover all
+              of the image.
+              We use the idea of uniform LBPs from the paper: 
+              <blockquote>
+                Face Description with Local Binary Patterns: Application to Face Recognition
+                by Ahonen, Hadid, and Pietikainen.
+              </blockquote><BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/image_transforms.h&gt;</tt></font></B><BR><b><a href="dlib/image_transforms/lbp_abstract.h.html#extract_uniform_lbp_descriptors"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="fill_rect"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">fill_rect</h1><BR><BR>        
+            This global function draws a solid rectangle on an image.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/image_transforms.h&gt;</tt></font></B><BR><b><a href="dlib/image_transforms/draw_abstract.h.html#fill_rect"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="find_candidate_object_locations"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">find_candidate_object_locations</h1><BR><BR>        
+              This function takes an input image and generates a set of candidate
+              rectangles which are expected to bound any objects in the image.  It does
+              this by running a version of the <a href="#segment_image">segment_image</a> routine on the image and
+              then reports rectangles containing each of the segments as well as rectangles
+              containing unions of adjacent segments.  The basic idea is described in the
+              paper: 
+              <blockquote>
+                  Segmentation as Selective Search for Object Recognition by Koen E. A. van de Sande, et al.
+              </blockquote>
+              Note that this function deviates from what is described in the paper slightly. 
+              See the code for details.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/image_transforms.h&gt;</tt></font></B><BR><b><a href="dlib/image_transforms/segment_image_abstract.h.html#find_candidate_object_locations"><font style="font-size:1.4em">Detailed Documentation</font></a></b><BR>Python Example Programs: <a href="find_candidate_object_locations.py.html">find_candidate_object_locations.py</a><br><br><center></center></div></a><a name="find_points_above_thresh"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">find_points_above_thresh</h1><BR><BR>        
+            This routine finds all points in an image with a pixel value above a
+            threshold.  It also has the ability to produce an efficient random
+            subsample of such points if the number of them is very large.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/image_processing.h&gt;</tt></font></B><BR><b><a href="dlib/image_processing/scan_image_abstract.h.html#find_points_above_thresh"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="fine_hog_image"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">fine_hog_image</h1><BR><BR>
+            This object is a version of the <a href="#hog_image">hog_image</a> that 
+            allows you to extract HOG features at a finer resolution.  
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/image_keypoint.h&gt;</tt></font></B><BR><b><a href="dlib/image_keypoint/fine_hog_image_abstract.h.html#fine_hog_image"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="flip_image_dataset_left_right"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">flip_image_dataset_left_right</h1><BR><BR>        
+            This routine takes a set of images and bounding boxes within those images and
+            mirrors the entire dataset left to right.  This means that all images are
+            flipped left to right and the bounding boxes are adjusted so that they still
+            sit on top of the same visual objects in the new flipped images.  
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/image_transforms.h&gt;</tt></font></B><BR><b><a href="dlib/image_transforms/interpolation_abstract.h.html#flip_image_dataset_left_right"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="flip_image_left_right"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">flip_image_left_right</h1><BR><BR>        
+            This is a routine which can flip an image from left to right. (e.g. as 
+            if viewed through a mirror).
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/image_transforms.h&gt;</tt></font></B><BR><b><a href="dlib/image_transforms/interpolation_abstract.h.html#flip_image_left_right"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="flip_image_up_down"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">flip_image_up_down</h1><BR><BR>        
+            This routine flips an image upside down.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/image_transforms.h&gt;</tt></font></B><BR><b><a href="dlib/image_transforms/interpolation_abstract.h.html#flip_image_up_down"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="float_spatially_filter_image_separable"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">float_spatially_filter_image_separable</h1><BR><BR>        
+            This global function performs spatial filtering on an image with a user
+            supplied separable filter.  It is optimized to work only on float valued 
+            images with float valued filters. 
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/image_transforms.h&gt;</tt></font></B><BR><b><a href="dlib/image_transforms/spatial_filtering_abstract.h.html#float_spatially_filter_image_separable"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="full_object_detection"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">full_object_detection</h1><BR><BR>        
+                This object represents the location of an object in an image along with the
+                positions of each of its constituent parts.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/image_processing.h&gt;</tt></font></B><BR><b><a href="dlib/image_processing/full_object_detection_abstract.h.html#full_object_detection"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="gaussian_blur"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">gaussian_blur</h1><BR><BR>        
+            This global function blurs an image by convolving it with a Gaussian filter.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/image_transforms.h&gt;</tt></font></B><BR><b><a href="dlib/image_transforms/spatial_filtering_abstract.h.html#gaussian_blur"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="get_frontal_face_detector"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">get_frontal_face_detector</h1><BR><BR>        
+            This function returns an <a href="#object_detector">object_detector</a> that is
+            configured to find human faces that are looking more or less towards the camera.  
+            It is created using the <a href="#scan_fhog_pyramid">scan_fhog_pyramid</a>
+            object.  
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/image_processing/frontal_face_detector.h&gt;</tt></font></B><BR><b><a href="dlib/image_processing/frontal_face_detector_abstract.h.html#get_frontal_face_detector"><font style="font-size:1.4em">Detailed Documentation</font></a></b><BR>C++ Example Programs: <a href="face_detection_ex.cpp.html">face_detection_ex.cpp</a>,
+               <a href="webcam_face_pose_ex.cpp.html">webcam_face_pose_ex.cpp</a><BR>Python Example Programs: <a href="face_detector.py.html">face_detector.py</a>,
+               <br><br><center></center></div></a><a name="get_histogram"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">get_histogram</h1><BR><BR>        
+            This global function computes an image's histogram and returns it in the
+            form of a column or row <a href="linear_algebra.html#matrix">matrix</a> object.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/image_transforms.h&gt;</tt></font></B><BR><b><a href="dlib/image_transforms/equalize_histogram_abstract.h.html#get_histogram"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="get_interest_points"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">get_interest_points</h1><BR><BR>
+            This function extracts interest points from a <a href="#hessian_pyramid">hessian_pyramid</a>.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/image_keypoint.h&gt;</tt></font></B><BR><b><a href="dlib/image_keypoint/hessian_pyramid_abstract.h.html#get_interest_points"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="get_pixel_intensity"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">get_pixel_intensity</h1><BR><BR>
+            get_pixel_intensity() is a templated function that 
+            returns the grayscale intensity of a pixel.  If the pixel isn't a grayscale
+            pixel then it converts the pixel to grayscale and returns that value.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/pixel.h&gt;</tt></font></B><BR><b><a href="dlib/pixel.h.html#get_pixel_intensity"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="get_surf_points"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">get_surf_points</h1><BR><BR>
+             This function runs the complete SURF algorithm on an input image and 
+             returns the points it found.  For a description of what exactly
+             the SURF algorithm does you should read the following paper:
+             <blockquote>
+               SURF: Speeded Up Robust Features
+               By Herbert Bay, Tinne Tuytelaars, and Luc Van Gool
+             </blockquote><p>
+                Also note that there are numerous flavors of the SURF algorithm
+                you can put together using the functions in dlib.  The get_surf_points()
+                function is just an example of one way you might do so.  
+             </p><BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/image_keypoint.h&gt;</tt></font></B><BR><b><a href="dlib/image_keypoint/surf_abstract.h.html#get_surf_points"><font style="font-size:1.4em">Detailed Documentation</font></a></b><BR>C++ Example Programs: <a href="surf_ex.cpp.html">surf_ex.cpp</a><br><br><center></center></div></a><a name="haar_x"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">haar_x</h1><BR><BR>
+            This is a function that operates on an <a href="#integral_image">integral_image</a>
+            and allows you to compute the response of a Haar wavelet oriented along
+            the X axis.  
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/image_transforms.h&gt;</tt></font></B><BR><b><a href="dlib/image_transforms/integral_image_abstract.h.html#haar_x"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="haar_y"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">haar_y</h1><BR><BR>
+            This is a function that operates on an <a href="#integral_image">integral_image</a>
+            and allows you to compute the response of a Haar wavelet oriented along
+            the Y axis.  
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/image_transforms.h&gt;</tt></font></B><BR><b><a href="dlib/image_transforms/integral_image_abstract.h.html#haar_y"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="hashed_feature_image"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">hashed_feature_image</h1><BR><BR>
+                This object is a tool for performing image feature extraction.  In
+                particular, it wraps another image feature extractor and converts
+                the wrapped image feature vectors into sparse indicator vectors.  It does
+                this by hashing each feature vector and then returns a new vector 
+                which is zero everywhere except for the position determined by the 
+                hash.  
+
+               <br><br>
+                The following feature extractors can be wrapped by the hashed_feature_image:
+               <ul style="margin-top:0em"><li><a href="#hog_image">hog_image</a></li><li><a href="#fine_hog_image">fine_hog_image</a></li><li><a href="#poly_image">poly_image</a></li></ul><BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/image_keypoint.h&gt;</tt></font></B><BR><b><a href="dlib/image_keypoint/hashed_feature_image_abstract.h.html#hashed_feature_image"><font style="font-size:1.4em">Detailed Documentation</font></a></b><BR>C++ Example Programs: <a href="object_detector_ex.cpp.html">object_detector_ex.cpp</a>,
+               <a href="train_object_detector.cpp.html">train_object_detector.cpp</a><br><br><center></center></div></a><a name="heatmap"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">heatmap</h1><BR><BR>
+            Converts a grayscale image into a heatmap.  This is useful if you want
+            to display a grayscale image with more than 256 values.  In particular,
+            this function uses the following color mapping:
+            <br><img src="heatmap.png" border="0" height="" width="" alt=""><BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/image_transforms.h&gt;</tt></font></B><BR><b><a href="dlib/image_transforms/colormaps_abstract.h.html#heatmap"><font style="font-size:1.4em">Detailed Documentation</font></a></b><BR>C++ Example Programs: <a href="image_ex.cpp.html">image_ex.cpp</a><br><br><center></center></div></a><a name="hessian_pyramid"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">hessian_pyramid</h1><BR><BR>
+                This object represents an image pyramid where each level in the
+                pyramid holds determinants of Hessian matrices for the original 
+                input image.  This object can be used to find stable interest
+                points in an image.  
+
+               <br><br>
+                This object is an implementation of the fast Hessian pyramid 
+                as described in the paper: 
+                <blockquote>
+                   SURF: Speeded Up Robust Features
+                   By Herbert Bay, Tinne Tuytelaars, and Luc Van Gool
+                </blockquote>
+
+                This implementation was also influenced by the very well documented
+                OpenSURF library and its corresponding description of how the fast
+                Hessian algorithm functions:  
+                <blockquote>Notes on the OpenSURF Library by Christopher Evans</blockquote><BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/image_keypoint.h&gt;</tt></font></B><BR><b><a href="dlib/image_keypoint/hessian_pyramid_abstract.h.html#hessian_pyramid"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="hog_image"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">hog_image</h1><BR><BR>
+                This object is a tool for performing the image feature extraction algorithm
+                described in the following paper:
+                <blockquote>
+                    Histograms of Oriented Gradients for Human Detection
+                    by Navneet Dalal and Bill Triggs
+                </blockquote><BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/image_keypoint.h&gt;</tt></font></B><BR><b><a href="dlib/image_keypoint/hog_abstract.h.html#hog_image"><font style="font-size:1.4em">Detailed Documentation</font></a></b><BR>C++ Example Programs: <a href="object_detector_ex.cpp.html">object_detector_ex.cpp</a>,
+               <a href="train_object_detector.cpp.html">train_object_detector.cpp</a><br><br><center></center></div></a><a name="hough_transform"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">hough_transform</h1><BR><BR>
+                This object is a tool for computing the line finding version of
+                the Hough transform given some kind of edge detection image as
+                input.  It also allows the edge pixels to be weighted such that
+                higher weighted edge pixels contribute correspondingly more to
+                the output of the Hough transform, allowing stronger edges to
+                create correspondingly stronger line detections in the final
+                Hough transform.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/image_transforms.h&gt;</tt></font></B><BR><b><a href="dlib/image_transforms/hough_transform_abstract.h.html#hough_transform"><font style="font-size:1.4em">Detailed Documentation</font></a></b><BR>C++ Example Programs: <a href="hough_transform_ex.cpp.html">hough_transform_ex.cpp</a><br><br><center></center></div></a><a name="hsi_pixel"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">hsi_pixel</h1><BR><BR>
+            This is a simple struct that represents an HSI colored graphical pixel.  
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/pixel.h&gt;</tt></font></B><BR><b><a href="dlib/pixel.h.html#hsi_pixel"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="hysteresis_threshold"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">hysteresis_threshold</h1><BR><BR>        
+            This global function performs hysteresis thresholding on an image. 
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/image_transforms.h&gt;</tt></font></B><BR><b><a href="dlib/image_transforms/thresholding_abstract.h.html#hysteresis_threshold"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="integral_image"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">integral_image</h1><BR><BR>
+            This is a specialization of the <a href="#integral_image_generic">integral_image_generic</a>
+            template for the case where sums of pixel values should be represented with 
+            longs.  E.g. if you use 8bit pixels in your original images then this is
+            the appropriate kind of integral image to use with them.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/image_transforms.h&gt;</tt></font></B><BR><b><a href="dlib/image_transforms/integral_image_abstract.h.html"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="integral_image_generic"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">integral_image_generic</h1><BR><BR>
+                This object is an alternate way of representing image data
+                that allows for very fast computations of sums of pixels in 
+                rectangular regions.  To use this object you load it with a
+                normal image and then you can use the get_sum_of_area()
+                member function to compute sums of pixels in a given area in
+                constant time.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/image_transforms.h&gt;</tt></font></B><BR><b><a href="dlib/image_transforms/integral_image_abstract.h.html#integral_image_generic"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="interest_point"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">interest_point</h1><BR><BR>
+            This is a simple struct used to represent the interest points returned
+            by the <a href="#get_interest_points">get_interest_points</a> function.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/image_keypoint.h&gt;</tt></font></B><BR><b><a href="dlib/image_keypoint/hessian_pyramid_abstract.h.html#interest_point"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="interpolate_bilinear"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">interpolate_bilinear</h1><BR><BR>        
+                This object is a tool for performing bilinear interpolation
+                on an image.  
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/image_transforms.h&gt;</tt></font></B><BR><b><a href="dlib/image_transforms/interpolation_abstract.h.html#interpolate_bilinear"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="interpolate_nearest_neighbor"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">interpolate_nearest_neighbor</h1><BR><BR>        
+                This object is a tool for performing nearest neighbor interpolation
+                on an image.  
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/image_transforms.h&gt;</tt></font></B><BR><b><a href="dlib/image_transforms/interpolation_abstract.h.html#interpolate_nearest_neighbor"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="interpolate_quadratic"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">interpolate_quadratic</h1><BR><BR>        
+                This object is a tool for performing quadratic interpolation
+                on an image.  
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/image_transforms.h&gt;</tt></font></B><BR><b><a href="dlib/image_transforms/interpolation_abstract.h.html#interpolate_quadratic"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="jet"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">jet</h1><BR><BR>
+            Converts a grayscale image into an image using the jet color
+            scheme.  This is useful if you want to display a grayscale image
+            with more than 256 values.   In particular, this function uses the
+            following color mapping:
+            <br><img src="jet.png" border="0" height="" width="" alt=""><BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/image_transforms.h&gt;</tt></font></B><BR><b><a href="dlib/image_transforms/colormaps_abstract.h.html#jet"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="jpeg_loader"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">jpeg_loader</h1><BR><BR>        
+            This object loads a JPEG image file into 
+            an <a href="containers.html#array2d">array2d</a> of <a href="dlib/pixel.h.html">pixels</a>.
+            <p>
+               Note that you must define DLIB_JPEG_SUPPORT if you want to use this object.  You
+               must also set your build environment to link to the libjpeg library.  However,
+               if you use CMake and dlib's default CMakeLists.txt file then it will get setup
+               automatically.
+            </p><BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/image_io.h&gt;</tt></font></B><BR><b><a href="dlib/image_loader/jpeg_loader_abstract.h.html#jpeg_loader"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="label_connected_blobs"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">label_connected_blobs</h1><BR><BR>        
+              This function labels each of the connected blobs in an image with a unique integer label.  
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/image_transforms.h&gt;</tt></font></B><BR><b><a href="dlib/image_transforms/label_connected_blobs_abstract.h.html#label_connected_blobs"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="load_bmp"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">load_bmp</h1><BR><BR>        
+      This global function loads a MS Windows BMP file into an <a href="containers.html#array2d">array2d</a> of 
+      <a href="dlib/pixel.h.html">pixels</a>.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/image_io.h&gt;</tt></font></B><BR><b><a href="dlib/image_loader/image_loader_abstract.h.html#load_bmp"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="load_dng"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">load_dng</h1><BR><BR>        
+      This global function loads a dlib DNG file (a lossless compressed image format) into 
+      an <a href="containers.html#array2d">array2d</a> of <a href="dlib/pixel.h.html">pixels</a>.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/image_io.h&gt;</tt></font></B><BR><b><a href="dlib/image_loader/image_loader_abstract.h.html#load_dng"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="load_image"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">load_image</h1><BR><BR>        
+            This global function takes a file name, looks at its extension, and 
+            then loads it into an <a href="containers.html#array2d">array2d</a> of 
+            <a href="dlib/pixel.h.html">pixels</a> using the appropriate image 
+            loading routine.  The supported types are BMP, PNG, JPEG, and the dlib DNG file format. 
+
+            <p>
+               Note that you can only load PNG and JPEG files if you link against
+               libpng and libjpeg respectively.
+            </p><BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/image_io.h&gt;</tt></font></B><BR><b><a href="dlib/image_loader/load_image_abstract.h.html#load_image"><font style="font-size:1.4em">Detailed Documentation</font></a></b><BR>C++ Example Programs: <a href="image_ex.cpp.html">image_ex.cpp</a><br><br><center></center></div></a><a name="load_jpeg"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">load_jpeg</h1><BR><BR>        
+            This function loads a JPEG image file into 
+            an <a href="containers.html#array2d">array2d</a> of <a href="dlib/pixel.h.html">pixels</a>.
+            <p>
+               Note that you must define DLIB_JPEG_SUPPORT if you want to use this object.  You
+               must also set your build environment to link to the libjpeg library.  However,
+               if you use CMake and dlib's default CMakeLists.txt file then it will get setup
+               automatically.
+            </p><BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/image_io.h&gt;</tt></font></B><BR><b><a href="dlib/image_loader/jpeg_loader_abstract.h.html#load_jpeg"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="load_png"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">load_png</h1><BR><BR>        
+            This function loads a Portable Network Graphics (PNG) image file into 
+            an <a href="containers.html#array2d">array2d</a> of <a href="dlib/pixel.h.html">pixels</a>.
+            <p>
+               Note that you must define DLIB_PNG_SUPPORT if you want to use this object.  You
+               must also set your build environment to link to the libpng library.  However,
+               if you use CMake and dlib's default CMakeLists.txt file then it will get setup
+               automatically.
+            </p><BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/image_io.h&gt;</tt></font></B><BR><b><a href="dlib/image_loader/png_loader_abstract.h.html#load_png"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="make_uniform_lbp_image"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">make_uniform_lbp_image</h1><BR><BR>
+              This function extracts the uniform local-binary-pattern feature at every pixel
+              of an image and stores the output in a new image object.  
+              We use the idea of uniform LBPs from the paper: 
+              <blockquote>
+                Face Description with Local Binary Patterns: Application to Face Recognition
+                by Ahonen, Hadid, and Pietikainen.
+              </blockquote><BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/image_transforms.h&gt;</tt></font></B><BR><b><a href="dlib/image_transforms/lbp_abstract.h.html#make_uniform_lbp_image"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="max_filter"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">max_filter</h1><BR><BR>        
+            This function slides a rectangle over an input image and outputs a new 
+            image which contains the maximum valued pixel found inside the rectangle at each
+            position in the input image.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/image_transforms.h&gt;</tt></font></B><BR><b><a href="dlib/image_transforms/spatial_filtering_abstract.h.html#max_filter"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="nearest_neighbor_feature_image"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">nearest_neighbor_feature_image</h1><BR><BR>
+                This object is a tool for performing image feature extraction.  In
+                particular, it wraps another image feature extractor and converts
+                the wrapped image feature vectors into sparse indicator vectors.  It does
+                this by finding the nearest neighbor for each feature vector and returning an
+                indicator vector that is zero everywhere except for the position indicated by 
+                the nearest neighbor.  
+
+               <br><br>
+               The following feature extractors can be wrapped by the nearest_neighbor_feature_image:
+               <ul style="margin-top:0em"><li><a href="#hog_image">hog_image</a></li><li><a href="#fine_hog_image">fine_hog_image</a></li><li><a href="#poly_image">poly_image</a></li></ul><BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/image_keypoint.h&gt;</tt></font></B><BR><b><a href="dlib/image_keypoint/nearest_neighbor_feature_image_abstract.h.html#nearest_neighbor_feature_image"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="object_detector"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">object_detector</h1><BR><BR>        
+                This object is a tool for detecting the positions of objects in an image.  In
+                particular, it is a simple container to aggregate an instance of an image
+                scanner object (either <a href="#scan_fhog_pyramid">scan_fhog_pyramid</a>,
+                <a href="#scan_image_pyramid">scan_image_pyramid</a>, <a href="#scan_image_boxes">scan_image_boxes</a>, or 
+                <a href="#scan_image_custom">scan_image_custom</a>), the weight vector
+                needed by one of these image scanners, and finally an instance of
+                <a href="#test_box_overlap">test_box_overlap</a>.  The test_box_overlap object
+                is used to perform non-max suppression on the output of the image scanner
+                object.  
+
+                <p>
+                   Note that you can use the 
+                   <a href="ml.html#structural_object_detection_trainer">structural_object_detection_trainer</a>
+                   to learn the parameters of an object_detector.  See the example programs for an introduction.
+                </p><BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/image_processing.h&gt;</tt></font></B><BR><b><a href="dlib/image_processing/object_detector_abstract.h.html#object_detector"><font style="font-size:1.4em">Detailed Documentation</font></a></b><BR>C++ Example Programs: <a href="fhog_object_detector_ex.cpp.html">fhog_object_detector_ex.cpp</a>,
+               <a href="face_detection_ex.cpp.html">face_detection_ex.cpp</a>,
+               <a href="object_detector_ex.cpp.html">object_detector_ex.cpp</a>,
+               <a href="object_detector_advanced_ex.cpp.html">object_detector_advanced_ex.cpp</a>,
+               <a href="train_object_detector.cpp.html">train_object_detector.cpp</a><BR>Python Example Programs: <a href="face_detector.py.html">face_detector.py</a>,
+               <a href="train_object_detector.py.html">train_object_detector.py</a><br><br><center></center></div></a><a name="pixel_traits"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">pixel_traits</h1><BR><BR>
+            As the name implies, this is a traits class for pixel types. It allows you
+            to determine what sort of pixel type you are dealing with.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/pixel.h&gt;</tt></font></B><BR><b><a href="dlib/pixel.h.html"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="png_loader"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">png_loader</h1><BR><BR>        
+            This object loads a Portable Network Graphics (PNG) image file into 
+            an <a href="containers.html#array2d">array2d</a> of <a href="dlib/pixel.h.html">pixels</a>.
+            <p>
+               Note that you must define DLIB_PNG_SUPPORT if you want to use this object.  You
+               must also set your build environment to link to the libpng library.  However,
+               if you use CMake and dlib's default CMakeLists.txt file then it will get setup
+               automatically.
+            </p><BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/image_io.h&gt;</tt></font></B><BR><b><a href="dlib/image_loader/png_loader_abstract.h.html#png_loader"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="poly_image"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">poly_image</h1><BR><BR>
+                This object is a tool for extracting local feature descriptors from an image.
+                In particular, it fits polynomials to local pixel patches and
+                allows you to query the coefficients of these polynomials.  
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/image_keypoint.h&gt;</tt></font></B><BR><b><a href="dlib/image_keypoint/poly_image_abstract.h.html#poly_image"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="pyramid_disable"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">pyramid_disable</h1><BR><BR>        
+               This object downsamples an image at a ratio of infinity to 1.  That
+               means it always outputs an image of size zero.  This is useful because
+               it can be supplied to routines which take a pyramid_down function object
+               and it will essentially disable pyramid processing.  This way, a pyramid
+               oriented function can be turned into a regular routine which processes
+               just the original undownsampled image.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/image_transforms.h&gt;</tt></font></B><BR><b><a href="dlib/image_transforms/image_pyramid_abstract.h.html#pyramid_disable"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="pyramid_down"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">pyramid_down</h1><BR><BR>        
+               This is a simple function object to help create image pyramids.  It 
+               downsamples an image by a ratio of N to N-1 where N is supplied by the
+               user as a template argument.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/image_transforms.h&gt;</tt></font></B><BR><b><a href="dlib/image_transforms/image_pyramid_abstract.h.html#pyramid_down"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="pyramid_up"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">pyramid_up</h1><BR><BR>        
+            This routine upsamples an image.  In particular, it takes a  
+            <a href="#pyramid_down">pyramid_down</a> object (or an object with a
+            compatible interface) as an argument and performs an upsampling
+            which is the inverse of the supplied pyramid_down object.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/image_transforms.h&gt;</tt></font></B><BR><b><a href="dlib/image_transforms/interpolation_abstract.h.html#pyramid_up"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="randomly_color_image"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">randomly_color_image</h1><BR><BR>
+              Randomly generates a mapping from gray level pixel values
+              to the RGB pixel space and then uses this mapping to create
+              a colored version an image. 
+              <p>
+                 This function is useful for displaying the results of some image 
+                 segmentation.  For example, the output of <a href="#label_connected_blobs">label_connected_blobs</a>
+                 or <a href="#segment_image">segment_image</a>.
+              </p><BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/image_transforms.h&gt;</tt></font></B><BR><b><a href="dlib/image_transforms/colormaps_abstract.h.html#randomly_color_image"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="randomly_sample_image_features"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">randomly_sample_image_features</h1><BR><BR>
+            Given a feature extractor such as the <a href="#hog_image">hog_image</a>,
+            this routine selects a random subsample of local image feature vectors 
+            from a set of images.  
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/statistics.h&gt;</tt></font></B><BR><b><a href="dlib/statistics/image_feature_sampling_abstract.h.html#randomly_sample_image_features"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="remove_unobtainable_rectangles"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">remove_unobtainable_rectangles</h1><BR><BR>        
+            Recall that the <a href="#scan_image_pyramid">scan_image_pyramid</a> and 
+            <a href="#scan_image_boxes">scan_image_boxes</a> objects can't produce
+            all possible rectangles as object detections since they only
+            consider a limited subset of all possible object positions.
+            Therefore, when training an object detector that uses these tools
+            you must make sure the training data does not contain any object
+            locations that are unobtainable by the image scanning model.
+            The remove_unobtainable_rectangles() routine is a tool to filter out
+            these unobtainable rectangles from the training.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/image_processing.h&gt;</tt></font></B><BR><b><a href="dlib/image_processing/remove_unobtainable_rectangles_abstract.h.html#remove_unobtainable_rectangles"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="render_face_detections"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">render_face_detections</h1><BR><BR>        
+            This function takes a set of <a href="#full_object_detection">full_object_detections</a>
+            which represent human faces annotated with 68 facial landmarks (according to the iBUG 300-W
+            scheme) and converts them into a form suitable for display on an 
+            <a href="dlib/gui_widgets/widgets_abstract.h.html#image_window">image_window</a>.
+
+            <p>
+               For example, it will take the output of a <a href="#shape_predictor">shape_predictor</a>
+               that uses this facial landmarking scheme and will produce visualizations like this:
+            </p><img src="face_landmarking_example.png" border="0" height="" width="" alt=""><BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/image_processing/render_face_detections.h&gt;</tt></font></B><BR><b><a href="dlib/image_processing/render_face_detections_abstract.h.html#render_face_detections"><font style="font-size:1.4em">Detailed Documentation</font></a></b><BR>C++ Example Programs: <a href="face_landmark_detection_ex.cpp.html">face_landmark_detection_ex.cpp</a>,
+               <a href="webcam_face_pose_ex.cpp.html">webcam_face_pose_ex.cpp</a><br><br><center></center></div></a><a name="resize_image"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">resize_image</h1><BR><BR>        
+            This is a routine capable of resizing or stretching an image.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/image_transforms.h&gt;</tt></font></B><BR><b><a href="dlib/image_transforms/interpolation_abstract.h.html#resize_image"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="rgb_alpha_pixel"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">rgb_alpha_pixel</h1><BR><BR>
+            This is a simple struct that represents an RGB colored graphical pixel with an 
+            alpha channel.  
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/pixel.h&gt;</tt></font></B><BR><b><a href="dlib/pixel.h.html#rgb_alpha_pixel"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="rgb_pixel"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">rgb_pixel</h1><BR><BR>
+            This is a simple struct that represents an RGB colored graphical pixel.  
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/pixel.h&gt;</tt></font></B><BR><b><a href="dlib/pixel.h.html#rgb_pixel"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="rotate_image"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">rotate_image</h1><BR><BR>        
+            This is a routine for rotating an image. 
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/image_transforms.h&gt;</tt></font></B><BR><b><a href="dlib/image_transforms/interpolation_abstract.h.html#rotate_image"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="rotate_image_dataset"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">rotate_image_dataset</h1><BR><BR>        
+            This routine takes a set of images and bounding boxes within those
+            images and rotates the entire dataset by a user specified angle.  
+            This means that all images are rotated and the bounding boxes are adjusted
+            so that they still sit on top of the same visual objects in the new rotated images.  
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/image_transforms.h&gt;</tt></font></B><BR><b><a href="dlib/image_transforms/interpolation_abstract.h.html#rotate_image_dataset"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="save_bmp"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">save_bmp</h1><BR><BR>        
+            This global function saves an image as a MS Windows BMP file. 
+
+            <p>
+               This routine can save images containing any type of pixel.  However, it will
+               convert all color pixels into <b>rgb_pixel</b> and grayscale pixels into 
+               <b>uint8</b> type before saving to disk.  
+            </p><BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/image_io.h&gt;</tt></font></B><BR><b><a href="dlib/image_saver/image_saver_abstract.h.html#save_bmp"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="save_dng"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">save_dng</h1><BR><BR>        
+      This global function saves an image as a dlib DNG file (a lossless 
+      compressed image format). 
+            <p>
+               This routine can save images containing any type of pixel.  However, the DNG format
+               can natively store only the following pixel types: <b>rgb_pixel</b>, <b>hsi_pixel</b>,
+               <b>rgb_alpha_pixel</b>, <b>uint8</b>, <b>uint16</b>, <b>float</b>, and <b>double</b>.  
+               All other pixel types will be converted
+               into one of these types as appropriate before being saved to disk.
+            </p><BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/image_io.h&gt;</tt></font></B><BR><b><a href="dlib/image_saver/image_saver_abstract.h.html#save_dng"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="save_jpeg"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">save_jpeg</h1><BR><BR>        
+         This global function writes an image to disk as a JPEG file. 
+            <p>
+               Note that you must define DLIB_JPEG_SUPPORT if you want to use this function.  You
+               must also set your build environment to link to the libjpeg library.  However,
+               if you use CMake and dlib's default CMakeLists.txt file then it will get setup
+               automatically.
+            </p><p>
+               This routine can save images containing any type of pixel.  However, save_jpeg() can
+               only natively store the following pixel types: <b>rgb_pixel</b> 
+               and <b>uint8</b>.  All other pixel types will be converted into
+               one of these types as appropriate before being saved to disk.
+            </p><BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/image_io.h&gt;</tt></font></B><BR><b><a href="dlib/image_saver/save_jpeg_abstract.h.html#save_jpeg"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="save_png"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">save_png</h1><BR><BR>        
+      This global function writes an image to disk as a PNG (Portable Network Graphics) file. 
+            <p>
+               Note that you must define DLIB_PNG_SUPPORT if you want to use this function.  You
+               must also set your build environment to link to the libpng library.  However,
+               if you use CMake and dlib's default CMakeLists.txt file then it will get setup
+               automatically.
+            </p><p>
+               This routine can save images containing any type of pixel.  However, save_png() can
+               only natively store the following pixel types: <b>rgb_pixel</b>, 
+               <b>rgb_alpha_pixel</b>, <b>uint8</b>, and <b>uint16</b>.  All other pixel
+               types will be converted into one of these types as appropriate before being
+               saved to disk.
+            </p><BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/image_io.h&gt;</tt></font></B><BR><b><a href="dlib/image_saver/save_png_abstract.h.html#save_png"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="scan_fhog_pyramid"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">scan_fhog_pyramid</h1><BR><BR>        
+
+                This object is a tool for running a fixed sized sliding window classifier
+                over an image pyramid.  In particular,  it slides a linear classifier over
+                a HOG pyramid as discussed in the paper:  
+                <blockquote>
+                    Histograms of Oriented Gradients for Human Detection by Navneet Dalal
+                    and Bill Triggs, CVPR 2005
+                </blockquote>
+                However, we augment the method slightly to use the version of HOG features 
+                from: 
+                <blockquote>
+                    Object Detection with Discriminatively Trained Part Based Models by
+                    P. Felzenszwalb, R. Girshick, D. McAllester, D. Ramanan
+                    IEEE Transactions on Pattern Analysis and Machine Intelligence, Vol. 32, No. 9, Sep. 2010
+                </blockquote>
+                Since these HOG features have been shown to give superior performance. 
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/image_processing.h&gt;</tt></font></B><BR><b><a href="dlib/image_processing/scan_fhog_pyramid_abstract.h.html#scan_fhog_pyramid"><font style="font-size:1.4em">Detailed Documentation</font></a></b><BR>C++ Example Programs: <a href="fhog_object_detector_ex.cpp.html">fhog_object_detector_ex.cpp</a><BR>Python Example Programs: <a href="train_object_detector.py.html">train_object_detector.py</a><br><br><center></center></div></a><a name="scan_image"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">scan_image</h1><BR><BR>        
+            This global function is a tool for sliding a set of rectangles
+            over an image space and finding the locations where the sum of pixels in
+            the rectangles exceeds a threshold.  It is useful for implementing
+            certain kinds of sliding window classifiers.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/image_processing.h&gt;</tt></font></B><BR><b><a href="dlib/image_processing/scan_image_abstract.h.html#scan_image"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="scan_image_boxes"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">scan_image_boxes</h1><BR><BR>        
+            This object is a tool for running a classifier over an image with the goal
+            of localizing each object present.  The localization is in the form of the
+            bounding box around each object of interest.  
+
+            <p>
+            Unlike the <a href="#scan_image_pyramid">scan_image_pyramid</a> object which scans a
+            fixed sized window over an image pyramid, the scan_image_boxes tool allows you to
+            define your own list of "candidate object locations" which should be evaluated.
+            This is simply a list of rectangle objects which might contain objects of
+            interest.  The scan_image_boxes object will then evaluate the classifier at each
+            of these locations and return the subset of rectangles which appear to have
+            objects in them.    
+            </p>
+
+            This object can also be understood as a general tool for implementing the spatial
+            pyramid models described in the paper:
+            <blockquote>
+               Beyond Bags of Features: Spatial Pyramid Matching for Recognizing 
+               Natural Scene Categories by Svetlana Lazebnik, Cordelia Schmid, 
+               and Jean Ponce
+            </blockquote><br><br>
+            The following feature extractors can be used with the scan_image_boxes object:
+            <ul style="margin-top:0em"><li><a href="#hashed_feature_image">hashed_feature_image</a></li><li><a href="#binned_vector_feature_image">binned_vector_feature_image</a></li><li><a href="#nearest_neighbor_feature_image">nearest_neighbor_feature_image</a></li></ul><BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/image_processing.h&gt;</tt></font></B><BR><b><a href="dlib/image_processing/scan_image_boxes_abstract.h.html#scan_image_boxes"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="scan_image_custom"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">scan_image_custom</h1><BR><BR>        
+            This object is a tool for running a classifier over an image with the goal
+            of localizing each object present.  The localization is in the form of the
+            bounding box around each object of interest.  
+
+            <p>
+               Unlike the <a href="#scan_image_pyramid">scan_image_pyramid</a> 
+               and <a href="#scan_image_boxes">scan_image_boxes</a> objects, this image
+                scanner delegates all the work of constructing the object feature vector to
+                a user supplied feature extraction object.  That is, scan_image_custom
+                simply asks the supplied feature extractor what boxes in the image we
+                should investigate and then asks the feature extractor for the complete
+                feature vector for each box.  That is, scan_image_custom does not apply any
+                kind of pyramiding or other higher level processing to the features coming
+                out of the feature extractor.  That means that when you use
+                scan_image_custom it is completely up to you to define the feature vector
+                used with each image box.
+            </p><BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/image_processing.h&gt;</tt></font></B><BR><b><a href="dlib/image_processing/scan_image_custom_abstract.h.html#scan_image_custom"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="scan_image_movable_parts"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">scan_image_movable_parts</h1><BR><BR>        
+            This global function is a tool for sliding a set of rectangles
+            over an image space and finding the locations where the sum of pixels in
+            the rectangles exceeds a threshold.  It is useful for implementing
+            certain kinds of sliding window classifiers.  The behavior of this
+            routine is similar to <a href="#scan_image">scan_image</a> except that
+            it can also handle movable parts in addition to rigidly placed parts
+            within the sliding window.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/image_processing.h&gt;</tt></font></B><BR><b><a href="dlib/image_processing/scan_image_abstract.h.html#scan_image_movable_parts"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="scan_image_pyramid"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">scan_image_pyramid</h1><BR><BR>        
+                This object is a tool for running a sliding window classifier over
+                an image pyramid.  This object can also be understood as a general 
+                tool for implementing the spatial pyramid models described in the paper:
+                <blockquote>
+                    Beyond Bags of Features: Spatial Pyramid Matching for Recognizing 
+                    Natural Scene Categories by Svetlana Lazebnik, Cordelia Schmid, 
+                    and Jean Ponce
+                </blockquote>
+                It also includes the ability to represent movable part models.
+
+               <br><br>
+               The following feature extractors can be used with the scan_image_pyramid object:
+               <ul style="margin-top:0em"><li><a href="#hashed_feature_image">hashed_feature_image</a></li><li><a href="#binned_vector_feature_image">binned_vector_feature_image</a></li><li><a href="#nearest_neighbor_feature_image">nearest_neighbor_feature_image</a></li></ul><BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/image_processing.h&gt;</tt></font></B><BR><b><a href="dlib/image_processing/scan_image_pyramid_abstract.h.html#scan_image_pyramid"><font style="font-size:1.4em">Detailed Documentation</font></a></b><BR>C++ Example Programs: <a href="object_detector_ex.cpp.html">object_detector_ex.cpp</a>,
+               <a href="object_detector_advanced_ex.cpp.html">object_detector_advanced_ex.cpp</a><br><br><center></center></div></a><a name="segment_image"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">segment_image</h1><BR><BR>        
+              Attempts to segment an image into regions which have some visual consistency to them.
+              In particular, this function implements the algorithm described in the paper:
+              <blockquote>
+               Efficient Graph-Based Image Segmentation by Felzenszwalb and Huttenlocher.
+              </blockquote><BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/image_transforms.h&gt;</tt></font></B><BR><b><a href="dlib/image_transforms/segment_image_abstract.h.html#segment_image"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="separable_3x3_filter_block_grayscale"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">separable_3x3_filter_block_grayscale</h1><BR><BR>        
+            This routine filters part of an image with a user supplied 3x3 separable filter.
+            The output is a grayscale sub-image.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/image_transforms.h&gt;</tt></font></B><BR><b><a href="dlib/image_transforms/spatial_filtering_abstract.h.html#separable_3x3_filter_block_grayscale"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="separable_3x3_filter_block_rgb"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">separable_3x3_filter_block_rgb</h1><BR><BR>        
+            This routine filters part of an image with a user supplied 3x3 separable filter.
+            The output is a RGB sub-image.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/image_transforms.h&gt;</tt></font></B><BR><b><a href="dlib/image_transforms/spatial_filtering_abstract.h.html#separable_3x3_filter_block_rgb"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="setup_grid_detection_templates"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">setup_grid_detection_templates</h1><BR><BR>        
+            This routine uses <a href="#determine_object_boxes">determine_object_boxes</a> to obtain a set of
+              object boxes and then adds them to a <a href="#scan_image_pyramid">scan_image_pyramid</a> object 
+              as detection templates.  It also uses <a href="#create_grid_detection_template">create_grid_detection_template</a>
+               to create each feature extraction region.  Therefore, the detection templates will extract
+              features from a regular grid inside each object box.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/image_processing.h&gt;</tt></font></B><BR><b><a href="dlib/image_processing/scan_image_pyramid_tools_abstract.h.html#setup_grid_detection_templates"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="setup_grid_detection_templates_verbose"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">setup_grid_detection_templates_verbose</h1><BR><BR>        
+            This function is identical to <a href="#setup_grid_detection_templates">setup_grid_detection_templates</a>
+            except that it also outputs information regarding the selected detection templates
+            to standard out.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/image_processing.h&gt;</tt></font></B><BR><b><a href="dlib/image_processing/scan_image_pyramid_tools_abstract.h.html#setup_grid_detection_templates_verbose"><font style="font-size:1.4em">Detailed Documentation</font></a></b><BR>C++ Example Programs: <a href="object_detector_ex.cpp.html">object_detector_ex.cpp</a>,
+               <a href="train_object_detector.cpp.html">train_object_detector.cpp</a><br><br><center></center></div></a><a name="setup_hashed_features"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">setup_hashed_features</h1><BR><BR>        
+            This is a tool for configuring the <a href="#hashed_feature_image">hashed_feature_image</a>
+            or <a href="#binned_vector_feature_image">binned_vector_feature_image</a> object
+            with a random <a href="algorithms.html#projection_hash">projection hash</a>. 
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/image_processing.h&gt;</tt></font></B><BR><b><a href="dlib/image_processing/setup_hashed_features_abstract.h.html#setup_hashed_features"><font style="font-size:1.4em">Detailed Documentation</font></a></b><BR>C++ Example Programs: <a href="object_detector_ex.cpp.html">object_detector_ex.cpp</a>,
+               <a href="train_object_detector.cpp.html">train_object_detector.cpp</a><br><br><center></center></div></a><a name="shape_predictor"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">shape_predictor</h1><BR><BR>
+                This object is a tool that takes in an image region containing some object
+                and outputs a set of point locations that define the pose of the
+                object.  The classic example of this is human face pose prediction, where
+                you take an image of a human face as input and are expected to identify the
+                locations of important facial landmarks such as the corners of the mouth
+                and eyes, tip of the nose, and so forth.  For example, here is the output
+                of dlib's <a href="http://sourceforge.net/projects/dclib/files/dlib/v18.10/shape_predictor_68_face_landmarks.dat.bz2">68-face-landmark shape_predictor</a> on an image from the HELEN dataset: <br><br><img src="face_landmarking_example.png" border="0" height="" width="" alt=""><br><br>
+
+                To create useful instantiations of this object you need to use the
+                <a href="ml.html#shape_predictor_trainer">shape_predictor_trainer</a> object to train a 
+                shape_predictor using a set of training images, each annotated with shapes you want to predict.
+                To do this, the shape_predictor_trainer uses the state-of-the-art method from the
+                paper:
+             <blockquote>
+                    One Millisecond Face Alignment with an Ensemble of Regression Trees
+                    by Vahid Kazemi and Josephine Sullivan, CVPR 2014
+             </blockquote><BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/image_processing.h&gt;</tt></font></B><BR><b><a href="dlib/image_processing/shape_predictor_abstract.h.html#shape_predictor"><font style="font-size:1.4em">Detailed Documentation</font></a></b><BR>C++ Example Programs: <a href="face_landmark_detection_ex.cpp.html">face_landmark_detection_ex.cpp</a>,
+               <a href="train_shape_predictor_ex.cpp.html">train_shape_predictor_ex.cpp</a>,
+               <a href="webcam_face_pose_ex.cpp.html">webcam_face_pose_ex.cpp</a><BR>Python Example Programs: <a href="train_shape_predictor.py.html">train_shape_predictor.py</a>,
+               <a href="face_landmark_detection.py.html">face_landmark_detection.py</a><br><br><center></center></div></a><a name="skeleton"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">skeleton</h1><BR><BR>
+              This function computes the skeletonization of an image.  That is,
+              given a binary image, we progressively thin the binary blobs
+              until only a single pixel wide skeleton of the original blobs
+              remains.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/image_transforms.h&gt;</tt></font></B><BR><b><a href="dlib/image_transforms/morphological_operations_abstract.h.html#skeleton"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="sobel_edge_detector"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">sobel_edge_detector</h1><BR><BR>        
+            This global function performs spatial filtering on an image using the
+            sobel edge detection filters.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/image_transforms.h&gt;</tt></font></B><BR><b><a href="dlib/image_transforms/edge_detector_abstract.h.html#sobel_edge_detector"><font style="font-size:1.4em">Detailed Documentation</font></a></b><BR>C++ Example Programs: <a href="image_ex.cpp.html">image_ex.cpp</a><br><br><center></center></div></a><a name="spatially_filter_image"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">spatially_filter_image</h1><BR><BR>        
+            This global function performs spatial filtering on an image with a user
+            supplied filter.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/image_transforms.h&gt;</tt></font></B><BR><b><a href="dlib/image_transforms/spatial_filtering_abstract.h.html#spatially_filter_image"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="spatially_filter_image_separable"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">spatially_filter_image_separable</h1><BR><BR>        
+            This global function performs spatial filtering on an image with a user
+            supplied separable filter.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/image_transforms.h&gt;</tt></font></B><BR><b><a href="dlib/image_transforms/spatial_filtering_abstract.h.html#spatially_filter_image_separable"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="spatially_filter_image_separable_down"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">spatially_filter_image_separable_down</h1><BR><BR>        
+            This global function performs spatial filtering on an image with a user
+            supplied separable filter.  Additionally, it produces a downsampled
+            output.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/image_transforms.h&gt;</tt></font></B><BR><b><a href="dlib/image_transforms/spatial_filtering_abstract.h.html#spatially_filter_image_separable_down"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="sub_image"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">sub_image</h1><BR><BR>        
+            This function returns a lightweight sub-image of another image.  In particular,
+            the returned sub-image simply holds a pointer to the original image, meaning there
+            is no overhead for using or creating the sub-image.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/image_transforms.h&gt;</tt></font></B><BR><b><a href="dlib/image_transforms/interpolation_abstract.h.html#sub_image"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="sum_filter"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">sum_filter</h1><BR><BR>        
+            This function slides a rectangle over an input image and adds the sum
+            of pixel values in each rectangle location to another image.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/image_transforms.h&gt;</tt></font></B><BR><b><a href="dlib/image_transforms/spatial_filtering_abstract.h.html#sum_filter"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="sum_filter_assign"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">sum_filter_assign</h1><BR><BR>        
+            This function slides a rectangle over an input image and outputs a new 
+            image which contains the sum of pixels inside the rectangle at each
+            position in the input image.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/image_transforms.h&gt;</tt></font></B><BR><b><a href="dlib/image_transforms/spatial_filtering_abstract.h.html#sum_filter_assign"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="suppress_non_maximum_edges"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">suppress_non_maximum_edges</h1><BR><BR>        
+            This global function performs non-maximum suppression on a gradient
+            image.  
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/image_transforms.h&gt;</tt></font></B><BR><b><a href="dlib/image_transforms/edge_detector_abstract.h.html#suppress_non_maximum_edges"><font style="font-size:1.4em">Detailed Documentation</font></a></b><BR>C++ Example Programs: <a href="image_ex.cpp.html">image_ex.cpp</a><br><br><center></center></div></a><a name="surf_point"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">surf_point</h1><BR><BR>
+            This is a simple struct used to represent the SURF points returned
+            by the <a href="#get_surf_points">get_surf_points</a> function.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/image_keypoint.h&gt;</tt></font></B><BR><b><a href="dlib/image_keypoint/surf_abstract.h.html#surf_point"><font style="font-size:1.4em">Detailed Documentation</font></a></b><BR>C++ Example Programs: <a href="surf_ex.cpp.html">surf_ex.cpp</a><br><br><center></center></div></a><a name="test_box_overlap"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">test_box_overlap</h1><BR><BR>        
+            This object is a simple function object for determining if two 
+            <a href="linear_algebra.html#rectangle">rectangles</a> overlap.  
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/image_processing.h&gt;</tt></font></B><BR><b><a href="dlib/image_processing/box_overlap_testing_abstract.h.html#test_box_overlap"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="threshold_image"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">threshold_image</h1><BR><BR>        
+            This global function performs a simple binary thresholding on an image with a user
+            supplied threshold.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/image_transforms.h&gt;</tt></font></B><BR><b><a href="dlib/image_transforms/thresholding_abstract.h.html#threshold_image"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="tile_images"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">tile_images</h1><BR><BR>        
+              This function takes an array of images and tiles them into a single large
+              square image and returns this new big tiled image.  Therefore, it is a useful
+              method to visualize many small images at once.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/image_transforms.h&gt;</tt></font></B><BR><b><a href="dlib/image_transforms/draw_abstract.h.html#tile_images"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="toMat"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">toMat</h1><BR><BR>
+            This routine converts a dlib style image into an instance of OpenCV's cv::Mat object.
+            This is done by setting up the Mat object to point to the same memory as the dlib image.
+               <p>
+                  Note that you can do the reverse conversion, from OpenCV to dlib,
+                  using the <a href="#cv_image">cv_image</a> object.  
+               </p><BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/opencv.h&gt;</tt></font></B><BR><b><a href="dlib/opencv/to_open_cv_abstract.h.html#toMat"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="transform_image"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">transform_image</h1><BR><BR>        
+            This routine is a tool for transforming images using some kind of point mapping
+            function (e.g. <a href="linear_algebra.html#point_transform_affine">point_transform_affine</a>)
+            and pixel interpolation tool (e.g. <a href="#interpolate_quadratic">interpolate_quadratic</a>).
+            An example application of this routine is for image rotation.  Indeed, it is how 
+            <a href="#rotate_image">rotate_image</a> is implemented.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/image_transforms.h&gt;</tt></font></B><BR><b><a href="dlib/image_transforms/interpolation_abstract.h.html#transform_image"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="upsample_image_dataset"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">upsample_image_dataset</h1><BR><BR>        
+            This routine takes a set of images and bounding boxes within those images and
+            upsamples the entire dataset.  This means that all images are upsampled and the
+            bounding boxes are adjusted so that they still sit on top of the same visual
+            objects in the new images.  
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/image_transforms.h&gt;</tt></font></B><BR><b><a href="dlib/image_transforms/interpolation_abstract.h.html#upsample_image_dataset"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="zero_border_pixels"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">zero_border_pixels</h1><BR><BR>        
+            This global function zeros the pixels on the border of an image.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/image_transforms.h&gt;</tt></font></B><BR><b><a href="dlib/image_transforms/assign_image_abstract.h.html#zero_border_pixels"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a></div></body></html>

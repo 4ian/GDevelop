@@ -1,0 +1,184 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - optimization_trust_region_abstract.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2010  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#undef</font> DLIB_OPTIMIZATION_TRUST_REGIoN_H_ABSTRACTh_
+<font color='#0000FF'>#ifdef</font> DLIB_OPTIMIZATION_TRUST_REGIoN_H_ABSTRACTh_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../matrix/matrix_abstract.h.html'>../matrix/matrix_abstract.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> EXP1,
+        <font color='#0000FF'>typename</font> EXP2,
+        <font color='#0000FF'>typename</font> T, <font color='#0000FF'><u>long</u></font> NR, <font color='#0000FF'><u>long</u></font> NC, <font color='#0000FF'>typename</font> MM, <font color='#0000FF'>typename</font> L
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='solve_trust_region_subproblem'></a>solve_trust_region_subproblem</b> <font face='Lucida Console'>(</font> 
+        <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&lt;</font>EXP1<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> B,
+        <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&lt;</font>EXP2<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> g,
+        <font color='#0000FF'>const</font> <font color='#0000FF'>typename</font> EXP1::type radius,
+        matrix<font color='#5555FF'>&lt;</font>T,NR,NC,MM,L<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> p,
+        <font color='#0000FF'><u>double</u></font> eps,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> max_iter
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - B == trans(B)
+              (i.e. B should be a symmetric matrix)
+            - B.nr() == B.nc()
+            - is_col_vector(g) == true
+            - g.size() == B.nr()
+            - p is capable of containing a column vector the size of g
+              (i.e. p = g; should be a legal expression)
+            - radius &gt; 0
+            - eps &gt; 0
+            - max_iter &gt; 0
+        ensures
+            - This function solves the following optimization problem:
+                Minimize: f(p) == 0.5*trans(p)*B*p + trans(g)*p
+                subject to the following constraint:
+                    - length(p) &lt;= radius
+            - returns the number of iterations performed.  If this method fails to
+              converge to eps accuracy then the number returned will be max_iter+1.
+            - if this function returns 0 or 1 then we are not hitting the radius bound.
+              Otherwise, the radius constraint is active and std::abs(length(#p)-radius) &lt;= eps.
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>class</font> <b><a name='function_model'></a>function_model</b> 
+    <b>{</b>
+        <font color='#009900'>/*!
+            WHAT THIS OBJECT REPRESENTS
+                This object defines the interface for a function model
+                used by the trust-region optimizers defined below.
+
+                In particular, this object represents a function f() and
+                its associated derivative and hessian.
+
+        !*/</font>
+
+    <font color='#0000FF'>public</font>:
+
+        <font color='#009900'>// Define the type used to represent column vectors
+</font>        <font color='#0000FF'>typedef</font> matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>0</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> column_vector;
+        <font color='#009900'>// Define the type used to represent the hessian matrix
+</font>        <font color='#0000FF'>typedef</font> matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font> general_matrix;
+
+        <font color='#0000FF'><u>double</u></font> <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font> 
+            <font color='#0000FF'>const</font> column_vector<font color='#5555FF'>&amp;</font> x
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns f(x)
+                  (i.e. evaluates this model at the given point and returns the value)
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='get_derivative_and_hessian'></a>get_derivative_and_hessian</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> column_vector<font color='#5555FF'>&amp;</font> x,
+            column_vector<font color='#5555FF'>&amp;</font> d,
+            general_matrix<font color='#5555FF'>&amp;</font> h
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #d == the derivative of f() at x
+                - #h == the hessian matrix of f() at x
+                - is_col_vector(#d) == true
+                - #d.size() == x.size()
+                - #h.nr() == #h.nc() == x.size()
+                - #h == trans(#h)
+        !*/</font>
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> stop_strategy_type,
+        <font color='#0000FF'>typename</font> funct_model
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>double</u></font> <b><a name='find_min_trust_region'></a>find_min_trust_region</b> <font face='Lucida Console'>(</font>
+        stop_strategy_type stop_strategy,
+        <font color='#0000FF'>const</font> funct_model<font color='#5555FF'>&amp;</font> model, 
+        <font color='#0000FF'>typename</font> funct_model::column_vector<font color='#5555FF'>&amp;</font> x, 
+        <font color='#0000FF'><u>double</u></font> radius <font color='#5555FF'>=</font> <font color='#979000'>1</font>
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - stop_strategy == an object that defines a stop strategy such as one of 
+              the objects from dlib/optimization/optimization_stop_strategies_abstract.h
+            - is_col_vector(x) == true
+            - radius &gt; 0
+            - model must be an object with an interface as defined by the function_model
+              example object shown above.
+        ensures
+            - Performs an unconstrained minimization of the function defined by model 
+              starting from the initial point x.  This function uses a trust region
+              algorithm to perform the minimization.  The radius parameter defines
+              the initial size of the trust region.
+            - The function is optimized until stop_strategy decides that an acceptable 
+              point has been found or the trust region subproblem fails to make progress.
+            - #x == the value of x that was found to minimize model()
+            - returns model(#x). 
+            - When this function makes calls to model.get_derivative_and_hessian() it always 
+              does so by first calling model() and then calling model.get_derivative_and_hessian().  
+              That is, any call to model.get_derivative_and_hessian(val) will always be 
+              preceded by a call to model(val) with the same value.  This way you can reuse 
+              any redundant computations performed by model() and model.get_derivative_and_hessian()
+              as appropriate.
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> stop_strategy_type,
+        <font color='#0000FF'>typename</font> funct_model
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>double</u></font> <b><a name='find_max_trust_region'></a>find_max_trust_region</b> <font face='Lucida Console'>(</font>
+        stop_strategy_type stop_strategy,
+        <font color='#0000FF'>const</font> funct_model<font color='#5555FF'>&amp;</font> model, 
+        <font color='#0000FF'>typename</font> funct_model::column_vector<font color='#5555FF'>&amp;</font> x, 
+        <font color='#0000FF'><u>double</u></font> radius <font color='#5555FF'>=</font> <font color='#979000'>1</font>
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - stop_strategy == an object that defines a stop strategy such as one of 
+              the objects from dlib/optimization/optimization_stop_strategies_abstract.h
+            - is_col_vector(x) == true
+            - radius &gt; 0
+            - model must be an object with an interface as defined by the function_model
+              example object shown above.
+        ensures
+            - Performs an unconstrained maximization of the function defined by model 
+              starting from the initial point x.  This function uses a trust region
+              algorithm to perform the maximization.  The radius parameter defines
+              the initial size of the trust region.
+            - The function is optimized until stop_strategy decides that an acceptable 
+              point has been found or the trust region subproblem fails to make progress.
+            - #x == the value of x that was found to maximize model()
+            - returns model(#x). 
+            - When this function makes calls to model.get_derivative_and_hessian() it always 
+              does so by first calling model() and then calling model.get_derivative_and_hessian().  
+              That is, any call to model.get_derivative_and_hessian(val) will always be 
+              preceded by a call to model(val) with the same value.  This way you can reuse 
+              any redundant computations performed by model() and model.get_derivative_and_hessian()
+              as appropriate.
+            - Note that this function solves the maximization problem by converting it 
+              into a minimization problem.  Therefore, the values of model() and its derivative
+              reported to the stopping strategy will be negated.  That is, stop_strategy
+              will see -model() and -derivative.  All this really means is that the status 
+              messages from a stopping strategy in verbose mode will display a negated objective
+              value.
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_OPTIMIZATION_TRUST_REGIoN_H_ABSTRACTh_
+</font>
+
+
+</pre></body></html>

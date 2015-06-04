@@ -1,0 +1,165 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - active_learning.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2012  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_ACTIVE_LEARnING_Hh_
+<font color='#0000FF'>#define</font> DLIB_ACTIVE_LEARnING_Hh_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='active_learning_abstract.h.html'>active_learning_abstract.h</a>"
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='svm_c_linear_dcd_trainer.h.html'>svm_c_linear_dcd_trainer.h</a>"
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>vector<font color='#5555FF'>&gt;</font>
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+    <font color='#0000FF'>enum</font> <b><a name='active_learning_mode'></a>active_learning_mode</b>
+    <b>{</b>
+        max_min_margin,
+        ratio_margin
+    <b>}</b>;
+    
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> kernel_type,
+        <font color='#0000FF'>typename</font> in_sample_vector_type,
+        <font color='#0000FF'>typename</font> in_scalar_vector_type,
+        <font color='#0000FF'>typename</font> in_sample_vector_type2
+        <font color='#5555FF'>&gt;</font>
+    std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font> <b><a name='impl_rank_unlabeled_training_samples'></a>impl_rank_unlabeled_training_samples</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> svm_c_linear_dcd_trainer<font color='#5555FF'>&lt;</font>kernel_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> trainer,
+        <font color='#0000FF'>const</font> in_sample_vector_type<font color='#5555FF'>&amp;</font> samples,
+        <font color='#0000FF'>const</font> in_scalar_vector_type<font color='#5555FF'>&amp;</font> labels,
+        <font color='#0000FF'>const</font> in_sample_vector_type2<font color='#5555FF'>&amp;</font> unlabeled_samples,
+        <font color='#0000FF'>const</font> active_learning_mode mode 
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font><font color='#BB00BB'>is_vector</font><font face='Lucida Console'>(</font>unlabeled_samples<font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font>
+                     <font face='Lucida Console'>(</font>samples.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font> <font color='#5555FF'>|</font><font color='#5555FF'>|</font> <font color='#BB00BB'>is_learning_problem</font><font face='Lucida Console'>(</font>samples, labels<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> ,
+                "<font color='#CC0000'>\t std::vector&lt;unsigned long&gt; rank_unlabeled_training_samples()</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t Invalid inputs were given to this function</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t is_vector(unlabeled_samples):         </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>is_vector</font><font face='Lucida Console'>(</font>unlabeled_samples<font face='Lucida Console'>)</font> 
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t is_learning_problem(samples, labels): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>is_learning_problem</font><font face='Lucida Console'>(</font>samples, labels<font face='Lucida Console'>)</font> 
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t samples.size(): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> samples.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> 
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t labels.size():  </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> labels.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> 
+                <font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// If there aren't any training samples then all unlabeled_samples are equally good.
+</font>        <font color='#009900'>// So just report an arbitrary ordering.
+</font>        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>samples.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font> <font color='#5555FF'>|</font><font color='#5555FF'>|</font> unlabeled_samples.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font> <font color='#BB00BB'>ret</font><font face='Lucida Console'>(</font>unlabeled_samples.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> ret.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                ret[i] <font color='#5555FF'>=</font> i;
+
+            <font color='#0000FF'>return</font> ret;
+        <b>}</b>
+
+        <font color='#009900'>// We are going to score each unlabeled sample and put the score and index into
+</font>        <font color='#009900'>// results.  Then at the end of this function we just sort it and return the indices.
+</font>        std::vector<font color='#5555FF'>&lt;</font>std::pair<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>, <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> results;
+        results.<font color='#BB00BB'>resize</font><font face='Lucida Console'>(</font>unlabeled_samples.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// make sure we use this trainer's ability to warm start itself since that will make
+</font>        <font color='#009900'>// this whole function run a lot faster.  But first, we need to find out what the state
+</font>        <font color='#009900'>// we will be warm starting from is. 
+</font>        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> svm_c_linear_dcd_trainer<font color='#5555FF'>&lt;</font>kernel_type<font color='#5555FF'>&gt;</font>::optimizer_state optimizer_state;
+        optimizer_state state;
+        trainer.<font color='#BB00BB'>train</font><font face='Lucida Console'>(</font>samples, labels, state<font face='Lucida Console'>)</font>; <font color='#009900'>// call train() just to get state
+</font>
+        decision_function<font color='#5555FF'>&lt;</font>kernel_type<font color='#5555FF'>&gt;</font> df;
+
+        std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> kernel_type::sample_type<font color='#5555FF'>&gt;</font> temp_samples;
+        std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> kernel_type::scalar_type<font color='#5555FF'>&gt;</font> temp_labels;
+        temp_samples.<font color='#BB00BB'>reserve</font><font face='Lucida Console'>(</font>samples.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>+</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+        temp_labels.<font color='#BB00BB'>reserve</font><font face='Lucida Console'>(</font>labels.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>+</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+        temp_samples.<font color='#BB00BB'>assign</font><font face='Lucida Console'>(</font>samples.<font color='#BB00BB'>begin</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, samples.<font color='#BB00BB'>end</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        temp_labels.<font color='#BB00BB'>assign</font><font face='Lucida Console'>(</font>labels.<font color='#BB00BB'>begin</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, labels.<font color='#BB00BB'>end</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        temp_samples.<font color='#BB00BB'>resize</font><font face='Lucida Console'>(</font>temp_samples.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>+</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+        temp_labels.<font color='#BB00BB'>resize</font><font face='Lucida Console'>(</font>temp_labels.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>+</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+
+
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> unlabeled_samples.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+        <b>{</b>
+            temp_samples.<font color='#BB00BB'>back</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#BB00BB'>unlabeled_samples</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>;
+            <font color='#009900'>// figure out the margin for each possible labeling of this sample.
+</font>
+            optimizer_state <font color='#BB00BB'>temp</font><font face='Lucida Console'>(</font>state<font face='Lucida Console'>)</font>;
+            temp_labels.<font color='#BB00BB'>back</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#5555FF'>+</font><font color='#979000'>1</font>;
+            df <font color='#5555FF'>=</font> trainer.<font color='#BB00BB'>train</font><font face='Lucida Console'>(</font>temp_samples, temp_labels, temp<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> margin_p <font color='#5555FF'>=</font> temp_labels.<font color='#BB00BB'>back</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>*</font><font color='#BB00BB'>df</font><font face='Lucida Console'>(</font>temp_samples.<font color='#BB00BB'>back</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+            temp <font color='#5555FF'>=</font> state;
+            temp_labels.<font color='#BB00BB'>back</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>1</font>;
+            df <font color='#5555FF'>=</font> trainer.<font color='#BB00BB'>train</font><font face='Lucida Console'>(</font>temp_samples, temp_labels, temp<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> margin_n <font color='#5555FF'>=</font> temp_labels.<font color='#BB00BB'>back</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>*</font><font color='#BB00BB'>df</font><font face='Lucida Console'>(</font>temp_samples.<font color='#BB00BB'>back</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>mode <font color='#5555FF'>=</font><font color='#5555FF'>=</font> max_min_margin<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#009900'>// The score for this sample is its min possible margin over possible labels.
+</font>                <font color='#009900'>// Therefore, this score measures how much flexibility we have to label this
+</font>                <font color='#009900'>// sample however we want.  The intuition being that the most useful points to
+</font>                <font color='#009900'>// label are the ones that are still free to obtain either label.
+</font>                results[i] <font color='#5555FF'>=</font> std::<font color='#BB00BB'>make_pair</font><font face='Lucida Console'>(</font>std::<font color='#BB00BB'>min</font><font face='Lucida Console'>(</font>margin_p, margin_n<font face='Lucida Console'>)</font>, i<font face='Lucida Console'>)</font>;
+            <b>}</b>
+            <font color='#0000FF'>else</font>
+            <b>{</b>
+                <font color='#009900'>// In this case, the score for the sample is a ratio that tells how close the
+</font>                <font color='#009900'>// two margin values are to each other.  The closer they are the better.  So in
+</font>                <font color='#009900'>// this case we are saying we are looking for samples that have the same
+</font>                <font color='#009900'>// preference for either class label. 
+</font>                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>std::<font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font>margin_p<font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> std::<font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font>margin_n<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>margin_p <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                        results[i] <font color='#5555FF'>=</font> std::<font color='#BB00BB'>make_pair</font><font face='Lucida Console'>(</font>margin_n<font color='#5555FF'>/</font>margin_p, i<font face='Lucida Console'>)</font>;
+                    <font color='#0000FF'>else</font> <font color='#009900'>// if both are == 0 then say 0/0 == 1
+</font>                        results[i] <font color='#5555FF'>=</font> std::<font color='#BB00BB'>make_pair</font><font face='Lucida Console'>(</font><font color='#979000'>1</font>, i<font face='Lucida Console'>)</font>;
+                <b>}</b>
+                <font color='#0000FF'>else</font>
+                <b>{</b>
+                    results[i] <font color='#5555FF'>=</font> std::<font color='#BB00BB'>make_pair</font><font face='Lucida Console'>(</font>margin_p<font color='#5555FF'>/</font>margin_n, i<font face='Lucida Console'>)</font>;
+                <b>}</b>
+            <b>}</b>
+        <b>}</b>
+
+        <font color='#009900'>// sort the results so the highest scoring samples come first.
+</font>        std::<font color='#BB00BB'>sort</font><font face='Lucida Console'>(</font>results.<font color='#BB00BB'>rbegin</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, results.<font color='#BB00BB'>rend</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// transfer results into a vector with just sample indices so we can return it.
+</font>        std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font> <font color='#BB00BB'>ret</font><font face='Lucida Console'>(</font>results.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> ret.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            ret[i] <font color='#5555FF'>=</font> results[i].second;
+        <font color='#0000FF'>return</font> ret;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> kernel_type,
+        <font color='#0000FF'>typename</font> in_sample_vector_type,
+        <font color='#0000FF'>typename</font> in_scalar_vector_type,
+        <font color='#0000FF'>typename</font> in_sample_vector_type2
+        <font color='#5555FF'>&gt;</font>
+    std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font> <b><a name='rank_unlabeled_training_samples'></a>rank_unlabeled_training_samples</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> svm_c_linear_dcd_trainer<font color='#5555FF'>&lt;</font>kernel_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> trainer,
+        <font color='#0000FF'>const</font> in_sample_vector_type<font color='#5555FF'>&amp;</font> samples,
+        <font color='#0000FF'>const</font> in_scalar_vector_type<font color='#5555FF'>&amp;</font> labels,
+        <font color='#0000FF'>const</font> in_sample_vector_type2<font color='#5555FF'>&amp;</font> unlabeled_samples,
+        <font color='#0000FF'>const</font> active_learning_mode mode <font color='#5555FF'>=</font> max_min_margin
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>return</font> <font color='#BB00BB'>impl_rank_unlabeled_training_samples</font><font face='Lucida Console'>(</font>trainer,
+                                                    <font color='#BB00BB'>mat</font><font face='Lucida Console'>(</font>samples<font face='Lucida Console'>)</font>,
+                                                    <font color='#BB00BB'>mat</font><font face='Lucida Console'>(</font>labels<font face='Lucida Console'>)</font>,
+                                                    <font color='#BB00BB'>mat</font><font face='Lucida Console'>(</font>unlabeled_samples<font face='Lucida Console'>)</font>,
+                                                    mode<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_ACTIVE_LEARnING_Hh_
+</font>
+
+</pre></body></html>

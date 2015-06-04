@@ -1,0 +1,274 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - matrix_exp.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2006  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_MATRIx_EXP_h_
+<font color='#0000FF'>#define</font> DLIB_MATRIx_EXP_h_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../algs.h.html'>../algs.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../is_kind.h.html'>../is_kind.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='matrix_fwd.h.html'>matrix_fwd.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='matrix_exp_abstract.h.html'>matrix_exp_abstract.h</a>"
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>iterator<font color='#5555FF'>&gt;</font>
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#009900'>// We want to return the compile time constant if our NR and NC dimensions
+</font>    <font color='#009900'>// aren't zero but if they are then we want to call ref_.nx() and return
+</font>    <font color='#009900'>// the correct values. 
+</font>    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font> <font color='#0000FF'>typename</font> exp_type, <font color='#0000FF'><u>long</u></font> NR <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>struct</font> <b><a name='get_nr_helper'></a>get_nr_helper</b>
+    <b>{</b>
+        <font color='#0000FF'>static</font> <font color='#0000FF'>inline</font> <font color='#0000FF'><u>long</u></font> <b><a name='get'></a>get</b><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> exp_type<font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font> <b>{</b> <font color='#0000FF'>return</font> NR; <b>}</b>
+    <b>}</b>;
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font> <font color='#0000FF'>typename</font> exp_type <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>struct</font> <b><a name='get_nr_helper'></a>get_nr_helper</b><font color='#5555FF'>&lt;</font>exp_type,<font color='#979000'>0</font><font color='#5555FF'>&gt;</font>
+    <b>{</b>
+        <font color='#0000FF'>static</font> <font color='#0000FF'>inline</font> <font color='#0000FF'><u>long</u></font> <b><a name='get'></a>get</b><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> exp_type<font color='#5555FF'>&amp;</font> m<font face='Lucida Console'>)</font> <b>{</b> <font color='#0000FF'>return</font> m.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <b>}</b>
+    <b>}</b>;
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font> <font color='#0000FF'>typename</font> exp_type, <font color='#0000FF'><u>long</u></font> NC <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>struct</font> <b><a name='get_nc_helper'></a>get_nc_helper</b>
+    <b>{</b>
+        <font color='#0000FF'>static</font> <font color='#0000FF'>inline</font> <font color='#0000FF'><u>long</u></font> <b><a name='get'></a>get</b><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> exp_type<font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font> <b>{</b> <font color='#0000FF'>return</font> NC; <b>}</b>
+    <b>}</b>;
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font> <font color='#0000FF'>typename</font> exp_type <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>struct</font> <b><a name='get_nc_helper'></a>get_nc_helper</b><font color='#5555FF'>&lt;</font>exp_type,<font color='#979000'>0</font><font color='#5555FF'>&gt;</font>
+    <b>{</b>
+        <font color='#0000FF'>static</font> <font color='#0000FF'>inline</font> <font color='#0000FF'><u>long</u></font> <b><a name='get'></a>get</b><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> exp_type<font color='#5555FF'>&amp;</font> m<font face='Lucida Console'>)</font> <b>{</b> <font color='#0000FF'>return</font> m.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <b>}</b>
+    <b>}</b>;
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> EXP<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>struct</font> <b><a name='matrix_traits'></a>matrix_traits</b>
+    <b>{</b>
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> EXP::type type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> EXP::const_ret_type const_ret_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> EXP::mem_manager_type mem_manager_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> EXP::layout_type layout_type;
+        <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>long</u></font> NR <font color='#5555FF'>=</font> EXP::NR;
+        <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>long</u></font> NC <font color='#5555FF'>=</font> EXP::NC;
+        <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>long</u></font> cost <font color='#5555FF'>=</font> EXP::cost;
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> EXP<font color='#5555FF'>&gt;</font> <font color='#0000FF'>class</font> matrix_exp;
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> EXP<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>class</font> <b><a name='matrix_exp_iterator'></a>matrix_exp_iterator</b> : <font color='#0000FF'>public</font> std::iterator<font color='#5555FF'>&lt;</font>std::forward_iterator_tag, <font color='#0000FF'>typename</font> matrix_traits<font color='#5555FF'>&lt;</font>EXP<font color='#5555FF'>&gt;</font>::type<font color='#5555FF'>&gt;</font>
+    <b>{</b>
+        <font color='#0000FF'>friend</font> <font color='#0000FF'>class</font> <b><a name='matrix_exp'></a>matrix_exp</b><font color='#5555FF'>&lt;</font>EXP<font color='#5555FF'>&gt;</font>;
+        <b><a name='matrix_exp_iterator'></a>matrix_exp_iterator</b><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> EXP<font color='#5555FF'>&amp;</font> m_, <font color='#0000FF'><u>long</u></font> r_, <font color='#0000FF'><u>long</u></font> c_<font face='Lucida Console'>)</font>
+        <b>{</b>
+            r <font color='#5555FF'>=</font> r_;
+            c <font color='#5555FF'>=</font> c_;
+            nc <font color='#5555FF'>=</font> m_.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            m <font color='#5555FF'>=</font> <font color='#5555FF'>&amp;</font>m_;
+        <b>}</b>
+
+    <font color='#0000FF'>public</font>:
+
+        <b><a name='matrix_exp_iterator'></a>matrix_exp_iterator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> : r<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>, c<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>, nc<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>, m<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> matrix_traits<font color='#5555FF'>&lt;</font>EXP<font color='#5555FF'>&gt;</font>::type type;
+        <font color='#0000FF'>typedef</font> type value_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> matrix_traits<font color='#5555FF'>&lt;</font>EXP<font color='#5555FF'>&gt;</font>::const_ret_type const_ret_type;
+
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='operator'></a>operator</b> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font> <font color='#0000FF'>const</font> matrix_exp_iterator<font color='#5555FF'>&amp;</font> itr<font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b> <font color='#0000FF'>return</font> r <font color='#5555FF'>=</font><font color='#5555FF'>=</font> itr.r <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> c <font color='#5555FF'>=</font><font color='#5555FF'>=</font> itr.c; <b>}</b>
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='operator'></a>operator</b> <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font> <font color='#0000FF'>const</font> matrix_exp_iterator<font color='#5555FF'>&amp;</font> itr<font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b> <font color='#0000FF'>return</font> <font color='#5555FF'>!</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> itr<font face='Lucida Console'>)</font>; <b>}</b>
+
+        matrix_exp_iterator<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#5555FF'>+</font><font color='#5555FF'>+</font>c;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>c<font color='#5555FF'>=</font><font color='#5555FF'>=</font>nc<font face='Lucida Console'>)</font>
+            <b>{</b>
+                c <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                <font color='#5555FF'>+</font><font color='#5555FF'>+</font>r;
+            <b>}</b>
+            <font color='#0000FF'>return</font> <font color='#5555FF'>*</font><font color='#0000FF'>this</font>;
+        <b>}</b>
+
+        matrix_exp_iterator <b><a name='operator'></a>operator</b><font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            matrix_exp_iterator <font color='#BB00BB'>temp</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font><font face='Lucida Console'>)</font>;
+            <font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>return</font> temp;
+        <b>}</b>
+
+        const_ret_type <b><a name='operator'></a>operator</b><font color='#5555FF'>*</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>m<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>r,c<font face='Lucida Console'>)</font>; <b>}</b>
+
+    <font color='#0000FF'>private</font>:
+        <font color='#0000FF'><u>long</u></font> r, c;
+        <font color='#0000FF'><u>long</u></font> nc;
+        <font color='#0000FF'>const</font> EXP<font color='#5555FF'>*</font> m;
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> EXP
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>class</font> <b><a name='matrix_exp'></a>matrix_exp</b> 
+    <b>{</b>
+        <font color='#009900'>/*!
+            REQUIREMENTS ON EXP
+                EXP should be something convertible to a matrix_exp.  That is,
+                it should inherit from matrix_exp
+        !*/</font>
+
+    <font color='#0000FF'>public</font>:
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> matrix_traits<font color='#5555FF'>&lt;</font>EXP<font color='#5555FF'>&gt;</font>::type type;
+        <font color='#0000FF'>typedef</font> type value_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> matrix_traits<font color='#5555FF'>&lt;</font>EXP<font color='#5555FF'>&gt;</font>::const_ret_type const_ret_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> matrix_traits<font color='#5555FF'>&lt;</font>EXP<font color='#5555FF'>&gt;</font>::mem_manager_type mem_manager_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> matrix_traits<font color='#5555FF'>&lt;</font>EXP<font color='#5555FF'>&gt;</font>::layout_type layout_type;
+        <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>long</u></font> NR <font color='#5555FF'>=</font> matrix_traits<font color='#5555FF'>&lt;</font>EXP<font color='#5555FF'>&gt;</font>::NR;
+        <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>long</u></font> NC <font color='#5555FF'>=</font> matrix_traits<font color='#5555FF'>&lt;</font>EXP<font color='#5555FF'>&gt;</font>::NC;
+        <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>long</u></font> cost <font color='#5555FF'>=</font> matrix_traits<font color='#5555FF'>&lt;</font>EXP<font color='#5555FF'>&gt;</font>::cost;
+
+        <font color='#0000FF'>typedef</font> matrix<font color='#5555FF'>&lt;</font>type,NR,NC,mem_manager_type,layout_type<font color='#5555FF'>&gt;</font> matrix_type;
+        <font color='#0000FF'>typedef</font> EXP exp_type;
+        <font color='#0000FF'>typedef</font> matrix_exp_iterator<font color='#5555FF'>&lt;</font>EXP<font color='#5555FF'>&gt;</font> iterator;
+        <font color='#0000FF'>typedef</font> matrix_exp_iterator<font color='#5555FF'>&lt;</font>EXP<font color='#5555FF'>&gt;</font> const_iterator;
+
+        <font color='#0000FF'>inline</font> const_ret_type <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>long</u></font> r,
+            <font color='#0000FF'><u>long</u></font> c
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> 
+        <b>{</b> 
+            <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font>r <font color='#5555FF'>&lt;</font> <font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> c <font color='#5555FF'>&lt;</font> <font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> r <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#979000'>0</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> c <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#979000'>0</font>, 
+                "<font color='#CC0000'>\tconst type matrix_exp::operator(r,c)</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tYou must give a valid row and column</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tr:    </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> r 
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tc:    </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> c
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tnr(): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tnc(): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> 
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tthis: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font>
+                <font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>return</font> <font color='#BB00BB'>ref</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>r,c<font face='Lucida Console'>)</font>; 
+        <b>}</b>
+
+        const_ret_type <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>long</u></font> i
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> 
+        <b>{</b>
+            <font color='#BB00BB'>COMPILE_TIME_ASSERT</font><font face='Lucida Console'>(</font>NC <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>1</font> <font color='#5555FF'>|</font><font color='#5555FF'>|</font> NC <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font> <font color='#5555FF'>|</font><font color='#5555FF'>|</font> NR <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>1</font> <font color='#5555FF'>|</font><font color='#5555FF'>|</font> NR <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font><font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>1</font> <font color='#5555FF'>|</font><font color='#5555FF'>|</font> <font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>1</font>, 
+                "<font color='#CC0000'>\tconst type matrix_exp::operator(i)</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tYou can only use this operator on column or row vectors</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\ti:    </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> i
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tnr(): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tnc(): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tthis: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font>
+                <font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>1</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> i <font color='#5555FF'>&lt;</font> <font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>|</font><font color='#5555FF'>|</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>1</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> i <font color='#5555FF'>&lt;</font> <font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> i <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#979000'>0</font>, 
+                "<font color='#CC0000'>\tconst type matrix_exp::operator(i)</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tYou must give a valid row/column number</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\ti:    </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> i
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tnr(): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tnc(): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tthis: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font>
+                <font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>
+                <font color='#0000FF'>return</font> <font color='#BB00BB'>ref</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>i,<font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>else</font>
+                <font color='#0000FF'>return</font> <font color='#BB00BB'>ref</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>,i<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'><u>long</u></font> <b><a name='size'></a>size</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> <font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>*</font><font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <b>}</b>
+
+        <font color='#0000FF'><u>long</u></font> <b><a name='nr'></a>nr</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> get_nr_helper<font color='#5555FF'>&lt;</font>exp_type,NR<font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font color='#BB00BB'>ref</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>; <b>}</b>
+
+        <font color='#0000FF'><u>long</u></font> <b><a name='nc'></a>nc</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> get_nc_helper<font color='#5555FF'>&lt;</font>exp_type,NC<font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font color='#BB00BB'>ref</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>; <b>}</b>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> U<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>bool</u></font> <b><a name='aliases'></a>aliases</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&lt;</font>U<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> item
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> <font color='#BB00BB'>ref</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>aliases</font><font face='Lucida Console'>(</font>item<font face='Lucida Console'>)</font>; <b>}</b>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> U<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>bool</u></font> <b><a name='destructively_aliases'></a>destructively_aliases</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&lt;</font>U<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> item
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> <font color='#BB00BB'>ref</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>destructively_aliases</font><font face='Lucida Console'>(</font>item<font face='Lucida Console'>)</font>; <b>}</b>
+
+        <font color='#0000FF'>inline</font> <font color='#0000FF'>const</font> exp_type<font color='#5555FF'>&amp;</font> <b><a name='ref'></a>ref</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> <font color='#5555FF'>*</font><font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'>const</font> exp_type<font color='#5555FF'>*</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#0000FF'>this</font><font face='Lucida Console'>)</font>; <b>}</b>
+
+        <font color='#0000FF'>inline</font> <b><a name='operator'></a>operator</b> <font color='#0000FF'>const</font> <b><a name='type'></a>type</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> 
+        <b>{</b>
+            <font color='#BB00BB'>COMPILE_TIME_ASSERT</font><font face='Lucida Console'>(</font>NC <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>1</font> <font color='#5555FF'>|</font><font color='#5555FF'>|</font> NC <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>COMPILE_TIME_ASSERT</font><font face='Lucida Console'>(</font>NR <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>1</font> <font color='#5555FF'>|</font><font color='#5555FF'>|</font> NR <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font><font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>1</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> <font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>1</font>, 
+                "<font color='#CC0000'>\tmatrix_exp::operator const type() const</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tYou can only use this operator on a 1x1 matrix</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tnr(): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tnc(): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tthis: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font>
+                <font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// Put the expression contained in this matrix_exp into
+</font>            <font color='#009900'>// a temporary 1x1 matrix so that the expression will encounter
+</font>            <font color='#009900'>// all the overloads of matrix_assign() and have the chance to
+</font>            <font color='#009900'>// go through any applicable optimizations.
+</font>            matrix<font color='#5555FF'>&lt;</font>type,<font color='#979000'>1</font>,<font color='#979000'>1</font>,mem_manager_type,layout_type<font color='#5555FF'>&gt;</font> <font color='#BB00BB'>temp</font><font face='Lucida Console'>(</font><font color='#BB00BB'>ref</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>return</font> <font color='#BB00BB'>temp</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        const_iterator <b><a name='begin'></a>begin</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> matrix_exp_iterator<font color='#5555FF'>&lt;</font>EXP<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#BB00BB'>ref</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font>; <b>}</b>
+        const_iterator <b><a name='end'></a>end</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>   <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> matrix_exp_iterator<font color='#5555FF'>&lt;</font>EXP<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#BB00BB'>ref</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font>; <b>}</b>
+
+    <font color='#0000FF'>protected</font>:
+        <b><a name='matrix_exp'></a>matrix_exp</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+        <b><a name='matrix_exp'></a>matrix_exp</b><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&amp;</font> <font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+
+    <font color='#0000FF'>private</font>:
+
+        matrix_exp<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font>;
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#009900'>// something is a matrix if it is convertible to a matrix_exp object
+</font>    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>struct</font> <b><a name='is_matrix'></a>is_matrix</b><font color='#5555FF'>&lt;</font>T, <font color='#0000FF'>typename</font> enable_if<font color='#5555FF'>&lt;</font>is_convertible<font color='#5555FF'>&lt;</font>T, <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T::exp_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> <font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font>::type <font color='#5555FF'>&gt;</font> 
+    <b>{</b> <font color='#0000FF'>static</font> <font color='#0000FF'>const</font> <font color='#0000FF'><u>bool</u></font> value <font color='#5555FF'>=</font> <font color='#979000'>true</font>; <b>}</b>; 
+    <font color='#009900'>/*
+        is_matrix&lt;T&gt;::value == 1 if T is a matrix type else 0
+    */</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> EXP
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>class</font> <b><a name='matrix_diag_exp'></a>matrix_diag_exp</b> : <font color='#0000FF'>public</font> matrix_exp<font color='#5555FF'>&lt;</font>EXP<font color='#5555FF'>&gt;</font> 
+    <b>{</b>
+        <font color='#009900'>/*!
+            This is a matrix expression type used to represent diagonal matrices.
+            That is, square matrices with all off diagonal elements equal to 0.
+        !*/</font>
+
+    <font color='#0000FF'>protected</font>:
+        <b><a name='matrix_diag_exp'></a>matrix_diag_exp</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+        <b><a name='matrix_diag_exp'></a>matrix_diag_exp</b><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> matrix_diag_exp<font color='#5555FF'>&amp;</font> item <font face='Lucida Console'>)</font>:matrix_exp<font color='#5555FF'>&lt;</font>EXP<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>item<font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_MATRIx_EXP_h_
+</font>
+
+</pre></body></html>

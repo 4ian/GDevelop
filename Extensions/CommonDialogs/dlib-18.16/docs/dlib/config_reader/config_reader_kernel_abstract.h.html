@@ -1,0 +1,366 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - config_reader_kernel_abstract.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2003  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#undef</font> DLIB_CONFIG_READER_KERNEl_ABSTRACT_
+<font color='#0000FF'>#ifdef</font> DLIB_CONFIG_READER_KERNEl_ABSTRACT_
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>string<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>iosfwd<font color='#5555FF'>&gt;</font>
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+    <font color='#0000FF'>class</font> <b><a name='config_reader'></a>config_reader</b> 
+    <b>{</b>
+
+        <font color='#009900'>/*!                
+            INITIAL VALUE
+                - there aren't any keys defined for this object
+                - there aren't any blocks defined for this object
+
+            POINTERS AND REFERENCES TO INTERNAL DATA
+                The destructor, clear(), and load_from() invalidate pointers
+                and references to internal data.  All other functions are guaranteed
+                to NOT invalidate pointers or references to internal data.
+
+            WHAT THIS OBJECT REPRESENTS
+                This object represents something which is intended to be used to read
+                text configuration files that are defined by the following EBNF (with
+                config_file as the starting symbol):
+            
+                config_file    = block;
+                block          = { key_value_pair | sub_block };
+                key_value_pair = key_name, "=", value;
+                sub_block      = block_name, "{", block, "}";
+
+                key_name       = identifier;
+                block_name     = identifier;
+                value          = matches any string of text that ends with a newline character, # or }.  
+                                 note that the trailing newline, # or } is not part of the value though.
+                identifier     = Any string that matches the following regular expression:
+                                 [a-zA-Z][a-zA-Z0-9_-\.]*
+                                 i.e. Any string that starts with a letter and then is continued
+                                 with any number of letters, numbers, _ . or - characters.
+
+                Whitespace and comments are ignored.  A comment is text that starts with # (but not \#
+                since the \ escapes the # so that you can have a # symbol in a value if you want) and 
+                ends in a new line.  You can also escape a } (e.g. "\}") if you want to have one in a 
+                value.
+
+                Note that in a value the leading and trailing white spaces are stripped off but any 
+                white space inside the value is preserved.
+
+                Also note that all key_names and block_names within a block syntax group must be unique 
+                but don't have to be globally unique.  I.e. different blocks can reuse names. 
+
+                EXAMPLE CONFIG FILES:
+
+                    Example 1:
+                        #comment.  This line is ignored because it starts with #
+
+                        #here we have key1 which will have the value of "my value"
+                        key1 = my value 
+
+                        another_key=  another value  # this is another key called "another_key" with
+                                                     # a value of "another value"
+
+                        # this key's value is the empty string.  I.e. ""
+                        key2=
+
+                    Example 2:
+                        #this example illustrates the use of blocks
+                        some_key = blah blah
+
+                        # now here is a block
+                        our_block
+                        {
+                            # here we can define some keys and values that are local to this block.
+                            a_key = something
+                            foo = bar
+                            some_key = more stuff  # note that it is ok to name our key this even though
+                                                   # there is a key called some_key above.  This is because
+                                                   # we are doing so inside a different block
+                        }
+
+                        another_block { foo = bar2 }  # this block has only one key and is all on a single line
+        !*/</font>
+    
+    <font color='#0000FF'>public</font>:
+
+        <font color='#009900'>// exception classes
+</font>        <font color='#0000FF'>class</font> <b><a name='config_reader_error'></a>config_reader_error</b> : <font color='#0000FF'>public</font> dlib::error 
+        <b>{</b>
+            <font color='#009900'>/*!
+                GENERAL
+                    This exception is thrown if there is an error while parsing the
+                    config file.  The type member of this exception will be set
+                    to ECONFIG_READER.
+
+                INTERPRETING THIS EXCEPTION
+                    - line_number == the line number the parser was at when the 
+                      error occurred.
+                    - if (redefinition) then
+                        - The key or block name on line line_number has already
+                          been defined in this scope which is an error.
+                    - else
+                        - Some other general syntax error was detected
+            !*/</font>
+        <font color='#0000FF'>public</font>:
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> line_number;
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>bool</u></font> redefinition;
+        <b>}</b>;
+
+        <font color='#0000FF'>class</font> <b><a name='file_not_found'></a>file_not_found</b> : <font color='#0000FF'>public</font> dlib::error 
+        <b>{</b>
+            <font color='#009900'>/*!
+                GENERAL
+                    This exception is thrown if the config file can't be opened for
+                    some reason.  The type member of this exception will be set
+                    to ECONFIG_READER.
+
+                INTERPRETING THIS EXCEPTION
+                    - file_name == the name of the config file which we failed to open
+            !*/</font>
+        <font color='#0000FF'>public</font>:
+            <font color='#0000FF'>const</font> std::string file_name;
+        <b>}</b>;
+
+
+        <font color='#0000FF'>class</font> <b><a name='config_reader_access_error'></a>config_reader_access_error</b> : <font color='#0000FF'>public</font> dlib::error
+        <b>{</b>
+            <font color='#009900'>/*!
+                GENERAL
+                    This exception is thrown if you try to access a key or
+                    block that doesn't exist inside a config reader.  The type 
+                    member of this exception will be set to ECONFIG_READER.
+            !*/</font>
+        <font color='#0000FF'>public</font>:
+            <b><a name='config_reader_access_error'></a>config_reader_access_error</b><font face='Lucida Console'>(</font>
+                <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> block_name_,
+                <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> key_name_
+            <font face='Lucida Console'>)</font>;
+            <font color='#009900'>/*!
+                ensures
+                    - #block_name == block_name_
+                    - #key_name == key_name_
+            !*/</font>
+
+            <font color='#0000FF'>const</font> std::string block_name;
+            <font color='#0000FF'>const</font> std::string key_name;
+        <b>}</b>;
+
+    <font color='#009900'>// --------------------------
+</font>
+        <b><a name='config_reader'></a>config_reader</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures 
+                - #*this is properly initialized
+                - This object will not have any keys or blocks defined in it.  
+            throws
+                - std::bad_alloc
+                - config_reader_error
+        !*/</font>
+
+        <b><a name='config_reader'></a>config_reader</b><font face='Lucida Console'>(</font>
+            std::istream<font color='#5555FF'>&amp;</font> in
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures 
+                - #*this is properly initialized
+                - reads the config file to parse from the given input stream,
+                  parses it and loads this object up with all the sub blocks and
+                  key/value pairs it finds.
+                - before the load is performed, the previous state of the config file
+                  reader is erased.  So after the load the config file reader will contain
+                  only information from the given config file.
+                - This object will represent the top most block of the config file.
+            throws
+                - std::bad_alloc
+                - config_reader_error
+        !*/</font>
+
+        <b><a name='config_reader'></a>config_reader</b><font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> config_file 
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures 
+                - #*this is properly initialized
+                - parses the config file named by the config_file string.  Specifically, 
+                  parses it and loads this object up with all the sub blocks and
+                  key/value pairs it finds in the file.
+                - before the load is performed, the previous state of the config file
+                  reader is erased.  So after the load the config file reader will contain
+                  only information from the given config file.
+                - This object will represent the top most block of the config file.
+            throws
+                - std::bad_alloc
+                - config_reader_error
+                - file_not_found
+        !*/</font>
+
+        <font color='#0000FF'>virtual</font> ~<b><a name='config_reader'></a>config_reader</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>; 
+        <font color='#009900'>/*!
+            ensures
+                - all memory associated with *this has been released
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='clear'></a>clear</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #*this has its initial value
+            throws
+                - std::bad_alloc 
+                    If this exception is thrown then *this is unusable 
+                    until clear() is called and succeeds
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='load_from'></a>load_from</b> <font face='Lucida Console'>(</font>
+            std::istream<font color='#5555FF'>&amp;</font> in
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures 
+                - reads the config file to parse from the given input stream,
+                  parses it and loads this object up with all the sub blocks and
+                  key/value pairs it finds.
+                - before the load is performed, the previous state of the config file
+                  reader is erased.  So after the load the config file reader will contain
+                  only information from the given config file.
+                - *this will represent the top most block of the config file contained
+                  in the input stream in.
+            throws
+                - std::bad_alloc 
+                    If this exception is thrown then *this is unusable 
+                    until clear() is called and succeeds
+                - config_reader_error
+                    If this exception is thrown then this object will
+                    revert to its initial value.
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='load_from'></a>load_from</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> config_file
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures 
+                - parses the config file named by the config_file string.  Specifically, 
+                  parses it and loads this object up with all the sub blocks and
+                  key/value pairs it finds in the file.  
+                - before the load is performed, the previous state of the config file
+                  reader is erased.  So after the load the config file reader will contain
+                  only information from the given config file.
+                - This object will represent the top most block of the config file.
+            throws
+                - std::bad_alloc 
+                    If this exception is thrown then *this is unusable 
+                    until clear() is called and succeeds
+                - config_reader_error
+                    If this exception is thrown then this object will
+                    revert to its initial value.
+                - file_not_found
+                    If this exception is thrown then this object will
+                    revert to its initial value.
+        !*/</font>
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='is_key_defined'></a>is_key_defined</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> key_name
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - if (there is a key with the given name defined within this config_reader's block) then
+                    - returns true
+                - else
+                    - returns false
+        !*/</font>
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='is_block_defined'></a>is_block_defined</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> block_name
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - if (there is a sub block with the given name defined within this config_reader's block) then
+                    - returns true
+                - else
+                    - returns false
+        !*/</font>
+
+        <font color='#0000FF'>typedef</font> config_reader this_type;
+        <font color='#0000FF'>const</font> this_type<font color='#5555FF'>&amp;</font> <b><a name='block'></a>block</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> block_name
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - if (is_block_defined(block_name) == true) then
+                    - returns a const reference to the config_reader that represents the given named sub block
+                - else
+                    - throws config_reader_access_error
+            throws
+                - config_reader_access_error
+                    if this exception is thrown then its block_name field will be set to the
+                    given block_name string.
+        !*/</font>
+
+        <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b>[] <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> key_name
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - if (is_key_defined(key_name) == true) then
+                    - returns a const reference to the value string associated with the given key in 
+                      this config_reader's block.
+                - else
+                    - throws config_reader_access_error
+            throws
+                - config_reader_access_error
+                    if this exception is thrown then its key_name field will be set to the
+                    given key_name string.
+        !*/</font>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'>typename</font> queue_of_strings
+            <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='get_keys'></a>get_keys</b> <font face='Lucida Console'>(</font>
+            queue_of_strings<font color='#5555FF'>&amp;</font> keys
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - queue_of_strings is an implementation of queue/queue_kernel_abstract.h 
+                  with T set to std::string, or std::vector&lt;std::string&gt;, or 
+                  dlib::std_vector_c&lt;std::string&gt;
+            ensures 
+                - #keys == a collection containing all the keys defined in this config_reader's block.
+                  (i.e. for all strings str in keys it is the case that is_key_defined(str) == true)
+        !*/</font>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'>typename</font> queue_of_strings
+            <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='get_blocks'></a>get_blocks</b> <font face='Lucida Console'>(</font>
+            queue_of_strings<font color='#5555FF'>&amp;</font> blocks
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - queue_of_strings is an implementation of queue/queue_kernel_abstract.h 
+                  with T set to std::string, or std::vector&lt;std::string&gt;, or 
+                  dlib::std_vector_c&lt;std::string&gt;
+            ensures 
+                - #blocks == a collection containing the names of all the blocks defined in this 
+                  config_reader's block.
+                  (i.e. for all strings str in blocks it is the case that is_block_defined(str) == true)
+        !*/</font>
+
+    <font color='#0000FF'>private</font>:
+
+        <font color='#009900'>// restricted functions
+</font>        <b><a name='config_reader'></a>config_reader</b><font face='Lucida Console'>(</font>config_reader<font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font>;        <font color='#009900'>// copy constructor
+</font>        config_reader<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>=</font><font face='Lucida Console'>(</font>config_reader<font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font>;    <font color='#009900'>// assignment operator
+</font>
+    <b>}</b>;
+
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_CONFIG_READER_KERNEl_ABSTRACT_
+</font>
+
+</pre></body></html>

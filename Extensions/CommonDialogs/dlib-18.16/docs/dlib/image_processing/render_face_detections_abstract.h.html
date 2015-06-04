@@ -1,0 +1,55 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - render_face_detections_abstract.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2014  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#undef</font> DLIB_RENDER_FACE_DeTECTIONS_ABSTRACT_H_
+<font color='#0000FF'>#ifdef</font> DLIB_RENDER_FACE_DeTECTIONS_ABSTRACT_H_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='full_object_detection_abstract.h.html'>full_object_detection_abstract.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../gui_widgets.h.html'>../gui_widgets.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>inline</font> std::vector<font color='#5555FF'>&lt;</font>image_window::overlay_line<font color='#5555FF'>&gt;</font> <b><a name='render_face_detections'></a>render_face_detections</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>full_object_detection<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> dets,
+        <font color='#0000FF'>const</font> rgb_pixel color <font color='#5555FF'>=</font> <font color='#BB00BB'>rgb_pixel</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>,<font color='#979000'>255</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font>
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - for all valid i:
+                - dets[i].num_parts() == 68
+        ensures
+            - Interprets the given objects as face detections with parts annotated using
+              the iBUG face landmark scheme.  We then return a set of overlay lines that
+              will draw the objects onto the screen in a way that properly draws the
+              outline of the face features defined by the part locations.
+            - returns a vector with dets.size() elements, each containing the lines
+              necessary to render a face detection from dets.
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>inline</font> std::vector<font color='#5555FF'>&lt;</font>image_window::overlay_line<font color='#5555FF'>&gt;</font> <b><a name='render_face_detections'></a>render_face_detections</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> full_object_detection<font color='#5555FF'>&amp;</font> det,
+        <font color='#0000FF'>const</font> rgb_pixel color <font color='#5555FF'>=</font> <font color='#BB00BB'>rgb_pixel</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>,<font color='#979000'>255</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font>
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - det.num_parts() == 68
+        ensures
+            - This function is identical to the above render_face_detections() routine
+              except that it takes just a single full_object_detection instead of a
+              std::vector of them.
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_RENDER_FACE_DeTECTIONS_ABSTRACT_H_
+</font>
+
+
+</pre></body></html>

@@ -1,0 +1,234 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - matrix_cholesky.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2009  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#009900'>// This code was adapted from code from the JAMA part of NIST's TNT library.
+</font><font color='#009900'>//    See: http://math.nist.gov/tnt/ 
+</font><font color='#0000FF'>#ifndef</font> DLIB_MATRIX_CHOLESKY_DECOMPOSITION_H
+<font color='#0000FF'>#define</font> DLIB_MATRIX_CHOLESKY_DECOMPOSITION_H
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='matrix.h.html'>matrix.h</a>" 
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='matrix_utilities.h.html'>matrix_utilities.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='matrix_subexp.h.html'>matrix_subexp.h</a>"
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>cmath<font color='#5555FF'>&gt;</font>
+
+<font color='#0000FF'>#ifdef</font> DLIB_USE_LAPACK
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='lapack/potrf.h.html'>lapack/potrf.h</a>"
+<font color='#0000FF'>#endif</font>
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='matrix_trsm.h.html'>matrix_trsm.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib 
+<b>{</b>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> matrix_exp_type
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>class</font> <b><a name='cholesky_decomposition'></a>cholesky_decomposition</b>
+    <b>{</b>
+
+    <font color='#0000FF'>public</font>:
+
+        <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>long</u></font> NR <font color='#5555FF'>=</font> matrix_exp_type::NR;
+        <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>long</u></font> NC <font color='#5555FF'>=</font> matrix_exp_type::NC;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> matrix_exp_type::type type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> matrix_exp_type::mem_manager_type mem_manager_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> matrix_exp_type::layout_type layout_type;
+
+        <font color='#0000FF'>typedef</font> matrix<font color='#5555FF'>&lt;</font>type,<font color='#979000'>0</font>,<font color='#979000'>0</font>,mem_manager_type,layout_type<font color='#5555FF'>&gt;</font>  matrix_type;
+        <font color='#0000FF'>typedef</font> matrix<font color='#5555FF'>&lt;</font>type,NR,<font color='#979000'>1</font>,mem_manager_type,layout_type<font color='#5555FF'>&gt;</font> column_vector_type;
+
+        <font color='#009900'>// You have supplied an invalid type of matrix_exp_type.  You have
+</font>        <font color='#009900'>// to use this object with matrices that contain float or double type data.
+</font>        <b><a name='COMPILE_TIME_ASSERT'></a>COMPILE_TIME_ASSERT</b><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>is_same_type<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>float</u></font>, type<font color='#5555FF'>&gt;</font>::value <font color='#5555FF'>|</font><font color='#5555FF'>|</font> 
+                             is_same_type<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>, type<font color='#5555FF'>&gt;</font>::value <font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> EXP<font color='#5555FF'>&gt;</font>
+        <b><a name='cholesky_decomposition'></a>cholesky_decomposition</b><font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&lt;</font>EXP<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> A
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='is_spd'></a>is_spd</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+        <font color='#0000FF'>const</font> matrix_type<font color='#5555FF'>&amp;</font> <b><a name='get_l'></a>get_l</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> EXP<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>const</font> <font color='#0000FF'>typename</font> EXP::matrix_type <b><a name='solve'></a>solve</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&lt;</font>EXP<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> B
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+    <font color='#0000FF'>private</font>:
+
+        matrix_type L_;     <font color='#009900'>// lower triangular factor
+</font>        <font color='#0000FF'><u>bool</u></font> isspd;         <font color='#009900'>// true if matrix to be factored was SPD
+</font>    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>//                                      Member functions
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> matrix_exp_type<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>bool</u></font> cholesky_decomposition<font color='#5555FF'>&lt;</font>matrix_exp_type<font color='#5555FF'>&gt;</font>::
+    <b><a name='is_spd'></a>is_spd</b><font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        <font color='#0000FF'>return</font> isspd;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> matrix_exp_type<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>const</font> <font color='#0000FF'>typename</font> cholesky_decomposition<font color='#5555FF'>&lt;</font>matrix_exp_type<font color='#5555FF'>&gt;</font>::matrix_type<font color='#5555FF'>&amp;</font> cholesky_decomposition<font color='#5555FF'>&lt;</font>matrix_exp_type<font color='#5555FF'>&gt;</font>::
+    <b><a name='get_l'></a>get_l</b><font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        <font color='#0000FF'>return</font> L_;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> matrix_exp_type<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> EXP<font color='#5555FF'>&gt;</font>
+    cholesky_decomposition<font color='#5555FF'>&lt;</font>matrix_exp_type<font color='#5555FF'>&gt;</font>::
+    <b><a name='cholesky_decomposition'></a>cholesky_decomposition</b><font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&lt;</font>EXP<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> A_
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>using</font> std::sqrt;
+        <font color='#BB00BB'>COMPILE_TIME_ASSERT</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>is_same_type<font color='#5555FF'>&lt;</font>type, <font color='#0000FF'>typename</font> EXP::type<font color='#5555FF'>&gt;</font>::value<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// make sure requires clause is not broken
+</font>        <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font>A_.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> A_.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> A_.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font>,
+            "<font color='#CC0000'>\tcholesky_decomposition::cholesky_decomposition(A_)</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tYou can only use this on square matrices</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tA_.nr():   </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> A_.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tA_.nc():   </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> A_.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tA_.size(): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> A_.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tthis:      </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font>
+            <font face='Lucida Console'>)</font>;
+
+<font color='#0000FF'>#ifdef</font> DLIB_USE_LAPACK
+        L_ <font color='#5555FF'>=</font> A_;
+        <font color='#0000FF'>const</font> type eps <font color='#5555FF'>=</font> <font color='#BB00BB'>max</font><font face='Lucida Console'>(</font><font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font><font color='#BB00BB'>diag</font><font face='Lucida Console'>(</font>L_<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font color='#5555FF'>*</font>std::<font color='#BB00BB'>sqrt</font><font face='Lucida Console'>(</font>std::numeric_limits<font color='#5555FF'>&lt;</font>type<font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>epsilon</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font color='#5555FF'>/</font><font color='#979000'>100</font>;
+
+        <font color='#009900'>// check if the matrix is actually symmetric
+</font>        <font color='#0000FF'><u>bool</u></font> is_symmetric <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> r <font color='#5555FF'>=</font> <font color='#979000'>0</font>; r <font color='#5555FF'>&lt;</font> L_.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> is_symmetric; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>r<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> c <font color='#5555FF'>=</font> r<font color='#5555FF'>+</font><font color='#979000'>1</font>; c <font color='#5555FF'>&lt;</font> L_.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> is_symmetric; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>c<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#009900'>// this is approximately doing: is_symmetric = is_symmetric &amp;&amp; ( L_(k,j) == L_(j,k))
+</font>                is_symmetric <font color='#5555FF'>=</font> is_symmetric <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> <font face='Lucida Console'>(</font>std::<font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font><font color='#BB00BB'>L_</font><font face='Lucida Console'>(</font>r,c<font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> <font color='#BB00BB'>L_</font><font face='Lucida Console'>(</font>c,r<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> eps <font face='Lucida Console'>)</font>; 
+            <b>}</b>
+        <b>}</b>
+
+        <font color='#009900'>// now compute the actual cholesky decomposition
+</font>        <font color='#0000FF'><u>int</u></font> info <font color='#5555FF'>=</font> lapack::<font color='#BB00BB'>potrf</font><font face='Lucida Console'>(</font>'<font color='#FF0000'>L</font>', L_<font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// check if it's really SPD
+</font>        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>info <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> is_symmetric <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> <font color='#BB00BB'>min</font><font face='Lucida Console'>(</font><font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font><font color='#BB00BB'>diag</font><font face='Lucida Console'>(</font>L_<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> eps<font color='#5555FF'>*</font><font color='#979000'>100</font><font face='Lucida Console'>)</font>
+            isspd <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+        <font color='#0000FF'>else</font>
+            isspd <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+
+        L_ <font color='#5555FF'>=</font> <font color='#BB00BB'>lowerm</font><font face='Lucida Console'>(</font>L_<font face='Lucida Console'>)</font>;
+<font color='#0000FF'>#else</font>
+        const_temp_matrix<font color='#5555FF'>&lt;</font>EXP<font color='#5555FF'>&gt;</font> <font color='#BB00BB'>A</font><font face='Lucida Console'>(</font>A_<font face='Lucida Console'>)</font>;
+
+
+        isspd <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> n <font color='#5555FF'>=</font> A.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        L_.<font color='#BB00BB'>set_size</font><font face='Lucida Console'>(</font>n,n<font face='Lucida Console'>)</font>; 
+
+        <font color='#0000FF'>const</font> type eps <font color='#5555FF'>=</font> <font color='#BB00BB'>max</font><font face='Lucida Console'>(</font><font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font><font color='#BB00BB'>diag</font><font face='Lucida Console'>(</font>A<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font color='#5555FF'>*</font>std::<font color='#BB00BB'>sqrt</font><font face='Lucida Console'>(</font>std::numeric_limits<font color='#5555FF'>&lt;</font>type<font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>epsilon</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font color='#5555FF'>/</font><font color='#979000'>100</font>;
+
+        <font color='#009900'>// Main loop.
+</font>        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> j <font color='#5555FF'>=</font> <font color='#979000'>0</font>; j <font color='#5555FF'>&lt;</font> n; j<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> 
+        <b>{</b>
+            type <font color='#BB00BB'>d</font><font face='Lucida Console'>(</font><font color='#979000'>0.0</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> k <font color='#5555FF'>=</font> <font color='#979000'>0</font>; k <font color='#5555FF'>&lt;</font> j; k<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> 
+            <b>{</b>
+                type <font color='#BB00BB'>s</font><font face='Lucida Console'>(</font><font color='#979000'>0.0</font><font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> k; i<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> 
+                <b>{</b>
+                    s <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#BB00BB'>L_</font><font face='Lucida Console'>(</font>k,i<font face='Lucida Console'>)</font><font color='#5555FF'>*</font><font color='#BB00BB'>L_</font><font face='Lucida Console'>(</font>j,i<font face='Lucida Console'>)</font>;
+                <b>}</b>
+
+                <font color='#009900'>// if L_(k,k) != 0
+</font>                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>std::<font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font><font color='#BB00BB'>L_</font><font face='Lucida Console'>(</font>k,k<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> eps<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    s <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>A</font><font face='Lucida Console'>(</font>j,k<font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> s<font face='Lucida Console'>)</font><font color='#5555FF'>/</font><font color='#BB00BB'>L_</font><font face='Lucida Console'>(</font>k,k<font face='Lucida Console'>)</font>;
+                <b>}</b>
+                <font color='#0000FF'>else</font>
+                <b>{</b>
+                    s <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>A</font><font face='Lucida Console'>(</font>j,k<font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> s<font face='Lucida Console'>)</font>;
+                    isspd <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+                <b>}</b>
+
+                <font color='#BB00BB'>L_</font><font face='Lucida Console'>(</font>j,k<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> s;
+
+                d <font color='#5555FF'>=</font> d <font color='#5555FF'>+</font> s<font color='#5555FF'>*</font>s;
+
+                <font color='#009900'>// this is approximately doing: isspd = isspd &amp;&amp; ( A(k,j) == A(j,k))
+</font>                isspd <font color='#5555FF'>=</font> isspd <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> <font face='Lucida Console'>(</font>std::<font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font><font color='#BB00BB'>A</font><font face='Lucida Console'>(</font>k,j<font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> <font color='#BB00BB'>A</font><font face='Lucida Console'>(</font>j,k<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> eps <font face='Lucida Console'>)</font>; 
+            <b>}</b>
+            d <font color='#5555FF'>=</font> <font color='#BB00BB'>A</font><font face='Lucida Console'>(</font>j,j<font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> d;
+            isspd <font color='#5555FF'>=</font> isspd <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> <font face='Lucida Console'>(</font>d <font color='#5555FF'>&gt;</font> eps<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>L_</font><font face='Lucida Console'>(</font>j,j<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#BB00BB'>sqrt</font><font face='Lucida Console'>(</font>d <font color='#5555FF'>&gt;</font> <font color='#979000'>0.0</font> ? d : <font color='#979000'>0.0</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> k <font color='#5555FF'>=</font> j<font color='#5555FF'>+</font><font color='#979000'>1</font>; k <font color='#5555FF'>&lt;</font> n; k<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> 
+            <b>{</b>
+                <font color='#BB00BB'>L_</font><font face='Lucida Console'>(</font>j,k<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>0.0</font>;
+            <b>}</b>
+        <b>}</b>
+<font color='#0000FF'>#endif</font>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> matrix_exp_type<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> EXP<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>const</font> <font color='#0000FF'>typename</font> EXP::matrix_type cholesky_decomposition<font color='#5555FF'>&lt;</font>matrix_exp_type<font color='#5555FF'>&gt;</font>::
+    <b><a name='solve'></a>solve</b><font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&lt;</font>EXP<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> B
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        <font color='#BB00BB'>COMPILE_TIME_ASSERT</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>is_same_type<font color='#5555FF'>&lt;</font>type, <font color='#0000FF'>typename</font> EXP::type<font color='#5555FF'>&gt;</font>::value<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// make sure requires clause is not broken
+</font>        <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font>L_.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> B.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,
+            "<font color='#CC0000'>\tconst matrix cholesky_decomposition::solve(B)</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tInvalid arguments were given to this function.</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tL_.nr():  </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> L_.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> 
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tB.nr():   </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> B.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> 
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tthis:     </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font>
+            <font face='Lucida Console'>)</font>;
+
+        matrix<font color='#5555FF'>&lt;</font>type, NR, EXP::NC, mem_manager_type, layout_type<font color='#5555FF'>&gt;</font>  <font color='#BB00BB'>X</font><font face='Lucida Console'>(</font>B<font face='Lucida Console'>)</font>; 
+
+        <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> blas_bindings;
+        <font color='#009900'>// Solve L*y = b;
+</font>        <font color='#BB00BB'>triangular_solver</font><font face='Lucida Console'>(</font>CblasLeft, CblasLower, CblasNoTrans, CblasNonUnit, L_, X<font face='Lucida Console'>)</font>;
+        <font color='#009900'>// Solve L'*X = Y;
+</font>        <font color='#BB00BB'>triangular_solver</font><font face='Lucida Console'>(</font>CblasLeft, CblasLower, CblasTrans, CblasNonUnit, L_, X<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>return</font> X;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+
+
+<b>}</b> 
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_MATRIX_CHOLESKY_DECOMPOSITION_H 
+</font>
+
+
+
+
+</pre></body></html>

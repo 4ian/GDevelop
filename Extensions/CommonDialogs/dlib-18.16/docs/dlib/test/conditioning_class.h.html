@@ -1,0 +1,844 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - conditioning_class.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2003  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_TEST_CONDITIONING_CLASs_H_
+<font color='#0000FF'>#define</font> DLIB_TEST_CONDITIONING_CLASs_H_
+
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>sstream<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>string<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>ctime<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>cstdlib<font color='#5555FF'>&gt;</font>
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>conditioning_class.h<font color='#5555FF'>&gt;</font>
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='tester.h.html'>tester.h</a>"
+
+<font color='#0000FF'>namespace</font>  
+<b>{</b>
+
+    <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> test;
+    <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> std;
+    <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> dlib;
+
+    logger <b><a name='dlog'></a>dlog</b><font face='Lucida Console'>(</font>"<font color='#CC0000'>test.conditioning_class</font>"<font face='Lucida Console'>)</font>;
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> cc,
+        <font color='#0000FF'>typename</font> cc2
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='conditioning_class_kernel_test'></a>conditioning_class_kernel_test</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font>
+    <font color='#009900'>/*!
+        requires
+            - cc is an implementation of conditioning_class/conditioning_class_kernel_abstract.h            
+              the alphabet_size for cc is 256
+            - cc2 is an implementation of conditioning_class/conditioning_class_kernel_abstract.h            
+              the alphabet_size for cc2 is 2
+        ensures
+            - runs tests on cc for compliance with the specs 
+    !*/</font>
+    <b>{</b>        
+
+        <font color='#BB00BB'>srand</font><font face='Lucida Console'>(</font><font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>int</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#BB00BB'>time</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+
+
+        <font color='#0000FF'>typename</font> cc::global_state_type gs;
+        <font color='#0000FF'>typename</font> cc2::global_state_type gs2;
+
+
+
+
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> g <font color='#5555FF'>=</font> <font color='#979000'>0</font>; g <font color='#5555FF'>&lt;</font> <font color='#979000'>2</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>g<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#BB00BB'>print_spinner</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> amount<font color='#5555FF'>=</font>g<font color='#5555FF'>+</font><font color='#979000'>1</font>;
+            cc2 <font color='#BB00BB'>test</font><font face='Lucida Console'>(</font>gs2<font face='Lucida Console'>)</font>;
+            cc2 <font color='#BB00BB'>test2</font><font face='Lucida Console'>(</font>gs2<font face='Lucida Console'>)</font>;
+
+
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>test.<font color='#BB00BB'>get_memory_usage</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> alphabet_size <font color='#5555FF'>=</font> <font color='#979000'>2</font>;                
+
+
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>test.<font color='#BB00BB'>get_total</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>test.<font color='#BB00BB'>get_count</font><font face='Lucida Console'>(</font>alphabet_size<font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font><font color='#5555FF'>=</font><font color='#5555FF'>=</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> alphabet_size<font color='#5555FF'>-</font><font color='#979000'>1</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> low_count, high_count, total_count;
+                <font color='#BB00BB'>DLIB_TEST_MSG</font><font face='Lucida Console'>(</font>test.<font color='#BB00BB'>get_range</font><font face='Lucida Console'>(</font>i,low_count,high_count,total_count<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font>,i<font face='Lucida Console'>)</font>;
+                <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>test.<font color='#BB00BB'>get_count</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+                <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>test.<font color='#BB00BB'>get_total</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+
+
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> alphabet_size; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                test.<font color='#BB00BB'>increment_count</font><font face='Lucida Console'>(</font>i,<font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>short</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>amount<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> low_count <font color='#5555FF'>=</font> <font color='#979000'>0</font>, high_count <font color='#5555FF'>=</font> <font color='#979000'>0</font>, total_count <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>i <font color='#5555FF'>=</font><font color='#5555FF'>=</font>alphabet_size<font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>test.<font color='#BB00BB'>get_range</font><font face='Lucida Console'>(</font>i,low_count,high_count,total_count<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font color='#5555FF'>+</font>amount<font face='Lucida Console'>)</font>;
+
+                    <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>high_count <font color='#5555FF'>=</font><font color='#5555FF'>=</font> low_count<font color='#5555FF'>+</font><font color='#979000'>1</font><font color='#5555FF'>+</font>amount<font face='Lucida Console'>)</font>;
+                    <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>total_count <font color='#5555FF'>=</font><font color='#5555FF'>=</font> test.<font color='#BB00BB'>get_total</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+
+                    <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>test.<font color='#BB00BB'>get_count</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font color='#5555FF'>+</font>amount<font face='Lucida Console'>)</font>;
+                <b>}</b>
+                <font color='#0000FF'>else</font>
+                <b>{</b>
+                    <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>test.<font color='#BB00BB'>get_range</font><font face='Lucida Console'>(</font>i,low_count,high_count,total_count<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> amount<font face='Lucida Console'>)</font>;
+
+                    <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>high_count <font color='#5555FF'>=</font><font color='#5555FF'>=</font> low_count<font color='#5555FF'>+</font>amount<font face='Lucida Console'>)</font>;
+                    <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>total_count <font color='#5555FF'>=</font><font color='#5555FF'>=</font> test.<font color='#BB00BB'>get_total</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+
+                    <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>test.<font color='#BB00BB'>get_count</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> amount<font face='Lucida Console'>)</font>;
+                <b>}</b>
+                <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>test.<font color='#BB00BB'>get_total</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>i<font color='#5555FF'>+</font><font color='#979000'>1</font><font face='Lucida Console'>)</font><font color='#5555FF'>*</font>amount <font color='#5555FF'>+</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+            <b>}</b> 
+
+
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> alphabet_size; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>                
+                <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> temp <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>::<font color='#BB00BB'>rand</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>%</font><font color='#979000'>40</font><font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> j <font color='#5555FF'>=</font> <font color='#979000'>0</font>; j <font color='#5555FF'>&lt;</font> temp; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>j<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    test.<font color='#BB00BB'>increment_count</font><font face='Lucida Console'>(</font>i,<font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>short</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>amount<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>i <font color='#5555FF'>=</font><font color='#5555FF'>=</font> alphabet_size<font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>test.<font color='#BB00BB'>get_count</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>j<font color='#5555FF'>+</font><font color='#979000'>1</font><font face='Lucida Console'>)</font><font color='#5555FF'>*</font>amount <font color='#5555FF'>+</font> <font color='#979000'>1</font> <font color='#5555FF'>+</font> amount<font face='Lucida Console'>)</font>;                    
+                    <b>}</b>
+                    <font color='#0000FF'>else</font>
+                    <b>{</b>
+                        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>test.<font color='#BB00BB'>get_count</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>j<font color='#5555FF'>+</font><font color='#979000'>1</font><font face='Lucida Console'>)</font><font color='#5555FF'>*</font>amount <font color='#5555FF'>+</font> amount<font face='Lucida Console'>)</font>;                    
+                    <b>}</b>
+                <b>}</b>
+
+                <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> target <font color='#5555FF'>=</font> test.<font color='#BB00BB'>get_total</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>/</font><font color='#979000'>2</font>;
+                <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> symbol <font color='#5555FF'>=</font> i, low_count <font color='#5555FF'>=</font> <font color='#979000'>0</font>, high_count <font color='#5555FF'>=</font> <font color='#979000'>0</font>, total_count <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>i <font color='#5555FF'>=</font><font color='#5555FF'>=</font> alphabet_size<font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>test.<font color='#BB00BB'>get_range</font><font face='Lucida Console'>(</font>symbol,low_count,high_count,total_count<font face='Lucida Console'>)</font><font color='#5555FF'>=</font><font color='#5555FF'>=</font>temp<font color='#5555FF'>*</font>amount<font color='#5555FF'>+</font><font color='#979000'>1</font><font color='#5555FF'>+</font>amount<font face='Lucida Console'>)</font>;
+                    <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>high_count<font color='#5555FF'>-</font>low_count <font color='#5555FF'>=</font><font color='#5555FF'>=</font> temp<font color='#5555FF'>*</font>amount<font color='#5555FF'>+</font><font color='#979000'>1</font><font color='#5555FF'>+</font>amount<font face='Lucida Console'>)</font>;
+                <b>}</b>
+                <font color='#0000FF'>else</font>
+                <b>{</b>
+                    <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>test.<font color='#BB00BB'>get_range</font><font face='Lucida Console'>(</font>symbol,low_count,high_count,total_count<font face='Lucida Console'>)</font><font color='#5555FF'>=</font><font color='#5555FF'>=</font>temp<font color='#5555FF'>*</font>amount <font color='#5555FF'>+</font> amount<font face='Lucida Console'>)</font>;
+                    <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>high_count<font color='#5555FF'>-</font>low_count <font color='#5555FF'>=</font><font color='#5555FF'>=</font> temp<font color='#5555FF'>*</font>amount <font color='#5555FF'>+</font> amount<font face='Lucida Console'>)</font>;
+                <b>}</b>
+                <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>total_count <font color='#5555FF'>=</font><font color='#5555FF'>=</font> test.<font color='#BB00BB'>get_total</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+                test.<font color='#BB00BB'>get_symbol</font><font face='Lucida Console'>(</font>target,symbol,low_count,high_count<font face='Lucida Console'>)</font>;
+                <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>test.<font color='#BB00BB'>get_count</font><font face='Lucida Console'>(</font>symbol<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> high_count<font color='#5555FF'>-</font>low_count<font face='Lucida Console'>)</font>;
+                <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>low_count <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> target<font face='Lucida Console'>)</font>;
+                <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>target <font color='#5555FF'>&lt;</font> high_count<font face='Lucida Console'>)</font>;
+                <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>high_count <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> test.<font color='#BB00BB'>get_total</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+            <b>}</b>
+
+            test.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> alphabet_size<font color='#5555FF'>-</font><font color='#979000'>1</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                test.<font color='#BB00BB'>increment_count</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>;
+                <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> low_count <font color='#5555FF'>=</font> <font color='#979000'>0</font>, high_count <font color='#5555FF'>=</font> <font color='#979000'>0</font>, total_count <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>test.<font color='#BB00BB'>get_range</font><font face='Lucida Console'>(</font>i,low_count,high_count,total_count<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+
+                <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>high_count <font color='#5555FF'>=</font><font color='#5555FF'>=</font> low_count<font color='#5555FF'>+</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+                <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>total_count <font color='#5555FF'>=</font><font color='#5555FF'>=</font> test.<font color='#BB00BB'>get_total</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+                <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>test.<font color='#BB00BB'>get_count</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+                <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>test.<font color='#BB00BB'>get_total</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> i<font color='#5555FF'>+</font><font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+            <b>}</b> 
+
+
+
+
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> counts[alphabet_size];
+
+
+            <font color='#BB00BB'>print_spinner</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> k <font color='#5555FF'>=</font> <font color='#979000'>0</font>; k <font color='#5555FF'>&lt;</font> <font color='#979000'>10</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>k<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> range <font color='#5555FF'>=</font> ::<font color='#BB00BB'>rand</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>%</font><font color='#979000'>50000</font> <font color='#5555FF'>+</font> <font color='#979000'>2</font>;
+
+                test.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> alphabet_size<font color='#5555FF'>-</font><font color='#979000'>1</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                    counts[i] <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> total <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+                counts[alphabet_size<font color='#5555FF'>-</font><font color='#979000'>1</font>] <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+
+
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> alphabet_size; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                <b>{</b>                
+                    <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> temp <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>::<font color='#BB00BB'>rand</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>%</font>range<font face='Lucida Console'>)</font>;
+                    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> j <font color='#5555FF'>=</font> <font color='#979000'>0</font>; j <font color='#5555FF'>&lt;</font> temp; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>j<font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        test.<font color='#BB00BB'>increment_count</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>;  
+
+
+                        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>total <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#979000'>65535</font><font face='Lucida Console'>)</font>
+                        <b>{</b>
+                            total <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> alphabet_size; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                            <b>{</b>
+                                counts[i] <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+                                total <font color='#5555FF'>+</font><font color='#5555FF'>=</font> counts[i];
+                            <b>}</b>
+                            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>counts[alphabet_size<font color='#5555FF'>-</font><font color='#979000'>1</font>]<font color='#5555FF'>=</font><font color='#5555FF'>=</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                            <b>{</b>
+                                counts[alphabet_size<font color='#5555FF'>-</font><font color='#979000'>1</font>] <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+                                <font color='#5555FF'>+</font><font color='#5555FF'>+</font>total;
+                            <b>}</b>
+                        <b>}</b>
+                        counts[i] <font color='#5555FF'>=</font> counts[i] <font color='#5555FF'>+</font> <font color='#979000'>1</font>;
+                        <font color='#5555FF'>+</font><font color='#5555FF'>+</font>total;
+
+
+                    <b>}</b>
+
+
+                    <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> temp_total <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> a <font color='#5555FF'>=</font> <font color='#979000'>0</font>; a <font color='#5555FF'>&lt;</font> alphabet_size; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>a<font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        temp_total <font color='#5555FF'>+</font><font color='#5555FF'>=</font> test.<font color='#BB00BB'>get_count</font><font face='Lucida Console'>(</font>a<font face='Lucida Console'>)</font>;
+                    <b>}</b>
+                    <font color='#BB00BB'>DLIB_TEST_MSG</font><font face='Lucida Console'>(</font>temp_total <font color='#5555FF'>=</font><font color='#5555FF'>=</font> test.<font color='#BB00BB'>get_total</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,
+                                 "<font color='#CC0000'>temp_total == </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> temp_total <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font>
+                                 "<font color='#CC0000'>test.get_total() == </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> test.<font color='#BB00BB'>get_total</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+                    <font face='Lucida Console'>)</font>;
+
+                    <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>test.<font color='#BB00BB'>get_count</font><font face='Lucida Console'>(</font>alphabet_size<font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> counts[alphabet_size<font color='#5555FF'>-</font><font color='#979000'>1</font>]<font face='Lucida Console'>)</font>;
+                    <font color='#BB00BB'>DLIB_TEST_MSG</font><font face='Lucida Console'>(</font>test.<font color='#BB00BB'>get_total</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> total,
+                                 "<font color='#CC0000'>test.get_total() == </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> test.<font color='#BB00BB'>get_total</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font>
+                                 "<font color='#CC0000'>total == </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> total
+                    <font face='Lucida Console'>)</font>;
+
+                    <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> target <font color='#5555FF'>=</font> test.<font color='#BB00BB'>get_total</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>/</font><font color='#979000'>2</font>;
+                    <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> symbol <font color='#5555FF'>=</font> i, low_count <font color='#5555FF'>=</font> <font color='#979000'>0</font>, high_count <font color='#5555FF'>=</font> <font color='#979000'>0</font>, total_count <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+
+
+                    <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>test.<font color='#BB00BB'>get_range</font><font face='Lucida Console'>(</font>symbol,low_count,high_count,total_count<font face='Lucida Console'>)</font><font color='#5555FF'>=</font><font color='#5555FF'>=</font>counts[symbol]<font face='Lucida Console'>)</font>;
+
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>counts[symbol] <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>total_count <font color='#5555FF'>=</font><font color='#5555FF'>=</font> total<font face='Lucida Console'>)</font>;
+
+                        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>high_count <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> total<font face='Lucida Console'>)</font>;
+                        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>low_count <font color='#5555FF'>&lt;</font> high_count<font face='Lucida Console'>)</font>;
+                        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>high_count <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> test.<font color='#BB00BB'>get_total</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>test.<font color='#BB00BB'>get_count</font><font face='Lucida Console'>(</font>symbol<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> high_count<font color='#5555FF'>-</font>low_count<font face='Lucida Console'>)</font>;
+                    <b>}</b>
+
+
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>target <font color='#5555FF'>&lt;</font> total<font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        test.<font color='#BB00BB'>get_symbol</font><font face='Lucida Console'>(</font>target,symbol,low_count,high_count<font face='Lucida Console'>)</font>;
+
+
+                        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>high_count <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> total<font face='Lucida Console'>)</font>;
+                        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>low_count <font color='#5555FF'>&lt;</font> high_count<font face='Lucida Console'>)</font>;
+                        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>high_count <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> test.<font color='#BB00BB'>get_total</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>test.<font color='#BB00BB'>get_count</font><font face='Lucida Console'>(</font>symbol<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> high_count<font color='#5555FF'>-</font>low_count<font face='Lucida Console'>)</font>;
+                        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>test.<font color='#BB00BB'>get_count</font><font face='Lucida Console'>(</font>symbol<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> counts[symbol]<font face='Lucida Console'>)</font>;
+                    <b>}</b>
+
+
+
+
+                <b>}</b>
+
+            <b>}</b>
+
+            <font color='#BB00BB'>print_spinner</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> h <font color='#5555FF'>=</font> <font color='#979000'>0</font>; h <font color='#5555FF'>&lt;</font> <font color='#979000'>10</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>h<font face='Lucida Console'>)</font>
+            <b>{</b>
+                test.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>test.<font color='#BB00BB'>get_total</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+
+                <font color='#009900'>// fill out test with some numbers
+</font>                <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> temp <font color='#5555FF'>=</font> ::<font color='#BB00BB'>rand</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>%</font><font color='#979000'>30000</font> <font color='#5555FF'>+</font> <font color='#979000'>50000</font>;
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> j <font color='#5555FF'>=</font> <font color='#979000'>0</font>; j <font color='#5555FF'>&lt;</font> temp; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>j<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> symbol <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font>::<font color='#BB00BB'>rand</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>%</font>alphabet_size;
+                    test.<font color='#BB00BB'>increment_count</font><font face='Lucida Console'>(</font>symbol<font face='Lucida Console'>)</font>;                    
+                <b>}</b>
+
+                <font color='#009900'>// make sure all symbols have a count of at least one
+</font>                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> j <font color='#5555FF'>=</font> <font color='#979000'>0</font>; j <font color='#5555FF'>&lt;</font> alphabet_size; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>j<font face='Lucida Console'>)</font>
+                <b>{</b>   
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>test.<font color='#BB00BB'>get_count</font><font face='Lucida Console'>(</font>j<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                        test.<font color='#BB00BB'>increment_count</font><font face='Lucida Console'>(</font>j<font face='Lucida Console'>)</font>;
+                <b>}</b>
+
+                <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> temp_total <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> j <font color='#5555FF'>=</font> <font color='#979000'>0</font>; j <font color='#5555FF'>&lt;</font> alphabet_size; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>j<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    temp_total <font color='#5555FF'>+</font><font color='#5555FF'>=</font> test.<font color='#BB00BB'>get_count</font><font face='Lucida Console'>(</font>j<font face='Lucida Console'>)</font>;
+                <b>}</b>
+                <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>temp_total <font color='#5555FF'>=</font><font color='#5555FF'>=</font> test.<font color='#BB00BB'>get_total</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+
+                <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> low_counts[alphabet_size];
+                <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> high_counts[alphabet_size];
+                <font color='#009900'>// iterate over all the symbols
+</font>                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> j <font color='#5555FF'>=</font> <font color='#979000'>0</font>; j <font color='#5555FF'>&lt;</font> alphabet_size; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>j<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> total;
+                    <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> count <font color='#5555FF'>=</font> test.<font color='#BB00BB'>get_range</font><font face='Lucida Console'>(</font>j,low_counts[j],high_counts[j],total<font face='Lucida Console'>)</font>;
+                    <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>count <font color='#5555FF'>=</font><font color='#5555FF'>=</font> test.<font color='#BB00BB'>get_count</font><font face='Lucida Console'>(</font>j<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                    <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>count <font color='#5555FF'>=</font><font color='#5555FF'>=</font> high_counts[j] <font color='#5555FF'>-</font> low_counts[j]<font face='Lucida Console'>)</font>;
+
+                <b>}</b>
+
+
+                <font color='#009900'>// make sure get_symbol() matches what get_range() told us
+</font>                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> j <font color='#5555FF'>=</font> <font color='#979000'>0</font>; j <font color='#5555FF'>&lt;</font> alphabet_size; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>j<font face='Lucida Console'>)</font>
+                <b>{</b>                    
+                    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> k <font color='#5555FF'>=</font> low_counts[j]; k <font color='#5555FF'>&lt;</font> high_counts[j]; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>k<font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> symbol, low_count, high_count;
+                        test.<font color='#BB00BB'>get_symbol</font><font face='Lucida Console'>(</font>k,symbol,low_count,high_count<font face='Lucida Console'>)</font>;
+                        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>high_count <font color='#5555FF'>-</font> low_count <font color='#5555FF'>=</font><font color='#5555FF'>=</font> test.<font color='#BB00BB'>get_count</font><font face='Lucida Console'>(</font>symbol<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                        <font color='#BB00BB'>DLIB_TEST_MSG</font><font face='Lucida Console'>(</font>j <font color='#5555FF'>=</font><font color='#5555FF'>=</font> symbol,
+                                     "<font color='#CC0000'>j == </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> j <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font>
+                                     "<font color='#CC0000'>k == </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> k <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font>
+                                     "<font color='#CC0000'>symbol == </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> symbol <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font>
+                                     "<font color='#CC0000'>low_counts[j] == </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> low_counts[j] <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font>
+                                     "<font color='#CC0000'>high_counts[j] == </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> high_counts[j] <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font>
+                                     "<font color='#CC0000'>low_counts[symbol] == </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> low_counts[symbol] <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font>
+                                     "<font color='#CC0000'>high_counts[symbol] == </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> high_counts[symbol] <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> 
+                                     "<font color='#CC0000'>low_count == </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> low_count <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> 
+                                     "<font color='#CC0000'>high_count == </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> high_count <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> 
+                                     "<font color='#CC0000'>temp.count(j) == </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> test.<font color='#BB00BB'>get_count</font><font face='Lucida Console'>(</font>j<font face='Lucida Console'>)</font>
+                        <font face='Lucida Console'>)</font>;
+                        <font color='#BB00BB'>DLIB_TEST_MSG</font><font face='Lucida Console'>(</font>low_count <font color='#5555FF'>=</font><font color='#5555FF'>=</font> low_counts[j],
+                                     "<font color='#CC0000'>symbol:        </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> j <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font>
+                                     "<font color='#CC0000'>target:        </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> k <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font>
+                                     "<font color='#CC0000'>low_count:     </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> low_count <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font>
+                                     "<font color='#CC0000'>low_counts[j]: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> low_counts[j]<font face='Lucida Console'>)</font>;
+                        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>high_count <font color='#5555FF'>=</font><font color='#5555FF'>=</font> high_counts[j]<font face='Lucida Console'>)</font>;
+                    <b>}</b>
+
+                <b>}</b>
+
+            <b>}</b>
+
+
+
+            <font color='#BB00BB'>print_spinner</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> h <font color='#5555FF'>=</font> <font color='#979000'>0</font>; h <font color='#5555FF'>&lt;</font> <font color='#979000'>10</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>h<font face='Lucida Console'>)</font>
+            <b>{</b>
+
+
+                test.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> k <font color='#5555FF'>=</font> <font color='#979000'>0</font>; k <font color='#5555FF'>&lt;</font> alphabet_size<font color='#5555FF'>-</font><font color='#979000'>1</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>k<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    counts[k] <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                <b>}</b>
+                counts[alphabet_size<font color='#5555FF'>-</font><font color='#979000'>1</font>] <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+                <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> total <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+                <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> ::<font color='#BB00BB'>rand</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>%</font>alphabet_size;
+
+                <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> temp <font color='#5555FF'>=</font> <font color='#979000'>65536</font>;
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> j <font color='#5555FF'>=</font> <font color='#979000'>0</font>; j <font color='#5555FF'>&lt;</font> temp; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>j<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    test.<font color='#BB00BB'>increment_count</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>;  
+
+
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>total <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#979000'>65535</font><font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        total <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> alphabet_size; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                        <b>{</b>
+                            counts[i] <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+                            total <font color='#5555FF'>+</font><font color='#5555FF'>=</font> counts[i];
+                        <b>}</b>
+                        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>counts[alphabet_size<font color='#5555FF'>-</font><font color='#979000'>1</font>] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                        <b>{</b>
+                            <font color='#5555FF'>+</font><font color='#5555FF'>+</font>total;
+                            counts[alphabet_size<font color='#5555FF'>-</font><font color='#979000'>1</font>] <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+                        <b>}</b>
+                    <b>}</b>
+                    counts[i] <font color='#5555FF'>=</font> counts[i] <font color='#5555FF'>+</font> <font color='#979000'>1</font>;
+                    <font color='#5555FF'>+</font><font color='#5555FF'>+</font>total;
+
+                <b>}</b>
+
+
+                <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>test.<font color='#BB00BB'>get_total</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> total<font face='Lucida Console'>)</font>;
+
+                <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> target <font color='#5555FF'>=</font> test.<font color='#BB00BB'>get_total</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>/</font><font color='#979000'>2</font>;
+                <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> symbol <font color='#5555FF'>=</font> i, low_count <font color='#5555FF'>=</font> <font color='#979000'>0</font>, high_count <font color='#5555FF'>=</font> <font color='#979000'>0</font>, total_count <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+
+
+                <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>test.<font color='#BB00BB'>get_range</font><font face='Lucida Console'>(</font>symbol,low_count,high_count,total_count<font face='Lucida Console'>)</font><font color='#5555FF'>=</font><font color='#5555FF'>=</font>counts[symbol]<font face='Lucida Console'>)</font>;
+
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>counts[symbol] <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>total_count <font color='#5555FF'>=</font><font color='#5555FF'>=</font> total<font face='Lucida Console'>)</font>;
+
+                    <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>high_count <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> total<font face='Lucida Console'>)</font>;
+                    <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>low_count <font color='#5555FF'>&lt;</font> high_count<font face='Lucida Console'>)</font>;
+                    <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>high_count <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> test.<font color='#BB00BB'>get_total</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                    <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>test.<font color='#BB00BB'>get_count</font><font face='Lucida Console'>(</font>symbol<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> high_count<font color='#5555FF'>-</font>low_count<font face='Lucida Console'>)</font>;
+                <b>}</b>
+
+
+
+                test.<font color='#BB00BB'>get_symbol</font><font face='Lucida Console'>(</font>target,symbol,low_count,high_count<font face='Lucida Console'>)</font>;
+
+
+                <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>high_count <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> total<font face='Lucida Console'>)</font>;
+                <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>low_count <font color='#5555FF'>&lt;</font> high_count<font face='Lucida Console'>)</font>;
+                <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>high_count <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> test.<font color='#BB00BB'>get_total</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>test.<font color='#BB00BB'>get_count</font><font face='Lucida Console'>(</font>symbol<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> high_count<font color='#5555FF'>-</font>low_count<font face='Lucida Console'>)</font>;
+                <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>test.<font color='#BB00BB'>get_count</font><font face='Lucida Console'>(</font>symbol<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> counts[symbol]<font face='Lucida Console'>)</font>;
+
+
+
+
+
+
+
+            <b>}</b>
+
+        <b>}</b> <font color='#009900'>// for (int g = 0; g &lt; 2; ++g)
+</font>
+
+
+
+
+
+
+
+
+
+
+
+
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> g <font color='#5555FF'>=</font> <font color='#979000'>0</font>; g <font color='#5555FF'>&lt;</font> <font color='#979000'>2</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>g<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#BB00BB'>print_spinner</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> amount<font color='#5555FF'>=</font>g<font color='#5555FF'>+</font><font color='#979000'>1</font>;
+            cc <font color='#BB00BB'>test</font><font face='Lucida Console'>(</font>gs<font face='Lucida Console'>)</font>;
+            cc <font color='#BB00BB'>test2</font><font face='Lucida Console'>(</font>gs<font face='Lucida Console'>)</font>;
+
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>test.<font color='#BB00BB'>get_memory_usage</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> alphabet_size <font color='#5555FF'>=</font> <font color='#979000'>256</font>;                
+
+
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>test.<font color='#BB00BB'>get_total</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>test.<font color='#BB00BB'>get_count</font><font face='Lucida Console'>(</font>alphabet_size<font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font><font color='#5555FF'>=</font><font color='#5555FF'>=</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> alphabet_size<font color='#5555FF'>-</font><font color='#979000'>1</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> low_count, high_count, total_count;
+                <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>test.<font color='#BB00BB'>get_range</font><font face='Lucida Console'>(</font>i,low_count,high_count,total_count<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+                <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>test.<font color='#BB00BB'>get_count</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+                <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>test.<font color='#BB00BB'>get_total</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+
+            <font color='#0000FF'><u>bool</u></font> oom <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> alphabet_size; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'><u>bool</u></font> status <font color='#5555FF'>=</font> test.<font color='#BB00BB'>increment_count</font><font face='Lucida Console'>(</font>i,<font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>short</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>amount<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> low_count <font color='#5555FF'>=</font> <font color='#979000'>0</font>, high_count <font color='#5555FF'>=</font> <font color='#979000'>0</font>, total_count <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font>status<font face='Lucida Console'>)</font>
+                    oom <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>status<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>i <font color='#5555FF'>=</font><font color='#5555FF'>=</font>alphabet_size<font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>test.<font color='#BB00BB'>get_range</font><font face='Lucida Console'>(</font>i,low_count,high_count,total_count<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font color='#5555FF'>+</font>amount<font face='Lucida Console'>)</font>;
+
+                        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>high_count <font color='#5555FF'>=</font><font color='#5555FF'>=</font> low_count<font color='#5555FF'>+</font><font color='#979000'>1</font><font color='#5555FF'>+</font>amount<font face='Lucida Console'>)</font>;
+                        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>total_count <font color='#5555FF'>=</font><font color='#5555FF'>=</font> test.<font color='#BB00BB'>get_total</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+
+                        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>test.<font color='#BB00BB'>get_count</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font color='#5555FF'>+</font>amount<font face='Lucida Console'>)</font>;
+                    <b>}</b>
+                    <font color='#0000FF'>else</font>
+                    <b>{</b>
+                        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>test.<font color='#BB00BB'>get_range</font><font face='Lucida Console'>(</font>i,low_count,high_count,total_count<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> amount<font face='Lucida Console'>)</font>;
+
+                        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>high_count <font color='#5555FF'>=</font><font color='#5555FF'>=</font> low_count<font color='#5555FF'>+</font>amount<font face='Lucida Console'>)</font>;
+                        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>total_count <font color='#5555FF'>=</font><font color='#5555FF'>=</font> test.<font color='#BB00BB'>get_total</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+
+                        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>test.<font color='#BB00BB'>get_count</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> amount<font face='Lucida Console'>)</font>;
+                    <b>}</b>
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font>oom<font face='Lucida Console'>)</font>
+                        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>test.<font color='#BB00BB'>get_total</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>i<font color='#5555FF'>+</font><font color='#979000'>1</font><font face='Lucida Console'>)</font><font color='#5555FF'>*</font>amount <font color='#5555FF'>+</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+                <b>}</b>
+            <b>}</b> 
+
+
+            oom <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> alphabet_size; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>        
+                <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> temp <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>::<font color='#BB00BB'>rand</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>%</font><font color='#979000'>40</font><font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> j <font color='#5555FF'>=</font> <font color='#979000'>0</font>; j <font color='#5555FF'>&lt;</font> temp; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>j<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#0000FF'><u>bool</u></font> status <font color='#5555FF'>=</font> test.<font color='#BB00BB'>increment_count</font><font face='Lucida Console'>(</font>i,<font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>short</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>amount<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font>status<font face='Lucida Console'>)</font>
+                        oom <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>status<font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>i <font color='#5555FF'>=</font><font color='#5555FF'>=</font> alphabet_size<font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>
+                        <b>{</b>
+                            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>test.<font color='#BB00BB'>get_count</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>j<font color='#5555FF'>+</font><font color='#979000'>1</font><font face='Lucida Console'>)</font><font color='#5555FF'>*</font>amount <font color='#5555FF'>+</font> <font color='#979000'>1</font> <font color='#5555FF'>+</font> amount<font face='Lucida Console'>)</font>;                    
+                        <b>}</b>
+                        <font color='#0000FF'>else</font>
+                        <b>{</b>
+                            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>test.<font color='#BB00BB'>get_count</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>j<font color='#5555FF'>+</font><font color='#979000'>1</font><font face='Lucida Console'>)</font><font color='#5555FF'>*</font>amount <font color='#5555FF'>+</font> amount<font face='Lucida Console'>)</font>;                    
+                        <b>}</b>
+                    <b>}</b>
+                <b>}</b>
+
+                <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> target <font color='#5555FF'>=</font> test.<font color='#BB00BB'>get_total</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>/</font><font color='#979000'>2</font>;
+                <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> symbol <font color='#5555FF'>=</font> i, low_count <font color='#5555FF'>=</font> <font color='#979000'>0</font>, high_count <font color='#5555FF'>=</font> <font color='#979000'>0</font>, total_count <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font>oom<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>i <font color='#5555FF'>=</font><font color='#5555FF'>=</font> alphabet_size<font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>test.<font color='#BB00BB'>get_range</font><font face='Lucida Console'>(</font>symbol,low_count,high_count,total_count<font face='Lucida Console'>)</font><font color='#5555FF'>=</font><font color='#5555FF'>=</font>temp<font color='#5555FF'>*</font>amount<font color='#5555FF'>+</font><font color='#979000'>1</font><font color='#5555FF'>+</font>amount<font face='Lucida Console'>)</font>;
+                        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>high_count<font color='#5555FF'>-</font>low_count <font color='#5555FF'>=</font><font color='#5555FF'>=</font> temp<font color='#5555FF'>*</font>amount<font color='#5555FF'>+</font><font color='#979000'>1</font><font color='#5555FF'>+</font>amount<font face='Lucida Console'>)</font>;
+                    <b>}</b>
+                    <font color='#0000FF'>else</font>
+                    <b>{</b>
+                        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>test.<font color='#BB00BB'>get_range</font><font face='Lucida Console'>(</font>symbol,low_count,high_count,total_count<font face='Lucida Console'>)</font><font color='#5555FF'>=</font><font color='#5555FF'>=</font>temp<font color='#5555FF'>*</font>amount <font color='#5555FF'>+</font> amount<font face='Lucida Console'>)</font>;
+                        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>high_count<font color='#5555FF'>-</font>low_count <font color='#5555FF'>=</font><font color='#5555FF'>=</font> temp<font color='#5555FF'>*</font>amount <font color='#5555FF'>+</font> amount<font face='Lucida Console'>)</font>;
+                    <b>}</b>
+                    <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>total_count <font color='#5555FF'>=</font><font color='#5555FF'>=</font> test.<font color='#BB00BB'>get_total</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+
+                    test.<font color='#BB00BB'>get_symbol</font><font face='Lucida Console'>(</font>target,symbol,low_count,high_count<font face='Lucida Console'>)</font>;
+                    <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>test.<font color='#BB00BB'>get_count</font><font face='Lucida Console'>(</font>symbol<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> high_count<font color='#5555FF'>-</font>low_count<font face='Lucida Console'>)</font>;
+                    <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>low_count <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> target<font face='Lucida Console'>)</font>;
+                    <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>target <font color='#5555FF'>&lt;</font> high_count<font face='Lucida Console'>)</font>;
+                    <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>high_count <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> test.<font color='#BB00BB'>get_total</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                <b>}</b>
+
+            <b>}</b>
+
+            test.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+
+            oom <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> alphabet_size<font color='#5555FF'>-</font><font color='#979000'>1</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>if</font><font face='Lucida Console'>(</font><font color='#5555FF'>!</font>test.<font color='#BB00BB'>increment_count</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                    oom <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+                <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> low_count <font color='#5555FF'>=</font> <font color='#979000'>0</font>, high_count <font color='#5555FF'>=</font> <font color='#979000'>0</font>, total_count <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font>oom<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>test.<font color='#BB00BB'>get_range</font><font face='Lucida Console'>(</font>i,low_count,high_count,total_count<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+
+                    <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>high_count <font color='#5555FF'>=</font><font color='#5555FF'>=</font> low_count<font color='#5555FF'>+</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+                    <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>total_count <font color='#5555FF'>=</font><font color='#5555FF'>=</font> test.<font color='#BB00BB'>get_total</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+                    <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>test.<font color='#BB00BB'>get_count</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+                    <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>test.<font color='#BB00BB'>get_total</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> i<font color='#5555FF'>+</font><font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+                <b>}</b>
+            <b>}</b> 
+
+
+
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> counts[alphabet_size];
+
+
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> k <font color='#5555FF'>=</font> <font color='#979000'>0</font>; k <font color='#5555FF'>&lt;</font> <font color='#979000'>10</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>k<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> range <font color='#5555FF'>=</font> ::<font color='#BB00BB'>rand</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>%</font><font color='#979000'>50000</font> <font color='#5555FF'>+</font> <font color='#979000'>2</font>;
+
+                test.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> alphabet_size<font color='#5555FF'>-</font><font color='#979000'>1</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                    counts[i] <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> total <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+                counts[alphabet_size<font color='#5555FF'>-</font><font color='#979000'>1</font>] <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+
+
+                oom <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> alphabet_size; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                <b>{</b>                
+                    <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> temp <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>::<font color='#BB00BB'>rand</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>%</font>range<font face='Lucida Console'>)</font>;
+                    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> j <font color='#5555FF'>=</font> <font color='#979000'>0</font>; j <font color='#5555FF'>&lt;</font> temp; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>j<font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font>test.<font color='#BB00BB'>increment_count</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                            oom <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+
+
+                        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>total <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#979000'>65535</font><font face='Lucida Console'>)</font>
+                        <b>{</b>
+
+                            total <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> alphabet_size; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                            <b>{</b>
+                                counts[i] <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+                                total <font color='#5555FF'>+</font><font color='#5555FF'>=</font> counts[i];
+                            <b>}</b>
+                            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>counts[alphabet_size<font color='#5555FF'>-</font><font color='#979000'>1</font>]<font color='#5555FF'>=</font><font color='#5555FF'>=</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                            <b>{</b>
+                                counts[alphabet_size<font color='#5555FF'>-</font><font color='#979000'>1</font>] <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+                                <font color='#5555FF'>+</font><font color='#5555FF'>+</font>total;
+                            <b>}</b>
+                        <b>}</b>
+                        counts[i] <font color='#5555FF'>=</font> counts[i] <font color='#5555FF'>+</font> <font color='#979000'>1</font>;
+                        <font color='#5555FF'>+</font><font color='#5555FF'>+</font>total;
+
+
+                    <b>}</b>
+
+
+                    <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> temp_total <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> a <font color='#5555FF'>=</font> <font color='#979000'>0</font>; a <font color='#5555FF'>&lt;</font> alphabet_size; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>a<font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        temp_total <font color='#5555FF'>+</font><font color='#5555FF'>=</font> test.<font color='#BB00BB'>get_count</font><font face='Lucida Console'>(</font>a<font face='Lucida Console'>)</font>;
+                    <b>}</b>
+
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font>oom<font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        <font color='#BB00BB'>DLIB_TEST_MSG</font><font face='Lucida Console'>(</font>temp_total <font color='#5555FF'>=</font><font color='#5555FF'>=</font> test.<font color='#BB00BB'>get_total</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,
+                                     "<font color='#CC0000'>temp_total == </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> temp_total <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font>
+                                     "<font color='#CC0000'>test.get_total() == </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> test.<font color='#BB00BB'>get_total</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+                        <font face='Lucida Console'>)</font>;
+
+                        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>test.<font color='#BB00BB'>get_count</font><font face='Lucida Console'>(</font>alphabet_size<font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> counts[alphabet_size<font color='#5555FF'>-</font><font color='#979000'>1</font>]<font face='Lucida Console'>)</font>;
+                        <font color='#BB00BB'>DLIB_TEST_MSG</font><font face='Lucida Console'>(</font>test.<font color='#BB00BB'>get_total</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> total,
+                                     "<font color='#CC0000'>test.get_total() == </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> test.<font color='#BB00BB'>get_total</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font>
+                                     "<font color='#CC0000'>total == </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> total
+                        <font face='Lucida Console'>)</font>;
+                    <b>}</b>
+
+                    <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> target <font color='#5555FF'>=</font> test.<font color='#BB00BB'>get_total</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>/</font><font color='#979000'>2</font>;
+                    <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> symbol <font color='#5555FF'>=</font> i, low_count <font color='#5555FF'>=</font> <font color='#979000'>0</font>, high_count <font color='#5555FF'>=</font> <font color='#979000'>0</font>, total_count <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font>oom<font face='Lucida Console'>)</font>
+                    <b>{</b>
+
+                        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>test.<font color='#BB00BB'>get_range</font><font face='Lucida Console'>(</font>symbol,low_count,high_count,total_count<font face='Lucida Console'>)</font><font color='#5555FF'>=</font><font color='#5555FF'>=</font>counts[symbol]<font face='Lucida Console'>)</font>;
+
+                        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>counts[symbol] <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                        <b>{</b>
+                            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>total_count <font color='#5555FF'>=</font><font color='#5555FF'>=</font> total<font face='Lucida Console'>)</font>;
+
+                            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>high_count <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> total<font face='Lucida Console'>)</font>;
+                            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>low_count <font color='#5555FF'>&lt;</font> high_count<font face='Lucida Console'>)</font>;
+                            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>high_count <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> test.<font color='#BB00BB'>get_total</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>test.<font color='#BB00BB'>get_count</font><font face='Lucida Console'>(</font>symbol<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> high_count<font color='#5555FF'>-</font>low_count<font face='Lucida Console'>)</font>;
+                        <b>}</b>
+
+
+                        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>target <font color='#5555FF'>&lt;</font> total<font face='Lucida Console'>)</font>
+                        <b>{</b>
+                            test.<font color='#BB00BB'>get_symbol</font><font face='Lucida Console'>(</font>target,symbol,low_count,high_count<font face='Lucida Console'>)</font>;
+
+
+                            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>high_count <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> total<font face='Lucida Console'>)</font>;
+                            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>low_count <font color='#5555FF'>&lt;</font> high_count<font face='Lucida Console'>)</font>;
+                            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>high_count <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> test.<font color='#BB00BB'>get_total</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>test.<font color='#BB00BB'>get_count</font><font face='Lucida Console'>(</font>symbol<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> high_count<font color='#5555FF'>-</font>low_count<font face='Lucida Console'>)</font>;
+                            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>test.<font color='#BB00BB'>get_count</font><font face='Lucida Console'>(</font>symbol<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> counts[symbol]<font face='Lucida Console'>)</font>;
+                        <b>}</b>
+                    <b>}</b>
+
+
+
+                <b>}</b>
+
+            <b>}</b>
+
+            oom <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> h <font color='#5555FF'>=</font> <font color='#979000'>0</font>; h <font color='#5555FF'>&lt;</font> <font color='#979000'>10</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>h<font face='Lucida Console'>)</font>
+            <b>{</b>
+                test.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>test.<font color='#BB00BB'>get_total</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+
+                <font color='#009900'>// fill out test with some numbers
+</font>                <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> temp <font color='#5555FF'>=</font> ::<font color='#BB00BB'>rand</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>%</font><font color='#979000'>30000</font> <font color='#5555FF'>+</font> <font color='#979000'>50000</font>;
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> j <font color='#5555FF'>=</font> <font color='#979000'>0</font>; j <font color='#5555FF'>&lt;</font> temp; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>j<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> symbol <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font>::<font color='#BB00BB'>rand</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>%</font>alphabet_size;
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font>test.<font color='#BB00BB'>increment_count</font><font face='Lucida Console'>(</font>symbol<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                        oom <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+                <b>}</b>
+
+                <font color='#009900'>// make sure all symbols have a count of at least one
+</font>                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> j <font color='#5555FF'>=</font> <font color='#979000'>0</font>; j <font color='#5555FF'>&lt;</font> alphabet_size; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>j<font face='Lucida Console'>)</font>
+                <b>{</b>   
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>test.<font color='#BB00BB'>get_count</font><font face='Lucida Console'>(</font>j<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                        test.<font color='#BB00BB'>increment_count</font><font face='Lucida Console'>(</font>j<font face='Lucida Console'>)</font>;
+                <b>}</b>
+
+                <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> temp_total <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> j <font color='#5555FF'>=</font> <font color='#979000'>0</font>; j <font color='#5555FF'>&lt;</font> alphabet_size; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>j<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    temp_total <font color='#5555FF'>+</font><font color='#5555FF'>=</font> test.<font color='#BB00BB'>get_count</font><font face='Lucida Console'>(</font>j<font face='Lucida Console'>)</font>;
+                <b>}</b>
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font>oom<font face='Lucida Console'>)</font>
+                    <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>temp_total <font color='#5555FF'>=</font><font color='#5555FF'>=</font> test.<font color='#BB00BB'>get_total</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+
+                <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> low_counts[alphabet_size];
+                <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> high_counts[alphabet_size];
+
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font>oom<font face='Lucida Console'>)</font>
+                <b>{</b>
+
+                    <font color='#009900'>// iterate over all the symbols
+</font>                    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> j <font color='#5555FF'>=</font> <font color='#979000'>0</font>; j <font color='#5555FF'>&lt;</font> alphabet_size; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>j<font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> total;
+                        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> count <font color='#5555FF'>=</font> test.<font color='#BB00BB'>get_range</font><font face='Lucida Console'>(</font>j,low_counts[j],high_counts[j],total<font face='Lucida Console'>)</font>;
+                        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>count <font color='#5555FF'>=</font><font color='#5555FF'>=</font> test.<font color='#BB00BB'>get_count</font><font face='Lucida Console'>(</font>j<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>count <font color='#5555FF'>=</font><font color='#5555FF'>=</font> high_counts[j] <font color='#5555FF'>-</font> low_counts[j]<font face='Lucida Console'>)</font>;
+
+                    <b>}</b>
+
+
+
+
+                    <font color='#009900'>// make sure get_symbol() matches what get_range() told us
+</font>                    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> j <font color='#5555FF'>=</font> <font color='#979000'>0</font>; j <font color='#5555FF'>&lt;</font> alphabet_size; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>j<font face='Lucida Console'>)</font>
+                    <b>{</b>                    
+                        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> k <font color='#5555FF'>=</font> low_counts[j]; k <font color='#5555FF'>&lt;</font> high_counts[j]; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>k<font face='Lucida Console'>)</font>
+                        <b>{</b>
+                            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> symbol, low_count, high_count;
+                            test.<font color='#BB00BB'>get_symbol</font><font face='Lucida Console'>(</font>k,symbol,low_count,high_count<font face='Lucida Console'>)</font>;
+                            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>high_count <font color='#5555FF'>-</font> low_count <font color='#5555FF'>=</font><font color='#5555FF'>=</font> test.<font color='#BB00BB'>get_count</font><font face='Lucida Console'>(</font>symbol<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                            <font color='#BB00BB'>DLIB_TEST_MSG</font><font face='Lucida Console'>(</font>j <font color='#5555FF'>=</font><font color='#5555FF'>=</font> symbol,
+                                         "<font color='#CC0000'>j == </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> j <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font>
+                                         "<font color='#CC0000'>k == </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> k <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font>
+                                         "<font color='#CC0000'>symbol == </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> symbol <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font>
+                                         "<font color='#CC0000'>low_counts[j] == </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> low_counts[j] <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font>
+                                         "<font color='#CC0000'>high_counts[j] == </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> high_counts[j] <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font>
+                                         "<font color='#CC0000'>low_counts[symbol] == </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> low_counts[symbol] <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font>
+                                         "<font color='#CC0000'>high_counts[symbol] == </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> high_counts[symbol] <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> 
+                                         "<font color='#CC0000'>low_count == </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> low_count <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> 
+                                         "<font color='#CC0000'>high_count == </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> high_count <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> 
+                                         "<font color='#CC0000'>temp.count(j) == </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> test.<font color='#BB00BB'>get_count</font><font face='Lucida Console'>(</font>j<font face='Lucida Console'>)</font>
+                            <font face='Lucida Console'>)</font>;
+                            <font color='#BB00BB'>DLIB_TEST_MSG</font><font face='Lucida Console'>(</font>low_count <font color='#5555FF'>=</font><font color='#5555FF'>=</font> low_counts[j],
+                                         "<font color='#CC0000'>symbol:        </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> j <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font>
+                                         "<font color='#CC0000'>target:        </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> k <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font>
+                                         "<font color='#CC0000'>low_count:     </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> low_count <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font>
+                                         "<font color='#CC0000'>low_counts[j]: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> low_counts[j]<font face='Lucida Console'>)</font>;
+                            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>high_count <font color='#5555FF'>=</font><font color='#5555FF'>=</font> high_counts[j]<font face='Lucida Console'>)</font>;
+                        <b>}</b>
+
+                    <b>}</b>
+                <b>}</b>
+
+            <b>}</b>
+
+
+
+
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> h <font color='#5555FF'>=</font> <font color='#979000'>0</font>; h <font color='#5555FF'>&lt;</font> <font color='#979000'>10</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>h<font face='Lucida Console'>)</font>
+            <b>{</b>
+
+
+                test.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> k <font color='#5555FF'>=</font> <font color='#979000'>0</font>; k <font color='#5555FF'>&lt;</font> alphabet_size<font color='#5555FF'>-</font><font color='#979000'>1</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>k<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    counts[k] <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                <b>}</b>
+                counts[alphabet_size<font color='#5555FF'>-</font><font color='#979000'>1</font>] <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+                <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> total <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+                <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> ::<font color='#BB00BB'>rand</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>%</font>alphabet_size;
+
+                <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> temp <font color='#5555FF'>=</font> <font color='#979000'>65536</font>;
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> j <font color='#5555FF'>=</font> <font color='#979000'>0</font>; j <font color='#5555FF'>&lt;</font> temp; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>j<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    test.<font color='#BB00BB'>increment_count</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>;  
+
+
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>total <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#979000'>65535</font><font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        total <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> alphabet_size; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                        <b>{</b>
+                            counts[i] <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+                            total <font color='#5555FF'>+</font><font color='#5555FF'>=</font> counts[i];
+                        <b>}</b>
+                        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>counts[alphabet_size<font color='#5555FF'>-</font><font color='#979000'>1</font>] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                        <b>{</b>
+                            <font color='#5555FF'>+</font><font color='#5555FF'>+</font>total;
+                            counts[alphabet_size<font color='#5555FF'>-</font><font color='#979000'>1</font>] <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+                        <b>}</b>
+                    <b>}</b>
+                    counts[i] <font color='#5555FF'>=</font> counts[i] <font color='#5555FF'>+</font> <font color='#979000'>1</font>;
+                    <font color='#5555FF'>+</font><font color='#5555FF'>+</font>total;
+
+                <b>}</b>
+
+
+                <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>test.<font color='#BB00BB'>get_total</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> total<font face='Lucida Console'>)</font>;
+
+                <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> target <font color='#5555FF'>=</font> test.<font color='#BB00BB'>get_total</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>/</font><font color='#979000'>2</font>;
+                <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> symbol <font color='#5555FF'>=</font> i, low_count <font color='#5555FF'>=</font> <font color='#979000'>0</font>, high_count <font color='#5555FF'>=</font> <font color='#979000'>0</font>, total_count <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+
+
+                <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>test.<font color='#BB00BB'>get_range</font><font face='Lucida Console'>(</font>symbol,low_count,high_count,total_count<font face='Lucida Console'>)</font><font color='#5555FF'>=</font><font color='#5555FF'>=</font>counts[symbol]<font face='Lucida Console'>)</font>;
+
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>counts[symbol] <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>total_count <font color='#5555FF'>=</font><font color='#5555FF'>=</font> total<font face='Lucida Console'>)</font>;
+
+                    <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>high_count <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> total<font face='Lucida Console'>)</font>;
+                    <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>low_count <font color='#5555FF'>&lt;</font> high_count<font face='Lucida Console'>)</font>;
+                    <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>high_count <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> test.<font color='#BB00BB'>get_total</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                    <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>test.<font color='#BB00BB'>get_count</font><font face='Lucida Console'>(</font>symbol<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> high_count<font color='#5555FF'>-</font>low_count<font face='Lucida Console'>)</font>;
+                <b>}</b>
+
+
+
+                test.<font color='#BB00BB'>get_symbol</font><font face='Lucida Console'>(</font>target,symbol,low_count,high_count<font face='Lucida Console'>)</font>;
+
+
+                <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>high_count <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> total<font face='Lucida Console'>)</font>;
+                <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>low_count <font color='#5555FF'>&lt;</font> high_count<font face='Lucida Console'>)</font>;
+                <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>high_count <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> test.<font color='#BB00BB'>get_total</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>test.<font color='#BB00BB'>get_count</font><font face='Lucida Console'>(</font>symbol<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> high_count<font color='#5555FF'>-</font>low_count<font face='Lucida Console'>)</font>;
+                <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>test.<font color='#BB00BB'>get_count</font><font face='Lucida Console'>(</font>symbol<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> counts[symbol]<font face='Lucida Console'>)</font>;
+
+
+
+
+
+
+
+            <b>}</b>
+
+        <b>}</b> <font color='#009900'>// for (int g = 0; g &lt; 2; ++g)
+</font>
+
+    <b>}</b>
+
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_TEST_CONDITIONING_CLASs_H_
+</font>
+
+</pre></body></html>

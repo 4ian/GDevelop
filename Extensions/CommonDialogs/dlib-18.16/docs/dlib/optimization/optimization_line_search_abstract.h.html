@@ -1,0 +1,363 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - optimization_line_search_abstract.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2008  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#undef</font> DLIB_OPTIMIZATIOn_ABSTRACT_
+<font color='#0000FF'>#ifdef</font> DLIB_OPTIMIZATIOn_ABSTRACT_
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>cmath<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>limits<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../matrix/matrix_abstract.h.html'>../matrix/matrix_abstract.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../algs.h.html'>../algs.h</a>"
+
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> funct, 
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>class</font> line_search_funct; 
+    <font color='#009900'>/*!
+        This object is a function object that represents a line search function.
+
+        Moreover, it represents a function with the signature:
+            double l(double x)
+    !*/</font>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> funct, 
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>const</font> line_search_funct<font color='#5555FF'>&lt;</font>funct,T<font color='#5555FF'>&gt;</font> <b><a name='make_line_search_function'></a>make_line_search_function</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> funct<font color='#5555FF'>&amp;</font> f, 
+        <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> start, 
+        <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> direction
+    <font face='Lucida Console'>)</font>; 
+    <font color='#009900'>/*!
+        requires
+            - is_col_vector(start) &amp;&amp; is_col_vector(direction) &amp;&amp; start.size() == direction.size() 
+              (i.e. start and direction should be column vectors of the same size)
+            - f must return either a double or a column vector the same length as start
+            - f(start + 1.5*direction) should be a valid expression
+        ensures
+            - if (f returns a double) then
+                - returns a line search function that computes l(x) == f(start + x*direction)
+            - else
+                - returns a line search function that computes l(x) == dot(f(start + x*direction),direction).
+                  That is, we assume f is the derivative of some other function and that what
+                  f returns is a gradient vector. 
+                  So the following two expressions both create the derivative of l(x): 
+                    - derivative(make_line_search_function(funct,start,direction))
+                    - make_line_search_function(derivative(funct),start,direction)
+    !*/</font>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> funct, 
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>const</font> line_search_funct<font color='#5555FF'>&lt;</font>funct,T<font color='#5555FF'>&gt;</font> <b><a name='make_line_search_function'></a>make_line_search_function</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> funct<font color='#5555FF'>&amp;</font> f, 
+        <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> start, 
+        <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> direction,
+        <font color='#0000FF'><u>double</u></font><font color='#5555FF'>&amp;</font> f_out
+    <font face='Lucida Console'>)</font>; 
+    <font color='#009900'>/*!
+        This function is identical to the above three argument version of make_line_search_function() 
+        except that, if f() outputs a double, every time f() is evaluated its output is also stored 
+        into f_out.
+    !*/</font>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> funct, 
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>const</font> line_search_funct<font color='#5555FF'>&lt;</font>funct,T<font color='#5555FF'>&gt;</font> <b><a name='make_line_search_function'></a>make_line_search_function</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> funct<font color='#5555FF'>&amp;</font> f, 
+        <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> start, 
+        <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> direction,
+        T<font color='#5555FF'>&amp;</font> gradient_out
+    <font face='Lucida Console'>)</font>; 
+    <font color='#009900'>/*!
+        This function is identical to the above three argument version of make_line_search_function() 
+        except that, if f() outputs a column vector, every time f() is evaluated its output is also 
+        stored into gradient_out.
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>double</u></font> <b><a name='poly_min_extrap'></a>poly_min_extrap</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'><u>double</u></font> f0,
+        <font color='#0000FF'><u>double</u></font> d0,
+        <font color='#0000FF'><u>double</u></font> f1,
+        <font color='#0000FF'><u>double</u></font> d1
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        ensures
+            - let c(x) be a 3rd degree polynomial such that:
+                - c(0) == f0
+                - c(1) == f1
+                - derivative of c(x) at x==0 is d0
+                - derivative of c(x) at x==1 is d1
+            - returns the point in the range [0,1] that minimizes the polynomial c(x) 
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>double</u></font> <b><a name='poly_min_extrap'></a>poly_min_extrap</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'><u>double</u></font> f0,
+        <font color='#0000FF'><u>double</u></font> d0,
+        <font color='#0000FF'><u>double</u></font> f1
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        ensures
+            - let c(x) be a 2nd degree polynomial such that:
+                - c(0) == f0
+                - c(1) == f1
+                - derivative of c(x) at x==0 is d0
+            - returns the point in the range [0,1] that minimizes the polynomial c(x) 
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>double</u></font> <b><a name='poly_min_extrap'></a>poly_min_extrap</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'><u>double</u></font> f0,
+        <font color='#0000FF'><u>double</u></font> d0,
+        <font color='#0000FF'><u>double</u></font> x1,
+        <font color='#0000FF'><u>double</u></font> f_x1,
+        <font color='#0000FF'><u>double</u></font> x2,
+        <font color='#0000FF'><u>double</u></font> f_x2
+    <font face='Lucida Console'>)</font>
+    <font color='#009900'>/*!
+        requires
+            - 0 &lt; x1 &lt; x2
+        ensures
+            - let f(x) be a 3rd degree polynomial such that:
+                - f(0) == f0
+                - derivative of f(x) at x==0 is d0
+                - f(x1) == f_x1
+                - f(x2) == f_x2
+            - returns the point in the range [0,x2] that minimizes the polynomial f(x) 
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>double</u></font> <b><a name='lagrange_poly_min_extrap'></a>lagrange_poly_min_extrap</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'><u>double</u></font> p1, 
+        <font color='#0000FF'><u>double</u></font> p2,
+        <font color='#0000FF'><u>double</u></font> p3,
+        <font color='#0000FF'><u>double</u></font> f1,
+        <font color='#0000FF'><u>double</u></font> f2,
+        <font color='#0000FF'><u>double</u></font> f3
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - f1 &gt;= f2 &lt;= f3
+            - p1 &lt; p2 &lt; p3
+        ensures
+            - let c(x) be the second order Lagrange polynomial that interpolates the
+              points p1, p2, and p3 where c(p1)==f1, c(p2)==f2, and c(p3)==f3
+            - this function returns the point in the range [p1,p3] that minimizes 
+              the polynomial c(x) 
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> funct, 
+        <font color='#0000FF'>typename</font> funct_der
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>double</u></font> <b><a name='line_search'></a>line_search</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> funct<font color='#5555FF'>&amp;</font> f, 
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> f0,
+        <font color='#0000FF'>const</font> funct_der<font color='#5555FF'>&amp;</font> der, 
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> d0,
+        <font color='#0000FF'><u>double</u></font> rho, 
+        <font color='#0000FF'><u>double</u></font> sigma, 
+        <font color='#0000FF'><u>double</u></font> min_f,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> max_iter
+    <font face='Lucida Console'>)</font>
+    <font color='#009900'>/*!
+        requires
+            - 0 &lt; rho &lt; sigma &lt; 1
+            - f and der are scalar functions of scalars
+              (e.g. line_search_funct objects)
+            - der is the derivative of f
+            - f0 == f(0)
+            - d0 == der(0)
+            - max_iter &gt; 0
+        ensures
+            - Performs a line search and uses the strong Wolfe conditions to decide when
+              the search can stop.  
+                - rho == the parameter of the Wolfe sufficient decrease condition
+                - sigma == the parameter of the Wolfe curvature condition
+                - max_iter == the maximum number of iterations allowable.  After this
+                  many evaluations of f() line_search() is guaranteed to terminate.
+            - returns a value alpha such that f(alpha) is significantly closer to 
+              the minimum of f than f(0).
+            - It is assumed that the minimum possible value of f(x) is min_f.  So if
+              an alpha is found such that f(alpha) &lt;= min_f then the search stops
+              immediately.
+            - This function is also optimized for the case where der(0) is negative.  I.e.
+              positive values of the argument to f() should be in a descent direction.  
+            - When this function makes calls to f() and der() it always does so by
+              first calling f() and then calling der().  That is, these two functions
+              are always called in pairs with f() being called first and then der()
+              being called second.
+    !*/</font>
+
+    <font color='#009900'>/*
+        A good discussion of the Wolfe conditions and line search algorithms in 
+        general can be found in the book Practical Methods of Optimization by R. Fletcher
+        and also in the more recent book Numerical Optimization by Nocedal and Wright.
+    */</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> funct
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>double</u></font> <b><a name='backtracking_line_search'></a>backtracking_line_search</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> funct<font color='#5555FF'>&amp;</font> f, 
+        <font color='#0000FF'><u>double</u></font> f0,
+        <font color='#0000FF'><u>double</u></font> d0,
+        <font color='#0000FF'><u>double</u></font> alpha,
+        <font color='#0000FF'><u>double</u></font> rho, 
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> max_iter 
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - 0 &lt; rho &lt; 1
+            - f is a scalar function of scalars 
+              (e.g. a line_search_funct object)
+            - f0 == f(0)
+            - d0 == the derivative of f() at f(0). 
+            - max_iter &gt; 0
+        ensures
+            - Performs a backtracking line search and uses the Armijo sufficient decrease
+              rule to decide when the search can stop.
+                - rho == the parameter of the sufficient decrease condition. 
+                - max_iter == the maximum number of iterations allowable.  After this many
+                  evaluations of f() backtracking_line_search() is guaranteed to terminate.
+            - The line search starts with the input alpha value and then backtracks until
+              it finds a good enough alpha value.  Once found, it returns the alpha value
+              such that f(alpha) is significantly closer to the minimum of f than f(0).
+            - The returned value of alpha will always be the last value of alpha which was
+              passed to f().  That is, it will always be the case that the last call to f()
+              made by backtracking_line_search() was f(alpha) where alpha is the return
+              value from this function.
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> funct
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>const</font> negate_function_object<font color='#5555FF'>&lt;</font>funct<font color='#5555FF'>&gt;</font> <b><a name='negate_function'></a>negate_function</b><font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> funct<font color='#5555FF'>&amp;</font> f
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - f == a function that returns a scalar
+        ensures
+            - returns a function that represents the negation of f.  That is,
+              the returned function object represents g(x) == -f(x)
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>class</font> <b><a name='optimize_single_variable_failure'></a>optimize_single_variable_failure</b> : <font color='#0000FF'>public</font> error;
+    <font color='#009900'>/*!
+        This is the exception class used by the functions defined below.
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> funct
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>double</u></font> <b><a name='find_min_single_variable'></a>find_min_single_variable</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> funct<font color='#5555FF'>&amp;</font> f,
+        <font color='#0000FF'><u>double</u></font><font color='#5555FF'>&amp;</font> starting_point,
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> begin <font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>1e200</font>,
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> end <font color='#5555FF'>=</font> <font color='#979000'>1e200</font>,
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> eps <font color='#5555FF'>=</font> <font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>3</font>,
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> max_iter <font color='#5555FF'>=</font> <font color='#979000'>100</font>,
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> initial_search_radius <font color='#5555FF'>=</font> <font color='#979000'>1</font>
+    <font face='Lucida Console'>)</font>
+    <font color='#009900'>/*!
+        requires
+            - eps &gt; 0
+            - max_iter &gt; 1
+            - begin &lt;= starting_point &lt;= end
+            - f must be a function of a double that returns a double
+              (e.g. f(starting_point) should be a valid expression that evaluates to a double)
+            - initial_search_radius &gt; 0
+        ensures
+            - Finds a point P such that:
+                - P is a local minimum of the function f().   
+                - begin &lt;= P &lt;= end
+            - Evaluates f() no more than max_iter times
+            - Stops searching when the window around the minimum point is smaller than eps.
+              The search will begin with the given starting_point and expand out to the
+              left and right by initial_search_radius sized steps.  So if you think the
+              minimum is likely to be found within X distance from the starting_point then
+              set initial_search_radius to X.
+            - #starting_point == P
+            - returns f(P)
+        throws
+            - optimize_single_variable_failure 
+                This exception is thrown if max_iter iterations are performed without 
+                determining the min point to the requested accuracy of eps.
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> funct
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>double</u></font> <b><a name='find_max_single_variable'></a>find_max_single_variable</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> funct<font color='#5555FF'>&amp;</font> f,
+        <font color='#0000FF'><u>double</u></font><font color='#5555FF'>&amp;</font> starting_point,
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> begin <font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>1e200</font>,
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> end <font color='#5555FF'>=</font> <font color='#979000'>1e200</font>,
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> eps <font color='#5555FF'>=</font> <font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>3</font>,
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> max_iter <font color='#5555FF'>=</font> <font color='#979000'>100</font>,
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> initial_search_radius <font color='#5555FF'>=</font> <font color='#979000'>1</font>
+    <font face='Lucida Console'>)</font>
+    <font color='#009900'>/*!
+        requires
+            - eps &gt; 0
+            - max_iter &gt; 1
+            - begin &lt;= starting_point &lt;= end
+            - f must be a function of a double that returns a double
+              (e.g. f(starting_point) should be a valid expression that evaluates to a double)
+            - initial_search_radius &gt; 0
+        ensures
+            - Finds a point P such that:
+                - P is a local maximum of the function f().   
+                - begin &lt;= P &lt;= end
+            - Evaluates f() no more than max_iter times
+            - Stops searching when the window around the maximum point is smaller than eps.
+              The search will begin with the given starting_point and expand out to the
+              left and right by initial_search_radius sized steps.  So if you think the
+              maximum is likely to be found within X distance from the starting_point then
+              set initial_search_radius to X.
+            - #starting_point == P
+            - returns f(P)
+        throws
+            - optimize_single_variable_failure 
+                This exception is thrown if max_iter iterations are performed without 
+                determining the max point to the requested accuracy of eps.
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_OPTIMIZATIOn_ABSTRACT_
+</font>
+
+</pre></body></html>

@@ -1,0 +1,211 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - kalman_filter_abstract.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2012  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#undef</font> DLIB_KALMAN_FiLTER_ABSTRACT_Hh_
+<font color='#0000FF'>#ifdef</font> DLIB_KALMAN_FiLTER_ABSTRACT_Hh_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../serialize.h.html'>../serialize.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../matrix.h.html'>../matrix.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'><u>long</u></font> states,
+        <font color='#0000FF'><u>long</u></font> measurements
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>class</font> <b><a name='kalman_filter'></a>kalman_filter</b>
+    <b>{</b>
+        <font color='#009900'>/*!
+            REQUIREMENTS ON states
+                states &gt; 0
+
+            REQUIREMENTS ON measurements 
+                measurements &gt; 0
+
+            WHAT THIS OBJECT REPRESENTS
+                This object implements the Kalman filter, which is a tool for 
+                recursively estimating the state of a process given measurements
+                related to that process.  To use this tool you will have to 
+                be familiar with the workings of the Kalman filter.  An excellent
+                introduction can be found in the paper:
+                    An Introduction to the Kalman Filter
+                    by Greg Welch and Gary Bishop
+
+        !*/</font>
+
+    <font color='#0000FF'>public</font>:
+
+        <b><a name='kalman_filter'></a>kalman_filter</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            - #get_observation_model()    == 0
+            - #get_transition_model()     == 0
+            - #get_process_noise()        == 0
+            - #get_measurement_noise()    == 0
+            - #get_current_state()        == 0
+            - #get_predicted_next_state() == 0
+            - #get_current_estimation_error_covariance() == the identity matrix
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_observation_model'></a>set_observation_model</b> <font face='Lucida Console'>(</font> 
+            <font color='#0000FF'>const</font> matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,measurements,states<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> H
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #get_observation_model() == H
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_transition_model'></a>set_transition_model</b>  <font face='Lucida Console'>(</font> 
+            <font color='#0000FF'>const</font> matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,states,states<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> A
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #get_transition_model() == A
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_process_noise'></a>set_process_noise</b>     <font face='Lucida Console'>(</font> 
+            <font color='#0000FF'>const</font> matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,states,states<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> Q
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #get_process_noise() == Q
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_measurement_noise'></a>set_measurement_noise</b> <font face='Lucida Console'>(</font> 
+            <font color='#0000FF'>const</font> matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,measurements,measurements<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> R
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #get_measurement_noise() == R
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_estimation_error_covariance'></a>set_estimation_error_covariance</b> <font face='Lucida Console'>(</font> 
+            <font color='#0000FF'>const</font> matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,states,states<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> P
+        <font face='Lucida Console'>)</font>; 
+        <font color='#009900'>/*!
+            ensures
+                - #get_current_estimation_error_covariance() == P
+                  (Note that you should only set this before you start filtering
+                  since the Kalman filter will maintain the value of P on its own.
+                  So only set this during initialization unless you are sure you
+                  understand what you are doing.)
+        !*/</font>
+
+        <font color='#0000FF'>const</font> matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,measurements,states<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> <b><a name='get_observation_model'></a>get_observation_model</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - Returns the matrix "H" which relates process states x to measurements z.
+                  The relation is linear, therefore, z = H*x.  That is, multiplying a
+                  state by H gives the measurement you expect to observe for that state.
+        !*/</font>
+
+        <font color='#0000FF'>const</font> matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,states,states<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> <b><a name='get_transition_model'></a>get_transition_model</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - Returns the matrix "A" which determines how process states change over time.
+                  The relation is linear, therefore, given a state vector x, the value you
+                  expect it to have at the next time step is A*x.
+        !*/</font>
+
+        <font color='#0000FF'>const</font> matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,states,states<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> <b><a name='get_process_noise'></a>get_process_noise</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the process noise covariance matrix.  You can think of this
+                  covariance matrix as a measure of how wrong the assumption of
+                  linear state transitions is. 
+        !*/</font>
+
+        <font color='#0000FF'>const</font> matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,measurements,measurements<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> <b><a name='get_measurement_noise'></a>get_measurement_noise</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the measurement noise covariance matrix.  That is, when we
+                  measure a state x we only obtain H*x corrupted by Gaussian noise.
+                  The measurement noise is the covariance matrix of this Gaussian
+                  noise which corrupts our measurements.
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='update'></a>update</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - propagates the current state estimate forward in time one
+                  time step.  In particular:
+                    - #get_current_state() == get_predicted_next_state()
+                    - #get_predicted_next_state() == get_transition_model()*get_current_state()
+                    - #get_current_estimation_error_covariance() == the propagated value of this covariance matrix
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='update'></a>update</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,measurements,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> z
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - propagates the current state estimate forward in time one time step.  
+                  Also applies a correction based on the given measurement z.  In particular:
+                    - #get_current_state(), #get_predicted_next_state(), and
+                      #get_current_estimation_error_covariance() are updated using the
+                      Kalman filter method based on the new measurement in z.
+        !*/</font>
+
+        <font color='#0000FF'>const</font> matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,states,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> <b><a name='get_current_state'></a>get_current_state</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the current estimate of the state of the process.  This
+                  estimate is based on all the measurements supplied to the update()
+                  method.
+        !*/</font>
+
+        <font color='#0000FF'>const</font> matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,states,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> <b><a name='get_predicted_next_state'></a>get_predicted_next_state</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the next expected value of the process state.  
+                - Specifically, returns get_transition_model()*get_current_state()
+                  
+        !*/</font>
+
+        <font color='#0000FF'>const</font> matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,states,states<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> <b><a name='get_current_estimation_error_covariance'></a>get_current_estimation_error_covariance</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the current state error estimation covariance matrix.  
+                  This matrix captures our uncertainty about the value of get_current_state().
+        !*/</font>
+
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='serialize'></a>serialize</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> kalman_filter<font color='#5555FF'>&amp;</font> item, 
+        std::ostream<font color='#5555FF'>&amp;</font> out 
+    <font face='Lucida Console'>)</font>;   
+    <font color='#009900'>/*!
+        provides serialization support 
+    !*/</font>
+
+    <font color='#0000FF'><u>void</u></font> <b><a name='deserialize'></a>deserialize</b> <font face='Lucida Console'>(</font>
+        kalman_filter<font color='#5555FF'>&amp;</font> item, 
+        std::istream<font color='#5555FF'>&amp;</font> in
+    <font face='Lucida Console'>)</font>;   
+    <font color='#009900'>/*!
+        provides deserialization support 
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_KALMAN_FiLTER_ABSTRACT_Hh_
+</font>
+
+
+</pre></body></html>

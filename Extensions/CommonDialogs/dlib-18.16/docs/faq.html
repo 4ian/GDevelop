@@ -1,0 +1,411 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html xmlns:gcse="googleCustomSearch"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><link rel="shortcut icon" href="dlib-icon.ico"><meta name="verify-v1" content="02MiiaFNVzS5/u0eQhsy3/knioFHsia1X3DXRpHkE6I="><meta name="google-site-verification" content="DGSSJMKDomaDaDTIRJ8jDkv0YMx9Cz7OESbXHjjr6Jw"><title>dlib C++ Library
+   - Frequently Asked Questions</title><script language="JavaScript">
+
+// ---------------------------------------------
+// --- Name:    Easy DHTML Treeview           --
+// --- Author:  D.D. de Kerf                  --
+// --- Version: 0.2          Date: 13-6-2001  --
+// ---------------------------------------------
+function Toggle(node)
+{
+   // Unfold the branch if it isn't visible
+   var next_node = node.nextSibling;
+   if (next_node.style.display == 'none')
+   {
+      // Change the image (if there is an image)
+      if (node.childNodes.length > 0)
+      {
+         if (node.childNodes.length > 0)
+         { 
+            if (node.childNodes.item(0).nodeName == "IMG")
+            {
+               node.childNodes.item(0).src = "minus.gif";
+            }
+         }
+      }
+
+      next_node.style.display = 'block';
+   }
+   // Collapse the branch if it IS visible
+   else
+   {
+      // Change the image (if there is an image)
+      if (node.childNodes.length > 0)
+      {
+         if (node.childNodes.length > 0)
+         { 
+            if (node.childNodes.item(0).nodeName == "IMG")
+            {
+               node.childNodes.item(0).src = "plus.gif";
+            }
+         }
+      }
+
+      next_node.style.display = 'none';
+   }
+
+}
+function BigToggle(node)
+{
+   // Unfold the branch if it isn't visible
+   var next_node = node.nextSibling;
+   if (next_node.style.display == 'none')
+   {
+      // Change the image (if there is an image)
+      if (node.childNodes.length > 0)
+      {
+         if (node.childNodes.length > 0)
+         { 
+            if (node.childNodes.item(0).nodeName == "IMG")
+            {
+               node.childNodes.item(0).src = "bigminus.gif";
+            }
+         }
+      }
+
+      next_node.style.display = 'block';
+   }
+   // Collapse the branch if it IS visible
+   else
+   {
+      // Change the image (if there is an image)
+      if (node.childNodes.length > 0)
+      {
+         if (node.childNodes.length > 0)
+         { 
+            if (node.childNodes.item(0).nodeName == "IMG")
+            {
+               node.childNodes.item(0).src = "bigplus.gif";
+            }
+         }
+      }
+
+      next_node.style.display = 'none';
+   }
+
+}
+</script><style type="text/css">
+   body {margin:0px;}
+   pre {margin:0px;}
+
+   ul.tree  li { list-style: none;  margin-left:10px;} 
+   ul.tree  { margin:0px; padding:0px; margin-left:5px; font-size:0.95em; }
+   ul.tree  li ul { margin-left:10px; padding:0px; }
+
+   li#term { list-style: none; }
+
+   div.component {
+      background-color:white; 
+      border: 2px solid rgb(102,102,102); 
+      text-align:left;
+      margin-top: 1.5em;
+      padding: 0.7em;
+   }
+
+   div.question {
+      background-color:white; 
+      border: 2px solid rgb(102,102,102); 
+      text-align:left;
+      margin-top: 1.5em;
+      margin-bottom: 90%;
+      padding: 0.7em;
+   }
+
+   div.function {
+      background-color:white; 
+      border: 2px solid rgb(102,102,255); 
+      text-align:left;
+      margin-top: 0.3em;
+      padding: 0.3em;
+   }
+
+   div.class {
+      background-color:white; 
+      border: 2px solid rgb(255,102,102); 
+      text-align:left;
+      margin-top: 0.3em;
+      padding: 0.3em;
+   }
+
+   div.extension {
+      background-color:#FDFDFD; 
+      border: 1px solid rgb(102,102,102); 
+      text-align:left;
+      margin-top: 1.0em;
+      padding: 0.7em;
+   }
+
+   div.logb {
+      text-align:left;
+      padding: 0.0em;
+      float: left;
+      background-color:#c0c0c0; 
+      border: double ; 
+      margin: 0.5em;
+   }
+
+   div.name {
+      float: left;
+   }
+   div.line1 {
+      float:left;
+      width:100%;
+      background-color:#dfdfdf; 
+   }
+   div.line2 {
+      float:left;
+      width:100%;
+   }
+   div.inc {
+      float: right;
+   }
+
+
+   .code_box
+   {
+      color: black;
+      margin: 1em 0.25in;
+      padding: 0.5em;
+      background: rgb(240,240,240);
+      border-top: black dotted 1px;
+      border-left: black dotted 1px;
+      border-right: black solid 2px;
+      border-bottom: black solid 2px;
+   }
+
+
+
+   .bdotted {border-bottom: 1px dotted}
+   .bdashed {border-bottom: 1px dashed}
+   .bsolid {border-bottom: 1px solid}
+   .bdouble {border-bottom: 1px double}
+   .bgroove {border-bottom: 1px groove}
+   .bridge {border-bottom: 1px ridge}
+   .binset {border-bottom: 1px inset}
+   .boutset {border-bottom: 1px outset}
+
+   div.row1 {
+      background-color:#dfdfdf; 
+   }
+   div.row2 {
+      background-color:#f2f2f2; 
+   }
+
+   div.typedefs {
+      margin-left: 1.5em;
+      margin-top: 0.2em;
+      border: 1px dotted;
+      width: 52em;
+   }
+
+   div.tdn {
+      width: 10em;
+   }
+
+   .fullhr {
+      clear: both;
+   }
+
+   body {
+      text-align: center;
+   }
+
+   div.entire_page_header {
+      width:62.5em;  
+      text-align: left;
+      margin-top: 0.4em;
+      margin-left: auto;
+      margin-right: auto;
+   }
+   div.entire_page {
+      width:62.5em;  
+      text-align: left;
+      margin-left: auto;
+      margin-right: auto;
+      clear:both;
+   }
+</style></head><body bgcolor="#EDF3EE"><a name="top"></a><div class="entire_page_header"><a href="http://dlib.net"><img src="dlib-logo.png"></a></div><div class="entire_page"><table bgcolor="white" height="100%" bordercolor="#EDF3EE" CELLSPACING="0" CELLPADDING="10" style="border:0px;margin-top:2px"><tr height="100%"><td BGCOLOR="#F5F5F5" style="padding:7px; border: 1px solid rgb(102,102,102);" VALIGN="TOP" height="100%"><br><table WIDTH="145" height="100%"><tr><td VALIGN="TOP"><b>The Library</b><ul class="tree"><li><a href="algorithms.html">Algorithms</a></li><li><a href="api.html">API Wrappers</a></li><li><a href="bayes.html">Bayesian Nets</a></li><li><a href="compression.html">Compression</a></li><li><a href="containers.html">Containers</a></li><li><a href="graph_tools.html">Graph Tools</a></li><li><a href="imaging.html">Image Processing</a></li><li><a href="linear_algebra.html">Linear Algebra</a></li><li><a href="ml.html">Machine Learning</a></li><li><a href="metaprogramming.html">Metaprogramming</a></li><li><a href="other.html">Miscellaneous</a></li><li><a href="network.html">Networking</a></li><li><a href="optimization.html">Optimization</a></li><li><a href="parsing.html">Parsing</a></li></ul><br><b>Help/Info</b><ul class="tree"><li><a onclick="Toggle(this)" style="cursor: pointer;margin-left:-9px"><img src="plus.gif"><font color="green"><u>Examples: C++</u></font></a><ul style="display:none;"><li><a href="3d_point_cloud_ex.cpp.html">3D_Point_Cloud</a></li><li><a href="assignment_learning_ex.cpp.html">Assignment_Learning</a></li><li><a href="file_to_code_ex.cpp.html">Base64_Encoder</a></li><li><a href="bayes_net_ex.cpp.html">Bayesian_Network</a></li><li><a href="bayes_net_from_disk_ex.cpp.html">Bayesian_Network_From_Disk</a></li><li><a href="bayes_net_gui_ex.cpp.html">Bayesian_Network_GUI</a></li><li><a href="bridge_ex.cpp.html">Bridge</a></li><li><a href="bsp_ex.cpp.html">BSP</a></li><li><a href="svm_c_ex.cpp.html">C-Support_Vector_Machine</a></li><li><a href="compress_stream_ex.cpp.html#_top">Cmd_Line_Parser</a></li><li><a href="compress_stream_ex.cpp.html">Compress_Stream</a></li><li><a href="config_reader_ex.cpp.html">Config_File_Reader</a></li><li><a href="custom_trainer_ex.cpp.html">Custom_Trainers</a></li><li><a href="dir_nav_ex.cpp.html">Directory_Navigation</a></li><li><a href="empirical_kernel_map_ex.cpp.html">Empirical_Kernel_Map</a></li><li><a href="face_detection_ex.cpp.html">Face_Detection</a></li><li><a href="face_landmark_detection_ex.cpp.html">Face_Landmark_Detection</a></li><li><a href="fhog_ex.cpp.html">FHOG_Feature_Extraction</a></li><li><a href="fhog_object_detector_ex.cpp.html">FHOG_Object_Detection</a></li><li><a href="graph_labeling_ex.cpp.html">Graph_Labeling</a></li><li><a href="gui_api_ex.cpp.html">GUI</a></li><li><a href="hough_transform_ex.cpp.html">Hough_Transform</a></li><li><a href="server_http_ex.cpp.html">HTTP_Server</a></li><li><a href="image_ex.cpp.html">Image</a></li><li><a href="iosockstream_ex.cpp.html">IO Socket Streams</a></li><li><a href="server_iostream_ex.cpp.html">IO Streams Server</a></li><li><a href="kcentroid_ex.cpp.html">Kernel_Centroid</a></li><li><a href="kkmeans_ex.cpp.html">Kernel_K-Means_Clustering</a></li><li><a href="krr_regression_ex.cpp.html">Kernel_Ridge_Regression</a></li><li><a href="krls_filter_ex.cpp.html">Kernel_RLS_Filtering</a></li><li><a href="krls_ex.cpp.html">Kernel_RLS_Regression</a></li><li><a href="krr_classification_ex.cpp.html">KRR_Classification</a></li><li><a href="learning_to_track_ex.cpp.html">Learning_to_Track</a></li><li><a href="max_cost_assignment_ex.cpp.html">Linear_Assignment_Problems</a></li><li><a href="linear_manifold_regularizer_ex.cpp.html">Linear_Manifold_Regularizer</a></li><li><a href="mpc_ex.cpp.html">Linear_Model_Predictive_Control</a></li><li><a href="logger_ex.cpp.html">Logger</a></li><li><a href="logger_ex_2.cpp.html">Logger_Advanced</a></li><li><a href="logger_custom_output_ex.cpp.html">Logger_Custom_Output</a></li><li><a href="matrix_ex.cpp.html">Matrix</a></li><li><a href="matrix_expressions_ex.cpp.html">Matrix_Expressions</a></li><li><a href="member_function_pointer_ex.cpp.html">Member_Function_Pointer</a></li><li><a href="model_selection_ex.cpp.html">Model_Selection</a></li><li><a href="multiclass_classification_ex.cpp.html">Multiclass_Classification</a></li><li><a href="multithreaded_object_ex.cpp.html">Multithreaded_Object</a></li><li><a href="mlp_ex.cpp.html">Neural_Network</a></li><li><a href="least_squares_ex.cpp.html">Non-Linear Least Squares</a></li><li><a href="svm_ex.cpp.html">Nu-Support_Vector_Machine</a></li><li><a href="integrate_function_adapt_simp_ex.cpp.html">Numerical_Integration</a></li><li><a href="object_detector_ex.cpp.html">Object_Detector</a></li><li><a href="object_detector_advanced_ex.cpp.html">Object_Detector_Advanced</a></li><li><a href="one_class_classifiers_ex.cpp.html">One_Class_Classifiers</a></li><li><a href="svm_pegasos_ex.cpp.html">Online_SVM</a></li><li><a href="optimization_ex.cpp.html">Optimization</a></li><li><a href="parallel_for_ex.cpp.html">Parallel_For_Loops</a></li><li><a href="pipe_ex.cpp.html">Pipe</a></li><li><a href="pipe_ex_2.cpp.html">Pipe_2</a></li><li><a href="quantum_computing_ex.cpp.html">Quantum_Computing</a></li><li><a href="queue_ex.cpp.html">Queue</a></li><li><a href="rank_features_ex.cpp.html">Rank_Features</a></li><li><a href="rvm_ex.cpp.html">Relevance_Vector_Classification</a></li><li><a href="rvm_regression_ex.cpp.html">Relevance_Vector_Regression</a></li><li><a href="running_stats_ex.cpp.html">Running_Stats</a></li><li><a href="sequence_labeler_ex.cpp.html">Sequence_Labeling</a></li><li><a href="sequence_segmenter_ex.cpp.html">Sequence_Segmentation</a></li><li><a href="sockets_ex.cpp.html">Sockets</a></li><li><a href="sockstreambuf_ex.cpp.html">Sockstreambuf</a></li><li><a href="svm_sparse_ex.cpp.html">Sparse_Vectors</a></li><li><a href="sqlite_ex.cpp.html">SQLite</a></li><li><a href="std_allocator_ex.cpp.html">Std_C++_Allocator</a></li><li><a href="svm_struct_ex.cpp.html">Structural_Support_Vector_Machines</a></li><li><a href="svr_ex.cpp.html">Support_Vector_Regression</a></li><li><a href="surf_ex.cpp.html">SURF</a></li><li><a href="svm_rank_ex.cpp.html">SVM-Rank</a></li><li><a href="threaded_object_ex.cpp.html">Threaded_Object</a></li><li><a href="threads_ex.cpp.html">Threads</a></li><li><a href="thread_function_ex.cpp.html">Thread_Function</a></li><li><a href="thread_pool_ex.cpp.html">Thread_Pool</a></li><li><a href="timer_ex.cpp.html">Timer</a></li><li><a href="train_object_detector.cpp.html">Train_Object_Detector</a></li><li><a href="train_shape_predictor_ex.cpp.html">Train_Shape_Predictor</a></li><li><a href="using_custom_kernels_ex.cpp.html">Using_Custom_Kernels</a></li><li><a href="video_tracking_ex.cpp.html">Video_Object_Tracking</a></li><li><a href="webcam_face_pose_ex.cpp.html">Webcam_Face_Pose_Estimation</a></li><li><a href="xml_parser_ex.cpp.html">XML_Parser</a></li></ul></li><li><a onclick="Toggle(this)" style="cursor: pointer;margin-left:-9px"><img src="plus.gif"><font color="green"><u>Examples: Python</u></font></a><ul style="display:none;"><li><a href="face_detector.py.html">Face_Detector</a></li><li><a href="face_landmark_detection.py.html">Face_Landmark_Detection</a></li><li><a href="find_candidate_object_locations.py.html">find_candidate_object_locations</a></li><li><a href="max_cost_assignment.py.html">Linear_Assignment_Problems</a></li><li><a href="sequence_segmenter.py.html">Sequence_Segmenter</a></li><li><a href="svm_struct.py.html">Structural_Support_Vector_Machines</a></li><li><a href="svm_rank.py.html">SVM-Rank</a></li><li><a href="train_object_detector.py.html">Train_Object_Detector</a></li><li><a href="train_shape_predictor.py.html">Train_Shape_Predictor</a></li><li><a href="correlation_tracker.py.html">Video_Object_Tracking</a></li></ul></li><li><a href="faq.html">FAQ</a></li><li><a href="index.html">Home</a></li><li><a href="compile.html">How to compile</a></li><li><a href="howto_contribute.html">How to contribute</a></li><li><a href="term_index.html">Index</a></li><li><a href="intro.html">Introduction</a></li><li><a href="license.html">License</a></li><li><a href="python/index.html">Python API</a></li><li><a href="books.html">Suggested Books</a></li></ul><br><b>Current Release</b><ul class="tree"><li><a href="change_log.html">Change Log</a></li><li><a href="release_notes.html">Release Notes</a></li><li>Version: 18.16</li></ul><br></td><td width="1"></td></tr><tr><td valign="bottom"><br><br><br><br><br><br><br><br><br>
+      Last Modified:<br>Jan 31, 2015<br><br></td></tr></table></td><td VALIGN="TOP" width="100%" style="border: 1px solid rgb(102,102,102);"><center><h1>Frequently Asked Questions</h1></center><h2>General</h2><ul><li><a href="#HowcanIcitedlib">How can I cite dlib?</a></li><li><a href="#HowcanIusedlibinVisualStudio">How can I use dlib in Visual Studio?</a></li><li><a href="#HowdoIsetthesizeofamatrixatruntime">How do I set the size of a matrix at runtime?</a></li><li><a href="#Howdoesdlibinterfacewithotherlibrariestools">How does dlib interface with other libraries/tools?</a></li><li><a href="#Whereisthedocumentationforobjectfunction">Where is the documentation for &lt;object/function&gt;?</a></li><li><a href="#Whyisdlibslow">Why is dlib slow?</a></li><li><a href="#Whyisn'tserializationworking">Why isn't serialization working?</a></li></ul><h2>Machine Learning</h2><ul><li><a href="#Canyougiveadviceonfeaturegenerationkernelselection">Can you give advice on feature generation/kernel selection?</a></li><li><a href="#HowcanIdefineacustomkernel">How can I define a custom kernel?</a></li><li><a href="#Whydoesmydecisionfunctionalwaysgivethesameoutput">Why does my decision_function always give the same output?</a></li><li><a href="#Whyiscrossvalidatetrainerthreadedcrashing">Why is cross_validate_trainer_threaded() crashing?</a></li><li><a href="#WhyisRVMtrainingisreallyslow">Why is RVM training is really slow?</a></li></ul></td></tr></table><a name="How%20can%20I%20cite%20dlib?"></a><a name="HowcanIcitedlib"><div class="question"><a href="#top"><font size="2"><center>[top]</center></font></a><h2>How can I cite dlib?</h2>
+         If you use dlib in your research then please use the following citation:
+         <br><br>
+Davis E. King. <a href="http://jmlr.csail.mit.edu/papers/volume10/king09a/king09a.pdf">Dlib-ml: A Machine Learning Toolkit</a>. 
+   <i>Journal of Machine Learning Research</i> 10, pp. 1755-1758, 2009
+         <br><pre>
+
+@Article{dlib09,
+  author = {Davis E. King},
+  title = {Dlib-ml: A Machine Learning Toolkit},
+  journal = {Journal of Machine Learning Research},
+  year = {2009},
+  volume = {10},
+  pages = {1755-1758},
+}
+         </pre></div></a><a name="How%20can%20I%20use%20dlib%20in%20Visual%20Studio?"></a><a name="HowcanIusedlibinVisualStudio"><div class="question"><a href="#top"><font size="2"><center>[top]</center></font></a><h2>How can I use dlib in Visual Studio?</h2>
+         There are instructions on the <a href="compile.html">How to Compile</a> page.  
+         If you do not understand the instructions in the "<b>Compiling on Windows Using Visual Studio</b>" section
+         or are getting errors then follow the instructions in the "<b>Compiling on Any Operating System Using CMake</b>"
+         section.  In particular, <a href="http://www.cmake.org/download/">install CMake</a> and then type 
+         these exact commands from within the root of the dlib distribution:  
+<pre class="code_box">
+cd examples
+mkdir build
+cd build
+del /F /S /Q *
+cmake ..
+cmake --build . --config Release
+</pre>
+         That should compile the dlib examples in visual studio.  The output executables will appear in the Release folder.
+         The <tt>del /F /S /Q *</tt> command is to make sure you clear out any extraneous files you might have placed in 
+         the build folder and is not necessary if build begins empty.
+      </div></a><a name="How%20do%20I%20set%20the%20size%20of%20a%20matrix%20at%20runtime?"></a><a name="HowdoIsetthesizeofamatrixatruntime"><div class="question"><a href="#top"><font size="2"><center>[top]</center></font></a><h2>How do I set the size of a matrix at runtime?</h2>
+         Long answer, read the <a href="matrix_ex.cpp.html">matrix example program</a>.
+         <br><br>
+         Short answer, here are some examples:
+<pre class="code_box">
+matrix&lt;double&gt; mat;
+mat.set_size(4,5);
+
+matrix&lt;double,0,1&gt; column_vect;
+column_vect.set_size(6);
+
+matrix&lt;double,0,1&gt; column_vect2(6);  // give size to constructor
+
+matrix&lt;double,1&gt; row_vect;
+row_vect.set_size(5);
+</pre></div></a><a name="How%20does%20dlib%20interface%20with%20other%20libraries/tools?"></a><a name="Howdoesdlibinterfacewithotherlibrariestools"><div class="question"><a href="#top"><font size="2"><center>[top]</center></font></a><h2>How does dlib interface with other libraries/tools?</h2>
+         There should never be anything in dlib that prevents you from using or 
+         interacting with other libraries.  Moreover, there are some additional tools
+         in dlib to make some interactions easier:  
+
+         <ul><li><b>BLAS and LAPACK libraries</b> are used by the <a href="linear_algebra.html#matrix">matrix</a>
+            automatically if you <tt>#define</tt> DLIB_USE_BLAS and/or DLIB_USE_LAPACK and link against
+            the appropriate library files.  Note that the CMakeLists.txt file that comes with dlib will
+            do this for you automatically in many instances.</li><br><li><b>Armadillo and Eigen libraries</b> have matrix objects which can be converted into
+            dlib matrix objects by calling dlib::mat() on them.</li><br><li><b>OpenCV</b> image objects can be converted into a form usable by dlib routines
+            by using <a href="imaging.html#cv_image">cv_image</a>.  You can also convert from a
+            dlib matrix or image to an OpenCV Mat using dlib::<a href="imaging.html#toMat">toMat</a>().</li><br><li><b>Google Protocol Buffers</b> can be serialized by the dlib 
+            <a href="other.html#serialize">serialization</a> routines.  
+            This means that, for example, you can pass protocol buffer objects through a 
+            <a href="network.html#bridge">bridge</a>.
+            </li><br><li><b>libpng and libjpeg</b> are used by <a href="imaging.html#load_image">load_image</a> whenever
+            DLIB_PNG_SUPPORT and DLIB_JPEG_SUPPORT are defined respectively.
+            You must also tell your compiler to link against these libraries to
+            use them. However, CMake will try to link against them
+            automatically if they are installed.</li><br><li><b>SQLite</b> is used by the <a href="other.html#database">database</a> object.  In
+            fact, it is just a wrapper around SQLite's C interface which simplifies its use (e.g. 
+            makes resource management use RAII).</li></ul></div></a><a name="Where%20is%20the%20documentation%20for%20&lt;object/function&gt;?"></a><a name="Whereisthedocumentationforobjectfunction"><div class="question"><a href="#top"><font size="2"><center>[top]</center></font></a><h2>Where is the documentation for &lt;object/function&gt;?</h2>
+         If you can't find something then check the <a href="term_index.html">index</a>.
+         <br><br>
+         Also, the bulk of the documentation can be found by following the 
+         <b><font color="#0000FF" style="font-size:1.3em">Detailed Documentation</font></b> links.   
+      </div></a><a name="Why%20is%20dlib%20slow?"></a><a name="Whyisdlibslow"><div class="question"><a href="#top"><font size="2"><center>[top]</center></font></a><h2>Why is dlib slow?</h2>
+         Dlib isn't slow.  I get this question many times a week and 95% of the time it's from someone
+         using Visual Studio who has compiled their program in Debug mode rather than the optimized
+         Release mode.  So if you are using Visual Studio then realize that Visual Studio has these two modes.  
+         The default is Debug.  The mode is selectable via a drop down:
+         <p><img src="vs_mode_1.png" border="0" height="" width="" alt=""></p>
+         Debug mode disables compiler optimizations.  So the program will be very slow if you run it in Debug mode.
+         So click the drop down,
+         <p><img src="vs_mode_2.png" border="0" height="" width="" alt=""></p>
+         and select Release.
+         <p><img src="vs_mode_3.png" border="0" height="" width="" alt=""></p>
+         Then when you compile the program it will appear in a folder named Release rather than in a folder named Debug.  
+
+         <br><br>
+         Finally, you can enable either SSE4 or AVX instruction use.  These will make certain operations much faster (e.g. face detection).
+         You do this using <a href="http://www.cmake.org/download/">CMake</a>'s cmake-gui tool.  For example, if you execute
+         these commands you will get the cmake-gui screen:
+<pre class="code_box">
+cd examples
+mkdir build
+cd build
+cmake .. 
+cmake-gui .
+</pre>
+         Which looks like this:
+         <p><img src="vs-cmake-gui.png" border="0" height="" width="" alt=""></p>
+         Where you can select SSE4 or AVX instruction use.  Then you click configure and then generate. After that
+         when you build your visual studio project some things will be faster.
+         
+         Finally, note that AVX is a little bit faster than SSE4 but if your computer is fairly old it might
+         not support it.  In that case, either buy a new computer or use SSE4
+         instructions. 
+      </div></a><a name="Why%20isn't%20serialization%20working?"></a><a name="Whyisn'tserializationworking"><div class="question"><a href="#top"><font size="2"><center>[top]</center></font></a><h2>Why isn't serialization working?</h2>
+         Here are the possibilities:
+         <ul><li>You are using a file stream and forgot to put it into binary mode.  
+               You need to do something like this:
+<pre class="code_box">
+std::ifstream fin("myfile", std::ios::binary);
+</pre>
+or
+<pre class="code_box">
+std::ofstream fout("myfile", std::ios::binary);
+</pre>
+
+If you don't give <tt>std::ios::binary</tt> then the iostream will mess with the binary data and cause serialization
+to not work right.  
+            </li><br><li>The iostream is in a bad state.  You can check the state by calling <tt>mystream.good()</tt>.
+            If it returns false then the stream is in an error state such as end-of-file or maybe it failed
+            to do the I/O.  Also note that if you close a file stream and reopen it you might have to call
+            <tt>mystream.clear()</tt> to clear out the error flags.
+            </li></ul></div></a><a name="Can%20you%20give%20advice%20on%20feature%20generation/kernel%20selection?"></a><a name="Canyougiveadviceonfeaturegenerationkernelselection"><div class="question"><a href="#top"><font size="2"><center>[top]</center></font></a><h2>Can you give advice on feature generation/kernel selection?</h2><p>
+            Picking the right kernel all comes down to understanding your data, and obviously this is 
+            highly dependent on your problem.  
+         </p><p>
+            One thing that's sometimes useful is to plot each feature against the target value.  You can get an idea of 
+            what your overall feature space looks like and maybe tell if a linear kernel is the right solution.  But 
+            this still hides important information from you.  For example, imagine you have two diagonal lines which 
+            are very close together and are both the same length.  Suppose one line is of the +1 class and the other is the -1 
+            class.  Each feature (the x or y coordinate values) by itself tells you almost nothing about which class 
+            a point belongs to but together they tell you everything you need to know.  
+         </p><p>
+            On the other hand, if you know something about the data you are working with then you can also try and 
+            generate your own features.  So for example, if your data is a bunch of images and you know that one 
+            of your classes contains a lot of lines then you can make a feature that attempts to measure the number 
+            of lines in an image using a hough transform or sobel edge filter or whatever.  Generally, try and 
+            think up features which should be highly correlated with your target value.  A good way to do this is 
+            to try and actually hand code N solutions to the problem using whatever you know about your data or 
+            domain.  If you do a good job then you will have N really great features and a linear or rbf kernel 
+            will probably do very well when using them.
+         </p><p>
+            Or you can just try a whole bunch of kernels, kernel parameters, and training algorithm options while 
+            using cross validation.  I.e. when in doubt, use brute force :)   There is an example of that kind of 
+            thing in the <a href="model_selection_ex.cpp.html">model selection</a> example program. 
+         </p></div></a><a name="How%20can%20I%20define%20a%20custom%20kernel?"></a><a name="HowcanIdefineacustomkernel"><div class="question"><a href="#top"><font size="2"><center>[top]</center></font></a><h2>How can I define a custom kernel?</h2>
+         See the <a href="using_custom_kernels_ex.cpp.html">Using Custom Kernels</a> example program.
+      </div></a><a name="Why%20does%20my%20decision_function%20always%20give%20the%20same%20output?"></a><a name="Whydoesmydecisionfunctionalwaysgivethesameoutput"><div class="question"><a href="#top"><font size="2"><center>[top]</center></font></a><h2>Why does my decision_function always give the same output?</h2>
+         This happens when you use the radial_basis_kernel and you set the gamma value to
+         something highly inappropriate.  To understand what's happening lets imagine your
+         data has just one feature and its value ranges from 0 to 7.  Then what you want is a 
+         gamma value that gives nice Gaussian bumps like the one in this graph: <br><center><img src="rbf_normal.gif" border="0"></center><br>
+         However, if you make gamma really huge you will get this (it's zero everywhere except for one place):
+         <br><center><img src="rbf_big_gamma.gif" border="0"></center><br>
+         Or if you make gamma really small then it will be 1.0 everywhere:
+         <br><center><img src="rbf_small_gamma.gif" border="0"></center><p>
+            So you need to pick the gamma value so that it is scaled reasonably to your data.  A <i><font color="red">good rule of
+            thumb (i.e. not the optimal gamma, just a heuristic guess)</font></i> is the following:
+         </p><pre class="code_box">const double gamma = 1.0/compute_mean_squared_distance(randomly_subsample(samples, 2000));</pre></div></a><a name="Why%20is%20cross_validate_trainer_threaded()%20crashing?"></a><a name="Whyiscrossvalidatetrainerthreadedcrashing"><div class="question"><a href="#top"><font size="2"><center>[top]</center></font></a><h2>Why is cross_validate_trainer_threaded() crashing?</h2>
+         This function makes a copy of your training data for each thread.  So you are probably running out
+         of memory.  To avoid this, use the <a href="algorithms.html#randomly_subsample">randomly_subsample</a> function
+         to reduce the amount of data you are using or use fewer threads. 
+         <p>
+            For example, you could reduce the amount of data by saying this:
+<pre class="code_box">
+// reduce to only 1000 samples
+cross_validate_trainer_threaded(trainer, 
+                                randomly_subsample(samples, 1000), 
+                                randomly_subsample(labels,  1000), 
+                                4,   // num folds
+                                4);  // num threads
+</pre></p></div></a><a name="Why%20is%20RVM%20training%20is%20really%20slow?"></a><a name="WhyisRVMtrainingisreallyslow"><div class="question"><a href="#top"><font size="2"><center>[top]</center></font></a><h2>Why is RVM training is really slow?</h2>
+         The optimization algorithm is somewhat unpredictable.  Sometimes it is fast and 
+         sometimes it is slow.  What usually makes it really slow is if you use a radial basis
+         kernel and you set the gamma parameter to something too large.  This causes the
+         algorithm to start using a whole lot of relevance vectors (i.e. basis vectors) which
+         then makes it slow.  The algorithm is only fast as long as the number of relevance vectors
+         remains small but it is hard to know beforehand if that will be the case.  
+         <p>
+            You should try <a href="ml.html#krr_trainer">kernel ridge regression</a> instead since it
+            also doesn't take any parameters but is always very fast.
+         </p></div></a></div></body></html>

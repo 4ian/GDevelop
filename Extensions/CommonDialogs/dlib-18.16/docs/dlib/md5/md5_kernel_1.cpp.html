@@ -1,0 +1,620 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - md5_kernel_1.cpp</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2003  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_MD5_KERNEL_1_CPp_
+<font color='#0000FF'>#define</font> DLIB_MD5_KERNEL_1_CPp_
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='md5_kernel_1.h.html'>md5_kernel_1.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../uintn.h.html'>../uintn.h</a>"
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>sstream<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>cstring<font color='#5555FF'>&gt;</font>
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>namespace</font> md5_stuff
+    <b>{</b>
+        
+        <font color='#0000FF'>inline</font> uint32 <b><a name='F'></a>F</b> <font face='Lucida Console'>(</font>
+            uint32 x, 
+            uint32 y, 
+            uint32 z
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>return</font> <font face='Lucida Console'>(</font> <font face='Lucida Console'>(</font>x<font color='#5555FF'>&amp;</font>y<font face='Lucida Console'>)</font> <font color='#5555FF'>|</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>~x<font face='Lucida Console'>)</font><font color='#5555FF'>&amp;</font>z<font face='Lucida Console'>)</font> <font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+    <font color='#009900'>// ------------------------------------------------------------------------------------
+</font>
+        <font color='#0000FF'>inline</font> uint32 <b><a name='G'></a>G</b> <font face='Lucida Console'>(</font>
+            uint32 x, 
+            uint32 y, 
+            uint32 z
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>return</font> <font face='Lucida Console'>(</font> <font face='Lucida Console'>(</font>x<font color='#5555FF'>&amp;</font>z<font face='Lucida Console'>)</font> <font color='#5555FF'>|</font> <font face='Lucida Console'>(</font>y<font color='#5555FF'>&amp;</font><font face='Lucida Console'>(</font>~z<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+    <font color='#009900'>// ------------------------------------------------------------------------------------
+</font>        
+        <font color='#0000FF'>inline</font> uint32 <b><a name='H'></a>H</b> <font face='Lucida Console'>(</font>
+            uint32 x, 
+            uint32 y, 
+            uint32 z
+        <font face='Lucida Console'>)</font> 
+        <b>{</b>
+            <font color='#0000FF'>return</font> <font face='Lucida Console'>(</font> x^y^z <font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+    <font color='#009900'>// ------------------------------------------------------------------------------------
+</font>
+        <font color='#0000FF'>inline</font> uint32 <b><a name='I'></a>I</b> <font face='Lucida Console'>(</font>
+            uint32 x, 
+            uint32 y, 
+            uint32 z
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>return</font> <font face='Lucida Console'>(</font> y ^ <font face='Lucida Console'>(</font>x<font color='#5555FF'>|</font><font face='Lucida Console'>(</font>~z<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+    <font color='#009900'>// ------------------------------------------------------------------------------------
+</font>
+        <font color='#0000FF'>inline</font> uint32 <b><a name='rotate_left'></a>rotate_left</b> <font face='Lucida Console'>(</font>
+            uint32 x, 
+            uint32 n
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>return</font>  <font face='Lucida Console'>(</font> <font face='Lucida Console'>(</font>x<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font>n<font face='Lucida Console'>)</font> <font color='#5555FF'>|</font> <font face='Lucida Console'>(</font>x<font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#979000'>32</font><font color='#5555FF'>-</font>n<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+    <font color='#009900'>// ------------------------------------------------------------------------------------
+</font>
+        <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='FF'></a>FF</b> <font face='Lucida Console'>(</font>
+            uint32<font color='#5555FF'>&amp;</font> a, 
+            uint32 b, 
+            uint32 c, 
+            uint32 d, 
+            uint32 x, 
+            uint32 s, 
+            uint32 ac
+        <font face='Lucida Console'>)</font> 
+        <b>{</b> 
+            a <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#BB00BB'>F</font><font face='Lucida Console'>(</font>b, c, d<font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> x <font color='#5555FF'>+</font> ac; 
+            a <font color='#5555FF'>=</font> <font color='#BB00BB'>rotate_left</font><font face='Lucida Console'>(</font>a, s<font face='Lucida Console'>)</font>; 
+            a <font color='#5555FF'>+</font><font color='#5555FF'>=</font> b; 
+        <b>}</b>
+
+    <font color='#009900'>// ------------------------------------------------------------------------------------
+</font>
+        <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='GG'></a>GG</b> <font face='Lucida Console'>(</font>
+            uint32<font color='#5555FF'>&amp;</font> a, 
+            uint32 b, 
+            uint32 c, 
+            uint32 d, 
+            uint32 x, 
+            uint32 s, 
+            uint32 ac
+        <font face='Lucida Console'>)</font> 
+        <b>{</b> 
+            a <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#BB00BB'>G</font><font face='Lucida Console'>(</font>b, c, d<font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> x <font color='#5555FF'>+</font> ac; 
+            a <font color='#5555FF'>=</font> <font color='#BB00BB'>rotate_left</font><font face='Lucida Console'>(</font>a, s<font face='Lucida Console'>)</font>; 
+            a <font color='#5555FF'>+</font><font color='#5555FF'>=</font> b; 
+        <b>}</b>
+
+    <font color='#009900'>// ------------------------------------------------------------------------------------
+</font>
+        <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='HH'></a>HH</b> <font face='Lucida Console'>(</font>
+            uint32<font color='#5555FF'>&amp;</font> a, 
+            uint32 b, 
+            uint32 c, 
+            uint32 d, 
+            uint32 x, 
+            uint32 s, 
+            uint32 ac
+        <font face='Lucida Console'>)</font> 
+        <b>{</b> 
+            a <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#BB00BB'>H</font><font face='Lucida Console'>(</font>b, c, d<font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> x <font color='#5555FF'>+</font> ac; 
+            a <font color='#5555FF'>=</font> <font color='#BB00BB'>rotate_left</font><font face='Lucida Console'>(</font>a, s<font face='Lucida Console'>)</font>; 
+            a <font color='#5555FF'>+</font><font color='#5555FF'>=</font> b; 
+        <b>}</b>
+
+    <font color='#009900'>// ------------------------------------------------------------------------------------
+</font>
+        <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='II'></a>II</b> <font face='Lucida Console'>(</font>
+            uint32<font color='#5555FF'>&amp;</font> a, 
+            uint32 b, 
+            uint32 c, 
+            uint32 d, 
+            uint32 x, 
+            uint32 s, 
+            uint32 ac
+        <font face='Lucida Console'>)</font> 
+        <b>{</b> 
+            a <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#BB00BB'>I</font><font face='Lucida Console'>(</font>b, c, d<font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> x <font color='#5555FF'>+</font> ac; 
+            a <font color='#5555FF'>=</font> <font color='#BB00BB'>rotate_left</font><font face='Lucida Console'>(</font>a, s<font face='Lucida Console'>)</font>; 
+            a <font color='#5555FF'>+</font><font color='#5555FF'>=</font> b; 
+        <b>}</b>
+
+    <font color='#009900'>// ------------------------------------------------------------------------------------
+</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='scramble_block'></a>scramble_block</b> <font face='Lucida Console'>(</font>
+            uint32<font color='#5555FF'>&amp;</font> a,
+            uint32<font color='#5555FF'>&amp;</font> b,
+            uint32<font color='#5555FF'>&amp;</font> c,
+            uint32<font color='#5555FF'>&amp;</font> d,
+            uint32<font color='#5555FF'>*</font> x
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>const</font> uint32 S11 <font color='#5555FF'>=</font> <font color='#979000'>7</font>;
+            <font color='#0000FF'>const</font> uint32 S12 <font color='#5555FF'>=</font> <font color='#979000'>12</font>;
+            <font color='#0000FF'>const</font> uint32 S13 <font color='#5555FF'>=</font> <font color='#979000'>17</font>;
+            <font color='#0000FF'>const</font> uint32 S14 <font color='#5555FF'>=</font> <font color='#979000'>22</font>;
+            <font color='#0000FF'>const</font> uint32 S21 <font color='#5555FF'>=</font> <font color='#979000'>5</font>;
+            <font color='#0000FF'>const</font> uint32 S22 <font color='#5555FF'>=</font> <font color='#979000'>9</font>;
+            <font color='#0000FF'>const</font> uint32 S23 <font color='#5555FF'>=</font> <font color='#979000'>14</font>;
+            <font color='#0000FF'>const</font> uint32 S24 <font color='#5555FF'>=</font> <font color='#979000'>20</font>;
+            <font color='#0000FF'>const</font> uint32 S31 <font color='#5555FF'>=</font> <font color='#979000'>4</font>;
+            <font color='#0000FF'>const</font> uint32 S32 <font color='#5555FF'>=</font> <font color='#979000'>11</font>;
+            <font color='#0000FF'>const</font> uint32 S33 <font color='#5555FF'>=</font> <font color='#979000'>16</font>;
+            <font color='#0000FF'>const</font> uint32 S34 <font color='#5555FF'>=</font> <font color='#979000'>23</font>;
+            <font color='#0000FF'>const</font> uint32 S41 <font color='#5555FF'>=</font> <font color='#979000'>6</font>;
+            <font color='#0000FF'>const</font> uint32 S42 <font color='#5555FF'>=</font> <font color='#979000'>10</font>;
+            <font color='#0000FF'>const</font> uint32 S43 <font color='#5555FF'>=</font> <font color='#979000'>15</font>;
+            <font color='#0000FF'>const</font> uint32 S44 <font color='#5555FF'>=</font> <font color='#979000'>21</font>;
+
+
+            <font color='#009900'>// round 1
+</font>            <font color='#BB00BB'>FF</font> <font face='Lucida Console'>(</font>a, b, c, d, x[ <font color='#979000'>0</font>], S11, <font color='#979000'>0xd76aa478</font><font face='Lucida Console'>)</font>; <font color='#009900'>// 1
+</font>            <font color='#BB00BB'>FF</font> <font face='Lucida Console'>(</font>d, a, b, c, x[ <font color='#979000'>1</font>], S12, <font color='#979000'>0xe8c7b756</font><font face='Lucida Console'>)</font>; <font color='#009900'>// 2
+</font>            <font color='#BB00BB'>FF</font> <font face='Lucida Console'>(</font>c, d, a, b, x[ <font color='#979000'>2</font>], S13, <font color='#979000'>0x242070db</font><font face='Lucida Console'>)</font>; <font color='#009900'>// 3
+</font>            <font color='#BB00BB'>FF</font> <font face='Lucida Console'>(</font>b, c, d, a, x[ <font color='#979000'>3</font>], S14, <font color='#979000'>0xc1bdceee</font><font face='Lucida Console'>)</font>; <font color='#009900'>// 4
+</font>            <font color='#BB00BB'>FF</font> <font face='Lucida Console'>(</font>a, b, c, d, x[ <font color='#979000'>4</font>], S11, <font color='#979000'>0xf57c0faf</font><font face='Lucida Console'>)</font>; <font color='#009900'>// 5
+</font>            <font color='#BB00BB'>FF</font> <font face='Lucida Console'>(</font>d, a, b, c, x[ <font color='#979000'>5</font>], S12, <font color='#979000'>0x4787c62a</font><font face='Lucida Console'>)</font>; <font color='#009900'>// 6
+</font>            <font color='#BB00BB'>FF</font> <font face='Lucida Console'>(</font>c, d, a, b, x[ <font color='#979000'>6</font>], S13, <font color='#979000'>0xa8304613</font><font face='Lucida Console'>)</font>; <font color='#009900'>// 7
+</font>            <font color='#BB00BB'>FF</font> <font face='Lucida Console'>(</font>b, c, d, a, x[ <font color='#979000'>7</font>], S14, <font color='#979000'>0xfd469501</font><font face='Lucida Console'>)</font>; <font color='#009900'>// 8
+</font>            <font color='#BB00BB'>FF</font> <font face='Lucida Console'>(</font>a, b, c, d, x[ <font color='#979000'>8</font>], S11, <font color='#979000'>0x698098d8</font><font face='Lucida Console'>)</font>; <font color='#009900'>// 9
+</font>            <font color='#BB00BB'>FF</font> <font face='Lucida Console'>(</font>d, a, b, c, x[ <font color='#979000'>9</font>], S12, <font color='#979000'>0x8b44f7af</font><font face='Lucida Console'>)</font>; <font color='#009900'>// 10
+</font>            <font color='#BB00BB'>FF</font> <font face='Lucida Console'>(</font>c, d, a, b, x[<font color='#979000'>10</font>], S13, <font color='#979000'>0xffff5bb1</font><font face='Lucida Console'>)</font>; <font color='#009900'>// 11
+</font>            <font color='#BB00BB'>FF</font> <font face='Lucida Console'>(</font>b, c, d, a, x[<font color='#979000'>11</font>], S14, <font color='#979000'>0x895cd7be</font><font face='Lucida Console'>)</font>; <font color='#009900'>// 12
+</font>            <font color='#BB00BB'>FF</font> <font face='Lucida Console'>(</font>a, b, c, d, x[<font color='#979000'>12</font>], S11, <font color='#979000'>0x6b901122</font><font face='Lucida Console'>)</font>; <font color='#009900'>// 13
+</font>            <font color='#BB00BB'>FF</font> <font face='Lucida Console'>(</font>d, a, b, c, x[<font color='#979000'>13</font>], S12, <font color='#979000'>0xfd987193</font><font face='Lucida Console'>)</font>; <font color='#009900'>// 14
+</font>            <font color='#BB00BB'>FF</font> <font face='Lucida Console'>(</font>c, d, a, b, x[<font color='#979000'>14</font>], S13, <font color='#979000'>0xa679438e</font><font face='Lucida Console'>)</font>; <font color='#009900'>// 15
+</font>            <font color='#BB00BB'>FF</font> <font face='Lucida Console'>(</font>b, c, d, a, x[<font color='#979000'>15</font>], S14, <font color='#979000'>0x49b40821</font><font face='Lucida Console'>)</font>; <font color='#009900'>// 16
+</font>
+            <font color='#009900'>// Round 2 
+</font>            <font color='#BB00BB'>GG</font> <font face='Lucida Console'>(</font>a, b, c, d, x[ <font color='#979000'>1</font>], S21, <font color='#979000'>0xf61e2562</font><font face='Lucida Console'>)</font>; <font color='#009900'>// 17
+</font>            <font color='#BB00BB'>GG</font> <font face='Lucida Console'>(</font>d, a, b, c, x[ <font color='#979000'>6</font>], S22, <font color='#979000'>0xc040b340</font><font face='Lucida Console'>)</font>; <font color='#009900'>// 18
+</font>            <font color='#BB00BB'>GG</font> <font face='Lucida Console'>(</font>c, d, a, b, x[<font color='#979000'>11</font>], S23, <font color='#979000'>0x265e5a51</font><font face='Lucida Console'>)</font>; <font color='#009900'>// 19
+</font>            <font color='#BB00BB'>GG</font> <font face='Lucida Console'>(</font>b, c, d, a, x[ <font color='#979000'>0</font>], S24, <font color='#979000'>0xe9b6c7aa</font><font face='Lucida Console'>)</font>; <font color='#009900'>// 20
+</font>            <font color='#BB00BB'>GG</font> <font face='Lucida Console'>(</font>a, b, c, d, x[ <font color='#979000'>5</font>], S21, <font color='#979000'>0xd62f105d</font><font face='Lucida Console'>)</font>; <font color='#009900'>// 21
+</font>            <font color='#BB00BB'>GG</font> <font face='Lucida Console'>(</font>d, a, b, c, x[<font color='#979000'>10</font>], S22,  <font color='#979000'>0x2441453</font><font face='Lucida Console'>)</font>; <font color='#009900'>// 22
+</font>            <font color='#BB00BB'>GG</font> <font face='Lucida Console'>(</font>c, d, a, b, x[<font color='#979000'>15</font>], S23, <font color='#979000'>0xd8a1e681</font><font face='Lucida Console'>)</font>; <font color='#009900'>// 23
+</font>            <font color='#BB00BB'>GG</font> <font face='Lucida Console'>(</font>b, c, d, a, x[ <font color='#979000'>4</font>], S24, <font color='#979000'>0xe7d3fbc8</font><font face='Lucida Console'>)</font>; <font color='#009900'>// 24
+</font>            <font color='#BB00BB'>GG</font> <font face='Lucida Console'>(</font>a, b, c, d, x[ <font color='#979000'>9</font>], S21, <font color='#979000'>0x21e1cde6</font><font face='Lucida Console'>)</font>; <font color='#009900'>// 25
+</font>            <font color='#BB00BB'>GG</font> <font face='Lucida Console'>(</font>d, a, b, c, x[<font color='#979000'>14</font>], S22, <font color='#979000'>0xc33707d6</font><font face='Lucida Console'>)</font>; <font color='#009900'>// 26
+</font>            <font color='#BB00BB'>GG</font> <font face='Lucida Console'>(</font>c, d, a, b, x[ <font color='#979000'>3</font>], S23, <font color='#979000'>0xf4d50d87</font><font face='Lucida Console'>)</font>; <font color='#009900'>// 27
+</font>            <font color='#BB00BB'>GG</font> <font face='Lucida Console'>(</font>b, c, d, a, x[ <font color='#979000'>8</font>], S24, <font color='#979000'>0x455a14ed</font><font face='Lucida Console'>)</font>; <font color='#009900'>// 28
+</font>            <font color='#BB00BB'>GG</font> <font face='Lucida Console'>(</font>a, b, c, d, x[<font color='#979000'>13</font>], S21, <font color='#979000'>0xa9e3e905</font><font face='Lucida Console'>)</font>; <font color='#009900'>// 29
+</font>            <font color='#BB00BB'>GG</font> <font face='Lucida Console'>(</font>d, a, b, c, x[ <font color='#979000'>2</font>], S22, <font color='#979000'>0xfcefa3f8</font><font face='Lucida Console'>)</font>; <font color='#009900'>// 30
+</font>            <font color='#BB00BB'>GG</font> <font face='Lucida Console'>(</font>c, d, a, b, x[ <font color='#979000'>7</font>], S23, <font color='#979000'>0x676f02d9</font><font face='Lucida Console'>)</font>; <font color='#009900'>// 31
+</font>            <font color='#BB00BB'>GG</font> <font face='Lucida Console'>(</font>b, c, d, a, x[<font color='#979000'>12</font>], S24, <font color='#979000'>0x8d2a4c8a</font><font face='Lucida Console'>)</font>; <font color='#009900'>// 32
+</font>
+            <font color='#009900'>// Round 3 
+</font>            <font color='#BB00BB'>HH</font> <font face='Lucida Console'>(</font>a, b, c, d, x[ <font color='#979000'>5</font>], S31, <font color='#979000'>0xfffa3942</font><font face='Lucida Console'>)</font>; <font color='#009900'>// 33
+</font>            <font color='#BB00BB'>HH</font> <font face='Lucida Console'>(</font>d, a, b, c, x[ <font color='#979000'>8</font>], S32, <font color='#979000'>0x8771f681</font><font face='Lucida Console'>)</font>; <font color='#009900'>// 34
+</font>            <font color='#BB00BB'>HH</font> <font face='Lucida Console'>(</font>c, d, a, b, x[<font color='#979000'>11</font>], S33, <font color='#979000'>0x6d9d6122</font><font face='Lucida Console'>)</font>; <font color='#009900'>// 35
+</font>            <font color='#BB00BB'>HH</font> <font face='Lucida Console'>(</font>b, c, d, a, x[<font color='#979000'>14</font>], S34, <font color='#979000'>0xfde5380c</font><font face='Lucida Console'>)</font>; <font color='#009900'>// 36
+</font>            <font color='#BB00BB'>HH</font> <font face='Lucida Console'>(</font>a, b, c, d, x[ <font color='#979000'>1</font>], S31, <font color='#979000'>0xa4beea44</font><font face='Lucida Console'>)</font>; <font color='#009900'>// 37
+</font>            <font color='#BB00BB'>HH</font> <font face='Lucida Console'>(</font>d, a, b, c, x[ <font color='#979000'>4</font>], S32, <font color='#979000'>0x4bdecfa9</font><font face='Lucida Console'>)</font>; <font color='#009900'>// 38
+</font>            <font color='#BB00BB'>HH</font> <font face='Lucida Console'>(</font>c, d, a, b, x[ <font color='#979000'>7</font>], S33, <font color='#979000'>0xf6bb4b60</font><font face='Lucida Console'>)</font>; <font color='#009900'>// 39
+</font>            <font color='#BB00BB'>HH</font> <font face='Lucida Console'>(</font>b, c, d, a, x[<font color='#979000'>10</font>], S34, <font color='#979000'>0xbebfbc70</font><font face='Lucida Console'>)</font>; <font color='#009900'>// 40
+</font>            <font color='#BB00BB'>HH</font> <font face='Lucida Console'>(</font>a, b, c, d, x[<font color='#979000'>13</font>], S31, <font color='#979000'>0x289b7ec6</font><font face='Lucida Console'>)</font>; <font color='#009900'>// 41
+</font>            <font color='#BB00BB'>HH</font> <font face='Lucida Console'>(</font>d, a, b, c, x[ <font color='#979000'>0</font>], S32, <font color='#979000'>0xeaa127fa</font><font face='Lucida Console'>)</font>; <font color='#009900'>// 42
+</font>            <font color='#BB00BB'>HH</font> <font face='Lucida Console'>(</font>c, d, a, b, x[ <font color='#979000'>3</font>], S33, <font color='#979000'>0xd4ef3085</font><font face='Lucida Console'>)</font>; <font color='#009900'>// 43
+</font>            <font color='#BB00BB'>HH</font> <font face='Lucida Console'>(</font>b, c, d, a, x[ <font color='#979000'>6</font>], S34,  <font color='#979000'>0x4881d05</font><font face='Lucida Console'>)</font>; <font color='#009900'>// 44
+</font>            <font color='#BB00BB'>HH</font> <font face='Lucida Console'>(</font>a, b, c, d, x[ <font color='#979000'>9</font>], S31, <font color='#979000'>0xd9d4d039</font><font face='Lucida Console'>)</font>; <font color='#009900'>// 45
+</font>            <font color='#BB00BB'>HH</font> <font face='Lucida Console'>(</font>d, a, b, c, x[<font color='#979000'>12</font>], S32, <font color='#979000'>0xe6db99e5</font><font face='Lucida Console'>)</font>; <font color='#009900'>// 46
+</font>            <font color='#BB00BB'>HH</font> <font face='Lucida Console'>(</font>c, d, a, b, x[<font color='#979000'>15</font>], S33, <font color='#979000'>0x1fa27cf8</font><font face='Lucida Console'>)</font>; <font color='#009900'>// 47
+</font>            <font color='#BB00BB'>HH</font> <font face='Lucida Console'>(</font>b, c, d, a, x[ <font color='#979000'>2</font>], S34, <font color='#979000'>0xc4ac5665</font><font face='Lucida Console'>)</font>; <font color='#009900'>// 48
+</font>
+            <font color='#009900'>// Round 4 
+</font>            <font color='#BB00BB'>II</font> <font face='Lucida Console'>(</font>a, b, c, d, x[ <font color='#979000'>0</font>], S41, <font color='#979000'>0xf4292244</font><font face='Lucida Console'>)</font>; <font color='#009900'>// 49
+</font>            <font color='#BB00BB'>II</font> <font face='Lucida Console'>(</font>d, a, b, c, x[ <font color='#979000'>7</font>], S42, <font color='#979000'>0x432aff97</font><font face='Lucida Console'>)</font>; <font color='#009900'>// 50
+</font>            <font color='#BB00BB'>II</font> <font face='Lucida Console'>(</font>c, d, a, b, x[<font color='#979000'>14</font>], S43, <font color='#979000'>0xab9423a7</font><font face='Lucida Console'>)</font>; <font color='#009900'>// 51
+</font>            <font color='#BB00BB'>II</font> <font face='Lucida Console'>(</font>b, c, d, a, x[ <font color='#979000'>5</font>], S44, <font color='#979000'>0xfc93a039</font><font face='Lucida Console'>)</font>; <font color='#009900'>// 52
+</font>            <font color='#BB00BB'>II</font> <font face='Lucida Console'>(</font>a, b, c, d, x[<font color='#979000'>12</font>], S41, <font color='#979000'>0x655b59c3</font><font face='Lucida Console'>)</font>; <font color='#009900'>// 53
+</font>            <font color='#BB00BB'>II</font> <font face='Lucida Console'>(</font>d, a, b, c, x[ <font color='#979000'>3</font>], S42, <font color='#979000'>0x8f0ccc92</font><font face='Lucida Console'>)</font>; <font color='#009900'>// 54
+</font>            <font color='#BB00BB'>II</font> <font face='Lucida Console'>(</font>c, d, a, b, x[<font color='#979000'>10</font>], S43, <font color='#979000'>0xffeff47d</font><font face='Lucida Console'>)</font>; <font color='#009900'>// 55
+</font>            <font color='#BB00BB'>II</font> <font face='Lucida Console'>(</font>b, c, d, a, x[ <font color='#979000'>1</font>], S44, <font color='#979000'>0x85845dd1</font><font face='Lucida Console'>)</font>; <font color='#009900'>// 56
+</font>            <font color='#BB00BB'>II</font> <font face='Lucida Console'>(</font>a, b, c, d, x[ <font color='#979000'>8</font>], S41, <font color='#979000'>0x6fa87e4f</font><font face='Lucida Console'>)</font>; <font color='#009900'>// 57
+</font>            <font color='#BB00BB'>II</font> <font face='Lucida Console'>(</font>d, a, b, c, x[<font color='#979000'>15</font>], S42, <font color='#979000'>0xfe2ce6e0</font><font face='Lucida Console'>)</font>; <font color='#009900'>// 58
+</font>            <font color='#BB00BB'>II</font> <font face='Lucida Console'>(</font>c, d, a, b, x[ <font color='#979000'>6</font>], S43, <font color='#979000'>0xa3014314</font><font face='Lucida Console'>)</font>; <font color='#009900'>// 59
+</font>            <font color='#BB00BB'>II</font> <font face='Lucida Console'>(</font>b, c, d, a, x[<font color='#979000'>13</font>], S44, <font color='#979000'>0x4e0811a1</font><font face='Lucida Console'>)</font>; <font color='#009900'>// 60
+</font>            <font color='#BB00BB'>II</font> <font face='Lucida Console'>(</font>a, b, c, d, x[ <font color='#979000'>4</font>], S41, <font color='#979000'>0xf7537e82</font><font face='Lucida Console'>)</font>; <font color='#009900'>// 61
+</font>            <font color='#BB00BB'>II</font> <font face='Lucida Console'>(</font>d, a, b, c, x[<font color='#979000'>11</font>], S42, <font color='#979000'>0xbd3af235</font><font face='Lucida Console'>)</font>; <font color='#009900'>// 62
+</font>            <font color='#BB00BB'>II</font> <font face='Lucida Console'>(</font>c, d, a, b, x[ <font color='#979000'>2</font>], S43, <font color='#979000'>0x2ad7d2bb</font><font face='Lucida Console'>)</font>; <font color='#009900'>// 63
+</font>            <font color='#BB00BB'>II</font> <font face='Lucida Console'>(</font>b, c, d, a, x[ <font color='#979000'>9</font>], S44, <font color='#979000'>0xeb86d391</font><font face='Lucida Console'>)</font>; <font color='#009900'>// 64
+</font>        <b>}</b>
+
+    <b>}</b> 
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+
+    <font color='#0000FF'>const</font> std::string <b><a name='md5'></a>md5</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> input
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> output[<font color='#979000'>16</font>];
+        <font color='#BB00BB'>md5</font> <font face='Lucida Console'>(</font> 
+            <font color='#0000FF'>reinterpret_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>*</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>input.<font color='#BB00BB'>data</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>,
+            <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>input.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>,
+            output
+            <font face='Lucida Console'>)</font>;
+
+        
+        std::stringstream temp;
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> <font color='#979000'>16</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+        <b>{</b>
+            temp.<font color='#BB00BB'>fill</font><font face='Lucida Console'>(</font>'<font color='#FF0000'>0</font>'<font face='Lucida Console'>)</font>;
+            temp.<font color='#BB00BB'>width</font><font face='Lucida Console'>(</font><font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+            temp <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> std::hex <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>int</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>output[i]<font face='Lucida Console'>)</font>;
+        <b>}</b>
+        
+        <font color='#0000FF'>return</font> temp.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='md5'></a>md5</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>*</font> input,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> len,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>*</font> output
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> md5_stuff;
+
+
+
+
+        <font color='#009900'>// make a temp version of input with enough space for padding and len appended
+</font>        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> extra_len <font color='#5555FF'>=</font> <font color='#979000'>64</font><font color='#5555FF'>-</font>len<font color='#5555FF'>%</font><font color='#979000'>64</font>;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>extra_len <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#979000'>8</font><font face='Lucida Console'>)</font>
+            extra_len <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#979000'>64</font>;
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>*</font> temp <font color='#5555FF'>=</font> <font color='#0000FF'>new</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font>[extra_len <font color='#5555FF'>+</font> len];
+
+        <font color='#009900'>// number of 16 word blocks
+</font>        <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> N <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>extra_len <font color='#5555FF'>+</font> len<font face='Lucida Console'>)</font><font color='#5555FF'>/</font><font color='#979000'>64</font>;
+
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>*</font> input2 <font color='#5555FF'>=</font> input;
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>*</font> temp2 <font color='#5555FF'>=</font> temp;
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>*</font> end <font color='#5555FF'>=</font> temp<font color='#5555FF'>+</font>len;
+
+        <font color='#009900'>// copy input into temp
+</font>        <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>temp2 <font color='#5555FF'>!</font><font color='#5555FF'>=</font> end<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#5555FF'>*</font>temp2 <font color='#5555FF'>=</font> <font color='#5555FF'>*</font>input2;
+            <font color='#5555FF'>+</font><font color='#5555FF'>+</font>temp2;
+            <font color='#5555FF'>+</font><font color='#5555FF'>+</font>input2;
+        <b>}</b>
+
+        <font color='#009900'>// pad temp
+</font>        end <font color='#5555FF'>+</font><font color='#5555FF'>=</font> extra_len<font color='#5555FF'>-</font><font color='#979000'>8</font>;
+        <font color='#5555FF'>*</font>temp2 <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#979000'>0x80</font><font face='Lucida Console'>)</font>;
+        <font color='#5555FF'>+</font><font color='#5555FF'>+</font>temp2;
+        <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>temp2 <font color='#5555FF'>!</font><font color='#5555FF'>=</font> end<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#5555FF'>*</font>temp2 <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            <font color='#5555FF'>+</font><font color='#5555FF'>+</font>temp2;
+        <b>}</b>
+
+        <font color='#009900'>// make len the number of bits in the original message
+</font>        <font color='#009900'>// but first multiply len by 8 and since len is only 32 bits the number might
+</font>        <font color='#009900'>// overflow so we will carry out the multiplication manually and end up with
+</font>        <font color='#009900'>// the result in the base 65536 number with three digits
+</font>        <font color='#009900'>// result = low + high*65536 + upper*65536*65536
+</font>        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> low <font color='#5555FF'>=</font> len <font color='#5555FF'>&amp;</font> <font color='#979000'>0xFFFF</font>;
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> high <font color='#5555FF'>=</font> len <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font> <font color='#979000'>16</font>;
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> upper;
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> tmp;
+        tmp <font color='#5555FF'>=</font> low <font color='#5555FF'>*</font> <font color='#979000'>8</font>;
+        low <font color='#5555FF'>=</font> tmp <font color='#5555FF'>&amp;</font> <font color='#979000'>0xFFFF</font>;
+        tmp <font color='#5555FF'>=</font> high <font color='#5555FF'>*</font> <font color='#979000'>8</font> <font color='#5555FF'>+</font> <font face='Lucida Console'>(</font>tmp<font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font><font color='#979000'>16</font><font face='Lucida Console'>)</font>;
+        high <font color='#5555FF'>=</font> tmp <font color='#5555FF'>&amp;</font> <font color='#979000'>0xFFFF</font>;
+        upper <font color='#5555FF'>=</font> tmp <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font> <font color='#979000'>16</font>;
+        
+
+        <font color='#009900'>// append the length
+</font>        <font color='#5555FF'>*</font>temp2 <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>low<font color='#5555FF'>&amp;</font><font color='#979000'>0xFF</font><font face='Lucida Console'>)</font>;
+        <font color='#5555FF'>+</font><font color='#5555FF'>+</font>temp2;
+        <font color='#5555FF'>*</font>temp2 <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>low<font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font><font color='#979000'>8</font><font face='Lucida Console'>)</font><font color='#5555FF'>&amp;</font><font color='#979000'>0xFF</font><font face='Lucida Console'>)</font>;
+        <font color='#5555FF'>+</font><font color='#5555FF'>+</font>temp2;
+        <font color='#5555FF'>*</font>temp2 <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>high<font face='Lucida Console'>)</font><font color='#5555FF'>&amp;</font><font color='#979000'>0xFF</font><font face='Lucida Console'>)</font>;
+        <font color='#5555FF'>+</font><font color='#5555FF'>+</font>temp2;
+        <font color='#5555FF'>*</font>temp2 <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>high<font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font><font color='#979000'>8</font><font face='Lucida Console'>)</font><font color='#5555FF'>&amp;</font><font color='#979000'>0xFF</font><font face='Lucida Console'>)</font>;
+        <font color='#5555FF'>+</font><font color='#5555FF'>+</font>temp2;
+        <font color='#5555FF'>*</font>temp2 <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>upper<font face='Lucida Console'>)</font><font color='#5555FF'>&amp;</font><font color='#979000'>0xFF</font><font face='Lucida Console'>)</font>;;
+        <font color='#5555FF'>+</font><font color='#5555FF'>+</font>temp2;
+        <font color='#5555FF'>*</font>temp2 <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>upper<font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font><font color='#979000'>8</font><font face='Lucida Console'>)</font><font color='#5555FF'>&amp;</font><font color='#979000'>0xFF</font><font face='Lucida Console'>)</font>;;
+        <font color='#5555FF'>+</font><font color='#5555FF'>+</font>temp2;
+        <font color='#5555FF'>*</font>temp2 <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <font color='#5555FF'>+</font><font color='#5555FF'>+</font>temp2;
+        <font color='#5555FF'>*</font>temp2 <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        
+
+        uint32 a <font color='#5555FF'>=</font> <font color='#979000'>0x67452301</font>;
+        uint32 b <font color='#5555FF'>=</font> <font color='#979000'>0xefcdab89</font>;
+        uint32 c <font color='#5555FF'>=</font> <font color='#979000'>0x98badcfe</font>;
+        uint32 d <font color='#5555FF'>=</font> <font color='#979000'>0x10325476</font>;
+
+
+        <font color='#009900'>// an array of 16 words
+</font>        uint32 x[<font color='#979000'>16</font>];
+
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> N; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+        <b>{</b>
+    
+            <font color='#009900'>// copy a block of 16 words from m into x
+</font>            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> j <font color='#5555FF'>=</font> <font color='#979000'>0</font>; j <font color='#5555FF'>&lt;</font> <font color='#979000'>16</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>j<font face='Lucida Console'>)</font>
+            <b>{</b>
+                x[j] <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>
+                    <font face='Lucida Console'>(</font><font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font>uint32<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>temp[<font color='#979000'>4</font><font color='#5555FF'>*</font><font face='Lucida Console'>(</font>j <font color='#5555FF'>+</font> <font color='#979000'>16</font><font color='#5555FF'>*</font>i<font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> <font color='#979000'>3</font>]<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#979000'>24</font><font face='Lucida Console'>)</font> <font color='#5555FF'>|</font>
+                    <font face='Lucida Console'>(</font><font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font>uint32<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>temp[<font color='#979000'>4</font><font color='#5555FF'>*</font><font face='Lucida Console'>(</font>j <font color='#5555FF'>+</font> <font color='#979000'>16</font><font color='#5555FF'>*</font>i<font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> <font color='#979000'>2</font>]<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#979000'>16</font><font face='Lucida Console'>)</font> <font color='#5555FF'>|</font>
+                    <font face='Lucida Console'>(</font><font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font>uint32<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>temp[<font color='#979000'>4</font><font color='#5555FF'>*</font><font face='Lucida Console'>(</font>j <font color='#5555FF'>+</font> <font color='#979000'>16</font><font color='#5555FF'>*</font>i<font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> <font color='#979000'>1</font>]<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#979000'>8</font> <font face='Lucida Console'>)</font> <font color='#5555FF'>|</font>
+                    <font face='Lucida Console'>(</font><font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font>uint32<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>temp[<font color='#979000'>4</font><font color='#5555FF'>*</font><font face='Lucida Console'>(</font>j <font color='#5555FF'>+</font> <font color='#979000'>16</font><font color='#5555FF'>*</font>i<font face='Lucida Console'>)</font>    ]<font face='Lucida Console'>)</font>      <font face='Lucida Console'>)</font>
+                    <font face='Lucida Console'>)</font>;               
+            <b>}</b>
+
+            uint32 aa <font color='#5555FF'>=</font> a;
+            uint32 bb <font color='#5555FF'>=</font> b;
+            uint32 cc <font color='#5555FF'>=</font> c;
+            uint32 dd <font color='#5555FF'>=</font> d;
+
+
+            <font color='#BB00BB'>scramble_block</font><font face='Lucida Console'>(</font>a,b,c,d,x<font face='Lucida Console'>)</font>;
+
+
+            a <font color='#5555FF'>=</font> a <font color='#5555FF'>+</font> aa;
+            b <font color='#5555FF'>=</font> b <font color='#5555FF'>+</font> bb;
+            c <font color='#5555FF'>=</font> c <font color='#5555FF'>+</font> cc;
+            d <font color='#5555FF'>=</font> d <font color='#5555FF'>+</font> dd;
+
+        <b>}</b>
+
+
+        <font color='#009900'>// put a, b, c, and d into output
+</font>        output[<font color='#979000'>0</font>]   <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>a<font face='Lucida Console'>)</font>    <font color='#5555FF'>&amp;</font><font color='#979000'>0xFF</font><font face='Lucida Console'>)</font>;
+        output[<font color='#979000'>1</font>]   <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>a<font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font><font color='#979000'>8</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#979000'>0xFF</font><font face='Lucida Console'>)</font>;
+        output[<font color='#979000'>2</font>]   <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>a<font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font><font color='#979000'>16</font><font face='Lucida Console'>)</font><font color='#5555FF'>&amp;</font><font color='#979000'>0xFF</font><font face='Lucida Console'>)</font>;
+        output[<font color='#979000'>3</font>]   <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>a<font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font><font color='#979000'>24</font><font face='Lucida Console'>)</font><font color='#5555FF'>&amp;</font><font color='#979000'>0xFF</font><font face='Lucida Console'>)</font>;
+
+        output[<font color='#979000'>4</font>]   <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>b<font face='Lucida Console'>)</font>    <font color='#5555FF'>&amp;</font><font color='#979000'>0xFF</font><font face='Lucida Console'>)</font>;
+        output[<font color='#979000'>5</font>]   <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>b<font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font><font color='#979000'>8</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#979000'>0xFF</font><font face='Lucida Console'>)</font>;
+        output[<font color='#979000'>6</font>]   <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>b<font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font><font color='#979000'>16</font><font face='Lucida Console'>)</font><font color='#5555FF'>&amp;</font><font color='#979000'>0xFF</font><font face='Lucida Console'>)</font>;
+        output[<font color='#979000'>7</font>]   <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>b<font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font><font color='#979000'>24</font><font face='Lucida Console'>)</font><font color='#5555FF'>&amp;</font><font color='#979000'>0xFF</font><font face='Lucida Console'>)</font>;
+
+        output[<font color='#979000'>8</font>]   <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>c<font face='Lucida Console'>)</font>    <font color='#5555FF'>&amp;</font><font color='#979000'>0xFF</font><font face='Lucida Console'>)</font>;
+        output[<font color='#979000'>9</font>]   <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>c<font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font><font color='#979000'>8</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#979000'>0xFF</font><font face='Lucida Console'>)</font>;
+        output[<font color='#979000'>10</font>]  <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>c<font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font><font color='#979000'>16</font><font face='Lucida Console'>)</font><font color='#5555FF'>&amp;</font><font color='#979000'>0xFF</font><font face='Lucida Console'>)</font>;
+        output[<font color='#979000'>11</font>]  <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>c<font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font><font color='#979000'>24</font><font face='Lucida Console'>)</font><font color='#5555FF'>&amp;</font><font color='#979000'>0xFF</font><font face='Lucida Console'>)</font>;
+
+        output[<font color='#979000'>12</font>]  <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>d<font face='Lucida Console'>)</font>    <font color='#5555FF'>&amp;</font><font color='#979000'>0xFF</font><font face='Lucida Console'>)</font>;
+        output[<font color='#979000'>13</font>]  <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>d<font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font><font color='#979000'>8</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#979000'>0xFF</font><font face='Lucida Console'>)</font>;
+        output[<font color='#979000'>14</font>]  <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>d<font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font><font color='#979000'>16</font><font face='Lucida Console'>)</font><font color='#5555FF'>&amp;</font><font color='#979000'>0xFF</font><font face='Lucida Console'>)</font>;
+        output[<font color='#979000'>15</font>]  <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>d<font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font><font color='#979000'>24</font><font face='Lucida Console'>)</font><font color='#5555FF'>&amp;</font><font color='#979000'>0xFF</font><font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>delete</font> [] temp;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>const</font> std::string <b><a name='md5'></a>md5</b> <font face='Lucida Console'>(</font>
+        std::istream<font color='#5555FF'>&amp;</font> input
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> output[<font color='#979000'>16</font>];
+        <font color='#BB00BB'>md5</font> <font face='Lucida Console'>(</font> 
+            input,
+            output
+            <font face='Lucida Console'>)</font>;
+
+        
+        std::stringstream temp;
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> <font color='#979000'>16</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+        <b>{</b>
+            temp.<font color='#BB00BB'>fill</font><font face='Lucida Console'>(</font>'<font color='#FF0000'>0</font>'<font face='Lucida Console'>)</font>;
+            temp.<font color='#BB00BB'>width</font><font face='Lucida Console'>(</font><font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+            temp <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> std::hex <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>int</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>output[i]<font face='Lucida Console'>)</font>;
+        <b>}</b>
+        
+        <font color='#0000FF'>return</font> temp.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='md5'></a>md5</b> <font face='Lucida Console'>(</font>
+        std::istream<font color='#5555FF'>&amp;</font> input,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>*</font> output
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> md5_stuff;
+
+
+                
+
+        uint32 a <font color='#5555FF'>=</font> <font color='#979000'>0x67452301</font>;
+        uint32 b <font color='#5555FF'>=</font> <font color='#979000'>0xefcdab89</font>;
+        uint32 c <font color='#5555FF'>=</font> <font color='#979000'>0x98badcfe</font>;
+        uint32 d <font color='#5555FF'>=</font> <font color='#979000'>0x10325476</font>;
+
+
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> len <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+
+        <font color='#009900'>// an array of 16 words
+</font>        uint32 x[<font color='#979000'>16</font>];
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> temp[<font color='#979000'>64</font>];
+
+
+
+        <font color='#0000FF'><u>bool</u></font> write_length <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+        <font color='#0000FF'><u>bool</u></font> at_end <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+        std::streambuf<font color='#5555FF'>&amp;</font> inputbuf <font color='#5555FF'>=</font> <font color='#5555FF'>*</font>input.<font color='#BB00BB'>rdbuf</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>while</font><font face='Lucida Console'>(</font><font color='#5555FF'>!</font>at_end<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'><u>int</u></font> num <font color='#5555FF'>=</font> inputbuf.<font color='#BB00BB'>sgetn</font><font face='Lucida Console'>(</font><font color='#0000FF'>reinterpret_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>char</u></font><font color='#5555FF'>*</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font>,<font color='#979000'>64</font><font face='Lucida Console'>)</font>;
+            len <font color='#5555FF'>+</font><font color='#5555FF'>=</font> num;
+
+            <font color='#009900'>// if we hit the end of the stream then pad and add length
+</font>            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>num <font color='#5555FF'>&lt;</font> <font color='#979000'>64</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                at_end <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+                <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>*</font> temp2 <font color='#5555FF'>=</font> temp;
+                <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>*</font> end;
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>num <font color='#5555FF'>&lt;</font> <font color='#979000'>56</font><font face='Lucida Console'>)</font>
+                    end <font color='#5555FF'>=</font> temp<font color='#5555FF'>+</font><font color='#979000'>56</font>;
+                <font color='#0000FF'>else</font>
+                    end <font color='#5555FF'>=</font> temp<font color='#5555FF'>+</font><font color='#979000'>64</font>;
+
+                temp2 <font color='#5555FF'>+</font><font color='#5555FF'>=</font> num;
+
+                <font color='#009900'>// apply padding
+</font>                <font color='#5555FF'>*</font>temp2 <font color='#5555FF'>=</font> <font color='#979000'>0x80</font>;
+                <font color='#5555FF'>+</font><font color='#5555FF'>+</font>temp2;
+                <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>temp2 <font color='#5555FF'>!</font><font color='#5555FF'>=</font> end<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#5555FF'>*</font>temp2 <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                    <font color='#5555FF'>+</font><font color='#5555FF'>+</font>temp2;
+                <b>}</b>
+
+
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>num <font color='#5555FF'>&lt;</font> <font color='#979000'>56</font><font face='Lucida Console'>)</font>
+                <b>{</b>
+                    write_length <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+                    <font color='#009900'>// make len the number of bits in the original message
+</font>                    <font color='#009900'>// but first multiply len by 8 and since len is only 32 bits the number might
+</font>                    <font color='#009900'>// overflow so we will carry out the multiplication manually and end up with
+</font>                    <font color='#009900'>// the result in the base 65536 number with three digits
+</font>                    <font color='#009900'>// result = low + high*65536 + upper*65536*65536
+</font>                    <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> low <font color='#5555FF'>=</font> len <font color='#5555FF'>&amp;</font> <font color='#979000'>0xFFFF</font>;
+                    <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> high <font color='#5555FF'>=</font> len <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font> <font color='#979000'>16</font>;
+                    <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> upper;
+                    <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> tmp;
+                    tmp <font color='#5555FF'>=</font> low <font color='#5555FF'>*</font> <font color='#979000'>8</font>;
+                    low <font color='#5555FF'>=</font> tmp <font color='#5555FF'>&amp;</font> <font color='#979000'>0xFFFF</font>;
+                    tmp <font color='#5555FF'>=</font> high <font color='#5555FF'>*</font> <font color='#979000'>8</font> <font color='#5555FF'>+</font> <font face='Lucida Console'>(</font>tmp<font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font><font color='#979000'>16</font><font face='Lucida Console'>)</font>;
+                    high <font color='#5555FF'>=</font> tmp <font color='#5555FF'>&amp;</font> <font color='#979000'>0xFFFF</font>;
+                    upper <font color='#5555FF'>=</font> tmp <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font> <font color='#979000'>16</font>;
+
+
+                    <font color='#009900'>// append the length
+</font>                    <font color='#5555FF'>*</font>temp2 <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>low<font color='#5555FF'>&amp;</font><font color='#979000'>0xFF</font><font face='Lucida Console'>)</font>;
+                    <font color='#5555FF'>+</font><font color='#5555FF'>+</font>temp2;
+                    <font color='#5555FF'>*</font>temp2 <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>low<font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font><font color='#979000'>8</font><font face='Lucida Console'>)</font><font color='#5555FF'>&amp;</font><font color='#979000'>0xFF</font><font face='Lucida Console'>)</font>;
+                    <font color='#5555FF'>+</font><font color='#5555FF'>+</font>temp2;
+                    <font color='#5555FF'>*</font>temp2 <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>high<font face='Lucida Console'>)</font><font color='#5555FF'>&amp;</font><font color='#979000'>0xFF</font><font face='Lucida Console'>)</font>;
+                    <font color='#5555FF'>+</font><font color='#5555FF'>+</font>temp2;
+                    <font color='#5555FF'>*</font>temp2 <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>high<font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font><font color='#979000'>8</font><font face='Lucida Console'>)</font><font color='#5555FF'>&amp;</font><font color='#979000'>0xFF</font><font face='Lucida Console'>)</font>;
+                    <font color='#5555FF'>+</font><font color='#5555FF'>+</font>temp2;
+                    <font color='#5555FF'>*</font>temp2 <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>upper<font face='Lucida Console'>)</font><font color='#5555FF'>&amp;</font><font color='#979000'>0xFF</font><font face='Lucida Console'>)</font>;;
+                    <font color='#5555FF'>+</font><font color='#5555FF'>+</font>temp2;
+                    <font color='#5555FF'>*</font>temp2 <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>upper<font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font><font color='#979000'>8</font><font face='Lucida Console'>)</font><font color='#5555FF'>&amp;</font><font color='#979000'>0xFF</font><font face='Lucida Console'>)</font>;;
+                    <font color='#5555FF'>+</font><font color='#5555FF'>+</font>temp2;
+                    <font color='#5555FF'>*</font>temp2 <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                    <font color='#5555FF'>+</font><font color='#5555FF'>+</font>temp2;
+                    <font color='#5555FF'>*</font>temp2 <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                <b>}</b>
+
+
+            <b>}</b>
+
+
+            <font color='#009900'>// copy a block of 16 words from m into x
+</font>            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> <font color='#979000'>16</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                x[i] <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>
+                    <font face='Lucida Console'>(</font><font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font>uint32<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>temp[<font color='#979000'>4</font><font color='#5555FF'>*</font>i <font color='#5555FF'>+</font> <font color='#979000'>3</font>]<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#979000'>24</font><font face='Lucida Console'>)</font> <font color='#5555FF'>|</font>
+                    <font face='Lucida Console'>(</font><font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font>uint32<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>temp[<font color='#979000'>4</font><font color='#5555FF'>*</font>i <font color='#5555FF'>+</font> <font color='#979000'>2</font>]<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#979000'>16</font><font face='Lucida Console'>)</font> <font color='#5555FF'>|</font>
+                    <font face='Lucida Console'>(</font><font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font>uint32<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>temp[<font color='#979000'>4</font><font color='#5555FF'>*</font>i <font color='#5555FF'>+</font> <font color='#979000'>1</font>]<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#979000'>8</font> <font face='Lucida Console'>)</font> <font color='#5555FF'>|</font>
+                    <font face='Lucida Console'>(</font><font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font>uint32<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>temp[<font color='#979000'>4</font><font color='#5555FF'>*</font>i    ]<font face='Lucida Console'>)</font>      <font face='Lucida Console'>)</font>
+                    <font face='Lucida Console'>)</font>;               
+            <b>}</b>
+            
+
+            uint32 aa <font color='#5555FF'>=</font> a;
+            uint32 bb <font color='#5555FF'>=</font> b;
+            uint32 cc <font color='#5555FF'>=</font> c;
+            uint32 dd <font color='#5555FF'>=</font> d;
+
+
+            <font color='#BB00BB'>scramble_block</font><font face='Lucida Console'>(</font>a,b,c,d,x<font face='Lucida Console'>)</font>;
+
+
+            a <font color='#5555FF'>=</font> a <font color='#5555FF'>+</font> aa;
+            b <font color='#5555FF'>=</font> b <font color='#5555FF'>+</font> bb;
+            c <font color='#5555FF'>=</font> c <font color='#5555FF'>+</font> cc;
+            d <font color='#5555FF'>=</font> d <font color='#5555FF'>+</font> dd;
+
+        <b>}</b>
+
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font>write_length<font face='Lucida Console'>)</font>
+        <b>{</b>
+            uint64 temp <font color='#5555FF'>=</font> len<font color='#5555FF'>*</font><font color='#979000'>8</font>;
+
+            uint32 aa <font color='#5555FF'>=</font> a;
+            uint32 bb <font color='#5555FF'>=</font> b;
+            uint32 cc <font color='#5555FF'>=</font> c;
+            uint32 dd <font color='#5555FF'>=</font> d;
+
+            std::<font color='#BB00BB'>memset</font><font face='Lucida Console'>(</font>x, <font color='#979000'>0</font>, <font color='#0000FF'>sizeof</font><font face='Lucida Console'>(</font>x<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            x[<font color='#979000'>15</font>] <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>temp<font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font><font color='#979000'>32</font><font face='Lucida Console'>)</font>;
+            x[<font color='#979000'>14</font>] <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>temp<font color='#5555FF'>&amp;</font><font color='#979000'>0xFFFFFFFF</font><font face='Lucida Console'>)</font>;
+
+            <font color='#BB00BB'>scramble_block</font><font face='Lucida Console'>(</font>a,b,c,d,x<font face='Lucida Console'>)</font>;
+
+
+            a <font color='#5555FF'>=</font> a <font color='#5555FF'>+</font> aa;
+            b <font color='#5555FF'>=</font> b <font color='#5555FF'>+</font> bb;
+            c <font color='#5555FF'>=</font> c <font color='#5555FF'>+</font> cc;
+            d <font color='#5555FF'>=</font> d <font color='#5555FF'>+</font> dd;
+
+        <b>}</b>
+
+
+        <font color='#009900'>// put a, b, c, and d into output
+</font>        output[<font color='#979000'>0</font>]   <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>a<font face='Lucida Console'>)</font>    <font color='#5555FF'>&amp;</font><font color='#979000'>0xFF</font><font face='Lucida Console'>)</font>;
+        output[<font color='#979000'>1</font>]   <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>a<font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font><font color='#979000'>8</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#979000'>0xFF</font><font face='Lucida Console'>)</font>;
+        output[<font color='#979000'>2</font>]   <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>a<font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font><font color='#979000'>16</font><font face='Lucida Console'>)</font><font color='#5555FF'>&amp;</font><font color='#979000'>0xFF</font><font face='Lucida Console'>)</font>;
+        output[<font color='#979000'>3</font>]   <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>a<font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font><font color='#979000'>24</font><font face='Lucida Console'>)</font><font color='#5555FF'>&amp;</font><font color='#979000'>0xFF</font><font face='Lucida Console'>)</font>;
+
+        output[<font color='#979000'>4</font>]   <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>b<font face='Lucida Console'>)</font>    <font color='#5555FF'>&amp;</font><font color='#979000'>0xFF</font><font face='Lucida Console'>)</font>;
+        output[<font color='#979000'>5</font>]   <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>b<font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font><font color='#979000'>8</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#979000'>0xFF</font><font face='Lucida Console'>)</font>;
+        output[<font color='#979000'>6</font>]   <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>b<font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font><font color='#979000'>16</font><font face='Lucida Console'>)</font><font color='#5555FF'>&amp;</font><font color='#979000'>0xFF</font><font face='Lucida Console'>)</font>;
+        output[<font color='#979000'>7</font>]   <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>b<font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font><font color='#979000'>24</font><font face='Lucida Console'>)</font><font color='#5555FF'>&amp;</font><font color='#979000'>0xFF</font><font face='Lucida Console'>)</font>;
+
+        output[<font color='#979000'>8</font>]   <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>c<font face='Lucida Console'>)</font>    <font color='#5555FF'>&amp;</font><font color='#979000'>0xFF</font><font face='Lucida Console'>)</font>;
+        output[<font color='#979000'>9</font>]   <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>c<font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font><font color='#979000'>8</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#979000'>0xFF</font><font face='Lucida Console'>)</font>;
+        output[<font color='#979000'>10</font>]  <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>c<font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font><font color='#979000'>16</font><font face='Lucida Console'>)</font><font color='#5555FF'>&amp;</font><font color='#979000'>0xFF</font><font face='Lucida Console'>)</font>;
+        output[<font color='#979000'>11</font>]  <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>c<font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font><font color='#979000'>24</font><font face='Lucida Console'>)</font><font color='#5555FF'>&amp;</font><font color='#979000'>0xFF</font><font face='Lucida Console'>)</font>;
+
+        output[<font color='#979000'>12</font>]  <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>d<font face='Lucida Console'>)</font>    <font color='#5555FF'>&amp;</font><font color='#979000'>0xFF</font><font face='Lucida Console'>)</font>;
+        output[<font color='#979000'>13</font>]  <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>d<font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font><font color='#979000'>8</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#979000'>0xFF</font><font face='Lucida Console'>)</font>;
+        output[<font color='#979000'>14</font>]  <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>d<font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font><font color='#979000'>16</font><font face='Lucida Console'>)</font><font color='#5555FF'>&amp;</font><font color='#979000'>0xFF</font><font face='Lucida Console'>)</font>;
+        output[<font color='#979000'>15</font>]  <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>d<font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font><font color='#979000'>24</font><font face='Lucida Console'>)</font><font color='#5555FF'>&amp;</font><font color='#979000'>0xFF</font><font face='Lucida Console'>)</font>;
+
+        input.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font>std::ios::eofbit<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_MD5_KERNEL_1_CPp_
+</font>
+
+</pre></body></html>

@@ -1,0 +1,981 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - sockets_kernel_1.cpp</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2003  Davis E. King (davis@dlib.net), Miguel Grinberg
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_SOCKETS_KERNEL_1_CPp_
+<font color='#0000FF'>#define</font> DLIB_SOCKETS_KERNEL_1_CPp_
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../platform.h.html'>../platform.h</a>"
+
+<font color='#0000FF'>#ifdef</font> WIN32
+
+<font color='#0000FF'>#ifndef</font> _WINSOCKAPI_
+<font color='#0000FF'>#define</font> _WINSOCKAPI_   <font color='#009900'>/* Prevent inclusion of winsock.h in windows.h */</font>
+<font color='#0000FF'>#endif</font>
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../windows_magic.h.html'>../windows_magic.h</a>"
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='sockets_kernel_1.h.html'>sockets_kernel_1.h</a>"
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>windows.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>winsock2.h<font color='#5555FF'>&gt;</font>
+
+<font color='#0000FF'>#ifndef</font> NI_MAXHOST
+<font color='#0000FF'>#define</font> NI_MAXHOST <font color='#979000'>1025</font>
+<font color='#0000FF'>#endif</font>
+
+
+<font color='#009900'>// tell visual studio to link to the libraries we need if we are
+</font><font color='#009900'>// in fact using visual studio
+</font><font color='#0000FF'>#ifdef</font> _MSC_VER
+<font color='#0000FF'>#pragma</font> comment <font face='Lucida Console'>(</font>lib, "<font color='#CC0000'>ws2_32.lib</font>"<font face='Lucida Console'>)</font>
+<font color='#0000FF'>#endif</font>
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../assert.h.html'>../assert.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>class</font> <b><a name='SOCKET_container'></a>SOCKET_container</b>
+    <b>{</b>
+        <font color='#009900'>/*!
+            This object is just a wrapper around the SOCKET type.  It exists
+            so that we can #include the windows.h and Winsock2.h header files
+            in this cpp file and not at all in the header file.
+        !*/</font>
+    <font color='#0000FF'>public</font>:
+        <b><a name='SOCKET_container'></a>SOCKET_container</b> <font face='Lucida Console'>(</font>
+            SOCKET s <font color='#5555FF'>=</font> INVALID_SOCKET
+        <font face='Lucida Console'>)</font> : val<font face='Lucida Console'>(</font>s<font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+
+        SOCKET val;
+        <b><a name='operator'></a>operator</b> SOCKET<font color='#5555FF'>&amp;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <b>{</b> <font color='#0000FF'>return</font> val; <b>}</b>
+
+        SOCKET_container<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> SOCKET<font color='#5555FF'>&amp;</font> s
+        <font face='Lucida Console'>)</font> <b>{</b> val <font color='#5555FF'>=</font> s; <font color='#0000FF'>return</font> <font color='#5555FF'>*</font><font color='#0000FF'>this</font>; <b>}</b>
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='operator'></a>operator</b><font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> SOCKET<font color='#5555FF'>&amp;</font> s
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> s <font color='#5555FF'>=</font><font color='#5555FF'>=</font> val; <b>}</b>
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// stuff to ensure that WSAStartup() is always called before any sockets stuff is needed
+</font>
+    <font color='#0000FF'>namespace</font> sockets_kernel_1_mutex
+    <b>{</b>
+        mutex startup_lock;
+    <b>}</b>
+
+    <font color='#0000FF'>class</font> <b><a name='sockets_startupdown'></a>sockets_startupdown</b>
+    <b>{</b>
+    <font color='#0000FF'>public</font>:
+        <b><a name='sockets_startupdown'></a>sockets_startupdown</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        ~<b><a name='sockets_startupdown'></a>sockets_startupdown</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <b>{</b> <font color='#BB00BB'>WSACleanup</font><font face='Lucida Console'>(</font> <font face='Lucida Console'>)</font>; <b>}</b>
+
+    <b>}</b>;
+    sockets_startupdown::<b><a name='sockets_startupdown'></a>sockets_startupdown</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        WSADATA wsaData;
+        <font color='#BB00BB'>WSAStartup</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>MAKEWORD</font><font face='Lucida Console'>(</font><font color='#979000'>2</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font>, <font color='#5555FF'>&amp;</font>wsaData<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+    <font color='#0000FF'><u>void</u></font> <b><a name='sockets_startup'></a>sockets_startup</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#009900'>// mutex crap to make this function thread-safe
+</font>        sockets_kernel_1_mutex::startup_lock.<font color='#BB00BB'>lock</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>static</font> sockets_startupdown a;
+        sockets_kernel_1_mutex::startup_lock.<font color='#BB00BB'>unlock</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+ 
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#009900'>// lookup functions
+</font>
+    <font color='#0000FF'><u>int</u></font>
+    <b><a name='get_local_hostname'></a>get_local_hostname</b> <font face='Lucida Console'>(</font>
+        std::string<font color='#5555FF'>&amp;</font> hostname
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#009900'>// ensure that WSAStartup has been called and WSACleanup will eventually
+</font>        <font color='#009900'>// be called when program ends
+</font>        <font color='#BB00BB'>sockets_startup</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>try</font> 
+        <b>{</b>
+
+            <font color='#0000FF'><u>char</u></font> temp[NI_MAXHOST];
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>gethostname</font><font face='Lucida Console'>(</font>temp,NI_MAXHOST<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> SOCKET_ERROR <font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>return</font> OTHER_ERROR;
+            <b>}</b>
+
+            hostname <font color='#5555FF'>=</font> temp;
+        <b>}</b>
+        <font color='#0000FF'>catch</font> <font face='Lucida Console'>(</font>...<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>return</font> OTHER_ERROR;
+        <b>}</b>
+
+        <font color='#0000FF'>return</font> <font color='#979000'>0</font>;
+    <b>}</b>
+
+<font color='#009900'>// -----------------
+</font>
+    <font color='#0000FF'><u>int</u></font> 
+    <b><a name='hostname_to_ip'></a>hostname_to_ip</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> hostname,
+        std::string<font color='#5555FF'>&amp;</font> ip,
+        <font color='#0000FF'><u>int</u></font> n
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#009900'>// ensure that WSAStartup has been called and WSACleanup will eventually 
+</font>        <font color='#009900'>// be called when program ends
+</font>        <font color='#BB00BB'>sockets_startup</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>try</font> 
+        <b>{</b>
+            <font color='#009900'>// lock this mutex since gethostbyname isn't really thread safe
+</font>            auto_mutex <font color='#BB00BB'>M</font><font face='Lucida Console'>(</font>sockets_kernel_1_mutex::startup_lock<font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// if no hostname was given then return error
+</font>            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> hostname.<font color='#BB00BB'>empty</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                <font color='#0000FF'>return</font> OTHER_ERROR;
+
+            hostent<font color='#5555FF'>*</font> address;
+            address <font color='#5555FF'>=</font> <font color='#BB00BB'>gethostbyname</font><font face='Lucida Console'>(</font>hostname.<font color='#BB00BB'>c_str</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>address <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>return</font> OTHER_ERROR;
+            <b>}</b>
+
+            <font color='#009900'>// find the nth address
+</font>            in_addr<font color='#5555FF'>*</font> addr <font color='#5555FF'>=</font> <font color='#0000FF'>reinterpret_cast</font><font color='#5555FF'>&lt;</font>in_addr<font color='#5555FF'>*</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>address<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>h_addr_list[<font color='#979000'>0</font>]<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>1</font>; i <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> n; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                addr <font color='#5555FF'>=</font> <font color='#0000FF'>reinterpret_cast</font><font color='#5555FF'>&lt;</font>in_addr<font color='#5555FF'>*</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>address<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>h_addr_list[i]<font face='Lucida Console'>)</font>;
+
+                <font color='#009900'>// if there is no nth address then return error
+</font>                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>addr <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                    <font color='#0000FF'>return</font> OTHER_ERROR;
+            <b>}</b>
+
+            <font color='#0000FF'><u>char</u></font><font color='#5555FF'>*</font> resolved_ip <font color='#5555FF'>=</font> <font color='#BB00BB'>inet_ntoa</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font>addr<font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// check if inet_ntoa returned an error
+</font>            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>resolved_ip <font color='#5555FF'>=</font><font color='#5555FF'>=</font> NULL<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>return</font> OTHER_ERROR;
+            <b>}</b>
+
+            ip.<font color='#BB00BB'>assign</font><font face='Lucida Console'>(</font>resolved_ip<font face='Lucida Console'>)</font>;
+
+        <b>}</b>
+        <font color='#0000FF'>catch</font><font face='Lucida Console'>(</font>...<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>return</font> OTHER_ERROR;
+        <b>}</b>
+
+        <font color='#0000FF'>return</font> <font color='#979000'>0</font>;
+    <b>}</b>
+
+<font color='#009900'>// -----------------
+</font>
+    <font color='#0000FF'><u>int</u></font>
+    <b><a name='ip_to_hostname'></a>ip_to_hostname</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> ip,
+        std::string<font color='#5555FF'>&amp;</font> hostname
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#009900'>// ensure that WSAStartup has been called and WSACleanup will eventually 
+</font>        <font color='#009900'>// be called when program ends
+</font>        <font color='#BB00BB'>sockets_startup</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>try</font> 
+        <b>{</b>
+            <font color='#009900'>// lock this mutex since gethostbyaddr isn't really thread safe
+</font>            auto_mutex <font color='#BB00BB'>M</font><font face='Lucida Console'>(</font>sockets_kernel_1_mutex::startup_lock<font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// if no ip was given then return error
+</font>            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>ip.<font color='#BB00BB'>empty</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                <font color='#0000FF'>return</font> OTHER_ERROR;
+
+            hostent<font color='#5555FF'>*</font> address;
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> ipnum <font color='#5555FF'>=</font> <font color='#BB00BB'>inet_addr</font><font face='Lucida Console'>(</font>ip.<font color='#BB00BB'>c_str</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// if inet_addr couldn't convert ip then return an error
+</font>            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>ipnum <font color='#5555FF'>=</font><font color='#5555FF'>=</font> INADDR_NONE<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>return</font> OTHER_ERROR;
+            <b>}</b>
+            address <font color='#5555FF'>=</font> <font color='#BB00BB'>gethostbyaddr</font><font face='Lucida Console'>(</font><font color='#0000FF'>reinterpret_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>char</u></font><font color='#5555FF'>*</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>ipnum<font face='Lucida Console'>)</font>,<font color='#979000'>4</font>,AF_INET<font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// check if gethostbyaddr returned an error
+</font>            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>address <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>return</font> OTHER_ERROR;
+            <b>}</b>
+            hostname.<font color='#BB00BB'>assign</font><font face='Lucida Console'>(</font>address<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>h_name<font face='Lucida Console'>)</font>;
+
+        <b>}</b>
+        <font color='#0000FF'>catch</font> <font face='Lucida Console'>(</font>...<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>return</font> OTHER_ERROR;
+        <b>}</b>
+        <font color='#0000FF'>return</font> <font color='#979000'>0</font>;
+
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>    <font color='#009900'>// connection object
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    connection::
+    <b><a name='connection'></a>connection</b><font face='Lucida Console'>(</font>
+        SOCKET_container sock,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>short</u></font> foreign_port, 
+        <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> foreign_ip, 
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>short</u></font> local_port,
+        <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> local_ip
+    <font face='Lucida Console'>)</font> :
+        user_data<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>,
+        connection_socket<font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font face='Lucida Console'>(</font><font color='#0000FF'>new</font> SOCKET_container<font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>,
+        connection_foreign_port<font face='Lucida Console'>(</font>foreign_port<font face='Lucida Console'>)</font>,
+        connection_foreign_ip<font face='Lucida Console'>(</font>foreign_ip<font face='Lucida Console'>)</font>,
+        connection_local_port<font face='Lucida Console'>(</font>local_port<font face='Lucida Console'>)</font>,
+        connection_local_ip<font face='Lucida Console'>(</font>local_ip<font face='Lucida Console'>)</font>,
+        sd<font face='Lucida Console'>(</font><font color='#979000'>false</font><font face='Lucida Console'>)</font>,
+        sdo<font face='Lucida Console'>(</font><font color='#979000'>false</font><font face='Lucida Console'>)</font>,
+        sdr<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>
+    <b>{</b>
+       connection_socket <font color='#5555FF'>=</font> sock;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    connection::
+    ~<b><a name='connection'></a>connection</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>connection_socket <font color='#5555FF'>!</font><font color='#5555FF'>=</font> INVALID_SOCKET<font face='Lucida Console'>)</font>
+            <font color='#BB00BB'>closesocket</font><font face='Lucida Console'>(</font>connection_socket<font face='Lucida Console'>)</font>;  
+        <font color='#0000FF'>delete</font> <font color='#5555FF'>&amp;</font>connection_socket;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>int</u></font> connection::
+    <b><a name='disable_nagle'></a>disable_nagle</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'><u>int</u></font> flag <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+        <font color='#0000FF'><u>int</u></font> status <font color='#5555FF'>=</font> <font color='#BB00BB'>setsockopt</font><font face='Lucida Console'>(</font> connection_socket, IPPROTO_TCP, TCP_NODELAY, <font face='Lucida Console'>(</font><font color='#0000FF'><u>char</u></font> <font color='#5555FF'>*</font><font face='Lucida Console'>)</font><font color='#5555FF'>&amp;</font>flag, <font color='#0000FF'>sizeof</font><font face='Lucida Console'>(</font>flag<font face='Lucida Console'>)</font> <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>status <font color='#5555FF'>=</font><font color='#5555FF'>=</font> SOCKET_ERROR<font face='Lucida Console'>)</font> 
+            <font color='#0000FF'>return</font> OTHER_ERROR;
+        <font color='#0000FF'>else</font>
+            <font color='#0000FF'>return</font> <font color='#979000'>0</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>long</u></font> connection::
+    <b><a name='write'></a>write</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>*</font> buf, 
+        <font color='#0000FF'><u>long</u></font> num
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> old_num <font color='#5555FF'>=</font> num;
+        <font color='#0000FF'><u>long</u></font> status;
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> max_send_length <font color='#5555FF'>=</font> <font color='#979000'>1024</font><font color='#5555FF'>*</font><font color='#979000'>1024</font><font color='#5555FF'>*</font><font color='#979000'>100</font>;
+        <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>num <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#009900'>// Make sure to cap the max value num can take on so that if it is 
+</font>            <font color='#009900'>// really large (it might be big on 64bit platforms) so that the OS
+</font>            <font color='#009900'>// can't possibly get upset about it being large.
+</font>            <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> length <font color='#5555FF'>=</font> std::<font color='#BB00BB'>min</font><font face='Lucida Console'>(</font>max_send_length, num<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> <font face='Lucida Console'>(</font>status <font color='#5555FF'>=</font> <font color='#BB00BB'>send</font><font face='Lucida Console'>(</font>connection_socket,buf,length,<font color='#979000'>0</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> SOCKET_ERROR<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>sdo_called</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                    <font color='#0000FF'>return</font> SHUTDOWN;
+                <font color='#0000FF'>else</font>
+                    <font color='#0000FF'>return</font> OTHER_ERROR;
+            <b>}</b>
+            num <font color='#5555FF'>-</font><font color='#5555FF'>=</font> status;
+            buf <font color='#5555FF'>+</font><font color='#5555FF'>=</font> status;
+        <b>}</b> 
+        <font color='#0000FF'>return</font> old_num;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>long</u></font> connection::
+    <b><a name='read'></a>read</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'><u>char</u></font><font color='#5555FF'>*</font> buf, 
+        <font color='#0000FF'><u>long</u></font> num
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> max_recv_length <font color='#5555FF'>=</font> <font color='#979000'>1024</font><font color='#5555FF'>*</font><font color='#979000'>1024</font><font color='#5555FF'>*</font><font color='#979000'>100</font>;
+        <font color='#009900'>// Make sure to cap the max value num can take on so that if it is 
+</font>        <font color='#009900'>// really large (it might be big on 64bit platforms) so that the OS
+</font>        <font color='#009900'>// can't possibly get upset about it being large.
+</font>        <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> length <font color='#5555FF'>=</font> std::<font color='#BB00BB'>min</font><font face='Lucida Console'>(</font>max_recv_length, num<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'><u>long</u></font> status <font color='#5555FF'>=</font> <font color='#BB00BB'>recv</font><font face='Lucida Console'>(</font>connection_socket,buf,length,<font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>status <font color='#5555FF'>=</font><font color='#5555FF'>=</font> SOCKET_ERROR<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#009900'>// if this error is the result of a shutdown call then return SHUTDOWN
+</font>            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>sd_called</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                <font color='#0000FF'>return</font> SHUTDOWN;
+            <font color='#0000FF'>else</font>
+                <font color='#0000FF'>return</font> OTHER_ERROR;
+        <b>}</b>
+        <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>status <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> <font color='#BB00BB'>sd_called</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>return</font> SHUTDOWN;
+        <b>}</b>
+        <font color='#0000FF'>return</font> status;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>long</u></font> connection::
+    <b><a name='read'></a>read</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'><u>char</u></font><font color='#5555FF'>*</font> buf, 
+        <font color='#0000FF'><u>long</u></font> num,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> timeout
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>readable</font><font face='Lucida Console'>(</font>timeout<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font><font face='Lucida Console'>)</font>
+            <font color='#0000FF'>return</font> TIMEOUT;
+
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> max_recv_length <font color='#5555FF'>=</font> <font color='#979000'>1024</font><font color='#5555FF'>*</font><font color='#979000'>1024</font><font color='#5555FF'>*</font><font color='#979000'>100</font>;
+        <font color='#009900'>// Make sure to cap the max value num can take on so that if it is 
+</font>        <font color='#009900'>// really large (it might be big on 64bit platforms) so that the OS
+</font>        <font color='#009900'>// can't possibly get upset about it being large.
+</font>        <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> length <font color='#5555FF'>=</font> std::<font color='#BB00BB'>min</font><font face='Lucida Console'>(</font>max_recv_length, num<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'><u>long</u></font> status <font color='#5555FF'>=</font> <font color='#BB00BB'>recv</font><font face='Lucida Console'>(</font>connection_socket,buf,length,<font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>status <font color='#5555FF'>=</font><font color='#5555FF'>=</font> SOCKET_ERROR<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#009900'>// if this error is the result of a shutdown call then return SHUTDOWN
+</font>            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>sd_called</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                <font color='#0000FF'>return</font> SHUTDOWN;
+            <font color='#0000FF'>else</font>
+                <font color='#0000FF'>return</font> OTHER_ERROR;
+        <b>}</b>
+        <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>status <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> <font color='#BB00BB'>sd_called</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>return</font> SHUTDOWN;
+        <b>}</b>
+        <font color='#0000FF'>return</font> status;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>bool</u></font> connection::
+    <b><a name='readable'></a>readable</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> timeout
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        fd_set read_set;
+        <font color='#009900'>// initialize read_set
+</font>        <font color='#BB00BB'>FD_ZERO</font><font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>read_set<font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// add the listening socket to read_set
+</font>        <font color='#BB00BB'>FD_SET</font><font face='Lucida Console'>(</font>connection_socket, <font color='#5555FF'>&amp;</font>read_set<font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// setup a timeval structure
+</font>        timeval time_to_wait;
+        time_to_wait.tv_sec <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>timeout<font color='#5555FF'>/</font><font color='#979000'>1000</font><font face='Lucida Console'>)</font>;
+        time_to_wait.tv_usec <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>timeout<font color='#5555FF'>%</font><font color='#979000'>1000</font><font face='Lucida Console'>)</font><font color='#5555FF'>*</font><font color='#979000'>1000</font><font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// wait on select
+</font>        <font color='#0000FF'><u>int</u></font> status <font color='#5555FF'>=</font> <font color='#BB00BB'>select</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>,<font color='#5555FF'>&amp;</font>read_set,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#5555FF'>&amp;</font>time_to_wait<font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// if select timed out or there was an error
+</font>        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>status <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+            <font color='#0000FF'>return</font> <font color='#979000'>false</font>;
+        
+        <font color='#009900'>// data is ready to be read
+</font>        <font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>int</u></font> connection::
+    <b><a name='shutdown_outgoing'></a>shutdown_outgoing</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font> 
+    <b>{</b> 
+        sd_mutex.<font color='#BB00BB'>lock</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>sdo <font color='#5555FF'>|</font><font color='#5555FF'>|</font> sd<font face='Lucida Console'>)</font>
+        <b>{</b>
+            sd_mutex.<font color='#BB00BB'>unlock</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>return</font> sdr;
+        <b>}</b>
+        sdo <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+        sdr <font color='#5555FF'>=</font> ::<font color='#BB00BB'>shutdown</font><font face='Lucida Console'>(</font>connection_socket,SD_SEND<font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// convert -1 error code into the OTHER_ERROR error code
+</font>        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>sdr <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font> 
+            sdr <font color='#5555FF'>=</font> OTHER_ERROR;
+
+        <font color='#0000FF'><u>int</u></font> temp <font color='#5555FF'>=</font> sdr;
+
+        sd_mutex.<font color='#BB00BB'>unlock</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>return</font> temp;            
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>int</u></font> connection::
+    <b><a name='shutdown'></a>shutdown</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font> 
+    <b>{</b> 
+        sd_mutex.<font color='#BB00BB'>lock</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>sd<font face='Lucida Console'>)</font>
+        <b>{</b>
+            sd_mutex.<font color='#BB00BB'>unlock</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>return</font> sdr;
+        <b>}</b>
+        sd <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+        SOCKET stemp <font color='#5555FF'>=</font> connection_socket;
+        connection_socket <font color='#5555FF'>=</font> INVALID_SOCKET;
+        sdr <font color='#5555FF'>=</font> <font color='#BB00BB'>closesocket</font><font face='Lucida Console'>(</font>stemp<font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// convert SOCKET_ERROR error code into the OTHER_ERROR error code
+</font>        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>sdr <font color='#5555FF'>=</font><font color='#5555FF'>=</font> SOCKET_ERROR<font face='Lucida Console'>)</font> 
+            sdr <font color='#5555FF'>=</font> OTHER_ERROR;
+
+        <font color='#0000FF'><u>int</u></font> temp <font color='#5555FF'>=</font> sdr;
+       
+        sd_mutex.<font color='#BB00BB'>unlock</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;            
+        <font color='#0000FF'>return</font> temp;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    connection::socket_descriptor_type connection::
+    <b><a name='get_socket_descriptor'></a>get_socket_descriptor</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        <font color='#0000FF'>return</font> connection_socket.val;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>    <font color='#009900'>// listener object
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    listener::
+    <b><a name='listener'></a>listener</b><font face='Lucida Console'>(</font>
+        SOCKET_container sock,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>short</u></font> port,
+        <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> ip
+    <font face='Lucida Console'>)</font> :
+        listening_socket<font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font face='Lucida Console'>(</font><font color='#0000FF'>new</font> SOCKET_container<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>,
+        listening_port<font face='Lucida Console'>(</font>port<font face='Lucida Console'>)</font>,
+        listening_ip<font face='Lucida Console'>(</font>ip<font face='Lucida Console'>)</font>,
+        inaddr_any<font face='Lucida Console'>(</font>listening_ip.empty<font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+    <b>{</b>
+        listening_socket <font color='#5555FF'>=</font> sock;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    listener::
+    ~<b><a name='listener'></a>listener</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#BB00BB'>closesocket</font><font face='Lucida Console'>(</font>listening_socket<font face='Lucida Console'>)</font>;  
+        <font color='#0000FF'>delete</font> <font color='#5555FF'>&amp;</font>listening_socket;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>int</u></font> listener::
+    <b><a name='accept'></a>accept</b> <font face='Lucida Console'>(</font>
+        scoped_ptr<font color='#5555FF'>&lt;</font>connection<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> new_connection,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> timeout
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        new_connection.<font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+        connection<font color='#5555FF'>*</font> con;
+        <font color='#0000FF'><u>int</u></font> status <font color='#5555FF'>=</font> <font color='#0000FF'>this</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>accept</font><font face='Lucida Console'>(</font>con, timeout<font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>status <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+            new_connection.<font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font>con<font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>return</font> status;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>int</u></font> listener::
+    <b><a name='accept'></a>accept</b> <font face='Lucida Console'>(</font>
+        connection<font color='#5555FF'>*</font><font color='#5555FF'>&amp;</font> new_connection,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> timeout
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        SOCKET incoming;
+        sockaddr_in incomingAddr;
+        <font color='#0000FF'><u>int</u></font> length <font color='#5555FF'>=</font> <font color='#0000FF'>sizeof</font><font face='Lucida Console'>(</font>sockaddr_in<font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// implement timeout with select if timeout is &gt; 0
+</font>        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>timeout <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            fd_set read_set;
+            <font color='#009900'>// initialize read_set
+</font>            <font color='#BB00BB'>FD_ZERO</font><font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>read_set<font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// add the listening socket to read_set
+</font>            <font color='#BB00BB'>FD_SET</font><font face='Lucida Console'>(</font>listening_socket, <font color='#5555FF'>&amp;</font>read_set<font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// setup a timeval structure
+</font>            timeval time_to_wait;
+            time_to_wait.tv_sec <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>timeout<font color='#5555FF'>/</font><font color='#979000'>1000</font><font face='Lucida Console'>)</font>;
+            time_to_wait.tv_usec <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>timeout<font color='#5555FF'>%</font><font color='#979000'>1000</font><font face='Lucida Console'>)</font><font color='#5555FF'>*</font><font color='#979000'>1000</font><font face='Lucida Console'>)</font>;
+
+
+            <font color='#009900'>// wait on select
+</font>            <font color='#0000FF'><u>int</u></font> status <font color='#5555FF'>=</font> <font color='#BB00BB'>select</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>,<font color='#5555FF'>&amp;</font>read_set,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#5555FF'>&amp;</font>time_to_wait<font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// if select timed out
+</font>            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>status <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                <font color='#0000FF'>return</font> TIMEOUT;
+            
+            <font color='#009900'>// if select returned an error
+</font>            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>status <font color='#5555FF'>=</font><font color='#5555FF'>=</font> SOCKET_ERROR<font face='Lucida Console'>)</font>
+                <font color='#0000FF'>return</font> OTHER_ERROR;
+
+        <b>}</b>
+
+
+        <font color='#009900'>// call accept to get a new connection
+</font>        incoming<font color='#5555FF'>=</font>::<font color='#BB00BB'>accept</font><font face='Lucida Console'>(</font>listening_socket,<font color='#0000FF'>reinterpret_cast</font><font color='#5555FF'>&lt;</font>sockaddr<font color='#5555FF'>*</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>incomingAddr<font face='Lucida Console'>)</font>,<font color='#5555FF'>&amp;</font>length<font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// if there was an error return OTHER_ERROR
+</font>        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> incoming <font color='#5555FF'>=</font><font color='#5555FF'>=</font> INVALID_SOCKET <font face='Lucida Console'>)</font>
+            <font color='#0000FF'>return</font> OTHER_ERROR;
+        
+
+        <font color='#009900'>// get the port of the foreign host into foreign_port
+</font>        <font color='#0000FF'><u>int</u></font> foreign_port <font color='#5555FF'>=</font> <font color='#BB00BB'>ntohs</font><font face='Lucida Console'>(</font>incomingAddr.sin_port<font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// get the IP of the foreign host into foreign_ip
+</font>        std::string foreign_ip;
+        <b>{</b>
+            <font color='#0000FF'><u>char</u></font><font color='#5555FF'>*</font> foreign_ip_temp <font color='#5555FF'>=</font> <font color='#BB00BB'>inet_ntoa</font><font face='Lucida Console'>(</font>incomingAddr.sin_addr<font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// check if inet_ntoa() returned an error
+</font>            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>foreign_ip_temp <font color='#5555FF'>=</font><font color='#5555FF'>=</font> NULL<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#BB00BB'>closesocket</font><font face='Lucida Console'>(</font>incoming<font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>return</font> OTHER_ERROR;            
+            <b>}</b>
+
+            foreign_ip.<font color='#BB00BB'>assign</font><font face='Lucida Console'>(</font>foreign_ip_temp<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+
+        <font color='#009900'>// get the local ip
+</font>        std::string local_ip;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>inaddr_any <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>true</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            sockaddr_in local_info;
+            length <font color='#5555FF'>=</font> <font color='#0000FF'>sizeof</font><font face='Lucida Console'>(</font>sockaddr_in<font face='Lucida Console'>)</font>;
+            <font color='#009900'>// get the local sockaddr_in structure associated with this new connection
+</font>            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> <font color='#BB00BB'>getsockname</font> <font face='Lucida Console'>(</font>
+                    incoming,
+                    <font color='#0000FF'>reinterpret_cast</font><font color='#5555FF'>&lt;</font>sockaddr<font color='#5555FF'>*</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>local_info<font face='Lucida Console'>)</font>,
+                    <font color='#5555FF'>&amp;</font>length
+                 <font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> SOCKET_ERROR 
+            <font face='Lucida Console'>)</font>
+            <b>{</b>   <font color='#009900'>// an error occurred
+</font>                <font color='#BB00BB'>closesocket</font><font face='Lucida Console'>(</font>incoming<font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>return</font> OTHER_ERROR;
+            <b>}</b>
+            <font color='#0000FF'><u>char</u></font><font color='#5555FF'>*</font> temp <font color='#5555FF'>=</font> <font color='#BB00BB'>inet_ntoa</font><font face='Lucida Console'>(</font>local_info.sin_addr<font face='Lucida Console'>)</font>;
+            
+            <font color='#009900'>// check if inet_ntoa() returned an error
+</font>            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>temp <font color='#5555FF'>=</font><font color='#5555FF'>=</font> NULL<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#BB00BB'>closesocket</font><font face='Lucida Console'>(</font>incoming<font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>return</font> OTHER_ERROR;            
+            <b>}</b>
+            local_ip.<font color='#BB00BB'>assign</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font>;
+        <b>}</b>
+        <font color='#0000FF'>else</font>
+        <b>{</b>
+            local_ip <font color='#5555FF'>=</font> listening_ip;
+        <b>}</b>
+
+
+        <font color='#009900'>// set the SO_OOBINLINE option
+</font>        <font color='#0000FF'><u>int</u></font> flag_value <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>setsockopt</font><font face='Lucida Console'>(</font>incoming,SOL_SOCKET,SO_OOBINLINE,<font color='#0000FF'>reinterpret_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'>const</font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>*</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>flag_value<font face='Lucida Console'>)</font>,<font color='#0000FF'>sizeof</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> SOCKET_ERROR <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#BB00BB'>closesocket</font><font face='Lucida Console'>(</font>incoming<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>return</font> OTHER_ERROR;  
+        <b>}</b>
+
+
+        <font color='#009900'>// make a new connection object for this new connection
+</font>        <font color='#0000FF'>try</font> 
+        <b>{</b> 
+            new_connection <font color='#5555FF'>=</font> <font color='#0000FF'>new</font> <font color='#BB00BB'>connection</font> <font face='Lucida Console'>(</font>
+                                    incoming,
+                                    foreign_port,
+                                    foreign_ip,
+                                    listening_port,
+                                    local_ip
+                                <font face='Lucida Console'>)</font>; 
+        <b>}</b>
+        <font color='#0000FF'>catch</font> <font face='Lucida Console'>(</font>...<font face='Lucida Console'>)</font> <b>{</b> <font color='#BB00BB'>closesocket</font><font face='Lucida Console'>(</font>incoming<font face='Lucida Console'>)</font>; <font color='#0000FF'>return</font> OTHER_ERROR; <b>}</b>
+
+        <font color='#0000FF'>return</font> <font color='#979000'>0</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>    <font color='#009900'>// socket creation functions
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------    
+</font>
+    <font color='#0000FF'><u>int</u></font> <b><a name='create_listener'></a>create_listener</b> <font face='Lucida Console'>(</font>
+        scoped_ptr<font color='#5555FF'>&lt;</font>listener<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> new_listener,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>short</u></font> port,
+        <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> ip
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        new_listener.<font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        listener<font color='#5555FF'>*</font> temp;
+        <font color='#0000FF'><u>int</u></font> status <font color='#5555FF'>=</font> <font color='#BB00BB'>create_listener</font><font face='Lucida Console'>(</font>temp,port,ip<font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>status <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+            new_listener.<font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>return</font> status;
+    <b>}</b>
+
+    <font color='#0000FF'><u>int</u></font> <b><a name='create_listener'></a>create_listener</b> <font face='Lucida Console'>(</font>
+        listener<font color='#5555FF'>*</font><font color='#5555FF'>&amp;</font> new_listener,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>short</u></font> port,
+        <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> ip
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#009900'>// ensure that WSAStartup has been called and WSACleanup will eventually 
+</font>        <font color='#009900'>// be called when program ends
+</font>        <font color='#BB00BB'>sockets_startup</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+        sockaddr_in sa;  <font color='#009900'>// local socket structure
+</font>        <font color='#BB00BB'>ZeroMemory</font><font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>sa,<font color='#0000FF'>sizeof</font><font face='Lucida Console'>(</font>sockaddr_in<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>; <font color='#009900'>// initialize sa
+</font>
+        SOCKET sock <font color='#5555FF'>=</font> <font color='#BB00BB'>socket</font> <font face='Lucida Console'>(</font>AF_INET, SOCK_STREAM, <font color='#979000'>0</font><font face='Lucida Console'>)</font>;  <font color='#009900'>// get a new socket
+</font>
+        <font color='#009900'>// if socket() returned an error then return OTHER_ERROR
+</font>        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>sock <font color='#5555FF'>=</font><font color='#5555FF'>=</font> INVALID_SOCKET <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>return</font> OTHER_ERROR;
+        <b>}</b>
+
+        <font color='#009900'>// set the local socket structure 
+</font>        sa.sin_family <font color='#5555FF'>=</font> AF_INET;
+        sa.sin_port <font color='#5555FF'>=</font> <font color='#BB00BB'>htons</font><font face='Lucida Console'>(</font>port<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>ip.<font color='#BB00BB'>empty</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+        <b>{</b>            
+            <font color='#009900'>// if the listener should listen on any IP
+</font>            sa.sin_addr.S_un.S_addr <font color='#5555FF'>=</font> <font color='#BB00BB'>htons</font><font face='Lucida Console'>(</font>INADDR_ANY<font face='Lucida Console'>)</font>;
+        <b>}</b>
+        <font color='#0000FF'>else</font>
+        <b>{</b>
+            <font color='#009900'>// if there is a specific ip to listen on
+</font>            sa.sin_addr.S_un.S_addr <font color='#5555FF'>=</font> <font color='#BB00BB'>inet_addr</font><font face='Lucida Console'>(</font>ip.<font color='#BB00BB'>c_str</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <font color='#009900'>// if inet_addr couldn't convert the ip then return an error
+</font>            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> sa.sin_addr.S_un.S_addr <font color='#5555FF'>=</font><font color='#5555FF'>=</font> INADDR_NONE <font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#BB00BB'>closesocket</font><font face='Lucida Console'>(</font>sock<font face='Lucida Console'>)</font>; 
+                <font color='#0000FF'>return</font> OTHER_ERROR;                
+            <b>}</b>
+        <b>}</b>
+
+        <font color='#009900'>// set the SO_REUSEADDR option
+</font>        <font color='#0000FF'><u>int</u></font> flag_value <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+        <font color='#BB00BB'>setsockopt</font><font face='Lucida Console'>(</font>sock,SOL_SOCKET,SO_REUSEADDR,<font color='#0000FF'>reinterpret_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'>const</font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>*</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>flag_value<font face='Lucida Console'>)</font>,<font color='#0000FF'>sizeof</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// bind the new socket to the requested port and ip
+</font>        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>bind</font><font face='Lucida Console'>(</font>sock,<font color='#0000FF'>reinterpret_cast</font><font color='#5555FF'>&lt;</font>sockaddr<font color='#5555FF'>*</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>sa<font face='Lucida Console'>)</font>,<font color='#0000FF'>sizeof</font><font face='Lucida Console'>(</font>sockaddr_in<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font color='#5555FF'>=</font><font color='#5555FF'>=</font>SOCKET_ERROR<font face='Lucida Console'>)</font>
+        <b>{</b>   
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>int</u></font> err <font color='#5555FF'>=</font> <font color='#BB00BB'>WSAGetLastError</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#009900'>// if there was an error 
+</font>            <font color='#BB00BB'>closesocket</font><font face='Lucida Console'>(</font>sock<font face='Lucida Console'>)</font>; 
+
+            <font color='#009900'>// if the port is already bound then return PORTINUSE
+</font>            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>err <font color='#5555FF'>=</font><font color='#5555FF'>=</font> WSAEADDRINUSE<font face='Lucida Console'>)</font>
+                <font color='#0000FF'>return</font> PORTINUSE;
+            <font color='#0000FF'>else</font>
+                <font color='#0000FF'>return</font> OTHER_ERROR;            
+        <b>}</b>
+
+
+        <font color='#009900'>// tell the new socket to listen
+</font>        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> <font color='#BB00BB'>listen</font><font face='Lucida Console'>(</font>sock,SOMAXCONN<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> SOCKET_ERROR<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>int</u></font> err <font color='#5555FF'>=</font> <font color='#BB00BB'>WSAGetLastError</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#009900'>// if there was an error return OTHER_ERROR
+</font>            <font color='#BB00BB'>closesocket</font><font face='Lucida Console'>(</font>sock<font face='Lucida Console'>)</font>; 
+
+            <font color='#009900'>// if the port is already bound then return PORTINUSE
+</font>            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>err <font color='#5555FF'>=</font><font color='#5555FF'>=</font> WSAEADDRINUSE<font face='Lucida Console'>)</font>
+                <font color='#0000FF'>return</font> PORTINUSE;
+            <font color='#0000FF'>else</font>
+                <font color='#0000FF'>return</font> OTHER_ERROR;  
+        <b>}</b>
+
+        <font color='#009900'>// determine the port used if necessary
+</font>        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>port <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            sockaddr_in local_info;
+            <font color='#0000FF'><u>int</u></font> length <font color='#5555FF'>=</font> <font color='#0000FF'>sizeof</font><font face='Lucida Console'>(</font>sockaddr_in<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> <font color='#BB00BB'>getsockname</font> <font face='Lucida Console'>(</font>
+                        sock,
+                        <font color='#0000FF'>reinterpret_cast</font><font color='#5555FF'>&lt;</font>sockaddr<font color='#5555FF'>*</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>local_info<font face='Lucida Console'>)</font>,
+                        <font color='#5555FF'>&amp;</font>length
+                 <font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> SOCKET_ERROR
+            <font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#BB00BB'>closesocket</font><font face='Lucida Console'>(</font>sock<font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>return</font> OTHER_ERROR;
+            <b>}</b>
+            port <font color='#5555FF'>=</font> <font color='#BB00BB'>ntohs</font><font face='Lucida Console'>(</font>local_info.sin_port<font face='Lucida Console'>)</font>;            
+        <b>}</b>
+
+
+        <font color='#009900'>// initialize a listener object on the heap with the new socket
+</font>        <font color='#0000FF'>try</font> <b>{</b> new_listener <font color='#5555FF'>=</font> <font color='#0000FF'>new</font> <font color='#BB00BB'>listener</font><font face='Lucida Console'>(</font>sock,port,ip<font face='Lucida Console'>)</font>; <b>}</b>
+        <font color='#0000FF'>catch</font><font face='Lucida Console'>(</font>...<font face='Lucida Console'>)</font> <b>{</b> <font color='#BB00BB'>closesocket</font><font face='Lucida Console'>(</font>sock<font face='Lucida Console'>)</font>; <font color='#0000FF'>return</font> OTHER_ERROR; <b>}</b>
+
+        <font color='#0000FF'>return</font> <font color='#979000'>0</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>int</u></font> <b><a name='create_connection'></a>create_connection</b> <font face='Lucida Console'>(</font>
+        scoped_ptr<font color='#5555FF'>&lt;</font>connection<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> new_connection,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>short</u></font> foreign_port, 
+        <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> foreign_ip, 
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>short</u></font> local_port,
+        <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> local_ip
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        new_connection.<font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        connection<font color='#5555FF'>*</font> temp;
+        <font color='#0000FF'><u>int</u></font> status <font color='#5555FF'>=</font> <font color='#BB00BB'>create_connection</font><font face='Lucida Console'>(</font>temp,foreign_port, foreign_ip, local_port, local_ip<font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>status <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+            new_connection.<font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>return</font> status;
+    <b>}</b>
+
+    <font color='#0000FF'><u>int</u></font> <b><a name='create_connection'></a>create_connection</b> <font face='Lucida Console'>(</font> 
+        connection<font color='#5555FF'>*</font><font color='#5555FF'>&amp;</font> new_connection,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>short</u></font> foreign_port, 
+        <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> foreign_ip, 
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>short</u></font> local_port,
+        <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> local_ip
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#009900'>// ensure that WSAStartup has been called and WSACleanup 
+</font>        <font color='#009900'>// will eventually be called when program ends
+</font>        <font color='#BB00BB'>sockets_startup</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+
+        sockaddr_in local_sa;  <font color='#009900'>// local socket structure
+</font>        sockaddr_in foreign_sa;  <font color='#009900'>// foreign socket structure
+</font>        <font color='#BB00BB'>ZeroMemory</font><font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>local_sa,<font color='#0000FF'>sizeof</font><font face='Lucida Console'>(</font>sockaddr_in<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>; <font color='#009900'>// initialize local_sa
+</font>        <font color='#BB00BB'>ZeroMemory</font><font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>foreign_sa,<font color='#0000FF'>sizeof</font><font face='Lucida Console'>(</font>sockaddr_in<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>; <font color='#009900'>// initialize foreign_sa
+</font>
+        <font color='#0000FF'><u>int</u></font> length;
+
+        SOCKET sock <font color='#5555FF'>=</font> <font color='#BB00BB'>socket</font> <font face='Lucida Console'>(</font>AF_INET, SOCK_STREAM, <font color='#979000'>0</font><font face='Lucida Console'>)</font>;  <font color='#009900'>// get a new socket
+</font>
+        <font color='#009900'>// if socket() returned an error then return OTHER_ERROR
+</font>        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>sock <font color='#5555FF'>=</font><font color='#5555FF'>=</font> INVALID_SOCKET <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>return</font> OTHER_ERROR;
+        <b>}</b>
+
+        <font color='#009900'>// set the foreign socket structure 
+</font>        foreign_sa.sin_family <font color='#5555FF'>=</font> AF_INET;
+        foreign_sa.sin_port <font color='#5555FF'>=</font> <font color='#BB00BB'>htons</font><font face='Lucida Console'>(</font>foreign_port<font face='Lucida Console'>)</font>;
+        foreign_sa.sin_addr.S_un.S_addr <font color='#5555FF'>=</font> <font color='#BB00BB'>inet_addr</font><font face='Lucida Console'>(</font>foreign_ip.<font color='#BB00BB'>c_str</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// if inet_addr couldn't convert the ip then return an error
+</font>        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> foreign_sa.sin_addr.S_un.S_addr <font color='#5555FF'>=</font><font color='#5555FF'>=</font> INADDR_NONE <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#BB00BB'>closesocket</font><font face='Lucida Console'>(</font>sock<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>return</font> OTHER_ERROR;
+        <b>}</b>
+
+
+        <font color='#009900'>// set up the local socket structure
+</font>        local_sa.sin_family <font color='#5555FF'>=</font> AF_INET;
+
+        <font color='#009900'>// set the local ip
+</font>        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>local_ip.<font color='#BB00BB'>empty</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+        <b>{</b>            
+            <font color='#009900'>// if the listener should listen on any IP
+</font>            local_sa.sin_addr.S_un.S_addr <font color='#5555FF'>=</font> <font color='#BB00BB'>htons</font><font face='Lucida Console'>(</font>INADDR_ANY<font face='Lucida Console'>)</font>;
+        <b>}</b>
+        <font color='#0000FF'>else</font>
+        <b>{</b>
+            <font color='#009900'>// if there is a specific ip to listen on
+</font>            local_sa.sin_addr.S_un.S_addr <font color='#5555FF'>=</font> <font color='#BB00BB'>inet_addr</font><font face='Lucida Console'>(</font>local_ip.<font color='#BB00BB'>c_str</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;   
+
+            <font color='#009900'>// if inet_addr couldn't convert the ip then return an error
+</font>            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>local_sa.sin_addr.S_un.S_addr <font color='#5555FF'>=</font><font color='#5555FF'>=</font> INADDR_NONE<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#BB00BB'>closesocket</font><font face='Lucida Console'>(</font>sock<font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>return</font> OTHER_ERROR;
+            <b>}</b>
+        <b>}</b>
+
+        <font color='#009900'>// set the local port
+</font>        local_sa.sin_port <font color='#5555FF'>=</font> <font color='#BB00BB'>htons</font><font face='Lucida Console'>(</font>local_port<font face='Lucida Console'>)</font>;
+
+        
+
+        <font color='#009900'>// bind the new socket to the requested local port and local ip
+</font>        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> <font color='#BB00BB'>bind</font> <font face='Lucida Console'>(</font>
+                sock,
+                <font color='#0000FF'>reinterpret_cast</font><font color='#5555FF'>&lt;</font>sockaddr<font color='#5555FF'>*</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>local_sa<font face='Lucida Console'>)</font>,
+                <font color='#0000FF'>sizeof</font><font face='Lucida Console'>(</font>sockaddr_in<font face='Lucida Console'>)</font>
+            <font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> SOCKET_ERROR
+        <font face='Lucida Console'>)</font>
+        <b>{</b>   
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>int</u></font> err <font color='#5555FF'>=</font> <font color='#BB00BB'>WSAGetLastError</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#009900'>// if there was an error 
+</font>            <font color='#BB00BB'>closesocket</font><font face='Lucida Console'>(</font>sock<font face='Lucida Console'>)</font>; 
+
+            <font color='#009900'>// if the port is already bound then return PORTINUSE
+</font>            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>err <font color='#5555FF'>=</font><font color='#5555FF'>=</font> WSAEADDRINUSE<font face='Lucida Console'>)</font>
+                <font color='#0000FF'>return</font> PORTINUSE;
+            <font color='#0000FF'>else</font>
+                <font color='#0000FF'>return</font> OTHER_ERROR;            
+        <b>}</b>
+
+        <font color='#009900'>// connect the socket        
+</font>        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>connect</font> <font face='Lucida Console'>(</font>
+                sock,
+                <font color='#0000FF'>reinterpret_cast</font><font color='#5555FF'>&lt;</font>sockaddr<font color='#5555FF'>*</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>foreign_sa<font face='Lucida Console'>)</font>,
+                <font color='#0000FF'>sizeof</font><font face='Lucida Console'>(</font>sockaddr_in<font face='Lucida Console'>)</font>
+            <font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> SOCKET_ERROR
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>int</u></font> err <font color='#5555FF'>=</font> <font color='#BB00BB'>WSAGetLastError</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>closesocket</font><font face='Lucida Console'>(</font>sock<font face='Lucida Console'>)</font>; 
+            <font color='#009900'>// if the port is already bound then return PORTINUSE
+</font>            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>err <font color='#5555FF'>=</font><font color='#5555FF'>=</font> WSAEADDRINUSE<font face='Lucida Console'>)</font>
+                <font color='#0000FF'>return</font> PORTINUSE;
+            <font color='#0000FF'>else</font>
+                <font color='#0000FF'>return</font> OTHER_ERROR;  
+        <b>}</b>
+
+
+
+        <font color='#009900'>// determine the local port and IP and store them in used_local_ip 
+</font>        <font color='#009900'>// and used_local_port
+</font>        <font color='#0000FF'><u>int</u></font> used_local_port;
+        std::string used_local_ip;
+        sockaddr_in local_info;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>local_port <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            length <font color='#5555FF'>=</font> <font color='#0000FF'>sizeof</font><font face='Lucida Console'>(</font>sockaddr_in<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>getsockname</font> <font face='Lucida Console'>(</font>
+                    sock,
+                    <font color='#0000FF'>reinterpret_cast</font><font color='#5555FF'>&lt;</font>sockaddr<font color='#5555FF'>*</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>local_info<font face='Lucida Console'>)</font>,
+                    <font color='#5555FF'>&amp;</font>length
+                <font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> SOCKET_ERROR
+            <font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#BB00BB'>closesocket</font><font face='Lucida Console'>(</font>sock<font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>return</font> OTHER_ERROR;
+            <b>}</b>
+            used_local_port <font color='#5555FF'>=</font> <font color='#BB00BB'>ntohs</font><font face='Lucida Console'>(</font>local_info.sin_port<font face='Lucida Console'>)</font>;            
+        <b>}</b>
+        <font color='#0000FF'>else</font>
+        <b>{</b>
+            used_local_port <font color='#5555FF'>=</font> local_port;
+        <b>}</b>
+
+        <font color='#009900'>// determine real local ip
+</font>        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>local_ip.<font color='#BB00BB'>empty</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#009900'>// if local_port is not 0 then we must fill the local_info structure
+</font>            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>local_port <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                length <font color='#5555FF'>=</font> <font color='#0000FF'>sizeof</font><font face='Lucida Console'>(</font>sockaddr_in<font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> <font color='#BB00BB'>getsockname</font> <font face='Lucida Console'>(</font>
+                        sock,
+                        <font color='#0000FF'>reinterpret_cast</font><font color='#5555FF'>&lt;</font>sockaddr<font color='#5555FF'>*</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>local_info<font face='Lucida Console'>)</font>,
+                        <font color='#5555FF'>&amp;</font>length
+                    <font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> SOCKET_ERROR 
+                <font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#BB00BB'>closesocket</font><font face='Lucida Console'>(</font>sock<font face='Lucida Console'>)</font>;
+                    <font color='#0000FF'>return</font> OTHER_ERROR;
+                <b>}</b>
+            <b>}</b>
+            <font color='#0000FF'><u>char</u></font><font color='#5555FF'>*</font> temp <font color='#5555FF'>=</font> <font color='#BB00BB'>inet_ntoa</font><font face='Lucida Console'>(</font>local_info.sin_addr<font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// check if inet_ntoa returned an error
+</font>            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>temp <font color='#5555FF'>=</font><font color='#5555FF'>=</font> NULL<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#BB00BB'>closesocket</font><font face='Lucida Console'>(</font>sock<font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>return</font> OTHER_ERROR;            
+            <b>}</b>
+            used_local_ip.<font color='#BB00BB'>assign</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font>;
+        <b>}</b>
+        <font color='#0000FF'>else</font>
+        <b>{</b>
+            used_local_ip <font color='#5555FF'>=</font> local_ip;
+        <b>}</b>
+
+        <font color='#009900'>// set the SO_OOBINLINE option
+</font>        <font color='#0000FF'><u>int</u></font> flag_value <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>setsockopt</font><font face='Lucida Console'>(</font>sock,SOL_SOCKET,SO_OOBINLINE,<font color='#0000FF'>reinterpret_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'>const</font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>*</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>flag_value<font face='Lucida Console'>)</font>,<font color='#0000FF'>sizeof</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> SOCKET_ERROR <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#BB00BB'>closesocket</font><font face='Lucida Console'>(</font>sock<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>return</font> OTHER_ERROR;  
+        <b>}</b>
+
+        <font color='#009900'>// initialize a connection object on the heap with the new socket
+</font>        <font color='#0000FF'>try</font> 
+        <b>{</b> 
+            new_connection <font color='#5555FF'>=</font> <font color='#0000FF'>new</font> <font color='#BB00BB'>connection</font> <font face='Lucida Console'>(</font>
+                                    sock,
+                                    foreign_port,
+                                    foreign_ip,
+                                    used_local_port,
+                                    used_local_ip
+                                <font face='Lucida Console'>)</font>; 
+        <b>}</b>
+        <font color='#0000FF'>catch</font><font face='Lucida Console'>(</font>...<font face='Lucida Console'>)</font> <b>{</b><font color='#BB00BB'>closesocket</font><font face='Lucida Console'>(</font>sock<font face='Lucida Console'>)</font>;  <font color='#0000FF'>return</font> OTHER_ERROR; <b>}</b>
+
+        <font color='#0000FF'>return</font> <font color='#979000'>0</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// WIN32
+</font>
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_SOCKETS_KERNEL_1_CPp_
+</font>
+
+</pre></body></html>

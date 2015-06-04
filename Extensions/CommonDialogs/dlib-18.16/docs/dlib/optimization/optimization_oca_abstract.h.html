@@ -1,0 +1,290 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - optimization_oca_abstract.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2010  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#undef</font> DLIB_OPTIMIZATION_OCA_ABsTRACT_Hh_
+<font color='#0000FF'>#ifdef</font> DLIB_OPTIMIZATION_OCA_ABsTRACT_Hh_
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> matrix_type<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>class</font> <b><a name='oca_problem'></a>oca_problem</b>
+    <b>{</b>
+        <font color='#009900'>/*!
+            REQUIREMENTS ON matrix_type
+                - matrix_type == a dlib::matrix capable of storing column vectors
+
+            WHAT THIS OBJECT REPRESENTS
+                This object is the interface used to define the optimization 
+                problems solved by the oca optimizer defined later in this file.
+
+                OCA solves optimization problems with the following form:
+                    Minimize: f(w) == 0.5*length_squared(w) + C*R(w)
+
+                    Where R(w) is a user-supplied convex function and C &gt; 0.  Optionally,
+                    there can also be non-negativity constraints on some or all of the 
+                    elements of w.
+
+                Or it can alternatively solve:
+                    Minimize: f(w) == 0.5*length_squared(w-prior) + C*R(w)
+
+                    Where prior is a user supplied vector and R(w) has the same
+                    interpretation as above.
+                       
+
+                Note that the stopping condition must be provided by the user
+                in the form of the optimization_status() function.
+        !*/</font>
+
+    <font color='#0000FF'>public</font>:
+
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> matrix_type::type scalar_type;
+
+        <font color='#0000FF'>virtual</font> ~<b><a name='oca_problem'></a>oca_problem</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+
+        <font color='#0000FF'>virtual</font> <font color='#0000FF'><u>bool</u></font> <b><a name='risk_has_lower_bound'></a>risk_has_lower_bound</b> <font face='Lucida Console'>(</font>
+            scalar_type<font color='#5555FF'>&amp;</font> lower_bound
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> <font color='#979000'>false</font>; <b>}</b>
+        <font color='#009900'>/*!
+            ensures
+                - if (R(w) &gt;= a constant for all values of w) then
+                    - returns true
+                    - #lower_bound == the constant that lower bounds R(w)
+                - else
+                    - returns false
+        !*/</font>
+
+        <font color='#0000FF'>virtual</font> <font color='#0000FF'><u>bool</u></font> <b><a name='optimization_status'></a>optimization_status</b> <font face='Lucida Console'>(</font>
+            scalar_type current_objective_value,
+            scalar_type current_error_gap,
+            scalar_type current_risk_value,
+            scalar_type current_risk_gap,
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> num_cutting_planes,
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> num_iterations
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <font color='#009900'>/*!
+            requires
+                - This function is called by the OCA optimizer each iteration.  
+                - current_objective_value == the current value of the objective function f(w)
+                - current_error_gap == The bound on how much lower the objective function
+                  can drop before we reach the optimal point.  At the optimal solution the
+                  error gap is equal to 0.
+                - current_risk_value == the current value of the R(w) term of the objective function.
+                - current_risk_gap == the bound on how much lower the risk term can go.  At the optimal
+                  solution the risk gap is zero.
+                - num_cutting_planes == the number of cutting planes the algorithm is currently using.
+                - num_iterations == A count of the total number of iterations that have executed
+                  since we started running the optimization.
+            ensures
+                - If it is appropriate to terminate the optimization then this function returns true
+                  and false otherwise.
+        !*/</font>
+
+        <font color='#0000FF'>virtual</font> scalar_type <b><a name='get_c'></a>get_c</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the C parameter
+        !*/</font>
+
+        <font color='#0000FF'>virtual</font> <font color='#0000FF'><u>long</u></font> <b><a name='get_num_dimensions'></a>get_num_dimensions</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the number of free variables in this optimization problem
+        !*/</font>
+
+        <font color='#0000FF'>virtual</font> <font color='#0000FF'><u>void</u></font> <b><a name='get_risk'></a>get_risk</b> <font face='Lucida Console'>(</font>
+            matrix_type<font color='#5555FF'>&amp;</font> current_solution,
+            scalar_type<font color='#5555FF'>&amp;</font> risk_value,
+            matrix_type<font color='#5555FF'>&amp;</font> risk_subgradient
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <font color='#009900'>/*!
+            requires
+                - is_col_vector(current_solution) == true
+                - current_solution.size() == get_num_dimensions()
+            ensures
+                - #current_solution will be set to one of the following:
+                    - current_solution (i.e. it won't be modified at all)
+                    - The result of a line search passing through current_solution.  
+                - #risk_value == R(#current_solution) 
+                - #risk_subgradient == an element of the subgradient of R() at the 
+                  point #current_solution
+                - Note that #risk_value and #risk_subgradient are NOT multiplied by get_c()
+        !*/</font>
+
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>class</font> <b><a name='oca'></a>oca</b>
+    <b>{</b>
+        <font color='#009900'>/*!
+            INITIAL VALUE
+                - get_subproblem_epsilon() == 1e-2
+                - get_subproblem_max_iterations() == 50000
+                - get_inactive_plane_threshold() == 20
+
+            WHAT THIS OBJECT REPRESENTS
+                This object is a tool for solving the optimization problem defined above
+                by the oca_problem abstract class.  
+
+                For reference, OCA solves optimization problems with the following form:
+                    Minimize: f(w) == 0.5*length_squared(w) + C*R(w)
+
+                    Where R(w) is a user-supplied convex function and C &gt; 0.  Optionally,
+                    this object can also add non-negativity constraints to some or all
+                    of the elements of w.
+
+                Or it can alternatively solve:
+                    Minimize: f(w) == 0.5*length_squared(w-prior) + C*R(w)
+
+                    Where prior is a user supplied vector and R(w) has the same
+                    interpretation as above.
+                       
+
+                For a detailed discussion you should consult the following papers
+                from the Journal of Machine Learning Research:
+                    Optimized Cutting Plane Algorithm for Large-Scale Risk Minimization
+                        Vojtech Franc, Soren Sonnenburg; 10(Oct):2157--2192, 2009. 
+
+                    Bundle Methods for Regularized Risk Minimization
+                        Choon Hui Teo, S.V.N. Vishwanthan, Alex J. Smola, Quoc V. Le; 11(Jan):311-365, 2010. 
+        !*/</font>
+    <font color='#0000FF'>public</font>:
+
+        <b><a name='oca'></a>oca</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>; 
+        <font color='#009900'>/*!
+            ensures
+                - this object is properly initialized
+        !*/</font>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'>typename</font> matrix_type
+            <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>typename</font> matrix_type::type <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> oca_problem<font color='#5555FF'>&lt;</font>matrix_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> problem,
+            matrix_type<font color='#5555FF'>&amp;</font> w,
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> num_nonnegative <font color='#5555FF'>=</font> <font color='#979000'>0</font>,
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> force_weight_to_1 <font color='#5555FF'>=</font> std::numeric_limits<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>max</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - problem.get_c() &gt; 0
+                - problem.get_num_dimensions() &gt; 0
+            ensures
+                - solves the given oca problem and stores the solution in #w.  In particular,
+                  this function solves:
+                    Minimize: f(w) == 0.5*length_squared(w) + C*R(w)
+                - The optimization algorithm runs until problem.optimization_status() 
+                  indicates it is time to stop.
+                - returns the objective value at the solution #w
+                - if (num_nonnegative != 0) then
+                    - Adds the constraint that #w(i) &gt;= 0 for all i &lt; num_nonnegative.
+                      That is, the first num_nonnegative elements of #w will always be
+                      non-negative.  This includes the copies of w passed to get_risk()
+                      in the form of the current_solution vector as well as the final
+                      output of this function.
+                - if (force_weight_to_1 &lt; problem.get_num_dimensions()) then
+                    - The optimizer enforces the following constraints:
+                        - #w(force_weight_to_1) == 1
+                        - for all i &gt; force_weight_to_1:
+                            - #w(i) == 0 
+                        - That is, the element in the weight vector at the index indicated
+                          by force_weight_to_1 will have a value of 1 upon completion of
+                          this function, while all subsequent elements of w will have
+                          values of 0.
+        !*/</font>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'>typename</font> matrix_type
+            <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>typename</font> matrix_type::type <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> oca_problem<font color='#5555FF'>&lt;</font>matrix_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> problem,
+            matrix_type<font color='#5555FF'>&amp;</font> w,
+            <font color='#0000FF'>const</font> matrix_type<font color='#5555FF'>&amp;</font> prior
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - problem.get_c() &gt; 0
+                - problem.get_num_dimensions() &gt; 0
+                - is_col_vector(prior) == true
+                - prior.size() == problem.get_num_dimensions()
+            ensures
+                - solves the given oca problem and stores the solution in #w.
+                - In this mode, we solve a version of the problem with a different
+                  regularizer.  In particular, this function solves:
+                    Minimize: f(w) == 0.5*length_squared(w-prior) + C*R(w)
+                - The optimization algorithm runs until problem.optimization_status() 
+                  indicates it is time to stop.
+                - returns the objective value at the solution #w
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_subproblem_epsilon'></a>set_subproblem_epsilon</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>double</u></font> eps
+        <font face='Lucida Console'>)</font>; 
+        <font color='#009900'>/*!
+            requires
+                - eps &gt; 0
+            ensures
+                - #get_subproblem_epsilon() == eps 
+        !*/</font>
+
+        <font color='#0000FF'><u>double</u></font> <b><a name='get_subproblem_epsilon'></a>get_subproblem_epsilon</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>; 
+        <font color='#009900'>/*!
+            ensures
+                - returns the accuracy used in solving the quadratic programming
+                  subproblem that is part of the overall OCA algorithm.
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_subproblem_max_iterations'></a>set_subproblem_max_iterations</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> sub_max_iter
+        <font face='Lucida Console'>)</font>; 
+        <font color='#009900'>/*!
+            requires
+                - sub_max_iter &gt; 0
+            ensures
+                - #get_subproblem_max_iterations() == sub_max_iter
+        !*/</font>
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='get_subproblem_max_iterations'></a>get_subproblem_max_iterations</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>; 
+        <font color='#009900'>/*!
+            ensures
+                - returns the maximum number of iterations this object will perform
+                  while attempting to solve each quadratic programming subproblem.
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_inactive_plane_threshold'></a>set_inactive_plane_threshold</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> inactive_thresh
+        <font face='Lucida Console'>)</font>; 
+        <font color='#009900'>/*!
+            requires
+                - inactive_thresh &gt; 0
+            ensures
+                - #get_inactive_plane_threshold() == inactive_thresh
+        !*/</font>
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='get_inactive_plane_threshold'></a>get_inactive_plane_threshold</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>; 
+        <font color='#009900'>/*!
+            ensures
+                - As OCA runs it builds up a set of cutting planes.  Typically
+                  cutting planes become inactive after a certain point and can then
+                  be removed.  This function returns the number of iterations of
+                  inactivity required before a cutting plane is removed.
+        !*/</font>
+
+    <b>}</b>;
+<b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_OPTIMIZATION_OCA_ABsTRACT_Hh_
+</font>
+
+
+</pre></body></html>

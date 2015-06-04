@@ -1,0 +1,357 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - jcprepct.cpp</title></head><body bgcolor='white'><pre>
+<font color='#009900'>/*
+ * jcprepct.c
+ *
+ * Copyright (C) 1994-1996, Thomas G. Lane.
+ * This file is part of the Independent JPEG Group's software.
+ * For conditions of distribution and use, see the accompanying README file.
+ *
+ * This file contains the compression preprocessing controller.
+ * This controller manages the color conversion, downsampling,
+ * and edge expansion steps.
+ *
+ * Most of the complexity here is associated with buffering input rows
+ * as required by the downsampler.  See the comments at the head of
+ * jcsample.c for the downsampler's needs.
+ */</font>
+
+<font color='#0000FF'>#define</font> JPEG_INTERNALS
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='jinclude.h.html'>jinclude.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='jpeglib.h.html'>jpeglib.h</a>"
+
+
+<font color='#009900'>/* At present, jcsample.c can request context rows only for smoothing.
+ * In the future, we might also need context rows for CCIR601 sampling
+ * or other more-complex downsampling procedures.  The code to support
+ * context rows should be compiled only if needed.
+ */</font>
+<font color='#0000FF'>#ifdef</font> INPUT_SMOOTHING_SUPPORTED
+<font color='#0000FF'>#define</font> CONTEXT_ROWS_SUPPORTED
+<font color='#0000FF'>#endif</font>
+
+
+<font color='#009900'>/*
+ * For the simple (no-context-row) case, we just need to buffer one
+ * row group's worth of pixels for the downsampling step.  At the bottom of
+ * the image, we pad to a full row group by replicating the last pixel row.
+ * The downsampler's last output row is then replicated if needed to pad
+ * out to a full iMCU row.
+ *
+ * When providing context rows, we must buffer three row groups' worth of
+ * pixels.  Three row groups are physically allocated, but the row pointer
+ * arrays are made five row groups high, with the extra pointers above and
+ * below "wrapping around" to point to the last and first real row groups.
+ * This allows the downsampler to access the proper context rows.
+ * At the top and bottom of the image, we create dummy context rows by
+ * copying the first or last real pixel row.  This copying could be avoided
+ * by pointer hacking as is done in jdmainct.c, but it doesn't seem worth the
+ * trouble on the compression side.
+ */</font>
+
+
+<font color='#009900'>/* Private buffer controller object */</font>
+
+<font color='#0000FF'>typedef</font> <font color='#0000FF'>struct</font> <b>{</b>
+  <font color='#0000FF'>struct</font> jpeg_c_prep_controller pub; <font color='#009900'>/* public fields */</font>
+
+  <font color='#009900'>/* Downsampling input buffer.  This buffer holds color-converted data
+   * until we have enough to do a downsample step.
+   */</font>
+  JSAMPARRAY color_buf[MAX_COMPONENTS];
+
+  JDIMENSION rows_to_go;	<font color='#009900'>/* counts rows remaining in source image */</font>
+  <font color='#0000FF'><u>int</u></font> next_buf_row;		<font color='#009900'>/* index of next row to store in color_buf */</font>
+
+<font color='#0000FF'>#ifdef</font> CONTEXT_ROWS_SUPPORTED	<font color='#009900'>/* only needed for context case */</font>
+  <font color='#0000FF'><u>int</u></font> this_row_group;		<font color='#009900'>/* starting row index of group to process */</font>
+  <font color='#0000FF'><u>int</u></font> next_buf_stop;		<font color='#009900'>/* downsample when we reach this index */</font>
+<font color='#0000FF'>#endif</font>
+<b>}</b> my_prep_controller;
+
+<font color='#0000FF'>typedef</font> my_prep_controller <font color='#5555FF'>*</font> my_prep_ptr;
+
+
+<font color='#009900'>/*
+ * Initialize for a processing pass.
+ */</font>
+
+<b><a name='METHODDEF'></a>METHODDEF</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font>
+<b><a name='start_pass_prep'></a>start_pass_prep</b> <font face='Lucida Console'>(</font>j_compress_ptr cinfo, J_BUF_MODE pass_mode<font face='Lucida Console'>)</font>
+<b>{</b>
+  my_prep_ptr prep <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>my_prep_ptr<font face='Lucida Console'>)</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>prep;
+
+  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>pass_mode <font color='#5555FF'>!</font><font color='#5555FF'>=</font> JBUF_PASS_THRU<font face='Lucida Console'>)</font>
+    <font color='#BB00BB'>ERREXIT</font><font face='Lucida Console'>(</font>cinfo, JERR_BAD_BUFFER_MODE<font face='Lucida Console'>)</font>;
+
+  <font color='#009900'>/* Initialize total-height counter for detecting bottom of image */</font>
+  prep<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>rows_to_go <font color='#5555FF'>=</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>image_height;
+  <font color='#009900'>/* Mark the conversion buffer empty */</font>
+  prep<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>next_buf_row <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+<font color='#0000FF'>#ifdef</font> CONTEXT_ROWS_SUPPORTED
+  <font color='#009900'>/* Preset additional state variables for context mode.
+   * These aren't used in non-context mode, so we needn't test which mode.
+   */</font>
+  prep<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>this_row_group <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+  <font color='#009900'>/* Set next_buf_stop to stop after two row groups have been read in. */</font>
+  prep<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>next_buf_stop <font color='#5555FF'>=</font> <font color='#979000'>2</font> <font color='#5555FF'>*</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>max_v_samp_factor;
+<font color='#0000FF'>#endif</font>
+<b>}</b>
+
+
+<font color='#009900'>/*
+ * Expand an image vertically from height input_rows to height output_rows,
+ * by duplicating the bottom row.
+ */</font>
+
+<b><a name='LOCAL'></a>LOCAL</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font>
+<b><a name='expand_bottom_edge'></a>expand_bottom_edge</b> <font face='Lucida Console'>(</font>JSAMPARRAY image_data, JDIMENSION num_cols,
+		    <font color='#0000FF'><u>int</u></font> input_rows, <font color='#0000FF'><u>int</u></font> output_rows<font face='Lucida Console'>)</font>
+<b>{</b>
+  <font color='#0000FF'>register</font> <font color='#0000FF'><u>int</u></font> row;
+
+  <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>row <font color='#5555FF'>=</font> input_rows; row <font color='#5555FF'>&lt;</font> output_rows; row<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> <b>{</b>
+    <font color='#BB00BB'>jcopy_sample_rows</font><font face='Lucida Console'>(</font>image_data, input_rows<font color='#5555FF'>-</font><font color='#979000'>1</font>, image_data, row,
+		      <font color='#979000'>1</font>, num_cols<font face='Lucida Console'>)</font>;
+  <b>}</b>
+<b>}</b>
+
+
+<font color='#009900'>/*
+ * Process some data in the simple no-context case.
+ *
+ * Preprocessor output data is counted in "row groups".  A row group
+ * is defined to be v_samp_factor sample rows of each component.
+ * Downsampling will produce this much data from each max_v_samp_factor
+ * input rows.
+ */</font>
+
+<b><a name='METHODDEF'></a>METHODDEF</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font>
+<b><a name='pre_process_data'></a>pre_process_data</b> <font face='Lucida Console'>(</font>j_compress_ptr cinfo,
+		  JSAMPARRAY input_buf, JDIMENSION <font color='#5555FF'>*</font>in_row_ctr,
+		  JDIMENSION in_rows_avail,
+		  JSAMPIMAGE output_buf, JDIMENSION <font color='#5555FF'>*</font>out_row_group_ctr,
+		  JDIMENSION out_row_groups_avail<font face='Lucida Console'>)</font>
+<b>{</b>
+  my_prep_ptr prep <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>my_prep_ptr<font face='Lucida Console'>)</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>prep;
+  <font color='#0000FF'><u>int</u></font> numrows, ci;
+  JDIMENSION inrows;
+  jpeg_component_info <font color='#5555FF'>*</font> compptr;
+
+  <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>in_row_ctr <font color='#5555FF'>&lt;</font> in_rows_avail <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font>
+	 <font color='#5555FF'>*</font>out_row_group_ctr <font color='#5555FF'>&lt;</font> out_row_groups_avail<font face='Lucida Console'>)</font> <b>{</b>
+    <font color='#009900'>/* Do color conversion to fill the conversion buffer. */</font>
+    inrows <font color='#5555FF'>=</font> in_rows_avail <font color='#5555FF'>-</font> <font color='#5555FF'>*</font>in_row_ctr;
+    numrows <font color='#5555FF'>=</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>max_v_samp_factor <font color='#5555FF'>-</font> prep<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>next_buf_row;
+    numrows <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font> <font color='#BB00BB'>MIN</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>JDIMENSION<font face='Lucida Console'>)</font> numrows, inrows<font face='Lucida Console'>)</font>;
+    <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>cconvert<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>color_convert<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>cinfo, input_buf <font color='#5555FF'>+</font> <font color='#5555FF'>*</font>in_row_ctr,
+				       prep<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>color_buf,
+				       <font face='Lucida Console'>(</font>JDIMENSION<font face='Lucida Console'>)</font> prep<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>next_buf_row,
+				       numrows<font face='Lucida Console'>)</font>;
+    <font color='#5555FF'>*</font>in_row_ctr <font color='#5555FF'>+</font><font color='#5555FF'>=</font> numrows;
+    prep<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>next_buf_row <font color='#5555FF'>+</font><font color='#5555FF'>=</font> numrows;
+    prep<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>rows_to_go <font color='#5555FF'>-</font><font color='#5555FF'>=</font> numrows;
+    <font color='#009900'>/* If at bottom of image, pad to fill the conversion buffer. */</font>
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>prep<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>rows_to_go <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font>
+	prep<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>next_buf_row <font color='#5555FF'>&lt;</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>max_v_samp_factor<font face='Lucida Console'>)</font> <b>{</b>
+      <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>ci <font color='#5555FF'>=</font> <font color='#979000'>0</font>; ci <font color='#5555FF'>&lt;</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>num_components; ci<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> <b>{</b>
+	<font color='#BB00BB'>expand_bottom_edge</font><font face='Lucida Console'>(</font>prep<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>color_buf[ci], cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>image_width,
+			   prep<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>next_buf_row, cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>max_v_samp_factor<font face='Lucida Console'>)</font>;
+      <b>}</b>
+      prep<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>next_buf_row <font color='#5555FF'>=</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>max_v_samp_factor;
+    <b>}</b>
+    <font color='#009900'>/* If we've filled the conversion buffer, empty it. */</font>
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>prep<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>next_buf_row <font color='#5555FF'>=</font><font color='#5555FF'>=</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>max_v_samp_factor<font face='Lucida Console'>)</font> <b>{</b>
+      <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>downsample<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>downsample<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>cinfo,
+					prep<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>color_buf, <font face='Lucida Console'>(</font>JDIMENSION<font face='Lucida Console'>)</font> <font color='#979000'>0</font>,
+					output_buf, <font color='#5555FF'>*</font>out_row_group_ctr<font face='Lucida Console'>)</font>;
+      prep<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>next_buf_row <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+      <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>out_row_group_ctr<font face='Lucida Console'>)</font><font color='#5555FF'>+</font><font color='#5555FF'>+</font>;
+    <b>}</b>
+    <font color='#009900'>/* If at bottom of image, pad the output to a full iMCU height.
+     * Note we assume the caller is providing a one-iMCU-height output buffer!
+     */</font>
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>prep<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>rows_to_go <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font>
+	<font color='#5555FF'>*</font>out_row_group_ctr <font color='#5555FF'>&lt;</font> out_row_groups_avail<font face='Lucida Console'>)</font> <b>{</b>
+      <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>ci <font color='#5555FF'>=</font> <font color='#979000'>0</font>, compptr <font color='#5555FF'>=</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>comp_info; ci <font color='#5555FF'>&lt;</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>num_components;
+	   ci<font color='#5555FF'>+</font><font color='#5555FF'>+</font>, compptr<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> <b>{</b>
+	<font color='#BB00BB'>expand_bottom_edge</font><font face='Lucida Console'>(</font>output_buf[ci],
+			   compptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>width_in_blocks <font color='#5555FF'>*</font> DCTSIZE,
+			   <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>out_row_group_ctr <font color='#5555FF'>*</font> compptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>v_samp_factor<font face='Lucida Console'>)</font>,
+			   <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>out_row_groups_avail <font color='#5555FF'>*</font> compptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>v_samp_factor<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+      <b>}</b>
+      <font color='#5555FF'>*</font>out_row_group_ctr <font color='#5555FF'>=</font> out_row_groups_avail;
+      <font color='#0000FF'>break</font>;			<font color='#009900'>/* can exit outer loop without test */</font>
+    <b>}</b>
+  <b>}</b>
+<b>}</b>
+
+
+<font color='#0000FF'>#ifdef</font> CONTEXT_ROWS_SUPPORTED
+
+<font color='#009900'>/*
+ * Process some data in the context case.
+ */</font>
+
+<b><a name='METHODDEF'></a>METHODDEF</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font>
+<b><a name='pre_process_context'></a>pre_process_context</b> <font face='Lucida Console'>(</font>j_compress_ptr cinfo,
+		     JSAMPARRAY input_buf, JDIMENSION <font color='#5555FF'>*</font>in_row_ctr,
+		     JDIMENSION in_rows_avail,
+		     JSAMPIMAGE output_buf, JDIMENSION <font color='#5555FF'>*</font>out_row_group_ctr,
+		     JDIMENSION out_row_groups_avail<font face='Lucida Console'>)</font>
+<b>{</b>
+  my_prep_ptr prep <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>my_prep_ptr<font face='Lucida Console'>)</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>prep;
+  <font color='#0000FF'><u>int</u></font> numrows, ci;
+  <font color='#0000FF'><u>int</u></font> buf_height <font color='#5555FF'>=</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>max_v_samp_factor <font color='#5555FF'>*</font> <font color='#979000'>3</font>;
+  JDIMENSION inrows;
+
+  <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>out_row_group_ctr <font color='#5555FF'>&lt;</font> out_row_groups_avail<font face='Lucida Console'>)</font> <b>{</b>
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>in_row_ctr <font color='#5555FF'>&lt;</font> in_rows_avail<font face='Lucida Console'>)</font> <b>{</b>
+      <font color='#009900'>/* Do color conversion to fill the conversion buffer. */</font>
+      inrows <font color='#5555FF'>=</font> in_rows_avail <font color='#5555FF'>-</font> <font color='#5555FF'>*</font>in_row_ctr;
+      numrows <font color='#5555FF'>=</font> prep<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>next_buf_stop <font color='#5555FF'>-</font> prep<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>next_buf_row;
+      numrows <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font> <font color='#BB00BB'>MIN</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>JDIMENSION<font face='Lucida Console'>)</font> numrows, inrows<font face='Lucida Console'>)</font>;
+      <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>cconvert<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>color_convert<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>cinfo, input_buf <font color='#5555FF'>+</font> <font color='#5555FF'>*</font>in_row_ctr,
+					 prep<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>color_buf,
+					 <font face='Lucida Console'>(</font>JDIMENSION<font face='Lucida Console'>)</font> prep<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>next_buf_row,
+					 numrows<font face='Lucida Console'>)</font>;
+      <font color='#009900'>/* Pad at top of image, if first time through */</font>
+      <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>prep<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>rows_to_go <font color='#5555FF'>=</font><font color='#5555FF'>=</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>image_height<font face='Lucida Console'>)</font> <b>{</b>
+	<font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>ci <font color='#5555FF'>=</font> <font color='#979000'>0</font>; ci <font color='#5555FF'>&lt;</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>num_components; ci<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> <b>{</b>
+	  <font color='#0000FF'><u>int</u></font> row;
+	  <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>row <font color='#5555FF'>=</font> <font color='#979000'>1</font>; row <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>max_v_samp_factor; row<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> <b>{</b>
+	    <font color='#BB00BB'>jcopy_sample_rows</font><font face='Lucida Console'>(</font>prep<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>color_buf[ci], <font color='#979000'>0</font>,
+			      prep<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>color_buf[ci], <font color='#5555FF'>-</font>row,
+			      <font color='#979000'>1</font>, cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>image_width<font face='Lucida Console'>)</font>;
+	  <b>}</b>
+	<b>}</b>
+      <b>}</b>
+      <font color='#5555FF'>*</font>in_row_ctr <font color='#5555FF'>+</font><font color='#5555FF'>=</font> numrows;
+      prep<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>next_buf_row <font color='#5555FF'>+</font><font color='#5555FF'>=</font> numrows;
+      prep<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>rows_to_go <font color='#5555FF'>-</font><font color='#5555FF'>=</font> numrows;
+    <b>}</b> <font color='#0000FF'>else</font> <b>{</b>
+      <font color='#009900'>/* Return for more data, unless we are at the bottom of the image. */</font>
+      <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>prep<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>rows_to_go <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+	<font color='#0000FF'>break</font>;
+      <font color='#009900'>/* When at bottom of image, pad to fill the conversion buffer. */</font>
+      <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>prep<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>next_buf_row <font color='#5555FF'>&lt;</font> prep<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>next_buf_stop<font face='Lucida Console'>)</font> <b>{</b>
+	<font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>ci <font color='#5555FF'>=</font> <font color='#979000'>0</font>; ci <font color='#5555FF'>&lt;</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>num_components; ci<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> <b>{</b>
+	  <font color='#BB00BB'>expand_bottom_edge</font><font face='Lucida Console'>(</font>prep<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>color_buf[ci], cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>image_width,
+			     prep<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>next_buf_row, prep<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>next_buf_stop<font face='Lucida Console'>)</font>;
+	<b>}</b>
+	prep<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>next_buf_row <font color='#5555FF'>=</font> prep<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>next_buf_stop;
+      <b>}</b>
+    <b>}</b>
+    <font color='#009900'>/* If we've gotten enough data, downsample a row group. */</font>
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>prep<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>next_buf_row <font color='#5555FF'>=</font><font color='#5555FF'>=</font> prep<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>next_buf_stop<font face='Lucida Console'>)</font> <b>{</b>
+      <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>downsample<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>downsample<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>cinfo,
+					prep<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>color_buf,
+					<font face='Lucida Console'>(</font>JDIMENSION<font face='Lucida Console'>)</font> prep<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>this_row_group,
+					output_buf, <font color='#5555FF'>*</font>out_row_group_ctr<font face='Lucida Console'>)</font>;
+      <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>out_row_group_ctr<font face='Lucida Console'>)</font><font color='#5555FF'>+</font><font color='#5555FF'>+</font>;
+      <font color='#009900'>/* Advance pointers with wraparound as necessary. */</font>
+      prep<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>this_row_group <font color='#5555FF'>+</font><font color='#5555FF'>=</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>max_v_samp_factor;
+      <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>prep<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>this_row_group <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> buf_height<font face='Lucida Console'>)</font>
+	prep<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>this_row_group <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+      <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>prep<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>next_buf_row <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> buf_height<font face='Lucida Console'>)</font>
+	prep<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>next_buf_row <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+      prep<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>next_buf_stop <font color='#5555FF'>=</font> prep<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>next_buf_row <font color='#5555FF'>+</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>max_v_samp_factor;
+    <b>}</b>
+  <b>}</b>
+<b>}</b>
+
+
+<font color='#009900'>/*
+ * Create the wrapped-around downsampling input buffer needed for context mode.
+ */</font>
+
+<b><a name='LOCAL'></a>LOCAL</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font>
+<b><a name='create_context_buffer'></a>create_context_buffer</b> <font face='Lucida Console'>(</font>j_compress_ptr cinfo<font face='Lucida Console'>)</font>
+<b>{</b>
+  my_prep_ptr prep <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>my_prep_ptr<font face='Lucida Console'>)</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>prep;
+  <font color='#0000FF'><u>int</u></font> rgroup_height <font color='#5555FF'>=</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>max_v_samp_factor;
+  <font color='#0000FF'><u>int</u></font> ci, i;
+  jpeg_component_info <font color='#5555FF'>*</font> compptr;
+  JSAMPARRAY true_buffer, fake_buffer;
+
+  <font color='#009900'>/* Grab enough space for fake row pointers for all the components;
+   * we need five row groups' worth of pointers for each component.
+   */</font>
+  fake_buffer <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>JSAMPARRAY<font face='Lucida Console'>)</font>
+    <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>mem<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>alloc_small<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>j_common_ptr<font face='Lucida Console'>)</font> cinfo, JPOOL_IMAGE,
+				<font face='Lucida Console'>(</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>num_components <font color='#5555FF'>*</font> <font color='#979000'>5</font> <font color='#5555FF'>*</font> rgroup_height<font face='Lucida Console'>)</font> <font color='#5555FF'>*</font>
+				<font color='#BB00BB'>SIZEOF</font><font face='Lucida Console'>(</font>JSAMPROW<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+  <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>ci <font color='#5555FF'>=</font> <font color='#979000'>0</font>, compptr <font color='#5555FF'>=</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>comp_info; ci <font color='#5555FF'>&lt;</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>num_components;
+       ci<font color='#5555FF'>+</font><font color='#5555FF'>+</font>, compptr<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> <b>{</b>
+    <font color='#009900'>/* Allocate the actual buffer space (3 row groups) for this component.
+     * We make the buffer wide enough to allow the downsampler to edge-expand
+     * horizontally within the buffer, if it so chooses.
+     */</font>
+    true_buffer <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>mem<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>alloc_sarray<font face='Lucida Console'>)</font>
+      <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>j_common_ptr<font face='Lucida Console'>)</font> cinfo, JPOOL_IMAGE,
+       <font face='Lucida Console'>(</font>JDIMENSION<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font> compptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>width_in_blocks <font color='#5555FF'>*</font> DCTSIZE <font color='#5555FF'>*</font>
+		      cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>max_h_samp_factor<font face='Lucida Console'>)</font> <font color='#5555FF'>/</font> compptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>h_samp_factor<font face='Lucida Console'>)</font>,
+       <font face='Lucida Console'>(</font>JDIMENSION<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font><font color='#979000'>3</font> <font color='#5555FF'>*</font> rgroup_height<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+    <font color='#009900'>/* Copy true buffer row pointers into the middle of the fake row array */</font>
+    <font color='#BB00BB'>MEMCOPY</font><font face='Lucida Console'>(</font>fake_buffer <font color='#5555FF'>+</font> rgroup_height, true_buffer,
+	    <font color='#979000'>3</font> <font color='#5555FF'>*</font> rgroup_height <font color='#5555FF'>*</font> <font color='#BB00BB'>SIZEOF</font><font face='Lucida Console'>(</font>JSAMPROW<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+    <font color='#009900'>/* Fill in the above and below wraparound pointers */</font>
+    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> rgroup_height; i<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> <b>{</b>
+      fake_buffer[i] <font color='#5555FF'>=</font> true_buffer[<font color='#979000'>2</font> <font color='#5555FF'>*</font> rgroup_height <font color='#5555FF'>+</font> i];
+      fake_buffer[<font color='#979000'>4</font> <font color='#5555FF'>*</font> rgroup_height <font color='#5555FF'>+</font> i] <font color='#5555FF'>=</font> true_buffer[i];
+    <b>}</b>
+    prep<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>color_buf[ci] <font color='#5555FF'>=</font> fake_buffer <font color='#5555FF'>+</font> rgroup_height;
+    fake_buffer <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#979000'>5</font> <font color='#5555FF'>*</font> rgroup_height; <font color='#009900'>/* point to space for next component */</font>
+  <b>}</b>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>/* CONTEXT_ROWS_SUPPORTED */</font>
+
+
+<font color='#009900'>/*
+ * Initialize preprocessing controller.
+ */</font>
+
+<b><a name='GLOBAL'></a>GLOBAL</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font>
+<b><a name='jinit_c_prep_controller'></a>jinit_c_prep_controller</b> <font face='Lucida Console'>(</font>j_compress_ptr cinfo, <font color='#0000FF'><u>int</u></font> need_full_buffer<font face='Lucida Console'>)</font>
+<b>{</b>
+  my_prep_ptr prep;
+  <font color='#0000FF'><u>int</u></font> ci;
+  jpeg_component_info <font color='#5555FF'>*</font> compptr;
+
+  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>need_full_buffer<font face='Lucida Console'>)</font>		<font color='#009900'>/* safety check */</font>
+    <font color='#BB00BB'>ERREXIT</font><font face='Lucida Console'>(</font>cinfo, JERR_BAD_BUFFER_MODE<font face='Lucida Console'>)</font>;
+
+  prep <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>my_prep_ptr<font face='Lucida Console'>)</font>
+    <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>mem<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>alloc_small<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>j_common_ptr<font face='Lucida Console'>)</font> cinfo, JPOOL_IMAGE,
+				<font color='#BB00BB'>SIZEOF</font><font face='Lucida Console'>(</font>my_prep_controller<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+  cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>prep <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'>struct</font> jpeg_c_prep_controller <font color='#5555FF'>*</font><font face='Lucida Console'>)</font> prep;
+  prep<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>pub.start_pass <font color='#5555FF'>=</font> start_pass_prep;
+
+  <font color='#009900'>/* Allocate the color conversion buffer.
+   * We make the buffer wide enough to allow the downsampler to edge-expand
+   * horizontally within the buffer, if it so chooses.
+   */</font>
+  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>downsample<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>need_context_rows<font face='Lucida Console'>)</font> <b>{</b>
+    <font color='#009900'>/* Set up to provide context rows */</font>
+<font color='#0000FF'>#ifdef</font> CONTEXT_ROWS_SUPPORTED
+    prep<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>pub.pre_process_data <font color='#5555FF'>=</font> pre_process_context;
+    <font color='#BB00BB'>create_context_buffer</font><font face='Lucida Console'>(</font>cinfo<font face='Lucida Console'>)</font>;
+<font color='#0000FF'>#else</font>
+    <font color='#BB00BB'>ERREXIT</font><font face='Lucida Console'>(</font>cinfo, JERR_NOT_COMPILED<font face='Lucida Console'>)</font>;
+<font color='#0000FF'>#endif</font>
+  <b>}</b> <font color='#0000FF'>else</font> <b>{</b>
+    <font color='#009900'>/* No context, just make it tall enough for one row group */</font>
+    prep<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>pub.pre_process_data <font color='#5555FF'>=</font> pre_process_data;
+    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>ci <font color='#5555FF'>=</font> <font color='#979000'>0</font>, compptr <font color='#5555FF'>=</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>comp_info; ci <font color='#5555FF'>&lt;</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>num_components;
+	 ci<font color='#5555FF'>+</font><font color='#5555FF'>+</font>, compptr<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> <b>{</b>
+      prep<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>color_buf[ci] <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>mem<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>alloc_sarray<font face='Lucida Console'>)</font>
+	<font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>j_common_ptr<font face='Lucida Console'>)</font> cinfo, JPOOL_IMAGE,
+	 <font face='Lucida Console'>(</font>JDIMENSION<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font> compptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>width_in_blocks <font color='#5555FF'>*</font> DCTSIZE <font color='#5555FF'>*</font>
+			cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>max_h_samp_factor<font face='Lucida Console'>)</font> <font color='#5555FF'>/</font> compptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>h_samp_factor<font face='Lucida Console'>)</font>,
+	 <font face='Lucida Console'>(</font>JDIMENSION<font face='Lucida Console'>)</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>max_v_samp_factor<font face='Lucida Console'>)</font>;
+    <b>}</b>
+  <b>}</b>
+<b>}</b>
+
+</pre></body></html>

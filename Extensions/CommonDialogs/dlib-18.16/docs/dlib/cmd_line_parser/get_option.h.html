@@ -1,0 +1,184 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - get_option.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2012  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_GET_OPTiON_Hh_
+<font color='#0000FF'>#define</font> DLIB_GET_OPTiON_Hh_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='get_option_abstract.h.html'>get_option_abstract.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../string.h.html'>../string.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../is_kind.h.html'>../is_kind.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>class</font> <b><a name='option_parse_error'></a>option_parse_error</b> : <font color='#0000FF'>public</font> error
+    <b>{</b>
+    <font color='#0000FF'>public</font>:
+        <b><a name='option_parse_error'></a>option_parse_error</b><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> option_string, <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> str<font face='Lucida Console'>)</font>:
+            error<font face='Lucida Console'>(</font>EOPTION_PARSE,"<font color='#CC0000'>Error parsing argument for option '</font>" <font color='#5555FF'>+</font> option_string <font color='#5555FF'>+</font> "<font color='#CC0000'>', offending string is '</font>" <font color='#5555FF'>+</font> str <font color='#5555FF'>+</font> "<font color='#CC0000'>'.</font>"<font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> config_reader_type, <font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+    T <b><a name='impl_config_reader_get_option'></a>impl_config_reader_get_option</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> config_reader_type<font color='#5555FF'>&amp;</font> cr,
+        <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> option_name,
+        <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> full_option_name,
+        T default_value
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        std::string::size_type pos <font color='#5555FF'>=</font> option_name.<font color='#BB00BB'>find_first_of</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>.</font>"<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>pos <font color='#5555FF'>=</font><font color='#5555FF'>=</font> std::string::npos<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>cr.<font color='#BB00BB'>is_key_defined</font><font face='Lucida Console'>(</font>option_name<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>try</font><b>{</b> <font color='#0000FF'>return</font> string_cast<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>cr[option_name]<font face='Lucida Console'>)</font>; <b>}</b>
+                <font color='#0000FF'>catch</font> <font face='Lucida Console'>(</font>string_cast_error<font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font> <b>{</b> <font color='#0000FF'>throw</font> <font color='#BB00BB'>option_parse_error</font><font face='Lucida Console'>(</font>full_option_name, cr[option_name]<font face='Lucida Console'>)</font>; <b>}</b>
+            <b>}</b>
+        <b>}</b>
+        <font color='#0000FF'>else</font>
+        <b>{</b>
+            std::string block_name <font color='#5555FF'>=</font> option_name.<font color='#BB00BB'>substr</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>,pos<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>cr.<font color='#BB00BB'>is_block_defined</font><font face='Lucida Console'>(</font>block_name<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>return</font> <font color='#BB00BB'>impl_config_reader_get_option</font><font face='Lucida Console'>(</font>cr.<font color='#BB00BB'>block</font><font face='Lucida Console'>(</font>block_name<font face='Lucida Console'>)</font>, 
+                                                     option_name.<font color='#BB00BB'>substr</font><font face='Lucida Console'>(</font>pos<font color='#5555FF'>+</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>,
+                                                     full_option_name,
+                                                     default_value<font face='Lucida Console'>)</font>;
+            <b>}</b>
+        <b>}</b>
+
+        <font color='#0000FF'>return</font> default_value;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> cr_type, <font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>typename</font> enable_if<font color='#5555FF'>&lt;</font>is_config_reader<font color='#5555FF'>&lt;</font>cr_type<font color='#5555FF'>&gt;</font>,T<font color='#5555FF'>&gt;</font>::type <b><a name='get_option'></a>get_option</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> cr_type<font color='#5555FF'>&amp;</font> cr,
+        <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> option_name,
+        T default_value
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>return</font> <font color='#BB00BB'>impl_config_reader_get_option</font><font face='Lucida Console'>(</font>cr, option_name, option_name, default_value<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> parser_type, <font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>typename</font> disable_if<font color='#5555FF'>&lt;</font>is_config_reader<font color='#5555FF'>&lt;</font>parser_type<font color='#5555FF'>&gt;</font>,T<font color='#5555FF'>&gt;</font>::type <b><a name='get_option'></a>get_option</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> parser_type<font color='#5555FF'>&amp;</font> parser,
+        <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> option_name,
+        T default_value
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#009900'>// make sure requires clause is not broken
+</font>        <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font> parser.<font color='#BB00BB'>option_is_defined</font><font face='Lucida Console'>(</font>option_name<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>true</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font>
+                     parser.<font color='#BB00BB'>option</font><font face='Lucida Console'>(</font>option_name<font face='Lucida Console'>)</font>.<font color='#BB00BB'>number_of_arguments</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>1</font>,
+            "<font color='#CC0000'>\t T get_option()</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t option_name: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> option_name
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t parser.option_is_defined(option_name):            </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> parser.<font color='#BB00BB'>option_is_defined</font><font face='Lucida Console'>(</font>option_name<font face='Lucida Console'>)</font>
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t parser.option(option_name).number_of_arguments(): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> parser.<font color='#BB00BB'>option</font><font face='Lucida Console'>(</font>option_name<font face='Lucida Console'>)</font>.<font color='#BB00BB'>number_of_arguments</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+            <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>parser.<font color='#BB00BB'>option</font><font face='Lucida Console'>(</font>option_name<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>try</font>
+            <b>{</b>
+                default_value <font color='#5555FF'>=</font> string_cast<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>parser.<font color='#BB00BB'>option</font><font face='Lucida Console'>(</font>option_name<font face='Lucida Console'>)</font>.<font color='#BB00BB'>argument</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>; 
+            <b>}</b>
+            <font color='#0000FF'>catch</font> <font face='Lucida Console'>(</font>string_cast_error<font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font> 
+            <b>{</b> 
+                <font color='#0000FF'>throw</font> <font color='#BB00BB'>option_parse_error</font><font face='Lucida Console'>(</font>option_name, parser.<font color='#BB00BB'>option</font><font face='Lucida Console'>(</font>option_name<font face='Lucida Console'>)</font>.<font color='#BB00BB'>argument</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>; 
+            <b>}</b>
+        <b>}</b>
+        <font color='#0000FF'>return</font> default_value;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> parser_type, <font color='#0000FF'>typename</font> cr_type, <font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>typename</font> disable_if<font color='#5555FF'>&lt;</font>is_config_reader<font color='#5555FF'>&lt;</font>parser_type<font color='#5555FF'>&gt;</font>,T<font color='#5555FF'>&gt;</font>::type <b><a name='get_option'></a>get_option</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> parser_type<font color='#5555FF'>&amp;</font> parser,
+        <font color='#0000FF'>const</font> cr_type<font color='#5555FF'>&amp;</font> cr,
+        <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> option_name,
+        T default_value
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#009900'>// make sure requires clause is not broken
+</font>        <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font> parser.<font color='#BB00BB'>option_is_defined</font><font face='Lucida Console'>(</font>option_name<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>true</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font>
+                     parser.<font color='#BB00BB'>option</font><font face='Lucida Console'>(</font>option_name<font face='Lucida Console'>)</font>.<font color='#BB00BB'>number_of_arguments</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>1</font>,
+            "<font color='#CC0000'>\t T get_option()</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t option_name: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> option_name
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t parser.option_is_defined(option_name):            </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> parser.<font color='#BB00BB'>option_is_defined</font><font face='Lucida Console'>(</font>option_name<font face='Lucida Console'>)</font>
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t parser.option(option_name).number_of_arguments(): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> parser.<font color='#BB00BB'>option</font><font face='Lucida Console'>(</font>option_name<font face='Lucida Console'>)</font>.<font color='#BB00BB'>number_of_arguments</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+            <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>parser.<font color='#BB00BB'>option</font><font face='Lucida Console'>(</font>option_name<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+            <font color='#0000FF'>return</font> <font color='#BB00BB'>get_option</font><font face='Lucida Console'>(</font>parser, option_name, default_value<font face='Lucida Console'>)</font>; 
+        <font color='#0000FF'>else</font>
+            <font color='#0000FF'>return</font> <font color='#BB00BB'>get_option</font><font face='Lucida Console'>(</font>cr, option_name, default_value<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> parser_type, <font color='#0000FF'>typename</font> cr_type, <font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>typename</font> disable_if<font color='#5555FF'>&lt;</font>is_config_reader<font color='#5555FF'>&lt;</font>parser_type<font color='#5555FF'>&gt;</font>,T<font color='#5555FF'>&gt;</font>::type <b><a name='get_option'></a>get_option</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> cr_type<font color='#5555FF'>&amp;</font> cr,
+        <font color='#0000FF'>const</font> parser_type<font color='#5555FF'>&amp;</font> parser,
+        <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> option_name,
+        T default_value
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#009900'>// make sure requires clause is not broken
+</font>        <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font> parser.<font color='#BB00BB'>option_is_defined</font><font face='Lucida Console'>(</font>option_name<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>true</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font>
+                     parser.<font color='#BB00BB'>option</font><font face='Lucida Console'>(</font>option_name<font face='Lucida Console'>)</font>.<font color='#BB00BB'>number_of_arguments</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>1</font>,
+            "<font color='#CC0000'>\t T get_option()</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t option_name: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> option_name
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t parser.option_is_defined(option_name):            </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> parser.<font color='#BB00BB'>option_is_defined</font><font face='Lucida Console'>(</font>option_name<font face='Lucida Console'>)</font>
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t parser.option(option_name).number_of_arguments(): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> parser.<font color='#BB00BB'>option</font><font face='Lucida Console'>(</font>option_name<font face='Lucida Console'>)</font>.<font color='#BB00BB'>number_of_arguments</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+            <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>parser.<font color='#BB00BB'>option</font><font face='Lucida Console'>(</font>option_name<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+            <font color='#0000FF'>return</font> <font color='#BB00BB'>get_option</font><font face='Lucida Console'>(</font>parser, option_name, default_value<font face='Lucida Console'>)</font>; 
+        <font color='#0000FF'>else</font>
+            <font color='#0000FF'>return</font> <font color='#BB00BB'>get_option</font><font face='Lucida Console'>(</font>cr, option_name, default_value<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>inline</font> std::string <b><a name='get_option'></a>get_option</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> cr,
+        <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> option_name,
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>*</font> default_value
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>return</font> <font color='#BB00BB'>get_option</font><font face='Lucida Console'>(</font>cr, option_name, std::<font color='#BB00BB'>string</font><font face='Lucida Console'>(</font>default_value<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> U<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>inline</font> std::string <b><a name='get_option'></a>get_option</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> parser,
+        <font color='#0000FF'>const</font> U<font color='#5555FF'>&amp;</font> cr,
+        <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> option_name,
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>*</font> default_value
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>return</font> <font color='#BB00BB'>get_option</font><font face='Lucida Console'>(</font>parser, cr, option_name, std::<font color='#BB00BB'>string</font><font face='Lucida Console'>(</font>default_value<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_GET_OPTiON_Hh_
+</font>
+
+</pre></body></html>

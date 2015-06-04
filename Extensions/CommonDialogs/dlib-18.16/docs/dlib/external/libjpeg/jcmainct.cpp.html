@@ -1,0 +1,296 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - jcmainct.cpp</title></head><body bgcolor='white'><pre>
+<font color='#009900'>/*
+ * jcmainct.c
+ *
+ * Copyright (C) 1994-1996, Thomas G. Lane.
+ * This file is part of the Independent JPEG Group's software.
+ * For conditions of distribution and use, see the accompanying README file.
+ *
+ * This file contains the main buffer controller for compression.
+ * The main buffer lies between the pre-processor and the JPEG
+ * compressor proper; it holds downsampled data in the JPEG colorspace.
+ */</font>
+
+<font color='#0000FF'>#define</font> JPEG_INTERNALS
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='jinclude.h.html'>jinclude.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='jpeglib.h.html'>jpeglib.h</a>"
+
+
+<font color='#009900'>/* Note: currently, there is no operating mode in which a full-image buffer
+ * is needed at this step.  If there were, that mode could not be used with
+ * "raw data" input, since this module is bypassed in that case.  However,
+ * we've left the code here for possible use in special applications.
+ */</font>
+<font color='#0000FF'>#undef</font> FULL_MAIN_BUFFER_SUPPORTED
+
+
+<font color='#009900'>/* Private buffer controller object */</font>
+
+<font color='#0000FF'>typedef</font> <font color='#0000FF'>struct</font> <b>{</b>
+  <font color='#0000FF'>struct</font> jpeg_c_main_controller pub; <font color='#009900'>/* public fields */</font>
+
+  JDIMENSION cur_iMCU_row;	<font color='#009900'>/* number of current iMCU row */</font>
+  JDIMENSION rowgroup_ctr;	<font color='#009900'>/* counts row groups received in iMCU row */</font>
+  <font color='#0000FF'><u>int</u></font> suspended;		<font color='#009900'>/* remember if we suspended output */</font>
+  J_BUF_MODE pass_mode;		<font color='#009900'>/* current operating mode */</font>
+
+  <font color='#009900'>/* If using just a strip buffer, this points to the entire set of buffers
+   * (we allocate one for each component).  In the full-image case, this
+   * points to the currently accessible strips of the virtual arrays.
+   */</font>
+  JSAMPARRAY buffer[MAX_COMPONENTS];
+
+<font color='#0000FF'>#ifdef</font> FULL_MAIN_BUFFER_SUPPORTED
+  <font color='#009900'>/* If using full-image storage, this array holds pointers to virtual-array
+   * control blocks for each component.  Unused if not full-image storage.
+   */</font>
+  jvirt_sarray_ptr whole_image[MAX_COMPONENTS];
+<font color='#0000FF'>#endif</font>
+<b>}</b> my_main_controller;
+
+<font color='#0000FF'>typedef</font> my_main_controller <font color='#5555FF'>*</font> my_main_ptr;
+
+
+<font color='#009900'>/* Forward declarations */</font>
+<b><a name='METHODDEF'></a>METHODDEF</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font> process_data_simple_main
+	<b><a name='JPP'></a>JPP</b><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>j_compress_ptr cinfo, JSAMPARRAY input_buf,
+	     JDIMENSION <font color='#5555FF'>*</font>in_row_ctr, JDIMENSION in_rows_avail<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+<font color='#0000FF'>#ifdef</font> FULL_MAIN_BUFFER_SUPPORTED
+<b><a name='METHODDEF'></a>METHODDEF</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font> process_data_buffer_main
+	<b><a name='JPP'></a>JPP</b><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>j_compress_ptr cinfo, JSAMPARRAY input_buf,
+	     JDIMENSION <font color='#5555FF'>*</font>in_row_ctr, JDIMENSION in_rows_avail<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+<font color='#0000FF'>#endif</font>
+
+
+<font color='#009900'>/*
+ * Initialize for a processing pass.
+ */</font>
+
+<b><a name='METHODDEF'></a>METHODDEF</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font>
+<b><a name='start_pass_main'></a>start_pass_main</b> <font face='Lucida Console'>(</font>j_compress_ptr cinfo, J_BUF_MODE pass_mode<font face='Lucida Console'>)</font>
+<b>{</b>
+  my_main_ptr main <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>my_main_ptr<font face='Lucida Console'>)</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>main;
+
+  <font color='#009900'>/* Do nothing in raw-data mode. */</font>
+  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>raw_data_in<font face='Lucida Console'>)</font>
+    <font color='#0000FF'>return</font>;
+
+  main<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>cur_iMCU_row <font color='#5555FF'>=</font> <font color='#979000'>0</font>;	<font color='#009900'>/* initialize counters */</font>
+  main<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>rowgroup_ctr <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+  main<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>suspended <font color='#5555FF'>=</font> FALSE;
+  main<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>pass_mode <font color='#5555FF'>=</font> pass_mode;	<font color='#009900'>/* save mode for use by process_data */</font>
+
+  <font color='#0000FF'>switch</font> <font face='Lucida Console'>(</font>pass_mode<font face='Lucida Console'>)</font> <b>{</b>
+  <font color='#0000FF'>case</font> JBUF_PASS_THRU:
+<font color='#0000FF'>#ifdef</font> FULL_MAIN_BUFFER_SUPPORTED
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>main<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>whole_image[<font color='#979000'>0</font>] <font color='#5555FF'>!</font><font color='#5555FF'>=</font> NULL<font face='Lucida Console'>)</font>
+      <font color='#BB00BB'>ERREXIT</font><font face='Lucida Console'>(</font>cinfo, JERR_BAD_BUFFER_MODE<font face='Lucida Console'>)</font>;
+<font color='#0000FF'>#endif</font>
+    main<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>pub.process_data <font color='#5555FF'>=</font> process_data_simple_main;
+    <font color='#0000FF'>break</font>;
+<font color='#0000FF'>#ifdef</font> FULL_MAIN_BUFFER_SUPPORTED
+  <font color='#0000FF'>case</font> JBUF_SAVE_SOURCE:
+  <font color='#0000FF'>case</font> JBUF_CRANK_DEST:
+  <font color='#0000FF'>case</font> JBUF_SAVE_AND_PASS:
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>main<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>whole_image[<font color='#979000'>0</font>] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> NULL<font face='Lucida Console'>)</font>
+      <font color='#BB00BB'>ERREXIT</font><font face='Lucida Console'>(</font>cinfo, JERR_BAD_BUFFER_MODE<font face='Lucida Console'>)</font>;
+    main<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>pub.process_data <font color='#5555FF'>=</font> process_data_buffer_main;
+    <font color='#0000FF'>break</font>;
+<font color='#0000FF'>#endif</font>
+  <font color='#0000FF'>default</font>:
+    <font color='#BB00BB'>ERREXIT</font><font face='Lucida Console'>(</font>cinfo, JERR_BAD_BUFFER_MODE<font face='Lucida Console'>)</font>;
+    <font color='#0000FF'>break</font>;
+  <b>}</b>
+<b>}</b>
+
+
+<font color='#009900'>/*
+ * Process some data.
+ * This routine handles the simple pass-through mode,
+ * where we have only a strip buffer.
+ */</font>
+
+<b><a name='METHODDEF'></a>METHODDEF</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font>
+<b><a name='process_data_simple_main'></a>process_data_simple_main</b> <font face='Lucida Console'>(</font>j_compress_ptr cinfo,
+			  JSAMPARRAY input_buf, JDIMENSION <font color='#5555FF'>*</font>in_row_ctr,
+			  JDIMENSION in_rows_avail<font face='Lucida Console'>)</font>
+<b>{</b>
+  my_main_ptr main <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>my_main_ptr<font face='Lucida Console'>)</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>main;
+
+  <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>main<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>cur_iMCU_row <font color='#5555FF'>&lt;</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>total_iMCU_rows<font face='Lucida Console'>)</font> <b>{</b>
+    <font color='#009900'>/* Read input data if we haven't filled the main buffer yet */</font>
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>main<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>rowgroup_ctr <font color='#5555FF'>&lt;</font> DCTSIZE<font face='Lucida Console'>)</font>
+      <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>prep<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>pre_process_data<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>cinfo,
+					input_buf, in_row_ctr, in_rows_avail,
+					main<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>buffer, <font color='#5555FF'>&amp;</font>main<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>rowgroup_ctr,
+					<font face='Lucida Console'>(</font>JDIMENSION<font face='Lucida Console'>)</font> DCTSIZE<font face='Lucida Console'>)</font>;
+
+    <font color='#009900'>/* If we don't have a full iMCU row buffered, return to application for
+     * more data.  Note that preprocessor will always pad to fill the iMCU row
+     * at the bottom of the image.
+     */</font>
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>main<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>rowgroup_ctr <font color='#5555FF'>!</font><font color='#5555FF'>=</font> DCTSIZE<font face='Lucida Console'>)</font>
+      <font color='#0000FF'>return</font>;
+
+    <font color='#009900'>/* Send the completed row to the compressor */</font>
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font> <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>coef<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>compress_data<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>cinfo, main<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>buffer<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <b>{</b>
+      <font color='#009900'>/* If compressor did not consume the whole row, then we must need to
+       * suspend processing and return to the application.  In this situation
+       * we pretend we didn't yet consume the last input row; otherwise, if
+       * it happened to be the last row of the image, the application would
+       * think we were done.
+       */</font>
+      <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font> main<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>suspended<font face='Lucida Console'>)</font> <b>{</b>
+	<font face='Lucida Console'>(</font><font color='#5555FF'>*</font>in_row_ctr<font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#5555FF'>-</font>;
+	main<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>suspended <font color='#5555FF'>=</font> TRUE;
+      <b>}</b>
+      <font color='#0000FF'>return</font>;
+    <b>}</b>
+    <font color='#009900'>/* We did finish the row.  Undo our little suspension hack if a previous
+     * call suspended; then mark the main buffer empty.
+     */</font>
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>main<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>suspended<font face='Lucida Console'>)</font> <b>{</b>
+      <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>in_row_ctr<font face='Lucida Console'>)</font><font color='#5555FF'>+</font><font color='#5555FF'>+</font>;
+      main<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>suspended <font color='#5555FF'>=</font> FALSE;
+    <b>}</b>
+    main<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>rowgroup_ctr <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+    main<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>cur_iMCU_row<font color='#5555FF'>+</font><font color='#5555FF'>+</font>;
+  <b>}</b>
+<b>}</b>
+
+
+<font color='#0000FF'>#ifdef</font> FULL_MAIN_BUFFER_SUPPORTED
+
+<font color='#009900'>/*
+ * Process some data.
+ * This routine handles all of the modes that use a full-size buffer.
+ */</font>
+
+<b><a name='METHODDEF'></a>METHODDEF</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font>
+<b><a name='process_data_buffer_main'></a>process_data_buffer_main</b> <font face='Lucida Console'>(</font>j_compress_ptr cinfo,
+			  JSAMPARRAY input_buf, JDIMENSION <font color='#5555FF'>*</font>in_row_ctr,
+			  JDIMENSION in_rows_avail<font face='Lucida Console'>)</font>
+<b>{</b>
+  my_main_ptr main <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>my_main_ptr<font face='Lucida Console'>)</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>main;
+  <font color='#0000FF'><u>int</u></font> ci;
+  jpeg_component_info <font color='#5555FF'>*</font>compptr;
+  <font color='#0000FF'><u>int</u></font> writing <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>main<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>pass_mode <font color='#5555FF'>!</font><font color='#5555FF'>=</font> JBUF_CRANK_DEST<font face='Lucida Console'>)</font>;
+
+  <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>main<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>cur_iMCU_row <font color='#5555FF'>&lt;</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>total_iMCU_rows<font face='Lucida Console'>)</font> <b>{</b>
+    <font color='#009900'>/* Realign the virtual buffers if at the start of an iMCU row. */</font>
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>main<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>rowgroup_ctr <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font> <b>{</b>
+      <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>ci <font color='#5555FF'>=</font> <font color='#979000'>0</font>, compptr <font color='#5555FF'>=</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>comp_info; ci <font color='#5555FF'>&lt;</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>num_components;
+	   ci<font color='#5555FF'>+</font><font color='#5555FF'>+</font>, compptr<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> <b>{</b>
+	main<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>buffer[ci] <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>mem<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>access_virt_sarray<font face='Lucida Console'>)</font>
+	  <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>j_common_ptr<font face='Lucida Console'>)</font> cinfo, main<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>whole_image[ci],
+	   main<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>cur_iMCU_row <font color='#5555FF'>*</font> <font face='Lucida Console'>(</font>compptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>v_samp_factor <font color='#5555FF'>*</font> DCTSIZE<font face='Lucida Console'>)</font>,
+	   <font face='Lucida Console'>(</font>JDIMENSION<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>compptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>v_samp_factor <font color='#5555FF'>*</font> DCTSIZE<font face='Lucida Console'>)</font>, writing<font face='Lucida Console'>)</font>;
+      <b>}</b>
+      <font color='#009900'>/* In a read pass, pretend we just read some source data. */</font>
+      <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font> writing<font face='Lucida Console'>)</font> <b>{</b>
+	<font color='#5555FF'>*</font>in_row_ctr <font color='#5555FF'>+</font><font color='#5555FF'>=</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>max_v_samp_factor <font color='#5555FF'>*</font> DCTSIZE;
+	main<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>rowgroup_ctr <font color='#5555FF'>=</font> DCTSIZE;
+      <b>}</b>
+    <b>}</b>
+
+    <font color='#009900'>/* If a write pass, read input data until the current iMCU row is full. */</font>
+    <font color='#009900'>/* Note: preprocessor will pad if necessary to fill the last iMCU row. */</font>
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>writing<font face='Lucida Console'>)</font> <b>{</b>
+      <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>prep<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>pre_process_data<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>cinfo,
+					input_buf, in_row_ctr, in_rows_avail,
+					main<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>buffer, <font color='#5555FF'>&amp;</font>main<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>rowgroup_ctr,
+					<font face='Lucida Console'>(</font>JDIMENSION<font face='Lucida Console'>)</font> DCTSIZE<font face='Lucida Console'>)</font>;
+      <font color='#009900'>/* Return to application if we need more data to fill the iMCU row. */</font>
+      <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>main<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>rowgroup_ctr <font color='#5555FF'>&lt;</font> DCTSIZE<font face='Lucida Console'>)</font>
+	<font color='#0000FF'>return</font>;
+    <b>}</b>
+
+    <font color='#009900'>/* Emit data, unless this is a sink-only pass. */</font>
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>main<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>pass_mode <font color='#5555FF'>!</font><font color='#5555FF'>=</font> JBUF_SAVE_SOURCE<font face='Lucida Console'>)</font> <b>{</b>
+      <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font> <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>coef<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>compress_data<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>cinfo, main<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>buffer<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <b>{</b>
+	<font color='#009900'>/* If compressor did not consume the whole row, then we must need to
+	 * suspend processing and return to the application.  In this situation
+	 * we pretend we didn't yet consume the last input row; otherwise, if
+	 * it happened to be the last row of the image, the application would
+	 * think we were done.
+	 */</font>
+	<font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font> main<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>suspended<font face='Lucida Console'>)</font> <b>{</b>
+	  <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>in_row_ctr<font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#5555FF'>-</font>;
+	  main<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>suspended <font color='#5555FF'>=</font> TRUE;
+	<b>}</b>
+	<font color='#0000FF'>return</font>;
+      <b>}</b>
+      <font color='#009900'>/* We did finish the row.  Undo our little suspension hack if a previous
+       * call suspended; then mark the main buffer empty.
+       */</font>
+      <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>main<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>suspended<font face='Lucida Console'>)</font> <b>{</b>
+	<font face='Lucida Console'>(</font><font color='#5555FF'>*</font>in_row_ctr<font face='Lucida Console'>)</font><font color='#5555FF'>+</font><font color='#5555FF'>+</font>;
+	main<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>suspended <font color='#5555FF'>=</font> FALSE;
+      <b>}</b>
+    <b>}</b>
+
+    <font color='#009900'>/* If get here, we are done with this iMCU row.  Mark buffer empty. */</font>
+    main<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>rowgroup_ctr <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+    main<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>cur_iMCU_row<font color='#5555FF'>+</font><font color='#5555FF'>+</font>;
+  <b>}</b>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>/* FULL_MAIN_BUFFER_SUPPORTED */</font>
+
+
+<font color='#009900'>/*
+ * Initialize main buffer controller.
+ */</font>
+
+<b><a name='GLOBAL'></a>GLOBAL</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font>
+<b><a name='jinit_c_main_controller'></a>jinit_c_main_controller</b> <font face='Lucida Console'>(</font>j_compress_ptr cinfo, <font color='#0000FF'><u>int</u></font> need_full_buffer<font face='Lucida Console'>)</font>
+<b>{</b>
+  my_main_ptr main;
+  <font color='#0000FF'><u>int</u></font> ci;
+  jpeg_component_info <font color='#5555FF'>*</font>compptr;
+
+  main <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>my_main_ptr<font face='Lucida Console'>)</font>
+    <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>mem<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>alloc_small<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>j_common_ptr<font face='Lucida Console'>)</font> cinfo, JPOOL_IMAGE,
+				<font color='#BB00BB'>SIZEOF</font><font face='Lucida Console'>(</font>my_main_controller<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+  cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>main <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'>struct</font> jpeg_c_main_controller <font color='#5555FF'>*</font><font face='Lucida Console'>)</font> main;
+  main<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>pub.start_pass <font color='#5555FF'>=</font> start_pass_main;
+
+  <font color='#009900'>/* We don't need to create a buffer in raw-data mode. */</font>
+  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>raw_data_in<font face='Lucida Console'>)</font>
+    <font color='#0000FF'>return</font>;
+
+  <font color='#009900'>/* Create the buffer.  It holds downsampled data, so each component
+   * may be of a different size.
+   */</font>
+  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>need_full_buffer<font face='Lucida Console'>)</font> <b>{</b>
+<font color='#0000FF'>#ifdef</font> FULL_MAIN_BUFFER_SUPPORTED
+    <font color='#009900'>/* Allocate a full-image virtual array for each component */</font>
+    <font color='#009900'>/* Note we pad the bottom to a multiple of the iMCU height */</font>
+    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>ci <font color='#5555FF'>=</font> <font color='#979000'>0</font>, compptr <font color='#5555FF'>=</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>comp_info; ci <font color='#5555FF'>&lt;</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>num_components;
+	 ci<font color='#5555FF'>+</font><font color='#5555FF'>+</font>, compptr<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> <b>{</b>
+      main<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>whole_image[ci] <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>mem<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>request_virt_sarray<font face='Lucida Console'>)</font>
+	<font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>j_common_ptr<font face='Lucida Console'>)</font> cinfo, JPOOL_IMAGE, FALSE,
+	 compptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>width_in_blocks <font color='#5555FF'>*</font> DCTSIZE,
+	 <font face='Lucida Console'>(</font>JDIMENSION<font face='Lucida Console'>)</font> <font color='#BB00BB'>jround_up</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font> compptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>height_in_blocks,
+				<font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font> compptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>v_samp_factor<font face='Lucida Console'>)</font> <font color='#5555FF'>*</font> DCTSIZE,
+	 <font face='Lucida Console'>(</font>JDIMENSION<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>compptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>v_samp_factor <font color='#5555FF'>*</font> DCTSIZE<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+<font color='#0000FF'>#else</font>
+    <font color='#BB00BB'>ERREXIT</font><font face='Lucida Console'>(</font>cinfo, JERR_BAD_BUFFER_MODE<font face='Lucida Console'>)</font>;
+<font color='#0000FF'>#endif</font>
+  <b>}</b> <font color='#0000FF'>else</font> <b>{</b>
+<font color='#0000FF'>#ifdef</font> FULL_MAIN_BUFFER_SUPPORTED
+    main<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>whole_image[<font color='#979000'>0</font>] <font color='#5555FF'>=</font> NULL; <font color='#009900'>/* flag for no virtual arrays */</font>
+<font color='#0000FF'>#endif</font>
+    <font color='#009900'>/* Allocate a strip buffer for each component */</font>
+    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>ci <font color='#5555FF'>=</font> <font color='#979000'>0</font>, compptr <font color='#5555FF'>=</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>comp_info; ci <font color='#5555FF'>&lt;</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>num_components;
+	 ci<font color='#5555FF'>+</font><font color='#5555FF'>+</font>, compptr<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> <b>{</b>
+      main<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>buffer[ci] <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>mem<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>alloc_sarray<font face='Lucida Console'>)</font>
+	<font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>j_common_ptr<font face='Lucida Console'>)</font> cinfo, JPOOL_IMAGE,
+	 compptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>width_in_blocks <font color='#5555FF'>*</font> DCTSIZE,
+	 <font face='Lucida Console'>(</font>JDIMENSION<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>compptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>v_samp_factor <font color='#5555FF'>*</font> DCTSIZE<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+  <b>}</b>
+<b>}</b>
+
+</pre></body></html>

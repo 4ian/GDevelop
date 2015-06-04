@@ -1,0 +1,177 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - dir_nav_extensions_abstract.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2009  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#undef</font> DLIB_DIR_NAV_EXTENSIONs_ABSTRACT_
+<font color='#0000FF'>#ifdef</font> DLIB_DIR_NAV_EXTENSIONs_ABSTRACT_
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>string<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>vector<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='dir_nav_kernel_abstract.h.html'>dir_nav_kernel_abstract.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>bool</u></font> <b><a name='file_exists'></a>file_exists</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> filename
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        ensures
+            - if (a file with the given filename exists) then
+                - returns true
+            - else
+                - returns false
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>file<font color='#5555FF'>&gt;</font> <b><a name='get_files_in_directory_tree'></a>get_files_in_directory_tree</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> directory<font color='#5555FF'>&amp;</font> top_of_tree,
+        <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> add_file,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> max_depth <font color='#5555FF'>=</font> <font color='#979000'>30</font>
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - add_file must be a function object with the following prototype:
+                bool add_file (file f);
+        ensures
+            - performs a recursive search through the directory top_of_tree and all
+              its sub-directories (up to the given max depth).  All files in these
+              directories are examined by passing them to add_file() and if it 
+              returns true then they will be included in the returned std::vector&lt;file&gt;
+              object.
+            - Note that a max_depth of 0 means that only the files in the directory
+              top_of_tree will be considered.  A depth of 1 means that only files in 
+              top_of_tree and its immediate sub-directories will be considered.  And
+              so on...
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>class</font> <b><a name='match_ending'></a>match_ending</b>
+    <b>{</b>
+        <font color='#009900'>/*!
+            WHAT THIS OBJECT REPRESENTS
+                This is a simple function object that can be used with the
+                above get_files_in_directory_tree() function.  This object
+                just looks for files with a certain ending.
+        !*/</font>
+
+    <font color='#0000FF'>public</font>:
+        <b><a name='match_ending'></a>match_ending</b> <font face='Lucida Console'>(</font> 
+            <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> ending
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - this object will be a function that checks if a file has a 
+                  name that ends with the given ending string.
+        !*/</font>
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> file<font color='#5555FF'>&amp;</font> f
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - if (the file f has a name that ends with the ending string given
+                  to this object's constructor) then
+                    - returns true
+                - else
+                    - returns false
+        !*/</font>
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>class</font> <b><a name='match_endings'></a>match_endings</b>
+    <b>{</b>
+        <font color='#009900'>/*!
+            WHAT THIS OBJECT REPRESENTS
+                This is a simple function object that can be used with the
+                above get_files_in_directory_tree() function.  This object
+                allows you to look for files with a number of different 
+                endings.
+        !*/</font>
+
+    <font color='#0000FF'>public</font>:
+        <b><a name='match_endings'></a>match_endings</b> <font face='Lucida Console'>(</font> 
+            <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> ending_list
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - ending_list is interpreted as a whitespace separated list
+                  of file endings. 
+                - this object will be a function that checks if a file has a 
+                  name that ends with one of the strings in ending_list.
+        !*/</font>
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> file<font color='#5555FF'>&amp;</font> f
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - if (the file f has a name that ends with one of the ending strings 
+                  given to this object's constructor) then
+                    - returns true
+                - else
+                    - returns false
+        !*/</font>
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>class</font> <b><a name='match_all'></a>match_all</b>
+    <b>{</b>
+        <font color='#009900'>/*!
+            WHAT THIS OBJECT REPRESENTS
+                This is a simple function object that can be used with the
+                above get_files_in_directory_tree() function.  This object
+                matches all files. 
+        !*/</font>
+
+    <font color='#0000FF'>public</font>:
+        <font color='#0000FF'><u>bool</u></font> <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> file<font color='#5555FF'>&amp;</font> f
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns true
+                  (i.e. this function doesn't do anything.  It just says it
+                  matches all files no matter what)
+        !*/</font>
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    directory <b><a name='get_parent_directory'></a>get_parent_directory</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> directory<font color='#5555FF'>&amp;</font> dir
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        ensures
+            - returns the parent directory of dir.  In particular, this
+              function returns the value of dir.get_parent()
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    directory <b><a name='get_parent_directory'></a>get_parent_directory</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> file<font color='#5555FF'>&amp;</font> f
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        ensures
+            - if (f.full_name() != "") then
+                - returns the directory which contains the given file
+            - else
+                - returns a default initialized directory (i.e. directory())
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_DIR_NAV_EXTENSIONs_ABSTRACT_
+</font>
+
+
+</pre></body></html>

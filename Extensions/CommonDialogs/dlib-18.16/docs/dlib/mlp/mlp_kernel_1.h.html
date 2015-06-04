@@ -1,0 +1,397 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - mlp_kernel_1.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2007  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_MLp_KERNEL_1_
+<font color='#0000FF'>#define</font> DLIB_MLp_KERNEL_1_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../algs.h.html'>../algs.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../serialize.h.html'>../serialize.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../matrix.h.html'>../matrix.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../rand.h.html'>../rand.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='mlp_kernel_abstract.h.html'>mlp_kernel_abstract.h</a>"
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>ctime<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>sstream<font color='#5555FF'>&gt;</font>
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+    <font color='#0000FF'>class</font> <b><a name='mlp_kernel_1'></a>mlp_kernel_1</b> : noncopyable
+    <b>{</b>
+        <font color='#009900'>/*!
+            INITIAL VALUE
+                The network is initially initialized with random weights 
+
+            CONVENTION
+                - input_layer_nodes() == input_nodes
+                - first_hidden_layer_nodes() == first_hidden_nodes
+                - second_hidden_layer_nodes() == second_hidden_nodes
+                - output_layer_nodes() == output_nodes
+                - get_alpha == alpha
+                - get_momentum() == momentum
+
+
+                - if (second_hidden_nodes == 0) then
+                    - for all i and j:
+                        - w1(i,j) == the weight on the link from node i in the first hidden layer 
+                          to input node j
+                        - w3(i,j) == the weight on the link from node i in the output layer 
+                          to first hidden layer node j
+                    - for all i and j:
+                        - w1m == the momentum terms for w1 from the previous update 
+                        - w3m == the momentum terms for w3 from the previous update 
+                - else
+                    - for all i and j:
+                        - w1(i,j) == the weight on the link from node i in the first hidden layer 
+                          to input node j
+                        - w2(i,j) == the weight on the link from node i in the second hidden layer 
+                          to first hidden layer node j
+                        - w3(i,j) == the weight on the link from node i in the output layer 
+                          to second hidden layer node j
+                    - for all i and j:
+                        - w1m == the momentum terms for w1 from the previous update 
+                        - w2m == the momentum terms for w2 from the previous update 
+                        - w3m == the momentum terms for w3 from the previous update 
+        !*/</font>
+
+    <font color='#0000FF'>public</font>:
+
+        <b><a name='mlp_kernel_1'></a>mlp_kernel_1</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>long</u></font> nodes_in_input_layer,
+            <font color='#0000FF'><u>long</u></font> nodes_in_first_hidden_layer, 
+            <font color='#0000FF'><u>long</u></font> nodes_in_second_hidden_layer <font color='#5555FF'>=</font> <font color='#979000'>0</font>, 
+            <font color='#0000FF'><u>long</u></font> nodes_in_output_layer <font color='#5555FF'>=</font> <font color='#979000'>1</font>,
+            <font color='#0000FF'><u>double</u></font> alpha_ <font color='#5555FF'>=</font> <font color='#979000'>0.1</font>,
+            <font color='#0000FF'><u>double</u></font> momentum_ <font color='#5555FF'>=</font> <font color='#979000'>0.8</font>
+        <font face='Lucida Console'>)</font> :
+            input_nodes<font face='Lucida Console'>(</font>nodes_in_input_layer<font face='Lucida Console'>)</font>,
+            first_hidden_nodes<font face='Lucida Console'>(</font>nodes_in_first_hidden_layer<font face='Lucida Console'>)</font>,
+            second_hidden_nodes<font face='Lucida Console'>(</font>nodes_in_second_hidden_layer<font face='Lucida Console'>)</font>,
+            output_nodes<font face='Lucida Console'>(</font>nodes_in_output_layer<font face='Lucida Console'>)</font>,
+            alpha<font face='Lucida Console'>(</font>alpha_<font face='Lucida Console'>)</font>,
+            momentum<font face='Lucida Console'>(</font>momentum_<font face='Lucida Console'>)</font>
+        <b>{</b>
+
+            <font color='#009900'>// seed the random number generator
+</font>            std::ostringstream sout;
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>time</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+            rand_nums.<font color='#BB00BB'>set_seed</font><font face='Lucida Console'>(</font>sout.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+            w1.<font color='#BB00BB'>set_size</font><font face='Lucida Console'>(</font>first_hidden_nodes<font color='#5555FF'>+</font><font color='#979000'>1</font>, input_nodes<font color='#5555FF'>+</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+            w1m.<font color='#BB00BB'>set_size</font><font face='Lucida Console'>(</font>first_hidden_nodes<font color='#5555FF'>+</font><font color='#979000'>1</font>, input_nodes<font color='#5555FF'>+</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+            z.<font color='#BB00BB'>set_size</font><font face='Lucida Console'>(</font>input_nodes<font color='#5555FF'>+</font><font color='#979000'>1</font>,<font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>second_hidden_nodes <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                w2.<font color='#BB00BB'>set_size</font><font face='Lucida Console'>(</font>second_hidden_nodes<font color='#5555FF'>+</font><font color='#979000'>1</font>, first_hidden_nodes<font color='#5555FF'>+</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+                w3.<font color='#BB00BB'>set_size</font><font face='Lucida Console'>(</font>output_nodes, second_hidden_nodes<font color='#5555FF'>+</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+
+                w2m.<font color='#BB00BB'>set_size</font><font face='Lucida Console'>(</font>second_hidden_nodes<font color='#5555FF'>+</font><font color='#979000'>1</font>, first_hidden_nodes<font color='#5555FF'>+</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+                w3m.<font color='#BB00BB'>set_size</font><font face='Lucida Console'>(</font>output_nodes, second_hidden_nodes<font color='#5555FF'>+</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+            <font color='#0000FF'>else</font>
+            <b>{</b>
+                w3.<font color='#BB00BB'>set_size</font><font face='Lucida Console'>(</font>output_nodes, first_hidden_nodes<font color='#5555FF'>+</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+
+                w3m.<font color='#BB00BB'>set_size</font><font face='Lucida Console'>(</font>output_nodes, first_hidden_nodes<font color='#5555FF'>+</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+            <font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>virtual</font> ~<b><a name='mlp_kernel_1'></a>mlp_kernel_1</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='reset'></a>reset</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> 
+        <b>{</b>
+            <font color='#009900'>// randomize the weights for the first layer
+</font>            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> r <font color='#5555FF'>=</font> <font color='#979000'>0</font>; r <font color='#5555FF'>&lt;</font> w1.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>r<font face='Lucida Console'>)</font>
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> c <font color='#5555FF'>=</font> <font color='#979000'>0</font>; c <font color='#5555FF'>&lt;</font> w1.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>c<font face='Lucida Console'>)</font>
+                    <font color='#BB00BB'>w1</font><font face='Lucida Console'>(</font>r,c<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> rand_nums.<font color='#BB00BB'>get_random_double</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// randomize the weights for the second layer
+</font>            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> r <font color='#5555FF'>=</font> <font color='#979000'>0</font>; r <font color='#5555FF'>&lt;</font> w2.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>r<font face='Lucida Console'>)</font>
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> c <font color='#5555FF'>=</font> <font color='#979000'>0</font>; c <font color='#5555FF'>&lt;</font> w2.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>c<font face='Lucida Console'>)</font>
+                    <font color='#BB00BB'>w2</font><font face='Lucida Console'>(</font>r,c<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> rand_nums.<font color='#BB00BB'>get_random_double</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// randomize the weights for the third layer
+</font>            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> r <font color='#5555FF'>=</font> <font color='#979000'>0</font>; r <font color='#5555FF'>&lt;</font> w3.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>r<font face='Lucida Console'>)</font>
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> c <font color='#5555FF'>=</font> <font color='#979000'>0</font>; c <font color='#5555FF'>&lt;</font> w3.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>c<font face='Lucida Console'>)</font>
+                    <font color='#BB00BB'>w3</font><font face='Lucida Console'>(</font>r,c<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> rand_nums.<font color='#BB00BB'>get_random_double</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// zero all the momentum terms
+</font>            <font color='#BB00BB'>set_all_elements</font><font face='Lucida Console'>(</font>w1m,<font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>set_all_elements</font><font face='Lucida Console'>(</font>w2m,<font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>set_all_elements</font><font face='Lucida Console'>(</font>w3m,<font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'><u>long</u></font> <b><a name='input_layer_nodes'></a>input_layer_nodes</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> input_nodes; <b>}</b>
+
+        <font color='#0000FF'><u>long</u></font> <b><a name='first_hidden_layer_nodes'></a>first_hidden_layer_nodes</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> first_hidden_nodes; <b>}</b>
+
+        <font color='#0000FF'><u>long</u></font> <b><a name='second_hidden_layer_nodes'></a>second_hidden_layer_nodes</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> second_hidden_nodes; <b>}</b>
+
+        <font color='#0000FF'><u>long</u></font> <b><a name='output_layer_nodes'></a>output_layer_nodes</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> output_nodes; <b>}</b>
+
+        <font color='#0000FF'><u>double</u></font> <b><a name='get_alpha'></a>get_alpha</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> alpha; <b>}</b>
+
+        <font color='#0000FF'><u>double</u></font> <b><a name='get_momentum'></a>get_momentum</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> momentum; <b>}</b>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> EXP<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>const</font> matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font> <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&lt;</font>EXP<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> in 
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> in.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                <font color='#BB00BB'>z</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#BB00BB'>in</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>;
+            <font color='#009900'>// insert the bias 
+</font>            <font color='#BB00BB'>z</font><font face='Lucida Console'>(</font>z.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>1</font>;
+
+            tmp1 <font color='#5555FF'>=</font> <font color='#BB00BB'>sigmoid</font><font face='Lucida Console'>(</font>w1<font color='#5555FF'>*</font>z<font face='Lucida Console'>)</font>;
+            <font color='#009900'>// insert the bias 
+</font>            <font color='#BB00BB'>tmp1</font><font face='Lucida Console'>(</font>tmp1.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>1</font>;
+
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>second_hidden_nodes <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>return</font> <font color='#BB00BB'>sigmoid</font><font face='Lucida Console'>(</font>w3<font color='#5555FF'>*</font>tmp1<font face='Lucida Console'>)</font>;
+            <b>}</b>
+            <font color='#0000FF'>else</font>
+            <b>{</b>
+                tmp2 <font color='#5555FF'>=</font> <font color='#BB00BB'>sigmoid</font><font face='Lucida Console'>(</font>w2<font color='#5555FF'>*</font>tmp1<font face='Lucida Console'>)</font>;
+                <font color='#009900'>// insert the bias 
+</font>                <font color='#BB00BB'>tmp2</font><font face='Lucida Console'>(</font>tmp2.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>1</font>;
+
+                <font color='#0000FF'>return</font> <font color='#BB00BB'>sigmoid</font><font face='Lucida Console'>(</font>w3<font color='#5555FF'>*</font>tmp2<font face='Lucida Console'>)</font>;
+            <b>}</b>
+        <b>}</b>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> EXP1, <font color='#0000FF'>typename</font> EXP2<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='train'></a>train</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&lt;</font>EXP1<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> example_in,
+            <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&lt;</font>EXP2<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> example_out 
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> example_in.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                <font color='#BB00BB'>z</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#BB00BB'>example_in</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>;
+            <font color='#009900'>// insert the bias 
+</font>            <font color='#BB00BB'>z</font><font face='Lucida Console'>(</font>z.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>1</font>;
+
+            tmp1 <font color='#5555FF'>=</font> <font color='#BB00BB'>sigmoid</font><font face='Lucida Console'>(</font>w1<font color='#5555FF'>*</font>z<font face='Lucida Console'>)</font>;
+            <font color='#009900'>// insert the bias 
+</font>            <font color='#BB00BB'>tmp1</font><font face='Lucida Console'>(</font>tmp1.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>1</font>;
+
+
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>second_hidden_nodes <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                o <font color='#5555FF'>=</font> <font color='#BB00BB'>sigmoid</font><font face='Lucida Console'>(</font>w3<font color='#5555FF'>*</font>tmp1<font face='Lucida Console'>)</font>;
+
+                <font color='#009900'>// now compute the errors and propagate them backwards though the network
+</font>                e3 <font color='#5555FF'>=</font> <font color='#BB00BB'>pointwise_multiply</font><font face='Lucida Console'>(</font>example_out<font color='#5555FF'>-</font>o, uniform_matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>output_nodes,<font color='#979000'>1</font>,<font color='#979000'>1.0</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font>o, o<font face='Lucida Console'>)</font>;
+                e1 <font color='#5555FF'>=</font> <font color='#BB00BB'>pointwise_multiply</font><font face='Lucida Console'>(</font>tmp1, uniform_matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>first_hidden_nodes<font color='#5555FF'>+</font><font color='#979000'>1</font>,<font color='#979000'>1</font>,<font color='#979000'>1.0</font><font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> tmp1, <font color='#BB00BB'>trans</font><font face='Lucida Console'>(</font>w3<font face='Lucida Console'>)</font><font color='#5555FF'>*</font>e3 <font face='Lucida Console'>)</font>;
+
+                <font color='#009900'>// compute the new weight updates
+</font>                w3m <font color='#5555FF'>=</font> alpha <font color='#5555FF'>*</font> e3<font color='#5555FF'>*</font><font color='#BB00BB'>trans</font><font face='Lucida Console'>(</font>tmp1<font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> w3m<font color='#5555FF'>*</font>momentum;
+                w1m <font color='#5555FF'>=</font> alpha <font color='#5555FF'>*</font> e1<font color='#5555FF'>*</font><font color='#BB00BB'>trans</font><font face='Lucida Console'>(</font>z<font face='Lucida Console'>)</font>    <font color='#5555FF'>+</font> w1m<font color='#5555FF'>*</font>momentum;
+
+                <font color='#009900'>// now update the weights
+</font>                w1 <font color='#5555FF'>+</font><font color='#5555FF'>=</font> w1m;
+                w3 <font color='#5555FF'>+</font><font color='#5555FF'>=</font> w3m;
+            <b>}</b>
+            <font color='#0000FF'>else</font>
+            <b>{</b>
+                tmp2 <font color='#5555FF'>=</font> <font color='#BB00BB'>sigmoid</font><font face='Lucida Console'>(</font>w2<font color='#5555FF'>*</font>tmp1<font face='Lucida Console'>)</font>;
+                <font color='#009900'>// insert the bias 
+</font>                <font color='#BB00BB'>tmp2</font><font face='Lucida Console'>(</font>tmp2.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>1</font>;
+
+                o <font color='#5555FF'>=</font> <font color='#BB00BB'>sigmoid</font><font face='Lucida Console'>(</font>w3<font color='#5555FF'>*</font>tmp2<font face='Lucida Console'>)</font>;
+
+
+                <font color='#009900'>// now compute the errors and propagate them backwards though the network
+</font>                e3 <font color='#5555FF'>=</font> <font color='#BB00BB'>pointwise_multiply</font><font face='Lucida Console'>(</font>example_out<font color='#5555FF'>-</font>o, uniform_matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>output_nodes,<font color='#979000'>1</font>,<font color='#979000'>1.0</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font>o, o<font face='Lucida Console'>)</font>;
+                e2 <font color='#5555FF'>=</font> <font color='#BB00BB'>pointwise_multiply</font><font face='Lucida Console'>(</font>tmp2, uniform_matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>second_hidden_nodes<font color='#5555FF'>+</font><font color='#979000'>1</font>,<font color='#979000'>1</font>,<font color='#979000'>1.0</font><font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> tmp2, <font color='#BB00BB'>trans</font><font face='Lucida Console'>(</font>w3<font face='Lucida Console'>)</font><font color='#5555FF'>*</font>e3 <font face='Lucida Console'>)</font>;
+                e1 <font color='#5555FF'>=</font> <font color='#BB00BB'>pointwise_multiply</font><font face='Lucida Console'>(</font>tmp1, uniform_matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>first_hidden_nodes<font color='#5555FF'>+</font><font color='#979000'>1</font>,<font color='#979000'>1</font>,<font color='#979000'>1.0</font><font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> tmp1, <font color='#BB00BB'>trans</font><font face='Lucida Console'>(</font>w2<font face='Lucida Console'>)</font><font color='#5555FF'>*</font>e2 <font face='Lucida Console'>)</font>;
+
+                <font color='#009900'>// compute the new weight updates
+</font>                w3m <font color='#5555FF'>=</font> alpha <font color='#5555FF'>*</font> e3<font color='#5555FF'>*</font><font color='#BB00BB'>trans</font><font face='Lucida Console'>(</font>tmp2<font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> w3m<font color='#5555FF'>*</font>momentum;
+                w2m <font color='#5555FF'>=</font> alpha <font color='#5555FF'>*</font> e2<font color='#5555FF'>*</font><font color='#BB00BB'>trans</font><font face='Lucida Console'>(</font>tmp1<font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> w2m<font color='#5555FF'>*</font>momentum;
+                w1m <font color='#5555FF'>=</font> alpha <font color='#5555FF'>*</font> e1<font color='#5555FF'>*</font><font color='#BB00BB'>trans</font><font face='Lucida Console'>(</font>z<font face='Lucida Console'>)</font>    <font color='#5555FF'>+</font> w1m<font color='#5555FF'>*</font>momentum;
+
+                <font color='#009900'>// now update the weights
+</font>                w1 <font color='#5555FF'>+</font><font color='#5555FF'>=</font> w1m;
+                w2 <font color='#5555FF'>+</font><font color='#5555FF'>=</font> w2m;
+                w3 <font color='#5555FF'>+</font><font color='#5555FF'>=</font> w3m;
+            <b>}</b>
+        <b>}</b>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> EXP<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='train'></a>train</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&lt;</font>EXP<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> example_in,
+            <font color='#0000FF'><u>double</u></font> example_out
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>1</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> e_out;
+            <font color='#BB00BB'>e_out</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> example_out;
+            <font color='#BB00BB'>train</font><font face='Lucida Console'>(</font>example_in,e_out<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'><u>double</u></font> <b><a name='get_average_change'></a>get_average_change</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#009900'>// sum up all the weight changes
+</font>            <font color='#0000FF'><u>double</u></font> delta <font color='#5555FF'>=</font> <font color='#BB00BB'>sum</font><font face='Lucida Console'>(</font><font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font>w1m<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> <font color='#BB00BB'>sum</font><font face='Lucida Console'>(</font><font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font>w2m<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> <font color='#BB00BB'>sum</font><font face='Lucida Console'>(</font><font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font>w3m<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// divide by the number of weights
+</font>            delta <font color='#5555FF'>/</font><font color='#5555FF'>=</font>  w1m.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>*</font>w1m.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> 
+                w2m.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>*</font>w2m.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> 
+                w3m.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>*</font>w3m.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>return</font> delta;
+        <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='swap'></a>swap</b> <font face='Lucida Console'>(</font>
+            mlp_kernel_1<font color='#5555FF'>&amp;</font> item
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#BB00BB'>exchange</font><font face='Lucida Console'>(</font>input_nodes, item.input_nodes<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>exchange</font><font face='Lucida Console'>(</font>first_hidden_nodes, item.first_hidden_nodes<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>exchange</font><font face='Lucida Console'>(</font>second_hidden_nodes, item.second_hidden_nodes<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>exchange</font><font face='Lucida Console'>(</font>output_nodes, item.output_nodes<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>exchange</font><font face='Lucida Console'>(</font>alpha, item.alpha<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>exchange</font><font face='Lucida Console'>(</font>momentum, item.momentum<font face='Lucida Console'>)</font>;
+
+            w1.<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>item.w1<font face='Lucida Console'>)</font>;
+            w2.<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>item.w2<font face='Lucida Console'>)</font>;
+            w3.<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>item.w3<font face='Lucida Console'>)</font>;
+
+            w1m.<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>item.w1m<font face='Lucida Console'>)</font>;
+            w2m.<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>item.w2m<font face='Lucida Console'>)</font>;
+            w3m.<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>item.w3m<font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// even swap the temporary matrices because this may ultimately result in 
+</font>            <font color='#009900'>// fewer calls to new and delete.
+</font>            e1.<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>item.e1<font face='Lucida Console'>)</font>;
+            e2.<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>item.e2<font face='Lucida Console'>)</font>;
+            e3.<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>item.e3<font face='Lucida Console'>)</font>;
+            z.<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>item.z<font face='Lucida Console'>)</font>;
+            tmp1.<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>item.tmp1<font face='Lucida Console'>)</font>;
+            tmp2.<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>item.tmp2<font face='Lucida Console'>)</font>;
+            o.<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>item.o<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+
+        <font color='#0000FF'>friend</font> <font color='#0000FF'><u>void</u></font> <b><a name='serialize'></a>serialize</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> mlp_kernel_1<font color='#5555FF'>&amp;</font> item, 
+            std::ostream<font color='#5555FF'>&amp;</font> out
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>friend</font> <font color='#0000FF'><u>void</u></font> <b><a name='deserialize'></a>deserialize</b> <font face='Lucida Console'>(</font>
+            mlp_kernel_1<font color='#5555FF'>&amp;</font> item, 
+            std::istream<font color='#5555FF'>&amp;</font> in
+        <font face='Lucida Console'>)</font>;
+
+    <font color='#0000FF'>private</font>:
+
+        <font color='#0000FF'><u>long</u></font> input_nodes;
+        <font color='#0000FF'><u>long</u></font> first_hidden_nodes;
+        <font color='#0000FF'><u>long</u></font> second_hidden_nodes;
+        <font color='#0000FF'><u>long</u></font> output_nodes;
+        <font color='#0000FF'><u>double</u></font> alpha;
+        <font color='#0000FF'><u>double</u></font> momentum;
+
+        matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font> w1;
+        matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font> w2;
+        matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font> w3;
+
+        matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font> w1m;
+        matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font> w2m;
+        matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font> w3m;
+
+
+        rand rand_nums;
+
+        <font color='#009900'>// temporary storage
+</font>        <font color='#0000FF'>mutable</font> matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font> e1, e2, e3;
+        <font color='#0000FF'>mutable</font> matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font> z, tmp1, tmp2, o;
+    <b>}</b>;   
+
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='swap'></a>swap</b> <font face='Lucida Console'>(</font>
+        mlp_kernel_1<font color='#5555FF'>&amp;</font> a, 
+        mlp_kernel_1<font color='#5555FF'>&amp;</font> b 
+    <font face='Lucida Console'>)</font> <b>{</b> a.<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>b<font face='Lucida Console'>)</font>; <b>}</b>   
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='serialize'></a>serialize</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> mlp_kernel_1<font color='#5555FF'>&amp;</font> item, 
+        std::ostream<font color='#5555FF'>&amp;</font> out
+    <font face='Lucida Console'>)</font>   
+    <b>{</b>
+        <font color='#0000FF'>try</font>
+        <b>{</b>
+            <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item.input_nodes, out<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item.first_hidden_nodes, out<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item.second_hidden_nodes, out<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item.output_nodes, out<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item.alpha, out<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item.momentum, out<font face='Lucida Console'>)</font>;
+
+            <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item.w1, out<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item.w2, out<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item.w3, out<font face='Lucida Console'>)</font>;
+
+            <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item.w1m, out<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item.w2m, out<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item.w3m, out<font face='Lucida Console'>)</font>;
+        <b>}</b>
+        <font color='#0000FF'>catch</font> <font face='Lucida Console'>(</font>serialization_error<font color='#5555FF'>&amp;</font> e<font face='Lucida Console'>)</font>
+        <b>{</b> 
+            <font color='#0000FF'>throw</font> <font color='#BB00BB'>serialization_error</font><font face='Lucida Console'>(</font>e.info <font color='#5555FF'>+</font> "<font color='#CC0000'>\n   while serializing object of type mlp_kernel_1</font>"<font face='Lucida Console'>)</font>; 
+        <b>}</b>
+    <b>}</b>
+
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='deserialize'></a>deserialize</b> <font face='Lucida Console'>(</font>
+        mlp_kernel_1<font color='#5555FF'>&amp;</font> item, 
+        std::istream<font color='#5555FF'>&amp;</font> in
+    <font face='Lucida Console'>)</font>   
+    <b>{</b>
+        <font color='#0000FF'>try</font>
+        <b>{</b>
+            <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item.input_nodes, in<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item.first_hidden_nodes, in<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item.second_hidden_nodes, in<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item.output_nodes, in<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item.alpha, in<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item.momentum, in<font face='Lucida Console'>)</font>;
+
+            <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item.w1, in<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item.w2, in<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item.w3, in<font face='Lucida Console'>)</font>;
+
+            <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item.w1m, in<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item.w2m, in<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item.w3m, in<font face='Lucida Console'>)</font>;
+
+            item.z.<font color='#BB00BB'>set_size</font><font face='Lucida Console'>(</font>item.input_nodes<font color='#5555FF'>+</font><font color='#979000'>1</font>,<font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+        <font color='#0000FF'>catch</font> <font face='Lucida Console'>(</font>serialization_error<font color='#5555FF'>&amp;</font> e<font face='Lucida Console'>)</font>
+        <b>{</b> 
+            <font color='#009900'>// give item a reasonable value since the deserialization failed
+</font>            <font color='#BB00BB'>mlp_kernel_1</font><font face='Lucida Console'>(</font><font color='#979000'>1</font>,<font color='#979000'>1</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>item<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>throw</font> <font color='#BB00BB'>serialization_error</font><font face='Lucida Console'>(</font>e.info <font color='#5555FF'>+</font> "<font color='#CC0000'>\n   while deserializing object of type mlp_kernel_1</font>"<font face='Lucida Console'>)</font>; 
+        <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_MLp_KERNEL_1_
+</font>
+
+</pre></body></html>

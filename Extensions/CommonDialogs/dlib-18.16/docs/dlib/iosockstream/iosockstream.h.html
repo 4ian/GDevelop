@@ -1,0 +1,173 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - iosockstream.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2012  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_IOSOCKSTrEAM_Hh_
+<font color='#0000FF'>#define</font> DLIB_IOSOCKSTrEAM_Hh_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='iosockstream_abstract.h.html'>iosockstream_abstract.h</a>"
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>iostream<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../sockstreambuf.h.html'>../sockstreambuf.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../smart_pointers_thread_safe.h.html'>../smart_pointers_thread_safe.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../timeout.h.html'>../timeout.h</a>"
+
+<font color='#0000FF'>#ifdef</font> _MSC_VER
+<font color='#009900'>// Disable the warning about inheriting from std::iostream 'via dominance' since this warning is a warning about
+</font><font color='#009900'>// visual studio conforming to the standard and is ignorable.  
+</font><font color='#009900'>// See http://connect.microsoft.com/VisualStudio/feedback/details/733720/inheriting-from-std-fstream-produces-c4250-warning
+</font><font color='#009900'>// for further details if interested.
+</font><font color='#0000FF'>#pragma</font> warning<font face='Lucida Console'>(</font>disable : <font color='#979000'>4250</font><font face='Lucida Console'>)</font>
+<font color='#0000FF'>#endif</font> <font color='#009900'>// _MSC_VER
+</font>
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ---------------------------------------------------------------------------------------- 
+</font>
+    <font color='#0000FF'>class</font> <b><a name='iosockstream'></a>iosockstream</b> : <font color='#0000FF'>public</font> std::iostream
+    <b>{</b>
+    <font color='#0000FF'>public</font>:
+
+        <b><a name='iosockstream'></a>iosockstream</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> :
+            std::iostream<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+        <b>}</b>
+
+        <b><a name='iosockstream'></a>iosockstream</b><font face='Lucida Console'>(</font> 
+            <font color='#0000FF'>const</font> network_address<font color='#5555FF'>&amp;</font> addr
+        <font face='Lucida Console'>)</font> :
+            std::iostream<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>
+        <b>{</b> 
+            <font color='#BB00BB'>open</font><font face='Lucida Console'>(</font>addr<font face='Lucida Console'>)</font>; 
+        <b>}</b>
+
+        <b><a name='iosockstream'></a>iosockstream</b><font face='Lucida Console'>(</font> 
+            <font color='#0000FF'>const</font> network_address<font color='#5555FF'>&amp;</font> addr,
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> timeout 
+        <font face='Lucida Console'>)</font> :
+            std::iostream<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>
+        <b>{</b> 
+            <font color='#BB00BB'>open</font><font face='Lucida Console'>(</font>addr, timeout<font face='Lucida Console'>)</font>; 
+        <b>}</b>
+
+        ~<b><a name='iosockstream'></a>iosockstream</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#BB00BB'>close</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='open'></a>open</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> network_address<font color='#5555FF'>&amp;</font> addr
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            auto_mutex <font color='#BB00BB'>lock</font><font face='Lucida Console'>(</font>class_mutex<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>close</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            con.<font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font><font color='#BB00BB'>connect</font><font face='Lucida Console'>(</font>addr<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            buf.<font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font><font color='#0000FF'>new</font> <font color='#BB00BB'>sockstreambuf</font><font face='Lucida Console'>(</font>con.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <font color='#009900'>// Note that we use the sockstreambuf's ability to autoflush instead of 
+</font>            <font color='#009900'>// telling the iostream::tie() function to tie the stream to itself even though
+</font>            <font color='#009900'>// that should work fine.  The reason we do it this way is because there is a
+</font>            <font color='#009900'>// bug in visual studio 2012 that causes a program to crash when a stream is
+</font>            <font color='#009900'>// tied to itself and then used.  See
+</font>            <font color='#009900'>// http://connect.microsoft.com/VisualStudio/feedback/details/772293/tying-a-c-iostream-object-to-itself-causes-a-stack-overflow-in-visual-studio-2012
+</font>            <font color='#009900'>// for further details.
+</font>            buf<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>flush_output_on_read</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>rdbuf</font><font face='Lucida Console'>(</font>buf.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='open'></a>open</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> network_address<font color='#5555FF'>&amp;</font> addr,
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> timeout
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            auto_mutex <font color='#BB00BB'>lock</font><font face='Lucida Console'>(</font>class_mutex<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>close</font><font face='Lucida Console'>(</font>timeout<font face='Lucida Console'>)</font>;
+            con.<font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font><font color='#BB00BB'>connect</font><font face='Lucida Console'>(</font>addr.host_address, addr.port, timeout<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            buf.<font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font><font color='#0000FF'>new</font> <font color='#BB00BB'>sockstreambuf</font><font face='Lucida Console'>(</font>con.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            buf<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>flush_output_on_read</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>rdbuf</font><font face='Lucida Console'>(</font>buf.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='close'></a>close</b><font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> timeout <font color='#5555FF'>=</font> <font color='#979000'>10000</font>
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            auto_mutex <font color='#BB00BB'>lock</font><font face='Lucida Console'>(</font>class_mutex<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>rdbuf</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>try</font>
+            <b>{</b>
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>buf<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    dlib::timeout <font color='#BB00BB'>t</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font>con,<font color='#5555FF'>&amp;</font>connection::shutdown,timeout<font face='Lucida Console'>)</font>;
+
+                    <font color='#009900'>// This will flush the sockstreambuf and also destroy it.
+</font>                    buf.<font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+                    <font color='#0000FF'>if</font><font face='Lucida Console'>(</font>con<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>shutdown_outgoing</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        <font color='#009900'>// there was an error so just close it now and return
+</font>                        con<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>shutdown</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                    <b>}</b>
+                    <font color='#0000FF'>else</font>
+                    <b>{</b>
+                        <font color='#0000FF'><u>char</u></font> junk[<font color='#979000'>100</font>];
+                        <font color='#009900'>// wait for the other end to close their side
+</font>                        <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>con<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>read</font><font face='Lucida Console'>(</font>junk,<font color='#0000FF'>sizeof</font><font face='Lucida Console'>(</font>junk<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+                    <b>}</b>
+                <b>}</b>
+            <b>}</b>
+            <font color='#0000FF'>catch</font> <font face='Lucida Console'>(</font>...<font face='Lucida Console'>)</font>
+            <b>{</b>
+                con.<font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>throw</font>;
+            <b>}</b>
+            con.<font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='terminate_connection_after_timeout'></a>terminate_connection_after_timeout</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> timeout
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            auto_mutex <font color='#BB00BB'>lock</font><font face='Lucida Console'>(</font>class_mutex<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>con<font face='Lucida Console'>)</font>
+            <b>{</b>
+                con_timeout.<font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font><font color='#0000FF'>new</font> dlib::<font color='#BB00BB'>timeout</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font>,<font color='#5555FF'>&amp;</font>iosockstream::terminate_connection,timeout,con<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+        <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='shutdown'></a>shutdown</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> 
+        <b>{</b>
+            auto_mutex <font color='#BB00BB'>lock</font><font face='Lucida Console'>(</font>class_mutex<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>con<font face='Lucida Console'>)</font>
+                con<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>shutdown</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+    <font color='#0000FF'>private</font>:
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='terminate_connection'></a>terminate_connection</b><font face='Lucida Console'>(</font>
+            shared_ptr_thread_safe<font color='#5555FF'>&lt;</font>connection<font color='#5555FF'>&gt;</font> thecon
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            thecon<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>shutdown</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        scoped_ptr<font color='#5555FF'>&lt;</font>timeout<font color='#5555FF'>&gt;</font> con_timeout;
+        rmutex class_mutex; 
+        shared_ptr_thread_safe<font color='#5555FF'>&lt;</font>connection<font color='#5555FF'>&gt;</font> con;
+        scoped_ptr<font color='#5555FF'>&lt;</font>sockstreambuf<font color='#5555FF'>&gt;</font> buf;
+
+    <b>}</b>;
+
+<font color='#009900'>// ---------------------------------------------------------------------------------------- 
+</font>
+<b>}</b>
+
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_IOSOCKSTrEAM_Hh_
+</font>
+
+
+</pre></body></html>

@@ -1,0 +1,43 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - cpp_tokenizer.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2005  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_CPP_TOKENIZEr_
+<font color='#0000FF'>#define</font> DLIB_CPP_TOKENIZEr_
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>string<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='cpp_tokenizer/cpp_tokenizer_kernel_1.h.html'>cpp_tokenizer/cpp_tokenizer_kernel_1.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='cpp_tokenizer/cpp_tokenizer_kernel_c.h.html'>cpp_tokenizer/cpp_tokenizer_kernel_c.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='tokenizer.h.html'>tokenizer.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='queue.h.html'>queue.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='set.h.html'>set.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+    <font color='#0000FF'>class</font> <b><a name='cpp_tokenizer'></a>cpp_tokenizer</b>
+    <b>{</b>
+        <b><a name='cpp_tokenizer'></a>cpp_tokenizer</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+
+
+        <font color='#0000FF'>typedef</font> set<font color='#5555FF'>&lt;</font>std::string<font color='#5555FF'>&gt;</font>::kernel_1a set;
+        <font color='#0000FF'>typedef</font> queue<font color='#5555FF'>&lt;</font>cpp_tok_kernel_1_helper::token_text_pair<font color='#5555FF'>&gt;</font>::kernel_2a queue;
+        <font color='#0000FF'>typedef</font> tokenizer::kernel_1a tok;
+
+    <font color='#0000FF'>public</font>:
+        
+        <font color='#009900'>//----------- kernels ---------------
+</font>
+        <font color='#009900'>// kernel_1a        
+</font>        <font color='#0000FF'>typedef</font>     cpp_tokenizer_kernel_1<font color='#5555FF'>&lt;</font>tok,queue,set<font color='#5555FF'>&gt;</font>
+                    kernel_1a;
+        <font color='#0000FF'>typedef</font>     cpp_tokenizer_kernel_c<font color='#5555FF'>&lt;</font>kernel_1a<font color='#5555FF'>&gt;</font>
+                    kernel_1a_c;
+          
+
+    <b>}</b>;
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_CPP_TOKENIZEr_
+</font>
+
+</pre></body></html>

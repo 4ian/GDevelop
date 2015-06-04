@@ -1,0 +1,239 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - lzp_buffer_kernel_1.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2005  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_LZP_BUFFER_KERNEl_1_
+<font color='#0000FF'>#define</font> DLIB_LZP_BUFFER_KERNEl_1_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../algs.h.html'>../algs.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='lzp_buffer_kernel_abstract.h.html'>lzp_buffer_kernel_abstract.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> sbuf
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>class</font> <b><a name='lzp_buffer_kernel_1'></a>lzp_buffer_kernel_1</b> 
+    <b>{</b>
+        <font color='#009900'>/*!
+            REQUIREMENTS ON sbuf
+                sbuf is an implementation of sliding_buffer/sliding_buffer_kernel_abstract.h
+                T == unsigned char
+
+            INITIAL VALUE
+                - buffer.size() == the size as defined by the constructor
+                - table_size == the number of elements in the table array
+                - for all i: buffer[i] == 0
+                - for all i: table[i] == buffer.size()                
+
+            CONVENTION
+                - table_size == the number of elements in the table array
+                - size() == buffer.size()
+                - operator[](i) == buffer[i]
+
+                - if (table[hash()] != buffer.size()) then
+                    - buffer.get_element_index(table[hash()]) == the index we will 
+                      predict for the current context
+                - else
+                    - there is no prediction for the current context
+
+                - last_element == buffer.size()-1
+
+                
+                This is LZP with just an order-3 model without context confirmation.
+        
+        !*/</font>
+
+    <font color='#0000FF'>public</font>:
+
+        <font color='#0000FF'>explicit</font> <b><a name='lzp_buffer_kernel_1'></a>lzp_buffer_kernel_1</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> buffer_size           
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>virtual</font> ~<b><a name='lzp_buffer_kernel_1'></a>lzp_buffer_kernel_1</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='clear'></a>clear</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='add'></a>add</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> symbol
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>inline</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='predict_match'></a>predict_match</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&amp;</font> index
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>inline</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='size'></a>size</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+        <font color='#0000FF'>inline</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> <b><a name='operator'></a>operator</b>[] <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> index
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+    <font color='#0000FF'>private</font>:
+
+        <font color='#0000FF'>inline</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='hash'></a>hash</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <font color='#009900'>/*!
+            ensures
+                - returns a hash computed from the current context.  This hash
+                  is always in the range for table.
+        !*/</font>
+        <b>{</b>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> temp <font color='#5555FF'>=</font> buffer[<font color='#979000'>0</font>];
+            temp <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#979000'>16</font>;
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> temp2 <font color='#5555FF'>=</font> buffer[<font color='#979000'>1</font>];
+            temp2 <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#979000'>8</font>;
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> temp3 <font color='#5555FF'>=</font> buffer[<font color='#979000'>2</font>];
+            temp <font color='#5555FF'>=</font> temp<font color='#5555FF'>|</font>temp2<font color='#5555FF'>|</font>temp3;
+
+            temp <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>temp<font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font><font color='#979000'>11</font><font face='Lucida Console'>)</font>^temp<font face='Lucida Console'>)</font><font color='#5555FF'>&amp;</font><font color='#979000'>0xFFFF</font>;
+           
+            <font color='#0000FF'>return</font> temp;
+        <b>}</b>
+
+        sbuf buffer;
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> table_size;
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>*</font> <font color='#0000FF'>const</font> table;
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> last_element;
+
+        <font color='#009900'>// restricted functions
+</font>        <b><a name='lzp_buffer_kernel_1'></a>lzp_buffer_kernel_1</b><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> lzp_buffer_kernel_1<font color='#5555FF'>&lt;</font>sbuf<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font>;        <font color='#009900'>// copy constructor
+</font>        lzp_buffer_kernel_1<font color='#5555FF'>&lt;</font>sbuf<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>=</font><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> lzp_buffer_kernel_1<font color='#5555FF'>&lt;</font>sbuf<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font>;    <font color='#009900'>// assignment operator
+</font>
+    <b>}</b>;      
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>    <font color='#009900'>// member function definitions
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> sbuf
+        <font color='#5555FF'>&gt;</font>
+    lzp_buffer_kernel_1<font color='#5555FF'>&lt;</font>sbuf<font color='#5555FF'>&gt;</font>::
+    <b><a name='lzp_buffer_kernel_1'></a>lzp_buffer_kernel_1</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> buffer_size           
+    <font face='Lucida Console'>)</font> :
+        table_size<font face='Lucida Console'>(</font><font color='#979000'>65536</font><font face='Lucida Console'>)</font>,
+        table<font face='Lucida Console'>(</font><font color='#0000FF'>new</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font>[table_size]<font face='Lucida Console'>)</font>
+    <b>{</b>
+        buffer.<font color='#BB00BB'>set_size</font><font face='Lucida Console'>(</font>buffer_size<font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> buffer.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            buffer[i] <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> table_size; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            table[i] <font color='#5555FF'>=</font> buffer.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+        last_element <font color='#5555FF'>=</font> buffer.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#979000'>1</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> sbuf
+        <font color='#5555FF'>&gt;</font>
+    lzp_buffer_kernel_1<font color='#5555FF'>&lt;</font>sbuf<font color='#5555FF'>&gt;</font>::
+    ~<b><a name='lzp_buffer_kernel_1'></a>lzp_buffer_kernel_1</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>delete</font> [] table;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> sbuf
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> lzp_buffer_kernel_1<font color='#5555FF'>&lt;</font>sbuf<font color='#5555FF'>&gt;</font>::
+    <b><a name='clear'></a>clear</b><font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> buffer.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            buffer[i] <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> table_size; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            table[i] <font color='#5555FF'>=</font> buffer.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> sbuf
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> lzp_buffer_kernel_1<font color='#5555FF'>&lt;</font>sbuf<font color='#5555FF'>&gt;</font>::
+    <b><a name='add'></a>add</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> symbol
+    <font face='Lucida Console'>)</font> 
+    <b>{</b> 
+        buffer.<font color='#BB00BB'>rotate_left</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>; 
+        buffer[<font color='#979000'>0</font>] <font color='#5555FF'>=</font> symbol; 
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> sbuf
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> lzp_buffer_kernel_1<font color='#5555FF'>&lt;</font>sbuf<font color='#5555FF'>&gt;</font>::
+    <b><a name='predict_match'></a>predict_match</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&amp;</font> index
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#BB00BB'>hash</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>table[i] <font color='#5555FF'>!</font><font color='#5555FF'>=</font> buffer.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            index <font color='#5555FF'>=</font> buffer.<font color='#BB00BB'>get_element_index</font><font face='Lucida Console'>(</font>table[i]<font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>index <font color='#5555FF'>&gt;</font> <font color='#979000'>20</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#009900'>// update the prediction for this context
+</font>                table[i] <font color='#5555FF'>=</font> buffer.<font color='#BB00BB'>get_element_id</font><font face='Lucida Console'>(</font>last_element<font face='Lucida Console'>)</font>;
+            <b>}</b>
+            <font color='#0000FF'>return</font> <font color='#979000'>3</font>;
+        <b>}</b>
+        <font color='#0000FF'>else</font>
+        <b>{</b>
+            <font color='#009900'>// update the prediction for this context
+</font>            table[i] <font color='#5555FF'>=</font> buffer.<font color='#BB00BB'>get_element_id</font><font face='Lucida Console'>(</font>last_element<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>return</font> <font color='#979000'>0</font>;
+        <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> sbuf
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> lzp_buffer_kernel_1<font color='#5555FF'>&lt;</font>sbuf<font color='#5555FF'>&gt;</font>::
+    <b><a name='size'></a>size</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> 
+    <b>{</b> 
+        <font color='#0000FF'>return</font> buffer.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; 
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> sbuf
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> lzp_buffer_kernel_1<font color='#5555FF'>&lt;</font>sbuf<font color='#5555FF'>&gt;</font>::
+    <b><a name='operator'></a>operator</b>[] <font face='Lucida Console'>(</font>
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> index
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> 
+    <b>{</b> 
+        <font color='#0000FF'>return</font> buffer[index]; 
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_LZP_BUFFER_KERNEl_1_
+</font>
+
+</pre></body></html>

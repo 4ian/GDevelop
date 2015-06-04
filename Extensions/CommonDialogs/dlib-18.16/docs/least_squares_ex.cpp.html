@@ -1,0 +1,231 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - least_squares_ex.cpp</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// The contents of this file are in the public domain. See LICENSE_FOR_EXAMPLE_PROGRAMS.txt
+</font><font color='#009900'>/*
+
+    This is an example illustrating the use the general purpose non-linear 
+    least squares optimization routines from the dlib C++ Library.
+
+    This example program will demonstrate how these routines can be used for data fitting.
+    In particular, we will generate a set of data and then use the least squares  
+    routines to infer the parameters of the model which generated the data.
+*/</font>
+
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>optimization.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>iostream<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>vector<font color='#5555FF'>&gt;</font>
+
+
+<font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> std;
+<font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> dlib;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<font color='#0000FF'>typedef</font> matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>2</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> input_vector;
+<font color='#0000FF'>typedef</font> matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>3</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> parameter_vector;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<font color='#009900'>// We will use this function to generate data.  It represents a function of 2 variables
+</font><font color='#009900'>// and 3 parameters.   The least squares procedure will be used to infer the values of 
+</font><font color='#009900'>// the 3 parameters based on a set of input/output pairs.
+</font><font color='#0000FF'><u>double</u></font> <b><a name='model'></a>model</b> <font face='Lucida Console'>(</font>
+    <font color='#0000FF'>const</font> input_vector<font color='#5555FF'>&amp;</font> input,
+    <font color='#0000FF'>const</font> parameter_vector<font color='#5555FF'>&amp;</font> params
+<font face='Lucida Console'>)</font>
+<b>{</b>
+    <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> p0 <font color='#5555FF'>=</font> <font color='#BB00BB'>params</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+    <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> p1 <font color='#5555FF'>=</font> <font color='#BB00BB'>params</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+    <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> p2 <font color='#5555FF'>=</font> <font color='#BB00BB'>params</font><font face='Lucida Console'>(</font><font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+
+    <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> i0 <font color='#5555FF'>=</font> <font color='#BB00BB'>input</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+    <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> i1 <font color='#5555FF'>=</font> <font color='#BB00BB'>input</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+
+    <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> temp <font color='#5555FF'>=</font> p0<font color='#5555FF'>*</font>i0 <font color='#5555FF'>+</font> p1<font color='#5555FF'>*</font>i1 <font color='#5555FF'>+</font> p2;
+
+    <font color='#0000FF'>return</font> temp<font color='#5555FF'>*</font>temp;
+<b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<font color='#009900'>// This function is the "residual" for a least squares problem.   It takes an input/output
+</font><font color='#009900'>// pair and compares it to the output of our model and returns the amount of error.  The idea
+</font><font color='#009900'>// is to find the set of parameters which makes the residual small on all the data pairs.
+</font><font color='#0000FF'><u>double</u></font> <b><a name='residual'></a>residual</b> <font face='Lucida Console'>(</font>
+    <font color='#0000FF'>const</font> std::pair<font color='#5555FF'>&lt;</font>input_vector, <font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> data,
+    <font color='#0000FF'>const</font> parameter_vector<font color='#5555FF'>&amp;</font> params
+<font face='Lucida Console'>)</font>
+<b>{</b>
+    <font color='#0000FF'>return</font> <font color='#BB00BB'>model</font><font face='Lucida Console'>(</font>data.first, params<font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> data.second;
+<b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<font color='#009900'>// This function is the derivative of the residual() function with respect to the parameters.
+</font>parameter_vector <b><a name='residual_derivative'></a>residual_derivative</b> <font face='Lucida Console'>(</font>
+    <font color='#0000FF'>const</font> std::pair<font color='#5555FF'>&lt;</font>input_vector, <font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> data,
+    <font color='#0000FF'>const</font> parameter_vector<font color='#5555FF'>&amp;</font> params
+<font face='Lucida Console'>)</font>
+<b>{</b>
+    parameter_vector der;
+
+    <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> p0 <font color='#5555FF'>=</font> <font color='#BB00BB'>params</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+    <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> p1 <font color='#5555FF'>=</font> <font color='#BB00BB'>params</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+    <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> p2 <font color='#5555FF'>=</font> <font color='#BB00BB'>params</font><font face='Lucida Console'>(</font><font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+
+    <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> i0 <font color='#5555FF'>=</font> data.<font color='#BB00BB'>first</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+    <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> i1 <font color='#5555FF'>=</font> data.<font color='#BB00BB'>first</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+
+    <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> temp <font color='#5555FF'>=</font> p0<font color='#5555FF'>*</font>i0 <font color='#5555FF'>+</font> p1<font color='#5555FF'>*</font>i1 <font color='#5555FF'>+</font> p2;
+
+    <font color='#BB00BB'>der</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> i0<font color='#5555FF'>*</font><font color='#979000'>2</font><font color='#5555FF'>*</font>temp;
+    <font color='#BB00BB'>der</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> i1<font color='#5555FF'>*</font><font color='#979000'>2</font><font color='#5555FF'>*</font>temp;
+    <font color='#BB00BB'>der</font><font face='Lucida Console'>(</font><font color='#979000'>2</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>2</font><font color='#5555FF'>*</font>temp;
+
+    <font color='#0000FF'>return</font> der;
+<b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<font color='#0000FF'><u>int</u></font> <b><a name='main'></a>main</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+<b>{</b>
+    <font color='#0000FF'>try</font>
+    <b>{</b>
+        <font color='#009900'>// randomly pick a set of parameters to use in this example
+</font>        <font color='#0000FF'>const</font> parameter_vector params <font color='#5555FF'>=</font> <font color='#979000'>10</font><font color='#5555FF'>*</font><font color='#BB00BB'>randm</font><font face='Lucida Console'>(</font><font color='#979000'>3</font>,<font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+        cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>params: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>trans</font><font face='Lucida Console'>(</font>params<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+
+
+        <font color='#009900'>// Now let's generate a bunch of input/output pairs according to our model.
+</font>        std::vector<font color='#5555FF'>&lt;</font>std::pair<font color='#5555FF'>&lt;</font>input_vector, <font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> data_samples;
+        input_vector input;
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> <font color='#979000'>1000</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+        <b>{</b>
+            input <font color='#5555FF'>=</font> <font color='#979000'>10</font><font color='#5555FF'>*</font><font color='#BB00BB'>randm</font><font face='Lucida Console'>(</font><font color='#979000'>2</font>,<font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> output <font color='#5555FF'>=</font> <font color='#BB00BB'>model</font><font face='Lucida Console'>(</font>input, params<font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// save the pair
+</font>            data_samples.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font><font color='#BB00BB'>make_pair</font><font face='Lucida Console'>(</font>input, output<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#009900'>// Before we do anything, let's make sure that our derivative function defined above matches
+</font>        <font color='#009900'>// the approximate derivative computed using central differences (via derivative()).  
+</font>        <font color='#009900'>// If this value is big then it means we probably typed the derivative function incorrectly.
+</font>        cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>derivative error: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>length</font><font face='Lucida Console'>(</font><font color='#BB00BB'>residual_derivative</font><font face='Lucida Console'>(</font>data_samples[<font color='#979000'>0</font>], params<font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> 
+                                               <font color='#BB00BB'>derivative</font><font face='Lucida Console'>(</font>residual<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>data_samples[<font color='#979000'>0</font>], params<font face='Lucida Console'>)</font> <font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+
+
+
+
+
+        <font color='#009900'>// Now let's use the solve_least_squares_lm() routine to figure out what the
+</font>        <font color='#009900'>// parameters are based on just the data_samples.
+</font>        parameter_vector x;
+        x <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+
+        cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>Use Levenberg-Marquardt</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+        <font color='#009900'>// Use the Levenberg-Marquardt method to determine the parameters which
+</font>        <font color='#009900'>// minimize the sum of all squared residuals.
+</font>        <font color='#BB00BB'>solve_least_squares_lm</font><font face='Lucida Console'>(</font><font color='#BB00BB'>objective_delta_stop_strategy</font><font face='Lucida Console'>(</font><font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>7</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>be_verbose</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, 
+                               residual,
+                               residual_derivative,
+                               data_samples,
+                               x<font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// Now x contains the solution.  If everything worked it will be equal to params.
+</font>        cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>inferred parameters: </font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>trans</font><font face='Lucida Console'>(</font>x<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+        cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>solution error:      </font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>length</font><font face='Lucida Console'>(</font>x <font color='#5555FF'>-</font> params<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+        cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+
+
+
+
+        x <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+        cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>Use Levenberg-Marquardt, approximate derivatives</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+        <font color='#009900'>// If we didn't create the residual_derivative function then we could
+</font>        <font color='#009900'>// have used this method which numerically approximates the derivatives for you.
+</font>        <font color='#BB00BB'>solve_least_squares_lm</font><font face='Lucida Console'>(</font><font color='#BB00BB'>objective_delta_stop_strategy</font><font face='Lucida Console'>(</font><font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>7</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>be_verbose</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, 
+                               residual,
+                               <font color='#BB00BB'>derivative</font><font face='Lucida Console'>(</font>residual<font face='Lucida Console'>)</font>,
+                               data_samples,
+                               x<font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// Now x contains the solution.  If everything worked it will be equal to params.
+</font>        cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>inferred parameters: </font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>trans</font><font face='Lucida Console'>(</font>x<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+        cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>solution error:      </font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>length</font><font face='Lucida Console'>(</font>x <font color='#5555FF'>-</font> params<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+        cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+
+
+
+
+        x <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+        cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>Use Levenberg-Marquardt/quasi-newton hybrid</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+        <font color='#009900'>// This version of the solver uses a method which is appropriate for problems
+</font>        <font color='#009900'>// where the residuals don't go to zero at the solution.  So in these cases
+</font>        <font color='#009900'>// it may provide a better answer.
+</font>        <font color='#BB00BB'>solve_least_squares</font><font face='Lucida Console'>(</font><font color='#BB00BB'>objective_delta_stop_strategy</font><font face='Lucida Console'>(</font><font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>7</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>be_verbose</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, 
+                            residual,
+                            residual_derivative,
+                            data_samples,
+                            x<font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// Now x contains the solution.  If everything worked it will be equal to params.
+</font>        cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>inferred parameters: </font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>trans</font><font face='Lucida Console'>(</font>x<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+        cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>solution error:      </font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>length</font><font face='Lucida Console'>(</font>x <font color='#5555FF'>-</font> params<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+
+    <b>}</b>
+    <font color='#0000FF'>catch</font> <font face='Lucida Console'>(</font>std::exception<font color='#5555FF'>&amp;</font> e<font face='Lucida Console'>)</font>
+    <b>{</b>
+        cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> e.<font color='#BB00BB'>what</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+    <b>}</b>
+<b>}</b>
+
+<font color='#009900'>// Example output:
+</font><font color='#009900'>/*
+params: 8.40188 3.94383 7.83099 
+
+derivative error: 9.78267e-06
+Use Levenberg-Marquardt
+iteration: 0   objective: 2.14455e+10
+iteration: 1   objective: 1.96248e+10
+iteration: 2   objective: 1.39172e+10
+iteration: 3   objective: 1.57036e+09
+iteration: 4   objective: 2.66917e+07
+iteration: 5   objective: 4741.9
+iteration: 6   objective: 0.000238674
+iteration: 7   objective: 7.8815e-19
+iteration: 8   objective: 0
+inferred parameters: 8.40188 3.94383 7.83099 
+
+solution error:      0
+
+Use Levenberg-Marquardt, approximate derivatives
+iteration: 0   objective: 2.14455e+10
+iteration: 1   objective: 1.96248e+10
+iteration: 2   objective: 1.39172e+10
+iteration: 3   objective: 1.57036e+09
+iteration: 4   objective: 2.66917e+07
+iteration: 5   objective: 4741.87
+iteration: 6   objective: 0.000238701
+iteration: 7   objective: 1.0571e-18
+iteration: 8   objective: 4.12469e-22
+inferred parameters: 8.40188 3.94383 7.83099 
+
+solution error:      5.34754e-15
+
+Use Levenberg-Marquardt/quasi-newton hybrid
+iteration: 0   objective: 2.14455e+10
+iteration: 1   objective: 1.96248e+10
+iteration: 2   objective: 1.3917e+10
+iteration: 3   objective: 1.5572e+09
+iteration: 4   objective: 2.74139e+07
+iteration: 5   objective: 5135.98
+iteration: 6   objective: 0.000285539
+iteration: 7   objective: 1.15441e-18
+iteration: 8   objective: 3.38834e-23
+inferred parameters: 8.40188 3.94383 7.83099 
+
+solution error:      1.77636e-15
+*/</font>
+
+</pre></body></html>

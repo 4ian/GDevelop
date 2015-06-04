@@ -1,0 +1,151 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - colormaps_abstract.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2011  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#undef</font> DLIB_RANDOMLY_COlOR_IMAGE_ABSTRACT_Hh_
+<font color='#0000FF'>#ifdef</font> DLIB_RANDOMLY_COlOR_IMAGE_ABSTRACT_Hh_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../hash.h.html'>../hash.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../pixel.h.html'>../pixel.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../matrix.h.html'>../matrix.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../image_processing/generic_image.h.html'>../image_processing/generic_image.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> image_type
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>const</font> matrix_exp <b><a name='randomly_color_image'></a>randomly_color_image</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> image_type<font color='#5555FF'>&amp;</font> img
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - image_type == an image object that implements the interface defined in
+              dlib/image_processing/generic_image.h, or something convertible to a matrix
+              via mat().
+        ensures
+            - randomly generates a mapping from gray level pixel values
+              to the RGB pixel space and then uses this mapping to create
+              a colored version of img.  Returns a matrix which represents
+              this colored version of img.
+            - black pixels in img will remain black in the output image.  
+            - The returned matrix will have the same dimensions as img.
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    rgb_pixel <b><a name='colormap_heat'></a>colormap_heat</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'><u>double</u></font> value,
+        <font color='#0000FF'><u>double</u></font> min_val,
+        <font color='#0000FF'><u>double</u></font> max_val
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        ensures
+            - Maps value to a color.  In particular, we use a heatmap color scheme where
+              values &lt;= min_val are black and larger values become more red, then yellow,
+              and then white as they approach max_val.
+    !*/</font>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> image_type
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>const</font> matrix_exp <b><a name='heatmap'></a>heatmap</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> image_type<font color='#5555FF'>&amp;</font> img,
+        <font color='#0000FF'><u>double</u></font> max_val,
+        <font color='#0000FF'><u>double</u></font> min_val <font color='#5555FF'>=</font> <font color='#979000'>0</font>
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - image_type == an image object that implements the interface defined in
+              dlib/image_processing/generic_image.h, or something convertible to a matrix
+              via mat().
+        ensures
+            - Interprets img as a grayscale image and returns a new matrix which represents
+              a colored version of img.  In particular, the colormap is defined by
+              colormap_heat().
+            - The returned matrix will have the same dimensions as img.
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> image_type
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>const</font> matrix_exp <b><a name='heatmap'></a>heatmap</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> image_type<font color='#5555FF'>&amp;</font> img
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - image_type == an image object that implements the interface defined in
+              dlib/image_processing/generic_image.h, or something convertible to a matrix
+              via mat().
+        ensures
+            - returns heatmap(img, max(mat(img)), min(mat(img)))
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    rgb_pixel <b><a name='colormap_jet'></a>colormap_jet</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'><u>double</u></font> value,
+        <font color='#0000FF'><u>double</u></font> min_val,
+        <font color='#0000FF'><u>double</u></font> max_val
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        ensures
+            - Maps value to a color.  In particular, we use a jet color scheme where 
+              values &lt;= min_val are dark blue and larger values become light blue, then
+              yellow, and then finally red as they approach max_val.
+    !*/</font>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> image_type
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>const</font> matrix_exp <b><a name='jet'></a>jet</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> image_type<font color='#5555FF'>&amp;</font> img,
+        <font color='#0000FF'><u>double</u></font> max_val,
+        <font color='#0000FF'><u>double</u></font> min_val <font color='#5555FF'>=</font> <font color='#979000'>0</font>
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - image_type == an image object that implements the interface defined in
+              dlib/image_processing/generic_image.h, or something convertible to a matrix
+              via mat().
+        ensures
+            - Interprets img as a grayscale image and returns a new matrix which represents
+              a colored version of img.  In particular, the colormap is defined by
+              colormap_jet().
+            - The returned matrix will have the same dimensions as img.
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> image_type
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>const</font> matrix_exp <b><a name='jet'></a>jet</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> image_type<font color='#5555FF'>&amp;</font> img
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - image_type == an image object that implements the interface defined in
+              dlib/image_processing/generic_image.h, or something convertible to a matrix
+              via mat().
+        ensures
+            - returns jet(img, max(mat(img)), min(mat(img)))
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_RANDOMLY_COlOR_IMAGE_ABSTRACT_Hh_
+</font>
+
+
+</pre></body></html>

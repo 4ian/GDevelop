@@ -1,0 +1,1045 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - bayes_utils_abstract.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2007  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#undef</font> DLIB_BAYES_UTILs_ABSTRACT_
+<font color='#0000FF'>#ifdef</font> DLIB_BAYES_UTILs_ABSTRACT_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../algs.h.html'>../algs.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../noncopyable.h.html'>../noncopyable.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../interfaces/enumerable.h.html'>../interfaces/enumerable.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../interfaces/map_pair.h.html'>../interfaces/map_pair.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../serialize.h.html'>../serialize.h</a>"
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>iostream<font color='#5555FF'>&gt;</font>
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>class</font> <b><a name='assignment'></a>assignment</b> : <font color='#0000FF'>public</font> enumerable<font color='#5555FF'>&lt;</font>map_pair<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font>, <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font>
+    <b>{</b>
+        <font color='#009900'>/*!
+            INITIAL VALUE
+                - size() == 0
+
+            ENUMERATION ORDER
+                The enumerator will iterate over the entries in the assignment in 
+                ascending order according to index values.  (i.e. the elements are 
+                enumerated in sorted order according to the value of their keys)
+
+            WHAT THIS OBJECT REPRESENTS
+                This object models an assignment of random variables to particular values.
+                It is used with the joint_probability_table and conditional_probability_table
+                objects to represent assignments of various random variables to actual values.
+
+                So for example, if you had a joint_probability_table that represented the
+                following table:
+                    P(A = 0, B = 0) = 0.2
+                    P(A = 0, B = 1) = 0.3
+                    P(A = 1, B = 0) = 0.1
+                    P(A = 1, B = 1) = 0.4
+
+                    Also lets define an enum so we have concrete index numbers for A and B
+                    enum { A = 0, B = 1};
+
+                Then you could query the value of P(A=1, B=0) as follows:
+                    assignment a;
+                    a.set(A, 1);
+                    a.set(B, 0);
+                    // and now it is the case that:
+                    table.probability(a) == 0.1 
+                    a[A] == 1
+                    a[B] == 0
+
+
+                Also note that when enumerating the elements of an assignment object
+                the key() refers to the index and the value() refers to the value at that
+                index. For example: 
+
+                // assume a is an assignment object
+                a.reset();
+                while (a.move_next())
+                {
+                    // in this loop it is always the case that:
+                    // a[a.element().key()] == a.element().value()
+                }
+        !*/</font>
+
+    <font color='#0000FF'>public</font>:
+
+        <b><a name='assignment'></a>assignment</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - this object is properly initialized
+        !*/</font>
+
+        <b><a name='assignment'></a>assignment</b><font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> assignment<font color='#5555FF'>&amp;</font> a
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #*this is a copy of a
+        !*/</font>
+
+        assignment<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b> <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> assignment<font color='#5555FF'>&amp;</font> rhs
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #*this is a copy of rhs
+                - returns *this
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='clear'></a>clear</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - this object has been returned to its initial value
+        !*/</font>
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='operator'></a>operator</b> <font color='#5555FF'>&lt;</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> assignment<font color='#5555FF'>&amp;</font> item
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - The exact functioning of this operator is undefined.  The only guarantee
+                  is that it establishes a total ordering on all possible assignment objects.
+                  In other words, this operator makes it so that you can use assignment
+                  objects in the associative containers but otherwise isn't of any 
+                  particular use.
+        !*/</font>
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='has_index'></a>has_index</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> idx
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - if (this assignment object has an entry for index idx) then
+                    - returns true
+                - else
+                    - returns false
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='add'></a>add</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> idx,
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> value <font color='#5555FF'>=</font> <font color='#979000'>0</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - has_index(idx) == false
+            ensures
+                - #has_index(idx) == true 
+                - #(*this)[idx] == value 
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='remove'></a>remove</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> idx
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - has_index(idx) == true 
+            ensures
+                - #has_index(idx) == false 
+        !*/</font>
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b>[] <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> idx
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - has_index(idx) == true
+            ensures
+                - returns a reference to the value associated with index idx
+        !*/</font>
+
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b>[] <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> idx
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - has_index(idx) == true
+            ensures
+                - returns a const reference to the value associated with index idx
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='swap'></a>swap</b> <font face='Lucida Console'>(</font>
+            assignment<font color='#5555FF'>&amp;</font> item
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - swaps *this and item
+        !*/</font>
+
+    <b>}</b>;
+
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='swap'></a>swap</b> <font face='Lucida Console'>(</font>
+        assignment<font color='#5555FF'>&amp;</font> a,
+        assignment<font color='#5555FF'>&amp;</font> b
+    <font face='Lucida Console'>)</font> <b>{</b> a.<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>b<font face='Lucida Console'>)</font>; <b>}</b>
+    <font color='#009900'>/*!
+        provides a global swap
+    !*/</font>
+
+    std::ostream<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font face='Lucida Console'>(</font>
+        std::ostream<font color='#5555FF'>&amp;</font> out,
+        <font color='#0000FF'>const</font> assignment<font color='#5555FF'>&amp;</font> a
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        ensures
+            - writes a to the given output stream in the following format:
+              (index1:value1, index2:value2, ..., indexN:valueN)
+    !*/</font>
+
+    <font color='#0000FF'><u>void</u></font> <b><a name='serialize'></a>serialize</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> assignment<font color='#5555FF'>&amp;</font> item,
+        std::ostream<font color='#5555FF'>&amp;</font> out 
+    <font face='Lucida Console'>)</font>;   
+    <font color='#009900'>/*!
+        provides serialization support 
+    !*/</font>
+
+    <font color='#0000FF'><u>void</u></font> <b><a name='deserialize'></a>deserialize</b> <font face='Lucida Console'>(</font>
+        assignment<font color='#5555FF'>&amp;</font> item,
+        std::istream<font color='#5555FF'>&amp;</font> in
+    <font face='Lucida Console'>)</font>;   
+    <font color='#009900'>/*!
+        provides deserialization support 
+    !*/</font>
+
+<font color='#009900'>// ------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>class</font> <b><a name='joint_probability_table'></a>joint_probability_table</b> : <font color='#0000FF'>public</font> enumerable<font color='#5555FF'>&lt;</font>map_pair<font color='#5555FF'>&lt;</font>assignment, <font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font>
+    <b>{</b>
+        <font color='#009900'>/*!
+            INITIAL VALUE
+                - size() == 0
+
+            ENUMERATION ORDER
+                The enumerator will iterate over the entries in the probability table 
+                in no particular order but they will all be visited.
+
+            WHAT THIS OBJECT REPRESENTS
+                This object models a joint probability table.  That is, it models
+                the function p(X).  So this object models the probability of a particular
+                set of variables (referred to as X).
+        !*/</font>
+
+    <font color='#0000FF'>public</font>:
+
+        <b><a name='joint_probability_table'></a>joint_probability_table</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - this object is properly initialized
+        !*/</font>
+
+        <b><a name='joint_probability_table'></a>joint_probability_table</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> joint_probability_table<font color='#5555FF'>&amp;</font> t
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - this object is a copy of t
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='clear'></a>clear</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - this object has its initial value
+        !*/</font>
+
+        joint_probability_table<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> joint_probability_table<font color='#5555FF'>&amp;</font> rhs
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - this object is a copy of rhs
+                - returns a reference to *this
+        !*/</font>
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='has_entry_for'></a>has_entry_for</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> assignment<font color='#5555FF'>&amp;</font> a
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - if (this joint_probability_table has an entry for p(X = a)) then
+                    - returns true
+                - else
+                    - returns false
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_probability'></a>set_probability</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> assignment<font color='#5555FF'>&amp;</font> a,
+            <font color='#0000FF'><u>double</u></font> p
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - 0 &lt;= p &lt;= 1
+            ensures
+                - if (has_entry_for(a) == false) then
+                    - #size() == size() + 1
+                - #probability(a) == p
+                - #has_entry_for(a) == true
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='add_probability'></a>add_probability</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> assignment<font color='#5555FF'>&amp;</font> a,
+            <font color='#0000FF'><u>double</u></font> p
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - 0 &lt;= p &lt;= 1
+            ensures
+                - if (has_entry_for(a) == false) then
+                    - #size() == size() + 1
+                    - #probability(a) == p
+                - else
+                    - #probability(a) == min(probability(a) + p, 1.0)
+                      (i.e. does a saturating add)
+                - #has_entry_for(a) == true
+        !*/</font>
+
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> <b><a name='probability'></a>probability</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> assignment<font color='#5555FF'>&amp;</font> a
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the probability p(X == a)
+        !*/</font>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'>typename</font> T
+            <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='marginalize'></a>marginalize</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> vars,
+            joint_probability_table<font color='#5555FF'>&amp;</font> output_table
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - T is an implementation of set/set_kernel_abstract.h
+            ensures
+                - marginalizes *this by summing over all variables not in vars.  The
+                  result is stored in output_table.  
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='marginalize'></a>marginalize</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> var,
+            joint_probability_table<font color='#5555FF'>&amp;</font> output_table
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - is identical to calling the above marginalize() function with a set
+                  that contains only var.  Or in other words, performs a marginalization
+                  with just one variable var.  So that output_table will contain a table giving
+                  the marginal probability of var all by itself.
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='normalize'></a>normalize</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - let sum == the sum of all the probabilities in this table
+                - after normalize() has finished it will be the case that the sum of all
+                  the entries in this table is 1.0.  This is accomplished by dividing all
+                  the entries by the sum described above.
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='swap'></a>swap</b> <font face='Lucida Console'>(</font>
+            joint_probability_table<font color='#5555FF'>&amp;</font> item
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - swaps *this and item
+        !*/</font>
+
+    <b>}</b>;
+
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='swap'></a>swap</b> <font face='Lucida Console'>(</font>
+        joint_probability_table<font color='#5555FF'>&amp;</font> a,
+        joint_probability_table<font color='#5555FF'>&amp;</font> b
+    <font face='Lucida Console'>)</font> <b>{</b> a.<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>b<font face='Lucida Console'>)</font>; <b>}</b>
+    <font color='#009900'>/*!
+        provides a global swap
+    !*/</font>
+
+    <font color='#0000FF'><u>void</u></font> <b><a name='serialize'></a>serialize</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> joint_probability_table<font color='#5555FF'>&amp;</font> item,
+        std::ostream<font color='#5555FF'>&amp;</font> out 
+    <font face='Lucida Console'>)</font>;   
+    <font color='#009900'>/*!
+        provides deserialization support 
+    !*/</font>
+
+    <font color='#0000FF'><u>void</u></font> <b><a name='deserialize'></a>deserialize</b> <font face='Lucida Console'>(</font>
+        joint_probability_table<font color='#5555FF'>&amp;</font> item,
+        std::istream<font color='#5555FF'>&amp;</font> in
+    <font face='Lucida Console'>)</font>;   
+    <font color='#009900'>/*!
+        provides deserialization support 
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>class</font> <b><a name='conditional_probability_table'></a>conditional_probability_table</b> : noncopyable
+    <b>{</b>
+        <font color='#009900'>/*!
+            INITIAL VALUE
+                - num_values() == 0
+                - has_value_for(x, y) == false for all values of x and y
+
+            WHAT THIS OBJECT REPRESENTS
+                This object models a conditional probability table.  That is, it models
+                the function p( X | parents).  So this object models the conditional 
+                probability of a particular variable (referred to as X) given another set 
+                of variables (referred to as parents).  
+        !*/</font>
+
+    <font color='#0000FF'>public</font>:
+
+        <b><a name='conditional_probability_table'></a>conditional_probability_table</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - this object is properly initialized
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='clear'></a>clear</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - this object has its initial value
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='empty_table'></a>empty_table</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - for all possible v and p:
+                    - #has_entry_for(v,p) == false
+                  (i.e. this function clears out the table when you call it but doesn't 
+                  change the value of num_values())
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_num_values'></a>set_num_values</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> num
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #num_values() == num
+                - for all possible v and p:
+                    - #has_entry_for(v,p) == false
+                  (i.e. this function clears out the table when you call it)
+        !*/</font>
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='num_values'></a>num_values</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>; 
+        <font color='#009900'>/*!
+            ensures
+                - This object models the probability table p(X | parents).  This
+                  function returns the number of values X can take on.
+        !*/</font>
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='has_entry_for'></a>has_entry_for</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> value,
+            <font color='#0000FF'>const</font> assignment<font color='#5555FF'>&amp;</font> ps
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - if (this conditional_probability_table has an entry for p(X = value, parents = ps)) then
+                    - returns true
+                - else
+                    - returns false
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_probability'></a>set_probability</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> value,
+            <font color='#0000FF'>const</font> assignment<font color='#5555FF'>&amp;</font> ps,
+            <font color='#0000FF'><u>double</u></font> p
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - value &lt; num_values()
+                - 0 &lt;= p &lt;= 1
+            ensures
+                - #probability(ps, value) == p
+                - #has_entry_for(value, ps) == true
+        !*/</font>
+
+        <font color='#0000FF'><u>double</u></font> <b><a name='probability'></a>probability</b><font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> value,
+            <font color='#0000FF'>const</font> assignment<font color='#5555FF'>&amp;</font> ps
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - value &lt; num_values()
+                - has_entry_for(value, ps) == true
+            ensures
+                - returns the probability p( X = value | parents = ps). 
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='swap'></a>swap</b> <font face='Lucida Console'>(</font>
+            conditional_probability_table<font color='#5555FF'>&amp;</font> item
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - swaps *this and item
+        !*/</font>
+    <b>}</b>;
+
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='swap'></a>swap</b> <font face='Lucida Console'>(</font>
+        conditional_probability_table<font color='#5555FF'>&amp;</font> a,
+        conditional_probability_table<font color='#5555FF'>&amp;</font> b
+    <font face='Lucida Console'>)</font> <b>{</b> a.<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>b<font face='Lucida Console'>)</font>; <b>}</b>
+    <font color='#009900'>/*!
+        provides a global swap
+    !*/</font>
+
+    <font color='#0000FF'><u>void</u></font> <b><a name='serialize'></a>serialize</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> conditional_probability_table<font color='#5555FF'>&amp;</font> item,
+        std::ostream<font color='#5555FF'>&amp;</font> out 
+    <font face='Lucida Console'>)</font>;   
+    <font color='#009900'>/*!
+        provides deserialization support 
+    !*/</font>
+
+    <font color='#0000FF'><u>void</u></font> <b><a name='deserialize'></a>deserialize</b> <font face='Lucida Console'>(</font>
+        conditional_probability_table<font color='#5555FF'>&amp;</font> item,
+        std::istream<font color='#5555FF'>&amp;</font> in
+    <font face='Lucida Console'>)</font>;   
+    <font color='#009900'>/*!
+        provides deserialization support 
+    !*/</font>
+
+<font color='#009900'>// ------------------------------------------------------------------------
+</font><font color='#009900'>// ------------------------------------------------------------------------
+</font><font color='#009900'>// ------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>class</font> <b><a name='bayes_node'></a>bayes_node</b> : noncopyable
+    <b>{</b>
+        <font color='#009900'>/*!
+            INITIAL VALUE
+                - is_evidence() == false
+                - value() == 0
+                - table().num_values() == 0
+
+            WHAT THIS OBJECT REPRESENTS
+                This object represents a node in a bayesian network.  It is
+                intended to be used inside the dlib::directed_graph object to
+                represent bayesian networks.
+        !*/</font>
+
+    <font color='#0000FF'>public</font>:
+        <b><a name='bayes_node'></a>bayes_node</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - this object is properly initialized
+        !*/</font>
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='value'></a>value</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the current value of this node
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_value'></a>set_value</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> new_value
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - new_value &lt; table().num_values()
+            ensures
+                - #value() == new_value
+        !*/</font>
+
+        conditional_probability_table<font color='#5555FF'>&amp;</font> <b><a name='table'></a>table</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns a reference to the conditional_probability_table associated with this node
+        !*/</font>
+
+        <font color='#0000FF'>const</font> conditional_probability_table<font color='#5555FF'>&amp;</font> <b><a name='table'></a>table</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns a const reference to the conditional_probability_table associated with this 
+                  node.
+        !*/</font>
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='is_evidence'></a>is_evidence</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - if (this is an evidence node) then
+                    - returns true
+                - else
+                    - returns false
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_as_nonevidence'></a>set_as_nonevidence</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #is_evidence() == false
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_as_evidence'></a>set_as_evidence</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #is_evidence() == true 
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='swap'></a>swap</b> <font face='Lucida Console'>(</font>
+            bayes_node<font color='#5555FF'>&amp;</font> item
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - swaps *this and item
+        !*/</font>
+
+    <b>}</b>;
+
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='swap'></a>swap</b> <font face='Lucida Console'>(</font>
+        bayes_node<font color='#5555FF'>&amp;</font> a,
+        bayes_node<font color='#5555FF'>&amp;</font> b
+    <font face='Lucida Console'>)</font> <b>{</b> a.<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>b<font face='Lucida Console'>)</font>; <b>}</b>
+    <font color='#009900'>/*!
+        provides a global swap
+    !*/</font>
+
+    <font color='#0000FF'><u>void</u></font> <b><a name='serialize'></a>serialize</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> bayes_node<font color='#5555FF'>&amp;</font> item,
+        std::ostream<font color='#5555FF'>&amp;</font> out 
+    <font face='Lucida Console'>)</font>;   
+    <font color='#009900'>/*!
+        provides deserialization support 
+    !*/</font>
+
+    <font color='#0000FF'><u>void</u></font> <b><a name='deserialize'></a>deserialize</b> <font face='Lucida Console'>(</font>
+        bayes_node<font color='#5555FF'>&amp;</font> item,
+        std::istream<font color='#5555FF'>&amp;</font> in
+    <font face='Lucida Console'>)</font>;   
+    <font color='#009900'>/*!
+        provides deserialization support 
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#009900'>/*
+        The following group of functions are convenience functions for manipulating 
+        bayes_node objects while they are inside a directed_graph.   These functions
+        also have additional requires clauses that, in debug mode, will protect you
+        from attempts to manipulate a bayesian network in an inappropriate way.
+    */</font>
+
+    <font color='#0000FF'>namespace</font> bayes_node_utils
+    <b>{</b>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'>typename</font> T
+            <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_node_value'></a>set_node_value</b> <font face='Lucida Console'>(</font>
+            T<font color='#5555FF'>&amp;</font> bn,
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> n,
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> val
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - T is an implementation of directed_graph/directed_graph_kernel_abstract.h
+                - T::type == bayes_node
+                - n &lt; bn.number_of_nodes()
+                - val &lt; node_num_values(bn, n)
+            ensures
+                - #bn.node(n).data.value() = val
+        !*/</font>
+
+    <font color='#009900'>// ------------------------------------------------------------------------------------
+</font>
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'>typename</font> T
+            <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='node_value'></a>node_value</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> bn,
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> n
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - T is an implementation of directed_graph/directed_graph_kernel_abstract.h
+                - T::type == bayes_node
+                - n &lt; bn.number_of_nodes()
+            ensures
+                - returns bn.node(n).data.value()
+        !*/</font>
+
+    <font color='#009900'>// ------------------------------------------------------------------------------------
+</font>
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'>typename</font> T
+            <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>bool</u></font> <b><a name='node_is_evidence'></a>node_is_evidence</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> bn,
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> n
+        <font face='Lucida Console'>)</font>; 
+        <font color='#009900'>/*!
+            requires
+                - T is an implementation of directed_graph/directed_graph_kernel_abstract.h
+                - T::type == bayes_node
+                - n &lt; bn.number_of_nodes()
+            ensures
+                - returns bn.node(n).data.is_evidence()
+        !*/</font>
+
+    <font color='#009900'>// ------------------------------------------------------------------------------------
+</font>
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'>typename</font> T
+            <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_node_as_evidence'></a>set_node_as_evidence</b> <font face='Lucida Console'>(</font>
+            T<font color='#5555FF'>&amp;</font> bn,
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> n
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - T is an implementation of directed_graph/directed_graph_kernel_abstract.h
+                - T::type == bayes_node
+                - n &lt; bn.number_of_nodes()
+            ensures
+                - executes: bn.node(n).data.set_as_evidence()
+        !*/</font>
+
+    <font color='#009900'>// ------------------------------------------------------------------------------------
+</font>
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'>typename</font> T
+            <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_node_as_nonevidence'></a>set_node_as_nonevidence</b> <font face='Lucida Console'>(</font>
+            T<font color='#5555FF'>&amp;</font> bn,
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> n
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - T is an implementation of directed_graph/directed_graph_kernel_abstract.h
+                - T::type == bayes_node
+                - n &lt; bn.number_of_nodes()
+            ensures
+                - executes: bn.node(n).data.set_as_nonevidence()
+        !*/</font>
+
+    <font color='#009900'>// ------------------------------------------------------------------------------------
+</font>
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'>typename</font> T
+            <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_node_num_values'></a>set_node_num_values</b> <font face='Lucida Console'>(</font>
+            T<font color='#5555FF'>&amp;</font> bn,
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> n,
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> num
+        <font face='Lucida Console'>)</font>; 
+        <font color='#009900'>/*!
+            requires
+                - T is an implementation of directed_graph/directed_graph_kernel_abstract.h
+                - T::type == bayes_node
+                - n &lt; bn.number_of_nodes()
+            ensures
+                - #bn.node(n).data.table().num_values() == num
+                  (i.e. sets the number of different values this node can take)
+        !*/</font>
+
+    <font color='#009900'>// ------------------------------------------------------------------------------------
+</font>
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'>typename</font> T
+            <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='node_num_values'></a>node_num_values</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> bn,
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> n
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - T is an implementation of directed_graph/directed_graph_kernel_abstract.h
+                - T::type == bayes_node
+                - n &lt; bn.number_of_nodes()
+            ensures
+                - returns bn.node(n).data.table().num_values() 
+                  (i.e. returns the number of different values this node can take)
+        !*/</font>
+
+    <font color='#009900'>// ------------------------------------------------------------------------------------
+</font>
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'>typename</font> T
+            <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> <b><a name='node_probability'></a>node_probability</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> bn,
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> n,
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> value,
+            <font color='#0000FF'>const</font> assignment<font color='#5555FF'>&amp;</font> parents 
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - T is an implementation of directed_graph/directed_graph_kernel_abstract.h
+                - T::type == bayes_node
+                - n &lt; bn.number_of_nodes()
+                - value &lt; node_num_values(bn,n)
+                - parents.size() == bn.node(n).number_of_parents()
+                - if (parents.has_index(x)) then
+                    - bn.has_edge(x, n)
+                    - parents[x] &lt; node_num_values(bn,x)
+            ensures
+                - returns bn.node(n).data.table().probability(value, parents)
+                  (i.e. returns the probability of node n having the given value when
+                  its parents have the given assignment)
+        !*/</font>
+
+    <font color='#009900'>// ------------------------------------------------------------------------------------
+</font>
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'>typename</font> T
+            <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> <b><a name='set_node_probability'></a>set_node_probability</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> bn,
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> n,
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> value,
+            <font color='#0000FF'>const</font> assignment<font color='#5555FF'>&amp;</font> parents,
+            <font color='#0000FF'><u>double</u></font> p
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - T is an implementation of directed_graph/directed_graph_kernel_abstract.h
+                - T::type == bayes_node
+                - n &lt; bn.number_of_nodes()
+                - value &lt; node_num_values(bn,n)
+                - 0 &lt;= p &lt;= 1
+                - parents.size() == bn.node(n).number_of_parents()
+                - if (parents.has_index(x)) then
+                    - bn.has_edge(x, n)
+                    - parents[x] &lt; node_num_values(bn,x)
+            ensures
+                - #bn.node(n).data.table().probability(value, parents) == p
+                  (i.e. sets the probability of node n having the given value when
+                  its parents have the given assignment to the probability p)
+        !*/</font>
+
+    <font color='#009900'>// ------------------------------------------------------------------------------------
+</font>
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>const</font> assignment <b><a name='node_first_parent_assignment'></a>node_first_parent_assignment</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> bn,
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> n
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - T is an implementation of directed_graph/directed_graph_kernel_abstract.h
+                - T::type == bayes_node
+                - n &lt; bn.number_of_nodes()
+            ensures
+                - returns an assignment A such that:
+                    - A.size() == bn.node(n).number_of_parents()
+                    - if (P is a parent of bn.node(n)) then
+                        - A.has_index(P)
+                        - A[P] == 0
+                    - I.e. this function returns an assignment that contains all
+                      the parents of the given node.  Also, all the values of each
+                      parent in the assignment is set to zero.
+        !*/</font>
+
+    <font color='#009900'>// ------------------------------------------------------------------------------------
+</font>
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>bool</u></font> <b><a name='node_next_parent_assignment'></a>node_next_parent_assignment</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> bn,
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> n,
+            assignment<font color='#5555FF'>&amp;</font> A
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - T is an implementation of directed_graph/directed_graph_kernel_abstract.h
+                - T::type == bayes_node
+                - n &lt; bn.number_of_nodes()
+                - A.size() == bn.node(n).number_of_parents()
+                - if (A.has_index(x)) then
+                    - bn.has_edge(x, n)
+                    - A[x] &lt; node_num_values(bn,x)
+            ensures
+                - The behavior of this function is defined by the following code:
+                  assignment a(node_first_parent_assignment(bn,n);
+                  do {
+                    // this loop loops over all possible parent assignments
+                    // of the node bn.node(n).  Each time through the loop variable a
+                    // will be the next assignment.
+                  } while (node_next_parent_assignment(bn,n,a))
+        !*/</font>
+
+    <font color='#009900'>// ------------------------------------------------------------------------------------
+</font>
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>bool</u></font> <b><a name='node_cpt_filled_out'></a>node_cpt_filled_out</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> bn,
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> n
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - T is an implementation of directed_graph/directed_graph_kernel_abstract.h
+                - T::type == bayes_node
+                - n &lt; bn.number_of_nodes()
+            ensures
+                - if (the conditional_probability_table bn.node(n).data.table() is
+                  fully filled out for this node) then
+                    - returns true
+                    - This means that each parent assignment for the given node
+                      along with all possible values of this node shows up in the
+                      table.
+                    - It also means that all the probabilities conditioned on the
+                      same parent assignment sum to 1.0
+                - else
+                    - returns false
+        !*/</font>
+
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>class</font> <b><a name='bayesian_network_gibbs_sampler'></a>bayesian_network_gibbs_sampler</b> : noncopyable
+    <b>{</b>
+        <font color='#009900'>/*!
+            INITIAL VALUE
+                This object has no state
+
+            WHAT THIS OBJECT REPRESENTS
+                This object performs Markov Chain Monte Carlo sampling of a bayesian
+                network using the Gibbs sampling technique. 
+
+                Note that this object is limited to only bayesian networks that 
+                don't contain deterministic nodes.  That is, incorrect results may
+                be computed if this object is used when the bayesian network contains 
+                any nodes that have a probability of 1 in their conditional probability
+                tables for any event.  So don't use this object for networks with 
+                deterministic nodes.
+        !*/</font>
+    <font color='#0000FF'>public</font>:
+
+        <b><a name='bayesian_network_gibbs_sampler'></a>bayesian_network_gibbs_sampler</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - this object is properly initialized
+        !*/</font>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'>typename</font> T
+            <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='sample_graph'></a>sample_graph</b> <font face='Lucida Console'>(</font>
+            T<font color='#5555FF'>&amp;</font> bn
+        <font face='Lucida Console'>)</font>
+        <font color='#009900'>/*!
+            requires
+                - T is an implementation of directed_graph/directed_graph_kernel_abstract.h
+                - T::type == bayes_node
+            ensures
+                - modifies randomly (via the Gibbs sampling technique) samples all the nodes
+                  in the network and updates their values with the newly sampled values
+        !*/</font>
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>class</font> <b><a name='bayesian_network_join_tree'></a>bayesian_network_join_tree</b> : noncopyable
+    <b>{</b>
+        <font color='#009900'>/*!
+            WHAT THIS OBJECT REPRESENTS
+                This object represents an implementation of the join tree algorithm
+                for inference in bayesian networks.  It doesn't have any mutable state.
+                To you use you just give it a directed_graph that contains a bayesian 
+                network and a graph object that contains that networks corresponding
+                join tree.  Then you may query this object to determine the probabilities
+                of any variables in the original bayesian network.
+        !*/</font>
+
+    <font color='#0000FF'>public</font>:
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'>typename</font> bn_type,
+            <font color='#0000FF'>typename</font> join_tree_type 
+            <font color='#5555FF'>&gt;</font>
+        <b><a name='bayesian_network_join_tree'></a>bayesian_network_join_tree</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> bn_type<font color='#5555FF'>&amp;</font> bn,
+            <font color='#0000FF'>const</font> join_tree_type<font color='#5555FF'>&amp;</font> join_tree
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - bn_type is an implementation of directed_graph/directed_graph_kernel_abstract.h
+                - bn_type::type == bayes_node
+                - join_tree_type is an implementation of graph/graph_kernel_abstract.h
+                - join_tree_type::type is an implementation of set/set_compare_abstract.h and
+                  this set type contains unsigned long objects. 
+                - join_tree_type::edge_type is an implementation of set/set_compare_abstract.h and
+                  this set type contains unsigned long objects. 
+                - is_join_tree(bn, join_tree) == true
+                - bn == a valid bayesian network with all its conditional probability tables
+                  filled out
+                - for all valid n:
+                    - node_cpt_filled_out(bn,n) == true
+                - graph_contains_length_one_cycle(bn) == false
+                - graph_is_connected(bn) == true
+                - bn.number_of_nodes() &gt; 0
+            ensures
+                - this object is properly initialized
+        !*/</font>
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='number_of_nodes'></a>number_of_nodes</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the number of nodes in the bayesian network that this
+                  object was instantiated from.
+        !*/</font>
+
+        <font color='#0000FF'>const</font> matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> <b><a name='probability'></a>probability</b><font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> idx
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - idx &lt; number_of_nodes()
+            ensures
+                - returns the probability distribution for the node with index idx that was in the bayesian 
+                  network that *this was instantiated from.  Let D represent this distribution, then:
+                    - D.nc() == the number of values the node idx ranges over
+                    - D.nr() == 1 
+                    - D(i) == the probability of node idx taking on the value i 
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='swap'></a>swap</b> <font face='Lucida Console'>(</font>
+            bayesian_network_join_tree<font color='#5555FF'>&amp;</font> item
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - swaps *this with item
+        !*/</font>
+
+    <b>}</b>;
+
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='swap'></a>swap</b> <font face='Lucida Console'>(</font>
+        bayesian_network_join_tree<font color='#5555FF'>&amp;</font> a,
+        bayesian_network_join_tree<font color='#5555FF'>&amp;</font> b
+    <font face='Lucida Console'>)</font> <b>{</b> a.<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>b<font face='Lucida Console'>)</font>; <b>}</b>
+    <font color='#009900'>/*!
+        provides a global swap
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_BAYES_UTILs_ABSTRACT_
+</font>
+
+
+</pre></body></html>

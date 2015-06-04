@@ -1,0 +1,127 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - save_png.cpp</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2011  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_SAVE_PnG_CPPh_
+<font color='#0000FF'>#define</font> DLIB_SAVE_PnG_CPPh_
+
+<font color='#009900'>// only do anything with this file if DLIB_PNG_SUPPORT is defined
+</font><font color='#0000FF'>#ifdef</font> DLIB_PNG_SUPPORT
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='save_png.h.html'>save_png.h</a>"
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>cstdio<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>png.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../byte_orderer.h.html'>../byte_orderer.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+    <font color='#009900'>// Don't do anything when libpng calls us to tell us about an error.  Just return to 
+</font>    <font color='#009900'>// our own code and throw an exception (at the long jump target).
+</font>    <font color='#0000FF'><u>void</u></font> <b><a name='png_reader_user_error_fn_silent'></a>png_reader_user_error_fn_silent</b><font face='Lucida Console'>(</font>png_structp  png_struct, png_const_charp <font face='Lucida Console'>)</font> 
+    <b>{</b>
+        <font color='#BB00BB'>longjmp</font><font face='Lucida Console'>(</font><font color='#BB00BB'>png_jmpbuf</font><font face='Lucida Console'>(</font>png_struct<font face='Lucida Console'>)</font>,<font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+    <font color='#0000FF'><u>void</u></font> <b><a name='png_reader_user_warning_fn_silent'></a>png_reader_user_warning_fn_silent</b><font face='Lucida Console'>(</font>png_structp , png_const_charp <font face='Lucida Console'>)</font> 
+    <b>{</b>
+    <b>}</b>
+
+    <font color='#0000FF'>namespace</font> impl
+    <b>{</b>
+        <font color='#0000FF'><u>void</u></font> <b><a name='impl_save_png'></a>impl_save_png</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> file_name,
+            std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>*</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> row_pointers,
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> width,
+            <font color='#0000FF'>const</font> png_type type,
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>int</u></font> bit_depth
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+
+            FILE <font color='#5555FF'>*</font>fp;
+            png_structp png_ptr;
+            png_infop info_ptr;
+
+            <font color='#009900'>/* Open the file */</font>
+            fp <font color='#5555FF'>=</font> <font color='#BB00BB'>fopen</font><font face='Lucida Console'>(</font>file_name.<font color='#BB00BB'>c_str</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, "<font color='#CC0000'>wb</font>"<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>fp <font color='#5555FF'>=</font><font color='#5555FF'>=</font> NULL<font face='Lucida Console'>)</font>
+                <font color='#0000FF'>throw</font> <font color='#BB00BB'>image_save_error</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>Unable to open </font>" <font color='#5555FF'>+</font> file_name <font color='#5555FF'>+</font> "<font color='#CC0000'> for writing.</font>"<font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>/* Create and initialize the png_struct with the desired error handler
+            * functions.  If you want to use the default stderr and longjump method,
+            * you can supply NULL for the last three parameters.  We also check that
+            * the library version is compatible with the one used at compile time,
+            * in case we are using dynamically linked libraries.  REQUIRED.
+            */</font>
+            png_ptr <font color='#5555FF'>=</font> <font color='#BB00BB'>png_create_write_struct</font><font face='Lucida Console'>(</font>PNG_LIBPNG_VER_STRING, NULL, <font color='#5555FF'>&amp;</font>png_reader_user_error_fn_silent, <font color='#5555FF'>&amp;</font>png_reader_user_warning_fn_silent<font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>png_ptr <font color='#5555FF'>=</font><font color='#5555FF'>=</font> NULL<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#BB00BB'>fclose</font><font face='Lucida Console'>(</font>fp<font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>throw</font> <font color='#BB00BB'>image_save_error</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>Error while writing PNG file </font>" <font color='#5555FF'>+</font> file_name<font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+            <font color='#009900'>/* Allocate/initialize the image information data.  REQUIRED */</font>
+            info_ptr <font color='#5555FF'>=</font> <font color='#BB00BB'>png_create_info_struct</font><font face='Lucida Console'>(</font>png_ptr<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>info_ptr <font color='#5555FF'>=</font><font color='#5555FF'>=</font> NULL<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#BB00BB'>fclose</font><font face='Lucida Console'>(</font>fp<font face='Lucida Console'>)</font>;
+                <font color='#BB00BB'>png_destroy_write_struct</font><font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>png_ptr,  NULL<font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>throw</font> <font color='#BB00BB'>image_save_error</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>Error while writing PNG file </font>" <font color='#5555FF'>+</font> file_name<font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+            <font color='#009900'>/* Set error handling.  REQUIRED if you aren't supplying your own
+            * error handling functions in the png_create_write_struct() call.
+            */</font>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>setjmp</font><font face='Lucida Console'>(</font><font color='#BB00BB'>png_jmpbuf</font><font face='Lucida Console'>(</font>png_ptr<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#009900'>/* If we get here, we had a problem writing the file */</font>
+                <font color='#BB00BB'>fclose</font><font face='Lucida Console'>(</font>fp<font face='Lucida Console'>)</font>;
+                <font color='#BB00BB'>png_destroy_write_struct</font><font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>png_ptr, <font color='#5555FF'>&amp;</font>info_ptr<font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>throw</font> <font color='#BB00BB'>image_save_error</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>Error while writing PNG file </font>" <font color='#5555FF'>+</font> file_name<font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+            <font color='#0000FF'><u>int</u></font> color_type <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            <font color='#0000FF'>switch</font><font face='Lucida Console'>(</font>type<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>case</font> png_type_rgb:       color_type <font color='#5555FF'>=</font> PNG_COLOR_TYPE_RGB; <font color='#0000FF'>break</font>;
+                <font color='#0000FF'>case</font> png_type_rgb_alpha: color_type <font color='#5555FF'>=</font> PNG_COLOR_TYPE_RGB_ALPHA; <font color='#0000FF'>break</font>;
+                <font color='#0000FF'>case</font> png_type_gray:      color_type <font color='#5555FF'>=</font> PNG_COLOR_TYPE_GRAY; <font color='#0000FF'>break</font>;
+                <font color='#0000FF'>default</font>:
+                    <b>{</b>
+                        <font color='#BB00BB'>fclose</font><font face='Lucida Console'>(</font>fp<font face='Lucida Console'>)</font>;
+                        <font color='#BB00BB'>png_destroy_write_struct</font><font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>png_ptr, <font color='#5555FF'>&amp;</font>info_ptr<font face='Lucida Console'>)</font>;
+                        <font color='#0000FF'>throw</font> <font color='#BB00BB'>image_save_error</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>Invalid color type</font>"<font face='Lucida Console'>)</font>;
+                    <b>}</b>
+            <b>}</b>
+
+
+            <font color='#009900'>/* Set up the output control if you are using standard C streams */</font>
+            <font color='#BB00BB'>png_init_io</font><font face='Lucida Console'>(</font>png_ptr, fp<font face='Lucida Console'>)</font>;
+
+
+            <font color='#0000FF'><u>int</u></font> png_transforms <font color='#5555FF'>=</font> PNG_TRANSFORM_IDENTITY;
+            byte_orderer bo;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>bo.<font color='#BB00BB'>host_is_little_endian</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                png_transforms <font color='#5555FF'>|</font><font color='#5555FF'>=</font> PNG_TRANSFORM_SWAP_ENDIAN;
+
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> height <font color='#5555FF'>=</font> row_pointers.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+
+            <font color='#BB00BB'>png_set_IHDR</font><font face='Lucida Console'>(</font>png_ptr, info_ptr, width, height, bit_depth, color_type, PNG_INTERLACE_NONE, PNG_COMPRESSION_TYPE_DEFAULT, PNG_FILTER_TYPE_DEFAULT<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>png_set_rows</font><font face='Lucida Console'>(</font>png_ptr, info_ptr, <font color='#5555FF'>&amp;</font>row_pointers[<font color='#979000'>0</font>]<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>png_write_png</font><font face='Lucida Console'>(</font>png_ptr, info_ptr, png_transforms, NULL<font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>/* Clean up after the write, and free any memory allocated */</font>
+            <font color='#BB00BB'>png_destroy_write_struct</font><font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>png_ptr, <font color='#5555FF'>&amp;</font>info_ptr<font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>/* Close the file */</font>
+            <font color='#BB00BB'>fclose</font><font face='Lucida Console'>(</font>fp<font face='Lucida Console'>)</font>;
+        <b>}</b>
+    <b>}</b>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_PNG_SUPPORT
+</font>
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_SAVE_PnG_CPPh_
+</font>
+
+
+</pre></body></html>

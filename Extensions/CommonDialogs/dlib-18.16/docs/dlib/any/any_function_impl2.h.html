@@ -1,0 +1,47 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - any_function_impl2.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2011  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_ANY_FUNCTION_ARG_LIST
+<font color='#0000FF'>#error</font> "<font color='#CC0000'>You aren't supposed to directly #include this file.  #include &lt;dlib/any.h&gt; instead.</font>"  
+<font color='#0000FF'>#endif</font>
+
+<font color='#0000FF'>#ifdef</font> DLIB_ANY_FUNCTION_ARG_LIST 
+
+<font color='#009900'>// The case where function_type has a non-void return type
+</font>    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> function_type, <font color='#0000FF'>typename</font> Enabled<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>class</font> <b><a name='any_function'></a>any_function</b><font color='#5555FF'>&lt;</font>function_type, Enabled, DLIB_ANY_FUNCTION_NUM_ARGS<font color='#5555FF'>&gt;</font>
+    <b>{</b>
+<font color='#0000FF'>#define</font> DLIB_ANY_FUNCTION_RETURN <font color='#0000FF'>return</font>
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='any_function_impl.h.html'>any_function_impl.h</a>"
+<font color='#0000FF'>#undef</font> DLIB_ANY_FUNCTION_RETURN
+
+    <font color='#0000FF'>private</font>:
+        <font color='#009900'>// You get a compiler error about this function being private if you try to assign
+</font>        <font color='#009900'>// or copy between any_functions with different types.  You must only copy between
+</font>        <font color='#009900'>// any_functions that represent functions with the same signature.
+</font>        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> U<font color='#5555FF'>&gt;</font> <b><a name='any_function'></a>any_function</b><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> any_function<font color='#5555FF'>&lt;</font>T,U<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font>;
+    <b>}</b>;
+
+<font color='#009900'>// The case where function_type has a void return type
+</font>    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> function_type<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>class</font> <b><a name='any_function'></a>any_function</b><font color='#5555FF'>&lt;</font>function_type, <font color='#0000FF'>typename</font> sig_traits<font color='#5555FF'>&lt;</font>function_type<font color='#5555FF'>&gt;</font>::type, DLIB_ANY_FUNCTION_NUM_ARGS<font color='#5555FF'>&gt;</font>
+    <b>{</b>
+<font color='#0000FF'>#define</font> DLIB_ANY_FUNCTION_RETURN 
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='any_function_impl.h.html'>any_function_impl.h</a>"
+<font color='#0000FF'>#undef</font> DLIB_ANY_FUNCTION_RETURN
+
+    <font color='#0000FF'>private</font>:
+        <font color='#009900'>// You get a compiler error about this function being private if you try to assign
+</font>        <font color='#009900'>// or copy between any_functions with different types.  You must only copy between
+</font>        <font color='#009900'>// any_functions that represent functions with the same signature.
+</font>        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font> <b><a name='any_function'></a>any_function</b><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> any_function<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font>;
+    <b>}</b>;
+
+<font color='#0000FF'>#undef</font> DLIB_ANY_FUNCTION_ARG_LIST
+<font color='#0000FF'>#undef</font> DLIB_ANY_FUNCTION_ARGS
+<font color='#0000FF'>#undef</font> DLIB_ANY_FUNCTION_NUM_ARGS
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_ANY_FUNCTION_ARG_LIST
+</font>
+
+</pre></body></html>

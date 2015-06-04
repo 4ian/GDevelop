@@ -1,0 +1,163 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - pipe_ex_2.cpp</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// The contents of this file are in the public domain. See LICENSE_FOR_EXAMPLE_PROGRAMS.txt
+</font>
+
+<font color='#009900'>/*
+    This is an example showing how to use the type_safe_union and pipe object from
+    from the dlib C++ Library to send messages between threads.
+
+    In this example we will create a class with a single thread in it.  This thread
+    will receive messages from a pipe object and simply print them to the screen.   
+    The interesting thing about this example is that it shows how to use a pipe and
+    type_safe_union to create a message channel between threads that can send many
+    different types of objects in a type safe manner.
+    
+
+
+    Program output:
+        got a float: 4.567
+        got a string: string message
+        got an int: 7
+        got a string: yet another string message
+*/</font>
+
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>threads.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>pipe.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>type_safe_union.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>iostream<font color='#5555FF'>&gt;</font>
+
+<font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> dlib;
+<font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> std;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<font color='#0000FF'>typedef</font> type_safe_union<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>int</u></font>, <font color='#0000FF'><u>float</u></font>, std::string<font color='#5555FF'>&gt;</font> tsu_type;
+<font color='#009900'>/*  This is a typedef for the type_safe_union we will be using in this example.
+    This type_safe_union object is a type-safe analogue of a union declared as follows:
+        union our_union_type
+        {
+            int a;
+            float b;
+            std::string c;
+        };
+   
+    Note that the above union isn't actually valid C++ code because it contains a
+    non-POD type.  That is, you can't put a std::string or any non-trivial 
+    C++ class in a union.   The type_safe_union, however, enables you to store non-POD 
+    types such as the std::string.  
+  
+*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<font color='#0000FF'>class</font> <b><a name='pipe_example'></a>pipe_example</b> : <font color='#0000FF'>private</font> threaded_object 
+<b>{</b>
+<font color='#0000FF'>public</font>:
+    <b><a name='pipe_example'></a>pipe_example</b><font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font> : 
+        message_pipe<font face='Lucida Console'>(</font><font color='#979000'>4</font><font face='Lucida Console'>)</font> <font color='#009900'>// This 4 here is the size of our message_pipe.  The significance is that
+</font>                    <font color='#009900'>// if you try to enqueue more than 4 messages onto the pipe then enqueue() will
+</font>                    <font color='#009900'>// block until there is room.  
+</font>    <b>{</b>
+        <font color='#009900'>// start the thread 
+</font>        <font color='#BB00BB'>start</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+    ~<b><a name='pipe_example'></a>pipe_example</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#009900'>// wait for all the messages to be processed
+</font>        message_pipe.<font color='#BB00BB'>wait_until_empty</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// Now disable the message_pipe.  Doing this will cause all calls to 
+</font>        <font color='#009900'>// message_pipe.dequeue() to return false so our thread will terminate
+</font>        message_pipe.<font color='#BB00BB'>disable</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// now block until our thread has terminated
+</font>        <font color='#BB00BB'>wait</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+    <font color='#009900'>// Here we declare our pipe object.  It will contain our messages.
+</font>    dlib::pipe<font color='#5555FF'>&lt;</font>tsu_type<font color='#5555FF'>&gt;</font> message_pipe;
+
+<font color='#0000FF'>private</font>:
+
+    <font color='#009900'>// When we call apply_to_contents() below these are the
+</font>    <font color='#009900'>// functions which get called.   
+</font>    <font color='#0000FF'><u>void</u></font> <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> val<font face='Lucida Console'>)</font>
+    <b>{</b>
+        cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>got an int: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> val <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+    <b>}</b>
+
+    <font color='#0000FF'><u>void</u></font> <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>float</u></font> val<font face='Lucida Console'>)</font>
+    <b>{</b>
+        cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>got a float: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> val <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+    <b>}</b>
+
+    <font color='#0000FF'><u>void</u></font> <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>std::string val<font face='Lucida Console'>)</font>
+    <b>{</b>
+        cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>got a string: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> val <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+    <b>}</b>
+
+    <font color='#0000FF'><u>void</u></font> <b><a name='thread'></a>thread</b> <font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+    <b>{</b>
+        tsu_type msg;
+
+        <font color='#009900'>// Here we loop on messages from the message_pipe.  
+</font>        <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>message_pipe.<font color='#BB00BB'>dequeue</font><font face='Lucida Console'>(</font>msg<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#009900'>// Here we call the apply_to_contents() function on our type_safe_union.
+</font>            <font color='#009900'>// It takes a function object and applies that function object
+</font>            <font color='#009900'>// to the contents of the union.  In our case we have setup
+</font>            <font color='#009900'>// the pipe_example class as our function object and so below we
+</font>            <font color='#009900'>// tell the msg object to take whatever it contains and 
+</font>            <font color='#009900'>// call (*this)(contained_object);   So what happens here is 
+</font>            <font color='#009900'>// one of the three above functions gets called with the message 
+</font>            <font color='#009900'>// we just got.  
+</font>            msg.<font color='#BB00BB'>apply_to_contents</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+    <b>}</b>
+
+    <font color='#009900'>// Finally, note that since we declared the operator() member functions 
+</font>    <font color='#009900'>// private we need to declare the type_safe_union as a friend of this 
+</font>    <font color='#009900'>// class so that it will be able to call them.   
+</font>    <font color='#0000FF'>friend</font> <font color='#0000FF'>class</font> <b><a name='type_safe_union'></a>type_safe_union</b><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>int</u></font>, <font color='#0000FF'><u>float</u></font>, std::string<font color='#5555FF'>&gt;</font>;
+
+<b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<font color='#0000FF'><u>int</u></font> <b><a name='main'></a>main</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+<b>{</b>
+    pipe_example pe;
+
+    <font color='#009900'>// Make one of our type_safe_union objects
+</font>    tsu_type msg;
+
+    <font color='#009900'>// Treat our msg as a float and assign it 4.567
+</font>    msg.get<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>float</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>4.567f</font>;
+    <font color='#009900'>// Now put the message into the pipe
+</font>    pe.message_pipe.<font color='#BB00BB'>enqueue</font><font face='Lucida Console'>(</font>msg<font face='Lucida Console'>)</font>;
+
+    <font color='#009900'>// Put a string into the pipe
+</font>    msg.get<font color='#5555FF'>&lt;</font>std::string<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> "<font color='#CC0000'>string message</font>";
+    pe.message_pipe.<font color='#BB00BB'>enqueue</font><font face='Lucida Console'>(</font>msg<font face='Lucida Console'>)</font>;
+
+    <font color='#009900'>// And now an int
+</font>    msg.get<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>int</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>7</font>;
+    pe.message_pipe.<font color='#BB00BB'>enqueue</font><font face='Lucida Console'>(</font>msg<font face='Lucida Console'>)</font>;
+
+    <font color='#009900'>// And another string
+</font>    msg.get<font color='#5555FF'>&lt;</font>std::string<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> "<font color='#CC0000'>yet another string message</font>";
+    pe.message_pipe.<font color='#BB00BB'>enqueue</font><font face='Lucida Console'>(</font>msg<font face='Lucida Console'>)</font>;
+
+
+    <font color='#009900'>// the main function won't really terminate here.  It will call the destructor for pe
+</font>    <font color='#009900'>// which will block until all the messages have been processed.
+</font><b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+
+</pre></body></html>

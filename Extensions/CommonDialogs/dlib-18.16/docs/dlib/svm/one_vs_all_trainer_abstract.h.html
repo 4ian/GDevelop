@@ -1,0 +1,166 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - one_vs_all_trainer_abstract.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2010  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#undef</font> DLIB_ONE_VS_ALL_TRAiNER_ABSTRACT_Hh_
+<font color='#0000FF'>#ifdef</font> DLIB_ONE_VS_ALL_TRAiNER_ABSTRACT_Hh_
+
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='one_vs_all_decision_function_abstract.h.html'>one_vs_all_decision_function_abstract.h</a>"
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>vector<font color='#5555FF'>&gt;</font>
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../any/any_trainer_abstract.h.html'>../any/any_trainer_abstract.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> any_trainer,
+        <font color='#0000FF'>typename</font> label_type_ <font color='#5555FF'>=</font> <font color='#0000FF'><u>double</u></font>
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>class</font> <b><a name='one_vs_all_trainer'></a>one_vs_all_trainer</b>
+    <b>{</b>
+        <font color='#009900'>/*!
+            REQUIREMENTS ON any_trainer
+                must be an instantiation of the dlib::any_trainer template.   
+
+            REQUIREMENTS ON label_type_
+                label_type_ must be default constructable, copyable, and comparable using
+                operator &lt; and ==.  It must also be possible to write it to an std::ostream
+                using operator&lt;&lt;.
+
+            WHAT THIS OBJECT REPRESENTS
+                This object is a tool for turning a bunch of binary classifiers into a 
+                multiclass classifier.  It does this by training the binary classifiers 
+                in a one vs. all fashion.  That is, if you have N possible classes then 
+                it trains N binary classifiers which are then used to vote on the identity 
+                of a test sample.
+
+                This object works with any kind of binary classification trainer object
+                capable of being assigned to an any_trainer object.  (e.g. the svm_nu_trainer) 
+        !*/</font>
+
+    <font color='#0000FF'>public</font>:
+
+
+        <font color='#0000FF'>typedef</font> label_type_ label_type;
+
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> any_trainer::sample_type sample_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> any_trainer::scalar_type scalar_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> any_trainer::mem_manager_type mem_manager_type;
+
+        <font color='#0000FF'>typedef</font> one_vs_all_decision_function<font color='#5555FF'>&lt;</font>one_vs_all_trainer<font color='#5555FF'>&gt;</font> trained_function_type;
+
+        <b><a name='one_vs_all_trainer'></a>one_vs_all_trainer</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - This object is properly initialized.
+                - This object will not be verbose unless be_verbose() is called.
+                - No binary trainers are associated with *this.  I.e. you have to
+                  call set_trainer() before calling train().
+                - #get_num_threads() == 4
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_trainer'></a>set_trainer</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> any_trainer<font color='#5555FF'>&amp;</font> trainer
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - sets the trainer used for all binary subproblems.  Any previous 
+                  calls to set_trainer() are overridden by this function.  Even the
+                  more specific set_trainer(trainer, l) form. 
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_trainer'></a>set_trainer</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> any_trainer<font color='#5555FF'>&amp;</font> trainer,
+            <font color='#0000FF'>const</font> label_type<font color='#5555FF'>&amp;</font> l
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - Sets the trainer object used to create a binary classifier to
+                  distinguish l labeled samples from all other samples.
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='be_verbose'></a>be_verbose</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - This object will print status messages to standard out so that a 
+                  user can observe the progress of the algorithm.
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='be_quiet'></a>be_quiet</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - this object will not print anything to standard out
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_num_threads'></a>set_num_threads</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> num
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #get_num_threads() == num
+        !*/</font>
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='get_num_threads'></a>get_num_threads</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the number of threads used during training.  You should 
+                  usually set this equal to the number of processing cores on your
+                  machine.
+        !*/</font>
+
+        <font color='#0000FF'>struct</font> <b><a name='invalid_label'></a>invalid_label</b> : <font color='#0000FF'>public</font> dlib::error 
+        <b>{</b> 
+            <font color='#009900'>/*!
+                This is the exception thrown by the train() function below.
+            !*/</font>
+            label_type l;
+        <b>}</b>;
+
+        trained_function_type <b><a name='train'></a>train</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>sample_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> all_samples,
+            <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>label_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> all_labels
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - is_learning_problem(all_samples, all_labels)
+            ensures
+                - trains a bunch of binary classifiers in a one vs all fashion to solve the given 
+                  multiclass classification problem.  
+                - returns a one_vs_all_decision_function F with the following properties:
+                    - F contains all the learned binary classifiers and can be used to predict
+                      the labels of new samples.
+                    - if (new_x is a sample predicted to have a label of L) then
+                        - F(new_x) == L
+                    - F.get_labels() == select_all_distinct_labels(all_labels)
+                    - F.number_of_classes() == select_all_distinct_labels(all_labels).size()
+            throws
+                - invalid_label
+                  This exception is thrown if there are labels in all_labels which don't have
+                  any corresponding trainer object.  This will never happen if set_trainer(trainer)
+                  has been called.  However, if only the set_trainer(trainer,l) form has been
+                  used then this exception is thrown if not all labels have been given a trainer.
+
+                  invalid_label::l will contain the label which is missing a trainer object.  
+                  Additionally, the exception will contain an informative error message available 
+                  via invalid_label::what().
+        !*/</font>
+
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_ONE_VS_ALL_TRAiNER_ABSTRACT_Hh_
+</font>
+
+
+
+</pre></body></html>

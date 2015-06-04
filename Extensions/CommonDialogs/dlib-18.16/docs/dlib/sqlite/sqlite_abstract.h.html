@@ -1,0 +1,509 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - sqlite_abstract.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2011  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#undef</font> DLIB_SQLiTE_ABSTRACT_H_
+<font color='#0000FF'>#ifdef</font> DLIB_SQLiTE_ABSTRACT_H_
+
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>iostream<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>vector<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../algs.h.html'>../algs.h</a>"
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>sqlite3.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../smart_pointers.h.html'>../smart_pointers.h</a>"
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>struct</font> <b><a name='sqlite_error'></a>sqlite_error</b> : <font color='#0000FF'>public</font> error
+    <b>{</b>
+        <font color='#009900'>/*!
+            WHAT THIS OBJECT REPRESENTS
+                This is the exception object used by the SQLite tools to indicate
+                that an error has occurred.  Any of the functions defined in this
+                file might throw this exception.
+        !*/</font>
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>class</font> <b><a name='database'></a>database</b> : noncopyable
+    <b>{</b>
+        <font color='#009900'>/*!
+            WHAT THIS OBJECT REPRESENTS
+                This object is a C++ wrapper around a SQLite database connection 
+                handle and therefore represents a SQLite database file. 
+
+                Note that this wrapper is targeted at SQLite Version 3.
+
+                Note also that whenever SQLite indicates an error has occurred 
+                this object will throw the sqlite_error exception.
+        !*/</font>
+
+    <font color='#0000FF'>public</font>:
+        <b><a name='database'></a>database</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>; 
+        <font color='#009900'>/*!
+            ensures
+                - #is_open() == false
+        !*/</font>
+
+        <b><a name='database'></a>database</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> file
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - opens the indicated database file or creates a new
+                  database with the given name if one doesn't already exist.
+                - #get_database_filename() == file
+                - #is_open() == true
+        !*/</font>
+
+        ~<b><a name='database'></a>database</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - safely disposes of any SQLite database connection.  If
+                  any statement objects still exist which reference this database
+                  then the SQLite database connection won't be fully closed
+                  until those statement objects are also destroyed.  This allows
+                  for any destruction order between database and statement objects.
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='open'></a>open</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> file
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - opens the indicated database file or creates a new
+                  database with the given name if one doesn't already exist.
+                - #get_database_filename() == file
+                - #is_open() == true
+                - safely disposes of any previous SQLite database connection.  If
+                  any statement objects still exist which reference this database
+                  then the SQLite database connection won't be fully closed
+                  until those statement objects are also destroyed.  
+        !*/</font>
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='is_open'></a>is_open</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - if (this object has an open connection to a SQLite database) then
+                    - returns true
+                - else
+                    - returns false
+        !*/</font>
+
+        <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> <b><a name='get_database_filename'></a>get_database_filename</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - is_open() == true
+            ensures
+                - returns the name of the SQLite database file this object
+                  currently has open.
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='exec'></a>exec</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> sql_statement
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - is_open() == true
+            ensures
+                - executes the supplied SQL statement against this database
+        !*/</font>
+
+        int64 <b><a name='last_insert_rowid'></a>last_insert_rowid</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - is_open() == true
+            ensures
+                - Each element in a database table has a rowid which uniquely identifies
+                  it.  Therefore, this routine returns the rowid of the most recent
+                  successful INSERT into the database via this database instance.  
+                - If an INSERT has not been performed on the current database instance then
+                  the return value is 0.  This is true even if the database is not empty.
+                - See the sqlite documentation for the full details on how this function
+                  behaves: http://www.sqlite.org/c3ref/last_insert_rowid.html
+        !*/</font>
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>class</font> <b><a name='statement'></a>statement</b> : noncopyable
+    <b>{</b>
+        <font color='#009900'>/*!
+            WHAT THIS OBJECT REPRESENTS
+                This object represents a SQL statement which can be executed
+                against a database object.  In particular, this object is a
+                C++ wrapper around a SQLite prepared statement.
+
+
+                Note that whenever SQLite indicates an error has occurred this 
+                object will throw the sqlite_error exception.
+
+            BINDABLE SQL PARAMETERS
+                Sometimes you want to execute a bunch of very similar SQL statements.
+                For example, you might need to execute many insert statements where each
+                statement changes only the value of a field.  Since it is somewhat
+                costly to construct a statement object for each SQL operation, SQLite
+                supports defining bindable parameters for a statement object.  This allows
+                you to reuse the same statement object.  
+                
+                Therefore, in SQL statements used with SQLite, wherever it is valid to 
+                include a string literal, one can use a parameter in one of the following 
+                forms:
+
+                    ?
+                    ?NNN
+                    :AAA
+                    $AAA
+                    @AAA
+
+               In the examples above, NNN is an integer value and AAA is an identifier.  A 
+               parameter initially has a value of NULL.  You can use the bind_*() routines
+               to attach values to the parameters.  Each call to a bind_*() routine overrides 
+               prior bindings on the same parameter.
+
+               Each SQL parameter has a numeric ID which is used to reference it when invoking
+               a bind_*() routine.  The leftmost SQL parameter in a statement has an index of 1,
+               the next parameter has an index of 2, and so on, except when the following rules
+               apply.  When the same named SQL parameter is used more than once, second and 
+               subsequent occurrences have the same index as the first occurrence.  The index 
+               for named parameters can be looked up using the get_parameter_id() method if desired.  
+               The index for "?NNN" parameters is the value of NNN. The NNN value must be between 
+               1 and get_max_parameter_id().
+        !*/</font>
+
+    <font color='#0000FF'>public</font>:
+        <b><a name='statement'></a>statement</b> <font face='Lucida Console'>(</font>
+            database<font color='#5555FF'>&amp;</font> db,
+            <font color='#0000FF'>const</font> std::string sql_statement
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - db.is_open() == true
+            ensures
+                - The given SQL statement can be executed against the given 
+                  database by calling exec().
+                - #get_sql_string() == sql_statement
+        !*/</font>
+
+        ~<b><a name='statement'></a>statement</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - any resources associated with this object have been freed.
+        !*/</font>
+
+        <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> <b><a name='get_sql_string'></a>get_sql_string</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns a copy of the SQL statement used to create this statement object.
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='exec'></a>exec</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #get_num_columns() == 0
+                - executes the SQL statement get_sql_string() against the database
+                  given to this object's constructor.
+                - If this was a select statement then you can obtain the resulting
+                  rows by calling move_next() and using the get_column_as_*() member
+                  functions.
+        !*/</font>
+
+    <font color='#009900'>// ----------------------------
+</font>
+        <font color='#0000FF'><u>bool</u></font> <b><a name='move_next'></a>move_next</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - if (there is a result row for this query) then
+                    - #get_num_columns() == the number of columns in the result row.
+                    - The get_column_as_*() routines can be used to access the elements 
+                      of the row data.
+                    - returns true
+                - else
+                    - returns false
+                    - #get_num_columns() == 0
+        !*/</font>
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='get_num_columns'></a>get_num_columns</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the number of columns of data available via the get_column_as_*() 
+                  routines.
+        !*/</font>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'>typename</font> T
+            <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='get_column'></a>get_column</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> idx,
+            T<font color='#5555FF'>&amp;</font> item
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - idx &lt; get_num_columns()
+            ensures
+                - This function automatically selects how to extract the column data based
+                  on the type of item given. In particular:
+                    - if (T is a 32bit or smaller built in integer type) then
+                        - #item == get_column_as_int(idx)
+                    - else if (T is a 64bit built in integer type) then
+                        - #item == get_column_as_int64(idx)
+                    - else if (T is float, double, or long double) then
+                        - #item == get_column_as_double(idx)
+                    - else if (T is std::string) then
+                        - #item == get_column_as_text(idx)
+                    - else
+                        - invokes: get_column_as_object(idx, item)
+        !*/</font>
+
+        <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font> <b><a name='get_column_as_blob'></a>get_column_as_blob</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> idx
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - idx &lt; get_num_columns()
+            ensures
+                - returns the contents of the idx-th column as a binary BLOB.
+        !*/</font>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'>typename</font> T
+            <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='get_column_as_object'></a>get_column_as_object</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> idx,
+            T<font color='#5555FF'>&amp;</font> item
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - idx &lt; get_num_columns()
+                - item is deserializable 
+                  (i.e. Calling deserialize(item, some_input_stream) reads an item
+                  of type T from the some_input_stream stream)
+            ensures
+                - gets the contents of the idx-th column as a binary BLOB and then
+                  deserializes it into item.
+        !*/</font>
+
+        <font color='#0000FF'>const</font> std::string <b><a name='get_column_as_text'></a>get_column_as_text</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> idx
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - idx &lt; get_num_columns()
+            ensures
+                - returns the contents of the idx-th column as a text string. 
+        !*/</font>
+
+        <font color='#0000FF'><u>double</u></font> <b><a name='get_column_as_double'></a>get_column_as_double</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> idx
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - idx &lt; get_num_columns()
+            ensures
+                - returns the contents of the idx-th column as a double. 
+        !*/</font>
+
+        <font color='#0000FF'><u>int</u></font> <b><a name='get_column_as_int'></a>get_column_as_int</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> idx
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - idx &lt; get_num_columns()
+            ensures
+                - returns the contents of the idx-th column as an int. 
+        !*/</font>
+
+        int64 <b><a name='get_column_as_int64'></a>get_column_as_int64</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> idx
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - idx &lt; get_num_columns()
+            ensures
+                - returns the contents of the idx-th column as a 64bit int. 
+        !*/</font>
+
+        <font color='#0000FF'>const</font> std::string <b><a name='get_column_name'></a>get_column_name</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> idx
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - idx &lt; get_num_columns()
+            ensures
+                - returns the name of the idx-th column.  In particular:
+                  The name of a result column is the value of the "AS" clause for 
+                  that column, if there is an AS clause. If there is no AS clause 
+                  then the name of the column is unspecified and may change from 
+                  one release of SQLite to the next.
+        !*/</font>
+
+    <font color='#009900'>// ----------------------------
+</font>
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='get_max_parameter_id'></a>get_max_parameter_id</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the max parameter ID value which can be used with the
+                  bind_() member functions defined below.
+                - In SQLite, the default value of this limit is usually 999.
+        !*/</font>
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='get_parameter_id'></a>get_parameter_id</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> name
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - if (This SQL statement contains a SQL parameter with the given name) then
+                    - returns the parameter_id number which can be used in the bind_*() 
+                      member functions defined below.
+                - else
+                    - returns 0
+        !*/</font>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'>typename</font> T
+            <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='bind'></a>bind</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> parameter_id,
+            <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> item
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - 1 &lt;= parameter_id &lt;= get_max_parameter_id()
+            ensures
+                - This function automatically selects how to bind item to a statement based
+                  on the type of item given.  In particular:
+                    - if (T is a 32bit or smaller built in integer type) then
+                        - invokes: bind_int(parameter_id, item)
+                    - else if (T is a 64bit built in integer type) then
+                        - invokes: bind_int64(parameter_id, item)
+                    - else if (T is float, double, or long double) then
+                        - invokes: bind_double(parameter_id, item)
+                    - else if (T is std::string) then
+                        - invokes: bind_text(parameter_id, item)
+                    - else
+                        - invokes: bind_object(parameter_id, item)
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='bind_blob'></a>bind_blob</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> parameter_id,
+            <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> item
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - 1 &lt;= parameter_id &lt;= get_max_parameter_id()
+            ensures
+                - #get_num_columns() == 0
+                - binds the value of item into the SQL parameter indicated by 
+                  parameter_id.
+        !*/</font>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'>typename</font> T
+            <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='bind_object'></a>bind_object</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> parameter_id,
+            <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> item
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - 1 &lt;= parameter_id &lt;= get_max_parameter_id()
+                - item is serializable
+                  (i.e. Calling serialize(item, some_output_stream) writes an item
+                  of type T to the some_output_stream stream)
+            ensures
+                - #get_num_columns() == 0
+                - binds the value of item into the SQL parameter indicated by
+                  parameter_id.  This is performed by serializing item and then 
+                  binding it as a binary BLOB.
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='bind_double'></a>bind_double</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> parameter_id,
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font><font color='#5555FF'>&amp;</font> item
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - 1 &lt;= parameter_id &lt;= get_max_parameter_id()
+            ensures
+                - #get_num_columns() == 0
+                - binds the value of item into the SQL parameter indicated by 
+                  parameter_id.
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='bind_int'></a>bind_int</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> parameter_id,
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>int</u></font><font color='#5555FF'>&amp;</font> item
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - 1 &lt;= parameter_id &lt;= get_max_parameter_id()
+            ensures
+                - #get_num_columns() == 0
+                - binds the value of item into the SQL parameter indicated by 
+                  parameter_id.
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='bind_int64'></a>bind_int64</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> parameter_id,
+            <font color='#0000FF'>const</font> int64<font color='#5555FF'>&amp;</font> item
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - 1 &lt;= parameter_id &lt;= get_max_parameter_id()
+            ensures
+                - #get_num_columns() == 0
+                - binds the value of item into the SQL parameter indicated by 
+                  parameter_id.
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='bind_null'></a>bind_null</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> parameter_id
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - 1 &lt;= parameter_id &lt;= get_max_parameter_id()
+            ensures
+                - #get_num_columns() == 0
+                - binds a NULL to the SQL parameter indicated by parameter_id.
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='bind_text'></a>bind_text</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> parameter_id,
+            <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> item
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - 1 &lt;= parameter_id &lt;= get_max_parameter_id()
+            ensures
+                - #get_num_columns() == 0
+                - binds the value of item into the SQL parameter indicated by 
+                  parameter_id.
+        !*/</font>
+
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_SQLiTE_ABSTRACT_H_
+</font>
+
+
+</pre></body></html>

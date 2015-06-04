@@ -1,0 +1,184 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - iosockstream.cpp</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2012  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font>
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>sstream<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>string<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>cstdlib<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>ctime<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>iosockstream.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>server.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>vector<font color='#5555FF'>&gt;</font>
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='tester.h.html'>tester.h</a>"
+
+<font color='#0000FF'>namespace</font>  
+<b>{</b>
+
+    <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> test;
+    <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> dlib;
+    <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> std;
+
+
+    logger <b><a name='dlog'></a>dlog</b><font face='Lucida Console'>(</font>"<font color='#CC0000'>test.iosockstream</font>"<font face='Lucida Console'>)</font>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>class</font> <b><a name='serv'></a>serv</b> : <font color='#0000FF'>public</font> server_iostream
+    <b>{</b>
+        <font color='#0000FF'>virtual</font> <font color='#0000FF'><u>void</u></font> <b><a name='on_connect'></a>on_connect</b> <font face='Lucida Console'>(</font>
+            std::istream<font color='#5555FF'>&amp;</font> in,
+            std::ostream<font color='#5555FF'>&amp;</font> out,
+            <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> ,
+            <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> ,
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>short</u></font> ,
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>short</u></font> ,
+            uint64 
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>try</font>
+            <b>{</b>
+                dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>serv1: serving connection</font>";
+
+                std::string temp;
+                in <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font> temp;
+                <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>temp <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'>word</font>"<font face='Lucida Console'>)</font>;
+                in <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font> temp;
+                <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>temp <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'>another</font>"<font face='Lucida Console'>)</font>;
+                out <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>yay words </font>";
+                in <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font> temp;
+                <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>temp <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'>yep</font>"<font face='Lucida Console'>)</font>;
+            <b>}</b>
+            <font color='#0000FF'>catch</font> <font face='Lucida Console'>(</font>error<font color='#5555FF'>&amp;</font> e<font face='Lucida Console'>)</font>
+            <b>{</b>
+                error_string <font color='#5555FF'>=</font> e.<font color='#BB00BB'>what</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+        <b>}</b>
+
+
+    <font color='#0000FF'>public</font>:
+        std::string error_string;
+
+    <b>}</b>;
+
+    <font color='#0000FF'>class</font> <b><a name='serv2'></a>serv2</b> : <font color='#0000FF'>public</font> server_iostream
+    <b>{</b>
+        <font color='#0000FF'>virtual</font> <font color='#0000FF'><u>void</u></font> <b><a name='on_connect'></a>on_connect</b> <font face='Lucida Console'>(</font>
+            std::istream<font color='#5555FF'>&amp;</font> ,
+            std::ostream<font color='#5555FF'>&amp;</font> out,
+            <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> ,
+            <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> ,
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>short</u></font> ,
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>short</u></font> ,
+            uint64 
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>try</font>
+            <b>{</b>
+                dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>serv2: serving connection</font>";
+
+                out <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>one two three four five</font>";
+            <b>}</b>
+            <font color='#0000FF'>catch</font> <font face='Lucida Console'>(</font>error<font color='#5555FF'>&amp;</font> e<font face='Lucida Console'>)</font>
+            <b>{</b>
+                error_string <font color='#5555FF'>=</font> e.<font color='#BB00BB'>what</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+        <b>}</b>
+
+
+    <font color='#0000FF'>public</font>:
+        std::string error_string;
+
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='test1'></a>test1</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+    <b>{</b>
+        dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>in test1()</font>";
+        serv theserv;
+        theserv.<font color='#BB00BB'>set_listening_port</font><font face='Lucida Console'>(</font><font color='#979000'>12345</font><font face='Lucida Console'>)</font>;
+        theserv.<font color='#BB00BB'>start_async</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// wait a little bit to make sure the server has started listening before we try 
+</font>        <font color='#009900'>// to connect to it.
+</font>        dlib::<font color='#BB00BB'>sleep</font><font face='Lucida Console'>(</font><font color='#979000'>500</font><font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> <font color='#979000'>200</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+        <b>{</b>
+            dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>i: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> i;
+            <font color='#BB00BB'>print_spinner</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            iosockstream <font color='#BB00BB'>stream</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>localhost:12345</font>"<font face='Lucida Console'>)</font>;
+
+            stream <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>word another </font>";
+            std::string temp;
+            stream <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font> temp;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>temp <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'>yay</font>"<font face='Lucida Console'>)</font>;
+            stream <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font> temp;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>temp <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'>words</font>"<font face='Lucida Console'>)</font>;
+            stream <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>yep </font>";
+        <b>}</b>
+
+        <font color='#009900'>// Just to make sure the server finishes processing the last connection before
+</font>        <font color='#009900'>// we kill it and accidentally trigger a DLIB_TEST().
+</font>        dlib::<font color='#BB00BB'>sleep</font><font face='Lucida Console'>(</font><font color='#979000'>500</font><font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>theserv.error_string.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+            <font color='#0000FF'>throw</font> <font color='#BB00BB'>error</font><font face='Lucida Console'>(</font>theserv.error_string<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='test2'></a>test2</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+    <b>{</b>
+        dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>in test2()</font>";
+        serv2 theserv;
+        theserv.<font color='#BB00BB'>set_listening_port</font><font face='Lucida Console'>(</font><font color='#979000'>12345</font><font face='Lucida Console'>)</font>;
+        theserv.<font color='#BB00BB'>start_async</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// wait a little bit to make sure the server has started listening before we try 
+</font>        <font color='#009900'>// to connect to it.
+</font>        dlib::<font color='#BB00BB'>sleep</font><font face='Lucida Console'>(</font><font color='#979000'>500</font><font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> <font color='#979000'>200</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+        <b>{</b>
+            dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>i: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> i;
+            <font color='#BB00BB'>print_spinner</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            iosockstream <font color='#BB00BB'>stream</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>localhost:12345</font>"<font face='Lucida Console'>)</font>;
+
+            std::string temp;
+            stream <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font> temp; <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>temp <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'>one</font>"<font face='Lucida Console'>)</font>;
+            stream <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font> temp; <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>temp <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'>two</font>"<font face='Lucida Console'>)</font>;
+            stream <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font> temp; <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>temp <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'>three</font>"<font face='Lucida Console'>)</font>;
+            stream <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font> temp; <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>temp <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'>four</font>"<font face='Lucida Console'>)</font>;
+            stream <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font> temp; <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>temp <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'>five</font>"<font face='Lucida Console'>)</font>;
+        <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>class</font> <b><a name='test_iosockstream'></a>test_iosockstream</b> : <font color='#0000FF'>public</font> tester
+    <b>{</b>
+    <font color='#0000FF'>public</font>:
+        <b><a name='test_iosockstream'></a>test_iosockstream</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> :
+            tester <font face='Lucida Console'>(</font>"<font color='#CC0000'>test_iosockstream</font>",
+                    "<font color='#CC0000'>Runs tests on the iosockstream component.</font>"<font face='Lucida Console'>)</font>
+        <b>{</b><b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='perform_test'></a>perform_test</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#BB00BB'>test1</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>test2</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+    <b>}</b> a;
+
+<b>}</b>
+
+
+
+</pre></body></html>

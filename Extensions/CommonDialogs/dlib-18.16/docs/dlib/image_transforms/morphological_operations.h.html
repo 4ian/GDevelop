@@ -1,0 +1,849 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - morphological_operations.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2006  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_MORPHOLOGICAL_OPERATIONs_
+<font color='#0000FF'>#define</font> DLIB_MORPHOLOGICAL_OPERATIONs_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../pixel.h.html'>../pixel.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='thresholding.h.html'>thresholding.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='morphological_operations_abstract.h.html'>morphological_operations_abstract.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='assign_image.h.html'>assign_image.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>namespace</font> morphological_operations_helpers
+    <b>{</b>
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> image_type<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>bool</u></font> <b><a name='is_binary_image'></a>is_binary_image</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> image_type<font color='#5555FF'>&amp;</font> img_
+        <font face='Lucida Console'>)</font>
+        <font color='#009900'>/*!
+            ensures
+                - returns true if img_ contains only on_pixel and off_pixel values.
+                - returns false otherwise
+        !*/</font>
+        <b>{</b>
+            const_image_view<font color='#5555FF'>&lt;</font>image_type<font color='#5555FF'>&gt;</font> <font color='#BB00BB'>img</font><font face='Lucida Console'>(</font>img_<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> r <font color='#5555FF'>=</font> <font color='#979000'>0</font>; r <font color='#5555FF'>&lt;</font> img.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>r<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> c <font color='#5555FF'>=</font> <font color='#979000'>0</font>; c <font color='#5555FF'>&lt;</font> img.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>c<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>img[r][c] <font color='#5555FF'>!</font><font color='#5555FF'>=</font> on_pixel <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> img[r][c] <font color='#5555FF'>!</font><font color='#5555FF'>=</font> off_pixel<font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        <font color='#0000FF'>return</font> <font color='#979000'>false</font>;
+                    <b>}</b>
+                <b>}</b>
+            <b>}</b>
+            <font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'><u>long</u></font> M,
+            <font color='#0000FF'><u>long</u></font> N
+            <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>bool</u></font> <b><a name='is_binary_image'></a>is_binary_image</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> <font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>structuring_element<font face='Lucida Console'>)</font>[M][N]
+        <font face='Lucida Console'>)</font>
+        <font color='#009900'>/*!
+            ensures
+                - returns true if structuring_element contains only on_pixel and off_pixel values.
+                - returns false otherwise
+        !*/</font>
+        <b>{</b>
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> m <font color='#5555FF'>=</font> <font color='#979000'>0</font>; m <font color='#5555FF'>&lt;</font> M; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>m<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> n <font color='#5555FF'>=</font> <font color='#979000'>0</font>; n <font color='#5555FF'>&lt;</font> N; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>n<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>structuring_element[m][n] <font color='#5555FF'>!</font><font color='#5555FF'>=</font> on_pixel <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font>
+                        structuring_element[m][n] <font color='#5555FF'>!</font><font color='#5555FF'>=</font> off_pixel<font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        <font color='#0000FF'>return</font> <font color='#979000'>false</font>;
+                    <b>}</b>
+                <b>}</b>
+            <b>}</b>
+            <font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+        <b>}</b>
+
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> in_image_type,
+        <font color='#0000FF'>typename</font> out_image_type,
+        <font color='#0000FF'><u>long</u></font> M,
+        <font color='#0000FF'><u>long</u></font> N
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='binary_dilation'></a>binary_dilation</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> in_image_type<font color='#5555FF'>&amp;</font> in_img_,
+        out_image_type<font color='#5555FF'>&amp;</font> out_img_,
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> <font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>structuring_element<font face='Lucida Console'>)</font>[M][N]
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> image_traits<font color='#5555FF'>&lt;</font>in_image_type<font color='#5555FF'>&gt;</font>::pixel_type in_pixel_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> image_traits<font color='#5555FF'>&lt;</font>out_image_type<font color='#5555FF'>&gt;</font>::pixel_type out_pixel_type;
+        <font color='#BB00BB'>COMPILE_TIME_ASSERT</font><font face='Lucida Console'>(</font> pixel_traits<font color='#5555FF'>&lt;</font>in_pixel_type<font color='#5555FF'>&gt;</font>::has_alpha <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font> <font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>COMPILE_TIME_ASSERT</font><font face='Lucida Console'>(</font> pixel_traits<font color='#5555FF'>&lt;</font>out_pixel_type<font color='#5555FF'>&gt;</font>::has_alpha <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font> <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> morphological_operations_helpers;
+        <font color='#BB00BB'>COMPILE_TIME_ASSERT</font><font face='Lucida Console'>(</font>M<font color='#5555FF'>%</font><font color='#979000'>2</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>COMPILE_TIME_ASSERT</font><font face='Lucida Console'>(</font>N<font color='#5555FF'>%</font><font color='#979000'>2</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font><font color='#BB00BB'>is_same_object</font><font face='Lucida Console'>(</font>in_img_,out_img_<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font>,
+            "<font color='#CC0000'>\tvoid binary_dilation()</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tYou must give two different image objects</font>"
+            <font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>COMPILE_TIME_ASSERT</font><font face='Lucida Console'>(</font>pixel_traits<font color='#5555FF'>&lt;</font>in_pixel_type<font color='#5555FF'>&gt;</font>::grayscale<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font><font color='#BB00BB'>is_binary_image</font><font face='Lucida Console'>(</font>in_img_<font face='Lucida Console'>)</font> ,
+            "<font color='#CC0000'>\tvoid binary_dilation()</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tin_img must be a binary image</font>"
+            <font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font><font color='#BB00BB'>is_binary_image</font><font face='Lucida Console'>(</font>structuring_element<font face='Lucida Console'>)</font> ,
+            "<font color='#CC0000'>\tvoid binary_dilation()</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tthe structuring_element must be a binary image</font>"
+            <font face='Lucida Console'>)</font>;
+
+
+        const_image_view<font color='#5555FF'>&lt;</font>in_image_type<font color='#5555FF'>&gt;</font> <font color='#BB00BB'>in_img</font><font face='Lucida Console'>(</font>in_img_<font face='Lucida Console'>)</font>;
+        image_view<font color='#5555FF'>&lt;</font>out_image_type<font color='#5555FF'>&gt;</font> <font color='#BB00BB'>out_img</font><font face='Lucida Console'>(</font>out_img_<font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// if there isn't any input image then don't do anything
+</font>        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>in_img.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            out_img.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>return</font>;
+        <b>}</b>
+
+        out_img.<font color='#BB00BB'>set_size</font><font face='Lucida Console'>(</font>in_img.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,in_img.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// apply the filter to the image
+</font>        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> r <font color='#5555FF'>=</font> <font color='#979000'>0</font>; r <font color='#5555FF'>&lt;</font> in_img.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>r<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> c <font color='#5555FF'>=</font> <font color='#979000'>0</font>; c <font color='#5555FF'>&lt;</font> in_img.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>c<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> out_pixel <font color='#5555FF'>=</font> off_pixel;
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> m <font color='#5555FF'>=</font> <font color='#979000'>0</font>; m <font color='#5555FF'>&lt;</font> M <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> out_pixel <font color='#5555FF'>=</font><font color='#5555FF'>=</font> off_pixel; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>m<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> n <font color='#5555FF'>=</font> <font color='#979000'>0</font>; n <font color='#5555FF'>&lt;</font> N <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> out_pixel <font color='#5555FF'>=</font><font color='#5555FF'>=</font> off_pixel; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>n<font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>structuring_element[m][n] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> on_pixel<font face='Lucida Console'>)</font>
+                        <b>{</b>
+                            <font color='#009900'>// if this pixel is inside the image then get it from the image
+</font>                            <font color='#009900'>// but if it isn't just pretend it was an off_pixel value
+</font>                            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>r<font color='#5555FF'>+</font>m <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> M<font color='#5555FF'>/</font><font color='#979000'>2</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> c<font color='#5555FF'>+</font>n <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> N<font color='#5555FF'>/</font><font color='#979000'>2</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font>
+                                r<font color='#5555FF'>+</font>m<font color='#5555FF'>-</font>M<font color='#5555FF'>/</font><font color='#979000'>2</font> <font color='#5555FF'>&lt;</font> in_img.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> c<font color='#5555FF'>+</font>n<font color='#5555FF'>-</font>N<font color='#5555FF'>/</font><font color='#979000'>2</font> <font color='#5555FF'>&lt;</font> in_img.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                            <b>{</b>
+                                out_pixel <font color='#5555FF'>=</font> in_img[r<font color='#5555FF'>+</font>m<font color='#5555FF'>-</font>M<font color='#5555FF'>/</font><font color='#979000'>2</font>][c<font color='#5555FF'>+</font>n<font color='#5555FF'>-</font>N<font color='#5555FF'>/</font><font color='#979000'>2</font>];
+                            <b>}</b>
+                        <b>}</b>
+                    <b>}</b>
+                <b>}</b>
+                <font color='#BB00BB'>assign_pixel</font><font face='Lucida Console'>(</font>out_img[r][c], out_pixel<font face='Lucida Console'>)</font>;
+            <b>}</b>
+        <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> in_image_type,
+        <font color='#0000FF'>typename</font> out_image_type,
+        <font color='#0000FF'><u>long</u></font> M,
+        <font color='#0000FF'><u>long</u></font> N
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='binary_erosion'></a>binary_erosion</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> in_image_type<font color='#5555FF'>&amp;</font> in_img_,
+        out_image_type<font color='#5555FF'>&amp;</font> out_img_,
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> <font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>structuring_element<font face='Lucida Console'>)</font>[M][N]
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> image_traits<font color='#5555FF'>&lt;</font>in_image_type<font color='#5555FF'>&gt;</font>::pixel_type in_pixel_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> image_traits<font color='#5555FF'>&lt;</font>out_image_type<font color='#5555FF'>&gt;</font>::pixel_type out_pixel_type;
+        <font color='#BB00BB'>COMPILE_TIME_ASSERT</font><font face='Lucida Console'>(</font> pixel_traits<font color='#5555FF'>&lt;</font>in_pixel_type<font color='#5555FF'>&gt;</font>::has_alpha <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font> <font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>COMPILE_TIME_ASSERT</font><font face='Lucida Console'>(</font> pixel_traits<font color='#5555FF'>&lt;</font>out_pixel_type<font color='#5555FF'>&gt;</font>::has_alpha <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font> <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> morphological_operations_helpers;
+        <font color='#BB00BB'>COMPILE_TIME_ASSERT</font><font face='Lucida Console'>(</font>M<font color='#5555FF'>%</font><font color='#979000'>2</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>COMPILE_TIME_ASSERT</font><font face='Lucida Console'>(</font>N<font color='#5555FF'>%</font><font color='#979000'>2</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font><font color='#BB00BB'>is_same_object</font><font face='Lucida Console'>(</font>in_img_,out_img_<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font>,
+            "<font color='#CC0000'>\tvoid binary_erosion()</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tYou must give two different image objects</font>"
+            <font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>COMPILE_TIME_ASSERT</font><font face='Lucida Console'>(</font>pixel_traits<font color='#5555FF'>&lt;</font>in_pixel_type<font color='#5555FF'>&gt;</font>::grayscale<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font><font color='#BB00BB'>is_binary_image</font><font face='Lucida Console'>(</font>in_img_<font face='Lucida Console'>)</font> ,
+            "<font color='#CC0000'>\tvoid binary_erosion()</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tin_img must be a binary image</font>"
+            <font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font><font color='#BB00BB'>is_binary_image</font><font face='Lucida Console'>(</font>structuring_element<font face='Lucida Console'>)</font> ,
+            "<font color='#CC0000'>\tvoid binary_erosion()</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tthe structuring_element must be a binary image</font>"
+            <font face='Lucida Console'>)</font>;
+
+        const_image_view<font color='#5555FF'>&lt;</font>in_image_type<font color='#5555FF'>&gt;</font> <font color='#BB00BB'>in_img</font><font face='Lucida Console'>(</font>in_img_<font face='Lucida Console'>)</font>;
+        image_view<font color='#5555FF'>&lt;</font>out_image_type<font color='#5555FF'>&gt;</font> <font color='#BB00BB'>out_img</font><font face='Lucida Console'>(</font>out_img_<font face='Lucida Console'>)</font>;
+
+
+        <font color='#009900'>// if there isn't any input image then don't do anything
+</font>        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>in_img.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            out_img.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>return</font>;
+        <b>}</b>
+
+        out_img.<font color='#BB00BB'>set_size</font><font face='Lucida Console'>(</font>in_img.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,in_img.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// apply the filter to the image
+</font>        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> r <font color='#5555FF'>=</font> <font color='#979000'>0</font>; r <font color='#5555FF'>&lt;</font> in_img.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>r<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> c <font color='#5555FF'>=</font> <font color='#979000'>0</font>; c <font color='#5555FF'>&lt;</font> in_img.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>c<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> out_pixel <font color='#5555FF'>=</font> on_pixel;
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> m <font color='#5555FF'>=</font> <font color='#979000'>0</font>; m <font color='#5555FF'>&lt;</font> M <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> out_pixel <font color='#5555FF'>=</font><font color='#5555FF'>=</font> on_pixel; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>m<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> n <font color='#5555FF'>=</font> <font color='#979000'>0</font>; n <font color='#5555FF'>&lt;</font> N <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> out_pixel <font color='#5555FF'>=</font><font color='#5555FF'>=</font> on_pixel; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>n<font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>structuring_element[m][n] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> on_pixel<font face='Lucida Console'>)</font>
+                        <b>{</b>
+                            <font color='#009900'>// if this pixel is inside the image then get it from the image
+</font>                            <font color='#009900'>// but if it isn't just pretend it was an off_pixel value
+</font>                            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>r<font color='#5555FF'>+</font>m <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> M<font color='#5555FF'>/</font><font color='#979000'>2</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> c<font color='#5555FF'>+</font>n <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> N<font color='#5555FF'>/</font><font color='#979000'>2</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font>
+                                r<font color='#5555FF'>+</font>m<font color='#5555FF'>-</font>M<font color='#5555FF'>/</font><font color='#979000'>2</font> <font color='#5555FF'>&lt;</font> in_img.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> c<font color='#5555FF'>+</font>n<font color='#5555FF'>-</font>N<font color='#5555FF'>/</font><font color='#979000'>2</font> <font color='#5555FF'>&lt;</font> in_img.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                            <b>{</b>
+                                out_pixel <font color='#5555FF'>=</font> in_img[r<font color='#5555FF'>+</font>m<font color='#5555FF'>-</font>M<font color='#5555FF'>/</font><font color='#979000'>2</font>][c<font color='#5555FF'>+</font>n<font color='#5555FF'>-</font>N<font color='#5555FF'>/</font><font color='#979000'>2</font>];
+                            <b>}</b>
+                            <font color='#0000FF'>else</font>
+                            <b>{</b>
+                                out_pixel <font color='#5555FF'>=</font> off_pixel;
+                            <b>}</b>
+                        <b>}</b>
+                    <b>}</b>
+                <b>}</b>
+                <font color='#BB00BB'>assign_pixel</font><font face='Lucida Console'>(</font>out_img[r][c], out_pixel<font face='Lucida Console'>)</font>;
+            <b>}</b>
+        <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> in_image_type,
+        <font color='#0000FF'>typename</font> out_image_type,
+        <font color='#0000FF'><u>long</u></font> M,
+        <font color='#0000FF'><u>long</u></font> N
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='binary_open'></a>binary_open</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> in_image_type<font color='#5555FF'>&amp;</font> in_img,
+        out_image_type<font color='#5555FF'>&amp;</font> out_img,
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> <font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>structuring_element<font face='Lucida Console'>)</font>[M][N],
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> iter <font color='#5555FF'>=</font> <font color='#979000'>1</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> image_traits<font color='#5555FF'>&lt;</font>in_image_type<font color='#5555FF'>&gt;</font>::pixel_type in_pixel_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> image_traits<font color='#5555FF'>&lt;</font>out_image_type<font color='#5555FF'>&gt;</font>::pixel_type out_pixel_type;
+        <font color='#BB00BB'>COMPILE_TIME_ASSERT</font><font face='Lucida Console'>(</font> pixel_traits<font color='#5555FF'>&lt;</font>in_pixel_type<font color='#5555FF'>&gt;</font>::has_alpha <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font> <font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>COMPILE_TIME_ASSERT</font><font face='Lucida Console'>(</font> pixel_traits<font color='#5555FF'>&lt;</font>out_pixel_type<font color='#5555FF'>&gt;</font>::has_alpha <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font> <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> morphological_operations_helpers;
+        <font color='#BB00BB'>COMPILE_TIME_ASSERT</font><font face='Lucida Console'>(</font>M<font color='#5555FF'>%</font><font color='#979000'>2</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>COMPILE_TIME_ASSERT</font><font face='Lucida Console'>(</font>N<font color='#5555FF'>%</font><font color='#979000'>2</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font><font color='#BB00BB'>is_same_object</font><font face='Lucida Console'>(</font>in_img,out_img<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font>,
+            "<font color='#CC0000'>\tvoid binary_open()</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tYou must give two different image objects</font>"
+            <font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>COMPILE_TIME_ASSERT</font><font face='Lucida Console'>(</font>pixel_traits<font color='#5555FF'>&lt;</font>in_pixel_type<font color='#5555FF'>&gt;</font>::grayscale<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font><font color='#BB00BB'>is_binary_image</font><font face='Lucida Console'>(</font>in_img<font face='Lucida Console'>)</font> ,
+            "<font color='#CC0000'>\tvoid binary_open()</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tin_img must be a binary image</font>"
+            <font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font><font color='#BB00BB'>is_binary_image</font><font face='Lucida Console'>(</font>structuring_element<font face='Lucida Console'>)</font> ,
+            "<font color='#CC0000'>\tvoid binary_open()</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tthe structuring_element must be a binary image</font>"
+            <font face='Lucida Console'>)</font>;
+
+
+        <font color='#009900'>// if there isn't any input image then don't do anything
+</font>        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>num_rows</font><font face='Lucida Console'>(</font>in_img<font face='Lucida Console'>)</font><font color='#5555FF'>*</font><font color='#BB00BB'>num_columns</font><font face='Lucida Console'>(</font>in_img<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#BB00BB'>set_image_size</font><font face='Lucida Console'>(</font>out_img, <font color='#979000'>0</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>return</font>;
+        <b>}</b>
+
+        <font color='#BB00BB'>set_image_size</font><font face='Lucida Console'>(</font>out_img, <font color='#BB00BB'>num_rows</font><font face='Lucida Console'>(</font>in_img<font face='Lucida Console'>)</font>, <font color='#BB00BB'>num_columns</font><font face='Lucida Console'>(</font>in_img<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>iter <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#009900'>// just copy the image over
+</font>            <font color='#BB00BB'>assign_image</font><font face='Lucida Console'>(</font>out_img, in_img<font face='Lucida Console'>)</font>;
+        <b>}</b>
+        <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>iter <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            in_image_type temp;
+            <font color='#BB00BB'>binary_erosion</font><font face='Lucida Console'>(</font>in_img,temp,structuring_element<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>binary_dilation</font><font face='Lucida Console'>(</font>temp,out_img,structuring_element<font face='Lucida Console'>)</font>;
+        <b>}</b>
+        <font color='#0000FF'>else</font>
+        <b>{</b>
+            in_image_type temp1, temp2;
+            <font color='#BB00BB'>binary_erosion</font><font face='Lucida Console'>(</font>in_img,temp1,structuring_element<font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// do the extra erosions
+</font>            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>1</font>; i <font color='#5555FF'>&lt;</font> iter; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>temp1, temp2<font face='Lucida Console'>)</font>;
+                <font color='#BB00BB'>binary_erosion</font><font face='Lucida Console'>(</font>temp2,temp1,structuring_element<font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+            <font color='#009900'>// do the extra dilations 
+</font>            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>1</font>; i <font color='#5555FF'>&lt;</font> iter; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>temp1, temp2<font face='Lucida Console'>)</font>;
+                <font color='#BB00BB'>binary_dilation</font><font face='Lucida Console'>(</font>temp2,temp1,structuring_element<font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+            <font color='#BB00BB'>binary_dilation</font><font face='Lucida Console'>(</font>temp1,out_img,structuring_element<font face='Lucida Console'>)</font>;
+        <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> in_image_type,
+        <font color='#0000FF'>typename</font> out_image_type,
+        <font color='#0000FF'><u>long</u></font> M,
+        <font color='#0000FF'><u>long</u></font> N
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='binary_close'></a>binary_close</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> in_image_type<font color='#5555FF'>&amp;</font> in_img,
+        out_image_type<font color='#5555FF'>&amp;</font> out_img,
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> <font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>structuring_element<font face='Lucida Console'>)</font>[M][N],
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> iter <font color='#5555FF'>=</font> <font color='#979000'>1</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> image_traits<font color='#5555FF'>&lt;</font>in_image_type<font color='#5555FF'>&gt;</font>::pixel_type in_pixel_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> image_traits<font color='#5555FF'>&lt;</font>out_image_type<font color='#5555FF'>&gt;</font>::pixel_type out_pixel_type;
+        <font color='#BB00BB'>COMPILE_TIME_ASSERT</font><font face='Lucida Console'>(</font> pixel_traits<font color='#5555FF'>&lt;</font>in_pixel_type<font color='#5555FF'>&gt;</font>::has_alpha <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font> <font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>COMPILE_TIME_ASSERT</font><font face='Lucida Console'>(</font> pixel_traits<font color='#5555FF'>&lt;</font>out_pixel_type<font color='#5555FF'>&gt;</font>::has_alpha <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font> <font face='Lucida Console'>)</font>;
+
+
+        <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> morphological_operations_helpers;
+        <font color='#BB00BB'>COMPILE_TIME_ASSERT</font><font face='Lucida Console'>(</font>M<font color='#5555FF'>%</font><font color='#979000'>2</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>COMPILE_TIME_ASSERT</font><font face='Lucida Console'>(</font>N<font color='#5555FF'>%</font><font color='#979000'>2</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font><font color='#BB00BB'>is_same_object</font><font face='Lucida Console'>(</font>in_img,out_img<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font>,
+            "<font color='#CC0000'>\tvoid binary_close()</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tYou must give two different image objects</font>"
+            <font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>COMPILE_TIME_ASSERT</font><font face='Lucida Console'>(</font>pixel_traits<font color='#5555FF'>&lt;</font>in_pixel_type<font color='#5555FF'>&gt;</font>::grayscale<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font><font color='#BB00BB'>is_binary_image</font><font face='Lucida Console'>(</font>in_img<font face='Lucida Console'>)</font> ,
+            "<font color='#CC0000'>\tvoid binary_close()</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tin_img must be a binary image</font>"
+            <font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font><font color='#BB00BB'>is_binary_image</font><font face='Lucida Console'>(</font>structuring_element<font face='Lucida Console'>)</font> ,
+            "<font color='#CC0000'>\tvoid binary_close()</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tthe structuring_element must be a binary image</font>"
+            <font face='Lucida Console'>)</font>;
+
+
+        <font color='#009900'>// if there isn't any input image then don't do anything
+</font>        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>num_rows</font><font face='Lucida Console'>(</font>in_img<font face='Lucida Console'>)</font><font color='#5555FF'>*</font><font color='#BB00BB'>num_columns</font><font face='Lucida Console'>(</font>in_img<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#BB00BB'>set_image_size</font><font face='Lucida Console'>(</font>out_img, <font color='#979000'>0</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>return</font>;
+        <b>}</b>
+
+        <font color='#BB00BB'>set_image_size</font><font face='Lucida Console'>(</font>out_img, <font color='#BB00BB'>num_rows</font><font face='Lucida Console'>(</font>in_img<font face='Lucida Console'>)</font>, <font color='#BB00BB'>num_columns</font><font face='Lucida Console'>(</font>in_img<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>iter <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#009900'>// just copy the image over
+</font>            <font color='#BB00BB'>assign_image</font><font face='Lucida Console'>(</font>out_img, in_img<font face='Lucida Console'>)</font>;
+        <b>}</b>
+        <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>iter <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            in_image_type temp;
+            <font color='#BB00BB'>binary_dilation</font><font face='Lucida Console'>(</font>in_img,temp,structuring_element<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>binary_erosion</font><font face='Lucida Console'>(</font>temp,out_img,structuring_element<font face='Lucida Console'>)</font>;
+        <b>}</b>
+        <font color='#0000FF'>else</font>
+        <b>{</b>
+            in_image_type temp1, temp2;
+            <font color='#BB00BB'>binary_dilation</font><font face='Lucida Console'>(</font>in_img,temp1,structuring_element<font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// do the extra dilations 
+</font>            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>1</font>; i <font color='#5555FF'>&lt;</font> iter; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>temp1, temp2<font face='Lucida Console'>)</font>;
+                <font color='#BB00BB'>binary_dilation</font><font face='Lucida Console'>(</font>temp2,temp1,structuring_element<font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+            <font color='#009900'>// do the extra erosions 
+</font>            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>1</font>; i <font color='#5555FF'>&lt;</font> iter; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>temp1, temp2<font face='Lucida Console'>)</font>;
+                <font color='#BB00BB'>binary_erosion</font><font face='Lucida Console'>(</font>temp2,temp1,structuring_element<font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+            <font color='#BB00BB'>binary_erosion</font><font face='Lucida Console'>(</font>temp1,out_img,structuring_element<font face='Lucida Console'>)</font>;
+        <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> in_image_type1,
+        <font color='#0000FF'>typename</font> in_image_type2,
+        <font color='#0000FF'>typename</font> out_image_type
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='binary_intersection'></a>binary_intersection</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> in_image_type1<font color='#5555FF'>&amp;</font> in_img1_,
+        <font color='#0000FF'>const</font> in_image_type2<font color='#5555FF'>&amp;</font> in_img2_,
+        out_image_type<font color='#5555FF'>&amp;</font> out_img_
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> image_traits<font color='#5555FF'>&lt;</font>in_image_type1<font color='#5555FF'>&gt;</font>::pixel_type in_pixel_type1;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> image_traits<font color='#5555FF'>&lt;</font>in_image_type2<font color='#5555FF'>&gt;</font>::pixel_type in_pixel_type2;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> image_traits<font color='#5555FF'>&lt;</font>out_image_type<font color='#5555FF'>&gt;</font>::pixel_type out_pixel_type;
+        <font color='#BB00BB'>COMPILE_TIME_ASSERT</font><font face='Lucida Console'>(</font> pixel_traits<font color='#5555FF'>&lt;</font>in_pixel_type1<font color='#5555FF'>&gt;</font>::has_alpha <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font> <font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>COMPILE_TIME_ASSERT</font><font face='Lucida Console'>(</font> pixel_traits<font color='#5555FF'>&lt;</font>in_pixel_type2<font color='#5555FF'>&gt;</font>::has_alpha <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font> <font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>COMPILE_TIME_ASSERT</font><font face='Lucida Console'>(</font> pixel_traits<font color='#5555FF'>&lt;</font>out_pixel_type<font color='#5555FF'>&gt;</font>::has_alpha <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font> <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> morphological_operations_helpers;
+        <font color='#BB00BB'>COMPILE_TIME_ASSERT</font><font face='Lucida Console'>(</font>pixel_traits<font color='#5555FF'>&lt;</font>in_pixel_type1<font color='#5555FF'>&gt;</font>::grayscale<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>COMPILE_TIME_ASSERT</font><font face='Lucida Console'>(</font>pixel_traits<font color='#5555FF'>&lt;</font>in_pixel_type2<font color='#5555FF'>&gt;</font>::grayscale<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font><font color='#BB00BB'>is_binary_image</font><font face='Lucida Console'>(</font>in_img1_<font face='Lucida Console'>)</font> ,
+            "<font color='#CC0000'>\tvoid binary_intersection()</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tin_img1 must be a binary image</font>"
+            <font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font><font color='#BB00BB'>is_binary_image</font><font face='Lucida Console'>(</font>in_img2_<font face='Lucida Console'>)</font> ,
+            "<font color='#CC0000'>\tvoid binary_intersection()</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tin_img2 must be a binary image</font>"
+            <font face='Lucida Console'>)</font>;
+
+        const_image_view<font color='#5555FF'>&lt;</font>in_image_type1<font color='#5555FF'>&gt;</font> <font color='#BB00BB'>in_img1</font><font face='Lucida Console'>(</font>in_img1_<font face='Lucida Console'>)</font>;
+        const_image_view<font color='#5555FF'>&lt;</font>in_image_type2<font color='#5555FF'>&gt;</font> <font color='#BB00BB'>in_img2</font><font face='Lucida Console'>(</font>in_img2_<font face='Lucida Console'>)</font>;
+        image_view<font color='#5555FF'>&lt;</font>out_image_type<font color='#5555FF'>&gt;</font> <font color='#BB00BB'>out_img</font><font face='Lucida Console'>(</font>out_img_<font face='Lucida Console'>)</font>;
+
+        <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font>in_img1.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> in_img2.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,
+            "<font color='#CC0000'>\tvoid binary_intersection()</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tin_img1 and in_img2 must have the same ncs.</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tin_img1.nc(): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> in_img1.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tin_img2.nc(): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> in_img2.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+            <font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font>in_img1.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> in_img2.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,
+            "<font color='#CC0000'>\tvoid binary_intersection()</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tin_img1 and in_img2 must have the same nrs.</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tin_img1.nr(): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> in_img1.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tin_img2.nr(): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> in_img2.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+            <font face='Lucida Console'>)</font>;
+            
+
+
+        <font color='#009900'>// if there isn't any input image then don't do anything
+</font>        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>in_img1.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            out_img.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>return</font>;
+        <b>}</b>
+
+        out_img.<font color='#BB00BB'>set_size</font><font face='Lucida Console'>(</font>in_img1.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,in_img1.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> r <font color='#5555FF'>=</font> <font color='#979000'>0</font>; r <font color='#5555FF'>&lt;</font> in_img1.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>r<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> c <font color='#5555FF'>=</font> <font color='#979000'>0</font>; c <font color='#5555FF'>&lt;</font> in_img1.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>c<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>in_img1[r][c] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> on_pixel <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> in_img2[r][c] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> on_pixel<font face='Lucida Console'>)</font>
+                    <font color='#BB00BB'>assign_pixel</font><font face='Lucida Console'>(</font>out_img[r][c], on_pixel<font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>else</font>
+                    <font color='#BB00BB'>assign_pixel</font><font face='Lucida Console'>(</font>out_img[r][c], off_pixel<font face='Lucida Console'>)</font>;
+            <b>}</b>
+        <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> in_image_type1,
+        <font color='#0000FF'>typename</font> in_image_type2,
+        <font color='#0000FF'>typename</font> out_image_type
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='binary_union'></a>binary_union</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> in_image_type1<font color='#5555FF'>&amp;</font> in_img1_,
+        <font color='#0000FF'>const</font> in_image_type2<font color='#5555FF'>&amp;</font> in_img2_,
+        out_image_type<font color='#5555FF'>&amp;</font> out_img_
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> image_traits<font color='#5555FF'>&lt;</font>in_image_type1<font color='#5555FF'>&gt;</font>::pixel_type in_pixel_type1;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> image_traits<font color='#5555FF'>&lt;</font>in_image_type2<font color='#5555FF'>&gt;</font>::pixel_type in_pixel_type2;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> image_traits<font color='#5555FF'>&lt;</font>out_image_type<font color='#5555FF'>&gt;</font>::pixel_type out_pixel_type;
+        <font color='#BB00BB'>COMPILE_TIME_ASSERT</font><font face='Lucida Console'>(</font> pixel_traits<font color='#5555FF'>&lt;</font>in_pixel_type1<font color='#5555FF'>&gt;</font>::has_alpha <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font> <font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>COMPILE_TIME_ASSERT</font><font face='Lucida Console'>(</font> pixel_traits<font color='#5555FF'>&lt;</font>in_pixel_type2<font color='#5555FF'>&gt;</font>::has_alpha <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font> <font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>COMPILE_TIME_ASSERT</font><font face='Lucida Console'>(</font> pixel_traits<font color='#5555FF'>&lt;</font>out_pixel_type<font color='#5555FF'>&gt;</font>::has_alpha <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font> <font face='Lucida Console'>)</font>;
+
+
+        <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> morphological_operations_helpers;
+        <font color='#BB00BB'>COMPILE_TIME_ASSERT</font><font face='Lucida Console'>(</font>pixel_traits<font color='#5555FF'>&lt;</font>in_pixel_type1<font color='#5555FF'>&gt;</font>::grayscale<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>COMPILE_TIME_ASSERT</font><font face='Lucida Console'>(</font>pixel_traits<font color='#5555FF'>&lt;</font>in_pixel_type2<font color='#5555FF'>&gt;</font>::grayscale<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font><font color='#BB00BB'>is_binary_image</font><font face='Lucida Console'>(</font>in_img1_<font face='Lucida Console'>)</font> ,
+            "<font color='#CC0000'>\tvoid binary_intersection()</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tin_img1 must be a binary image</font>"
+            <font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font><font color='#BB00BB'>is_binary_image</font><font face='Lucida Console'>(</font>in_img2_<font face='Lucida Console'>)</font> ,
+            "<font color='#CC0000'>\tvoid binary_intersection()</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tin_img2 must be a binary image</font>"
+            <font face='Lucida Console'>)</font>;
+
+        const_image_view<font color='#5555FF'>&lt;</font>in_image_type1<font color='#5555FF'>&gt;</font> <font color='#BB00BB'>in_img1</font><font face='Lucida Console'>(</font>in_img1_<font face='Lucida Console'>)</font>;
+        const_image_view<font color='#5555FF'>&lt;</font>in_image_type2<font color='#5555FF'>&gt;</font> <font color='#BB00BB'>in_img2</font><font face='Lucida Console'>(</font>in_img2_<font face='Lucida Console'>)</font>;
+        image_view<font color='#5555FF'>&lt;</font>out_image_type<font color='#5555FF'>&gt;</font> <font color='#BB00BB'>out_img</font><font face='Lucida Console'>(</font>out_img_<font face='Lucida Console'>)</font>;
+
+        <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font>in_img1.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> in_img2.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,
+            "<font color='#CC0000'>\tvoid binary_intersection()</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tin_img1 and in_img2 must have the same ncs.</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tin_img1.nc(): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> in_img1.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tin_img2.nc(): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> in_img2.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+            <font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font>in_img1.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> in_img2.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,
+            "<font color='#CC0000'>\tvoid binary_intersection()</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tin_img1 and in_img2 must have the same nrs.</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tin_img1.nr(): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> in_img1.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tin_img2.nr(): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> in_img2.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+            <font face='Lucida Console'>)</font>;
+            
+
+
+        <font color='#009900'>// if there isn't any input image then don't do anything
+</font>        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>in_img1.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            out_img.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>return</font>;
+        <b>}</b>
+
+        out_img.<font color='#BB00BB'>set_size</font><font face='Lucida Console'>(</font>in_img1.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,in_img1.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> r <font color='#5555FF'>=</font> <font color='#979000'>0</font>; r <font color='#5555FF'>&lt;</font> in_img1.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>r<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> c <font color='#5555FF'>=</font> <font color='#979000'>0</font>; c <font color='#5555FF'>&lt;</font> in_img1.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>c<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>in_img1[r][c] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> on_pixel <font color='#5555FF'>|</font><font color='#5555FF'>|</font> in_img2[r][c] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> on_pixel<font face='Lucida Console'>)</font>
+                    <font color='#BB00BB'>assign_pixel</font><font face='Lucida Console'>(</font>out_img[r][c], on_pixel<font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>else</font>
+                    <font color='#BB00BB'>assign_pixel</font><font face='Lucida Console'>(</font>out_img[r][c], off_pixel<font face='Lucida Console'>)</font>;
+            <b>}</b>
+        <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> in_image_type1,
+        <font color='#0000FF'>typename</font> in_image_type2,
+        <font color='#0000FF'>typename</font> out_image_type
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='binary_difference'></a>binary_difference</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> in_image_type1<font color='#5555FF'>&amp;</font> in_img1_,
+        <font color='#0000FF'>const</font> in_image_type2<font color='#5555FF'>&amp;</font> in_img2_,
+        out_image_type<font color='#5555FF'>&amp;</font> out_img_
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> image_traits<font color='#5555FF'>&lt;</font>in_image_type1<font color='#5555FF'>&gt;</font>::pixel_type in_pixel_type1;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> image_traits<font color='#5555FF'>&lt;</font>in_image_type2<font color='#5555FF'>&gt;</font>::pixel_type in_pixel_type2;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> image_traits<font color='#5555FF'>&lt;</font>out_image_type<font color='#5555FF'>&gt;</font>::pixel_type out_pixel_type;
+        <font color='#BB00BB'>COMPILE_TIME_ASSERT</font><font face='Lucida Console'>(</font> pixel_traits<font color='#5555FF'>&lt;</font>in_pixel_type1<font color='#5555FF'>&gt;</font>::has_alpha <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font> <font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>COMPILE_TIME_ASSERT</font><font face='Lucida Console'>(</font> pixel_traits<font color='#5555FF'>&lt;</font>in_pixel_type2<font color='#5555FF'>&gt;</font>::has_alpha <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font> <font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>COMPILE_TIME_ASSERT</font><font face='Lucida Console'>(</font> pixel_traits<font color='#5555FF'>&lt;</font>out_pixel_type<font color='#5555FF'>&gt;</font>::has_alpha <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font> <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> morphological_operations_helpers;
+        <font color='#BB00BB'>COMPILE_TIME_ASSERT</font><font face='Lucida Console'>(</font>pixel_traits<font color='#5555FF'>&lt;</font>in_pixel_type1<font color='#5555FF'>&gt;</font>::grayscale<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>COMPILE_TIME_ASSERT</font><font face='Lucida Console'>(</font>pixel_traits<font color='#5555FF'>&lt;</font>in_pixel_type2<font color='#5555FF'>&gt;</font>::grayscale<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font><font color='#BB00BB'>is_binary_image</font><font face='Lucida Console'>(</font>in_img1_<font face='Lucida Console'>)</font> ,
+            "<font color='#CC0000'>\tvoid binary_difference()</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tin_img1 must be a binary image</font>"
+            <font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font><font color='#BB00BB'>is_binary_image</font><font face='Lucida Console'>(</font>in_img2_<font face='Lucida Console'>)</font> ,
+            "<font color='#CC0000'>\tvoid binary_difference()</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tin_img2 must be a binary image</font>"
+            <font face='Lucida Console'>)</font>;
+
+        const_image_view<font color='#5555FF'>&lt;</font>in_image_type1<font color='#5555FF'>&gt;</font> <font color='#BB00BB'>in_img1</font><font face='Lucida Console'>(</font>in_img1_<font face='Lucida Console'>)</font>;
+        const_image_view<font color='#5555FF'>&lt;</font>in_image_type2<font color='#5555FF'>&gt;</font> <font color='#BB00BB'>in_img2</font><font face='Lucida Console'>(</font>in_img2_<font face='Lucida Console'>)</font>;
+        image_view<font color='#5555FF'>&lt;</font>out_image_type<font color='#5555FF'>&gt;</font> <font color='#BB00BB'>out_img</font><font face='Lucida Console'>(</font>out_img_<font face='Lucida Console'>)</font>;
+
+        <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font>in_img1.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> in_img2.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,
+            "<font color='#CC0000'>\tvoid binary_difference()</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tin_img1 and in_img2 must have the same ncs.</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tin_img1.nc(): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> in_img1.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tin_img2.nc(): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> in_img2.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+            <font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font>in_img1.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> in_img2.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,
+            "<font color='#CC0000'>\tvoid binary_difference()</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tin_img1 and in_img2 must have the same nrs.</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tin_img1.nr(): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> in_img1.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tin_img2.nr(): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> in_img2.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+            <font face='Lucida Console'>)</font>;
+            
+
+
+        <font color='#009900'>// if there isn't any input image then don't do anything
+</font>        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>in_img1.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            out_img.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>return</font>;
+        <b>}</b>
+
+        out_img.<font color='#BB00BB'>set_size</font><font face='Lucida Console'>(</font>in_img1.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,in_img1.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> r <font color='#5555FF'>=</font> <font color='#979000'>0</font>; r <font color='#5555FF'>&lt;</font> in_img1.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>r<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> c <font color='#5555FF'>=</font> <font color='#979000'>0</font>; c <font color='#5555FF'>&lt;</font> in_img1.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>c<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>in_img1[r][c] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> on_pixel <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> in_img2[r][c] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> off_pixel<font face='Lucida Console'>)</font>
+                    <font color='#BB00BB'>assign_pixel</font><font face='Lucida Console'>(</font>out_img[r][c], on_pixel<font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>else</font>
+                    <font color='#BB00BB'>assign_pixel</font><font face='Lucida Console'>(</font>out_img[r][c], off_pixel<font face='Lucida Console'>)</font>;
+            <b>}</b>
+        <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> in_image_type,
+        <font color='#0000FF'>typename</font> out_image_type
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='binary_complement'></a>binary_complement</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> in_image_type<font color='#5555FF'>&amp;</font> in_img_,
+        out_image_type<font color='#5555FF'>&amp;</font> out_img_
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> image_traits<font color='#5555FF'>&lt;</font>in_image_type<font color='#5555FF'>&gt;</font>::pixel_type in_pixel_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> image_traits<font color='#5555FF'>&lt;</font>out_image_type<font color='#5555FF'>&gt;</font>::pixel_type out_pixel_type;
+        <font color='#BB00BB'>COMPILE_TIME_ASSERT</font><font face='Lucida Console'>(</font> pixel_traits<font color='#5555FF'>&lt;</font>in_pixel_type<font color='#5555FF'>&gt;</font>::has_alpha <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font> <font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>COMPILE_TIME_ASSERT</font><font face='Lucida Console'>(</font> pixel_traits<font color='#5555FF'>&lt;</font>out_pixel_type<font color='#5555FF'>&gt;</font>::has_alpha <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font> <font face='Lucida Console'>)</font>;
+
+
+        <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> morphological_operations_helpers;
+        <font color='#BB00BB'>COMPILE_TIME_ASSERT</font><font face='Lucida Console'>(</font>pixel_traits<font color='#5555FF'>&lt;</font>in_pixel_type<font color='#5555FF'>&gt;</font>::grayscale<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font><font color='#BB00BB'>is_binary_image</font><font face='Lucida Console'>(</font>in_img_<font face='Lucida Console'>)</font> ,
+            "<font color='#CC0000'>\tvoid binary_complement()</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tin_img must be a binary image</font>"
+            <font face='Lucida Console'>)</font>;
+
+        const_image_view<font color='#5555FF'>&lt;</font>in_image_type<font color='#5555FF'>&gt;</font> <font color='#BB00BB'>in_img</font><font face='Lucida Console'>(</font>in_img_<font face='Lucida Console'>)</font>;
+        image_view<font color='#5555FF'>&lt;</font>out_image_type<font color='#5555FF'>&gt;</font> <font color='#BB00BB'>out_img</font><font face='Lucida Console'>(</font>out_img_<font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// if there isn't any input image then don't do anything
+</font>        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>in_img.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            out_img.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>return</font>;
+        <b>}</b>
+
+        out_img.<font color='#BB00BB'>set_size</font><font face='Lucida Console'>(</font>in_img.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,in_img.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> r <font color='#5555FF'>=</font> <font color='#979000'>0</font>; r <font color='#5555FF'>&lt;</font> in_img.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>r<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> c <font color='#5555FF'>=</font> <font color='#979000'>0</font>; c <font color='#5555FF'>&lt;</font> in_img.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>c<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>in_img[r][c] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> on_pixel<font face='Lucida Console'>)</font>
+                    <font color='#BB00BB'>assign_pixel</font><font face='Lucida Console'>(</font>out_img[r][c], off_pixel<font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>else</font>
+                    <font color='#BB00BB'>assign_pixel</font><font face='Lucida Console'>(</font>out_img[r][c], on_pixel<font face='Lucida Console'>)</font>;
+            <b>}</b>
+        <b>}</b>
+    <b>}</b>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> image_type
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='binary_complement'></a>binary_complement</b> <font face='Lucida Console'>(</font>
+        image_type<font color='#5555FF'>&amp;</font> img
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#BB00BB'>binary_complement</font><font face='Lucida Console'>(</font>img,img<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>namespace</font> impl
+    <b>{</b>
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> image_type<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>inline</font> <font color='#0000FF'><u>bool</u></font> <b><a name='should_remove_pixel'></a>should_remove_pixel</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> image_type<font color='#5555FF'>&amp;</font> img,
+            <font color='#0000FF'><u>long</u></font> r,
+            <font color='#0000FF'><u>long</u></font> c,
+            <font color='#0000FF'><u>int</u></font> iter
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>int</u></font> p2 <font color='#5555FF'>=</font> img[r<font color='#5555FF'>-</font><font color='#979000'>1</font>][c];
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>int</u></font> p3 <font color='#5555FF'>=</font> img[r<font color='#5555FF'>-</font><font color='#979000'>1</font>][c<font color='#5555FF'>+</font><font color='#979000'>1</font>];
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>int</u></font> p4 <font color='#5555FF'>=</font> img[r][c<font color='#5555FF'>+</font><font color='#979000'>1</font>];
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>int</u></font> p5 <font color='#5555FF'>=</font> img[r<font color='#5555FF'>+</font><font color='#979000'>1</font>][c<font color='#5555FF'>+</font><font color='#979000'>1</font>];
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>int</u></font> p6 <font color='#5555FF'>=</font> img[r<font color='#5555FF'>+</font><font color='#979000'>1</font>][c];
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>int</u></font> p7 <font color='#5555FF'>=</font> img[r<font color='#5555FF'>+</font><font color='#979000'>1</font>][c<font color='#5555FF'>-</font><font color='#979000'>1</font>];
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>int</u></font> p8 <font color='#5555FF'>=</font> img[r][c<font color='#5555FF'>-</font><font color='#979000'>1</font>];
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>int</u></font> p9 <font color='#5555FF'>=</font> img[r<font color='#5555FF'>-</font><font color='#979000'>1</font>][c<font color='#5555FF'>-</font><font color='#979000'>1</font>];
+
+            <font color='#0000FF'><u>int</u></font> A  <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>p2 <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> p3 <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>255</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> <font face='Lucida Console'>(</font>p3 <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> p4 <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>255</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> 
+                <font face='Lucida Console'>(</font>p4 <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> p5 <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>255</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> <font face='Lucida Console'>(</font>p5 <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> p6 <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>255</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> 
+                <font face='Lucida Console'>(</font>p6 <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> p7 <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>255</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> <font face='Lucida Console'>(</font>p7 <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> p8 <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>255</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font>
+                <font face='Lucida Console'>(</font>p8 <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> p9 <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>255</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> <font face='Lucida Console'>(</font>p9 <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> p2 <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>255</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'><u>int</u></font> B  <font color='#5555FF'>=</font> p2 <font color='#5555FF'>+</font> p3 <font color='#5555FF'>+</font> p4 <font color='#5555FF'>+</font> p5 <font color='#5555FF'>+</font> p6 <font color='#5555FF'>+</font> p7 <font color='#5555FF'>+</font> p8 <font color='#5555FF'>+</font> p9;
+            <font color='#0000FF'><u>int</u></font> m1 <font color='#5555FF'>=</font> iter <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font> ? <font face='Lucida Console'>(</font>p2 <font color='#5555FF'>*</font> p4 <font color='#5555FF'>*</font> p6<font face='Lucida Console'>)</font> : <font face='Lucida Console'>(</font>p2 <font color='#5555FF'>*</font> p4 <font color='#5555FF'>*</font> p8<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'><u>int</u></font> m2 <font color='#5555FF'>=</font> iter <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font> ? <font face='Lucida Console'>(</font>p4 <font color='#5555FF'>*</font> p6 <font color='#5555FF'>*</font> p8<font face='Lucida Console'>)</font> : <font face='Lucida Console'>(</font>p2 <font color='#5555FF'>*</font> p6 <font color='#5555FF'>*</font> p8<font face='Lucida Console'>)</font>;
+            <font color='#009900'>// Decide if we should remove the pixel img[r][c].  
+</font>            <font color='#0000FF'>return</font> <font face='Lucida Console'>(</font>A <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>1</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> <font face='Lucida Console'>(</font>B <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#979000'>2</font><font color='#5555FF'>*</font><font color='#979000'>255</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> B <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#979000'>6</font><font color='#5555FF'>*</font><font color='#979000'>255</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> m1 <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> m2 <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> image_type<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='add_to_remove'></a>add_to_remove</b> <font face='Lucida Console'>(</font>
+            std::vector<font color='#5555FF'>&lt;</font>point<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> to_remove,
+            array2d<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> marker, 
+            <font color='#0000FF'>const</font> image_type<font color='#5555FF'>&amp;</font> img,
+            <font color='#0000FF'><u>long</u></font> r,
+            <font color='#0000FF'><u>long</u></font> c,
+            <font color='#0000FF'><u>int</u></font> iter
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>marker[r][c]<font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font><font color='#BB00BB'>should_remove_pixel</font><font face='Lucida Console'>(</font>img,r,c,iter<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> 
+            <b>{</b>
+                to_remove.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font><font color='#BB00BB'>point</font><font face='Lucida Console'>(</font>c,r<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                marker[r][c] <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            <b>}</b>
+        <b>}</b>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> image_type<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>inline</font> <font color='#0000FF'><u>bool</u></font> <b><a name='is_bw_border_pixel'></a>is_bw_border_pixel</b><font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> image_type<font color='#5555FF'>&amp;</font> img,
+            <font color='#0000FF'><u>long</u></font> r,
+            <font color='#0000FF'><u>long</u></font> c
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>int</u></font> p2 <font color='#5555FF'>=</font> img[r<font color='#5555FF'>-</font><font color='#979000'>1</font>][c];
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>int</u></font> p3 <font color='#5555FF'>=</font> img[r<font color='#5555FF'>-</font><font color='#979000'>1</font>][c<font color='#5555FF'>+</font><font color='#979000'>1</font>];
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>int</u></font> p4 <font color='#5555FF'>=</font> img[r][c<font color='#5555FF'>+</font><font color='#979000'>1</font>];
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>int</u></font> p5 <font color='#5555FF'>=</font> img[r<font color='#5555FF'>+</font><font color='#979000'>1</font>][c<font color='#5555FF'>+</font><font color='#979000'>1</font>];
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>int</u></font> p6 <font color='#5555FF'>=</font> img[r<font color='#5555FF'>+</font><font color='#979000'>1</font>][c];
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>int</u></font> p7 <font color='#5555FF'>=</font> img[r<font color='#5555FF'>+</font><font color='#979000'>1</font>][c<font color='#5555FF'>-</font><font color='#979000'>1</font>];
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>int</u></font> p8 <font color='#5555FF'>=</font> img[r][c<font color='#5555FF'>-</font><font color='#979000'>1</font>];
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>int</u></font> p9 <font color='#5555FF'>=</font> img[r<font color='#5555FF'>-</font><font color='#979000'>1</font>][c<font color='#5555FF'>-</font><font color='#979000'>1</font>];
+
+            <font color='#0000FF'><u>int</u></font> B  <font color='#5555FF'>=</font> p2 <font color='#5555FF'>+</font> p3 <font color='#5555FF'>+</font> p4 <font color='#5555FF'>+</font> p5 <font color='#5555FF'>+</font> p6 <font color='#5555FF'>+</font> p7 <font color='#5555FF'>+</font> p8 <font color='#5555FF'>+</font> p9;
+            <font color='#009900'>// If you are on but at least one of your neighbors isn't.
+</font>            <font color='#0000FF'>return</font> B<font color='#5555FF'>&lt;</font><font color='#979000'>8</font><font color='#5555FF'>*</font><font color='#979000'>255</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> img[r][c];
+
+        <b>}</b>
+
+        <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='add_if'></a>add_if</b><font face='Lucida Console'>(</font>
+            std::vector<font color='#5555FF'>&lt;</font>point<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> to_check2, 
+            <font color='#0000FF'>const</font> array2d<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> marker,
+            <font color='#0000FF'><u>long</u></font> c,
+            <font color='#0000FF'><u>long</u></font> r
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>marker[r][c]<font face='Lucida Console'>)</font>
+                to_check2.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font><font color='#BB00BB'>point</font><font face='Lucida Console'>(</font>c,r<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+    <b>}</b> <font color='#009900'>// end namespace impl
+</font>
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> image_type
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='skeleton'></a>skeleton</b><font face='Lucida Console'>(</font>
+        image_type<font color='#5555FF'>&amp;</font> img_
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#009900'>/*
+            The implementation of this function is based on the paper
+            "A fast parallel algorithm for thinning digital patterns” by T.Y. Zhang and C.Y. Suen.
+            and also the excellent discussion of it at:
+            http://opencv-code.com/quick-tips/implementation-of-thinning-algorithm-in-opencv/
+        */</font>
+
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> image_traits<font color='#5555FF'>&lt;</font>image_type<font color='#5555FF'>&gt;</font>::pixel_type pixel_type;
+
+        <font color='#009900'>// This function only works on grayscale images
+</font>        <font color='#BB00BB'>COMPILE_TIME_ASSERT</font><font face='Lucida Console'>(</font>pixel_traits<font color='#5555FF'>&lt;</font>pixel_type<font color='#5555FF'>&gt;</font>::grayscale<font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> impl;
+        <font color='#009900'>// Note that it's important to zero the border for 2 reasons. First, it allows
+</font>        <font color='#009900'>// thinning to being at the border of the image.  But more importantly, it causes
+</font>        <font color='#009900'>// the mask to have a border of 0 pixels as well which we use later to avoid
+</font>        <font color='#009900'>// indexing outside the image inside add_to_remove().
+</font>        <font color='#BB00BB'>zero_border_pixels</font><font face='Lucida Console'>(</font>img_,<font color='#979000'>1</font>,<font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+        image_view<font color='#5555FF'>&lt;</font>image_type<font color='#5555FF'>&gt;</font> <font color='#BB00BB'>img</font><font face='Lucida Console'>(</font>img_<font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// We use the marker to keep track of pixels we have committed to removing but
+</font>        <font color='#009900'>// haven't yet removed from img.
+</font>        array2d<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font> <font color='#BB00BB'>marker</font><font face='Lucida Console'>(</font>img.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, img.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>assign_image</font><font face='Lucida Console'>(</font>marker, img<font face='Lucida Console'>)</font>;
+
+
+        <font color='#009900'>// Begin by making a list of the pixels on the borders of binary blobs.
+</font>        std::vector<font color='#5555FF'>&lt;</font>point<font color='#5555FF'>&gt;</font> to_remove, to_check, to_check2;
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> r <font color='#5555FF'>=</font> <font color='#979000'>1</font>; r <font color='#5555FF'>&lt;</font> img.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#979000'>1</font>; r<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> c <font color='#5555FF'>=</font> <font color='#979000'>1</font>; c <font color='#5555FF'>&lt;</font> img.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#979000'>1</font>; c<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>is_bw_border_pixel</font><font face='Lucida Console'>(</font>img, r, c<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                <b>{</b>
+                    to_check.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font><font color='#BB00BB'>point</font><font face='Lucida Console'>(</font>c,r<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                <b>}</b>
+            <b>}</b>
+        <b>}</b>
+
+        <font color='#009900'>// Now start iteratively looking at the border pixels and removing them.
+</font>        <font color='#0000FF'>while</font><font face='Lucida Console'>(</font>to_check.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> iter <font color='#5555FF'>=</font> <font color='#979000'>0</font>; iter <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#979000'>1</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>iter<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#009900'>// Check which pixels we should remove
+</font>                to_remove.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> to_check.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#0000FF'><u>long</u></font> r <font color='#5555FF'>=</font> to_check[i].<font color='#BB00BB'>y</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                    <font color='#0000FF'><u>long</u></font> c <font color='#5555FF'>=</font> to_check[i].<font color='#BB00BB'>x</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                    <font color='#BB00BB'>add_to_remove</font><font face='Lucida Console'>(</font>to_remove, marker, img, r, c, iter<font face='Lucida Console'>)</font>;
+                <b>}</b>
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> to_check2.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#0000FF'><u>long</u></font> r <font color='#5555FF'>=</font> to_check2[i].<font color='#BB00BB'>y</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                    <font color='#0000FF'><u>long</u></font> c <font color='#5555FF'>=</font> to_check2[i].<font color='#BB00BB'>x</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                    <font color='#BB00BB'>add_to_remove</font><font face='Lucida Console'>(</font>to_remove, marker, img, r, c, iter<font face='Lucida Console'>)</font>;
+                <b>}</b>
+                <font color='#009900'>// Now remove those pixels.  Also add their neighbors into the "to check"
+</font>                <font color='#009900'>// pixel list for the next iteration.
+</font>                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> to_remove.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#0000FF'><u>long</u></font> r <font color='#5555FF'>=</font> to_remove[i].<font color='#BB00BB'>y</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                    <font color='#0000FF'><u>long</u></font> c <font color='#5555FF'>=</font> to_remove[i].<font color='#BB00BB'>x</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                    <font color='#009900'>// remove the pixel
+</font>                    img[r][c] <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                    <font color='#BB00BB'>add_if</font><font face='Lucida Console'>(</font>to_check2, marker, c<font color='#5555FF'>-</font><font color='#979000'>1</font>, r<font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+                    <font color='#BB00BB'>add_if</font><font face='Lucida Console'>(</font>to_check2, marker, c,   r<font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+                    <font color='#BB00BB'>add_if</font><font face='Lucida Console'>(</font>to_check2, marker, c<font color='#5555FF'>+</font><font color='#979000'>1</font>, r<font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+                    <font color='#BB00BB'>add_if</font><font face='Lucida Console'>(</font>to_check2, marker, c<font color='#5555FF'>-</font><font color='#979000'>1</font>, r<font face='Lucida Console'>)</font>;
+                    <font color='#BB00BB'>add_if</font><font face='Lucida Console'>(</font>to_check2, marker, c<font color='#5555FF'>+</font><font color='#979000'>1</font>, r<font face='Lucida Console'>)</font>;
+                    <font color='#BB00BB'>add_if</font><font face='Lucida Console'>(</font>to_check2, marker, c<font color='#5555FF'>-</font><font color='#979000'>1</font>, r<font color='#5555FF'>+</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+                    <font color='#BB00BB'>add_if</font><font face='Lucida Console'>(</font>to_check2, marker, c,   r<font color='#5555FF'>+</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+                    <font color='#BB00BB'>add_if</font><font face='Lucida Console'>(</font>to_check2, marker, c<font color='#5555FF'>+</font><font color='#979000'>1</font>, r<font color='#5555FF'>+</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+                <b>}</b>
+            <b>}</b>
+            to_check.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            to_check.<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>to_check2<font face='Lucida Console'>)</font>;
+        <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_MORPHOLOGICAL_OPERATIONs_
+</font>
+
+</pre></body></html>

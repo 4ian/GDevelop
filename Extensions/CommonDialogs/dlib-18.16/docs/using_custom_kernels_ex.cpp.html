@@ -1,0 +1,211 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - using_custom_kernels_ex.cpp</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// The contents of this file are in the public domain. See LICENSE_FOR_EXAMPLE_PROGRAMS.txt
+</font><font color='#009900'>/*
+
+    This is an example showing how to define custom kernel functions for use with 
+    the machine learning tools in the dlib C++ Library.
+
+    This example assumes you are somewhat familiar with the machine learning
+    tools in dlib.  In particular, you should be familiar with the krr_trainer
+    and the matrix object.  So you may want to read the <a href="krr_classification_ex.cpp.html">krr_classification_ex.cpp</a>
+    and <a href="matrix_ex.cpp.html">matrix_ex.cpp</a> example programs if you haven't already.
+*/</font>
+
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>iostream<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>svm.h<font color='#5555FF'>&gt;</font>
+
+<font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> std;
+<font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> dlib;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<font color='#009900'>/*
+    Here we define our new kernel.  It is the UKF kernel from 
+        Facilitating the applications of support vector machine by using a new kernel
+        by Rui Zhang and Wenjian Wang.
+
+
+    
+    In the context of the dlib library a kernel function object is an object with 
+    an interface with the following properties:
+        - a public typedef named sample_type
+        - a public typedef named scalar_type which should be a float, double, or 
+          long double type.
+        - an overloaded operator() that operates on two items of sample_type 
+          and returns a scalar_type.  
+        - a public typedef named mem_manager_type that is an implementation of 
+          dlib/memory_manager/memory_manager_kernel_abstract.h or
+          dlib/memory_manager_global/memory_manager_global_kernel_abstract.h or
+          dlib/memory_manager_stateless/memory_manager_stateless_kernel_abstract.h 
+        - an overloaded == operator that tells you if two kernels are
+          identical or not.
+
+    Below we define such a beast for the UKF kernel.  In this case we are expecting the 
+    sample type (i.e. the T type) to be a dlib::matrix.  However, note that you can design 
+    kernels which operate on any type you like so long as you meet the above requirements.
+*/</font>
+
+<font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font> <font color='#0000FF'>typename</font> T <font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>struct</font> <b><a name='ukf_kernel'></a>ukf_kernel</b>
+<b>{</b>
+    <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> T::type             scalar_type;
+    <font color='#0000FF'>typedef</font>          T                   sample_type;
+    <font color='#009900'>// If your sample type, the T, doesn't have a memory manager then
+</font>    <font color='#009900'>// you can use dlib::default_memory_manager here.
+</font>    <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> T::mem_manager_type mem_manager_type;
+
+    <b><a name='ukf_kernel'></a>ukf_kernel</b><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> scalar_type g<font face='Lucida Console'>)</font> : sigma<font face='Lucida Console'>(</font>g<font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+    <b><a name='ukf_kernel'></a>ukf_kernel</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> : sigma<font face='Lucida Console'>(</font><font color='#979000'>0.1</font><font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+
+    scalar_type sigma;
+
+    scalar_type <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> sample_type<font color='#5555FF'>&amp;</font> a,
+        <font color='#0000FF'>const</font> sample_type<font color='#5555FF'>&amp;</font> b
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b> 
+        <font color='#009900'>// This is the formula for the UKF kernel from the above referenced paper.
+</font>        <font color='#0000FF'>return</font> <font color='#979000'>1</font><font color='#5555FF'>/</font><font face='Lucida Console'>(</font><font color='#BB00BB'>length_squared</font><font face='Lucida Console'>(</font>a<font color='#5555FF'>-</font>b<font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> sigma<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+    <font color='#0000FF'><u>bool</u></font> <b><a name='operator'></a>operator</b><font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> ukf_kernel<font color='#5555FF'>&amp;</font> k
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        <font color='#0000FF'>return</font> sigma <font color='#5555FF'>=</font><font color='#5555FF'>=</font> k.sigma;
+    <b>}</b>
+<b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<font color='#009900'>/*
+    Here we define serialize() and deserialize() functions for our new kernel.  Defining
+    these functions is optional.  However, if you don't define them you won't be able
+    to save your learned decision_function objects to disk. 
+*/</font>
+
+<font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font> <font color='#0000FF'>typename</font> T <font color='#5555FF'>&gt;</font>
+<font color='#0000FF'><u>void</u></font> <b><a name='serialize'></a>serialize</b> <font face='Lucida Console'>(</font> <font color='#0000FF'>const</font> ukf_kernel<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> item, std::ostream<font color='#5555FF'>&amp;</font> out<font face='Lucida Console'>)</font>
+<b>{</b>
+    <font color='#009900'>// save the state of the kernel to the output stream
+</font>    <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item.sigma, out<font face='Lucida Console'>)</font>;
+<b>}</b>
+
+<font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font> <font color='#0000FF'>typename</font> T <font color='#5555FF'>&gt;</font>
+<font color='#0000FF'><u>void</u></font> <b><a name='deserialize'></a>deserialize</b> <font face='Lucida Console'>(</font> ukf_kernel<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> item, std::istream<font color='#5555FF'>&amp;</font> in <font face='Lucida Console'>)</font>
+<b>{</b>
+    <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item.sigma, in<font face='Lucida Console'>)</font>;
+<b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<font color='#009900'>/*
+    This next thing, the kernel_derivative specialization is optional.  You only need
+    to define it if you want to use the dlib::reduced2() or dlib::approximate_distance_function() 
+    routines.  If so, then you need to supply code for computing the derivative of your kernel as 
+    shown below.  Note also that you can only do this if your kernel operates on dlib::matrix
+    objects which represent column vectors.
+*/</font>
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font> <font color='#0000FF'>typename</font> T <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>struct</font> <b><a name='kernel_derivative'></a>kernel_derivative</b><font color='#5555FF'>&lt;</font>ukf_kernel<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font>
+    <b>{</b>
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> T::type             scalar_type;
+        <font color='#0000FF'>typedef</font>          T                   sample_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> T::mem_manager_type mem_manager_type;
+
+        <b><a name='kernel_derivative'></a>kernel_derivative</b><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> ukf_kernel<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> k_<font face='Lucida Console'>)</font> : k<font face='Lucida Console'>(</font>k_<font face='Lucida Console'>)</font><b>{</b><b>}</b>
+
+        sample_type <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font><font color='#0000FF'>const</font> sample_type<font color='#5555FF'>&amp;</font> x, <font color='#0000FF'>const</font> sample_type<font color='#5555FF'>&amp;</font> y<font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#009900'>// return the derivative of the ukf kernel with respect to the second argument (i.e. y)
+</font>            <font color='#0000FF'>return</font> <font color='#979000'>2</font><font color='#5555FF'>*</font><font face='Lucida Console'>(</font>x<font color='#5555FF'>-</font>y<font face='Lucida Console'>)</font><font color='#5555FF'>*</font>std::<font color='#BB00BB'>pow</font><font face='Lucida Console'>(</font><font color='#BB00BB'>k</font><font face='Lucida Console'>(</font>x,y<font face='Lucida Console'>)</font>,<font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>const</font> ukf_kernel<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> k;
+    <b>}</b>;
+<b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<font color='#0000FF'><u>int</u></font> <b><a name='main'></a>main</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+<b>{</b>
+    <font color='#009900'>// We are going to be working with 2 dimensional samples and trying to perform
+</font>    <font color='#009900'>// binary classification on them using our new ukf_kernel.
+</font>    <font color='#0000FF'>typedef</font> matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>, <font color='#979000'>2</font>, <font color='#979000'>1</font><font color='#5555FF'>&gt;</font> sample_type;
+
+    <font color='#0000FF'>typedef</font> ukf_kernel<font color='#5555FF'>&lt;</font>sample_type<font color='#5555FF'>&gt;</font> kernel_type;
+
+
+    <font color='#009900'>// Now let's generate some training data
+</font>    std::vector<font color='#5555FF'>&lt;</font>sample_type<font color='#5555FF'>&gt;</font> samples;
+    std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font> labels;
+    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>double</u></font> r <font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>20</font>; r <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#979000'>20</font>; r <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#979000'>0.9</font><font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>double</u></font> c <font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>20</font>; c <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#979000'>20</font>; c <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#979000'>0.9</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            sample_type samp;
+            <font color='#BB00BB'>samp</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> r;
+            <font color='#BB00BB'>samp</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> c;
+            samples.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>samp<font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// if this point is less than 13 from the origin
+</font>            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>sqrt</font><font face='Lucida Console'>(</font>r<font color='#5555FF'>*</font>r <font color='#5555FF'>+</font> c<font color='#5555FF'>*</font>c<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#979000'>13</font><font face='Lucida Console'>)</font>
+                labels.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font><font color='#5555FF'>+</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>else</font>
+                labels.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font><font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+
+        <b>}</b>
+    <b>}</b>
+    cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>samples generated: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> samples.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+    cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>  number of +1 samples: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>sum</font><font face='Lucida Console'>(</font><font color='#BB00BB'>mat</font><font face='Lucida Console'>(</font>labels<font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+    cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>  number of -1 samples: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>sum</font><font face='Lucida Console'>(</font><font color='#BB00BB'>mat</font><font face='Lucida Console'>(</font>labels<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+
+
+    <font color='#009900'>// A valid kernel must always give rise to kernel matrices which are symmetric 
+</font>    <font color='#009900'>// and positive semidefinite (i.e. have nonnegative eigenvalues).  This next
+</font>    <font color='#009900'>// bit of code makes a kernel matrix and checks if it has these properties.
+</font>    <font color='#0000FF'>const</font> matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font> K <font color='#5555FF'>=</font> <font color='#BB00BB'>kernel_matrix</font><font face='Lucida Console'>(</font><font color='#BB00BB'>kernel_type</font><font face='Lucida Console'>(</font><font color='#979000'>0.1</font><font face='Lucida Console'>)</font>, <font color='#BB00BB'>randomly_subsample</font><font face='Lucida Console'>(</font>samples, <font color='#979000'>500</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+    cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\nIs it symmetric? (this value should be 0): </font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>min</font><font face='Lucida Console'>(</font><font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font>K <font color='#5555FF'>-</font> <font color='#BB00BB'>trans</font><font face='Lucida Console'>(</font>K<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+    cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>Smallest eigenvalue (should be &gt;= 0):      </font>"  <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>min</font><font face='Lucida Console'>(</font><font color='#BB00BB'>real_eigenvalues</font><font face='Lucida Console'>(</font>K<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+
+
+    <font color='#009900'>// here we make an instance of the krr_trainer object that uses our new kernel.
+</font>    krr_trainer<font color='#5555FF'>&lt;</font>kernel_type<font color='#5555FF'>&gt;</font> trainer;
+    trainer.<font color='#BB00BB'>use_classification_loss_for_loo_cv</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+
+    <font color='#009900'>// Finally, let's test how good our new kernel is by doing some leave-one-out cross-validation.
+</font>    cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\ndoing leave-one-out cross-validation</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>double</u></font> sigma <font color='#5555FF'>=</font> <font color='#979000'>0.01</font>; sigma <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#979000'>100</font>; sigma <font color='#5555FF'>*</font><font color='#5555FF'>=</font> <font color='#979000'>3</font><font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#009900'>// tell the trainer the parameters we want to use
+</font>        trainer.<font color='#BB00BB'>set_kernel</font><font face='Lucida Console'>(</font><font color='#BB00BB'>kernel_type</font><font face='Lucida Console'>(</font>sigma<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+        std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font> loo_values; 
+        trainer.<font color='#BB00BB'>train</font><font face='Lucida Console'>(</font>samples, labels, loo_values<font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// Print sigma and the fraction of samples correctly classified during LOO cross-validation.
+</font>        <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> classification_accuracy <font color='#5555FF'>=</font> <font color='#BB00BB'>mean_sign_agreement</font><font face='Lucida Console'>(</font>labels, loo_values<font face='Lucida Console'>)</font>;
+        cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>sigma: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> sigma <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>     LOO accuracy: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> classification_accuracy <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+    <b>}</b>
+
+
+
+
+    <font color='#0000FF'>const</font> kernel_type <font color='#BB00BB'>kern</font><font face='Lucida Console'>(</font><font color='#979000'>10</font><font face='Lucida Console'>)</font>;
+    <font color='#009900'>// Since it is very easy to make a mistake while coding a derivative it is a good idea
+</font>    <font color='#009900'>// to compare your derivative function against a numerical approximation and see if
+</font>    <font color='#009900'>// the results are similar.  If they are very different then you probably made a 
+</font>    <font color='#009900'>// mistake.  So here we compare the results at a test point. 
+</font>    cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\nThese vectors should match, if they don't then we coded the kernel_derivative wrong!</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+    cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>approximate derivative: \n</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font>               <font color='#BB00BB'>derivative</font><font face='Lucida Console'>(</font>kern<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>samples[<font color='#979000'>0</font>],samples[<font color='#979000'>100</font>]<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+    cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>exact derivative: \n</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> kernel_derivative<font color='#5555FF'>&lt;</font>kernel_type<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>kern<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>samples[<font color='#979000'>0</font>],samples[<font color='#979000'>100</font>]<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+
+<b>}</b>
+
+
+</pre></body></html>

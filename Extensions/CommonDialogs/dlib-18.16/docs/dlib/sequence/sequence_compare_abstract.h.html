@@ -1,0 +1,78 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - sequence_compare_abstract.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2003  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#undef</font> DLIB_SEQUENCE_COMPARe_ABSTRACT_
+<font color='#0000FF'>#ifdef</font> DLIB_SEQUENCE_COMPARe_ABSTRACT_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='sequence_kernel_abstract.h.html'>sequence_kernel_abstract.h</a>"
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../algs.h.html'>../algs.h</a>"
+
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> seq_base
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>class</font> <b><a name='sequence_compare'></a>sequence_compare</b> : <font color='#0000FF'>public</font> seq_base
+    <b>{</b>
+
+        <font color='#009900'>/*!
+            REQUIREMENTS ON T
+                T must implement operator&lt; for its type and
+                T must implement operator== for its type
+
+            REQUIREMENTS ON SEQUENCE_BASE
+                must be an implementation of sequence/sequence_kernel_abstract.h
+
+
+            POINTERS AND REFERENCES TO INTERNAL DATA
+                operator== and operator&lt; do not invalidate pointers or references to 
+                data members
+
+            WHAT THIS EXTENSION DOES FOR sequence
+                This gives a sequence the ability to compare itself to other 
+                sequences using the &lt; and == operators. 
+        !*/</font>
+
+    <font color='#0000FF'>public</font>:
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='operator'></a>operator</b><font color='#5555FF'>&lt;</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> sequence_compare<font color='#5555FF'>&amp;</font> rhs
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns true if there exists an integer j such that 0 &lt;= j &lt; size() 
+                  and for all integers i such that 0 &lt;= i &lt; j where it is true that
+                  (*this)[i] &lt;= rhs[i] and (*this)[j] &lt; rhs[j] 
+                - returns false if there is no j that will satisfy the above conditions
+        !*/</font>
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='operator'></a>operator</b><font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> sequence_compare<font color='#5555FF'>&amp;</font> rhs
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns true if for all i: (*this)[i] == rhs[i] else returns false                   
+        !*/</font>
+
+    <b>}</b>;
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> seq_base
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='swap'></a>swap</b> <font face='Lucida Console'>(</font>
+        sequence_compare<font color='#5555FF'>&lt;</font>seq_base<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> a, 
+        sequence_compare<font color='#5555FF'>&lt;</font>seq_base<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> b 
+    <font face='Lucida Console'>)</font> <b>{</b> a.<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>b<font face='Lucida Console'>)</font>; <b>}</b> 
+    <font color='#009900'>/*!
+        provides a global swap function
+    !*/</font>
+
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_SEQUENCE_COMPARe_ABSTRACT_
+</font>
+
+</pre></body></html>

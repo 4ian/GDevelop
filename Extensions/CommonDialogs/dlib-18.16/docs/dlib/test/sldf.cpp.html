@@ -1,0 +1,299 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - sldf.cpp</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2010  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font>
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='tester.h.html'>tester.h</a>"
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>svm.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>rand.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>string.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>vector<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>sstream<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>ctime<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>data_io.h<font color='#5555FF'>&gt;</font>
+
+<font color='#0000FF'>namespace</font>  
+<b>{</b>
+    <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> test;
+    <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> dlib;
+    <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> std;
+    dlib::logger <b><a name='dlog'></a>dlog</b><font face='Lucida Console'>(</font>"<font color='#CC0000'>test.sldf</font>"<font face='Lucida Console'>)</font>;
+
+
+    <font color='#0000FF'>class</font> <b><a name='sldf_tester'></a>sldf_tester</b> : <font color='#0000FF'>public</font> tester
+    <b>{</b>
+        <font color='#009900'>/*!
+            WHAT THIS OBJECT REPRESENTS
+                This object represents a unit test.  When it is constructed
+                it adds itself into the testing framework.
+        !*/</font>
+    <font color='#0000FF'>public</font>:
+        <b><a name='sldf_tester'></a>sldf_tester</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> :
+            tester <font face='Lucida Console'>(</font>
+                "<font color='#CC0000'>test_sldf</font>",       <font color='#009900'>// the command line argument name for this test
+</font>                "<font color='#CC0000'>Run tests on the simplify_linear_decision_function routines.</font>", <font color='#009900'>// the command line argument description
+</font>                <font color='#979000'>0</font>                     <font color='#009900'>// the number of command line arguments for this test
+</font>            <font face='Lucida Console'>)</font>
+        <b>{</b>
+        <b>}</b>
+
+        dlib::rand rnd;
+
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='perform_test'></a>perform_test</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#BB00BB'>print_spinner</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>typedef</font> std::map<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font>,<font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font> sample_type;
+
+            <font color='#0000FF'>typedef</font> matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>0</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> dense_sample_type;
+
+            <font color='#0000FF'>typedef</font> sparse_linear_kernel<font color='#5555FF'>&lt;</font>sample_type<font color='#5555FF'>&gt;</font> kernel_type;
+            <font color='#0000FF'>typedef</font> linear_kernel<font color='#5555FF'>&lt;</font>dense_sample_type<font color='#5555FF'>&gt;</font> dense_kernel_type;
+
+
+            svm_nu_trainer<font color='#5555FF'>&lt;</font>kernel_type<font color='#5555FF'>&gt;</font> linear_trainer;
+            linear_trainer.<font color='#BB00BB'>set_nu</font><font face='Lucida Console'>(</font><font color='#979000'>0.2</font><font face='Lucida Console'>)</font>;
+            svm_nu_trainer<font color='#5555FF'>&lt;</font>dense_kernel_type<font color='#5555FF'>&gt;</font> dense_linear_trainer;
+            dense_linear_trainer.<font color='#BB00BB'>set_nu</font><font face='Lucida Console'>(</font><font color='#979000'>0.2</font><font face='Lucida Console'>)</font>;
+
+            std::vector<font color='#5555FF'>&lt;</font>sample_type<font color='#5555FF'>&gt;</font> samples;
+            std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font> labels;
+
+            <font color='#009900'>// make an instance of a sample vector so we can use it below
+</font>            sample_type sample;
+
+            <font color='#009900'>// Now lets go into a loop and randomly generate 300 samples.
+</font>            <font color='#0000FF'><u>double</u></font> label <font color='#5555FF'>=</font> <font color='#5555FF'>+</font><font color='#979000'>1</font>;
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> <font color='#979000'>300</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#009900'>// flip this flag
+</font>                label <font color='#5555FF'>*</font><font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>1</font>;
+
+                sample.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+                <font color='#009900'>// now make a random sparse sample with at most 10 non-zero elements
+</font>                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> j <font color='#5555FF'>=</font> <font color='#979000'>0</font>; j <font color='#5555FF'>&lt;</font> <font color='#979000'>10</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>j<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#0000FF'><u>int</u></font> idx <font color='#5555FF'>=</font> rnd.<font color='#BB00BB'>get_random_32bit_number</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>%</font><font color='#979000'>100</font>;
+                    <font color='#0000FF'><u>double</u></font> value <font color='#5555FF'>=</font> rnd.<font color='#BB00BB'>get_random_double</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+                    sample[idx] <font color='#5555FF'>=</font> label<font color='#5555FF'>*</font>value;
+                <b>}</b>
+
+                <font color='#009900'>// Also save the samples we are generating so we can let the svm_c_linear_trainer
+</font>                <font color='#009900'>// learn from them below.  
+</font>                samples.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>sample<font face='Lucida Console'>)</font>;
+                labels.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>label<font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+
+            <b>{</b>
+                <font color='#BB00BB'>print_spinner</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'> test with sparse samples </font>";
+                decision_function<font color='#5555FF'>&lt;</font>kernel_type<font color='#5555FF'>&gt;</font> df <font color='#5555FF'>=</font> linear_trainer.<font color='#BB00BB'>train</font><font face='Lucida Console'>(</font>samples, labels<font face='Lucida Console'>)</font>;
+
+                dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>df.basis_vectors.size(): </font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> df.basis_vectors.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>df.basis_vectors.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> <font color='#979000'>4</font><font face='Lucida Console'>)</font>;
+
+                dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>test scores: </font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>test_binary_decision_function</font><font face='Lucida Console'>(</font>df, samples, labels<font face='Lucida Console'>)</font>;
+
+                <font color='#009900'>// save the outputs of the decision function before we mess with it
+</font>                std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font> prev_vals;
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> samples.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                    prev_vals.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font><font color='#BB00BB'>df</font><font face='Lucida Console'>(</font>samples[i]<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+                df <font color='#5555FF'>=</font> <font color='#BB00BB'>simplify_linear_decision_function</font><font face='Lucida Console'>(</font>df<font face='Lucida Console'>)</font>;
+
+                dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>df.basis_vectors.size(): </font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> df.basis_vectors.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>df.basis_vectors.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+
+                dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>test scores: </font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>test_binary_decision_function</font><font face='Lucida Console'>(</font>df, samples, labels<font face='Lucida Console'>)</font>;
+
+                <font color='#009900'>// now check that the simplified decision function still produces the same results
+</font>                std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font> cur_vals;
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> samples.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                    cur_vals.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font><font color='#BB00BB'>df</font><font face='Lucida Console'>(</font>samples[i]<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+                <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> err <font color='#5555FF'>=</font> <font color='#BB00BB'>max</font><font face='Lucida Console'>(</font><font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font><font color='#BB00BB'>mat</font><font face='Lucida Console'>(</font>cur_vals<font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> <font color='#BB00BB'>mat</font><font face='Lucida Console'>(</font>prev_vals<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>simplify error: </font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> err;
+                <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>err <font color='#5555FF'>&lt;</font> <font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>13</font><font face='Lucida Console'>)</font>;
+
+            <b>}</b>
+
+
+            <font color='#009900'>// same as above but call simplify_linear_decision_function() two times
+</font>            <b>{</b>
+                <font color='#BB00BB'>print_spinner</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'> test with sparse samples </font>";
+                decision_function<font color='#5555FF'>&lt;</font>kernel_type<font color='#5555FF'>&gt;</font> df <font color='#5555FF'>=</font> linear_trainer.<font color='#BB00BB'>train</font><font face='Lucida Console'>(</font>samples, labels<font face='Lucida Console'>)</font>;
+
+                dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>df.basis_vectors.size(): </font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> df.basis_vectors.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>df.basis_vectors.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> <font color='#979000'>4</font><font face='Lucida Console'>)</font>;
+
+                dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>test scores: </font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>test_binary_decision_function</font><font face='Lucida Console'>(</font>df, samples, labels<font face='Lucida Console'>)</font>;
+
+                <font color='#009900'>// save the outputs of the decision function before we mess with it
+</font>                std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font> prev_vals;
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> samples.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                    prev_vals.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font><font color='#BB00BB'>df</font><font face='Lucida Console'>(</font>samples[i]<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+                df <font color='#5555FF'>=</font> <font color='#BB00BB'>simplify_linear_decision_function</font><font face='Lucida Console'>(</font>df<font face='Lucida Console'>)</font>;
+                df <font color='#5555FF'>=</font> <font color='#BB00BB'>simplify_linear_decision_function</font><font face='Lucida Console'>(</font>df<font face='Lucida Console'>)</font>;
+
+                dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>df.basis_vectors.size(): </font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> df.basis_vectors.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>df.basis_vectors.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+
+                dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>test scores: </font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>test_binary_decision_function</font><font face='Lucida Console'>(</font>df, samples, labels<font face='Lucida Console'>)</font>;
+
+                <font color='#009900'>// now check that the simplified decision function still produces the same results
+</font>                std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font> cur_vals;
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> samples.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                    cur_vals.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font><font color='#BB00BB'>df</font><font face='Lucida Console'>(</font>samples[i]<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+                <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> err <font color='#5555FF'>=</font> <font color='#BB00BB'>max</font><font face='Lucida Console'>(</font><font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font><font color='#BB00BB'>mat</font><font face='Lucida Console'>(</font>cur_vals<font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> <font color='#BB00BB'>mat</font><font face='Lucida Console'>(</font>prev_vals<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>simplify error: </font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> err;
+                <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>err <font color='#5555FF'>&lt;</font> <font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>13</font><font face='Lucida Console'>)</font>;
+
+            <b>}</b>
+
+
+            <b>{</b>
+                <font color='#BB00BB'>print_spinner</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'> test with dense samples </font>";
+                std::vector<font color='#5555FF'>&lt;</font>dense_sample_type<font color='#5555FF'>&gt;</font> <font color='#BB00BB'>dense_samples</font><font face='Lucida Console'>(</font><font color='#BB00BB'>sparse_to_dense</font><font face='Lucida Console'>(</font>samples<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+                <font color='#009900'>// In addition to the rule we learned with the pegasos trainer lets also use our linear_trainer
+</font>                <font color='#009900'>// to learn a decision rule.
+</font>                decision_function<font color='#5555FF'>&lt;</font>dense_kernel_type<font color='#5555FF'>&gt;</font> dense_df <font color='#5555FF'>=</font> dense_linear_trainer.<font color='#BB00BB'>train</font><font face='Lucida Console'>(</font>dense_samples, labels<font face='Lucida Console'>)</font>;
+
+                dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>dense_df.basis_vectors.size(): </font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> dense_df.basis_vectors.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>dense_df.basis_vectors.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> <font color='#979000'>4</font><font face='Lucida Console'>)</font>;
+
+                dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>test scores: </font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>test_binary_decision_function</font><font face='Lucida Console'>(</font>dense_df, dense_samples, labels<font face='Lucida Console'>)</font>;
+
+                <font color='#009900'>// save the outputs of the decision function before we mess with it
+</font>                std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font> prev_vals;
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> dense_samples.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                    prev_vals.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font><font color='#BB00BB'>dense_df</font><font face='Lucida Console'>(</font>dense_samples[i]<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+                dense_df <font color='#5555FF'>=</font> <font color='#BB00BB'>simplify_linear_decision_function</font><font face='Lucida Console'>(</font>dense_df<font face='Lucida Console'>)</font>;
+
+                dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>dense_df.basis_vectors.size(): </font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> dense_df.basis_vectors.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>dense_df.basis_vectors.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+
+                dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>test scores: </font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>test_binary_decision_function</font><font face='Lucida Console'>(</font>dense_df, dense_samples, labels<font face='Lucida Console'>)</font>;
+
+
+                <font color='#009900'>// now check that the simplified decision function still produces the same results
+</font>                std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font> cur_vals;
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> dense_samples.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                    cur_vals.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font><font color='#BB00BB'>dense_df</font><font face='Lucida Console'>(</font>dense_samples[i]<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+                <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> err <font color='#5555FF'>=</font> <font color='#BB00BB'>max</font><font face='Lucida Console'>(</font><font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font><font color='#BB00BB'>mat</font><font face='Lucida Console'>(</font>cur_vals<font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> <font color='#BB00BB'>mat</font><font face='Lucida Console'>(</font>prev_vals<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>simplify error: </font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> err;
+                <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>err <font color='#5555FF'>&lt;</font> <font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>13</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+            <font color='#009900'>// same as above but call simplify_linear_decision_function() two times
+</font>            <b>{</b>
+                <font color='#BB00BB'>print_spinner</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'> test with dense samples </font>";
+                std::vector<font color='#5555FF'>&lt;</font>dense_sample_type<font color='#5555FF'>&gt;</font> <font color='#BB00BB'>dense_samples</font><font face='Lucida Console'>(</font><font color='#BB00BB'>sparse_to_dense</font><font face='Lucida Console'>(</font>samples<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+                <font color='#009900'>// In addition to the rule we learned with the pegasos trainer lets also use our linear_trainer
+</font>                <font color='#009900'>// to learn a decision rule.
+</font>                decision_function<font color='#5555FF'>&lt;</font>dense_kernel_type<font color='#5555FF'>&gt;</font> dense_df <font color='#5555FF'>=</font> dense_linear_trainer.<font color='#BB00BB'>train</font><font face='Lucida Console'>(</font>dense_samples, labels<font face='Lucida Console'>)</font>;
+
+                dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>dense_df.basis_vectors.size(): </font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> dense_df.basis_vectors.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>dense_df.basis_vectors.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> <font color='#979000'>4</font><font face='Lucida Console'>)</font>;
+
+                dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>test scores: </font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>test_binary_decision_function</font><font face='Lucida Console'>(</font>dense_df, dense_samples, labels<font face='Lucida Console'>)</font>;
+
+                <font color='#009900'>// save the outputs of the decision function before we mess with it
+</font>                std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font> prev_vals;
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> dense_samples.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                    prev_vals.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font><font color='#BB00BB'>dense_df</font><font face='Lucida Console'>(</font>dense_samples[i]<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+                dense_df <font color='#5555FF'>=</font> <font color='#BB00BB'>simplify_linear_decision_function</font><font face='Lucida Console'>(</font>dense_df<font face='Lucida Console'>)</font>;
+                dense_df <font color='#5555FF'>=</font> <font color='#BB00BB'>simplify_linear_decision_function</font><font face='Lucida Console'>(</font>dense_df<font face='Lucida Console'>)</font>;
+
+                dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>dense_df.basis_vectors.size(): </font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> dense_df.basis_vectors.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>dense_df.basis_vectors.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+
+                dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>test scores: </font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>test_binary_decision_function</font><font face='Lucida Console'>(</font>dense_df, dense_samples, labels<font face='Lucida Console'>)</font>;
+
+
+                <font color='#009900'>// now check that the simplified decision function still produces the same results
+</font>                std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font> cur_vals;
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> dense_samples.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                    cur_vals.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font><font color='#BB00BB'>dense_df</font><font face='Lucida Console'>(</font>dense_samples[i]<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+                <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> err <font color='#5555FF'>=</font> <font color='#BB00BB'>max</font><font face='Lucida Console'>(</font><font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font><font color='#BB00BB'>mat</font><font face='Lucida Console'>(</font>cur_vals<font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> <font color='#BB00BB'>mat</font><font face='Lucida Console'>(</font>prev_vals<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>simplify error: </font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> err;
+                <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>err <font color='#5555FF'>&lt;</font> <font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>13</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+            <b>{</b>
+                <font color='#BB00BB'>print_spinner</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+                dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'> test with sparse samples and a vector normalizer</font>";
+                std::vector<font color='#5555FF'>&lt;</font>dense_sample_type<font color='#5555FF'>&gt;</font> <font color='#BB00BB'>dense_samples</font><font face='Lucida Console'>(</font><font color='#BB00BB'>sparse_to_dense</font><font face='Lucida Console'>(</font>samples<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                std::vector<font color='#5555FF'>&lt;</font>dense_sample_type<font color='#5555FF'>&gt;</font> norm_samples;
+
+                <font color='#009900'>// make a normalizer and normalize everything
+</font>                vector_normalizer<font color='#5555FF'>&lt;</font>dense_sample_type<font color='#5555FF'>&gt;</font> normalizer;
+                normalizer.<font color='#BB00BB'>train</font><font face='Lucida Console'>(</font>dense_samples<font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> dense_samples.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                    norm_samples.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font><font color='#BB00BB'>normalizer</font><font face='Lucida Console'>(</font>dense_samples[i]<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+                normalized_function<font color='#5555FF'>&lt;</font>decision_function<font color='#5555FF'>&lt;</font>dense_kernel_type<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> dense_df;
+
+                dense_df.normalizer <font color='#5555FF'>=</font> normalizer;
+                dense_df.function <font color='#5555FF'>=</font> dense_linear_trainer.<font color='#BB00BB'>train</font><font face='Lucida Console'>(</font>norm_samples, labels<font face='Lucida Console'>)</font>;
+
+                dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>dense_df.function.basis_vectors.size(): </font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> dense_df.function.basis_vectors.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>dense_df.function.basis_vectors.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> <font color='#979000'>4</font><font face='Lucida Console'>)</font>;
+
+                dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>test scores: </font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>test_binary_decision_function</font><font face='Lucida Console'>(</font>dense_df, dense_samples, labels<font face='Lucida Console'>)</font>;
+
+                <font color='#009900'>// save the outputs of the decision function before we mess with it
+</font>                std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font> prev_vals;
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> dense_samples.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                    prev_vals.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font><font color='#BB00BB'>dense_df</font><font face='Lucida Console'>(</font>dense_samples[i]<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+
+                decision_function<font color='#5555FF'>&lt;</font>dense_kernel_type<font color='#5555FF'>&gt;</font> simple_df <font color='#5555FF'>=</font> <font color='#BB00BB'>simplify_linear_decision_function</font><font face='Lucida Console'>(</font>dense_df<font face='Lucida Console'>)</font>;
+
+                dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>simple_df.basis_vectors.size(): </font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> simple_df.basis_vectors.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>simple_df.basis_vectors.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+
+                dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>test scores: </font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>test_binary_decision_function</font><font face='Lucida Console'>(</font>simple_df, dense_samples, labels<font face='Lucida Console'>)</font>;
+
+
+                <font color='#009900'>// now check that the simplified decision function still produces the same results
+</font>                std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font> cur_vals;
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> dense_samples.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                    cur_vals.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font><font color='#BB00BB'>simple_df</font><font face='Lucida Console'>(</font>dense_samples[i]<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+                <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> err <font color='#5555FF'>=</font> <font color='#BB00BB'>max</font><font face='Lucida Console'>(</font><font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font><font color='#BB00BB'>mat</font><font face='Lucida Console'>(</font>cur_vals<font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> <font color='#BB00BB'>mat</font><font face='Lucida Console'>(</font>prev_vals<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>simplify error: </font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> err;
+                <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>err <font color='#5555FF'>&lt;</font> <font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>13</font><font face='Lucida Console'>)</font>;
+
+            <b>}</b>
+
+        <b>}</b>
+    <b>}</b>;
+
+    <font color='#009900'>// Create an instance of this object.  Doing this causes this test
+</font>    <font color='#009900'>// to be automatically inserted into the testing framework whenever this cpp file
+</font>    <font color='#009900'>// is linked into the project.  Note that since we are inside an unnamed-namespace 
+</font>    <font color='#009900'>// we won't get any linker errors about the symbol a being defined multiple times. 
+</font>    sldf_tester a;
+
+<b>}</b>
+
+
+
+
+</pre></body></html>

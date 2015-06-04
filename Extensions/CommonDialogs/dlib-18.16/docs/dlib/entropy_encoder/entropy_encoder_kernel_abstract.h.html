@@ -1,0 +1,164 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - entropy_encoder_kernel_abstract.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2003  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#undef</font> DLIB_ENTROPY_ENCODER_KERNEl_ABSTRACT_
+<font color='#0000FF'>#ifdef</font> DLIB_ENTROPY_ENCODER_KERNEl_ABSTRACT_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../algs.h.html'>../algs.h</a>"
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>iosfwd<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../uintn.h.html'>../uintn.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+    <font color='#0000FF'>class</font> <b><a name='entropy_encoder'></a>entropy_encoder</b> 
+    <b>{</b>
+        <font color='#009900'>/*!
+            INITIAL VALUE
+                stream_is_set() == false
+
+
+            WHAT THIS OBJECT REPRESENTS
+                This object represents an entropy encoder (could be implemented as an 
+                arithmetic encoder for example).      
+                
+                Note that all implementations of entropy_encoder and entropy_decoder 
+                are paired. This means that if you use entropy_encoder_kernel_n to 
+                encode something then you must use the corresponding 
+                entropy_decoder_kernel_n to decode it.
+
+            NOTATION:              
+                At any moment each symbol has a certain probability of appearing in 
+                the input stream.  These probabilities may change as each symbol is 
+                encountered and the probability model is updated accordingly.
+
+
+                let P(i) be a function which gives the probability of seeing the ith 
+                symbol of an N symbol alphabet BEFORE the probability model is updated
+                to account for the current symbol.  ( The domain of P(i) is from 0 to N-1. )
+
+                for each i: P(i) == COUNT/TOTAL where COUNT and TOTAL are integers.
+                and TOTAL is the same number for all P(i) but COUNT may vary.
+                   
+                let LOW_COUNT(i)  be the sum of all P(x)*TOTAL from x == 0 to x == i-1
+                  (note that LOW_COUNT(0) == 0)
+                let HIGH_COUNT(i) be the sum of all P(x)*TOTAL from x == 0 to x == i
+        !*/</font>
+
+    <font color='#0000FF'>public</font>:
+
+        <b><a name='entropy_encoder'></a>entropy_encoder</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #*this is properly initialized
+            throws
+                - std::bad_alloc
+        !*/</font>
+
+        <font color='#0000FF'>virtual</font> ~<b><a name='entropy_encoder'></a>entropy_encoder</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - all memory associated with *this has been released
+                - if (stream_is_set()) then
+                    - any buffered data in *this will be written to get_stream() 
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='clear'></a>clear</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #*this has its initial value
+                - if (stream_is_set()) then
+                    - any buffered data in *this will be written to get_stream() 
+                    - clears any memory of all previous calls to encode() from #*this
+            throws
+                - std::ios_base::failure
+                    if (stream_is_set() &amp;&amp; there was a problem writing to get_stream())
+                    then this exception will be thrown.  #*this will be unusable until
+                    clear() is called and succeeds
+                - any other exception
+                    if this exception is thrown then #*this is unusable 
+                    until clear() is called and succeeds
+        !*/</font>
+
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_stream'></a>set_stream</b> <font face='Lucida Console'>(</font>
+            std::ostream<font color='#5555FF'>&amp;</font> out
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #get_stream()    == out
+                - #stream_is_set() == true
+                - if (stream_is_set()) then
+                    - any buffered data in *this will be written to get_stream() 
+                    - clears any memory of all previous calls to encode() from #*this
+            throws
+                - std::ios_base::failure
+                    if (stream_is_set() &amp;&amp; there was a problem writing to get_stream())
+                    then this exception will be thrown.  #*this will be unusable until
+                    clear() is called and succeeds
+                - any other exception
+                    if this exception is thrown then #*this is unusable 
+                    until clear() is called and succeeds
+        !*/</font>
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='stream_is_set'></a>stream_is_set</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns true if a stream has been associated with *this by calling
+                  set_stream()
+        !*/</font>
+
+        std::ostream<font color='#5555FF'>&amp;</font> <b><a name='get_stream'></a>get_stream</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - stream_is_set() == true
+            ensures
+                - returns a reference to the ostream object that *this writes its 
+                  encoded data to
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='encode'></a>encode</b> <font face='Lucida Console'>(</font>
+            uint32 low_count,
+            uint32 high_count,
+            uint32 total
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - 0 &lt; total &lt;  65536 (2^16)
+                - total == TOTAL
+                - low_count &lt; high_count &lt;= total    
+                - stream_is_set() == true
+            ensures
+                - encodes the symbol S where: 
+                    - LOW_COUNT(S)  == low_count
+                    - HIGH_COUNT(S) == high_count
+            throws
+                - std::ios_base::failure
+                    if (there was a problem writing to get_stream()) then
+                    this exception will be thrown.  #*this will be unusable until
+                    clear() is called and succeeds
+                - any other exception
+                    if this exception is thrown then #*this is unusable 
+                    until clear() is called and succeeds
+        !*/</font>
+
+
+    <font color='#0000FF'>private</font>:
+
+        <font color='#009900'>// restricted functions
+</font>        <b><a name='entropy_encoder'></a>entropy_encoder</b><font face='Lucida Console'>(</font>entropy_encoder<font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font>;        <font color='#009900'>// copy constructor
+</font>        entropy_encoder<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>=</font><font face='Lucida Console'>(</font>entropy_encoder<font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font>;    <font color='#009900'>// assignment operator
+</font>
+    <b>}</b>;   
+   
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_ENTROPY_ENCODER_KERNEl_ABSTRACT_
+</font>
+
+</pre></body></html>

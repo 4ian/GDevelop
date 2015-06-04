@@ -1,0 +1,1523 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - xml_parser_kernel_1.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2003  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_XML_PARSER_KERNEl_1_
+<font color='#0000FF'>#define</font> DLIB_XML_PARSER_KERNEl_1_
+
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='xml_parser_kernel_abstract.h.html'>xml_parser_kernel_abstract.h</a>"
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>sstream<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>string<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>fstream<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>iostream<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='xml_parser_kernel_interfaces.h.html'>xml_parser_kernel_interfaces.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../algs.h.html'>../algs.h</a>"
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>cstdio<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../map.h.html'>../map.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../stack.h.html'>../stack.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../sequence.h.html'>../sequence.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../memory_manager.h.html'>../memory_manager.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+    <font color='#0000FF'>class</font> <b><a name='xml_parser'></a>xml_parser</b>
+    <b>{</b>
+        <font color='#0000FF'>typedef</font> dlib::map<font color='#5555FF'>&lt;</font>std::string,std::string,memory_manager<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font>::kernel_2a<font color='#5555FF'>&gt;</font>::kernel_1b map;
+        <font color='#0000FF'>typedef</font> dlib::stack<font color='#5555FF'>&lt;</font>std::string,memory_manager<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font>::kernel_2a<font color='#5555FF'>&gt;</font>::kernel_1a stack;
+        <font color='#0000FF'>typedef</font> sequence<font color='#5555FF'>&lt;</font>document_handler<font color='#5555FF'>*</font><font color='#5555FF'>&gt;</font>::kernel_2a seq_dh;
+        <font color='#0000FF'>typedef</font> sequence<font color='#5555FF'>&lt;</font>error_handler<font color='#5555FF'>*</font><font color='#5555FF'>&gt;</font>::kernel_2a seq_eh;
+
+         <font color='#009900'>/*!                
+            INITIAL VALUE
+                dh_list.size() == 0
+                eh_list.size() == 0
+
+            CONVENTION
+                dh_list == a sequence of pointers to all the document_handlers that
+                           have been added to the xml_parser
+                eh_list == a sequence of pointers to all the error_handlers that
+                           have been added to the xml_parser
+
+                map is used to implement the attribute_list interface
+                stack is used just inside the parse function
+                seq_dh is used to make the dh_list member variable
+                seq_eh is used to make the eh_list member variable
+        !*/</font>
+
+
+       
+        <font color='#0000FF'>public</font>:
+
+            <font color='#009900'>// These typedefs are here for backwards compatibily with previous versions of
+</font>            <font color='#009900'>// dlib.
+</font>            <font color='#0000FF'>typedef</font> xml_parser kernel_1a;
+            <font color='#0000FF'>typedef</font> xml_parser kernel_1a_c;
+
+            <b><a name='xml_parser'></a>xml_parser</b><font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+
+            <font color='#0000FF'>virtual</font> ~<b><a name='xml_parser'></a>xml_parser</b><font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font><b>{</b><b>}</b>
+
+            <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='clear'></a>clear</b><font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='parse'></a>parse</b> <font face='Lucida Console'>(</font>
+                std::istream<font color='#5555FF'>&amp;</font> in
+            <font face='Lucida Console'>)</font>;
+  
+            <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='add_document_handler'></a>add_document_handler</b> <font face='Lucida Console'>(</font>
+                document_handler<font color='#5555FF'>&amp;</font> item
+            <font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='add_error_handler'></a>add_error_handler</b> <font face='Lucida Console'>(</font>
+                error_handler<font color='#5555FF'>&amp;</font> item
+            <font face='Lucida Console'>)</font>;
+
+
+            <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='swap'></a>swap</b> <font face='Lucida Console'>(</font>
+                xml_parser<font color='#5555FF'>&amp;</font> item
+            <font face='Lucida Console'>)</font>;
+   
+
+        <font color='#0000FF'>private</font>:
+    
+            <font color='#009900'>// -----------------------------------
+</font>
+            <font color='#009900'>// attribute_list interface implementation
+</font>            <font color='#0000FF'>class</font> <b><a name='attrib_list'></a>attrib_list</b> : <font color='#0000FF'>public</font> attribute_list
+            <b>{</b>
+            <font color='#0000FF'>public</font>:
+                <font color='#009900'>// the list of attribute name/value pairs
+</font>                map list;
+
+                <font color='#0000FF'><u>bool</u></font> <b><a name='is_in_list'></a>is_in_list</b> <font face='Lucida Console'>(</font>
+                    <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> key
+                <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+                <b>{</b>
+                    <font color='#0000FF'>return</font> list.<font color='#BB00BB'>is_in_domain</font><font face='Lucida Console'>(</font>key<font face='Lucida Console'>)</font>;
+                <b>}</b>
+
+                <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b>[] <font face='Lucida Console'>(</font>
+                    <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> key
+                <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+                <b>{</b>
+                    <font color='#0000FF'>return</font> list[key];
+                <b>}</b>
+
+                <font color='#0000FF'><u>bool</u></font> <b><a name='at_start'></a>at_start</b> <font face='Lucida Console'>(</font>
+                <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> list.<font color='#BB00BB'>at_start</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <b>}</b>
+
+                <font color='#0000FF'><u>void</u></font> <b><a name='reset'></a>reset</b> <font face='Lucida Console'>(</font>
+                <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> list.<font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <b>}</b>
+
+                <font color='#0000FF'><u>bool</u></font> <b><a name='current_element_valid'></a>current_element_valid</b> <font face='Lucida Console'>(</font>
+                <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> list.<font color='#BB00BB'>current_element_valid</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <b>}</b>
+
+                <font color='#0000FF'>const</font> type<font color='#5555FF'>&amp;</font> <b><a name='element'></a>element</b> <font face='Lucida Console'>(</font>
+                <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> list.<font color='#BB00BB'>element</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <b>}</b>
+
+                type<font color='#5555FF'>&amp;</font> <b><a name='element'></a>element</b> <font face='Lucida Console'>(</font>
+                <font face='Lucida Console'>)</font> <b>{</b> <font color='#0000FF'>return</font> list.<font color='#BB00BB'>element</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <b>}</b>
+
+                <font color='#0000FF'><u>bool</u></font> <b><a name='move_next'></a>move_next</b> <font face='Lucida Console'>(</font>
+                <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> list.<font color='#BB00BB'>move_next</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <b>}</b>
+
+                <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='size'></a>size</b> <font face='Lucida Console'>(</font>
+                <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> list.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <b>}</b>
+            <b>}</b>;
+
+            
+            <font color='#009900'>// -----------------------------------
+</font>
+            <font color='#0000FF'>enum</font> <b><a name='token_type'></a>token_type</b>
+            <b>{</b>
+                element_start, <font color='#009900'>// the first tag of an element
+</font>                element_end,   <font color='#009900'>// the last tag of an element
+</font>                empty_element, <font color='#009900'>// the singular tag of an empty element
+</font>                pi,            <font color='#009900'>// processing instruction
+</font>                chars,         <font color='#009900'>// the non-markup data between tags
+</font>                chars_cdata,   <font color='#009900'>// the data from a CDATA section
+</font>                eof,           <font color='#009900'>// this token is returned when we reach the end of input
+</font>                error,         <font color='#009900'>// this token indicates that the tokenizer couldn't
+</font>                               <font color='#009900'>// determine which category the next token fits into
+</font>                dtd,           <font color='#009900'>// this token is for an entire dtd 
+</font>                comment        <font color='#009900'>// this is a token for comments
+</font>            <b>}</b>;
+            <font color='#009900'>/*
+                notes about the tokens:
+                    the tokenizer guarantees that the following tokens to not 
+                    contain the '&lt;' character except as the first character of the token
+                    element_start, element_end, empty_element, and pi.  they also only
+                    contain the '&gt;' characer as their last character.
+
+                    it is also guaranteed that pi is at least of the form &lt;??&gt;.  that
+                    is to say that it always always begins with &lt;? and ends with ?&gt;.
+
+                    it is also guaranteed that all markup tokens will begin with the '&lt;'
+                    character and end with the '&gt;'. there won't be any leading or
+                    trailing whitespaces.   this whitespace is considered a chars token.
+            */</font>
+
+
+            <font color='#009900'>// private member functions
+</font>            <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='get_next_token'></a>get_next_token</b><font face='Lucida Console'>(</font>
+                std::istream<font color='#5555FF'>&amp;</font> in,
+                std::string<font color='#5555FF'>&amp;</font> token_text,
+                <font color='#0000FF'><u>int</u></font><font color='#5555FF'>&amp;</font> token_kind,
+                <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&amp;</font> line_number
+            <font face='Lucida Console'>)</font>;
+            <font color='#009900'>/*!
+                ensures
+                    gets the next token from in and puts it in token_text and
+                    token_kind == the kind of the token found and
+                    line_number is incremented every time a '\n' is encountered and
+                    entity references are translated into the characters they represent
+                    only for chars tokens
+            !*/</font>
+
+            <font color='#0000FF'>inline</font> <font color='#0000FF'><u>int</u></font> <b><a name='parse_element'></a>parse_element</b> <font face='Lucida Console'>(</font>
+                <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> token,
+                std::string<font color='#5555FF'>&amp;</font> name,
+                attrib_list<font color='#5555FF'>&amp;</font> atts
+            <font face='Lucida Console'>)</font>;
+            <font color='#009900'>/*!
+                requires
+                    token is a token of kind start_element or empty_element
+                ensures
+                    gets the element name and puts it into the string name and
+                    parses out the attributes and puts them into the attribute_list atts
+
+                    return 0 upon success or
+                    returns -1 if it failed to parse token
+            !*/</font>
+
+            <font color='#0000FF'>inline</font> <font color='#0000FF'><u>int</u></font> <b><a name='parse_pi'></a>parse_pi</b> <font face='Lucida Console'>(</font>
+                <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> token,
+                std::string<font color='#5555FF'>&amp;</font> target,
+                std::string<font color='#5555FF'>&amp;</font> data
+            <font face='Lucida Console'>)</font>;
+            <font color='#009900'>/*!
+                requires
+                    token is a token of kind pi
+                ensures
+                    the target from the processing instruction is put into target and
+                    the data from the processing instruction is put into data
+
+                    return 0 upon success or
+                    returns -1 if it failed to parse token
+            !*/</font>
+
+            <font color='#0000FF'>inline</font> <font color='#0000FF'><u>int</u></font> <b><a name='parse_element_end'></a>parse_element_end</b> <font face='Lucida Console'>(</font>
+                <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> token,
+                std::string<font color='#5555FF'>&amp;</font> name
+            <font face='Lucida Console'>)</font>;
+            <font color='#009900'>/*!
+                requires
+                    token is a token of kind element_end
+                ensures
+                    the name from the ending element tag is put into the string name
+                    
+                    return 0 upon success or
+                    returns -1 if it failed to parse token
+            !*/</font>
+
+            <font color='#0000FF'>inline</font> <font color='#0000FF'><u>int</u></font> <b><a name='change_entity'></a>change_entity</b> <font face='Lucida Console'>(</font>
+                std::istream<font color='#5555FF'>&amp;</font> in
+            <font face='Lucida Console'>)</font>;
+            <font color='#009900'>/*!
+                ensures
+                    performs the following translations and returns the new character
+                                amp;   -&gt; &amp;
+                                lt;    -&gt; &lt;
+                                gt;    -&gt; &gt;
+                                apos;  -&gt; '
+                                quot;  -&gt; "
+
+                    or returns -1 if we hit an undefined entity reference or EOF. 
+                            (i.e. it was not one of the entities listed above)
+
+            !*/</font>
+
+            <font color='#009900'>// -----------------------------------
+</font>
+            <font color='#009900'>// private member data
+</font>            seq_dh dh_list;
+            seq_eh eh_list;
+
+            <font color='#009900'>// -----------------------------------
+</font>
+            <font color='#009900'>// restricted functions: assignment and copy construction
+</font>            <b><a name='xml_parser'></a>xml_parser</b><font face='Lucida Console'>(</font>xml_parser<font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font>;   
+            xml_parser<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>
+                        xml_parser<font color='#5555FF'>&amp;</font>
+                        <font face='Lucida Console'>)</font>;  
+
+    <b>}</b>;
+
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='swap'></a>swap</b> <font face='Lucida Console'>(</font>
+        xml_parser<font color='#5555FF'>&amp;</font> a, 
+        xml_parser<font color='#5555FF'>&amp;</font> b 
+    <font face='Lucida Console'>)</font> <b>{</b> a.<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>b<font face='Lucida Console'>)</font>; <b>}</b>   
+
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>    <font color='#009900'>// member function definitions
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font> 
+    <font color='#0000FF'><u>void</u></font> xml_parser::
+    <b><a name='clear'></a>clear</b><font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#009900'>// unregister all event handlers
+</font>        eh_list.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        dh_list.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>        
+    <font color='#0000FF'><u>void</u></font> xml_parser::
+    <b><a name='parse'></a>parse</b> <font face='Lucida Console'>(</font>
+        std::istream<font color='#5555FF'>&amp;</font> in
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#BB00BB'>DLIB_CASSERT</font> <font face='Lucida Console'>(</font> in.<font color='#BB00BB'>fail</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font> ,
+            "<font color='#CC0000'>\tvoid xml_parser::parse</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tthe input stream must not be in the fail state</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tthis: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font>
+            <font face='Lucida Console'>)</font>;
+
+
+        <font color='#009900'>// save which exceptions in will throw and make it so it won't throw any
+</font>        <font color='#009900'>// for the life of this function
+</font>        std::ios::iostate old_exceptions <font color='#5555FF'>=</font> in.<font color='#BB00BB'>exceptions</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <font color='#009900'>// set it to not throw anything
+</font>        in.<font color='#BB00BB'>exceptions</font><font face='Lucida Console'>(</font>std::ios::goodbit<font face='Lucida Console'>)</font>;
+
+
+        <font color='#0000FF'>try</font> 
+        <b>{</b>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> line_number <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+
+            <font color='#009900'>// skip any whitespace before the start of the document
+</font>            <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>in.<font color='#BB00BB'>peek</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> '<font color='#FF0000'> </font>' <font color='#5555FF'>|</font><font color='#5555FF'>|</font> in.<font color='#BB00BB'>peek</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> '<font color='#FF0000'>\t</font>' <font color='#5555FF'>|</font><font color='#5555FF'>|</font> in.<font color='#BB00BB'>peek</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> '<font color='#FF0000'>\n</font>' <font color='#5555FF'>|</font><font color='#5555FF'>|</font> in.<font color='#BB00BB'>peek</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> '<font color='#FF0000'>\r</font>' <font face='Lucida Console'>)</font> 
+            <b>{</b>
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>in.<font color='#BB00BB'>peek</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> '<font color='#FF0000'>\n</font>'<font face='Lucida Console'>)</font>
+                    <font color='#5555FF'>+</font><font color='#5555FF'>+</font>line_number;
+                in.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+
+
+            stack tags; <font color='#009900'>// this stack contains the last start tag seen
+</font>            <font color='#0000FF'><u>bool</u></font> seen_fatal_error <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+            <font color='#0000FF'><u>bool</u></font> seen_root_tag <font color='#5555FF'>=</font> <font color='#979000'>false</font>;  <font color='#009900'>// this is true after we have seen the root tag
+</font>            
+
+
+            <font color='#009900'>// notify all the document_handlers that we are about to being parsing
+</font>            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> dh_list.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                dh_list[i]<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>start_document</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+
+            std::string chars_buf; <font color='#009900'>// used to collect chars data between consecutive
+</font>                                <font color='#009900'>// chars and chars_cdata tokens so that 
+</font>                                <font color='#009900'>// document_handlers receive all chars data between
+</font>                                <font color='#009900'>// tags in one call
+</font>
+            <font color='#009900'>// variables to be used with the parsing functions
+</font>            attrib_list atts;
+            std::string name;
+            std::string target;
+            std::string data;
+
+            
+
+            <font color='#009900'>// variables to use with the get_next_token() function
+</font>            std::string token_text;
+            <font color='#0000FF'><u>int</u></font> token_kind;
+
+            <font color='#BB00BB'>get_next_token</font><font face='Lucida Console'>(</font>in,token_text,token_kind,line_number<font face='Lucida Console'>)</font>;
+
+
+            <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>token_kind <font color='#5555FF'>!</font><font color='#5555FF'>=</font> eof<font face='Lucida Console'>)</font>
+            <b>{</b>          
+                <font color='#0000FF'><u>bool</u></font> is_empty <font color='#5555FF'>=</font> <font color='#979000'>false</font>;  <font color='#009900'>// this becomes true when this token is an empty_element
+</font>
+                <font color='#0000FF'>switch</font> <font face='Lucida Console'>(</font>token_kind<font face='Lucida Console'>)</font>
+                <b>{</b>
+
+
+                <font color='#0000FF'>case</font> empty_element: is_empty <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+                <font color='#0000FF'>case</font> element_start:
+                    <b>{</b>
+                        seen_root_tag <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+
+                        <font color='#0000FF'><u>int</u></font> status <font color='#5555FF'>=</font> <font color='#BB00BB'>parse_element</font><font face='Lucida Console'>(</font>token_text,name,atts<font face='Lucida Console'>)</font>;
+                        <font color='#009900'>// if there was no error parsing the element
+</font>                        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>status <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                        <b>{</b>
+                            <font color='#009900'>// notify all the document_handlers
+</font>                            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> dh_list.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                            <b>{</b>
+                                dh_list[i]<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>start_element</font><font face='Lucida Console'>(</font>line_number,name,atts<font face='Lucida Console'>)</font>;
+                                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>is_empty<font face='Lucida Console'>)</font>
+                                    dh_list[i]<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>end_element</font><font face='Lucida Console'>(</font>line_number,name<font face='Lucida Console'>)</font>;
+                            <b>}</b>
+                        <b>}</b>
+                        <font color='#0000FF'>else</font>
+                        <b>{</b>
+                            seen_fatal_error <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+                        <b>}</b>
+
+                        <font color='#009900'>// if this is an element_start token then push the name of
+</font>                        <font color='#009900'>// the element on to the stack
+</font>                        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>token_kind <font color='#5555FF'>=</font><font color='#5555FF'>=</font> element_start<font face='Lucida Console'>)</font>
+                        <b>{</b>
+                            tags.<font color='#BB00BB'>push</font><font face='Lucida Console'>(</font>name<font face='Lucida Console'>)</font>;
+                        <b>}</b>
+
+                    <b>}</b><font color='#0000FF'>break</font>;
+
+                <font color='#009900'>// ----------------------------------------
+</font>
+                <font color='#0000FF'>case</font> element_end:
+                    <b>{</b>
+
+                        <font color='#0000FF'><u>int</u></font> status <font color='#5555FF'>=</font> <font color='#BB00BB'>parse_element_end</font> <font face='Lucida Console'>(</font>token_text,name<font face='Lucida Console'>)</font>;
+
+                        <font color='#009900'>// if there was no error parsing the element
+</font>                        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>status <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                        <b>{</b>
+                            <font color='#009900'>// make sure this ending element tag matches the last start
+</font>                            <font color='#009900'>// element tag we saw
+</font>                            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> tags.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font> <font color='#5555FF'>|</font><font color='#5555FF'>|</font> name <font color='#5555FF'>!</font><font color='#5555FF'>=</font> tags.<font color='#BB00BB'>current</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                            <b>{</b>
+                                <font color='#009900'>// they don't match so signal a fatal error
+</font>                                seen_fatal_error <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+                            <b>}</b>
+                            <font color='#0000FF'>else</font>
+                            <b>{</b>
+                                <font color='#009900'>// notify all the document_handlers
+</font>                                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> dh_list.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                                <b>{</b>
+                                    dh_list[i]<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>end_element</font><font face='Lucida Console'>(</font>line_number,name<font face='Lucida Console'>)</font>;
+                                <b>}</b>
+
+                                <font color='#009900'>// they match so throw away this element name
+</font>                                tags.<font color='#BB00BB'>pop</font><font face='Lucida Console'>(</font>name<font face='Lucida Console'>)</font>;
+                            <b>}</b>
+                        <b>}</b>
+                        <font color='#0000FF'>else</font>
+                        <b>{</b>
+                            seen_fatal_error <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+                        <b>}</b>
+
+
+                    <b>}</b><font color='#0000FF'>break</font>;
+
+                <font color='#009900'>// ----------------------------------------
+</font>
+                <font color='#0000FF'>case</font> pi:
+                    <b>{</b>
+
+                        <font color='#0000FF'><u>int</u></font> status <font color='#5555FF'>=</font> <font color='#BB00BB'>parse_pi</font> <font face='Lucida Console'>(</font>token_text,target,data<font face='Lucida Console'>)</font>;
+                        <font color='#009900'>// if there was no error parsing the element
+</font>                        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>status <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                        <b>{</b>
+                            <font color='#009900'>// notify all the document_handlers
+</font>                            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> dh_list.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                            <b>{</b>
+                                dh_list[i]<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>processing_instruction</font><font face='Lucida Console'>(</font>line_number,target,data<font face='Lucida Console'>)</font>;
+                            <b>}</b>
+                        <b>}</b>
+                        <font color='#0000FF'>else</font>
+                        <b>{</b>
+                            <font color='#009900'>// notify all the error_handlers
+</font>                            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> eh_list.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                            <b>{</b>
+                                eh_list[i]<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>error</font><font face='Lucida Console'>(</font>line_number<font face='Lucida Console'>)</font>;
+                            <b>}</b>
+                        <b>}</b>
+                        <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>in.<font color='#BB00BB'>peek</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> '<font color='#FF0000'> </font>' <font color='#5555FF'>|</font><font color='#5555FF'>|</font> in.<font color='#BB00BB'>peek</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> '<font color='#FF0000'>\t</font>' <font color='#5555FF'>|</font><font color='#5555FF'>|</font> in.<font color='#BB00BB'>peek</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> '<font color='#FF0000'>\n</font>' <font color='#5555FF'>|</font><font color='#5555FF'>|</font> in.<font color='#BB00BB'>peek</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> '<font color='#FF0000'>\r</font>' <font face='Lucida Console'>)</font> 
+                        <b>{</b>
+                            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>in.<font color='#BB00BB'>peek</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> '<font color='#FF0000'>\n</font>'<font face='Lucida Console'>)</font>
+                                <font color='#5555FF'>+</font><font color='#5555FF'>+</font>line_number;
+                            in.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                        <b>}</b>
+
+
+                    <b>}</b><font color='#0000FF'>break</font>;
+
+                <font color='#009900'>// ----------------------------------------
+</font>
+                <font color='#0000FF'>case</font> chars:
+                    <b>{</b>
+                        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>tags.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                        <b>{</b>
+                            chars_buf <font color='#5555FF'>+</font><font color='#5555FF'>=</font> token_text;
+                        <b>}</b>
+                        <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>token_text.<font color='#BB00BB'>find_first_not_of</font><font face='Lucida Console'>(</font>"<font color='#CC0000'> \t\r\n</font>"<font face='Lucida Console'>)</font> <font color='#5555FF'>!</font><font color='#5555FF'>=</font> std::string::npos<font face='Lucida Console'>)</font>
+                        <b>{</b>
+                            <font color='#009900'>// you can't have non whitespace chars data outside the root element
+</font>                            seen_fatal_error <font color='#5555FF'>=</font> <font color='#979000'>true</font>;                        
+                        <b>}</b>
+                    <b>}</b><font color='#0000FF'>break</font>;
+
+                <font color='#009900'>// ----------------------------------------
+</font>
+                <font color='#0000FF'>case</font> chars_cdata:
+                    <b>{</b>
+                        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>tags.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                        <b>{</b>
+                            chars_buf <font color='#5555FF'>+</font><font color='#5555FF'>=</font> token_text;
+                        <b>}</b>
+                        <font color='#0000FF'>else</font>
+                        <b>{</b>
+                            <font color='#009900'>// you can't have chars_data outside the root element
+</font>                            seen_fatal_error <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+                        <b>}</b>
+                    <b>}</b><font color='#0000FF'>break</font>;
+
+                <font color='#009900'>// ----------------------------------------
+</font>
+                <font color='#0000FF'>case</font> eof:
+                    <font color='#0000FF'>break</font>;
+
+                <font color='#009900'>// ----------------------------------------
+</font>
+                <font color='#0000FF'>case</font> error:
+                    <b>{</b>
+                        seen_fatal_error <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+                    <b>}</b><font color='#0000FF'>break</font>;
+
+                <font color='#009900'>// ----------------------------------------
+</font>
+                <font color='#0000FF'>case</font> dtd:       <font color='#009900'>// fall though
+</font>                <font color='#0000FF'>case</font> comment:   <font color='#009900'>// do nothing
+</font>                    <font color='#0000FF'>break</font>;
+
+                <font color='#009900'>// ----------------------------------------
+</font>
+
+                <b>}</b>
+
+                <font color='#009900'>// if there was a fatal error then quit loop
+</font>                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>seen_fatal_error<font face='Lucida Console'>)</font>
+                    <font color='#0000FF'>break</font>;
+
+                <font color='#009900'>// if we have seen the last tag then quit the loop
+</font>                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>tags.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> seen_root_tag<font face='Lucida Console'>)</font>
+                    <font color='#0000FF'>break</font>;
+                
+
+                <font color='#BB00BB'>get_next_token</font><font face='Lucida Console'>(</font>in,token_text,token_kind,line_number<font face='Lucida Console'>)</font>;
+
+                <font color='#009900'>// if the next token is not a chars or chars_cdata token then flush
+</font>                <font color='#009900'>// the chars_buf to the document_handlers
+</font>                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> <font face='Lucida Console'>(</font>token_kind <font color='#5555FF'>!</font><font color='#5555FF'>=</font> chars<font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> 
+                    <font face='Lucida Console'>(</font>token_kind <font color='#5555FF'>!</font><font color='#5555FF'>=</font> chars_cdata<font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font>
+                    <font face='Lucida Console'>(</font>token_kind <font color='#5555FF'>!</font><font color='#5555FF'>=</font> dtd<font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> 
+                    <font face='Lucida Console'>(</font>token_kind <font color='#5555FF'>!</font><font color='#5555FF'>=</font> comment<font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font>
+                    <font face='Lucida Console'>(</font>chars_buf.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                    <font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#009900'>// notify all the document_handlers
+</font>                    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> dh_list.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        dh_list[i]<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>characters</font><font face='Lucida Console'>(</font>chars_buf<font face='Lucida Console'>)</font>;
+                    <b>}</b>
+                    chars_buf.<font color='#BB00BB'>erase</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                <b>}</b>
+
+
+            <b>}</b> <font color='#009900'>//while (token_kind != eof)
+</font>
+
+
+
+            <font color='#009900'>// you can't have any unmatched tags or any fatal erros
+</font>            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>tags.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font> <font color='#5555FF'>|</font><font color='#5555FF'>|</font> seen_fatal_error<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#009900'>// notify all the error_handlers
+</font>                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> eh_list.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    eh_list[i]<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>fatal_error</font><font face='Lucida Console'>(</font>line_number<font face='Lucida Console'>)</font>;
+                <b>}</b>
+                
+            <b>}</b>
+
+
+            <font color='#009900'>// notify all the document_handlers that we have ended parsing
+</font>            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> dh_list.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                dh_list[i]<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>end_document</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+        
+        <b>}</b>
+        <font color='#0000FF'>catch</font> <font face='Lucida Console'>(</font>...<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#009900'>// notify all the document_handlers that we have ended parsing
+</font>            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> dh_list.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                dh_list[i]<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>end_document</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+            <font color='#009900'>// restore the old exception settings to in
+</font>            in.<font color='#BB00BB'>exceptions</font><font face='Lucida Console'>(</font>old_exceptions<font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// don't forget to rethrow the exception
+</font>            <font color='#0000FF'>throw</font>;
+        <b>}</b>
+
+        <font color='#009900'>// restore the old exception settings to in
+</font>        in.<font color='#BB00BB'>exceptions</font><font face='Lucida Console'>(</font>old_exceptions<font face='Lucida Console'>)</font>;
+
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>        
+    <font color='#0000FF'><u>void</u></font> xml_parser::
+    <b><a name='add_document_handler'></a>add_document_handler</b> <font face='Lucida Console'>(</font>
+        document_handler<font color='#5555FF'>&amp;</font> item
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        document_handler<font color='#5555FF'>*</font> temp <font color='#5555FF'>=</font> <font color='#5555FF'>&amp;</font>item;
+        dh_list.<font color='#BB00BB'>add</font><font face='Lucida Console'>(</font>dh_list.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,temp<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>        
+    <font color='#0000FF'><u>void</u></font> xml_parser::
+    <b><a name='add_error_handler'></a>add_error_handler</b> <font face='Lucida Console'>(</font>
+        error_handler<font color='#5555FF'>&amp;</font> item
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        error_handler<font color='#5555FF'>*</font> temp <font color='#5555FF'>=</font> <font color='#5555FF'>&amp;</font>item;
+        eh_list.<font color='#BB00BB'>add</font><font face='Lucida Console'>(</font>eh_list.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,temp<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>        
+    <font color='#0000FF'><u>void</u></font> xml_parser::
+    <b><a name='swap'></a>swap</b> <font face='Lucida Console'>(</font>
+        xml_parser<font color='#5555FF'>&amp;</font> item
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        dh_list.<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>item.dh_list<font face='Lucida Console'>)</font>;
+        eh_list.<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>item.eh_list<font face='Lucida Console'>)</font>;
+    <b>}</b>
+   
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>    <font color='#009900'>// private member function definitions
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>        
+    <font color='#0000FF'><u>void</u></font> xml_parser::
+    <b><a name='get_next_token'></a>get_next_token</b><font face='Lucida Console'>(</font>
+        std::istream<font color='#5555FF'>&amp;</font> in,
+        std::string<font color='#5555FF'>&amp;</font> token_text,
+        <font color='#0000FF'><u>int</u></font><font color='#5555FF'>&amp;</font> token_kind,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&amp;</font> line_number
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+
+        token_text.<font color='#BB00BB'>erase</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+        std::istream::int_type ch1 <font color='#5555FF'>=</font> in.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        std::istream::int_type ch2;
+
+
+        <font color='#0000FF'>switch</font> <font face='Lucida Console'>(</font>ch1<font face='Lucida Console'>)</font>
+        <b>{</b>
+
+        <font color='#009900'>// -----------------------------------------
+</font>
+            <font color='#009900'>// this is the start of some kind of a tag
+</font>        <font color='#0000FF'>case</font> '<font color='#FF0000'>&lt;</font>':
+            <b>{</b>
+                ch2 <font color='#5555FF'>=</font> in.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>switch</font> <font face='Lucida Console'>(</font>ch2<font face='Lucida Console'>)</font>
+                <b>{</b>
+                
+                <font color='#009900'>// ---------------------------------
+</font>
+                    <font color='#009900'>// this is a dtd, comment, or chars_cdata token 
+</font>                <font color='#0000FF'>case</font> '<font color='#FF0000'>!</font>':
+                    <b>{</b>
+                        <font color='#009900'>// if this is a CDATA section *******************************
+</font>                        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> in.<font color='#BB00BB'>peek</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> '<font color='#FF0000'>[</font>'<font face='Lucida Console'>)</font>
+                        <b>{</b>
+                            token_kind <font color='#5555FF'>=</font> chars_cdata;
+
+                            <font color='#009900'>// throw away the '['
+</font>                            in.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+                            <font color='#009900'>// make sure the next chars are CDATA[
+</font>                            std::istream::int_type ch <font color='#5555FF'>=</font> in.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>ch <font color='#5555FF'>!</font><font color='#5555FF'>=</font> '<font color='#FF0000'>C</font>'<font face='Lucida Console'>)</font>                                
+                                token_kind <font color='#5555FF'>=</font> error;
+                            ch <font color='#5555FF'>=</font> in.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>ch <font color='#5555FF'>!</font><font color='#5555FF'>=</font> '<font color='#FF0000'>D</font>'<font face='Lucida Console'>)</font>
+                                token_kind <font color='#5555FF'>=</font> error;
+                            ch <font color='#5555FF'>=</font> in.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>ch <font color='#5555FF'>!</font><font color='#5555FF'>=</font> '<font color='#FF0000'>A</font>'<font face='Lucida Console'>)</font>
+                                token_kind <font color='#5555FF'>=</font> error;
+                            ch <font color='#5555FF'>=</font> in.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>ch <font color='#5555FF'>!</font><font color='#5555FF'>=</font> '<font color='#FF0000'>T</font>'<font face='Lucida Console'>)</font>
+                                token_kind <font color='#5555FF'>=</font> error;
+                            ch <font color='#5555FF'>=</font> in.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>ch <font color='#5555FF'>!</font><font color='#5555FF'>=</font> '<font color='#FF0000'>A</font>'<font face='Lucida Console'>)</font>
+                                token_kind <font color='#5555FF'>=</font> error;
+                            ch <font color='#5555FF'>=</font> in.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>ch <font color='#5555FF'>!</font><font color='#5555FF'>=</font> '<font color='#FF0000'>[</font>'<font face='Lucida Console'>)</font>
+                                token_kind <font color='#5555FF'>=</font> error;
+                            <font color='#009900'>// if this is an error token then end
+</font>                            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>token_kind <font color='#5555FF'>=</font><font color='#5555FF'>=</font> error<font face='Lucida Console'>)</font>
+                                <font color='#0000FF'>break</font>;
+
+
+                            <font color='#009900'>// get the rest of the chars and put them into token_text
+</font>                            <font color='#0000FF'><u>int</u></font> brackets_seen <font color='#5555FF'>=</font> <font color='#979000'>0</font>; <font color='#009900'>// this is the number of ']' chars
+</font>                                                   <font color='#009900'>// we have seen in a row
+</font>                            <font color='#0000FF'><u>bool</u></font> seen_closing <font color='#5555FF'>=</font> <font color='#979000'>false</font>; <font color='#009900'>// true if we have seen ]]&gt;
+</font>                            <font color='#0000FF'>do</font>
+                            <b>{</b>
+                                ch <font color='#5555FF'>=</font> in.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+                                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>ch <font color='#5555FF'>=</font><font color='#5555FF'>=</font> '<font color='#FF0000'>\n</font>'<font face='Lucida Console'>)</font>
+                                    <font color='#5555FF'>+</font><font color='#5555FF'>+</font>line_number;
+
+                                token_text <font color='#5555FF'>+</font><font color='#5555FF'>=</font> ch;
+
+                                <font color='#009900'>// if this is the closing 
+</font>                                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>brackets_seen <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>2</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> ch <font color='#5555FF'>=</font><font color='#5555FF'>=</font> '<font color='#FF0000'>&gt;</font>'<font face='Lucida Console'>)</font>
+                                    seen_closing <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+                                <font color='#009900'>// if we are seeing a bracket
+</font>                                <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>ch <font color='#5555FF'>=</font><font color='#5555FF'>=</font> '<font color='#FF0000'>]</font>'<font face='Lucida Console'>)</font>
+                                    <font color='#5555FF'>+</font><font color='#5555FF'>+</font>brackets_seen;
+                                <font color='#009900'>// if we didn't see a bracket
+</font>                                <font color='#0000FF'>else</font>
+                                    brackets_seen <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+
+
+                            <b>}</b> <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font>seen_closing<font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> <font face='Lucida Console'>(</font>ch <font color='#5555FF'>!</font><font color='#5555FF'>=</font> EOF<font face='Lucida Console'>)</font> <font face='Lucida Console'>)</font>;
+
+                            <font color='#009900'>// check if this is an error token
+</font>                            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>ch <font color='#5555FF'>=</font><font color='#5555FF'>=</font> EOF<font face='Lucida Console'>)</font>
+                            <b>{</b>
+                                token_kind <font color='#5555FF'>=</font> error;
+                            <b>}</b>
+                            <font color='#0000FF'>else</font>
+                            <b>{</b>
+                                token_text.<font color='#BB00BB'>erase</font><font face='Lucida Console'>(</font>token_text.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#979000'>3</font><font face='Lucida Console'>)</font>;
+                            <b>}</b>
+
+                            
+
+                        <b>}</b>
+                        <font color='#009900'>// this is a comment token ****************************
+</font>                        <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>in.<font color='#BB00BB'>peek</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> '<font color='#FF0000'>-</font>'<font face='Lucida Console'>)</font>
+                        <b>{</b>
+
+                            token_text <font color='#5555FF'>+</font><font color='#5555FF'>=</font> ch1;
+                            token_text <font color='#5555FF'>+</font><font color='#5555FF'>=</font> ch2;
+                            token_text <font color='#5555FF'>+</font><font color='#5555FF'>=</font> '<font color='#FF0000'>-</font>';
+
+                            token_kind <font color='#5555FF'>=</font> comment;
+
+                            <font color='#009900'>// throw away the '-' char
+</font>                            in.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+                            <font color='#009900'>// make sure the next char is another '-'
+</font>                            std::istream::int_type ch <font color='#5555FF'>=</font> in.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>ch <font color='#5555FF'>!</font><font color='#5555FF'>=</font> '<font color='#FF0000'>-</font>'<font face='Lucida Console'>)</font>
+                            <b>{</b>
+                                token_kind <font color='#5555FF'>=</font> error;
+                                <font color='#0000FF'>break</font>;
+                            <b>}</b>
+
+                            token_text <font color='#5555FF'>+</font><font color='#5555FF'>=</font> '<font color='#FF0000'>-</font>';
+
+
+                            <font color='#009900'>// get the rest of the chars and put them into token_text
+</font>                            <font color='#0000FF'><u>int</u></font> hyphens_seen <font color='#5555FF'>=</font> <font color='#979000'>0</font>; <font color='#009900'>// this is the number of '-' chars
+</font>                                                   <font color='#009900'>// we have seen in a row
+</font>                            <font color='#0000FF'><u>bool</u></font> seen_closing <font color='#5555FF'>=</font> <font color='#979000'>false</font>; <font color='#009900'>// true if we have seen ]]&gt;
+</font>                            <font color='#0000FF'>do</font>
+                            <b>{</b>
+                                ch <font color='#5555FF'>=</font> in.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+                                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>ch <font color='#5555FF'>=</font><font color='#5555FF'>=</font> '<font color='#FF0000'>\n</font>'<font face='Lucida Console'>)</font>
+                                    <font color='#5555FF'>+</font><font color='#5555FF'>+</font>line_number;
+
+                                token_text <font color='#5555FF'>+</font><font color='#5555FF'>=</font> ch;
+
+                                <font color='#009900'>// if this should be a closing block
+</font>                                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>hyphens_seen <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>2</font><font face='Lucida Console'>)</font>
+                                <b>{</b>
+                                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>ch <font color='#5555FF'>=</font><font color='#5555FF'>=</font> '<font color='#FF0000'>&gt;</font>'<font face='Lucida Console'>)</font>
+                                        seen_closing <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+                                    <font color='#0000FF'>else</font> <font color='#009900'>// this isn't a closing so make it signal error
+</font>                                        ch <font color='#5555FF'>=</font> EOF;
+                                <b>}</b>
+                                <font color='#009900'>// if we are seeing a hyphen
+</font>                                <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>ch <font color='#5555FF'>=</font><font color='#5555FF'>=</font> '<font color='#FF0000'>-</font>'<font face='Lucida Console'>)</font>
+                                    <font color='#5555FF'>+</font><font color='#5555FF'>+</font>hyphens_seen;
+                                <font color='#009900'>// if we didn't see a hyphen
+</font>                                <font color='#0000FF'>else</font>
+                                    hyphens_seen <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+
+
+                            <b>}</b> <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font>seen_closing<font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> <font face='Lucida Console'>(</font>ch <font color='#5555FF'>!</font><font color='#5555FF'>=</font> EOF<font face='Lucida Console'>)</font> <font face='Lucida Console'>)</font>;
+
+                            <font color='#009900'>// check if this is an error token
+</font>                            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>ch <font color='#5555FF'>=</font><font color='#5555FF'>=</font> EOF<font face='Lucida Console'>)</font>
+                            <b>{</b>
+                                token_kind <font color='#5555FF'>=</font> error;
+                            <b>}</b>
+
+
+
+
+
+                        <b>}</b>
+                        <font color='#0000FF'>else</font> <font color='#009900'>// this is a dtd token *************************
+</font>                        <b>{</b>
+
+                            token_text <font color='#5555FF'>+</font><font color='#5555FF'>=</font> ch1;
+                            token_text <font color='#5555FF'>+</font><font color='#5555FF'>=</font> ch2;
+                            <font color='#0000FF'><u>int</u></font> bracket_depth <font color='#5555FF'>=</font> <font color='#979000'>1</font>;  <font color='#009900'>// this is the number of '&lt;' chars seen 
+</font>                                                    <font color='#009900'>// minus the number of '&gt;' chars seen
+</font>
+                            std::istream::int_type ch;
+                            <font color='#0000FF'>do</font>
+                            <b>{</b>
+                                ch <font color='#5555FF'>=</font> in.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>ch <font color='#5555FF'>=</font><font color='#5555FF'>=</font> '<font color='#FF0000'>&gt;</font>'<font face='Lucida Console'>)</font>
+                                    <font color='#5555FF'>-</font><font color='#5555FF'>-</font>bracket_depth;
+                                <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>ch <font color='#5555FF'>=</font><font color='#5555FF'>=</font> '<font color='#FF0000'>&lt;</font>'<font face='Lucida Console'>)</font>
+                                    <font color='#5555FF'>+</font><font color='#5555FF'>+</font>bracket_depth;
+                                <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>ch <font color='#5555FF'>=</font><font color='#5555FF'>=</font> '<font color='#FF0000'>\n</font>'<font face='Lucida Console'>)</font>
+                                    <font color='#5555FF'>+</font><font color='#5555FF'>+</font>line_number;
+
+                                token_text <font color='#5555FF'>+</font><font color='#5555FF'>=</font> ch;
+                                
+                            <b>}</b> <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font> <font face='Lucida Console'>(</font>bracket_depth <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> <font face='Lucida Console'>(</font>ch <font color='#5555FF'>!</font><font color='#5555FF'>=</font> EOF<font face='Lucida Console'>)</font> <font face='Lucida Console'>)</font>;
+
+                            <font color='#009900'>// make sure we didn't just hit EOF
+</font>                            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>bracket_depth <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                            <b>{</b>
+                                token_kind <font color='#5555FF'>=</font> dtd;
+                            <b>}</b>
+                            <font color='#0000FF'>else</font>
+                            <b>{</b>
+                                token_kind <font color='#5555FF'>=</font> error;
+                            <b>}</b>
+                        <b>}</b>
+                    <b>}</b>
+                    <font color='#0000FF'>break</font>;
+
+                <font color='#009900'>// ---------------------------------
+</font>
+                    <font color='#009900'>// this is a pi token 
+</font>                <font color='#0000FF'>case</font> '<font color='#FF0000'>?</font>':
+                    <b>{</b>
+                        token_text <font color='#5555FF'>+</font><font color='#5555FF'>=</font> ch1;
+                        token_text <font color='#5555FF'>+</font><font color='#5555FF'>=</font> ch2;
+                        std::istream::int_type ch;
+                        
+                        <font color='#0000FF'>do</font>
+                        <b>{</b>
+                            ch <font color='#5555FF'>=</font> in.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                            token_text <font color='#5555FF'>+</font><font color='#5555FF'>=</font> ch;
+                            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>ch <font color='#5555FF'>=</font><font color='#5555FF'>=</font> '<font color='#FF0000'>\n</font>'<font face='Lucida Console'>)</font>
+                                <font color='#5555FF'>+</font><font color='#5555FF'>+</font>line_number;
+                            <font color='#009900'>// else if we hit a &lt; then thats an error
+</font>                            <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>ch <font color='#5555FF'>=</font><font color='#5555FF'>=</font> '<font color='#FF0000'>&lt;</font>'<font face='Lucida Console'>)</font>
+                                ch <font color='#5555FF'>=</font> EOF;
+                        <b>}</b> <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>ch <font color='#5555FF'>!</font><font color='#5555FF'>=</font> '<font color='#FF0000'>&gt;</font>' <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> ch <font color='#5555FF'>!</font><font color='#5555FF'>=</font> EOF<font face='Lucida Console'>)</font>;
+                        <font color='#009900'>// if we hit the end of the pi
+</font>                        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>ch <font color='#5555FF'>=</font><font color='#5555FF'>=</font> '<font color='#FF0000'>&gt;</font>'<font face='Lucida Console'>)</font>
+                        <b>{</b>
+                            <font color='#009900'>// make sure there was a trailing '?'
+</font>                            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> <font face='Lucida Console'>(</font>token_text.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> <font color='#979000'>3</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> 
+                                <font face='Lucida Console'>(</font>token_text[token_text.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#979000'>2</font>] <font color='#5555FF'>!</font><font color='#5555FF'>=</font> '<font color='#FF0000'>?</font>'<font face='Lucida Console'>)</font> 
+                                <font face='Lucida Console'>)</font>
+                            <b>{</b>
+                                token_kind <font color='#5555FF'>=</font> error;
+                            <b>}</b>
+                            <font color='#0000FF'>else</font>
+                            <b>{</b>
+                                token_kind <font color='#5555FF'>=</font> pi;
+                            <b>}</b>
+                        <b>}</b>
+                        <font color='#009900'>// if we hit EOF unexpectidely then error
+</font>                        <font color='#0000FF'>else</font>
+                        <b>{</b>
+                            token_kind <font color='#5555FF'>=</font> error;
+                        <b>}</b>
+                    <b>}</b>
+                    <font color='#0000FF'>break</font>;
+
+                <font color='#009900'>// ---------------------------------
+</font>
+                    <font color='#009900'>// this is an error token
+</font>                <font color='#0000FF'>case</font> EOF:
+                    <b>{</b>
+                        token_kind <font color='#5555FF'>=</font> error;
+                    <b>}</b>
+                    <font color='#0000FF'>break</font>;
+
+                <font color='#009900'>// ---------------------------------
+</font>                    <font color='#009900'>// this is an element_end token
+</font>                <font color='#0000FF'>case</font> '<font color='#FF0000'>/</font>':
+                    <b>{</b>
+                        token_kind <font color='#5555FF'>=</font> element_end;
+                        token_text <font color='#5555FF'>+</font><font color='#5555FF'>=</font> ch1;
+                        token_text <font color='#5555FF'>+</font><font color='#5555FF'>=</font> ch2;
+                        std::istream::int_type ch;
+                        <font color='#0000FF'>do</font>
+                        <b>{</b>
+                            ch <font color='#5555FF'>=</font> in.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>ch <font color='#5555FF'>=</font><font color='#5555FF'>=</font> '<font color='#FF0000'>\n</font>'<font face='Lucida Console'>)</font>
+                                <font color='#5555FF'>+</font><font color='#5555FF'>+</font>line_number;
+                            <font color='#009900'>// else if we hit a &lt; then thats an error
+</font>                            <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>ch <font color='#5555FF'>=</font><font color='#5555FF'>=</font> '<font color='#FF0000'>&lt;</font>'<font face='Lucida Console'>)</font>
+                                ch <font color='#5555FF'>=</font> EOF;
+                            token_text <font color='#5555FF'>+</font><font color='#5555FF'>=</font> ch;                                
+                        <b>}</b> <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font> <font face='Lucida Console'>(</font>ch <font color='#5555FF'>!</font><font color='#5555FF'>=</font> '<font color='#FF0000'>&gt;</font>'<font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> <font face='Lucida Console'>(</font>ch <font color='#5555FF'>!</font><font color='#5555FF'>=</font> EOF<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+                        <font color='#009900'>// check if this is an error token
+</font>                        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>ch <font color='#5555FF'>=</font><font color='#5555FF'>=</font> EOF<font face='Lucida Console'>)</font>
+                        <b>{</b>
+                            token_kind <font color='#5555FF'>=</font> error;
+                        <b>}</b>
+                    <b>}</b>
+                    <font color='#0000FF'>break</font>;
+
+
+                <font color='#009900'>// ---------------------------------
+</font>
+                    <font color='#009900'>// this is an element_start or empty_element token
+</font>                <font color='#0000FF'>default</font>:
+                    <b>{</b>
+
+                        token_text <font color='#5555FF'>+</font><font color='#5555FF'>=</font> ch1;
+                        token_text <font color='#5555FF'>+</font><font color='#5555FF'>=</font> ch2;
+                        std::istream::int_type ch <font color='#5555FF'>=</font> '<font color='#FF0000'>\0</font>';
+                        std::istream::int_type last;
+                        <font color='#0000FF'>do</font>
+                        <b>{</b>
+                            last <font color='#5555FF'>=</font> ch;
+                            ch <font color='#5555FF'>=</font> in.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>ch <font color='#5555FF'>=</font><font color='#5555FF'>=</font> '<font color='#FF0000'>\n</font>'<font face='Lucida Console'>)</font>
+                                <font color='#5555FF'>+</font><font color='#5555FF'>+</font>line_number;
+                            <font color='#009900'>// else if we hit a &lt; then thats an error
+</font>                            <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>ch <font color='#5555FF'>=</font><font color='#5555FF'>=</font> '<font color='#FF0000'>&lt;</font>'<font face='Lucida Console'>)</font>
+                                ch <font color='#5555FF'>=</font> EOF;
+                            token_text <font color='#5555FF'>+</font><font color='#5555FF'>=</font> ch;                                
+                        <b>}</b> <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font> <font face='Lucida Console'>(</font>ch <font color='#5555FF'>!</font><font color='#5555FF'>=</font> '<font color='#FF0000'>&gt;</font>'<font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> <font face='Lucida Console'>(</font>ch <font color='#5555FF'>!</font><font color='#5555FF'>=</font> EOF<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+                        <font color='#009900'>// check if this is an error token
+</font>                        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>ch <font color='#5555FF'>=</font><font color='#5555FF'>=</font> EOF<font face='Lucida Console'>)</font>
+                        <b>{</b>
+                            token_kind <font color='#5555FF'>=</font> error;
+                        <b>}</b>
+                        <font color='#009900'>// if this is an empty_element
+</font>                        <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>last <font color='#5555FF'>=</font><font color='#5555FF'>=</font> '<font color='#FF0000'>/</font>'<font face='Lucida Console'>)</font>
+                        <b>{</b>
+                            token_kind <font color='#5555FF'>=</font> empty_element;
+                        <b>}</b>
+                        <font color='#0000FF'>else</font>
+                        <b>{</b>
+                            token_kind <font color='#5555FF'>=</font> element_start;
+                        <b>}</b>
+                        
+                
+                    <b>}</b>
+                    <font color='#0000FF'>break</font>;
+
+                <font color='#009900'>// ---------------------------------
+</font>
+                <b>}</b>
+
+            <b>}</b>
+            <font color='#0000FF'>break</font>;
+
+        <font color='#009900'>// -----------------------------------------
+</font>
+            <font color='#009900'>// this is an eof token
+</font>        <font color='#0000FF'>case</font> EOF:
+            <b>{</b>
+                token_kind <font color='#5555FF'>=</font> eof;                
+            <b>}</b>
+            <font color='#0000FF'>break</font>;
+
+        <font color='#009900'>// -----------------------------------------
+</font>
+            <font color='#009900'>// this is a chars token
+</font>        <font color='#0000FF'>default</font>:
+            <b>{</b>
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>ch1 <font color='#5555FF'>=</font><font color='#5555FF'>=</font> '<font color='#FF0000'>\n</font>'<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#5555FF'>+</font><font color='#5555FF'>+</font>line_number;
+                    token_text <font color='#5555FF'>+</font><font color='#5555FF'>=</font> ch1;
+                <b>}</b>
+                <font color='#009900'>// if the first thing in this chars token is an entity reference
+</font>                <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>ch1 <font color='#5555FF'>=</font><font color='#5555FF'>=</font> '<font color='#FF0000'>&amp;</font>'<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    
+                    <font color='#0000FF'><u>int</u></font> temp <font color='#5555FF'>=</font> <font color='#BB00BB'>change_entity</font><font face='Lucida Console'>(</font>in<font face='Lucida Console'>)</font>;
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>temp <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        token_kind <font color='#5555FF'>=</font> error;
+                        <font color='#0000FF'>break</font>;
+                    <b>}</b>
+                    <font color='#0000FF'>else</font>
+                    <b>{</b>
+                        token_text <font color='#5555FF'>+</font><font color='#5555FF'>=</font> temp;
+                    <b>}</b>
+                <b>}</b>
+                <font color='#0000FF'>else</font>
+                <b>{</b>
+                    token_text <font color='#5555FF'>+</font><font color='#5555FF'>=</font> ch1;
+                <b>}</b>
+                
+
+                token_kind <font color='#5555FF'>=</font> chars;
+                
+                std::istream::int_type ch <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>in.<font color='#BB00BB'>peek</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>!</font><font color='#5555FF'>=</font> '<font color='#FF0000'>&lt;</font>' <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> in.<font color='#BB00BB'>peek</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>!</font><font color='#5555FF'>=</font> EOF<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    ch <font color='#5555FF'>=</font> in.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>ch <font color='#5555FF'>=</font><font color='#5555FF'>=</font> '<font color='#FF0000'>\n</font>'<font face='Lucida Console'>)</font>
+                        <font color='#5555FF'>+</font><font color='#5555FF'>+</font>line_number;
+
+                    <font color='#009900'>// if this is one of the predefined entity references then change it
+</font>                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>ch <font color='#5555FF'>=</font><font color='#5555FF'>=</font> '<font color='#FF0000'>&amp;</font>'<font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        <font color='#0000FF'><u>int</u></font> temp <font color='#5555FF'>=</font> <font color='#BB00BB'>change_entity</font><font face='Lucida Console'>(</font>in<font face='Lucida Console'>)</font>;
+                        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>temp <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>
+                        <b>{</b>
+                            ch <font color='#5555FF'>=</font> EOF;
+                            <font color='#0000FF'>break</font>;
+                        <b>}</b>
+                        <font color='#0000FF'>else</font>
+                            token_text <font color='#5555FF'>+</font><font color='#5555FF'>=</font> temp;
+                    <b>}</b>
+                    <font color='#0000FF'>else</font>
+                    <b>{</b>
+                        token_text <font color='#5555FF'>+</font><font color='#5555FF'>=</font> ch;
+                    <b>}</b>
+                <b>}</b>
+
+                <font color='#009900'>// if this is an error token
+</font>                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>ch <font color='#5555FF'>=</font><font color='#5555FF'>=</font> EOF<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    token_kind <font color='#5555FF'>=</font> error;
+                <b>}</b>
+
+            <b>}</b>
+            <font color='#0000FF'>break</font>;
+
+        <font color='#009900'>// -----------------------------------------
+</font>
+        <b>}</b>
+       
+
+    <b>}</b>
+
+
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>        
+    <font color='#0000FF'><u>int</u></font> xml_parser::
+    <b><a name='parse_element'></a>parse_element</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> token,
+        std::string<font color='#5555FF'>&amp;</font> name,
+        attrib_list<font color='#5555FF'>&amp;</font> atts
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        name.<font color='#BB00BB'>erase</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        atts.list.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+     
+        <font color='#009900'>// there must be at least one character between the &lt;&gt;
+</font>        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>token[<font color='#979000'>1</font>] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> '<font color='#FF0000'>&gt;</font>'<font face='Lucida Console'>)</font>
+            <font color='#0000FF'>return</font> <font color='#5555FF'>-</font><font color='#979000'>1</font>;
+
+        std::string::size_type i;
+        std::istream::int_type ch <font color='#5555FF'>=</font> token[<font color='#979000'>1</font>];
+        i <font color='#5555FF'>=</font> <font color='#979000'>2</font>;
+
+        <font color='#009900'>// fill out name.  the name can not contain any of the following characters
+</font>        <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font> <font face='Lucida Console'>(</font>ch <font color='#5555FF'>!</font><font color='#5555FF'>=</font> '<font color='#FF0000'>&gt;</font>'<font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> 
+                <font face='Lucida Console'>(</font>ch <font color='#5555FF'>!</font><font color='#5555FF'>=</font> '<font color='#FF0000'> </font>'<font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> 
+                <font face='Lucida Console'>(</font>ch <font color='#5555FF'>!</font><font color='#5555FF'>=</font> '<font color='#FF0000'>=</font>'<font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> 
+                <font face='Lucida Console'>(</font>ch <font color='#5555FF'>!</font><font color='#5555FF'>=</font> '<font color='#FF0000'>/</font>'<font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> 
+                <font face='Lucida Console'>(</font>ch <font color='#5555FF'>!</font><font color='#5555FF'>=</font> '<font color='#FF0000'>\t</font>'<font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> 
+                <font face='Lucida Console'>(</font>ch <font color='#5555FF'>!</font><font color='#5555FF'>=</font> '<font color='#FF0000'>\r</font>'<font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font>
+                <font face='Lucida Console'>(</font>ch <font color='#5555FF'>!</font><font color='#5555FF'>=</font> '<font color='#FF0000'>\n</font>'<font face='Lucida Console'>)</font>
+            <font face='Lucida Console'>)</font>
+        <b>{</b>
+            name <font color='#5555FF'>+</font><font color='#5555FF'>=</font> ch;
+            ch <font color='#5555FF'>=</font> token[i];
+            <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i;
+        <b>}</b>
+
+        <font color='#009900'>// skip any whitespaces
+</font>        <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font> ch <font color='#5555FF'>=</font><font color='#5555FF'>=</font> '<font color='#FF0000'> </font>' <font color='#5555FF'>|</font><font color='#5555FF'>|</font> ch <font color='#5555FF'>=</font><font color='#5555FF'>=</font> '<font color='#FF0000'>\t</font>' <font color='#5555FF'>|</font><font color='#5555FF'>|</font> ch <font color='#5555FF'>=</font><font color='#5555FF'>=</font> '<font color='#FF0000'>\n</font>' <font color='#5555FF'>|</font><font color='#5555FF'>|</font> ch <font color='#5555FF'>=</font><font color='#5555FF'>=</font> '<font color='#FF0000'>\r</font>' <font face='Lucida Console'>)</font>
+        <b>{</b>
+             ch <font color='#5555FF'>=</font> token[i];
+             <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i;
+        <b>}</b>
+
+        <font color='#009900'>// find any attributes
+</font>        <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>ch <font color='#5555FF'>!</font><font color='#5555FF'>=</font> '<font color='#FF0000'>&gt;</font>' <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> ch <font color='#5555FF'>!</font><font color='#5555FF'>=</font> '<font color='#FF0000'>/</font>'<font face='Lucida Console'>)</font>
+        <b>{</b>
+            std::string attribute_name;
+            std::string attribute_value;
+
+            <font color='#009900'>// fill out attribute_name
+</font>            <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font> <font face='Lucida Console'>(</font>ch <font color='#5555FF'>!</font><font color='#5555FF'>=</font> '<font color='#FF0000'>=</font>'<font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> 
+                    <font face='Lucida Console'>(</font>ch <font color='#5555FF'>!</font><font color='#5555FF'>=</font> '<font color='#FF0000'> </font>'<font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> 
+                    <font face='Lucida Console'>(</font>ch <font color='#5555FF'>!</font><font color='#5555FF'>=</font> '<font color='#FF0000'>\t</font>'<font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> 
+                    <font face='Lucida Console'>(</font>ch <font color='#5555FF'>!</font><font color='#5555FF'>=</font> '<font color='#FF0000'>\r</font>'<font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font>
+                    <font face='Lucida Console'>(</font>ch <font color='#5555FF'>!</font><font color='#5555FF'>=</font> '<font color='#FF0000'>\n</font>'<font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font>
+                    <font face='Lucida Console'>(</font>ch <font color='#5555FF'>!</font><font color='#5555FF'>=</font> '<font color='#FF0000'>&gt;</font>'<font face='Lucida Console'>)</font>
+                    <font face='Lucida Console'>)</font>
+            <b>{</b>
+                attribute_name <font color='#5555FF'>+</font><font color='#5555FF'>=</font> ch;
+                ch <font color='#5555FF'>=</font> token[i];
+                <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i;
+            <b>}</b>    
+
+            <font color='#009900'>// you can't have empty attribute names
+</font>            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>attribute_name.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                <font color='#0000FF'>return</font> <font color='#5555FF'>-</font><font color='#979000'>1</font>;
+
+            <font color='#009900'>// if we hit &gt; too early then return error
+</font>            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>ch <font color='#5555FF'>=</font><font color='#5555FF'>=</font> '<font color='#FF0000'>&gt;</font>'<font face='Lucida Console'>)</font>
+                <font color='#0000FF'>return</font> <font color='#5555FF'>-</font><font color='#979000'>1</font>;
+
+            <font color='#009900'>// skip any whitespaces
+</font>            <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>ch <font color='#5555FF'>=</font><font color='#5555FF'>=</font> '<font color='#FF0000'> </font>' <font color='#5555FF'>|</font><font color='#5555FF'>|</font> ch <font color='#5555FF'>=</font><font color='#5555FF'>=</font> '<font color='#FF0000'>\t</font>' <font color='#5555FF'>|</font><font color='#5555FF'>|</font> ch <font color='#5555FF'>=</font><font color='#5555FF'>=</font>'<font color='#FF0000'>\n</font>' <font color='#5555FF'>|</font><font color='#5555FF'>|</font> ch <font color='#5555FF'>=</font><font color='#5555FF'>=</font>'<font color='#FF0000'>\r</font>'<font face='Lucida Console'>)</font>
+            <b>{</b>
+                ch <font color='#5555FF'>=</font> token[i];
+                <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i;
+            <b>}</b>
+
+            <font color='#009900'>// the next char should be a '=', error if it's not
+</font>            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>ch <font color='#5555FF'>!</font><font color='#5555FF'>=</font> '<font color='#FF0000'>=</font>'<font face='Lucida Console'>)</font>
+                <font color='#0000FF'>return</font> <font color='#5555FF'>-</font><font color='#979000'>1</font>;
+
+            <font color='#009900'>// get the next char
+</font>            ch <font color='#5555FF'>=</font> token[i];  
+            <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i;  
+
+            <font color='#009900'>// skip any whitespaces
+</font>            <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>ch <font color='#5555FF'>=</font><font color='#5555FF'>=</font> '<font color='#FF0000'> </font>' <font color='#5555FF'>|</font><font color='#5555FF'>|</font> ch <font color='#5555FF'>=</font><font color='#5555FF'>=</font> '<font color='#FF0000'>\t</font>' <font color='#5555FF'>|</font><font color='#5555FF'>|</font> ch <font color='#5555FF'>=</font><font color='#5555FF'>=</font>'<font color='#FF0000'>\n</font>' <font color='#5555FF'>|</font><font color='#5555FF'>|</font> ch <font color='#5555FF'>=</font><font color='#5555FF'>=</font>'<font color='#FF0000'>\r</font>'<font face='Lucida Console'>)</font>
+            <b>{</b>
+                ch <font color='#5555FF'>=</font> token[i];
+                <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i;
+            <b>}</b>
+
+
+            <font color='#009900'>// get the delimiter for the attribute value
+</font>            std::istream::int_type delimiter <font color='#5555FF'>=</font> ch; <font color='#009900'>// this should be either a ' or " character
+</font>            ch <font color='#5555FF'>=</font> token[i];  <font color='#009900'>// get the next char
+</font>            <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i;            
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>delimiter <font color='#5555FF'>!</font><font color='#5555FF'>=</font> '<font color='#FF0000'>\'</font>' <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> delimiter<font color='#5555FF'>!</font><font color='#5555FF'>=</font>'<font color='#FF0000'>"</font>'<font face='Lucida Console'>)</font>
+                <font color='#0000FF'>return</font> <font color='#5555FF'>-</font><font color='#979000'>1</font>;
+
+
+            <font color='#009900'>// fill out attribute_value
+</font>            <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font> <font face='Lucida Console'>(</font>ch <font color='#5555FF'>!</font><font color='#5555FF'>=</font> delimiter<font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font>
+                    <font face='Lucida Console'>(</font>ch <font color='#5555FF'>!</font><font color='#5555FF'>=</font> '<font color='#FF0000'>&gt;</font>'<font face='Lucida Console'>)</font>
+                    <font face='Lucida Console'>)</font>
+            <b>{</b>
+                attribute_value <font color='#5555FF'>+</font><font color='#5555FF'>=</font> ch;
+                ch <font color='#5555FF'>=</font> token[i];
+                <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i;
+            <b>}</b>  
+
+
+            <font color='#009900'>// if there was no delimiter then this is an error
+</font>            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>ch <font color='#5555FF'>=</font><font color='#5555FF'>=</font> '<font color='#FF0000'>&gt;</font>'<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>return</font> <font color='#5555FF'>-</font><font color='#979000'>1</font>;
+            <b>}</b>          
+
+            <font color='#009900'>// go to the next char
+</font>            ch <font color='#5555FF'>=</font> token[i];
+            <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i;
+
+            <font color='#009900'>// the next char must be either a '&gt;' or '/' (denoting the end of the tag)
+</font>            <font color='#009900'>// or a white space character
+</font>            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>ch <font color='#5555FF'>!</font><font color='#5555FF'>=</font> '<font color='#FF0000'>&gt;</font>' <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> ch <font color='#5555FF'>!</font><font color='#5555FF'>=</font> '<font color='#FF0000'> </font>' <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> ch <font color='#5555FF'>!</font><font color='#5555FF'>=</font> '<font color='#FF0000'>/</font>' <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> ch <font color='#5555FF'>!</font><font color='#5555FF'>=</font> '<font color='#FF0000'>\t</font>' <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> ch <font color='#5555FF'>!</font><font color='#5555FF'>=</font>'<font color='#FF0000'>\n</font>' <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> ch <font color='#5555FF'>!</font><font color='#5555FF'>=</font>'<font color='#FF0000'>\r</font>'<font face='Lucida Console'>)</font>
+                <font color='#0000FF'>return</font> <font color='#5555FF'>-</font><font color='#979000'>1</font>;
+
+            <font color='#009900'>// skip any whitespaces
+</font>            <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>ch <font color='#5555FF'>=</font><font color='#5555FF'>=</font> '<font color='#FF0000'> </font>' <font color='#5555FF'>|</font><font color='#5555FF'>|</font> ch <font color='#5555FF'>=</font><font color='#5555FF'>=</font> '<font color='#FF0000'>\t</font>' <font color='#5555FF'>|</font><font color='#5555FF'>|</font> ch <font color='#5555FF'>=</font><font color='#5555FF'>=</font>'<font color='#FF0000'>\n</font>' <font color='#5555FF'>|</font><font color='#5555FF'>|</font> ch <font color='#5555FF'>=</font><font color='#5555FF'>=</font>'<font color='#FF0000'>\r</font>'<font face='Lucida Console'>)</font>
+            <b>{</b>
+                ch <font color='#5555FF'>=</font> token[i];
+                <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i;
+            <b>}</b>
+
+
+            <font color='#009900'>// add attribute_value and attribute_name to atts
+</font>            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>atts.list.<font color='#BB00BB'>is_in_domain</font><font face='Lucida Console'>(</font>attribute_name<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#009900'>// attributes may not be multiply defined
+</font>                <font color='#0000FF'>return</font> <font color='#5555FF'>-</font><font color='#979000'>1</font>;
+            <b>}</b>
+            <font color='#0000FF'>else</font>
+            <b>{</b>
+                atts.list.<font color='#BB00BB'>add</font><font face='Lucida Console'>(</font>attribute_name,attribute_value<font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+
+        <b>}</b>
+
+        <font color='#009900'>// you can't have an element with no name
+</font>        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>name.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+            <font color='#0000FF'>return</font> <font color='#5555FF'>-</font><font color='#979000'>1</font>;
+
+        <font color='#0000FF'>return</font> <font color='#979000'>0</font>;
+
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>        
+    <font color='#0000FF'><u>int</u></font> xml_parser::
+    <b><a name='parse_pi'></a>parse_pi</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> token,
+        std::string<font color='#5555FF'>&amp;</font> target,
+        std::string<font color='#5555FF'>&amp;</font> data
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        target.<font color='#BB00BB'>erase</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        data.<font color='#BB00BB'>erase</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+        std::istream::int_type ch <font color='#5555FF'>=</font> token[<font color='#979000'>2</font>];
+        std::string::size_type i <font color='#5555FF'>=</font> <font color='#979000'>3</font>;
+        <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>ch <font color='#5555FF'>!</font><font color='#5555FF'>=</font> '<font color='#FF0000'> </font>' <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> ch <font color='#5555FF'>!</font><font color='#5555FF'>=</font> '<font color='#FF0000'>?</font>' <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> ch <font color='#5555FF'>!</font><font color='#5555FF'>=</font> '<font color='#FF0000'>\t</font>' <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> ch <font color='#5555FF'>!</font><font color='#5555FF'>=</font> '<font color='#FF0000'>\n</font>' <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> ch<font color='#5555FF'>!</font><font color='#5555FF'>=</font>'<font color='#FF0000'>\r</font>'<font face='Lucida Console'>)</font>
+        <b>{</b>
+            target <font color='#5555FF'>+</font><font color='#5555FF'>=</font> ch;
+            ch <font color='#5555FF'>=</font> token[i];
+            <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i;
+        <b>}</b>
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>target.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+            <font color='#0000FF'>return</font> <font color='#5555FF'>-</font><font color='#979000'>1</font>;
+
+        <font color='#009900'>// if we aren't at a ? character then go to the next character
+</font>        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>ch <font color='#5555FF'>!</font><font color='#5555FF'>=</font> '<font color='#FF0000'>?</font>' <font face='Lucida Console'>)</font>
+        <b>{</b>
+            ch <font color='#5555FF'>=</font> token[i];
+            <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i;
+        <b>}</b>
+
+        <font color='#009900'>// if we still aren't at the end of the processing instruction then
+</font>        <font color='#009900'>// set this stuff in the data section
+</font>        <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>ch <font color='#5555FF'>!</font><font color='#5555FF'>=</font> '<font color='#FF0000'>?</font>'<font face='Lucida Console'>)</font>
+        <b>{</b>
+            data <font color='#5555FF'>+</font><font color='#5555FF'>=</font> ch;
+            ch <font color='#5555FF'>=</font> token[i];
+            <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i;
+        <b>}</b>
+
+        <font color='#0000FF'>return</font> <font color='#979000'>0</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>        
+    <font color='#0000FF'><u>int</u></font> xml_parser::
+    <b><a name='parse_element_end'></a>parse_element_end</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> token,
+        std::string<font color='#5555FF'>&amp;</font> name
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        name.<font color='#BB00BB'>erase</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        std::string::size_type end <font color='#5555FF'>=</font> token.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#979000'>1</font>;
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>std::string::size_type i <font color='#5555FF'>=</font> <font color='#979000'>2</font>; i <font color='#5555FF'>&lt;</font> end; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>token[i] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> '<font color='#FF0000'> </font>' <font color='#5555FF'>|</font><font color='#5555FF'>|</font> token[i] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> '<font color='#FF0000'>\t</font>' <font color='#5555FF'>|</font><font color='#5555FF'>|</font> token[i] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> '<font color='#FF0000'>\n</font>'<font color='#5555FF'>|</font><font color='#5555FF'>|</font> token[i] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> '<font color='#FF0000'>\r</font>'<font face='Lucida Console'>)</font>
+                <font color='#0000FF'>break</font>;
+            name <font color='#5555FF'>+</font><font color='#5555FF'>=</font> token[i];
+        <b>}</b>
+
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>name.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+            <font color='#0000FF'>return</font> <font color='#5555FF'>-</font><font color='#979000'>1</font>;
+
+        <font color='#0000FF'>return</font> <font color='#979000'>0</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>        
+    <font color='#0000FF'><u>int</u></font> xml_parser::
+    <b><a name='change_entity'></a>change_entity</b> <font face='Lucida Console'>(</font>
+        std::istream<font color='#5555FF'>&amp;</font> in
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        
+        std::istream::int_type buf[<font color='#979000'>6</font>];
+   
+        
+        buf[<font color='#979000'>1</font>] <font color='#5555FF'>=</font> in.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// if this is an undefined entity reference then return error
+</font>        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>buf[<font color='#979000'>1</font>] <font color='#5555FF'>!</font><font color='#5555FF'>=</font> '<font color='#FF0000'>a</font>' <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> 
+            buf[<font color='#979000'>1</font>] <font color='#5555FF'>!</font><font color='#5555FF'>=</font> '<font color='#FF0000'>l</font>' <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font>
+            buf[<font color='#979000'>1</font>] <font color='#5555FF'>!</font><font color='#5555FF'>=</font> '<font color='#FF0000'>g</font>' <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font>
+            buf[<font color='#979000'>1</font>] <font color='#5555FF'>!</font><font color='#5555FF'>=</font> '<font color='#FF0000'>q</font>'
+            <font face='Lucida Console'>)</font>
+            <font color='#0000FF'>return</font> <font color='#5555FF'>-</font><font color='#979000'>1</font>;
+
+
+        buf[<font color='#979000'>2</font>] <font color='#5555FF'>=</font> in.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <font color='#009900'>// if this is an undefined entity reference then return error
+</font>        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>buf[<font color='#979000'>2</font>] <font color='#5555FF'>!</font><font color='#5555FF'>=</font> '<font color='#FF0000'>m</font>' <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> 
+            buf[<font color='#979000'>2</font>] <font color='#5555FF'>!</font><font color='#5555FF'>=</font> '<font color='#FF0000'>t</font>' <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font>
+            buf[<font color='#979000'>2</font>] <font color='#5555FF'>!</font><font color='#5555FF'>=</font> '<font color='#FF0000'>p</font>' <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font>
+            buf[<font color='#979000'>2</font>] <font color='#5555FF'>!</font><font color='#5555FF'>=</font> '<font color='#FF0000'>u</font>'
+            <font face='Lucida Console'>)</font>
+            <font color='#0000FF'>return</font> <font color='#5555FF'>-</font><font color='#979000'>1</font>;
+
+
+        buf[<font color='#979000'>3</font>] <font color='#5555FF'>=</font> in.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <font color='#009900'>// if this is an undefined entity reference then return error
+</font>        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>buf[<font color='#979000'>3</font>] <font color='#5555FF'>!</font><font color='#5555FF'>=</font> '<font color='#FF0000'>p</font>' <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> 
+            buf[<font color='#979000'>3</font>] <font color='#5555FF'>!</font><font color='#5555FF'>=</font> '<font color='#FF0000'>;</font>' <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font>
+            buf[<font color='#979000'>3</font>] <font color='#5555FF'>!</font><font color='#5555FF'>=</font> '<font color='#FF0000'>o</font>'
+            <font face='Lucida Console'>)</font>
+            <font color='#0000FF'>return</font> <font color='#5555FF'>-</font><font color='#979000'>1</font>;
+
+        <font color='#009900'>// check if this is &amp;lt; or &amp;gt;
+</font>        <font color='#0000FF'>if</font>  <font face='Lucida Console'>(</font>buf[<font color='#979000'>3</font>] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> '<font color='#FF0000'>;</font>'<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>buf[<font color='#979000'>2</font>] <font color='#5555FF'>!</font><font color='#5555FF'>=</font> '<font color='#FF0000'>t</font>'<font face='Lucida Console'>)</font>
+                <font color='#0000FF'>return</font> <font color='#5555FF'>-</font><font color='#979000'>1</font>;
+
+            <font color='#009900'>// if this is &amp;lt; then return '&lt;'
+</font>            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>buf[<font color='#979000'>1</font>] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> '<font color='#FF0000'>l</font>'<font face='Lucida Console'>)</font>
+                <font color='#0000FF'>return</font> '<font color='#FF0000'>&lt;</font>';
+            <font color='#009900'>// if this is &amp;gt; then return '&gt;'
+</font>            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>buf[<font color='#979000'>1</font>] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> '<font color='#FF0000'>g</font>'<font face='Lucida Console'>)</font>
+                <font color='#0000FF'>return</font> '<font color='#FF0000'>&gt;</font>';
+
+            <font color='#009900'>// it is neither so it must be an undefined entity reference
+</font>            <font color='#0000FF'>return</font> <font color='#5555FF'>-</font><font color='#979000'>1</font>;
+        <b>}</b>
+
+
+        buf[<font color='#979000'>4</font>] <font color='#5555FF'>=</font> in.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <font color='#009900'>// if this should be &amp;amp;
+</font>        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>buf[<font color='#979000'>4</font>] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> '<font color='#FF0000'>;</font>'<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#009900'>// if this is not &amp;amp; then return error
+</font>            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>buf[<font color='#979000'>1</font>] <font color='#5555FF'>!</font><font color='#5555FF'>=</font> '<font color='#FF0000'>a</font>' <font color='#5555FF'>|</font><font color='#5555FF'>|</font>
+                buf[<font color='#979000'>2</font>] <font color='#5555FF'>!</font><font color='#5555FF'>=</font> '<font color='#FF0000'>m</font>' <font color='#5555FF'>|</font><font color='#5555FF'>|</font> 
+                buf[<font color='#979000'>3</font>] <font color='#5555FF'>!</font><font color='#5555FF'>=</font> '<font color='#FF0000'>p</font>'
+                <font face='Lucida Console'>)</font>
+                <font color='#0000FF'>return</font> <font color='#5555FF'>-</font><font color='#979000'>1</font>;
+
+            <font color='#0000FF'>return</font> '<font color='#FF0000'>&amp;</font>';
+        <b>}</b>
+
+        buf[<font color='#979000'>5</font>] <font color='#5555FF'>=</font> in.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// if this should be &amp;apos;
+</font>        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>buf[<font color='#979000'>1</font>] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> '<font color='#FF0000'>a</font>' <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font>
+            buf[<font color='#979000'>2</font>] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> '<font color='#FF0000'>p</font>' <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font>
+            buf[<font color='#979000'>3</font>] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> '<font color='#FF0000'>o</font>' <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font>
+            buf[<font color='#979000'>4</font>] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> '<font color='#FF0000'>s</font>' <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font>
+            buf[<font color='#979000'>5</font>] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> '<font color='#FF0000'>;</font>'
+            <font face='Lucida Console'>)</font>
+            <font color='#0000FF'>return</font> '<font color='#FF0000'>\'</font>';
+
+
+        <font color='#009900'>// if this should be &amp;quot;
+</font>        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>buf[<font color='#979000'>1</font>] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> '<font color='#FF0000'>q</font>' <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font>
+            buf[<font color='#979000'>2</font>] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> '<font color='#FF0000'>u</font>' <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font>
+            buf[<font color='#979000'>3</font>] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> '<font color='#FF0000'>o</font>' <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font>
+            buf[<font color='#979000'>4</font>] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> '<font color='#FF0000'>t</font>' <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font>
+            buf[<font color='#979000'>5</font>] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> '<font color='#FF0000'>;</font>'
+            <font face='Lucida Console'>)</font>
+            <font color='#0000FF'>return</font> '<font color='#FF0000'>"</font>';
+
+
+        <font color='#009900'>// it was an undefined entity reference
+</font>        <font color='#0000FF'>return</font> <font color='#5555FF'>-</font><font color='#979000'>1</font>;
+
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>class</font> <b><a name='xml_parse_error'></a>xml_parse_error</b> : <font color='#0000FF'>public</font> error
+    <b>{</b>
+    <font color='#0000FF'>public</font>:
+        <b><a name='xml_parse_error'></a>xml_parse_error</b><font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> a
+        <font face='Lucida Console'>)</font>: error<font face='Lucida Console'>(</font>a<font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+    <b>}</b>;
+
+    <font color='#0000FF'>namespace</font> impl
+    <b>{</b>
+        <font color='#0000FF'>class</font> <b><a name='default_xml_error_handler'></a>default_xml_error_handler</b> : <font color='#0000FF'>public</font> error_handler
+        <b>{</b>
+            std::string filename;
+
+        <font color='#0000FF'>public</font>:
+
+            <b><a name='default_xml_error_handler'></a>default_xml_error_handler</b> <font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+
+            <b><a name='default_xml_error_handler'></a>default_xml_error_handler</b> <font face='Lucida Console'>(</font>
+                <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> filename_
+            <font face='Lucida Console'>)</font> :filename<font face='Lucida Console'>(</font>filename_<font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+
+            <font color='#0000FF'>virtual</font> <font color='#0000FF'><u>void</u></font> <b><a name='error'></a>error</b> <font face='Lucida Console'>(</font>
+                <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> 
+            <font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#009900'>// just ignore non-fatal errors
+</font>            <b>}</b>
+
+            <font color='#0000FF'>virtual</font> <font color='#0000FF'><u>void</u></font> <b><a name='fatal_error'></a>fatal_error</b> <font face='Lucida Console'>(</font>
+                <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> line_number
+            <font face='Lucida Console'>)</font>
+            <b>{</b>
+                std::ostringstream sout;
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>filename.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                    sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>There is a fatal error on line </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> line_number <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'> in the XML file '</font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font>filename<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font>"<font color='#CC0000'>'.</font>";
+                <font color='#0000FF'>else</font>
+                    sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>There is a fatal error on line </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> line_number <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'> in the XML being processed.</font>";
+
+                <font color='#0000FF'>throw</font> <font color='#BB00BB'>xml_parse_error</font><font face='Lucida Console'>(</font>sout.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+        <b>}</b>;
+    <b>}</b>
+
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='parse_xml'></a>parse_xml</b> <font face='Lucida Console'>(</font>
+        std::istream<font color='#5555FF'>&amp;</font> in,
+        document_handler<font color='#5555FF'>&amp;</font> dh,
+        error_handler<font color='#5555FF'>&amp;</font> eh
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        xml_parser parser;
+        parser.<font color='#BB00BB'>add_document_handler</font><font face='Lucida Console'>(</font>dh<font face='Lucida Console'>)</font>;
+        parser.<font color='#BB00BB'>add_error_handler</font><font face='Lucida Console'>(</font>eh<font face='Lucida Console'>)</font>;
+        parser.<font color='#BB00BB'>parse</font><font face='Lucida Console'>(</font>in<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='parse_xml'></a>parse_xml</b> <font face='Lucida Console'>(</font>
+        std::istream<font color='#5555FF'>&amp;</font> in,
+        error_handler<font color='#5555FF'>&amp;</font> eh,
+        document_handler<font color='#5555FF'>&amp;</font> dh
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        xml_parser parser;
+        parser.<font color='#BB00BB'>add_document_handler</font><font face='Lucida Console'>(</font>dh<font face='Lucida Console'>)</font>;
+        parser.<font color='#BB00BB'>add_error_handler</font><font face='Lucida Console'>(</font>eh<font face='Lucida Console'>)</font>;
+        parser.<font color='#BB00BB'>parse</font><font face='Lucida Console'>(</font>in<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='parse_xml'></a>parse_xml</b> <font face='Lucida Console'>(</font>
+        std::istream<font color='#5555FF'>&amp;</font> in,
+        error_handler<font color='#5555FF'>&amp;</font> eh
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        xml_parser parser;
+        parser.<font color='#BB00BB'>add_error_handler</font><font face='Lucida Console'>(</font>eh<font face='Lucida Console'>)</font>;
+        parser.<font color='#BB00BB'>parse</font><font face='Lucida Console'>(</font>in<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='parse_xml'></a>parse_xml</b> <font face='Lucida Console'>(</font>
+        std::istream<font color='#5555FF'>&amp;</font> in,
+        document_handler<font color='#5555FF'>&amp;</font> dh
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        xml_parser parser;
+        parser.<font color='#BB00BB'>add_document_handler</font><font face='Lucida Console'>(</font>dh<font face='Lucida Console'>)</font>;
+        impl::default_xml_error_handler eh;
+        parser.<font color='#BB00BB'>add_error_handler</font><font face='Lucida Console'>(</font>eh<font face='Lucida Console'>)</font>;
+        parser.<font color='#BB00BB'>parse</font><font face='Lucida Console'>(</font>in<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='parse_xml'></a>parse_xml</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> filename,
+        document_handler<font color='#5555FF'>&amp;</font> dh,
+        error_handler<font color='#5555FF'>&amp;</font> eh
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        std::ifstream <font color='#BB00BB'>in</font><font face='Lucida Console'>(</font>filename.<font color='#BB00BB'>c_str</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font>in<font face='Lucida Console'>)</font>
+            <font color='#0000FF'>throw</font> <font color='#BB00BB'>xml_parse_error</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>Unable to open file '</font>" <font color='#5555FF'>+</font> filename <font color='#5555FF'>+</font> "<font color='#CC0000'>'.</font>"<font face='Lucida Console'>)</font>;
+        xml_parser parser;
+        parser.<font color='#BB00BB'>add_document_handler</font><font face='Lucida Console'>(</font>dh<font face='Lucida Console'>)</font>;
+        parser.<font color='#BB00BB'>add_error_handler</font><font face='Lucida Console'>(</font>eh<font face='Lucida Console'>)</font>;
+        parser.<font color='#BB00BB'>parse</font><font face='Lucida Console'>(</font>in<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='parse_xml'></a>parse_xml</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> filename,
+        error_handler<font color='#5555FF'>&amp;</font> eh,
+        document_handler<font color='#5555FF'>&amp;</font> dh
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        std::ifstream <font color='#BB00BB'>in</font><font face='Lucida Console'>(</font>filename.<font color='#BB00BB'>c_str</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font>in<font face='Lucida Console'>)</font>
+            <font color='#0000FF'>throw</font> <font color='#BB00BB'>xml_parse_error</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>Unable to open file '</font>" <font color='#5555FF'>+</font> filename <font color='#5555FF'>+</font> "<font color='#CC0000'>'.</font>"<font face='Lucida Console'>)</font>;
+        xml_parser parser;
+        parser.<font color='#BB00BB'>add_document_handler</font><font face='Lucida Console'>(</font>dh<font face='Lucida Console'>)</font>;
+        parser.<font color='#BB00BB'>add_error_handler</font><font face='Lucida Console'>(</font>eh<font face='Lucida Console'>)</font>;
+        parser.<font color='#BB00BB'>parse</font><font face='Lucida Console'>(</font>in<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='parse_xml'></a>parse_xml</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> filename,
+        error_handler<font color='#5555FF'>&amp;</font> eh
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        std::ifstream <font color='#BB00BB'>in</font><font face='Lucida Console'>(</font>filename.<font color='#BB00BB'>c_str</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font>in<font face='Lucida Console'>)</font>
+            <font color='#0000FF'>throw</font> <font color='#BB00BB'>xml_parse_error</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>Unable to open file '</font>" <font color='#5555FF'>+</font> filename <font color='#5555FF'>+</font> "<font color='#CC0000'>'.</font>"<font face='Lucida Console'>)</font>;
+        xml_parser parser;
+        parser.<font color='#BB00BB'>add_error_handler</font><font face='Lucida Console'>(</font>eh<font face='Lucida Console'>)</font>;
+        parser.<font color='#BB00BB'>parse</font><font face='Lucida Console'>(</font>in<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='parse_xml'></a>parse_xml</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> filename,
+        document_handler<font color='#5555FF'>&amp;</font> dh
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        std::ifstream <font color='#BB00BB'>in</font><font face='Lucida Console'>(</font>filename.<font color='#BB00BB'>c_str</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font>in<font face='Lucida Console'>)</font>
+            <font color='#0000FF'>throw</font> <font color='#BB00BB'>xml_parse_error</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>Unable to open file '</font>" <font color='#5555FF'>+</font> filename <font color='#5555FF'>+</font> "<font color='#CC0000'>'.</font>"<font face='Lucida Console'>)</font>;
+        xml_parser parser;
+        parser.<font color='#BB00BB'>add_document_handler</font><font face='Lucida Console'>(</font>dh<font face='Lucida Console'>)</font>;
+        impl::default_xml_error_handler <font color='#BB00BB'>eh</font><font face='Lucida Console'>(</font>filename<font face='Lucida Console'>)</font>;
+        parser.<font color='#BB00BB'>add_error_handler</font><font face='Lucida Console'>(</font>eh<font face='Lucida Console'>)</font>;
+        parser.<font color='#BB00BB'>parse</font><font face='Lucida Console'>(</font>in<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_XML_PARSER_KERNEl_1_
+</font>
+
+</pre></body></html>

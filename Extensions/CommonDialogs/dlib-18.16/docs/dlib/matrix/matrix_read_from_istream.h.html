@@ -1,0 +1,111 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - matrix_read_from_istream.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2013  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_MATRIx_READ_FROM_ISTREAM_H_h_
+<font color='#0000FF'>#define</font> DLIB_MATRIx_READ_FROM_ISTREAM_H_h_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='matrix.h.html'>matrix.h</a>"
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>vector<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>iostream<font color='#5555FF'>&gt;</font>
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>namespace</font> impl
+    <b>{</b>
+        <font color='#0000FF'>inline</font> <font color='#0000FF'><u>bool</u></font> <b><a name='next_is_whitespace'></a>next_is_whitespace</b> <font face='Lucida Console'>(</font>
+            std::istream<font color='#5555FF'>&amp;</font> in
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>return</font> in.<font color='#BB00BB'>peek</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> '<font color='#FF0000'>\n</font>' <font color='#5555FF'>|</font><font color='#5555FF'>|</font>
+                in.<font color='#BB00BB'>peek</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> '<font color='#FF0000'> </font>' <font color='#5555FF'>|</font><font color='#5555FF'>|</font> 
+                in.<font color='#BB00BB'>peek</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> '<font color='#FF0000'>,</font>' <font color='#5555FF'>|</font><font color='#5555FF'>|</font> 
+                in.<font color='#BB00BB'>peek</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> '<font color='#FF0000'>\t</font>' <font color='#5555FF'>|</font><font color='#5555FF'>|</font>
+                in.<font color='#BB00BB'>peek</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> '<font color='#FF0000'>\r</font>';
+        <b>}</b>
+    <b>}</b>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T, <font color='#0000FF'><u>long</u></font> NR, <font color='#0000FF'><u>long</u></font> NC, <font color='#0000FF'>typename</font> MM, <font color='#0000FF'>typename</font> L<font color='#5555FF'>&gt;</font>
+    std::istream<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font> <font face='Lucida Console'>(</font>
+        std::istream<font color='#5555FF'>&amp;</font> in,
+        matrix<font color='#5555FF'>&lt;</font>T,NR,NC,MM,L<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> m
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> dlib::impl;
+        <font color='#0000FF'><u>long</u></font> num_rows <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        std::vector<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font> buf;
+        buf.<font color='#BB00BB'>reserve</font><font face='Lucida Console'>(</font><font color='#979000'>100</font><font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// eat any leading whitespace
+</font>        <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>next_is_whitespace</font><font face='Lucida Console'>(</font>in<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+            in.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'><u>bool</u></font> at_start_of_line <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+        <font color='#0000FF'><u>bool</u></font> stop <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+        <font color='#0000FF'>while</font><font face='Lucida Console'>(</font><font color='#5555FF'>!</font>stop <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> in.<font color='#BB00BB'>peek</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>!</font><font color='#5555FF'>=</font> EOF<font face='Lucida Console'>)</font>
+        <b>{</b>
+            T temp;
+            in <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font> temp;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font>in<font face='Lucida Console'>)</font>
+                <font color='#0000FF'>return</font> in;
+
+            buf.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>at_start_of_line<font face='Lucida Console'>)</font>
+            <b>{</b>
+                at_start_of_line <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+                <font color='#5555FF'>+</font><font color='#5555FF'>+</font>num_rows;
+            <b>}</b>
+
+            <font color='#009900'>// Eat next block of whitespace but also note if we hit the start of the next
+</font>            <font color='#009900'>// line. 
+</font>            <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>next_is_whitespace</font><font face='Lucida Console'>(</font>in<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>at_start_of_line <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> in.<font color='#BB00BB'>peek</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> '<font color='#FF0000'>\n</font>'<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    stop <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+                    <font color='#0000FF'>break</font>;
+                <b>}</b>
+
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>in.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> '<font color='#FF0000'>\n</font>'<font face='Lucida Console'>)</font>
+                    at_start_of_line <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+            <b>}</b>
+        <b>}</b>
+
+        <font color='#009900'>// It's an error for there to not be any matrix data in the input stream
+</font>        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>num_rows <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            in.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font>in.<font color='#BB00BB'>rdstate</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>|</font> std::ios::failbit<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>return</font> in;
+        <b>}</b>
+
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> num_cols <font color='#5555FF'>=</font> buf.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>/</font>num_rows;
+        <font color='#009900'>// It's also an error if the sizes don't make sense.
+</font>        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>num_rows<font color='#5555FF'>*</font>num_cols <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font>buf.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>|</font><font color='#5555FF'>|</font>
+            <font face='Lucida Console'>(</font>NR <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> NR <font color='#5555FF'>!</font><font color='#5555FF'>=</font> num_rows<font face='Lucida Console'>)</font> <font color='#5555FF'>|</font><font color='#5555FF'>|</font>
+            <font face='Lucida Console'>(</font>NC <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> NC <font color='#5555FF'>!</font><font color='#5555FF'>=</font> num_cols<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            in.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font>in.<font color='#BB00BB'>rdstate</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>|</font> std::ios::failbit<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>return</font> in;
+        <b>}</b>
+
+
+        m <font color='#5555FF'>=</font> <font color='#BB00BB'>reshape</font><font face='Lucida Console'>(</font><font color='#BB00BB'>mat</font><font face='Lucida Console'>(</font>buf<font face='Lucida Console'>)</font>,num_rows, buf.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>/</font>num_rows<font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>in.<font color='#BB00BB'>eof</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#009900'>// Clear the eof and fail bits since this is caused by peeking at the EOF.
+</font>            <font color='#009900'>// But in the current case, we have successfully read the matrix.
+</font>            in.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font>in.<font color='#BB00BB'>rdstate</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font> <font face='Lucida Console'>(</font>~<font face='Lucida Console'>(</font>std::ios::eofbit <font color='#5555FF'>|</font> std::ios::failbit<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+        <font color='#0000FF'>return</font> in;
+    <b>}</b>
+<b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_MATRIx_READ_FROM_ISTREAM_H_h_
+</font>
+
+</pre></body></html>

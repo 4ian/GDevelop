@@ -1,0 +1,310 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - bayes_net_ex.cpp</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// The contents of this file are in the public domain. See LICENSE_FOR_EXAMPLE_PROGRAMS.txt
+</font><font color='#009900'>/*
+    This is an example illustrating the use of the Bayesian Network 
+    inference utilities found in the dlib C++ library.
+    
+
+    In this example all the nodes in the Bayesian network are
+    boolean variables.  That is, they take on either the value
+    0 or the value 1.
+
+    The network contains 4 nodes and looks as follows:
+
+        B     C
+        \\   //
+         \/ \/ 
+           A
+           ||
+           \/
+            D
+
+
+    The probabilities of each node are summarized below.  (The probability
+    of each node being 0 is not listed since it is just P(X=0) = 1-p(X=1) ) 
+
+        p(B=1) = 0.01
+
+        p(C=1) = 0.001
+
+        p(A=1 | B=0, C=0) = 0.01  
+        p(A=1 | B=0, C=1) = 0.5
+        p(A=1 | B=1, C=0) = 0.9
+        p(A=1 | B=1, C=1) = 0.99 
+
+        p(D=1 | A=0) = 0.2 
+        p(D=1 | A=1) = 0.5
+
+*/</font>
+
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>bayes_utils.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>graph_utils.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>graph.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>directed_graph.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>iostream<font color='#5555FF'>&gt;</font>
+
+
+<font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> dlib;
+<font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> std;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<font color='#0000FF'><u>int</u></font> <b><a name='main'></a>main</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+<b>{</b>
+    <font color='#0000FF'>try</font>
+    <b>{</b>
+        <font color='#009900'>// There are many useful convenience functions in this namespace.  They all
+</font>        <font color='#009900'>// perform simple access or modify operations on the nodes of a bayesian network. 
+</font>        <font color='#009900'>// You don't have to use them but they are convenient and they also will check for
+</font>        <font color='#009900'>// various errors in your bayesian network when your application is built with
+</font>        <font color='#009900'>// the DEBUG or ENABLE_ASSERTS preprocessor definitions defined.  So their use
+</font>        <font color='#009900'>// is recommended.  In fact, most of the global functions used in this example 
+</font>        <font color='#009900'>// program are from this namespace.
+</font>        <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> bayes_node_utils;
+
+        <font color='#009900'>// This statement declares a bayesian network called bn.  Note that a bayesian network
+</font>        <font color='#009900'>// in the dlib world is just a directed_graph object that contains a special kind 
+</font>        <font color='#009900'>// of node called a bayes_node.
+</font>        directed_graph<font color='#5555FF'>&lt;</font>bayes_node<font color='#5555FF'>&gt;</font>::kernel_1a_c bn;
+
+        <font color='#009900'>// Use an enum to make some more readable names for our nodes.
+</font>        <font color='#0000FF'>enum</font> <b><a name='nodes'></a>nodes</b>
+        <b>{</b>
+            A <font color='#5555FF'>=</font> <font color='#979000'>0</font>,
+            B <font color='#5555FF'>=</font> <font color='#979000'>1</font>,
+            C <font color='#5555FF'>=</font> <font color='#979000'>2</font>,
+            D <font color='#5555FF'>=</font> <font color='#979000'>3</font>
+        <b>}</b>;
+
+        <font color='#009900'>// The next few blocks of code setup our bayesian network.
+</font>
+        <font color='#009900'>// The first thing we do is tell the bn object how many nodes it has
+</font>        <font color='#009900'>// and also add the three edges.  Again, we are using the network
+</font>        <font color='#009900'>// shown in ASCII art at the top of this file.
+</font>        bn.<font color='#BB00BB'>set_number_of_nodes</font><font face='Lucida Console'>(</font><font color='#979000'>4</font><font face='Lucida Console'>)</font>;
+        bn.<font color='#BB00BB'>add_edge</font><font face='Lucida Console'>(</font>A, D<font face='Lucida Console'>)</font>;
+        bn.<font color='#BB00BB'>add_edge</font><font face='Lucida Console'>(</font>B, A<font face='Lucida Console'>)</font>;
+        bn.<font color='#BB00BB'>add_edge</font><font face='Lucida Console'>(</font>C, A<font face='Lucida Console'>)</font>;
+
+
+        <font color='#009900'>// Now we inform all the nodes in the network that they are binary
+</font>        <font color='#009900'>// nodes.  That is, they only have two possible values.  
+</font>        <font color='#BB00BB'>set_node_num_values</font><font face='Lucida Console'>(</font>bn, A, <font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>set_node_num_values</font><font face='Lucida Console'>(</font>bn, B, <font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>set_node_num_values</font><font face='Lucida Console'>(</font>bn, C, <font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>set_node_num_values</font><font face='Lucida Console'>(</font>bn, D, <font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+
+        assignment parent_state;
+        <font color='#009900'>// Now we will enter all the conditional probability information for each node.
+</font>        <font color='#009900'>// Each node's conditional probability is dependent on the state of its parents.  
+</font>        <font color='#009900'>// To specify this state we need to use the assignment object.  This assignment 
+</font>        <font color='#009900'>// object allows us to specify the state of each nodes parents. 
+</font>
+
+        <font color='#009900'>// Here we specify that p(B=1) = 0.01
+</font>        <font color='#009900'>// parent_state is empty in this case since B is a root node. 
+</font>        <font color='#BB00BB'>set_node_probability</font><font face='Lucida Console'>(</font>bn, B, <font color='#979000'>1</font>, parent_state, <font color='#979000'>0.01</font><font face='Lucida Console'>)</font>;
+        <font color='#009900'>// Here we specify that p(B=0) = 1-0.01
+</font>        <font color='#BB00BB'>set_node_probability</font><font face='Lucida Console'>(</font>bn, B, <font color='#979000'>0</font>, parent_state, <font color='#979000'>1</font><font color='#5555FF'>-</font><font color='#979000'>0.01</font><font face='Lucida Console'>)</font>;
+
+
+        <font color='#009900'>// Here we specify that p(C=1) = 0.001
+</font>        <font color='#009900'>// parent_state is empty in this case since B is a root node. 
+</font>        <font color='#BB00BB'>set_node_probability</font><font face='Lucida Console'>(</font>bn, C, <font color='#979000'>1</font>, parent_state, <font color='#979000'>0.001</font><font face='Lucida Console'>)</font>;
+        <font color='#009900'>// Here we specify that p(C=0) = 1-0.001
+</font>        <font color='#BB00BB'>set_node_probability</font><font face='Lucida Console'>(</font>bn, C, <font color='#979000'>0</font>, parent_state, <font color='#979000'>1</font><font color='#5555FF'>-</font><font color='#979000'>0.001</font><font face='Lucida Console'>)</font>;
+
+
+        <font color='#009900'>// This is our first node that has parents. So we set the parent_state
+</font>        <font color='#009900'>// object to reflect that A has both B and C as parents.
+</font>        parent_state.<font color='#BB00BB'>add</font><font face='Lucida Console'>(</font>B, <font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+        parent_state.<font color='#BB00BB'>add</font><font face='Lucida Console'>(</font>C, <font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+        <font color='#009900'>// Here we specify that p(A=1 | B=1, C=1) = 0.99 
+</font>        <font color='#BB00BB'>set_node_probability</font><font face='Lucida Console'>(</font>bn, A, <font color='#979000'>1</font>, parent_state, <font color='#979000'>0.99</font><font face='Lucida Console'>)</font>;
+        <font color='#009900'>// Here we specify that p(A=0 | B=1, C=1) = 1-0.99 
+</font>        <font color='#BB00BB'>set_node_probability</font><font face='Lucida Console'>(</font>bn, A, <font color='#979000'>0</font>, parent_state, <font color='#979000'>1</font><font color='#5555FF'>-</font><font color='#979000'>0.99</font><font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// Here we use the [] notation because B and C have already
+</font>        <font color='#009900'>// been added into parent state.  
+</font>        parent_state[B] <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+        parent_state[C] <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <font color='#009900'>// Here we specify that p(A=1 | B=1, C=0) = 0.9 
+</font>        <font color='#BB00BB'>set_node_probability</font><font face='Lucida Console'>(</font>bn, A, <font color='#979000'>1</font>, parent_state, <font color='#979000'>0.9</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>set_node_probability</font><font face='Lucida Console'>(</font>bn, A, <font color='#979000'>0</font>, parent_state, <font color='#979000'>1</font><font color='#5555FF'>-</font><font color='#979000'>0.9</font><font face='Lucida Console'>)</font>;
+
+        parent_state[B] <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        parent_state[C] <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+        <font color='#009900'>// Here we specify that p(A=1 | B=0, C=1) = 0.5 
+</font>        <font color='#BB00BB'>set_node_probability</font><font face='Lucida Console'>(</font>bn, A, <font color='#979000'>1</font>, parent_state, <font color='#979000'>0.5</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>set_node_probability</font><font face='Lucida Console'>(</font>bn, A, <font color='#979000'>0</font>, parent_state, <font color='#979000'>1</font><font color='#5555FF'>-</font><font color='#979000'>0.5</font><font face='Lucida Console'>)</font>;
+
+        parent_state[B] <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        parent_state[C] <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <font color='#009900'>// Here we specify that p(A=1 | B=0, C=0) = 0.01 
+</font>        <font color='#BB00BB'>set_node_probability</font><font face='Lucida Console'>(</font>bn, A, <font color='#979000'>1</font>, parent_state, <font color='#979000'>0.01</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>set_node_probability</font><font face='Lucida Console'>(</font>bn, A, <font color='#979000'>0</font>, parent_state, <font color='#979000'>1</font><font color='#5555FF'>-</font><font color='#979000'>0.01</font><font face='Lucida Console'>)</font>;
+
+
+        <font color='#009900'>// Here we set probabilities for node D.
+</font>        <font color='#009900'>// First we clear out parent state so that it doesn't have any of
+</font>        <font color='#009900'>// the assignments for the B and C nodes used above.
+</font>        parent_state.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        parent_state.<font color='#BB00BB'>add</font><font face='Lucida Console'>(</font>A,<font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+        <font color='#009900'>// Here we specify that p(D=1 | A=1) = 0.5 
+</font>        <font color='#BB00BB'>set_node_probability</font><font face='Lucida Console'>(</font>bn, D, <font color='#979000'>1</font>, parent_state, <font color='#979000'>0.5</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>set_node_probability</font><font face='Lucida Console'>(</font>bn, D, <font color='#979000'>0</font>, parent_state, <font color='#979000'>1</font><font color='#5555FF'>-</font><font color='#979000'>0.5</font><font face='Lucida Console'>)</font>;
+
+        parent_state[A] <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <font color='#009900'>// Here we specify that p(D=1 | A=0) = 0.2 
+</font>        <font color='#BB00BB'>set_node_probability</font><font face='Lucida Console'>(</font>bn, D, <font color='#979000'>1</font>, parent_state, <font color='#979000'>0.2</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>set_node_probability</font><font face='Lucida Console'>(</font>bn, D, <font color='#979000'>0</font>, parent_state, <font color='#979000'>1</font><font color='#5555FF'>-</font><font color='#979000'>0.2</font><font face='Lucida Console'>)</font>;
+
+
+
+        <font color='#009900'>// We have now finished setting up our bayesian network.  So let's compute some 
+</font>        <font color='#009900'>// probability values.  The first thing we will do is compute the prior probability
+</font>        <font color='#009900'>// of each node in the network.  To do this we will use the join tree algorithm which
+</font>        <font color='#009900'>// is an algorithm for performing exact inference in a bayesian network.   
+</font>
+        <font color='#009900'>// First we need to create an undirected graph which contains set objects at each node and
+</font>        <font color='#009900'>// edge.  This long declaration does the trick.
+</font>        <font color='#0000FF'>typedef</font> dlib::set<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font>::compare_1b_c set_type;
+        <font color='#0000FF'>typedef</font> graph<font color='#5555FF'>&lt;</font>set_type, set_type<font color='#5555FF'>&gt;</font>::kernel_1a_c join_tree_type;
+        join_tree_type join_tree;
+
+        <font color='#009900'>// Now we need to populate the join_tree with data from our bayesian network.  The next  
+</font>        <font color='#009900'>// function calls do this.  Explaining exactly what they do is outside the scope of this
+</font>        <font color='#009900'>// example.  Just think of them as filling join_tree with information that is useful 
+</font>        <font color='#009900'>// later on for dealing with our bayesian network.  
+</font>        <font color='#BB00BB'>create_moral_graph</font><font face='Lucida Console'>(</font>bn, join_tree<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>create_join_tree</font><font face='Lucida Console'>(</font>join_tree, join_tree<font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// Now that we have a proper join_tree we can use it to obtain a solution to our
+</font>        <font color='#009900'>// bayesian network.  Doing this is as simple as declaring an instance of
+</font>        <font color='#009900'>// the bayesian_network_join_tree object as follows:
+</font>        bayesian_network_join_tree <font color='#BB00BB'>solution</font><font face='Lucida Console'>(</font>bn, join_tree<font face='Lucida Console'>)</font>;
+
+
+        <font color='#009900'>// now print out the probabilities for each node
+</font>        cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>Using the join tree algorithm:\n</font>";
+        cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>p(A=1) = </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> solution.<font color='#BB00BB'>probability</font><font face='Lucida Console'>(</font>A<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+        cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>p(A=0) = </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> solution.<font color='#BB00BB'>probability</font><font face='Lucida Console'>(</font>A<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+        cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>p(B=1) = </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> solution.<font color='#BB00BB'>probability</font><font face='Lucida Console'>(</font>B<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+        cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>p(B=0) = </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> solution.<font color='#BB00BB'>probability</font><font face='Lucida Console'>(</font>B<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+        cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>p(C=1) = </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> solution.<font color='#BB00BB'>probability</font><font face='Lucida Console'>(</font>C<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+        cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>p(C=0) = </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> solution.<font color='#BB00BB'>probability</font><font face='Lucida Console'>(</font>C<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+        cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>p(D=1) = </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> solution.<font color='#BB00BB'>probability</font><font face='Lucida Console'>(</font>D<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+        cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>p(D=0) = </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> solution.<font color='#BB00BB'>probability</font><font face='Lucida Console'>(</font>D<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+        cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\n\n</font>";
+
+
+        <font color='#009900'>// Now to make things more interesting let's say that we have discovered that the C 
+</font>        <font color='#009900'>// node really has a value of 1.  That is to say, we now have evidence that 
+</font>        <font color='#009900'>// C is 1.  We can represent this in the network using the following two function
+</font>        <font color='#009900'>// calls.
+</font>        <font color='#BB00BB'>set_node_value</font><font face='Lucida Console'>(</font>bn, C, <font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>set_node_as_evidence</font><font face='Lucida Console'>(</font>bn, C<font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// Now we want to compute the probabilities of all the nodes in the network again
+</font>        <font color='#009900'>// given that we now know that C is 1.  We can do this as follows:
+</font>        bayesian_network_join_tree <font color='#BB00BB'>solution_with_evidence</font><font face='Lucida Console'>(</font>bn, join_tree<font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// now print out the probabilities for each node
+</font>        cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>Using the join tree algorithm:\n</font>";
+        cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>p(A=1 | C=1) = </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> solution_with_evidence.<font color='#BB00BB'>probability</font><font face='Lucida Console'>(</font>A<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+        cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>p(A=0 | C=1) = </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> solution_with_evidence.<font color='#BB00BB'>probability</font><font face='Lucida Console'>(</font>A<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+        cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>p(B=1 | C=1) = </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> solution_with_evidence.<font color='#BB00BB'>probability</font><font face='Lucida Console'>(</font>B<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+        cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>p(B=0 | C=1) = </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> solution_with_evidence.<font color='#BB00BB'>probability</font><font face='Lucida Console'>(</font>B<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+        cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>p(C=1 | C=1) = </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> solution_with_evidence.<font color='#BB00BB'>probability</font><font face='Lucida Console'>(</font>C<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+        cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>p(C=0 | C=1) = </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> solution_with_evidence.<font color='#BB00BB'>probability</font><font face='Lucida Console'>(</font>C<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+        cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>p(D=1 | C=1) = </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> solution_with_evidence.<font color='#BB00BB'>probability</font><font face='Lucida Console'>(</font>D<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+        cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>p(D=0 | C=1) = </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> solution_with_evidence.<font color='#BB00BB'>probability</font><font face='Lucida Console'>(</font>D<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+        cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\n\n</font>";
+
+        <font color='#009900'>// Note that when we made our solution_with_evidence object we reused our join_tree object.
+</font>        <font color='#009900'>// This saves us the time it takes to calculate the join_tree object from scratch.  But
+</font>        <font color='#009900'>// it is important to note that we can only reuse the join_tree object if we haven't changed
+</font>        <font color='#009900'>// the structure of our bayesian network.  That is, if we have added or removed nodes or 
+</font>        <font color='#009900'>// edges from our bayesian network then we must recompute our join_tree.  But in this example
+</font>        <font color='#009900'>// all we did was change the value of a bayes_node object (we made node C be evidence)
+</font>        <font color='#009900'>// so we are ok.
+</font>
+
+
+
+
+        <font color='#009900'>// Next this example will show you how to use the bayesian_network_gibbs_sampler object
+</font>        <font color='#009900'>// to perform approximate inference in a bayesian network.  This is an algorithm 
+</font>        <font color='#009900'>// that doesn't give you an exact solution but it may be necessary to use in some 
+</font>        <font color='#009900'>// instances.  For example, the join tree algorithm used above, while fast in many
+</font>        <font color='#009900'>// instances, has exponential runtime in some cases.  Moreover, inference in bayesian
+</font>        <font color='#009900'>// networks is NP-Hard for general networks so sometimes the best you can do is
+</font>        <font color='#009900'>// find an approximation.
+</font>        <font color='#009900'>// However, it should be noted that the gibbs sampler does not compute the correct
+</font>        <font color='#009900'>// probabilities if the network contains a deterministic node.  That is, if any
+</font>        <font color='#009900'>// of the conditional probability tables in the bayesian network have a probability
+</font>        <font color='#009900'>// of 1.0 for something the gibbs sampler should not be used.
+</font>
+
+        <font color='#009900'>// This Gibbs sampler algorithm works by randomly sampling possibles values of the
+</font>        <font color='#009900'>// network.  So to use it we should set the network to some initial state.  
+</font>
+        <font color='#BB00BB'>set_node_value</font><font face='Lucida Console'>(</font>bn, A, <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>set_node_value</font><font face='Lucida Console'>(</font>bn, B, <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>set_node_value</font><font face='Lucida Console'>(</font>bn, D, <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// We will leave the C node with a value of 1 and keep it as an evidence node.  
+</font>
+
+        <font color='#009900'>// First create an instance of the gibbs sampler object
+</font>        bayesian_network_gibbs_sampler sampler;
+
+
+        <font color='#009900'>// To use this algorithm all we do is go into a loop for a certain number of times
+</font>        <font color='#009900'>// and each time through we sample the bayesian network.  Then we count how 
+</font>        <font color='#009900'>// many times a node has a certain state.  Then the probability of that node
+</font>        <font color='#009900'>// having that state is just its count/total times through the loop. 
+</font>
+        <font color='#009900'>// The following code illustrates the general procedure.
+</font>        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> A_count <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> B_count <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> C_count <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> D_count <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+
+        <font color='#009900'>// The more times you let the loop run the more accurate the result will be.  Here we loop
+</font>        <font color='#009900'>// 2000 times.
+</font>        <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> rounds <font color='#5555FF'>=</font> <font color='#979000'>2000</font>;
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> rounds; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+        <b>{</b>
+            sampler.<font color='#BB00BB'>sample_graph</font><font face='Lucida Console'>(</font>bn<font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>node_value</font><font face='Lucida Console'>(</font>bn, A<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>
+                <font color='#5555FF'>+</font><font color='#5555FF'>+</font>A_count;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>node_value</font><font face='Lucida Console'>(</font>bn, B<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>
+                <font color='#5555FF'>+</font><font color='#5555FF'>+</font>B_count;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>node_value</font><font face='Lucida Console'>(</font>bn, C<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>
+                <font color='#5555FF'>+</font><font color='#5555FF'>+</font>C_count;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>node_value</font><font face='Lucida Console'>(</font>bn, D<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>
+                <font color='#5555FF'>+</font><font color='#5555FF'>+</font>D_count;
+        <b>}</b>
+
+        cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>Using the approximate Gibbs Sampler algorithm:\n</font>";
+        cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>p(A=1 | C=1) = </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>double</u></font><font face='Lucida Console'>)</font>A_count<font color='#5555FF'>/</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>double</u></font><font face='Lucida Console'>)</font>rounds <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+        cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>p(B=1 | C=1) = </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>double</u></font><font face='Lucida Console'>)</font>B_count<font color='#5555FF'>/</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>double</u></font><font face='Lucida Console'>)</font>rounds <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+        cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>p(C=1 | C=1) = </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>double</u></font><font face='Lucida Console'>)</font>C_count<font color='#5555FF'>/</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>double</u></font><font face='Lucida Console'>)</font>rounds <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+        cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>p(D=1 | C=1) = </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>double</u></font><font face='Lucida Console'>)</font>D_count<font color='#5555FF'>/</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>double</u></font><font face='Lucida Console'>)</font>rounds <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+    <b>}</b>
+    <font color='#0000FF'>catch</font> <font face='Lucida Console'>(</font>std::exception<font color='#5555FF'>&amp;</font> e<font face='Lucida Console'>)</font>
+    <b>{</b>
+        cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>exception thrown: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+        cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> e.<font color='#BB00BB'>what</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+        cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>hit enter to terminate</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+        cin.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+<b>}</b>
+
+
+
+
+</pre></body></html>

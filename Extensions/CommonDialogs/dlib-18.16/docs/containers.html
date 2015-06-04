@@ -1,0 +1,604 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html xmlns:gcse="googleCustomSearch"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><link rel="shortcut icon" href="dlib-icon.ico"><meta name="verify-v1" content="02MiiaFNVzS5/u0eQhsy3/knioFHsia1X3DXRpHkE6I="><meta name="google-site-verification" content="DGSSJMKDomaDaDTIRJ8jDkv0YMx9Cz7OESbXHjjr6Jw"><title>dlib C++ Library
+   - Containers</title><script language="JavaScript">
+
+// ---------------------------------------------
+// --- Name:    Easy DHTML Treeview           --
+// --- Author:  D.D. de Kerf                  --
+// --- Version: 0.2          Date: 13-6-2001  --
+// ---------------------------------------------
+function Toggle(node)
+{
+   // Unfold the branch if it isn't visible
+   var next_node = node.nextSibling;
+   if (next_node.style.display == 'none')
+   {
+      // Change the image (if there is an image)
+      if (node.childNodes.length > 0)
+      {
+         if (node.childNodes.length > 0)
+         { 
+            if (node.childNodes.item(0).nodeName == "IMG")
+            {
+               node.childNodes.item(0).src = "minus.gif";
+            }
+         }
+      }
+
+      next_node.style.display = 'block';
+   }
+   // Collapse the branch if it IS visible
+   else
+   {
+      // Change the image (if there is an image)
+      if (node.childNodes.length > 0)
+      {
+         if (node.childNodes.length > 0)
+         { 
+            if (node.childNodes.item(0).nodeName == "IMG")
+            {
+               node.childNodes.item(0).src = "plus.gif";
+            }
+         }
+      }
+
+      next_node.style.display = 'none';
+   }
+
+}
+function BigToggle(node)
+{
+   // Unfold the branch if it isn't visible
+   var next_node = node.nextSibling;
+   if (next_node.style.display == 'none')
+   {
+      // Change the image (if there is an image)
+      if (node.childNodes.length > 0)
+      {
+         if (node.childNodes.length > 0)
+         { 
+            if (node.childNodes.item(0).nodeName == "IMG")
+            {
+               node.childNodes.item(0).src = "bigminus.gif";
+            }
+         }
+      }
+
+      next_node.style.display = 'block';
+   }
+   // Collapse the branch if it IS visible
+   else
+   {
+      // Change the image (if there is an image)
+      if (node.childNodes.length > 0)
+      {
+         if (node.childNodes.length > 0)
+         { 
+            if (node.childNodes.item(0).nodeName == "IMG")
+            {
+               node.childNodes.item(0).src = "bigplus.gif";
+            }
+         }
+      }
+
+      next_node.style.display = 'none';
+   }
+
+}
+</script><style type="text/css">
+   body {margin:0px;}
+   pre {margin:0px;}
+
+   ul.tree  li { list-style: none;  margin-left:10px;} 
+   ul.tree  { margin:0px; padding:0px; margin-left:5px; font-size:0.95em; }
+   ul.tree  li ul { margin-left:10px; padding:0px; }
+
+   li#term { list-style: none; }
+
+   div.component {
+      background-color:white; 
+      border: 2px solid rgb(102,102,102); 
+      text-align:left;
+      margin-top: 1.5em;
+      padding: 0.7em;
+   }
+
+   div.question {
+      background-color:white; 
+      border: 2px solid rgb(102,102,102); 
+      text-align:left;
+      margin-top: 1.5em;
+      margin-bottom: 90%;
+      padding: 0.7em;
+   }
+
+   div.function {
+      background-color:white; 
+      border: 2px solid rgb(102,102,255); 
+      text-align:left;
+      margin-top: 0.3em;
+      padding: 0.3em;
+   }
+
+   div.class {
+      background-color:white; 
+      border: 2px solid rgb(255,102,102); 
+      text-align:left;
+      margin-top: 0.3em;
+      padding: 0.3em;
+   }
+
+   div.extension {
+      background-color:#FDFDFD; 
+      border: 1px solid rgb(102,102,102); 
+      text-align:left;
+      margin-top: 1.0em;
+      padding: 0.7em;
+   }
+
+   div.logb {
+      text-align:left;
+      padding: 0.0em;
+      float: left;
+      background-color:#c0c0c0; 
+      border: double ; 
+      margin: 0.5em;
+   }
+
+   div.name {
+      float: left;
+   }
+   div.line1 {
+      float:left;
+      width:100%;
+      background-color:#dfdfdf; 
+   }
+   div.line2 {
+      float:left;
+      width:100%;
+   }
+   div.inc {
+      float: right;
+   }
+
+
+   .code_box
+   {
+      color: black;
+      margin: 1em 0.25in;
+      padding: 0.5em;
+      background: rgb(240,240,240);
+      border-top: black dotted 1px;
+      border-left: black dotted 1px;
+      border-right: black solid 2px;
+      border-bottom: black solid 2px;
+   }
+
+
+
+   .bdotted {border-bottom: 1px dotted}
+   .bdashed {border-bottom: 1px dashed}
+   .bsolid {border-bottom: 1px solid}
+   .bdouble {border-bottom: 1px double}
+   .bgroove {border-bottom: 1px groove}
+   .bridge {border-bottom: 1px ridge}
+   .binset {border-bottom: 1px inset}
+   .boutset {border-bottom: 1px outset}
+
+   div.row1 {
+      background-color:#dfdfdf; 
+   }
+   div.row2 {
+      background-color:#f2f2f2; 
+   }
+
+   div.typedefs {
+      margin-left: 1.5em;
+      margin-top: 0.2em;
+      border: 1px dotted;
+      width: 52em;
+   }
+
+   div.tdn {
+      width: 10em;
+   }
+
+   .fullhr {
+      clear: both;
+   }
+
+   body {
+      text-align: center;
+   }
+
+   div.entire_page_header {
+      width:62.5em;  
+      text-align: left;
+      margin-top: 0.4em;
+      margin-left: auto;
+      margin-right: auto;
+   }
+   div.entire_page {
+      width:62.5em;  
+      text-align: left;
+      margin-left: auto;
+      margin-right: auto;
+      clear:both;
+   }
+</style></head><body bgcolor="#EDF3EE"><a name="top"></a><div class="entire_page_header"><a href="http://dlib.net"><img src="dlib-logo.png"></a></div><div class="entire_page"><table bgcolor="white" height="100%" bordercolor="#EDF3EE" CELLSPACING="0" CELLPADDING="10" style="border:0px;margin-top:2px"><tr height="100%"><td BGCOLOR="#F5F5F5" style="padding:7px; border: 1px solid rgb(102,102,102);" VALIGN="TOP" height="100%"><br><table WIDTH="145" height="100%"><tr><td VALIGN="TOP"><b>The Library</b><ul class="tree"><li><a href="algorithms.html">Algorithms</a></li><li><a href="api.html">API Wrappers</a></li><li><a href="bayes.html">Bayesian Nets</a></li><li><a href="compression.html">Compression</a></li><li><a href="containers.html">Containers</a></li><li><a href="graph_tools.html">Graph Tools</a></li><li><a href="imaging.html">Image Processing</a></li><li><a href="linear_algebra.html">Linear Algebra</a></li><li><a href="ml.html">Machine Learning</a></li><li><a href="metaprogramming.html">Metaprogramming</a></li><li><a href="other.html">Miscellaneous</a></li><li><a href="network.html">Networking</a></li><li><a href="optimization.html">Optimization</a></li><li><a href="parsing.html">Parsing</a></li></ul><br><b>Help/Info</b><ul class="tree"><li><a onclick="Toggle(this)" style="cursor: pointer;margin-left:-9px"><img src="plus.gif"><font color="green"><u>Examples: C++</u></font></a><ul style="display:none;"><li><a href="3d_point_cloud_ex.cpp.html">3D_Point_Cloud</a></li><li><a href="assignment_learning_ex.cpp.html">Assignment_Learning</a></li><li><a href="file_to_code_ex.cpp.html">Base64_Encoder</a></li><li><a href="bayes_net_ex.cpp.html">Bayesian_Network</a></li><li><a href="bayes_net_from_disk_ex.cpp.html">Bayesian_Network_From_Disk</a></li><li><a href="bayes_net_gui_ex.cpp.html">Bayesian_Network_GUI</a></li><li><a href="bridge_ex.cpp.html">Bridge</a></li><li><a href="bsp_ex.cpp.html">BSP</a></li><li><a href="svm_c_ex.cpp.html">C-Support_Vector_Machine</a></li><li><a href="compress_stream_ex.cpp.html#_top">Cmd_Line_Parser</a></li><li><a href="compress_stream_ex.cpp.html">Compress_Stream</a></li><li><a href="config_reader_ex.cpp.html">Config_File_Reader</a></li><li><a href="custom_trainer_ex.cpp.html">Custom_Trainers</a></li><li><a href="dir_nav_ex.cpp.html">Directory_Navigation</a></li><li><a href="empirical_kernel_map_ex.cpp.html">Empirical_Kernel_Map</a></li><li><a href="face_detection_ex.cpp.html">Face_Detection</a></li><li><a href="face_landmark_detection_ex.cpp.html">Face_Landmark_Detection</a></li><li><a href="fhog_ex.cpp.html">FHOG_Feature_Extraction</a></li><li><a href="fhog_object_detector_ex.cpp.html">FHOG_Object_Detection</a></li><li><a href="graph_labeling_ex.cpp.html">Graph_Labeling</a></li><li><a href="gui_api_ex.cpp.html">GUI</a></li><li><a href="hough_transform_ex.cpp.html">Hough_Transform</a></li><li><a href="server_http_ex.cpp.html">HTTP_Server</a></li><li><a href="image_ex.cpp.html">Image</a></li><li><a href="iosockstream_ex.cpp.html">IO Socket Streams</a></li><li><a href="server_iostream_ex.cpp.html">IO Streams Server</a></li><li><a href="kcentroid_ex.cpp.html">Kernel_Centroid</a></li><li><a href="kkmeans_ex.cpp.html">Kernel_K-Means_Clustering</a></li><li><a href="krr_regression_ex.cpp.html">Kernel_Ridge_Regression</a></li><li><a href="krls_filter_ex.cpp.html">Kernel_RLS_Filtering</a></li><li><a href="krls_ex.cpp.html">Kernel_RLS_Regression</a></li><li><a href="krr_classification_ex.cpp.html">KRR_Classification</a></li><li><a href="learning_to_track_ex.cpp.html">Learning_to_Track</a></li><li><a href="max_cost_assignment_ex.cpp.html">Linear_Assignment_Problems</a></li><li><a href="linear_manifold_regularizer_ex.cpp.html">Linear_Manifold_Regularizer</a></li><li><a href="mpc_ex.cpp.html">Linear_Model_Predictive_Control</a></li><li><a href="logger_ex.cpp.html">Logger</a></li><li><a href="logger_ex_2.cpp.html">Logger_Advanced</a></li><li><a href="logger_custom_output_ex.cpp.html">Logger_Custom_Output</a></li><li><a href="matrix_ex.cpp.html">Matrix</a></li><li><a href="matrix_expressions_ex.cpp.html">Matrix_Expressions</a></li><li><a href="member_function_pointer_ex.cpp.html">Member_Function_Pointer</a></li><li><a href="model_selection_ex.cpp.html">Model_Selection</a></li><li><a href="multiclass_classification_ex.cpp.html">Multiclass_Classification</a></li><li><a href="multithreaded_object_ex.cpp.html">Multithreaded_Object</a></li><li><a href="mlp_ex.cpp.html">Neural_Network</a></li><li><a href="least_squares_ex.cpp.html">Non-Linear Least Squares</a></li><li><a href="svm_ex.cpp.html">Nu-Support_Vector_Machine</a></li><li><a href="integrate_function_adapt_simp_ex.cpp.html">Numerical_Integration</a></li><li><a href="object_detector_ex.cpp.html">Object_Detector</a></li><li><a href="object_detector_advanced_ex.cpp.html">Object_Detector_Advanced</a></li><li><a href="one_class_classifiers_ex.cpp.html">One_Class_Classifiers</a></li><li><a href="svm_pegasos_ex.cpp.html">Online_SVM</a></li><li><a href="optimization_ex.cpp.html">Optimization</a></li><li><a href="parallel_for_ex.cpp.html">Parallel_For_Loops</a></li><li><a href="pipe_ex.cpp.html">Pipe</a></li><li><a href="pipe_ex_2.cpp.html">Pipe_2</a></li><li><a href="quantum_computing_ex.cpp.html">Quantum_Computing</a></li><li><a href="queue_ex.cpp.html">Queue</a></li><li><a href="rank_features_ex.cpp.html">Rank_Features</a></li><li><a href="rvm_ex.cpp.html">Relevance_Vector_Classification</a></li><li><a href="rvm_regression_ex.cpp.html">Relevance_Vector_Regression</a></li><li><a href="running_stats_ex.cpp.html">Running_Stats</a></li><li><a href="sequence_labeler_ex.cpp.html">Sequence_Labeling</a></li><li><a href="sequence_segmenter_ex.cpp.html">Sequence_Segmentation</a></li><li><a href="sockets_ex.cpp.html">Sockets</a></li><li><a href="sockstreambuf_ex.cpp.html">Sockstreambuf</a></li><li><a href="svm_sparse_ex.cpp.html">Sparse_Vectors</a></li><li><a href="sqlite_ex.cpp.html">SQLite</a></li><li><a href="std_allocator_ex.cpp.html">Std_C++_Allocator</a></li><li><a href="svm_struct_ex.cpp.html">Structural_Support_Vector_Machines</a></li><li><a href="svr_ex.cpp.html">Support_Vector_Regression</a></li><li><a href="surf_ex.cpp.html">SURF</a></li><li><a href="svm_rank_ex.cpp.html">SVM-Rank</a></li><li><a href="threaded_object_ex.cpp.html">Threaded_Object</a></li><li><a href="threads_ex.cpp.html">Threads</a></li><li><a href="thread_function_ex.cpp.html">Thread_Function</a></li><li><a href="thread_pool_ex.cpp.html">Thread_Pool</a></li><li><a href="timer_ex.cpp.html">Timer</a></li><li><a href="train_object_detector.cpp.html">Train_Object_Detector</a></li><li><a href="train_shape_predictor_ex.cpp.html">Train_Shape_Predictor</a></li><li><a href="using_custom_kernels_ex.cpp.html">Using_Custom_Kernels</a></li><li><a href="video_tracking_ex.cpp.html">Video_Object_Tracking</a></li><li><a href="webcam_face_pose_ex.cpp.html">Webcam_Face_Pose_Estimation</a></li><li><a href="xml_parser_ex.cpp.html">XML_Parser</a></li></ul></li><li><a onclick="Toggle(this)" style="cursor: pointer;margin-left:-9px"><img src="plus.gif"><font color="green"><u>Examples: Python</u></font></a><ul style="display:none;"><li><a href="face_detector.py.html">Face_Detector</a></li><li><a href="face_landmark_detection.py.html">Face_Landmark_Detection</a></li><li><a href="find_candidate_object_locations.py.html">find_candidate_object_locations</a></li><li><a href="max_cost_assignment.py.html">Linear_Assignment_Problems</a></li><li><a href="sequence_segmenter.py.html">Sequence_Segmenter</a></li><li><a href="svm_struct.py.html">Structural_Support_Vector_Machines</a></li><li><a href="svm_rank.py.html">SVM-Rank</a></li><li><a href="train_object_detector.py.html">Train_Object_Detector</a></li><li><a href="train_shape_predictor.py.html">Train_Shape_Predictor</a></li><li><a href="correlation_tracker.py.html">Video_Object_Tracking</a></li></ul></li><li><a href="faq.html">FAQ</a></li><li><a href="index.html">Home</a></li><li><a href="compile.html">How to compile</a></li><li><a href="howto_contribute.html">How to contribute</a></li><li><a href="term_index.html">Index</a></li><li><a href="intro.html">Introduction</a></li><li><a href="license.html">License</a></li><li><a href="python/index.html">Python API</a></li><li><a href="books.html">Suggested Books</a></li></ul><br><b>Current Release</b><ul class="tree"><li><a href="change_log.html">Change Log</a></li><li><a href="release_notes.html">Release Notes</a></li><li>Version: 18.16</li></ul><br></td><td width="1"></td></tr><tr><td valign="bottom"><br><br><br><br><br><br><br><br><br>
+      Last Modified:<br>Feb 28, 2013<br><br></td></tr></table></td><td VALIGN="TOP" width="100%" style="border: 1px solid rgb(102,102,102);"><center><h1>Containers</h1></center><br><br><p>
+         Many of these containers were inspired by the work of the <a href="http://www.cse.ohio-state.edu/~weide/rsrg/index.html">Reusable
+           Software Research Group</a> at Ohio State.  As such, many of the objects do not support
+         copying in any form, only swapping is allowed. That is, when objects
+         are added or removed from most of these containers they are swapped in
+         and out, not copied. 
+         </p><p>
+         This allows you to do things like have containers of containers of
+         containers without encountering the overhead of the massive copying
+         that would likely result if you did the same thing with the STL.  It
+         also means you can store objects that are not copyable inside these
+         containers, which is not something you can do with the STL prior to C++11.  
+         </p><p>
+         Note that it is assumed by these containers that swap() and
+         operator&lt; do not throw.  They may not function correctly if this
+         assumption is broken.  Also note that the built in types (int, long,
+         char, etc.) and std::string will not cause operator&lt; or swap() to
+         throw.
+         </p><p>
+            Note also that most of the containers inherit from the 
+            <a href="#enumerable">enumerable</a> interface.  Thus, all the
+            member functions inherited from enumerable are defined in the
+            enumerable class and their documentation is not repeated in each
+            container's documentation.  This includes the size() member
+            function in each container.
+         </p></td><td BGCOLOR="#F5F5F5" style="padding:7px; border: 1px solid rgb(102,102,102);" VALIGN="TOP" height="100%"><br><table WIDTH="150" height="100%"><tr><td VALIGN="TOP"><b>Objects</b><ul class="tree"><li><a href="#any">any</a></li><li><a href="#any_decision_function">any_decision_function</a></li><li><a href="#any_function">any_function</a></li><li><a href="#any_trainer">any_trainer</a></li><li><a href="#array">array</a></li><li><a href="#array2d">array2d</a></li><li><a href="#binary_search_tree">binary_search_tree</a></li><li><a href="#circular_buffer">circular_buffer</a></li><li><a href="#directed_graph">directed_graph</a></li><li><a href="#graph">graph</a></li><li><a href="#hash_map">hash_map</a></li><li><a href="#hash_set">hash_set</a></li><li><a href="#hash_table">hash_table</a></li><li><a href="#map">map</a></li><li><a href="#queue">queue</a></li><li><a href="#reference_counter">reference_counter</a></li><li><a href="#reference_wrapper">reference_wrapper</a></li><li><a href="#sequence">sequence</a></li><li><a href="#set">set</a></li><li><a href="#sliding_buffer">sliding_buffer</a></li><li><a href="#stack">stack</a></li><li><a href="#static_map">static_map</a></li><li><a href="#static_set">static_set</a></li><li><a href="#std_vector_c">std_vector_c</a></li><li><a href="#tuple">tuple</a></li><li><a href="#type_safe_union">type_safe_union</a></li><li><a href="#unordered_pair">unordered_pair</a></li></ul><br><b>Smart Pointers</b><ul class="tree"><li><a href="#scoped_ptr">scoped_ptr</a></li><li><a href="#shared_ptr">shared_ptr</a></li><li><a href="#shared_ptr_thread_safe">shared_ptr_thread_safe</a></li><li><a href="#weak_ptr">weak_ptr</a></li></ul><br><b>Interfaces</b><ul class="tree"><li><a href="#enumerable">enumerable</a></li><li><a href="#map_pair">map_pair</a></li><li><a href="#remover" style="float:right"><img src="down.gif" border="0"></a><a onclick="Toggle(this)" style="cursor: pointer;"><img src="plus.gif" border="0"><font color="green"><u>remover</u></font></a><ul style="display:none;"><li><a href="dlib/interfaces/remover.h.html#asc_pair_remover">asc_pair_remover</a></li><li><a href="dlib/interfaces/remover.h.html#asc_remover">asc_remover</a></li><li><a href="dlib/interfaces/remover.h.html#pair_remover">pair_remover</a></li><li><a href="dlib/interfaces/remover.h.html#remover">remover</a></li></ul></li></ul><br></td><td width="1"></td></tr><tr><td valign="bottom"></td></tr></table></td></tr></table><a name="any"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">any</h1><BR><BR>
+                This object is basically a type-safe version of a void*.  In particular,
+                it is a container which can contain only one object but the object may
+                be of any type.  
+
+               <p>
+                It is somewhat like the <a href="#type_safe_union">type_safe_union</a> except you don't have to declare 
+                the set of possible content types beforehand.  So in some sense this is 
+                like a less type-strict version of the type_safe_union.
+               </p><BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/any.h&gt;</tt></font></B><BR><b><a href="dlib/any/any_abstract.h.html#any"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="any_decision_function"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">any_decision_function</h1><BR><BR>
+               This object is a version of dlib::<a href="#any">any</a> that is restricted to containing 
+                elements which are some kind of function object with an operator() with 
+                the following signature: 
+                <tt>result_type operator()(const sample_type&amp;) const</tt><p>
+                  It is intended to be used to contain dlib::<a href="ml.html#decision_function">decision_function</a> 
+                  objects and other types which represent learned decision functions.  It allows you
+                to write code which contains and processes these decision functions
+                without needing to know the specific types of decision functions used.
+               </p><BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/any.h&gt;</tt></font></B><BR><b><a href="dlib/any/any_decision_function_abstract.h.html#any_decision_function"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="any_function"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">any_function</h1><BR><BR>
+                This object is a version of dlib::<a href="#any">any</a> that is restricted to containing 
+                elements which are some kind of function or function object.    
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/any.h&gt;</tt></font></B><BR><b><a href="dlib/any/any_function_abstract.h.html#any_function"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="any_trainer"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">any_trainer</h1><BR><BR>
+                This object is a version of dlib::<a href="#any">any</a> that is restricted to containing 
+                elements which are some kind of object with a .train() method compatible 
+                with the following signature: 
+<pre> decision_function train(
+      const std::vector&lt;sample_type&gt;&amp; samples,
+      const std::vector&lt;scalar_type&gt;&amp; labels
+   ) const
+</pre>
+                  Where <tt>decision_function</tt> is a type capable of being stored in an
+                    <a href="#any_decision_function">any_decision_function</a> object.
+
+               <p>
+                  any_trainer is intended to be used to contain objects such as the <a href="ml.html#svm_nu_trainer">svm_nu_trainer</a>
+                and other similar types which represent supervised machine learning algorithms.   
+                It allows you to write code which contains and processes these trainer objects 
+                without needing to know the specific types of trainer objects used.
+               </p><BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/any.h&gt;</tt></font></B><BR><b><a href="dlib/any/any_trainer_abstract.h.html#any_trainer"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="array"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">array</h1><BR><BR>
+             This object represents a 1-Dimensional array of objects.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/array.h&gt;</tt></font></B><BR><b><a href="dlib/array/array_kernel_abstract.h.html"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="array2d"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">array2d</h1><BR><BR>
+                This object represents a 2-Dimensional array of objects.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/array2d.h&gt;</tt></font></B><BR><b><a href="dlib/array2d/array2d_kernel_abstract.h.html"><font style="font-size:1.4em">Detailed Documentation</font></a></b><BR>C++ Example Programs: <a href="image_ex.cpp.html">image_ex.cpp</a><br><br><center></center></div></a><a name="binary_search_tree"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">binary_search_tree</h1><BR><BR>
+            This object represents a data dictionary that is built on top of some kind of binary search tree.  
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/binary_search_tree.h&gt;</tt></font></B><BR><b><a href="dlib/binary_search_tree/binary_search_tree_kernel_abstract.h.html"><font style="font-size:1.4em">Detailed Documentation</font></a></b><BR><BR><B>Implementations:</B><blockquote><a href="dlib/binary_search_tree/binary_search_tree_kernel_1.h.html">binary_search_tree_kernel_1</a>:
+                  <br> 
+        This implementation is done using an AVL binary search tree.  It uses the 
+        <a href="other.html#memory_manager">memory_manager</a> for all memory allocations.
+     <div class="typedefs"><table CELLSPACING="0" CELLPADDING="0" bgcolor="white"><tr><td bgcolor="#E3E3E3" valign="top"><div class="tdn">kernel_1a</div></td><td width="100%" bgcolor="#E3E3E3">is a typedef for binary_search_tree_kernel_1</td></tr><tr><td valign="top"><div class="tdn">kernel_1a_c</div></td><td width="100%"> 
+                  is a typedef for kernel_1a that checks its preconditions.             
+                  </td></tr></table></div></blockquote><blockquote><a href="dlib/binary_search_tree/binary_search_tree_kernel_2.h.html">binary_search_tree_kernel_2</a>:
+                  <br> 
+                  This implementation is done using a red-black binary search tree.  It uses the 
+        <a href="other.html#memory_manager">memory_manager</a> for all memory allocations. 
+               <div class="typedefs"><table CELLSPACING="0" CELLPADDING="0" bgcolor="white"><tr><td bgcolor="#E3E3E3" valign="top"><div class="tdn">kernel_2a</div></td><td width="100%" bgcolor="#E3E3E3">is a typedef for binary_search_tree_kernel_2</td></tr><tr><td valign="top"><div class="tdn">kernel_2a_c</div></td><td width="100%"> 
+                  is a typedef for kernel_2a that checks its preconditions.             
+                  </td></tr></table></div></blockquote><center></center></div></a><a name="circular_buffer"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">circular_buffer</h1><BR><BR>
+            This object represents a simple sliding buffer which can contain
+            and arbitrary number of elements.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/sliding_buffer.h&gt;</tt></font></B><BR><b><a href="dlib/sliding_buffer/circular_buffer_abstract.h.html"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="directed_graph"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">directed_graph</h1><BR><BR>
+                This object represents a directed graph which is a set of nodes with directed
+                edges connecting various nodes.  
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/directed_graph.h&gt;</tt></font></B><BR><b><a href="dlib/directed_graph/directed_graph_kernel_abstract.h.html"><font style="font-size:1.4em">Detailed Documentation</font></a></b><BR><BR><B>Implementations:</B><blockquote><a href="dlib/directed_graph/directed_graph_kernel_1.h.html">directed_graph_kernel_1</a>:
+                  <br> 
+                  This is implemented using std::vector to contain all the nodes and edges.   
+               <div class="typedefs"><table CELLSPACING="0" CELLPADDING="0" bgcolor="white"><tr><td bgcolor="#E3E3E3" valign="top"><div class="tdn">kernel_1a</div></td><td width="100%" bgcolor="#E3E3E3">is a typedef for directed_graph_kernel_1</td></tr><tr><td valign="top"><div class="tdn">kernel_1a_c</div></td><td width="100%"> 
+                  is a typedef for kernel_1a that checks its preconditions.             
+                  </td></tr></table></div></blockquote><center></center></div></a><a name="enumerable"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">enumerable</h1><BR><BR>
+            This object is an abstract class which represents an interface for iterating over 
+            all the elements of a container. 
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/interfaces/enumerable.h&gt;</tt></font></B><BR><b><a href="dlib/interfaces/enumerable.h.html"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="graph"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">graph</h1><BR><BR>
+                This object represents a graph which is a set of nodes with undirected
+                edges connecting various nodes.  
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/graph.h&gt;</tt></font></B><BR><b><a href="dlib/graph/graph_kernel_abstract.h.html"><font style="font-size:1.4em">Detailed Documentation</font></a></b><BR><BR><B>Implementations:</B><blockquote><a href="dlib/graph/graph_kernel_1.h.html">graph_kernel_1</a>:
+                  <br> 
+                  This is implemented using std::vector to contain all the nodes and edges.   
+               <div class="typedefs"><table CELLSPACING="0" CELLPADDING="0" bgcolor="white"><tr><td bgcolor="#E3E3E3" valign="top"><div class="tdn">kernel_1a</div></td><td width="100%" bgcolor="#E3E3E3">is a typedef for graph_kernel_1</td></tr><tr><td valign="top"><div class="tdn">kernel_1a_c</div></td><td width="100%"> 
+                  is a typedef for kernel_1a that checks its preconditions.             
+                  </td></tr></table></div></blockquote><center></center></div></a><a name="hash_map"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">hash_map</h1><BR><BR>
+            This object represents a hashed mapping of items of type domain onto items of type range. 
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/hash_map.h&gt;</tt></font></B><BR><b><a href="dlib/hash_map/hash_map_kernel_abstract.h.html"><font style="font-size:1.4em">Detailed Documentation</font></a></b><BR><BR><B>Implementations:</B><blockquote><a href="dlib/hash_map/hash_map_kernel_1.h.html">hash_map_kernel_1</a>:
+                  <br> 
+                  This implementation is done using a <a href="#hash_table">hash_table</a> object. It uses the 
+        <a href="other.html#memory_manager">memory_manager</a> for all memory allocations.
+
+               <div class="typedefs"><table CELLSPACING="0" CELLPADDING="0" bgcolor="white"><tr><td bgcolor="#E3E3E3" valign="top"><div class="tdn">kernel_1a</div></td><td width="100%" bgcolor="#E3E3E3">is a typedef for hash_map_kernel_1 that uses hash_table_kernel_1a</td></tr><tr><td valign="top"><div class="tdn">kernel_1a_c</div></td><td width="100%"> 
+                  is a typedef for kernel_1a that checks its preconditions.             
+                  </td></tr><tr><td bgcolor="#E3E3E3" valign="top"><div class="tdn">kernel_1b</div></td><td width="100%" bgcolor="#E3E3E3">is a typedef for hash_map_kernel_1 that uses hash_table_kernel_2a</td></tr><tr><td valign="top"><div class="tdn">kernel_1b_c</div></td><td width="100%"> 
+                  is a typedef for kernel_1b that checks its preconditions.             
+                  </td></tr><tr><td bgcolor="#E3E3E3" valign="top"><div class="tdn">kernel_1c</div></td><td width="100%" bgcolor="#E3E3E3">is a typedef for hash_map_kernel_1 that uses hash_table_kernel_2b</td></tr><tr><td valign="top"><div class="tdn">kernel_1c_c</div></td><td width="100%"> 
+                  is a typedef for kernel_1c that checks its preconditions.             
+                  </td></tr></table></div></blockquote><center></center></div></a><a name="hash_set"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">hash_set</h1><BR><BR>
+            This object represents a hashed unordered and unaddressed collection of unique items. 
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/hash_set.h&gt;</tt></font></B><BR><b><a href="dlib/hash_set/hash_set_kernel_abstract.h.html"><font style="font-size:1.4em">Detailed Documentation</font></a></b><BR><BR><B>Implementations:</B><blockquote><a href="dlib/hash_set/hash_set_kernel_1.h.html">hash_set_kernel_1</a>:
+                  <br> 
+                  This implementation is done using a <a href="#hash_table">hash_table</a> object. It uses the 
+        <a href="other.html#memory_manager">memory_manager</a> for all memory allocations.
+
+               <div class="typedefs"><table CELLSPACING="0" CELLPADDING="0" bgcolor="white"><tr><td bgcolor="#E3E3E3" valign="top"><div class="tdn">kernel_1a</div></td><td width="100%" bgcolor="#E3E3E3">is a typedef for hash_set_kernel_1 that uses hash_table_kernel_1a</td></tr><tr><td valign="top"><div class="tdn">kernel_1a_c</div></td><td width="100%"> 
+                  is a typedef for kernel_1a that checks its preconditions.             
+                  </td></tr><tr><td bgcolor="#E3E3E3" valign="top"><div class="tdn">kernel_1b</div></td><td width="100%" bgcolor="#E3E3E3">is a typedef for hash_set_kernel_1 that uses hash_table_kernel_2a</td></tr><tr><td valign="top"><div class="tdn">kernel_1b_c</div></td><td width="100%"> 
+                  is a typedef for kernel_1b that checks its preconditions.             
+                  </td></tr><tr><td bgcolor="#E3E3E3" valign="top"><div class="tdn">kernel_1c</div></td><td width="100%" bgcolor="#E3E3E3">is a typedef for hash_set_kernel_1 that uses hash_table_kernel_2b</td></tr><tr><td valign="top"><div class="tdn">kernel_1c_c</div></td><td width="100%"> 
+                  is a typedef for kernel_1c that checks its preconditions.             
+                  </td></tr></table></div></blockquote><center></center></div></a><a name="hash_table"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">hash_table</h1><BR><BR>
+            This object represents a data dictionary that is built on top of some kind of 
+            hash table. 
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/hash_table.h&gt;</tt></font></B><BR><b><a href="dlib/hash_table/hash_table_kernel_abstract.h.html"><font style="font-size:1.4em">Detailed Documentation</font></a></b><BR><BR><B>Implementations:</B><blockquote><a href="dlib/hash_table/hash_table_kernel_1.h.html">hash_table_kernel_1</a>:
+                  <br> 
+                  This implementation is done using singly linked lists as hashing buckets.  It uses the 
+        <a href="other.html#memory_manager">memory_manager</a> for all memory allocations. 
+               <div class="typedefs"><table CELLSPACING="0" CELLPADDING="0" bgcolor="white"><tr><td bgcolor="#E3E3E3" valign="top"><div class="tdn">kernel_1a</div></td><td width="100%" bgcolor="#E3E3E3">is a typedef for hash_table_kernel_1. </td></tr><tr><td valign="top"><div class="tdn">kernel_1a_c</div></td><td width="100%"> 
+                  is a typedef for kernel_1a that checks its preconditions.             
+                  </td></tr></table></div></blockquote><blockquote><a href="dlib/hash_table/hash_table_kernel_2.h.html">hash_table_kernel_2</a>:
+                  <br> 
+                  This implementation is done using <a href="#binary_search_tree">
+                  binary_search_tree</a> objects as hashing buckets.  It uses the 
+        <a href="other.html#memory_manager">memory_manager</a> for all memory allocations. 
+
+               <div class="typedefs"><table CELLSPACING="0" CELLPADDING="0" bgcolor="white"><tr><td bgcolor="#E3E3E3" valign="top"><div class="tdn">kernel_2a</div></td><td width="100%" bgcolor="#E3E3E3">is a typedef for hash_table_kernel_2 that uses binary_search_tree_kernel_1</td></tr><tr><td valign="top"><div class="tdn">kernel_2a_c</div></td><td width="100%"> 
+                  is a typedef for kernel_2a that checks its preconditions.             
+                  </td></tr><tr><td bgcolor="#E3E3E3" valign="top"><div class="tdn">kernel_2b</div></td><td width="100%" bgcolor="#E3E3E3">is a typedef for hash_table_kernel_2 that uses binary_search_tree_kernel_2</td></tr><tr><td valign="top"><div class="tdn">kernel_2b_c</div></td><td width="100%"> 
+                  is a typedef for kernel_2b that checks its preconditions.             
+                  </td></tr></table></div></blockquote><center></center></div></a><a name="map"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">map</h1><BR><BR>
+            This object represents a mapping of items of type domain onto items of type range.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/map.h&gt;</tt></font></B><BR><b><a href="dlib/map/map_kernel_abstract.h.html"><font style="font-size:1.4em">Detailed Documentation</font></a></b><BR><BR><B>Implementations:</B><blockquote><a href="dlib/map/map_kernel_1.h.html">map_kernel_1</a>:
+                  <br> 
+                  This is implemented using the <a href="#binary_search_tree">binary_search_tree</a> component. It uses the 
+        <a href="other.html#memory_manager">memory_manager</a> for all memory allocations.
+
+               <div class="typedefs"><table CELLSPACING="0" CELLPADDING="0" bgcolor="white"><tr><td bgcolor="#E3E3E3" valign="top"><div class="tdn">kernel_1a</div></td><td width="100%" bgcolor="#E3E3E3">is a typedef for map_kernel_1 that uses binary_search_tree_kernel_1</td></tr><tr><td valign="top"><div class="tdn">kernel_1a_c</div></td><td width="100%"> 
+                  is a typedef for kernel_1a that checks its preconditions.             
+                  </td></tr><tr><td bgcolor="#E3E3E3" valign="top"><div class="tdn">kernel_1b</div></td><td width="100%" bgcolor="#E3E3E3">is a typedef for map_kernel_1 that uses binary_search_tree_kernel_2</td></tr><tr><td valign="top"><div class="tdn">kernel_1b_c</div></td><td width="100%"> 
+                  is a typedef for kernel_1b that checks its preconditions.             
+                  </td></tr></table></div></blockquote><center></center></div></a><a name="map_pair"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">map_pair</h1><BR><BR>
+            This object is an abstract class which represents an interface for accessing a 
+            pair from a container such as the map, hash_table, etc. 
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/interfaces/map_pair.h&gt;</tt></font></B><BR><b><a href="dlib/interfaces/map_pair.h.html"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="queue"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">queue</h1><BR><BR>
+            This object represents a first in first out queue. 
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/queue.h&gt;</tt></font></B><BR><b><a href="dlib/queue/queue_kernel_abstract.h.html"><font style="font-size:1.4em">Detailed Documentation</font></a></b><BR>C++ Example Programs: <a href="queue_ex.cpp.html">queue_ex.cpp</a><BR><BR><B>Implementations:</B><blockquote><a href="dlib/queue/queue_kernel_1.h.html">queue_kernel_1</a>:
+                  <br> 
+                  This is implemented in the obvious way using a singly linked list.  It does not use the 
+        <a href="other.html#memory_manager">memory_manager</a> at all. 
+               <div class="typedefs"><table CELLSPACING="0" CELLPADDING="0" bgcolor="white"><tr><td bgcolor="#E3E3E3" valign="top"><div class="tdn">kernel_1a</div></td><td width="100%" bgcolor="#E3E3E3">is a typedef for queue_kernel_1</td></tr><tr><td valign="top"><div class="tdn">kernel_1a_c</div></td><td width="100%"> 
+                  is a typedef for kernel_1a that checks its preconditions.             
+                  </td></tr></table></div></blockquote><blockquote><a href="dlib/queue/queue_kernel_2.h.html">queue_kernel_2</a>:
+                  <br> 
+               This is implemented using a singly linked list and each node in the list
+               contains block_size (a template parameter) elements.  It uses the 
+        <a href="other.html#memory_manager">memory_manager</a> for all memory allocations. 
+               <div class="typedefs"><table CELLSPACING="0" CELLPADDING="0" bgcolor="white"><tr><td bgcolor="#E3E3E3" valign="top"><div class="tdn">kernel_2a</div></td><td width="100%" bgcolor="#E3E3E3">is a typedef for queue_kernel_2 with a block_size of 20</td></tr><tr><td valign="top"><div class="tdn">kernel_2a_c</div></td><td width="100%"> 
+                  is a typedef for kernel_2a that checks its preconditions.             
+                  </td></tr><tr><td bgcolor="#E3E3E3" valign="top"><div class="tdn">kernel_2b</div></td><td width="100%" bgcolor="#E3E3E3">is a typedef for queue_kernel_2 with a block_size of 100</td></tr><tr><td valign="top"><div class="tdn">kernel_2b_c</div></td><td width="100%"> 
+                  is a typedef for kernel_2b that checks its preconditions.             
+                  </td></tr></table></div></blockquote><br><center><h1>Extensions to queue</h1></center><div class="extension"><a name="queue_sort"><B><font size="5">queue_sort</font></B></a><Br><BR> 
+                  This extension gives a queue the ability to sort its contents.
+               <BR><BR><b><a href="dlib/queue/queue_sort_abstract.h.html"><font style="font-size:1.4em">Detailed Documentation</font></a></b><BR><BR><B>Implementations:</B><blockquote><a href="dlib/queue/queue_sort_1.h.html">queue_sort_1</a>:
+                  <br> 
+                        This is a version of the QuickSort algorithm.
+                     <div class="typedefs"><table CELLSPACING="0" CELLPADDING="0" bgcolor="white"><tr><td bgcolor="#E3E3E3" valign="top"><div class="tdn">sort_1a</div></td><td width="100%" bgcolor="#E3E3E3">is a typedef for queue_kernel_1a extended by queue_sort_1</td></tr><tr><td valign="top"><div class="tdn">sort_1a_c</div></td><td width="100%"> 
+                  is a typedef for sort_1a that checks its preconditions.             
+                  </td></tr><tr><td bgcolor="#E3E3E3" valign="top"><div class="tdn">sort_1b</div></td><td width="100%" bgcolor="#E3E3E3">is a typedef for queue_kernel_2a extended by queue_sort_1</td></tr><tr><td valign="top"><div class="tdn">sort_1b_c</div></td><td width="100%"> 
+                  is a typedef for sort_1b that checks its preconditions.             
+                  </td></tr><tr><td bgcolor="#E3E3E3" valign="top"><div class="tdn">sort_1c</div></td><td width="100%" bgcolor="#E3E3E3">is a typedef for queue_kernel_2b extended by queue_sort_1</td></tr><tr><td valign="top"><div class="tdn">sort_1c_c</div></td><td width="100%"> 
+                  is a typedef for sort_1c that checks its preconditions.             
+                  </td></tr></table></div></blockquote></div><center></center></div></a><a name="reference_counter"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">reference_counter</h1><BR><BR>
+            This object represents a container for an object and provides reference counting
+            capabilities for the object it contains. 
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/reference_counter.h&gt;</tt></font></B><BR><b><a href="dlib/reference_counter/reference_counter_kernel_abstract.h.html"><font style="font-size:1.4em">Detailed Documentation</font></a></b><BR><BR><B>Implementations:</B><blockquote><a href="dlib/reference_counter/reference_counter_kernel_1.h.html">reference_counter_kernel_1</a>:
+                  <br> 
+                  This implementation is done using pointers in the obvious way.
+               <div class="typedefs"><table CELLSPACING="0" CELLPADDING="0" bgcolor="white"><tr><td bgcolor="#E3E3E3" valign="top"><div class="tdn">kernel_1a</div></td><td width="100%" bgcolor="#E3E3E3">is a typedef for reference_counter_kernel_1</td></tr></table></div></blockquote><center></center></div></a><a name="reference_wrapper"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">reference_wrapper</h1><BR><BR>
+                This is a simple object that just holds a reference to another object. 
+                It is useful because it can serve as a kind of "copyable reference".  
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/ref.h&gt;</tt></font></B><BR><b><a href="dlib/ref.h.html"><font style="font-size:1.4em">Detailed Documentation</font></a></b><BR>C++ Example Programs: <a href="thread_function_ex.cpp.html">thread_function_ex.cpp</a><br><br><center></center></div></a><a name="remover"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">remover</h1><BR><BR>
+            This is a set of interfaces which gives the ability to remove all the items in a 
+            container without actually knowing what kind of container contains them. 
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/interfaces/remover.h&gt;</tt></font></B><BR><b><a href="dlib/interfaces/remover.h.html"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="scoped_ptr"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">scoped_ptr</h1><BR><BR>
+                This is a implementation of the scoped_ptr class found in the Boost C++ 
+                library.  It is a simple smart pointer class which guarantees that the 
+                pointer contained within it will always be deleted.  
+                
+                The class does not permit copying and so does not do any kind of 
+                reference counting.  Thus it is very simple and quite fast.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/smart_pointers.h&gt;</tt></font></B><BR><b><a href="dlib/smart_pointers/scoped_ptr_abstract.h.html"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="sequence"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">sequence</h1><BR><BR>
+            This object represents an ordered sequence of items, each item is 
+            associated with an integer value. The items are numbered from 0 to the number of items in the 
+            sequence minus 1. 
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/sequence.h&gt;</tt></font></B><BR><b><a href="dlib/sequence/sequence_kernel_abstract.h.html"><font style="font-size:1.4em">Detailed Documentation</font></a></b><BR><BR><B>Implementations:</B><blockquote><a href="dlib/sequence/sequence_kernel_1.h.html">sequence_kernel_1</a>:
+                  <br> 
+                  This is implemented as an AVL binary search tree.  
+                  Accessing(or adding or removing) an element always takes O(log n) time.  
+ It uses the <a href="other.html#memory_manager">memory_manager</a> for all memory allocations. 
+               <div class="typedefs"><table CELLSPACING="0" CELLPADDING="0" bgcolor="white"><tr><td bgcolor="#E3E3E3" valign="top"><div class="tdn">kernel_1a</div></td><td width="100%" bgcolor="#E3E3E3">is a typedef for sequence_kernel_1</td></tr><tr><td valign="top"><div class="tdn">kernel_1a_c</div></td><td width="100%"> 
+                  is a typedef for kernel_1a that checks its preconditions.             
+                  </td></tr></table></div></blockquote><blockquote><a href="dlib/sequence/sequence_kernel_2.h.html">sequence_kernel_2</a>:
+                  <br> 
+                  This implementation is done using a doubly linked list in the shape of a ring.  
+                  It will remember the last element accessed(or added or removed) and give O(1) 
+                  access time to the elements just left and right of it.  Aside from that, 
+                  accessing(or adding or removing) a random element will take O(n) and in the worst 
+                  case it will take time proportional to the size of the sequence/2.  
+      <p>
+                     It does not use the 
+                     <a href="other.html#memory_manager">memory_manager</a> at all. 
+      </p><div class="typedefs"><table CELLSPACING="0" CELLPADDING="0" bgcolor="white"><tr><td bgcolor="#E3E3E3" valign="top"><div class="tdn">kernel_2a</div></td><td width="100%" bgcolor="#E3E3E3">is a typedef for sequence_kernel_2</td></tr><tr><td valign="top"><div class="tdn">kernel_2a_c</div></td><td width="100%"> 
+                  is a typedef for kernel_2a that checks its preconditions.             
+                  </td></tr></table></div></blockquote><br><center><h1>Extensions to sequence</h1></center><div class="extension"><a name="sequence_compare"><B><font size="5">sequence_compare</font></B></a><Br><BR> 
+                  This extension gives sequences the ability to compare themselves using 
+                  operator&lt; and operator==.  Thus they can be used in the other container classes 
+                  that require this ability. (maps, sets, etc.)
+               <BR><BR><b><a href="dlib/sequence/sequence_compare_abstract.h.html"><font style="font-size:1.4em">Detailed Documentation</font></a></b><BR><BR><B>Implementations:</B><blockquote><a href="dlib/sequence/sequence_compare_1.h.html">sequence_compare_1</a>:
+                  <br> 
+                        The implementation is obvious.  Click on the sequence_compare_1 link if you want to see.                       
+                     <div class="typedefs"><table CELLSPACING="0" CELLPADDING="0" bgcolor="white"><tr><td bgcolor="#E3E3E3" valign="top"><div class="tdn">compare_1a</div></td><td width="100%" bgcolor="#E3E3E3">is a typedef for sequence_kernel_1a extended by sequence_compare_1</td></tr><tr><td valign="top"><div class="tdn">compare_1a_c</div></td><td width="100%"> 
+                  is a typedef for compare_1a that checks its preconditions.             
+                  </td></tr><tr><td bgcolor="#E3E3E3" valign="top"><div class="tdn">compare_1b</div></td><td width="100%" bgcolor="#E3E3E3">is a typedef for sequence_kernel_2a extended by sequence_compare_1</td></tr><tr><td valign="top"><div class="tdn">compare_1b_c</div></td><td width="100%"> 
+                  is a typedef for compare_1b that checks its preconditions.             
+                  </td></tr></table></div></blockquote></div><div class="extension"><a name="sequence_sort"><B><font size="5">sequence_sort</font></B></a><Br><BR> 
+                  This extension gives a sequence the ability to sort its contents.
+               <BR><BR><b><a href="dlib/sequence/sequence_sort_abstract.h.html"><font style="font-size:1.4em">Detailed Documentation</font></a></b><BR><BR><B>Implementations:</B><blockquote><a href="dlib/sequence/sequence_sort_1.h.html">sequence_sort_1</a>:
+                  <br> 
+                        This is a version of the QuickSort algorithm and it sorts sequences of less 
+                        than 30 elements with a selection sort.  This implementation is fastest when 
+                        used with sequence_kernel_2 and fairly slow when used with sequence_kernel_1                       
+                     <div class="typedefs"><table CELLSPACING="0" CELLPADDING="0" bgcolor="white"><tr><td bgcolor="#E3E3E3" valign="top"><div class="tdn">sort_1a</div></td><td width="100%" bgcolor="#E3E3E3">is a typedef for sequence_kernel_2a extended by sequence_sort_1</td></tr><tr><td valign="top"><div class="tdn">sort_1a_c</div></td><td width="100%"> 
+                  is a typedef for sort_1a that checks its preconditions.             
+                  </td></tr></table></div></blockquote><blockquote><a href="dlib/sequence/sequence_sort_2.h.html">sequence_sort_2</a>:
+                  <br> 
+                        This is a version of the QuickSort algorithm.  This implementation of sort is 
+                        the best to use with sequence_kernel_1 objects but gives extremely poor performance 
+                        with sequence_kernel_2 objects.
+                     <div class="typedefs"><table CELLSPACING="0" CELLPADDING="0" bgcolor="white"><tr><td bgcolor="#E3E3E3" valign="top"><div class="tdn">sort_2a</div></td><td width="100%" bgcolor="#E3E3E3">is a typedef for sequence_kernel_1a extended by sequence_sort_2</td></tr><tr><td valign="top"><div class="tdn">sort_2a_c</div></td><td width="100%"> 
+                  is a typedef for sort_2a that checks its preconditions.             
+                  </td></tr></table></div></blockquote></div><center></center></div></a><a name="set"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">set</h1><BR><BR>
+            This object represents an unordered and unaddressed collection of unique items. 
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/set.h&gt;</tt></font></B><BR><b><a href="dlib/set/set_kernel_abstract.h.html"><font style="font-size:1.4em">Detailed Documentation</font></a></b><BR><BR><B>Implementations:</B><blockquote><a href="dlib/set/set_kernel_1.h.html">set_kernel_1</a>:
+                  <br> 
+                  This is implemented using the <a href="#binary_search_tree">binary_search_tree</a> component.   It uses the 
+        <a href="other.html#memory_manager">memory_manager</a> for all memory allocations.
+
+               <div class="typedefs"><table CELLSPACING="0" CELLPADDING="0" bgcolor="white"><tr><td bgcolor="#E3E3E3" valign="top"><div class="tdn">kernel_1a</div></td><td width="100%" bgcolor="#E3E3E3">is a typedef for set_kernel_1 that uses binary_search_tree_kernel_1</td></tr><tr><td valign="top"><div class="tdn">kernel_1a_c</div></td><td width="100%"> 
+                  is a typedef for kernel_1a that checks its preconditions.             
+                  </td></tr><tr><td bgcolor="#E3E3E3" valign="top"><div class="tdn">kernel_1b</div></td><td width="100%" bgcolor="#E3E3E3">is a typedef for set_kernel_1 that uses binary_search_tree_kernel_2</td></tr><tr><td valign="top"><div class="tdn">kernel_1b_c</div></td><td width="100%"> 
+                  is a typedef for kernel_1b that checks its preconditions.             
+                  </td></tr></table></div></blockquote><br><center><h1>Extensions to set</h1></center><div class="extension"><a name="set_compare"><B><font size="5">set_compare</font></B></a><Br><BR> 
+                  This extension gives sets the ability to compare themselves using operator&lt; and 
+                  operator==.  Thus they can be used in the other container classes that require 
+                  this ability. (maps, sets, etc.)
+               <BR><BR><b><a href="dlib/set/set_compare_abstract.h.html"><font style="font-size:1.4em">Detailed Documentation</font></a></b><BR><BR><B>Implementations:</B><blockquote><a href="dlib/set/set_compare_1.h.html">set_compare_1</a>:
+                  <br> 
+                        The implementation is obvious.  Click on the set_compare_1 link if you want to see.                      
+                     <div class="typedefs"><table CELLSPACING="0" CELLPADDING="0" bgcolor="white"><tr><td bgcolor="#E3E3E3" valign="top"><div class="tdn">compare_1a</div></td><td width="100%" bgcolor="#E3E3E3">is a typedef for set_kernel_1a extended by set_compare_1</td></tr><tr><td valign="top"><div class="tdn">compare_1a_c</div></td><td width="100%"> 
+                  is a typedef for compare_1a that checks its preconditions.             
+                  </td></tr><tr><td bgcolor="#E3E3E3" valign="top"><div class="tdn">compare_1b</div></td><td width="100%" bgcolor="#E3E3E3">is a typedef for set_kernel_1b extended by set_compare_1</td></tr><tr><td valign="top"><div class="tdn">compare_1b_c</div></td><td width="100%"> 
+                  is a typedef for compare_1b that checks its preconditions.             
+                  </td></tr></table></div></blockquote></div><center></center></div></a><a name="shared_ptr"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">shared_ptr</h1><BR><BR><p>
+                This object represents a reference counted smart pointer.  Each shared_ptr
+                contains a pointer to some object and when the last shared_ptr that points
+                to the object is destructed or reset() then the object is guaranteed to be 
+                deleted.
+            </p><p>
+                This is an implementation of the std::tr1::shared_ptr template from the 
+                document ISO/IEC PDTR 19768, Proposed Draft Technical Report on C++
+                Library Extensions.  The only deviation from that document is that this 
+                shared_ptr is declared inside the dlib namespace rather than std::tr1.
+            </p><BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/smart_pointers.h&gt;</tt></font></B><BR><b><a href="dlib/smart_pointers/shared_ptr_abstract.h.html"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="shared_ptr_thread_safe"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">shared_ptr_thread_safe</h1><BR><BR><p>
+                This object represents a reference counted smart pointer just like 
+                <a href="#shared_ptr">shared_ptr</a> except that it is threadsafe.
+            </p><BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/smart_pointers_thread_safe.h&gt;</tt></font></B><BR><b><a href="dlib/smart_pointers/shared_ptr_thread_safe_abstract.h.html"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="sliding_buffer"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">sliding_buffer</h1><BR><BR>
+            This object represents an array with the ability to rotate its contents
+            left or right.  Note that the size of this object is always a power of two.
+            If you need arbitrary sized objects then use a <a href="#circular_buffer">circular_buffer</a>.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/sliding_buffer.h&gt;</tt></font></B><BR><b><a href="dlib/sliding_buffer/sliding_buffer_kernel_abstract.h.html"><font style="font-size:1.4em">Detailed Documentation</font></a></b><BR><BR><B>Implementations:</B><blockquote><a href="dlib/sliding_buffer/sliding_buffer_kernel_1.h.html">sliding_buffer_kernel_1</a>:
+                  <br> 
+                  This object is implemented using a C style array in the obvious way.  See the code for details. 
+               <div class="typedefs"><table CELLSPACING="0" CELLPADDING="0" bgcolor="white"><tr><td bgcolor="#E3E3E3" valign="top"><div class="tdn">kernel_1a</div></td><td width="100%" bgcolor="#E3E3E3">is a typedef for sliding_buffer_kernel_1</td></tr><tr><td valign="top"><div class="tdn">kernel_1a_c</div></td><td width="100%"> 
+                  is a typedef for kernel_1a that checks its preconditions.             
+                  </td></tr></table></div></blockquote><center></center></div></a><a name="stack"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">stack</h1><BR><BR>
+            This object represents a last in first out stack. 
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/stack.h&gt;</tt></font></B><BR><b><a href="dlib/stack/stack_kernel_abstract.h.html"><font style="font-size:1.4em">Detailed Documentation</font></a></b><BR><BR><B>Implementations:</B><blockquote><a href="dlib/stack/stack_kernel_1.h.html">stack_kernel_1</a>:
+                  <br> 
+                  This implementation is done in the obvious way using a singly linked list.  It uses the 
+        <a href="other.html#memory_manager">memory_manager</a> for all memory allocations. 
+
+               <div class="typedefs"><table CELLSPACING="0" CELLPADDING="0" bgcolor="white"><tr><td bgcolor="#E3E3E3" valign="top"><div class="tdn">kernel_1a</div></td><td width="100%" bgcolor="#E3E3E3">is a typedef for stack_kernel_1</td></tr><tr><td valign="top"><div class="tdn">kernel_1a_c</div></td><td width="100%"> 
+                  is a typedef for kernel_1a that checks its preconditions.             
+                  </td></tr></table></div></blockquote><center></center></div></a><a name="static_map"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">static_map</h1><BR><BR>
+            This object represents a mapping of items of type domain onto items of type range. 
+            The difference between this object and the normal <a href="#map">map</a> object is that it does not support adding
+            or removing individual objects from itself.  This allows implementations to focus on using less memory and 
+            achieving faster searching. 
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/static_map.h&gt;</tt></font></B><BR><b><a href="dlib/static_map/static_map_kernel_abstract.h.html"><font style="font-size:1.4em">Detailed Documentation</font></a></b><BR><BR><B>Implementations:</B><blockquote><a href="dlib/static_map/static_map_kernel_1.h.html">static_map_kernel_1</a>:
+                  <br> 
+                  This implementation is just a sorted array which can be searched using a binary search.  
+               <div class="typedefs"><table CELLSPACING="0" CELLPADDING="0" bgcolor="white"><tr><td bgcolor="#E3E3E3" valign="top"><div class="tdn">kernel_1a</div></td><td width="100%" bgcolor="#E3E3E3">is a typedef for static_map_kernel_1</td></tr><tr><td valign="top"><div class="tdn">kernel_1a_c</div></td><td width="100%"> 
+                  is a typedef for kernel_1a that checks its preconditions.             
+                  </td></tr></table></div></blockquote><center></center></div></a><a name="static_set"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">static_set</h1><BR><BR>
+            This object represents an unordered and unaddressed collection of items. 
+            The difference between this object and the normal <a href="#set">set</a> object is that it does not support adding
+            or removing individual objects from itself.  This allows implementations to focus on using less memory and 
+            achieving faster searching. 
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/static_set.h&gt;</tt></font></B><BR><b><a href="dlib/static_set/static_set_kernel_abstract.h.html"><font style="font-size:1.4em">Detailed Documentation</font></a></b><BR><BR><B>Implementations:</B><blockquote><a href="dlib/static_set/static_set_kernel_1.h.html">static_set_kernel_1</a>:
+                  <br> 
+                  This implementation is just a sorted array which can be searched using a binary search.  
+               <div class="typedefs"><table CELLSPACING="0" CELLPADDING="0" bgcolor="white"><tr><td bgcolor="#E3E3E3" valign="top"><div class="tdn">kernel_1a</div></td><td width="100%" bgcolor="#E3E3E3">is a typedef for static_set_kernel_1</td></tr><tr><td valign="top"><div class="tdn">kernel_1a_c</div></td><td width="100%"> 
+                  is a typedef for kernel_1a that checks its preconditions.             
+                  </td></tr></table></div></blockquote><br><center><h1>Extensions to static_set</h1></center><div class="extension"><a name="static_set_compare"><B><font size="5">static_set_compare</font></B></a><Br><BR> 
+                  This extension gives static_sets the ability to compare themselves using operator&lt; and 
+                  operator==.  Thus they can be used in the other container classes that require 
+                  this ability. (maps, static_sets, etc.)
+               <BR><BR><b><a href="dlib/static_set/static_set_compare_abstract.h.html"><font style="font-size:1.4em">Detailed Documentation</font></a></b><BR><BR><B>Implementations:</B><blockquote><a href="dlib/static_set/static_set_compare_1.h.html">static_set_compare_1</a>:
+                  <br> 
+                        The implementation is obvious.  Click on the static_set_compare_1 link if you want to see.                        
+                     <div class="typedefs"><table CELLSPACING="0" CELLPADDING="0" bgcolor="white"><tr><td bgcolor="#E3E3E3" valign="top"><div class="tdn">compare_1a</div></td><td width="100%" bgcolor="#E3E3E3">is a typedef for static_set_kernel_1a extended by static_set_compare_1</td></tr><tr><td valign="top"><div class="tdn">compare_1a_c</div></td><td width="100%"> 
+                  is a typedef for compare_1a that checks its preconditions.             
+                  </td></tr></table></div></blockquote></div><center></center></div></a><a name="std_vector_c"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">std_vector_c</h1><BR><BR>
+            This object is a simple wrapper around the std::vector object.  It 
+            provides an identical interface but also checks the preconditions of
+            each member function.  That is, if you violate a requires
+            clause the dlib::fatal_error exception is thrown. 
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/stl_checked.h&gt;</tt></font></B><BR><b><a href="dlib/stl_checked/std_vector_c_abstract.h.html#std_vector_c"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="tuple"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">tuple</h1><BR><BR>
+                This is an implementation of a very simple templated container object.
+                It contains between 0 and 31 objects where each object is listed
+                explicitly in the tuple's template arguments.   
+
+            <p>
+               Note that there is only one implementation of this object so there aren't any
+               different kernels to choose from when you create instances of the tuple object.  
+               So for example, you
+               could declare a tuple of 3 ints using the following statement: 
+               <tt>dlib::tuple&lt;int,int,int&gt; t;</tt></p><BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/tuple.h&gt;</tt></font></B><BR><b><a href="dlib/tuple/tuple_abstract.h.html"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="type_safe_union"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">type_safe_union</h1><BR><BR>
+                This object is a type safe analogue of the classic C union object. 
+                The type_safe_union, unlike a union, can contain non-POD types such 
+                as std::string.    
+                <p>It is also implemented without performing any
+                   heap memory allocations and instead it stores everything on the stack.</p><BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/type_safe_union.h&gt;</tt></font></B><BR><b><a href="dlib/type_safe_union/type_safe_union_kernel_abstract.h.html#type_safe_union"><font style="font-size:1.4em">Detailed Documentation</font></a></b><BR>C++ Example Programs: <a href="pipe_ex_2.cpp.html">pipe_ex_2.cpp</a>,
+               <a href="bridge_ex.cpp.html">bridge_ex.cpp</a><br><br><center></center></div></a><a name="unordered_pair"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">unordered_pair</h1><BR><BR>
+                This object is very similar to the std::pair struct except unordered_pair 
+                is only capable of representing an unordered set of two items rather than 
+                an ordered list of two items like std::pair.  
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/unordered_pair.h&gt;</tt></font></B><BR><b><a href="dlib/unordered_pair.h.html#unordered_pair"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="weak_ptr"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">weak_ptr</h1><BR><BR><p>
+                The weak_ptr class template stores a weak reference to an object that is 
+                already managed by a shared_ptr. To access the object, a weak_ptr can 
+                be converted to a shared_ptr using the member function lock().  
+            </p><p>
+                This is an implementation of the std::tr1::weak_ptr template from the 
+                document ISO/IEC PDTR 19768, Proposed Draft Technical Report on C++
+                Library Extensions.  The only deviation from that document is that this 
+                shared_ptr is declared inside the dlib namespace rather than std::tr1.
+            </p><BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/smart_pointers.h&gt;</tt></font></B><BR><b><a href="dlib/smart_pointers/weak_ptr_abstract.h.html"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a></div></body></html>

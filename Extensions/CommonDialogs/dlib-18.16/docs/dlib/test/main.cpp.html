@@ -1,0 +1,220 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - main.cpp</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2006  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font>
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>iostream<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>fstream<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>cmd_line_parser.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='tester.h.html'>tester.h</a>"
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>string.h<font color='#5555FF'>&gt;</font>
+
+
+<font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> std;
+<font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> dlib;
+<font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> test;
+
+<font color='#0000FF'>typedef</font> cmd_line_parser<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font>::check_1a_c clp;
+
+<font color='#0000FF'>static</font> logger <b><a name='dlog'></a>dlog</b><font face='Lucida Console'>(</font>"<font color='#CC0000'>test.main</font>"<font face='Lucida Console'>)</font>;
+
+<font color='#0000FF'><u>int</u></font> <b><a name='main'></a>main</b> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> argc, <font color='#0000FF'><u>char</u></font><font color='#5555FF'>*</font><font color='#5555FF'>*</font> argv<font face='Lucida Console'>)</font>
+<b>{</b>
+    <font color='#0000FF'>try</font>
+    <b>{</b>
+        clp parser;
+
+        parser.<font color='#BB00BB'>add_option</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>runall</font>","<font color='#CC0000'>Run all the tests that don't take any arguments.</font>"<font face='Lucida Console'>)</font>;
+        parser.<font color='#BB00BB'>add_option</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>h</font>","<font color='#CC0000'>Displays this information.</font>"<font face='Lucida Console'>)</font>;
+        parser.<font color='#BB00BB'>add_option</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>n</font>","<font color='#CC0000'>How many times to run the selected tests. The default is 1.</font>",<font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+        parser.<font color='#BB00BB'>add_option</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>d</font>","<font color='#CC0000'>log debugging statements to file debug.txt.</font>"<font face='Lucida Console'>)</font>;
+        parser.<font color='#BB00BB'>add_option</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>l</font>","<font color='#CC0000'>Set the logging level (all, trace, debug, info, warn, error, or fatal), the default is all.</font>",<font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+        parser.<font color='#BB00BB'>add_option</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>a</font>","<font color='#CC0000'>Append debugging messages to debug.txt rather than clearing the file at program startup.</font>"<font face='Lucida Console'>)</font>;
+        parser.<font color='#BB00BB'>add_option</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>q</font>","<font color='#CC0000'>Be quiet.  Don't print the testing progress or results to standard out.</font>"<font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> num <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+
+        <font color='#009900'>// add the options for all the different tests
+</font>        <font color='#BB00BB'>testers</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>testers</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>move_next</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            tester<font color='#5555FF'>&amp;</font> test <font color='#5555FF'>=</font> <font color='#5555FF'>*</font><font color='#BB00BB'>testers</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>element</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>value</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            parser.<font color='#BB00BB'>add_option</font><font face='Lucida Console'>(</font>test.<font color='#BB00BB'>cmd_line_switch</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, test.<font color='#BB00BB'>description</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, test.<font color='#BB00BB'>num_of_args</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        parser.<font color='#BB00BB'>parse</font><font face='Lucida Console'>(</font>argc,argv<font face='Lucida Console'>)</font>;
+
+        parser.<font color='#BB00BB'>check_option_arg_range</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>n</font>",<font color='#979000'>1</font>,<font color='#979000'>1000000000</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>*</font> singles[] <font color='#5555FF'>=</font> <b>{</b>"<font color='#CC0000'>d</font>","<font color='#CC0000'>l</font>","<font color='#CC0000'>a</font>","<font color='#CC0000'>n</font>","<font color='#CC0000'>h</font>","<font color='#CC0000'>runall</font>","<font color='#CC0000'>q</font>"<b>}</b>;
+        parser.<font color='#BB00BB'>check_one_time_options</font><font face='Lucida Console'>(</font>singles<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>*</font> d_sub[] <font color='#5555FF'>=</font> <b>{</b>"<font color='#CC0000'>l</font>","<font color='#CC0000'>a</font>"<b>}</b>;
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>*</font> l_args[] <font color='#5555FF'>=</font> <b>{</b>"<font color='#CC0000'>all</font>", "<font color='#CC0000'>trace</font>", "<font color='#CC0000'>debug</font>", "<font color='#CC0000'>info</font>", "<font color='#CC0000'>warn</font>", "<font color='#CC0000'>error</font>", "<font color='#CC0000'>fatal</font>"<b>}</b>;
+        parser.<font color='#BB00BB'>check_sub_options</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>d</font>",d_sub<font face='Lucida Console'>)</font>;
+        parser.<font color='#BB00BB'>check_option_arg_range</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>l</font>",l_args<font face='Lucida Console'>)</font>;
+
+
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>parser.<font color='#BB00BB'>option</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>n</font>"<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            num <font color='#5555FF'>=</font> string_cast<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>parser.<font color='#BB00BB'>option</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>n</font>"<font face='Lucida Console'>)</font>.<font color='#BB00BB'>argument</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>parser.<font color='#BB00BB'>option</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>q</font>"<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            be_verbose <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>parser.<font color='#BB00BB'>option</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>h</font>"<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>Usage: test [options]\n</font>";
+            parser.<font color='#BB00BB'>print_options</font><font face='Lucida Console'>(</font>cout<font face='Lucida Console'>)</font>;
+            cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\n</font>";
+            <font color='#0000FF'>return</font> <font color='#979000'>0</font>;
+        <b>}</b>
+
+        ofstream fout;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>parser.<font color='#BB00BB'>option</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>d</font>"<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>parser.<font color='#BB00BB'>option</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>a</font>"<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                fout.<font color='#BB00BB'>open</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>debug.txt</font>",ios::app<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>else</font>
+                fout.<font color='#BB00BB'>open</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>debug.txt</font>"<font face='Lucida Console'>)</font>;
+
+            <font color='#BB00BB'>set_all_logging_output_streams</font><font face='Lucida Console'>(</font>fout<font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>parser.<font color='#BB00BB'>option</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>l</font>"<font face='Lucida Console'>)</font>.<font color='#BB00BB'>count</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                <font color='#BB00BB'>set_all_logging_levels</font><font face='Lucida Console'>(</font>LALL<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>parser.<font color='#BB00BB'>option</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>l</font>"<font face='Lucida Console'>)</font>.<font color='#BB00BB'>argument</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'>all</font>"<font face='Lucida Console'>)</font>
+                <font color='#BB00BB'>set_all_logging_levels</font><font face='Lucida Console'>(</font>LALL<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>parser.<font color='#BB00BB'>option</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>l</font>"<font face='Lucida Console'>)</font>.<font color='#BB00BB'>argument</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'>trace</font>"<font face='Lucida Console'>)</font>
+                <font color='#BB00BB'>set_all_logging_levels</font><font face='Lucida Console'>(</font>LTRACE<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>parser.<font color='#BB00BB'>option</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>l</font>"<font face='Lucida Console'>)</font>.<font color='#BB00BB'>argument</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'>debug</font>"<font face='Lucida Console'>)</font>
+                <font color='#BB00BB'>set_all_logging_levels</font><font face='Lucida Console'>(</font>LDEBUG<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>parser.<font color='#BB00BB'>option</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>l</font>"<font face='Lucida Console'>)</font>.<font color='#BB00BB'>argument</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'>info</font>"<font face='Lucida Console'>)</font>
+                <font color='#BB00BB'>set_all_logging_levels</font><font face='Lucida Console'>(</font>LINFO<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>parser.<font color='#BB00BB'>option</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>l</font>"<font face='Lucida Console'>)</font>.<font color='#BB00BB'>argument</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'>warn</font>"<font face='Lucida Console'>)</font>
+                <font color='#BB00BB'>set_all_logging_levels</font><font face='Lucida Console'>(</font>LWARN<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>parser.<font color='#BB00BB'>option</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>l</font>"<font face='Lucida Console'>)</font>.<font color='#BB00BB'>argument</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'>error</font>"<font face='Lucida Console'>)</font>
+                <font color='#BB00BB'>set_all_logging_levels</font><font face='Lucida Console'>(</font>LERROR<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>parser.<font color='#BB00BB'>option</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>l</font>"<font face='Lucida Console'>)</font>.<font color='#BB00BB'>argument</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'>fatal</font>"<font face='Lucida Console'>)</font>
+                <font color='#BB00BB'>set_all_logging_levels</font><font face='Lucida Console'>(</font>LFATAL<font face='Lucida Console'>)</font>;
+        <b>}</b>
+        <font color='#0000FF'>else</font>
+        <b>{</b>
+            <font color='#BB00BB'>set_all_logging_levels</font><font face='Lucida Console'>(</font>LNONE<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> num_of_failed_tests <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> num_of_passed_tests <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> num; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+        <b>{</b>
+            dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>************ Starting Test Run </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> i<font color='#5555FF'>+</font><font color='#979000'>1</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'> of </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> num <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>. ************</font>";
+
+            <font color='#009900'>// loop over all the testers and see if they are supposed to run
+</font>            <font color='#BB00BB'>testers</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>testers</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>move_next</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                tester<font color='#5555FF'>&amp;</font> test<font color='#5555FF'>=</font> <font color='#5555FF'>*</font><font color='#BB00BB'>testers</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>element</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>value</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>const</font> clp::option_type<font color='#5555FF'>&amp;</font> opt <font color='#5555FF'>=</font> parser.<font color='#BB00BB'>option</font><font face='Lucida Console'>(</font>test.<font color='#BB00BB'>cmd_line_switch</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                <font color='#009900'>// run the test for this option as many times as the user has requested.
+</font>                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> j <font color='#5555FF'>=</font> <font color='#979000'>0</font>; j <font color='#5555FF'>&lt;</font> parser.<font color='#BB00BB'>option</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>runall</font>"<font face='Lucida Console'>)</font>.<font color='#BB00BB'>count</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> opt.<font color='#BB00BB'>count</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>j<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#009900'>// quit this loop if this option has arguments and this round through the loop is
+</font>                    <font color='#009900'>// from the runall option being present.
+</font>                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>test.<font color='#BB00BB'>num_of_args</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> j <font color='#5555FF'>=</font><font color='#5555FF'>=</font> opt.<font color='#BB00BB'>count</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                        <font color='#0000FF'>break</font>;
+
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>be_verbose<font face='Lucida Console'>)</font>
+                        cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>Running </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> test.<font color='#BB00BB'>cmd_line_switch</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>   </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> flush;
+
+                    dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>Running </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> test.<font color='#BB00BB'>cmd_line_switch</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                    <font color='#0000FF'>try</font>
+                    <b>{</b>
+                        <font color='#0000FF'>switch</font> <font face='Lucida Console'>(</font>test.<font color='#BB00BB'>num_of_args</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                        <b>{</b>
+                            <font color='#0000FF'>case</font> <font color='#979000'>0</font>:
+                                test.<font color='#BB00BB'>perform_test</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                                <font color='#0000FF'>break</font>;
+                            <font color='#0000FF'>case</font> <font color='#979000'>1</font>:
+                                test.<font color='#BB00BB'>perform_test</font><font face='Lucida Console'>(</font>opt.<font color='#BB00BB'>argument</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>,j<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                                <font color='#0000FF'>break</font>;
+                            <font color='#0000FF'>case</font> <font color='#979000'>2</font>:
+                                test.<font color='#BB00BB'>perform_test</font><font face='Lucida Console'>(</font>opt.<font color='#BB00BB'>argument</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>,j<font face='Lucida Console'>)</font>, opt.<font color='#BB00BB'>argument</font><font face='Lucida Console'>(</font><font color='#979000'>1</font>,j<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                                <font color='#0000FF'>break</font>;
+                            <font color='#0000FF'>default</font>:
+                                cerr <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\nThe test '</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> test.<font color='#BB00BB'>cmd_line_switch</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>' requested </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> test.<font color='#BB00BB'>num_of_args</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+                                    <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'> arguments but only 2 are supported.</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+                                dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>The test '</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> test.<font color='#BB00BB'>cmd_line_switch</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>' requested </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> test.<font color='#BB00BB'>num_of_args</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+                                    <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'> arguments but only 2 are supported.</font>";
+                                <font color='#0000FF'>break</font>;
+                        <b>}</b>
+                        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>be_verbose<font face='Lucida Console'>)</font>
+                            cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\r                                                                               \r</font>";
+
+                        <font color='#5555FF'>+</font><font color='#5555FF'>+</font>num_of_passed_tests;
+
+                    <b>}</b>
+                    <font color='#0000FF'>catch</font> <font face='Lucida Console'>(</font>std::exception<font color='#5555FF'>&amp;</font> e<font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>be_verbose<font face='Lucida Console'>)</font>
+                        <b>{</b>
+                            cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\n!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n</font>";
+                            cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>!!!!!!!!!!!!!!!!!!!!!!!!!!!!! TEST FAILED: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> test.<font color='#BB00BB'>cmd_line_switch</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> 
+                                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'> !!!!!!!!!!!!!!!!!!!!!!!!!!!!!</font>";
+                            cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n\n</font>";
+                            cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>Failure message from test: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> e.<font color='#BB00BB'>what</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+                        <b>}</b>
+
+
+                        dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LERROR <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!</font>";
+                        dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LERROR <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>!!!!!!!!!!!!!!!!!!!!!!!!!!!!! TEST FAILED: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> test.<font color='#BB00BB'>cmd_line_switch</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> 
+                            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'> !!!!!!!!!!!!!!!!!!!!!!!!!!!!!</font>";
+                        dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LERROR <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!</font>";
+                        dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LERROR <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>Failure message from test: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> e.<font color='#BB00BB'>what</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                        <font color='#5555FF'>+</font><font color='#5555FF'>+</font>num_of_failed_tests;
+                    <b>}</b>
+                <b>}</b>
+            <b>}</b>
+        <b>}</b>
+        dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>Testing Finished</font>";
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>num_of_passed_tests <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> num_of_failed_tests <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>You didn't select any tests to run.\n</font>";
+            cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>Try the -h option for more information.\n</font>";
+        <b>}</b>
+        <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>num_of_failed_tests <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>be_verbose<font face='Lucida Console'>)</font>
+            <b>{</b>
+                cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\nTesting Finished\n</font>";
+                cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>Total number of individual testing statements executed: </font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>number_of_testing_statements_executed</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+                cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>All tests completed successfully\n\n</font>";
+            <b>}</b>
+            dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>Total number of individual testing statements executed: </font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>number_of_testing_statements_executed</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>All tests completed successfully</font>";
+        <b>}</b>
+        <font color='#0000FF'>else</font>
+        <b>{</b>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>be_verbose<font face='Lucida Console'>)</font>
+            <b>{</b>
+                cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\nTesting Finished\n</font>";
+                cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>Total number of individual testing statements executed: </font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>number_of_testing_statements_executed</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+                cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>Number of failed tests: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> num_of_failed_tests <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n</font>";
+                cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>Number of passed tests: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> num_of_passed_tests <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\n</font>";
+            <b>}</b>
+            dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>Total number of individual testing statements executed: </font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>number_of_testing_statements_executed</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LWARN <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>Number of failed tests: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> num_of_failed_tests;
+            dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LWARN <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>Number of passed tests: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> num_of_passed_tests;
+        <b>}</b>
+
+        <font color='#0000FF'>return</font> num_of_failed_tests;
+    <b>}</b>
+    <font color='#0000FF'>catch</font> <font face='Lucida Console'>(</font>exception<font color='#5555FF'>&amp;</font> e<font face='Lucida Console'>)</font>
+    <b>{</b>
+        cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> e.<font color='#BB00BB'>what</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+        cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\nTry the -h option for more information.\n</font>";
+        cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+    <b>}</b>
+<b>}</b>
+
+
+</pre></body></html>

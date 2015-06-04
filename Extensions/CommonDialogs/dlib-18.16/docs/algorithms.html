@@ -1,0 +1,431 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html xmlns:gcse="googleCustomSearch"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><link rel="shortcut icon" href="dlib-icon.ico"><meta name="verify-v1" content="02MiiaFNVzS5/u0eQhsy3/knioFHsia1X3DXRpHkE6I="><meta name="google-site-verification" content="DGSSJMKDomaDaDTIRJ8jDkv0YMx9Cz7OESbXHjjr6Jw"><title>dlib C++ Library
+   - Algorithms</title><script language="JavaScript">
+
+// ---------------------------------------------
+// --- Name:    Easy DHTML Treeview           --
+// --- Author:  D.D. de Kerf                  --
+// --- Version: 0.2          Date: 13-6-2001  --
+// ---------------------------------------------
+function Toggle(node)
+{
+   // Unfold the branch if it isn't visible
+   var next_node = node.nextSibling;
+   if (next_node.style.display == 'none')
+   {
+      // Change the image (if there is an image)
+      if (node.childNodes.length > 0)
+      {
+         if (node.childNodes.length > 0)
+         { 
+            if (node.childNodes.item(0).nodeName == "IMG")
+            {
+               node.childNodes.item(0).src = "minus.gif";
+            }
+         }
+      }
+
+      next_node.style.display = 'block';
+   }
+   // Collapse the branch if it IS visible
+   else
+   {
+      // Change the image (if there is an image)
+      if (node.childNodes.length > 0)
+      {
+         if (node.childNodes.length > 0)
+         { 
+            if (node.childNodes.item(0).nodeName == "IMG")
+            {
+               node.childNodes.item(0).src = "plus.gif";
+            }
+         }
+      }
+
+      next_node.style.display = 'none';
+   }
+
+}
+function BigToggle(node)
+{
+   // Unfold the branch if it isn't visible
+   var next_node = node.nextSibling;
+   if (next_node.style.display == 'none')
+   {
+      // Change the image (if there is an image)
+      if (node.childNodes.length > 0)
+      {
+         if (node.childNodes.length > 0)
+         { 
+            if (node.childNodes.item(0).nodeName == "IMG")
+            {
+               node.childNodes.item(0).src = "bigminus.gif";
+            }
+         }
+      }
+
+      next_node.style.display = 'block';
+   }
+   // Collapse the branch if it IS visible
+   else
+   {
+      // Change the image (if there is an image)
+      if (node.childNodes.length > 0)
+      {
+         if (node.childNodes.length > 0)
+         { 
+            if (node.childNodes.item(0).nodeName == "IMG")
+            {
+               node.childNodes.item(0).src = "bigplus.gif";
+            }
+         }
+      }
+
+      next_node.style.display = 'none';
+   }
+
+}
+</script><style type="text/css">
+   body {margin:0px;}
+   pre {margin:0px;}
+
+   ul.tree  li { list-style: none;  margin-left:10px;} 
+   ul.tree  { margin:0px; padding:0px; margin-left:5px; font-size:0.95em; }
+   ul.tree  li ul { margin-left:10px; padding:0px; }
+
+   li#term { list-style: none; }
+
+   div.component {
+      background-color:white; 
+      border: 2px solid rgb(102,102,102); 
+      text-align:left;
+      margin-top: 1.5em;
+      padding: 0.7em;
+   }
+
+   div.question {
+      background-color:white; 
+      border: 2px solid rgb(102,102,102); 
+      text-align:left;
+      margin-top: 1.5em;
+      margin-bottom: 90%;
+      padding: 0.7em;
+   }
+
+   div.function {
+      background-color:white; 
+      border: 2px solid rgb(102,102,255); 
+      text-align:left;
+      margin-top: 0.3em;
+      padding: 0.3em;
+   }
+
+   div.class {
+      background-color:white; 
+      border: 2px solid rgb(255,102,102); 
+      text-align:left;
+      margin-top: 0.3em;
+      padding: 0.3em;
+   }
+
+   div.extension {
+      background-color:#FDFDFD; 
+      border: 1px solid rgb(102,102,102); 
+      text-align:left;
+      margin-top: 1.0em;
+      padding: 0.7em;
+   }
+
+   div.logb {
+      text-align:left;
+      padding: 0.0em;
+      float: left;
+      background-color:#c0c0c0; 
+      border: double ; 
+      margin: 0.5em;
+   }
+
+   div.name {
+      float: left;
+   }
+   div.line1 {
+      float:left;
+      width:100%;
+      background-color:#dfdfdf; 
+   }
+   div.line2 {
+      float:left;
+      width:100%;
+   }
+   div.inc {
+      float: right;
+   }
+
+
+   .code_box
+   {
+      color: black;
+      margin: 1em 0.25in;
+      padding: 0.5em;
+      background: rgb(240,240,240);
+      border-top: black dotted 1px;
+      border-left: black dotted 1px;
+      border-right: black solid 2px;
+      border-bottom: black solid 2px;
+   }
+
+
+
+   .bdotted {border-bottom: 1px dotted}
+   .bdashed {border-bottom: 1px dashed}
+   .bsolid {border-bottom: 1px solid}
+   .bdouble {border-bottom: 1px double}
+   .bgroove {border-bottom: 1px groove}
+   .bridge {border-bottom: 1px ridge}
+   .binset {border-bottom: 1px inset}
+   .boutset {border-bottom: 1px outset}
+
+   div.row1 {
+      background-color:#dfdfdf; 
+   }
+   div.row2 {
+      background-color:#f2f2f2; 
+   }
+
+   div.typedefs {
+      margin-left: 1.5em;
+      margin-top: 0.2em;
+      border: 1px dotted;
+      width: 52em;
+   }
+
+   div.tdn {
+      width: 10em;
+   }
+
+   .fullhr {
+      clear: both;
+   }
+
+   body {
+      text-align: center;
+   }
+
+   div.entire_page_header {
+      width:62.5em;  
+      text-align: left;
+      margin-top: 0.4em;
+      margin-left: auto;
+      margin-right: auto;
+   }
+   div.entire_page {
+      width:62.5em;  
+      text-align: left;
+      margin-left: auto;
+      margin-right: auto;
+      clear:both;
+   }
+</style></head><body bgcolor="#EDF3EE"><a name="top"></a><div class="entire_page_header"><a href="http://dlib.net"><img src="dlib-logo.png"></a></div><div class="entire_page"><table bgcolor="white" height="100%" bordercolor="#EDF3EE" CELLSPACING="0" CELLPADDING="10" style="border:0px;margin-top:2px"><tr height="100%"><td BGCOLOR="#F5F5F5" style="padding:7px; border: 1px solid rgb(102,102,102);" VALIGN="TOP" height="100%"><br><table WIDTH="145" height="100%"><tr><td VALIGN="TOP"><b>The Library</b><ul class="tree"><li><a href="algorithms.html">Algorithms</a></li><li><a href="api.html">API Wrappers</a></li><li><a href="bayes.html">Bayesian Nets</a></li><li><a href="compression.html">Compression</a></li><li><a href="containers.html">Containers</a></li><li><a href="graph_tools.html">Graph Tools</a></li><li><a href="imaging.html">Image Processing</a></li><li><a href="linear_algebra.html">Linear Algebra</a></li><li><a href="ml.html">Machine Learning</a></li><li><a href="metaprogramming.html">Metaprogramming</a></li><li><a href="other.html">Miscellaneous</a></li><li><a href="network.html">Networking</a></li><li><a href="optimization.html">Optimization</a></li><li><a href="parsing.html">Parsing</a></li></ul><br><b>Help/Info</b><ul class="tree"><li><a onclick="Toggle(this)" style="cursor: pointer;margin-left:-9px"><img src="plus.gif"><font color="green"><u>Examples: C++</u></font></a><ul style="display:none;"><li><a href="3d_point_cloud_ex.cpp.html">3D_Point_Cloud</a></li><li><a href="assignment_learning_ex.cpp.html">Assignment_Learning</a></li><li><a href="file_to_code_ex.cpp.html">Base64_Encoder</a></li><li><a href="bayes_net_ex.cpp.html">Bayesian_Network</a></li><li><a href="bayes_net_from_disk_ex.cpp.html">Bayesian_Network_From_Disk</a></li><li><a href="bayes_net_gui_ex.cpp.html">Bayesian_Network_GUI</a></li><li><a href="bridge_ex.cpp.html">Bridge</a></li><li><a href="bsp_ex.cpp.html">BSP</a></li><li><a href="svm_c_ex.cpp.html">C-Support_Vector_Machine</a></li><li><a href="compress_stream_ex.cpp.html#_top">Cmd_Line_Parser</a></li><li><a href="compress_stream_ex.cpp.html">Compress_Stream</a></li><li><a href="config_reader_ex.cpp.html">Config_File_Reader</a></li><li><a href="custom_trainer_ex.cpp.html">Custom_Trainers</a></li><li><a href="dir_nav_ex.cpp.html">Directory_Navigation</a></li><li><a href="empirical_kernel_map_ex.cpp.html">Empirical_Kernel_Map</a></li><li><a href="face_detection_ex.cpp.html">Face_Detection</a></li><li><a href="face_landmark_detection_ex.cpp.html">Face_Landmark_Detection</a></li><li><a href="fhog_ex.cpp.html">FHOG_Feature_Extraction</a></li><li><a href="fhog_object_detector_ex.cpp.html">FHOG_Object_Detection</a></li><li><a href="graph_labeling_ex.cpp.html">Graph_Labeling</a></li><li><a href="gui_api_ex.cpp.html">GUI</a></li><li><a href="hough_transform_ex.cpp.html">Hough_Transform</a></li><li><a href="server_http_ex.cpp.html">HTTP_Server</a></li><li><a href="image_ex.cpp.html">Image</a></li><li><a href="iosockstream_ex.cpp.html">IO Socket Streams</a></li><li><a href="server_iostream_ex.cpp.html">IO Streams Server</a></li><li><a href="kcentroid_ex.cpp.html">Kernel_Centroid</a></li><li><a href="kkmeans_ex.cpp.html">Kernel_K-Means_Clustering</a></li><li><a href="krr_regression_ex.cpp.html">Kernel_Ridge_Regression</a></li><li><a href="krls_filter_ex.cpp.html">Kernel_RLS_Filtering</a></li><li><a href="krls_ex.cpp.html">Kernel_RLS_Regression</a></li><li><a href="krr_classification_ex.cpp.html">KRR_Classification</a></li><li><a href="learning_to_track_ex.cpp.html">Learning_to_Track</a></li><li><a href="max_cost_assignment_ex.cpp.html">Linear_Assignment_Problems</a></li><li><a href="linear_manifold_regularizer_ex.cpp.html">Linear_Manifold_Regularizer</a></li><li><a href="mpc_ex.cpp.html">Linear_Model_Predictive_Control</a></li><li><a href="logger_ex.cpp.html">Logger</a></li><li><a href="logger_ex_2.cpp.html">Logger_Advanced</a></li><li><a href="logger_custom_output_ex.cpp.html">Logger_Custom_Output</a></li><li><a href="matrix_ex.cpp.html">Matrix</a></li><li><a href="matrix_expressions_ex.cpp.html">Matrix_Expressions</a></li><li><a href="member_function_pointer_ex.cpp.html">Member_Function_Pointer</a></li><li><a href="model_selection_ex.cpp.html">Model_Selection</a></li><li><a href="multiclass_classification_ex.cpp.html">Multiclass_Classification</a></li><li><a href="multithreaded_object_ex.cpp.html">Multithreaded_Object</a></li><li><a href="mlp_ex.cpp.html">Neural_Network</a></li><li><a href="least_squares_ex.cpp.html">Non-Linear Least Squares</a></li><li><a href="svm_ex.cpp.html">Nu-Support_Vector_Machine</a></li><li><a href="integrate_function_adapt_simp_ex.cpp.html">Numerical_Integration</a></li><li><a href="object_detector_ex.cpp.html">Object_Detector</a></li><li><a href="object_detector_advanced_ex.cpp.html">Object_Detector_Advanced</a></li><li><a href="one_class_classifiers_ex.cpp.html">One_Class_Classifiers</a></li><li><a href="svm_pegasos_ex.cpp.html">Online_SVM</a></li><li><a href="optimization_ex.cpp.html">Optimization</a></li><li><a href="parallel_for_ex.cpp.html">Parallel_For_Loops</a></li><li><a href="pipe_ex.cpp.html">Pipe</a></li><li><a href="pipe_ex_2.cpp.html">Pipe_2</a></li><li><a href="quantum_computing_ex.cpp.html">Quantum_Computing</a></li><li><a href="queue_ex.cpp.html">Queue</a></li><li><a href="rank_features_ex.cpp.html">Rank_Features</a></li><li><a href="rvm_ex.cpp.html">Relevance_Vector_Classification</a></li><li><a href="rvm_regression_ex.cpp.html">Relevance_Vector_Regression</a></li><li><a href="running_stats_ex.cpp.html">Running_Stats</a></li><li><a href="sequence_labeler_ex.cpp.html">Sequence_Labeling</a></li><li><a href="sequence_segmenter_ex.cpp.html">Sequence_Segmentation</a></li><li><a href="sockets_ex.cpp.html">Sockets</a></li><li><a href="sockstreambuf_ex.cpp.html">Sockstreambuf</a></li><li><a href="svm_sparse_ex.cpp.html">Sparse_Vectors</a></li><li><a href="sqlite_ex.cpp.html">SQLite</a></li><li><a href="std_allocator_ex.cpp.html">Std_C++_Allocator</a></li><li><a href="svm_struct_ex.cpp.html">Structural_Support_Vector_Machines</a></li><li><a href="svr_ex.cpp.html">Support_Vector_Regression</a></li><li><a href="surf_ex.cpp.html">SURF</a></li><li><a href="svm_rank_ex.cpp.html">SVM-Rank</a></li><li><a href="threaded_object_ex.cpp.html">Threaded_Object</a></li><li><a href="threads_ex.cpp.html">Threads</a></li><li><a href="thread_function_ex.cpp.html">Thread_Function</a></li><li><a href="thread_pool_ex.cpp.html">Thread_Pool</a></li><li><a href="timer_ex.cpp.html">Timer</a></li><li><a href="train_object_detector.cpp.html">Train_Object_Detector</a></li><li><a href="train_shape_predictor_ex.cpp.html">Train_Shape_Predictor</a></li><li><a href="using_custom_kernels_ex.cpp.html">Using_Custom_Kernels</a></li><li><a href="video_tracking_ex.cpp.html">Video_Object_Tracking</a></li><li><a href="webcam_face_pose_ex.cpp.html">Webcam_Face_Pose_Estimation</a></li><li><a href="xml_parser_ex.cpp.html">XML_Parser</a></li></ul></li><li><a onclick="Toggle(this)" style="cursor: pointer;margin-left:-9px"><img src="plus.gif"><font color="green"><u>Examples: Python</u></font></a><ul style="display:none;"><li><a href="face_detector.py.html">Face_Detector</a></li><li><a href="face_landmark_detection.py.html">Face_Landmark_Detection</a></li><li><a href="find_candidate_object_locations.py.html">find_candidate_object_locations</a></li><li><a href="max_cost_assignment.py.html">Linear_Assignment_Problems</a></li><li><a href="sequence_segmenter.py.html">Sequence_Segmenter</a></li><li><a href="svm_struct.py.html">Structural_Support_Vector_Machines</a></li><li><a href="svm_rank.py.html">SVM-Rank</a></li><li><a href="train_object_detector.py.html">Train_Object_Detector</a></li><li><a href="train_shape_predictor.py.html">Train_Shape_Predictor</a></li><li><a href="correlation_tracker.py.html">Video_Object_Tracking</a></li></ul></li><li><a href="faq.html">FAQ</a></li><li><a href="index.html">Home</a></li><li><a href="compile.html">How to compile</a></li><li><a href="howto_contribute.html">How to contribute</a></li><li><a href="term_index.html">Index</a></li><li><a href="intro.html">Introduction</a></li><li><a href="license.html">License</a></li><li><a href="python/index.html">Python API</a></li><li><a href="books.html">Suggested Books</a></li></ul><br><b>Current Release</b><ul class="tree"><li><a href="change_log.html">Change Log</a></li><li><a href="release_notes.html">Release Notes</a></li><li>Version: 18.16</li></ul><br></td><td width="1"></td></tr><tr><td valign="bottom"><br><br><br><br><br><br><br><br><br>
+      Last Modified:<br>Aug 23, 2013<br><br></td></tr></table></td><td VALIGN="TOP" width="100%" style="border: 1px solid rgb(102,102,102);"><center><h1>Algorithms</h1></center><br><br><p>
+            This page documents library components that are all basically just implementations of 
+            mathematical functions or algorithms that don't fit in any of the other pages
+            of the dlib documentation.  So this includes things like checksums, cryptographic hashes, 
+            sorting, etc.
+         </p></td><td BGCOLOR="#F5F5F5" style="padding:7px; border: 1px solid rgb(102,102,102);" VALIGN="TOP" height="100%"><br><table WIDTH="150" height="100%"><tr><td VALIGN="TOP"><b>Tools</b><ul class="tree"><li><a href="#bigint">bigint</a></li><li><a href="#disjoint_subsets">disjoint_subsets</a></li><li><a href="#hsort_array">hsort_array</a></li><li><a href="#integrate_function_adapt_simp">integrate_function_adapt_simp</a></li><li><a href="#isort_array">isort_array</a></li><li><a href="#numeric_constants">numeric_constants</a></li><li><a href="#put_in_range">put_in_range</a></li><li><a href="#qsort_array">qsort_array</a></li><li><a onclick="Toggle(this)" style="cursor: pointer;margin-left:-9px"><img src="plus.gif"><font color="green"><u>Quantum Computing</u></font></a><ul style="display:none;"><li><a href="#gate">gate</a></li><li><a href="#quantum_register">quantum_register</a></li></ul></li><li><a onclick="Toggle(this)" style="cursor: pointer;margin-left:-9px"><img src="plus.gif"><font color="green"><u>Set Utilities</u></font></a><ul style="display:none;"><li><a href="#set_difference">set_difference</a></li><li><a href="#set_intersection">set_intersection</a></li><li><a href="#set_intersection_size">set_intersection_size</a></li><li><a href="#set_union">set_union</a></li></ul></li><li><a href="#split_array">split_array</a></li><li><a href="#square_root">square_root</a></li></ul><br><b>Statistics</b><ul class="tree"><li><a href="#correlation">correlation</a></li><li><a href="#covariance">covariance</a></li><li><a href="#mean_sign_agreement">mean_sign_agreement</a></li><li><a href="#mean_squared_error">mean_squared_error</a></li><li><a href="#median">median</a></li><li><a href="#rand">rand</a></li><li><a href="#randomly_subsample">randomly_subsample</a></li><li><a href="#random_subset_selector">random_subset_selector</a></li><li><a href="#running_covariance">running_covariance</a></li><li><a href="#running_cross_covariance">running_cross_covariance</a></li><li><a href="#running_scalar_covariance">running_scalar_covariance</a></li><li><a href="#running_stats">running_stats</a></li><li><a href="#r_squared">r_squared</a></li></ul><br><b>Hashing</b><ul class="tree"><li><a href="#count_bits">count_bits</a></li><li><a href="#crc32">crc32</a></li><li><a href="#create_max_margin_projection_hash">create_max_margin_projection_hash</a></li><li><a href="#create_random_projection_hash">create_random_projection_hash</a></li><li><a href="#gaussian_random_hash">gaussian_random_hash</a></li><li><a href="#hamming_distance">hamming_distance</a></li><li><a href="#hash">hash</a></li><li><a href="#hash_samples">hash_samples</a></li><li><a href="#hash_similar_angles_128">hash_similar_angles_128</a></li><li><a href="#hash_similar_angles_256">hash_similar_angles_256</a></li><li><a href="#hash_similar_angles_512">hash_similar_angles_512</a></li><li><a href="#hash_similar_angles_64">hash_similar_angles_64</a></li><li><a href="#md5">md5</a></li><li><a href="#murmur_hash3">murmur_hash3</a></li><li><a href="#murmur_hash3_128bit">murmur_hash3_128bit</a></li><li><a href="#projection_hash">projection_hash</a></li><li><a href="#uniform_random_hash">uniform_random_hash</a></li></ul><br><b>Filtering</b><ul class="tree"><li><a href="#kalman_filter">kalman_filter</a></li><li><a href="#rls_filter">rls_filter</a></li></ul><br></td><td width="1"></td></tr><tr><td valign="bottom"></td></tr></table></td></tr></table><a name="bigint"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">bigint</h1><BR><BR>
+            This object represents an arbitrary precision unsigned integer.  It's pretty simple.  
+            It's interface is just like a normal int, you don't have to tell it how much memory
+            to use or anything unusual.  It just goes :)       
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/bigint.h&gt;</tt></font></B><BR><b><a href="dlib/bigint/bigint_kernel_abstract.h.html"><font style="font-size:1.4em">Detailed Documentation</font></a></b><BR><BR><B>Implementations:</B><blockquote><a href="dlib/bigint/bigint_kernel_1.h.html">bigint_kernel_1</a>:
+                  <br> 
+                  This implementation is done using an array of unsigned shorts.  It is also reference counted.  
+                  For further details see the above link.  Also note that kernel_2 should be 
+      faster in almost every case so you should really just use that version of the bigint object.
+               <div class="typedefs"><table CELLSPACING="0" CELLPADDING="0" bgcolor="white"><tr><td bgcolor="#E3E3E3" valign="top"><div class="tdn">kernel_1a</div></td><td width="100%" bgcolor="#E3E3E3">is a typedef for bigint_kernel_1</td></tr><tr><td valign="top"><div class="tdn">kernel_1a_c</div></td><td width="100%"> 
+                  is a typedef for kernel_1a that checks its preconditions.             
+                  </td></tr></table></div></blockquote><blockquote><a href="dlib/bigint/bigint_kernel_2.h.html">bigint_kernel_2</a>:
+                  <br> 
+                  This implementation is basically the same as kernel_1 except it uses the 
+                  Fast Fourier Transform to perform multiplications much faster.  
+               <div class="typedefs"><table CELLSPACING="0" CELLPADDING="0" bgcolor="white"><tr><td bgcolor="#E3E3E3" valign="top"><div class="tdn">kernel_2a</div></td><td width="100%" bgcolor="#E3E3E3">is a typedef for bigint_kernel_2</td></tr><tr><td valign="top"><div class="tdn">kernel_2a_c</div></td><td width="100%"> 
+                  is a typedef for kernel_2a that checks its preconditions.             
+                  </td></tr></table></div></blockquote><center></center></div></a><a name="correlation"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">correlation</h1><BR><BR>
+               This is a function for computing the correlation between 
+               matching elements of two std::vectors.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/statistics.h&gt;</tt></font></B><BR><b><a href="dlib/statistics/statistics_abstract.h.html#correlation"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="count_bits"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">count_bits</h1><BR><BR>
+            This function counts the number of bits in an unsigned integer which are
+            set to 1.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/hash.h&gt;</tt></font></B><BR><b><a href="dlib/general_hash/count_bits_abstract.h.html#count_bits"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="covariance"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">covariance</h1><BR><BR>
+               This is a function for computing the covariance between 
+               matching elements of two std::vectors.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/statistics.h&gt;</tt></font></B><BR><b><a href="dlib/statistics/statistics_abstract.h.html#covariance"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="crc32"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">crc32</h1><BR><BR>
+            This object represents the CRC-32 algorithm for calculating checksums.   
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/crc32.h&gt;</tt></font></B><BR><b><a href="dlib/crc32/crc32_kernel_abstract.h.html"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="create_max_margin_projection_hash"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">create_max_margin_projection_hash</h1><BR><BR>
+            Creates a random projection based locality sensitive 
+            <a href="#projection_hash">hashing function</a>.  
+               This is accomplished using a variation on the random hyperplane generation
+               technique from the paper:
+               <blockquote>
+                    Random Maximum Margin Hashing by Alexis Joly and Olivier Buisson
+               </blockquote>
+                  In particular, we use a linear support vector machine to generate planes.
+                  We train it on randomly selected and randomly labeled points from 
+                  the data to be hashed.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/lsh.h&gt;</tt></font></B><BR><b><a href="dlib/lsh/create_random_projection_hash_abstract.h.html#create_max_margin_projection_hash"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="create_random_projection_hash"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">create_random_projection_hash</h1><BR><BR>
+            Creates a random projection based locality sensitive 
+            <a href="#projection_hash">hashing function</a>.  The projection matrix
+            is generated by sampling its elements from a Gaussian random number generator.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/lsh.h&gt;</tt></font></B><BR><b><a href="dlib/lsh/create_random_projection_hash_abstract.h.html#create_random_projection_hash"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="disjoint_subsets"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">disjoint_subsets</h1><BR><BR>
+                This object represents a set of integers which is partitioned into
+                a number of disjoint subsets.  It supports the two fundamental operations
+                of finding which subset a particular integer belongs to as well as 
+                merging subsets. 
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/disjoint_subsets.h&gt;</tt></font></B><BR><b><a href="dlib/disjoint_subsets/disjoint_subsets_abstract.h.html#disjoint_subsets"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="gate"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">gate</h1><BR><BR>        
+            This object represents a quantum gate that operates on a 
+            <a href="#quantum_register">quantum_register</a>.   
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/quantum_computing.h&gt;</tt></font></B><BR><b><a href="dlib/quantum_computing/quantum_computing_abstract.h.html#gate"><font style="font-size:1.4em">Detailed Documentation</font></a></b><BR>C++ Example Programs: <a href="quantum_computing_ex.cpp.html">quantum_computing_ex.cpp</a><br><br><center></center></div></a><a name="gaussian_random_hash"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">gaussian_random_hash</h1><BR><BR>
+              This function uses hashing to generate Gaussian distributed random values
+              with mean 0 and variance 1.  
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/hash.h&gt;</tt></font></B><BR><b><a href="dlib/general_hash/random_hashing_abstract.h.html#gaussian_random_hash"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="hamming_distance"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">hamming_distance</h1><BR><BR>
+            This function returns the hamming distance between two unsigned integers.
+            That is, it returns the number of bits which differer in the two integers.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/hash.h&gt;</tt></font></B><BR><b><a href="dlib/general_hash/count_bits_abstract.h.html#hamming_distance"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="hash"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">hash</h1><BR><BR>
+            This is a set of convenience functions for invoking <a href="#murmur_hash3">murmur_hash3</a>
+            on std::strings, std::vectors, std::maps, or <a href="linear_algebra.html#matrix">dlib::matrix</a> objects.
+            <p>
+               As an aside, the hash() for matrix objects is defined <a href="dlib/matrix/matrix_utilities_abstract.h.html#hash">here</a>.
+               It has the same interface as all the others.
+            </p><BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/hash.h&gt;</tt></font></B><BR><b><a href="dlib/general_hash/hash_abstract.h.html"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="hash_samples"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">hash_samples</h1><BR><BR>
+            This is a simple function for hashing a bunch of vectors using a
+            locality sensitive hashing object such as <a href="#hash_similar_angles_128">hash_similar_angles_128</a>.  
+            It is also capable of running in parallel on a multi-core CPU.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/graph_utils_threaded.h&gt;</tt></font></B><BR><b><a href="dlib/graph_utils/find_k_nearest_neighbors_lsh_abstract.h.html#hash_samples"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="hash_similar_angles_128"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">hash_similar_angles_128</h1><BR><BR>
+            This object is a tool for computing locality sensitive hashes that give
+            vectors with small angles between each other similar hash values.  In
+            particular, this object creates 128 random planes which pass though the
+            origin and uses them to create a 128bit hash.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/lsh.h&gt;</tt></font></B><BR><b><a href="dlib/lsh/hashes_abstract.h.html#hash_similar_angles_128"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="hash_similar_angles_256"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">hash_similar_angles_256</h1><BR><BR>
+            This object is a tool for computing locality sensitive hashes that give
+            vectors with small angles between each other similar hash values.  In
+            particular, this object creates 256 random planes which pass though the
+            origin and uses them to create a 256bit hash.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/lsh.h&gt;</tt></font></B><BR><b><a href="dlib/lsh/hashes_abstract.h.html#hash_similar_angles_256"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="hash_similar_angles_512"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">hash_similar_angles_512</h1><BR><BR>
+            This object is a tool for computing locality sensitive hashes that give
+            vectors with small angles between each other similar hash values.  In
+            particular, this object creates 512 random planes which pass though the
+            origin and uses them to create a 512bit hash.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/lsh.h&gt;</tt></font></B><BR><b><a href="dlib/lsh/hashes_abstract.h.html#hash_similar_angles_512"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="hash_similar_angles_64"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">hash_similar_angles_64</h1><BR><BR>
+            This object is a tool for computing locality sensitive hashes that give
+            vectors with small angles between each other similar hash values.  In
+            particular, this object creates 64 random planes which pass though the
+            origin and uses them to create a 64bit hash.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/lsh.h&gt;</tt></font></B><BR><b><a href="dlib/lsh/hashes_abstract.h.html#hash_similar_angles_64"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="hsort_array"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">hsort_array</h1><BR><BR>
+            hsort_array is an implementation of the heapsort algorithm.  It will sort anything that has an 
+            array like operator[] interface.  
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/sort.h&gt;</tt></font></B><BR><b><a href="dlib/sort.h.html#hsort_array"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="integrate_function_adapt_simp"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">integrate_function_adapt_simp</h1><BR><BR>
+          Computes an approximation of the integral of a real valued function using the
+          adaptive Simpson method outlined in 
+          <blockquote>
+             Gander, W. and W. Gautshi, "Adaptive
+             Quadrature -- Revisited" BIT, Vol. 40, (2000), pp.84-101
+          </blockquote><BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/numerical_integration.h&gt;</tt></font></B><BR><b><a href="dlib/numerical_integration/integrate_function_adapt_simpson_abstract.h.html#integrate_function_adapt_simp"><font style="font-size:1.4em">Detailed Documentation</font></a></b><BR>C++ Example Programs: <a href="integrate_function_adapt_simp_ex.cpp.html">integrate_function_adapt_simp_ex.cpp</a><br><br><center></center></div></a><a name="isort_array"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">isort_array</h1><BR><BR>
+            isort_array is an implementation of the insertion sort algorithm.  It will sort anything that has an 
+            array like operator[] interface.   
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/sort.h&gt;</tt></font></B><BR><b><a href="dlib/sort.h.html#isort_array"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="kalman_filter"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">kalman_filter</h1><BR><BR>
+                This object implements the Kalman filter, which is a tool for 
+                recursively estimating the state of a process given measurements
+                related to that process.  To use this tool you will have to 
+                be familiar with the workings of the Kalman filter.  An excellent
+                introduction can be found in the paper:
+                <blockquote>
+                    An Introduction to the Kalman Filter
+                    by Greg Welch and Gary Bishop
+                </blockquote><BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/filtering.h&gt;</tt></font></B><BR><b><a href="dlib/filtering/kalman_filter_abstract.h.html"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="md5"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">md5</h1><BR><BR>
+            This is an implementation of The MD5 Message-Digest Algorithm as described in rfc1321.   
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/md5.h&gt;</tt></font></B><BR><b><a href="dlib/md5/md5_kernel_abstract.h.html"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="mean_sign_agreement"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">mean_sign_agreement</h1><BR><BR>
+               This is a function for computing the probability that 
+               matching elements of two std::vectors have the same sign.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/statistics.h&gt;</tt></font></B><BR><b><a href="dlib/statistics/statistics_abstract.h.html#mean_sign_agreement"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="mean_squared_error"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">mean_squared_error</h1><BR><BR>
+               This is a function for computing the mean squared error between 
+               matching elements of two std::vectors.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/statistics.h&gt;</tt></font></B><BR><b><a href="dlib/statistics/statistics_abstract.h.html#mean_squared_error"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="median"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">median</h1><BR><BR>
+            This function takes three parameters and finds the median of the three.  The median is swapped into
+            the first parameter and the first parameter ends up in one of the other two, unless the first parameter was
+            the median to begin with of course. 
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/algs.h&gt;</tt></font></B><BR><b><a href="dlib/algs.h.html#median"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="murmur_hash3"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">murmur_hash3</h1><BR><BR>
+            This function takes a block of memory and returns a 32bit hash.  The 
+            hashing algorithm used is Austin Appleby's excellent 
+            <a href="http://code.google.com/p/smhasher/">MurmurHash3</a>. 
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/hash.h&gt;</tt></font></B><BR><b><a href="dlib/general_hash/murmur_hash3_abstract.h.html"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="murmur_hash3_128bit"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">murmur_hash3_128bit</h1><BR><BR>
+            This function takes a block of memory and returns a 128bit hash.  The 
+            hashing algorithm used is Austin Appleby's excellent 
+            <a href="http://code.google.com/p/smhasher/">MurmurHash3</a>. 
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/hash.h&gt;</tt></font></B><BR><b><a href="dlib/general_hash/murmur_hash3_abstract.h.html#murmur_hash3_128bit"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="numeric_constants"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">numeric_constants</h1><BR><BR>
+            This is just a header file containing definitions of common numeric constants such as pi and e.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/numeric_constants.h&gt;</tt></font></B><BR><b><a href="dlib/numeric_constants.h.html"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="projection_hash"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">projection_hash</h1><BR><BR>
+                This is a tool for hashing elements of a vector space into the integers.  
+                It is intended to represent locality sensitive hashing functions such as 
+                the popular <a href="#create_random_projection_hash">random projection hashing</a> method.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/lsh.h&gt;</tt></font></B><BR><b><a href="dlib/lsh/projection_hash_abstract.h.html"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="put_in_range"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">put_in_range</h1><BR><BR>
+            This is a simple function that takes a range and a value and returns the given
+            value if it is within the range.  If it isn't in the range then it returns the  
+            end of range value that is closest.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/algs.h&gt;</tt></font></B><BR><b><a href="dlib/algs.h.html#put_in_range"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="qsort_array"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">qsort_array</h1><BR><BR>
+            qsort_array is an implementation of the QuickSort algorithm.  It will sort anything that has an array like 
+            operator[] interface.  If the quick sort becomes unstable then it switches to a heap sort.  This 
+            way sorting is guaranteed to take at most N*log(N) time.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/sort.h&gt;</tt></font></B><BR><b><a href="dlib/sort.h.html#qsort_array"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="quantum_register"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">quantum_register</h1><BR><BR>        
+                This object represents a set of quantum bits.  It can be used
+                with the quantum <a href="#gate">gate</a> object to simulate
+                quantum algorithms.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/quantum_computing.h&gt;</tt></font></B><BR><b><a href="dlib/quantum_computing/quantum_computing_abstract.h.html#quantum_register"><font style="font-size:1.4em">Detailed Documentation</font></a></b><BR>C++ Example Programs: <a href="quantum_computing_ex.cpp.html">quantum_computing_ex.cpp</a><br><br><center></center></div></a><a name="rand"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">rand</h1><BR><BR>
+            This object represents a pseudorandom number generator.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/rand.h&gt;</tt></font></B><BR><b><a href="dlib/rand/rand_kernel_abstract.h.html"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="randomly_subsample"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">randomly_subsample</h1><BR><BR>
+            This is a set of convenience functions for 
+            creating <a href="#random_subset_selector">random subsets</a> of data.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/statistics.h&gt;</tt></font></B><BR><b><a href="dlib/statistics/random_subset_selector_abstract.h.html#randomly_subsample"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="random_subset_selector"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">random_subset_selector</h1><BR><BR>
+               This object is a tool to help you select a random subset of a large body of data.  
+               In particular, it is useful when the body of data is too large to fit into memory.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/statistics.h&gt;</tt></font></B><BR><b><a href="dlib/statistics/random_subset_selector_abstract.h.html"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="rls_filter"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">rls_filter</h1><BR><BR>
+            This object is a tool for doing time series prediction using 
+            linear <a href="ml.html#rls">recursive least squares</a>.  In particular,
+            this object takes a sequence of points from the user and, at each
+            step, attempts to predict the value of the next point.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/filtering.h&gt;</tt></font></B><BR><b><a href="dlib/filtering/rls_filter_abstract.h.html"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="running_covariance"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">running_covariance</h1><BR><BR>
+                This object is a simple tool for computing the mean and
+                covariance of a sequence of vectors.  
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/statistics.h&gt;</tt></font></B><BR><b><a href="dlib/statistics/statistics_abstract.h.html#running_covariance"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="running_cross_covariance"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">running_cross_covariance</h1><BR><BR>
+                This object is a simple tool for computing the mean and
+                cross-covariance matrices of a sequence of pairs of vectors.  
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/statistics.h&gt;</tt></font></B><BR><b><a href="dlib/statistics/statistics_abstract.h.html#running_cross_covariance"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="running_scalar_covariance"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">running_scalar_covariance</h1><BR><BR>
+                This object is a simple tool for computing the covariance of a 
+                sequence of scalar values.  
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/statistics.h&gt;</tt></font></B><BR><b><a href="dlib/statistics/statistics_abstract.h.html#running_scalar_covariance"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="running_stats"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">running_stats</h1><BR><BR>
+                This object represents something that can compute the running mean,
+                variance, skewness, and kurtosis statistics of a stream of real numbers.  
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/statistics.h&gt;</tt></font></B><BR><b><a href="dlib/statistics/statistics_abstract.h.html#running_stats"><font style="font-size:1.4em">Detailed Documentation</font></a></b><BR>C++ Example Programs: <a href="running_stats_ex.cpp.html">running_stats_ex.cpp</a>,
+               <a href="kcentroid_ex.cpp.html">kcentroid_ex.cpp</a><br><br><center></center></div></a><a name="r_squared"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">r_squared</h1><BR><BR>
+               This is a function for computing the R squared coefficient between 
+               matching elements of two std::vectors.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/statistics.h&gt;</tt></font></B><BR><b><a href="dlib/statistics/statistics_abstract.h.html#r_squared"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="set_difference"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">set_difference</h1><BR><BR>        
+            This function takes two <a href="containers.html#set">set</a> objects and 
+            gives you their difference.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/set_utils.h&gt;</tt></font></B><BR><b><a href="dlib/set_utils/set_utils_abstract.h.html#set_difference"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="set_intersection"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">set_intersection</h1><BR><BR>        
+            This function takes two <a href="containers.html#set">set</a> objects and 
+            gives you their intersection.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/set_utils.h&gt;</tt></font></B><BR><b><a href="dlib/set_utils/set_utils_abstract.h.html#set_intersection"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="set_intersection_size"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">set_intersection_size</h1><BR><BR>        
+            This function takes two <a href="containers.html#set">set</a> objects and tells you
+            how many items they have in common.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/set_utils.h&gt;</tt></font></B><BR><b><a href="dlib/set_utils/set_utils_abstract.h.html#set_intersection_size"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="set_union"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">set_union</h1><BR><BR>        
+            This function takes two <a href="containers.html#set">set</a> objects and 
+            gives you their union.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/set_utils.h&gt;</tt></font></B><BR><b><a href="dlib/set_utils/set_utils_abstract.h.html#set_union"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="split_array"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">split_array</h1><BR><BR>
+            This function is used to efficiently split <a href="containers.html#array">array</a>
+            like objects into two parts.  It uses the global swap() function instead
+            of copying to move elements around, so it works on arrays of non-copyable
+            types.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/array.h&gt;</tt></font></B><BR><b><a href="dlib/array/array_tools_abstract.h.html#split_array"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="square_root"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">square_root</h1><BR><BR>        
+            square_root is a function which takes an unsigned long and returns the square root of it or
+            if the root is not an integer then it is rounded up to the next integer.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/algs.h&gt;</tt></font></B><BR><b><a href="dlib/algs.h.html#square_root"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="uniform_random_hash"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">uniform_random_hash</h1><BR><BR>
+              This function uses hashing to generate uniform random values in the range [0,1).
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/hash.h&gt;</tt></font></B><BR><b><a href="dlib/general_hash/random_hashing_abstract.h.html#uniform_random_hash"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a></div></body></html>

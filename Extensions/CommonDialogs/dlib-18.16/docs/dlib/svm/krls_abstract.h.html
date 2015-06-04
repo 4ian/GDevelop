@@ -1,0 +1,205 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - krls_abstract.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2008  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#undef</font> DLIB_KRLs_ABSTRACT_
+<font color='#0000FF'>#ifdef</font> DLIB_KRLs_ABSTRACT_
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>cmath<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../matrix/matrix_abstract.h.html'>../matrix/matrix_abstract.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../algs.h.html'>../algs.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../serialize.h.html'>../serialize.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='kernel_abstract.h.html'>kernel_abstract.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> kernel_type
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>class</font> <b><a name='krls'></a>krls</b>
+    <b>{</b>
+        <font color='#009900'>/*!
+            REQUIREMENTS ON kernel_type
+                is a kernel function object as defined in dlib/svm/kernel_abstract.h 
+
+            INITIAL VALUE
+                - dictionary_size() == 0
+
+            WHAT THIS OBJECT REPRESENTS
+                This is an implementation of the kernel recursive least squares algorithm 
+                described in the paper:
+                    The Kernel Recursive Least Squares Algorithm by Yaakov Engel.
+
+                The long and short of this algorithm is that it is an online kernel based 
+                regression algorithm.  You give it samples (x,y) and it learns the function
+                f(x) == y.  For a detailed description of the algorithm read the above paper.
+
+                Also note that the algorithm internally keeps a set of "dictionary vectors" 
+                that are used to represent the regression function.  You can force the 
+                algorithm to use no more than a set number of vectors by setting 
+                the 3rd constructor argument to whatever you want.  However, note that 
+                doing this causes the algorithm to bias it's results towards more 
+                recent training examples.  
+        !*/</font>
+
+    <font color='#0000FF'>public</font>:
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> kernel_type::scalar_type scalar_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> kernel_type::sample_type sample_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> kernel_type::mem_manager_type mem_manager_type;
+
+
+        <font color='#0000FF'>explicit</font> <b><a name='krls'></a>krls</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> kernel_type<font color='#5555FF'>&amp;</font> kernel_, 
+            scalar_type tolerance_ <font color='#5555FF'>=</font> <font color='#979000'>0.001</font>,
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> max_dictionary_size_ <font color='#5555FF'>=</font> <font color='#979000'>1000000</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - tolerance &gt;= 0
+            ensures
+                - this object is properly initialized
+                - #tolerance() == tolerance_
+                - #get_decision_function().kernel_function == kernel_
+                  (i.e. this object will use the given kernel function)
+                - #get_kernel() == kernel_
+                - #max_dictionary_size() == max_dictionary_size_
+        !*/</font>
+
+        scalar_type <b><a name='tolerance'></a>tolerance</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the tolerance to use for the approximately linearly dependent 
+                  test in the KRLS algorithm.  This is a number which governs how 
+                  accurately this object will approximate the decision function it is 
+                  learning.  Smaller values generally result in a more accurate 
+                  estimate while also resulting in a bigger set of dictionary vectors in 
+                  the learned decision function.  Bigger tolerances values result in a 
+                  less accurate decision function but also in less dictionary vectors.
+                - The exact meaning of the tolerance parameter is the following: 
+                  Imagine that we have an empirical_kernel_map that contains all
+                  the current dictionary vectors.  Then the tolerance is the minimum
+                  projection error (as given by empirical_kernel_map::project()) required
+                  to cause us to include a new vector in the dictionary.  So each time
+                  you call train() the krls object basically just computes the projection
+                  error for that new sample and if it is larger than the tolerance
+                  then that new sample becomes part of the dictionary.
+        !*/</font>
+
+        <font color='#0000FF'>const</font> kernel_type<font color='#5555FF'>&amp;</font> <b><a name='get_kernel'></a>get_kernel</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns a const reference to the kernel used by this object
+        !*/</font>
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='max_dictionary_size'></a>max_dictionary_size</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the maximum number of dictionary vectors this object
+                  will use at a time.  That is, dictionary_size() will never be
+                  greater than max_dictionary_size().
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='clear_dictionary'></a>clear_dictionary</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - clears out all learned data 
+                  (e.g. #get_decision_function().basis_vectors.size() == 0)
+        !*/</font>
+
+        scalar_type <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> sample_type<font color='#5555FF'>&amp;</font> x
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the current y estimate for the given x
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='train'></a>train</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> sample_type<font color='#5555FF'>&amp;</font> x,
+            scalar_type y
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - trains this object that the given x should be mapped to the given y
+                - if (dictionary_size() == max_dictionary_size() and training
+                  would add another dictionary vector to this object) then
+                    - discards the oldest dictionary vector so that we can still
+                      add a new one and remain below the max number of dictionary
+                      vectors.
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='swap'></a>swap</b> <font face='Lucida Console'>(</font>
+            krls<font color='#5555FF'>&amp;</font> item
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - swaps *this with item
+        !*/</font>
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='dictionary_size'></a>dictionary_size</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the number of vectors in the dictionary.  That is,
+                  returns a number equal to get_decision_function().basis_vectors.size()
+        !*/</font>
+
+        decision_function<font color='#5555FF'>&lt;</font>kernel_type<font color='#5555FF'>&gt;</font> <b><a name='get_decision_function'></a>get_decision_function</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns a decision function F that represents the function learned
+                  by this object so far.  I.e. it is the case that:
+                    - for all x: F(x) == (*this)(x)
+        !*/</font>
+
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> kernel_type
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='swap'></a>swap</b><font face='Lucida Console'>(</font>
+        krls<font color='#5555FF'>&lt;</font>kernel_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> a, 
+        krls<font color='#5555FF'>&lt;</font>kernel_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> b
+    <font face='Lucida Console'>)</font>
+    <b>{</b> a.<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>b<font face='Lucida Console'>)</font>; <b>}</b>
+    <font color='#009900'>/*!
+        provides a global swap function
+    !*/</font>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> kernel_type
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='serialize'></a>serialize</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> krls<font color='#5555FF'>&lt;</font>kernel_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> item,
+        std::ostream<font color='#5555FF'>&amp;</font> out
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        provides serialization support for krls objects
+    !*/</font>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> kernel_type 
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='deserialize'></a>deserialize</b> <font face='Lucida Console'>(</font>
+        krls<font color='#5555FF'>&lt;</font>kernel_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> item,
+        std::istream<font color='#5555FF'>&amp;</font> in 
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        provides serialization support for krls objects
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_KRLs_ABSTRACT_
+</font>
+
+</pre></body></html>

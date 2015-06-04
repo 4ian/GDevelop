@@ -1,0 +1,361 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - edge_list_graphs_abstract.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2010  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#undef</font> DLIB_EDGE_LIST_GrAPHS_ABSTRACT_Hh_
+<font color='#0000FF'>#ifdef</font> DLIB_EDGE_LIST_GrAPHS_ABSTRACT_Hh_
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>vector<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../string.h.html'>../string.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='sample_pair_abstract.h.html'>sample_pair_abstract.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='ordered_sample_pair_abstract.h.html'>ordered_sample_pair_abstract.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> vector_type,
+        <font color='#0000FF'>typename</font> distance_function_type,
+        <font color='#0000FF'>typename</font> alloc,
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='find_percent_shortest_edges_randomly'></a>find_percent_shortest_edges_randomly</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> vector_type<font color='#5555FF'>&amp;</font> samples,
+        <font color='#0000FF'>const</font> distance_function_type<font color='#5555FF'>&amp;</font> dist_funct,
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> percent,
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> num,
+        <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> random_seed,
+        std::vector<font color='#5555FF'>&lt;</font>sample_pair, alloc<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> out
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - 0 &lt; percent &lt;= 1
+            - num &gt; 0
+            - random_seed must be convertible to a string by dlib::cast_to_string()
+            - dist_funct(samples[i], samples[j]) must be a valid expression that evaluates
+              to a floating point number 
+        ensures
+            - This function randomly samples the space of pairs of integers between
+              0 and samples.size()-1 inclusive.  For each of these pairs, (i,j), a
+              sample_pair is created as follows:    
+                sample_pair(i, j, dist_funct(samples[i], samples[j]))
+              num such sample_pair objects are generated, duplicates and pairs with distance
+              values == infinity are removed, and then the top percent of them with the 
+              smallest distance are stored into out.  
+            - #out.size() &lt;= num*percent 
+            - contains_duplicate_pairs(#out) == false
+            - for all valid i:
+                - #out[i].distance() == dist_funct(samples[#out[i].index1()], samples[#out[i].index2()])
+                - #out[i].distance() &lt; std::numeric_limits&lt;double&gt;::infinity()
+            - random_seed is used to seed the random number generator used by this 
+              function.
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> vector_type,
+        <font color='#0000FF'>typename</font> distance_function_type,
+        <font color='#0000FF'>typename</font> alloc,
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='find_approximate_k_nearest_neighbors'></a>find_approximate_k_nearest_neighbors</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> vector_type<font color='#5555FF'>&amp;</font> samples,
+        <font color='#0000FF'>const</font> distance_function_type<font color='#5555FF'>&amp;</font> dist_funct,
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> k,
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> num,
+        <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> random_seed,
+        std::vector<font color='#5555FF'>&lt;</font>sample_pair, alloc<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> out
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - k &gt; 0
+            - num &gt; 0
+            - random_seed must be convertible to a string by dlib::cast_to_string()
+            - dist_funct(samples[i], samples[j]) must be a valid expression that evaluates
+              to a floating point number 
+        ensures
+            - This function computes an approximate form of k nearest neighbors. As num grows 
+              larger the output of this function converges to the output of the 
+              find_k_nearest_neighbors() function defined below.
+            - Specifically, this function randomly samples the space of pairs of integers between
+              0 and samples.size()-1 inclusive.  For each of these pairs, (i,j), a
+              sample_pair is created as follows:    
+                sample_pair(i, j, dist_funct(samples[i], samples[j]))
+              num such sample_pair objects are generated and then exact k-nearest-neighbors
+              is performed amongst these sample_pairs and the results are stored into #out.
+              Note that samples with an infinite distance between them are considered to 
+              be not connected at all.
+            - contains_duplicate_pairs(#out) == false
+            - for all valid i:
+                - #out[i].distance() == dist_funct(samples[#out[i].index1()], samples[#out[i].index2()])
+                - #out[i].distance() &lt; std::numeric_limits&lt;double&gt;::infinity()
+            - random_seed is used to seed the random number generator used by this 
+              function.
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> vector_type,
+        <font color='#0000FF'>typename</font> distance_function_type,
+        <font color='#0000FF'>typename</font> alloc
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='find_k_nearest_neighbors'></a>find_k_nearest_neighbors</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> vector_type<font color='#5555FF'>&amp;</font> samples,
+        <font color='#0000FF'>const</font> distance_function_type<font color='#5555FF'>&amp;</font> dist_funct,
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> k,
+        std::vector<font color='#5555FF'>&lt;</font>sample_pair, alloc<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> out
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - k &gt; 0
+            - dist_funct(samples[i], samples[j]) must be a valid expression that evaluates
+              to a floating point number 
+        ensures
+            - #out == a set of sample_pair objects that represent all the k nearest 
+              neighbors in samples according to the given distance function dist_funct.  
+              Note that samples with an infinite distance between them are considered to 
+              be not connected at all.
+            - for all valid i:
+                - #out[i].distance() == dist_funct(samples[#out[i].index1()], samples[#out[i].index2()])
+                - #out[i].distance() &lt; std::numeric_limits&lt;double&gt;::infinity()
+            - contains_duplicate_pairs(#out) == false
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> vector_type 
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>bool</u></font> <b><a name='contains_duplicate_pairs'></a>contains_duplicate_pairs</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> vector_type<font color='#5555FF'>&amp;</font> pairs
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - vector_type == a type with an interface compatible with std::vector and it
+              must in turn contain objects with an interface compatible with
+              dlib::sample_pair or dlib::ordered_sample_pair.
+        ensures
+            - if (pairs contains any elements that are equal according to operator==) then
+                - returns true
+            - else
+                - returns false
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> vector_type 
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='max_index_plus_one'></a>max_index_plus_one</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> vector_type<font color='#5555FF'>&amp;</font> pairs
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - vector_type == a type with an interface compatible with std::vector and it
+              must in turn contain objects with an interface compatible with
+              dlib::sample_pair or dlib::ordered_sample_pair.
+        ensures
+            - if (pairs.size() == 0) then
+                - returns 0
+            - else
+                - returns a number N such that: 
+                    - for all i:  pairs[i].index1()   &lt;  N &amp;&amp; pairs[i].index2()   &lt;  N
+                    - for some j: pairs[j].index1()+1 == N || pairs[j].index2()+1 == N
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> vector_type
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='remove_long_edges'></a>remove_long_edges</b> <font face='Lucida Console'>(</font>
+        vector_type<font color='#5555FF'>&amp;</font> pairs,
+        <font color='#0000FF'><u>double</u></font> distance_threshold
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - vector_type == a type with an interface compatible with std::vector and it
+              must in turn contain objects with an interface compatible with
+              dlib::sample_pair or dlib::ordered_sample_pair.
+        ensures
+            - Removes all elements of pairs that have a distance value greater than the
+              given threshold.
+            - #pairs.size() &lt;= pairs.size()
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> vector_type
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='remove_short_edges'></a>remove_short_edges</b> <font face='Lucida Console'>(</font>
+        vector_type<font color='#5555FF'>&amp;</font> pairs,
+        <font color='#0000FF'><u>double</u></font> distance_threshold
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - vector_type == a type with an interface compatible with std::vector and it
+              must in turn contain objects with an interface compatible with
+              dlib::sample_pair or dlib::ordered_sample_pair.
+        ensures
+            - Removes all elements of pairs that have a distance value less than the
+              given threshold.
+            - #pairs.size() &lt;= pairs.size()
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> vector_type
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='remove_percent_longest_edges'></a>remove_percent_longest_edges</b> <font face='Lucida Console'>(</font>
+        vector_type<font color='#5555FF'>&amp;</font> pairs,
+        <font color='#0000FF'><u>double</u></font> percent 
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - 0 &lt;= percent &lt; 1
+            - vector_type == a type with an interface compatible with std::vector and it
+              must in turn contain objects with an interface compatible with
+              dlib::sample_pair or dlib::ordered_sample_pair.
+        ensures
+            - Removes the given upper percentage of the longest edges in pairs.  I.e.
+              this function removes the long edges from pairs.
+            - #pairs.size() == (1-percent)*pairs.size()
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> vector_type
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='remove_percent_shortest_edges'></a>remove_percent_shortest_edges</b> <font face='Lucida Console'>(</font>
+        vector_type<font color='#5555FF'>&amp;</font> pairs,
+        <font color='#0000FF'><u>double</u></font> percent 
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - 0 &lt;= percent &lt; 1
+            - vector_type == a type with an interface compatible with std::vector and it
+              must in turn contain objects with an interface compatible with
+              dlib::sample_pair or dlib::ordered_sample_pair.
+        ensures
+            - Removes the given upper percentage of the shortest edges in pairs.  I.e.
+              this function removes the short edges from pairs.
+            - #pairs.size() == (1-percent)*pairs.size()
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> vector_type
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='remove_duplicate_edges'></a>remove_duplicate_edges</b> <font face='Lucida Console'>(</font>
+        vector_type<font color='#5555FF'>&amp;</font> pairs
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - vector_type == a type with an interface compatible with std::vector and it
+              must in turn contain objects with an interface compatible with
+              dlib::sample_pair or dlib::ordered_sample_pair.
+        ensures
+            - Removes any duplicate edges from pairs.  That is, for all elements of pairs,
+              A and B, such that A == B, only one of A or B will be in pairs after this
+              function terminates.
+            - #pairs.size() &lt;= pairs.size()
+            - is_ordered_by_index(#pairs) == true
+            - contains_duplicate_pairs(#pairs) == false
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> vector_type
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>bool</u></font> <b><a name='is_ordered_by_index'></a>is_ordered_by_index</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> vector_type<font color='#5555FF'>&amp;</font> edges
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - vector_type == a type with an interface compatible with std::vector and it
+              must in turn contain objects with an interface compatible with
+              dlib::sample_pair or dlib::ordered_sample_pair.
+        ensures
+            - returns true if and only if the contents of edges are in sorted order
+              according to order_by_index().  That is, we return true if calling
+              std::stable_sort(edges.begin(), edges.end(), &amp;order_by_index&lt;T&gt;) would not
+              change the ordering of elements of edges.
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> alloc1, 
+        <font color='#0000FF'>typename</font> alloc2
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='find_neighbor_ranges'></a>find_neighbor_ranges</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>ordered_sample_pair,alloc1<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> edges,
+        std::vector<font color='#5555FF'>&lt;</font>std::pair<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font>, <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font>,alloc2<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> neighbors
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - is_ordered_by_index(edges) == true
+              (i.e. edges is sorted so that all the edges for a particular node are grouped
+              together)
+        ensures
+            - This function takes a graph, represented by its list of edges, and finds the
+              ranges that contain the edges for each node in the graph.  In particular,
+              #neighbors[i] will tell you which edges correspond to the ith node in the
+              graph.
+            - #neighbors.size() == max_index_plus_one(edges)
+              (i.e. neighbors will have an entry for each node in the graph defined by the
+              list of edges)
+            - for all valid i:
+                - all elements of edges such that their index1() value == i are in the
+                  range [neighbors[i].first, neighbors[i].second).  That is, for all k such
+                  that neighbors[i].first &lt;= k &lt; neighbors[i].second:
+                    - edges[k].index1() == i.
+                    - all edges outside this range have an index1() value != i
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> alloc1, 
+        <font color='#0000FF'>typename</font> alloc2
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='convert_unordered_to_ordered'></a>convert_unordered_to_ordered</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>sample_pair,alloc1<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> edges,
+        std::vector<font color='#5555FF'>&lt;</font>ordered_sample_pair,alloc2<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> out_edges
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        ensures
+            - interprets edges a defining an undirected graph. 
+            - This function populates out_edges with a directed graph that represents the
+              same graph as the one in edges.  In particular, this means that for all valid
+              i we have the following:
+                - if (edges[i].index1() != edges[i].index2()) then
+                    - #out_edges contains two edges corresponding to edges[i].  They
+                      represent the two directions of this edge.  The distance value from
+                      edges[i] is also copied into the output edges.
+                - else
+                    - #out_edges contains one edge corresponding to edges[i] since this is
+                      a self edge.  The distance value from edges[i] is also copied into
+                      the output edge.
+            - max_index_plus_one(edges) == max_index_plus_one(#out_edges) 
+              (i.e. both graphs have the same number of nodes)
+            - In all but the most trivial cases, we will have is_ordered_by_index(#out_edges) == false
+            - contains_duplicate_pairs(#out_edges) == contains_duplicate_pairs(edges)
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_EDGE_LIST_GrAPHS_ABSTRACT_Hh_
+</font>
+
+</pre></body></html>

@@ -1,0 +1,340 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - quantum_computing_ex.cpp</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// The contents of this file are in the public domain. See LICENSE_FOR_EXAMPLE_PROGRAMS.txt
+</font><font color='#009900'>/*
+    This is an example illustrating the use of the quantum computing
+    simulation classes from the dlib C++ Library.
+
+    This example assumes you are familiar with quantum computing and 
+    Grover's search algorithm and Shor's 9 bit error correcting code
+    in particular.   The example shows how to simulate both of these
+    algorithms.
+
+
+    The code to simulate Grover's algorithm is primarily here to show
+    you how to make custom quantum gate objects.  The Shor ECC example
+    is simpler and uses just the default gates that come with the 
+    library.
+
+*/</font>
+
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>iostream<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>complex<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>ctime<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>quantum_computing.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>string.h<font color='#5555FF'>&gt;</font>
+
+
+<font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> std;
+<font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> dlib;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<font color='#009900'>// This declares a random number generator that we will be using below  
+</font>dlib::rand rnd;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<font color='#0000FF'><u>void</u></font> <b><a name='shor_encode'></a>shor_encode</b> <font face='Lucida Console'>(</font>
+    quantum_register<font color='#5555FF'>&amp;</font> reg
+<font face='Lucida Console'>)</font>
+<font color='#009900'>/*!
+    requires
+        - reg.num_bits() == 1
+    ensures
+        - #reg.num_bits() == 9
+        - #reg == the Shor error coding of the input register
+!*/</font>
+<b>{</b>
+    <font color='#BB00BB'>DLIB_CASSERT</font><font face='Lucida Console'>(</font>reg.<font color='#BB00BB'>num_bits</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>1</font>,"<font color='#CC0000'></font>"<font face='Lucida Console'>)</font>;
+
+    quantum_register zeros;
+    zeros.<font color='#BB00BB'>set_num_bits</font><font face='Lucida Console'>(</font><font color='#979000'>8</font><font face='Lucida Console'>)</font>;
+    reg.<font color='#BB00BB'>append</font><font face='Lucida Console'>(</font>zeros<font face='Lucida Console'>)</font>;
+
+    <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> dlib::quantum_gates;
+    <font color='#0000FF'>const</font> gate<font color='#5555FF'>&lt;</font><font color='#979000'>1</font><font color='#5555FF'>&gt;</font> h <font color='#5555FF'>=</font> <font color='#BB00BB'>hadamard</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    <font color='#0000FF'>const</font> gate<font color='#5555FF'>&lt;</font><font color='#979000'>1</font><font color='#5555FF'>&gt;</font> i <font color='#5555FF'>=</font> <font color='#BB00BB'>noop</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+    <font color='#009900'>// Note that the expression (h,i) represents the tensor product of the 1 qubit 
+</font>    <font color='#009900'>// h gate with the 1 qubit i gate and larger versions of this expression 
+</font>    <font color='#009900'>// represent even bigger tensor products.  So as you see below, we make gates 
+</font>    <font color='#009900'>// big enough to apply to our quantum register by listing out all the gates we 
+</font>    <font color='#009900'>// want to go into the tensor product and then we just apply the resulting gate 
+</font>    <font color='#009900'>// to the quantum register.
+</font>
+    <font color='#009900'>// Now apply the gates that constitute Shor's encoding to the input register.  
+</font>    <font face='Lucida Console'>(</font>cnot<font color='#5555FF'>&lt;</font><font color='#979000'>3</font>,<font color='#979000'>0</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,i,i,i,i,i<font face='Lucida Console'>)</font>.<font color='#BB00BB'>apply_gate_to</font><font face='Lucida Console'>(</font>reg<font face='Lucida Console'>)</font>;
+    <font face='Lucida Console'>(</font>cnot<font color='#5555FF'>&lt;</font><font color='#979000'>6</font>,<font color='#979000'>0</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,i,i<font face='Lucida Console'>)</font>.<font color='#BB00BB'>apply_gate_to</font><font face='Lucida Console'>(</font>reg<font face='Lucida Console'>)</font>;
+    <font face='Lucida Console'>(</font>h,i,i,h,i,i,h,i,i<font face='Lucida Console'>)</font>.<font color='#BB00BB'>apply_gate_to</font><font face='Lucida Console'>(</font>reg<font face='Lucida Console'>)</font>;
+    <font face='Lucida Console'>(</font>cnot<font color='#5555FF'>&lt;</font><font color='#979000'>1</font>,<font color='#979000'>0</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,i,cnot<font color='#5555FF'>&lt;</font><font color='#979000'>1</font>,<font color='#979000'>0</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,i,cnot<font color='#5555FF'>&lt;</font><font color='#979000'>1</font>,<font color='#979000'>0</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,i<font face='Lucida Console'>)</font>.<font color='#BB00BB'>apply_gate_to</font><font face='Lucida Console'>(</font>reg<font face='Lucida Console'>)</font>;
+    <font face='Lucida Console'>(</font>cnot<font color='#5555FF'>&lt;</font><font color='#979000'>2</font>,<font color='#979000'>0</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,cnot<font color='#5555FF'>&lt;</font><font color='#979000'>2</font>,<font color='#979000'>0</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,cnot<font color='#5555FF'>&lt;</font><font color='#979000'>2</font>,<font color='#979000'>0</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>apply_gate_to</font><font face='Lucida Console'>(</font>reg<font face='Lucida Console'>)</font>;
+<b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<font color='#0000FF'><u>void</u></font> <b><a name='shor_decode'></a>shor_decode</b> <font face='Lucida Console'>(</font>
+    quantum_register<font color='#5555FF'>&amp;</font> reg
+<font face='Lucida Console'>)</font>
+<font color='#009900'>/*!
+    requires
+        - reg.num_bits() == 9
+    ensures
+        - #reg.num_bits() == 1
+        - #reg == the decoded qubit that was in the given input register 
+!*/</font>
+<b>{</b>
+    <font color='#BB00BB'>DLIB_CASSERT</font><font face='Lucida Console'>(</font>reg.<font color='#BB00BB'>num_bits</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>9</font>,"<font color='#CC0000'></font>"<font face='Lucida Console'>)</font>;
+
+    <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> dlib::quantum_gates;
+    <font color='#0000FF'>const</font> gate<font color='#5555FF'>&lt;</font><font color='#979000'>1</font><font color='#5555FF'>&gt;</font> h <font color='#5555FF'>=</font> <font color='#BB00BB'>hadamard</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    <font color='#0000FF'>const</font> gate<font color='#5555FF'>&lt;</font><font color='#979000'>1</font><font color='#5555FF'>&gt;</font> i <font color='#5555FF'>=</font> <font color='#BB00BB'>noop</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+    <font color='#009900'>// Now apply the gates that constitute Shor's decoding to the input register
+</font>
+    <font face='Lucida Console'>(</font>cnot<font color='#5555FF'>&lt;</font><font color='#979000'>2</font>,<font color='#979000'>0</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,cnot<font color='#5555FF'>&lt;</font><font color='#979000'>2</font>,<font color='#979000'>0</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,cnot<font color='#5555FF'>&lt;</font><font color='#979000'>2</font>,<font color='#979000'>0</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>apply_gate_to</font><font face='Lucida Console'>(</font>reg<font face='Lucida Console'>)</font>;
+    <font face='Lucida Console'>(</font>cnot<font color='#5555FF'>&lt;</font><font color='#979000'>1</font>,<font color='#979000'>0</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,i,cnot<font color='#5555FF'>&lt;</font><font color='#979000'>1</font>,<font color='#979000'>0</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,i,cnot<font color='#5555FF'>&lt;</font><font color='#979000'>1</font>,<font color='#979000'>0</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,i<font face='Lucida Console'>)</font>.<font color='#BB00BB'>apply_gate_to</font><font face='Lucida Console'>(</font>reg<font face='Lucida Console'>)</font>;
+
+    <font face='Lucida Console'>(</font>toffoli<font color='#5555FF'>&lt;</font><font color='#979000'>0</font>,<font color='#979000'>1</font>,<font color='#979000'>2</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,toffoli<font color='#5555FF'>&lt;</font><font color='#979000'>0</font>,<font color='#979000'>1</font>,<font color='#979000'>2</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,toffoli<font color='#5555FF'>&lt;</font><font color='#979000'>0</font>,<font color='#979000'>1</font>,<font color='#979000'>2</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>apply_gate_to</font><font face='Lucida Console'>(</font>reg<font face='Lucida Console'>)</font>;
+
+    <font face='Lucida Console'>(</font>h,i,i,h,i,i,h,i,i<font face='Lucida Console'>)</font>.<font color='#BB00BB'>apply_gate_to</font><font face='Lucida Console'>(</font>reg<font face='Lucida Console'>)</font>;
+
+    <font face='Lucida Console'>(</font>cnot<font color='#5555FF'>&lt;</font><font color='#979000'>6</font>,<font color='#979000'>0</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,i,i<font face='Lucida Console'>)</font>.<font color='#BB00BB'>apply_gate_to</font><font face='Lucida Console'>(</font>reg<font face='Lucida Console'>)</font>;
+    <font face='Lucida Console'>(</font>cnot<font color='#5555FF'>&lt;</font><font color='#979000'>3</font>,<font color='#979000'>0</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,i,i,i,i,i<font face='Lucida Console'>)</font>.<font color='#BB00BB'>apply_gate_to</font><font face='Lucida Console'>(</font>reg<font face='Lucida Console'>)</font>;
+    <font face='Lucida Console'>(</font>toffoli<font color='#5555FF'>&lt;</font><font color='#979000'>0</font>,<font color='#979000'>3</font>,<font color='#979000'>6</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,i,i<font face='Lucida Console'>)</font>.<font color='#BB00BB'>apply_gate_to</font><font face='Lucida Console'>(</font>reg<font face='Lucida Console'>)</font>;
+
+    <font color='#009900'>// Now that we have decoded the value we don't need the extra 8 bits any more so 
+</font>    <font color='#009900'>// remove them from the register.
+</font>    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> <font color='#979000'>8</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+        reg.<font color='#BB00BB'>measure_and_remove_bit</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>,rnd<font face='Lucida Console'>)</font>;
+<b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<font color='#009900'>// This is the function we will use in Grover's search algorithm.  In this
+</font><font color='#009900'>// case the value we are searching for is 257.
+</font><font color='#0000FF'><u>bool</u></font> <b><a name='is_key'></a>is_key</b> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> n<font face='Lucida Console'>)</font>
+<b>{</b>
+    <font color='#0000FF'>return</font> n <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>257</font>;
+<b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'><u>int</u></font> bits<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>class</font> uf_gate;
+
+<font color='#0000FF'>namespace</font> dlib <b>{</b>
+<font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'><u>int</u></font> bits<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>struct</font> <b><a name='gate_traits'></a>gate_traits</b><font color='#5555FF'>&lt;</font>uf_gate<font color='#5555FF'>&lt;</font>bits<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font>
+<b>{</b>
+    <font color='#0000FF'>static</font> <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> num_bits <font color='#5555FF'>=</font> bits;
+    <font color='#0000FF'>static</font> <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> dims <font color='#5555FF'>=</font> dlib::qc_helpers::exp_2_n<font color='#5555FF'>&lt;</font>num_bits<font color='#5555FF'>&gt;</font>::value;
+<b>}</b>;<b>}</b>
+
+<font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'><u>int</u></font> bits<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>class</font> <b><a name='uf_gate'></a>uf_gate</b> : <font color='#0000FF'>public</font> gate_exp<font color='#5555FF'>&lt;</font>uf_gate<font color='#5555FF'>&lt;</font>bits<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font>
+<b>{</b>
+    <font color='#009900'>/*!
+        This gate represents the black box function in Grover's search algorithm.
+        That is, it is the gate defined as follows:
+            Uf|x&gt;|y&gt; = |x&gt;|y XOR is_key(x)&gt;
+
+        See the documentation for the gate_exp object for the details regarding
+        the compute_state_element() and operator() functions defined below.
+    !*/</font>
+<font color='#0000FF'>public</font>:
+    <b><a name='uf_gate'></a>uf_gate</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> : gate_exp<font color='#5555FF'>&lt;</font>uf_gate<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font><font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+
+    <font color='#0000FF'>static</font> <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> num_bits <font color='#5555FF'>=</font> gate_traits<font color='#5555FF'>&lt;</font>uf_gate<font color='#5555FF'>&gt;</font>::num_bits;
+    <font color='#0000FF'>static</font> <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> dims <font color='#5555FF'>=</font> gate_traits<font color='#5555FF'>&lt;</font>uf_gate<font color='#5555FF'>&gt;</font>::dims;
+
+    <font color='#0000FF'>const</font> qc_scalar_type <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> r, <font color='#0000FF'><u>long</u></font> c<font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> 
+    <b>{</b> 
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> output <font color='#5555FF'>=</font> c;
+        <font color='#009900'>// if the input control bit is set
+</font>        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>is_key</font><font face='Lucida Console'>(</font>output<font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font><font color='#979000'>1</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            output <font color='#5555FF'>=</font> output^<font color='#979000'>0x1</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font>r <font color='#5555FF'>=</font><font color='#5555FF'>=</font> output<font face='Lucida Console'>)</font>
+            <font color='#0000FF'>return</font> <font color='#979000'>1</font>;
+        <font color='#0000FF'>else</font>
+            <font color='#0000FF'>return</font> <font color='#979000'>0</font>;
+    <b>}</b>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> exp<font color='#5555FF'>&gt;</font>
+    qc_scalar_type <b><a name='compute_state_element'></a>compute_state_element</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&lt;</font>exp<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> reg,
+        <font color='#0000FF'><u>long</u></font> row_idx
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> output <font color='#5555FF'>=</font> row_idx;
+        <font color='#009900'>// if the input control bit is set
+</font>        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>is_key</font><font face='Lucida Console'>(</font>output<font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font><font color='#979000'>1</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            output <font color='#5555FF'>=</font> output^<font color='#979000'>0x1</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>return</font> <font color='#BB00BB'>reg</font><font face='Lucida Console'>(</font>output<font face='Lucida Console'>)</font>;
+    <b>}</b>
+<b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'><u>int</u></font> bits<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>class</font> w_gate;
+
+<font color='#0000FF'>namespace</font> dlib <b>{</b>
+<font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'><u>int</u></font> bits<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>struct</font> <b><a name='gate_traits'></a>gate_traits</b><font color='#5555FF'>&lt;</font>w_gate<font color='#5555FF'>&lt;</font>bits<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font>
+<b>{</b>
+    <font color='#0000FF'>static</font> <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> num_bits <font color='#5555FF'>=</font> bits;
+    <font color='#0000FF'>static</font> <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> dims <font color='#5555FF'>=</font> dlib::qc_helpers::exp_2_n<font color='#5555FF'>&lt;</font>num_bits<font color='#5555FF'>&gt;</font>::value;
+<b>}</b>; <b>}</b>
+
+<font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'><u>int</u></font> bits<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>class</font> <b><a name='w_gate'></a>w_gate</b> : <font color='#0000FF'>public</font> gate_exp<font color='#5555FF'>&lt;</font>w_gate<font color='#5555FF'>&lt;</font>bits<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font>
+<b>{</b>
+    <font color='#009900'>/*!
+        This is the W gate from the Grover algorithm
+    !*/</font>
+<font color='#0000FF'>public</font>:
+
+    <b><a name='w_gate'></a>w_gate</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> : gate_exp<font color='#5555FF'>&lt;</font>w_gate<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font><font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+
+    <font color='#0000FF'>static</font> <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> num_bits <font color='#5555FF'>=</font> gate_traits<font color='#5555FF'>&lt;</font>w_gate<font color='#5555FF'>&gt;</font>::num_bits;
+    <font color='#0000FF'>static</font> <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> dims <font color='#5555FF'>=</font> gate_traits<font color='#5555FF'>&lt;</font>w_gate<font color='#5555FF'>&gt;</font>::dims;
+
+    <font color='#0000FF'>const</font> qc_scalar_type <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> r, <font color='#0000FF'><u>long</u></font> c<font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> 
+    <b>{</b> 
+        qc_scalar_type res <font color='#5555FF'>=</font> <font color='#979000'>2.0</font><font color='#5555FF'>/</font>dims;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>r <font color='#5555FF'>!</font><font color='#5555FF'>=</font> c<font face='Lucida Console'>)</font>
+            <font color='#0000FF'>return</font> res;
+        <font color='#0000FF'>else</font>
+            <font color='#0000FF'>return</font> res <font color='#5555FF'>-</font> <font color='#979000'>1.0</font>;
+    <b>}</b>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> exp<font color='#5555FF'>&gt;</font>
+    qc_scalar_type <b><a name='compute_state_element'></a>compute_state_element</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&lt;</font>exp<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> reg,
+        <font color='#0000FF'><u>long</u></font> row_idx
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        qc_scalar_type temp <font color='#5555FF'>=</font> <font color='#BB00BB'>sum</font><font face='Lucida Console'>(</font>reg<font face='Lucida Console'>)</font><font color='#5555FF'>*</font><font color='#979000'>2.0</font><font color='#5555FF'>/</font>dims;
+        <font color='#009900'>// compute this value: temp = temp - reg(row_idx)*2.0/dims + reg(row_idx)*(2.0/dims - 1.0)
+</font>        temp <font color='#5555FF'>=</font> temp <font color='#5555FF'>-</font> <font color='#BB00BB'>reg</font><font face='Lucida Console'>(</font>row_idx<font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>return</font> temp;
+    <b>}</b>
+<b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<font color='#0000FF'><u>int</u></font> <b><a name='main'></a>main</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+<b>{</b>
+    <font color='#009900'>// seed the random number generator
+</font>    rnd.<font color='#BB00BB'>set_seed</font><font face='Lucida Console'>(</font><font color='#BB00BB'>cast_to_string</font><font face='Lucida Console'>(</font><font color='#BB00BB'>time</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+    <font color='#009900'>// Pick out some of the gates we will be using below
+</font>    <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> dlib::quantum_gates;
+    <font color='#0000FF'>const</font> gate<font color='#5555FF'>&lt;</font><font color='#979000'>1</font><font color='#5555FF'>&gt;</font> h <font color='#5555FF'>=</font> quantum_gates::<font color='#BB00BB'>hadamard</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    <font color='#0000FF'>const</font> gate<font color='#5555FF'>&lt;</font><font color='#979000'>1</font><font color='#5555FF'>&gt;</font> z <font color='#5555FF'>=</font> quantum_gates::<font color='#BB00BB'>z</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    <font color='#0000FF'>const</font> gate<font color='#5555FF'>&lt;</font><font color='#979000'>1</font><font color='#5555FF'>&gt;</font> x <font color='#5555FF'>=</font> quantum_gates::<font color='#BB00BB'>x</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    <font color='#0000FF'>const</font> gate<font color='#5555FF'>&lt;</font><font color='#979000'>1</font><font color='#5555FF'>&gt;</font> i <font color='#5555FF'>=</font> quantum_gates::<font color='#BB00BB'>noop</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+    quantum_register reg;
+
+    <font color='#009900'>// We will be doing the 12 qubit version of Grover's search algorithm.
+</font>    <font color='#0000FF'>const</font> <font color='#0000FF'><u>int</u></font> bits<font color='#5555FF'>=</font><font color='#979000'>12</font>;
+    reg.<font color='#BB00BB'>set_num_bits</font><font face='Lucida Console'>(</font>bits<font face='Lucida Console'>)</font>;
+
+
+    <font color='#009900'>// set the quantum register to its initial state
+</font>    <font face='Lucida Console'>(</font>i,i, i,i,i,i,i, i,i,i,i,x<font face='Lucida Console'>)</font>.<font color='#BB00BB'>apply_gate_to</font><font face='Lucida Console'>(</font>reg<font face='Lucida Console'>)</font>;
+
+    <font color='#009900'>// Print out the starting bits
+</font>    cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>starting bits: </font>";
+    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> i <font color='#5555FF'>=</font> reg.<font color='#BB00BB'>num_bits</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#979000'>1</font>; i <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#979000'>0</font>; <font color='#5555FF'>-</font><font color='#5555FF'>-</font>i<font face='Lucida Console'>)</font>
+        cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> reg.<font color='#BB00BB'>probability_of_bit</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>;
+    cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+
+
+    <font color='#009900'>// Now apply the Hadamard gate to all the input bits
+</font>    <font face='Lucida Console'>(</font>h,h, h,h,h,h,h, h,h,h,h,h<font face='Lucida Console'>)</font>.<font color='#BB00BB'>apply_gate_to</font><font face='Lucida Console'>(</font>reg<font face='Lucida Console'>)</font>;
+
+    <font color='#009900'>// Here we do the grover iteration
+</font>    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> j <font color='#5555FF'>=</font> <font color='#979000'>0</font>; j <font color='#5555FF'>&lt;</font> <font color='#979000'>35</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>j<font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font face='Lucida Console'>(</font>uf_gate<font color='#5555FF'>&lt;</font>bits<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>apply_gate_to</font><font face='Lucida Console'>(</font>reg<font face='Lucida Console'>)</font>;
+        <font face='Lucida Console'>(</font>w_gate<font color='#5555FF'>&lt;</font>bits<font color='#5555FF'>-</font><font color='#979000'>1</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,i<font face='Lucida Console'>)</font>.<font color='#BB00BB'>apply_gate_to</font><font face='Lucida Console'>(</font>reg<font face='Lucida Console'>)</font>;
+
+
+        cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> j <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'> probability: bit 1 = </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> reg.<font color='#BB00BB'>probability_of_bit</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>, bit 9 = </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> reg.<font color='#BB00BB'>probability_of_bit</font><font face='Lucida Console'>(</font><font color='#979000'>9</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+    <b>}</b>
+
+    cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+
+    <font color='#009900'>// Print out the final probability of measuring a 1 for each of the bits
+</font>    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> i <font color='#5555FF'>=</font> reg.<font color='#BB00BB'>num_bits</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#979000'>1</font>; i <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#979000'>1</font>; <font color='#5555FF'>-</font><font color='#5555FF'>-</font>i<font face='Lucida Console'>)</font>
+        cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>probability for bit </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> i <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'> = </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> reg.<font color='#BB00BB'>probability_of_bit</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+    cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+
+    cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>The value we want grover's search to find is 257 which means we should measure a bit pattern of 00100000001</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+    cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>Measured bits: </font>";
+    <font color='#009900'>// finally, measure all the bits and print out what they are.
+</font>    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> i <font color='#5555FF'>=</font> reg.<font color='#BB00BB'>num_bits</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#979000'>1</font>; i <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#979000'>1</font>; <font color='#5555FF'>-</font><font color='#5555FF'>-</font>i<font face='Lucida Console'>)</font>
+        cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> reg.<font color='#BB00BB'>measure_bit</font><font face='Lucida Console'>(</font>i,rnd<font face='Lucida Console'>)</font>;
+    cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+
+    
+
+
+
+    <font color='#009900'>// Now let's test out the Shor 9 bit encoding
+</font>    cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\n\n\nNow let's try playing around with Shor's 9bit error correcting code</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+
+    <font color='#009900'>// Reset the quantum register to contain a single bit
+</font>    reg.<font color='#BB00BB'>set_num_bits</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+    <font color='#009900'>// Set the state of this single qubit to some random mixture of the two computational bases
+</font>    reg.<font color='#BB00BB'>state_vector</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#BB00BB'>qc_scalar_type</font><font face='Lucida Console'>(</font>rnd.<font color='#BB00BB'>get_random_double</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,rnd.<font color='#BB00BB'>get_random_double</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+    reg.<font color='#BB00BB'>state_vector</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#BB00BB'>qc_scalar_type</font><font face='Lucida Console'>(</font>rnd.<font color='#BB00BB'>get_random_double</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,rnd.<font color='#BB00BB'>get_random_double</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+    <font color='#009900'>// Make sure the state of the quantum register is a unit vector
+</font>    reg.<font color='#BB00BB'>state_vector</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>/</font><font color='#5555FF'>=</font> <font color='#BB00BB'>sqrt</font><font face='Lucida Console'>(</font><font color='#BB00BB'>sum</font><font face='Lucida Console'>(</font><font color='#BB00BB'>norm</font><font face='Lucida Console'>(</font>reg.<font color='#BB00BB'>state_vector</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+    cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>state: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>trans</font><font face='Lucida Console'>(</font>reg.<font color='#BB00BB'>state_vector</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+    <font color='#BB00BB'>shor_encode</font><font face='Lucida Console'>(</font>reg<font face='Lucida Console'>)</font>;
+    cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>x bit corruption on bit 8</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+    <font face='Lucida Console'>(</font>x,i,i,i,i,i,i,i,i<font face='Lucida Console'>)</font>.<font color='#BB00BB'>apply_gate_to</font><font face='Lucida Console'>(</font>reg<font face='Lucida Console'>)</font>; <font color='#009900'>// mess up the high order bit 
+</font>    <font color='#BB00BB'>shor_decode</font><font face='Lucida Console'>(</font>reg<font face='Lucida Console'>)</font>; <font color='#009900'>// try to decode the register
+</font>
+    cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>state: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>trans</font><font face='Lucida Console'>(</font>reg.<font color='#BB00BB'>state_vector</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+    <font color='#BB00BB'>shor_encode</font><font face='Lucida Console'>(</font>reg<font face='Lucida Console'>)</font>;
+    cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>x bit corruption on bit 1</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+    <font face='Lucida Console'>(</font>i,i,i,i,i,i,i,x,i<font face='Lucida Console'>)</font>.<font color='#BB00BB'>apply_gate_to</font><font face='Lucida Console'>(</font>reg<font face='Lucida Console'>)</font>;
+    <font color='#BB00BB'>shor_decode</font><font face='Lucida Console'>(</font>reg<font face='Lucida Console'>)</font>;
+
+    cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>state: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>trans</font><font face='Lucida Console'>(</font>reg.<font color='#BB00BB'>state_vector</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+    <font color='#BB00BB'>shor_encode</font><font face='Lucida Console'>(</font>reg<font face='Lucida Console'>)</font>;
+    cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>z bit corruption on bit 8</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+    <font face='Lucida Console'>(</font>z,i,i,i,i,i,i,i,i<font face='Lucida Console'>)</font>.<font color='#BB00BB'>apply_gate_to</font><font face='Lucida Console'>(</font>reg<font face='Lucida Console'>)</font>;
+    <font color='#BB00BB'>shor_decode</font><font face='Lucida Console'>(</font>reg<font face='Lucida Console'>)</font>;
+
+    cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>state: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>trans</font><font face='Lucida Console'>(</font>reg.<font color='#BB00BB'>state_vector</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+    cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\nThe state of the input qubit survived all the corruptions in tact so the code works.</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+
+<b>}</b>
+
+
+
+</pre></body></html>

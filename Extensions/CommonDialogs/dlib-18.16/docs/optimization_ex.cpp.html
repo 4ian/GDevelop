@@ -1,0 +1,342 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - optimization_ex.cpp</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// The contents of this file are in the public domain. See LICENSE_FOR_EXAMPLE_PROGRAMS.txt
+</font><font color='#009900'>/*
+
+    This is an example illustrating the use the general purpose non-linear 
+    optimization routines from the dlib C++ Library.
+
+    The library provides implementations of the conjugate gradient,  BFGS,
+    L-BFGS, and BOBYQA optimization algorithms.  These algorithms allow you to
+    find the minimum of a function of many input variables.  This example walks
+    though a few of the ways you might put these routines to use.
+
+*/</font>
+
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>optimization.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>iostream<font color='#5555FF'>&gt;</font>
+
+
+<font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> std;
+<font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> dlib;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<font color='#009900'>// In dlib, the general purpose solvers optimize functions that take a column
+</font><font color='#009900'>// vector as input and return a double.  So here we make a typedef for a
+</font><font color='#009900'>// variable length column vector of doubles.  This is the type we will use to
+</font><font color='#009900'>// represent the input to our objective functions which we will be minimizing.
+</font><font color='#0000FF'>typedef</font> matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>0</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> column_vector;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// Below we create a few functions.  When you get down into main() you will see that
+</font><font color='#009900'>// we can use the optimization algorithms to find the minimums of these functions.
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<font color='#0000FF'><u>double</u></font> <b><a name='rosen'></a>rosen</b> <font face='Lucida Console'>(</font><font color='#0000FF'>const</font> column_vector<font color='#5555FF'>&amp;</font> m<font face='Lucida Console'>)</font>
+<font color='#009900'>/*
+    This function computes what is known as Rosenbrock's function.  It is 
+    a function of two input variables and has a global minimum at (1,1).
+    So when we use this function to test out the optimization algorithms
+    we will see that the minimum found is indeed at the point (1,1). 
+*/</font>
+<b>{</b>
+    <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> x <font color='#5555FF'>=</font> <font color='#BB00BB'>m</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>; 
+    <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> y <font color='#5555FF'>=</font> <font color='#BB00BB'>m</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+
+    <font color='#009900'>// compute Rosenbrock's function and return the result
+</font>    <font color='#0000FF'>return</font> <font color='#979000'>100.0</font><font color='#5555FF'>*</font><font color='#BB00BB'>pow</font><font face='Lucida Console'>(</font>y <font color='#5555FF'>-</font> x<font color='#5555FF'>*</font>x,<font color='#979000'>2</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> <font color='#BB00BB'>pow</font><font face='Lucida Console'>(</font><font color='#979000'>1</font> <font color='#5555FF'>-</font> x,<font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+<b>}</b>
+
+<font color='#009900'>// This is a helper function used while optimizing the rosen() function.  
+</font><font color='#0000FF'>const</font> column_vector <b><a name='rosen_derivative'></a>rosen_derivative</b> <font face='Lucida Console'>(</font><font color='#0000FF'>const</font> column_vector<font color='#5555FF'>&amp;</font> m<font face='Lucida Console'>)</font>
+<font color='#009900'>/*!
+    ensures
+        - returns the gradient vector for the rosen function
+!*/</font>
+<b>{</b>
+    <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> x <font color='#5555FF'>=</font> <font color='#BB00BB'>m</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+    <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> y <font color='#5555FF'>=</font> <font color='#BB00BB'>m</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+
+    <font color='#009900'>// make us a column vector of length 2
+</font>    column_vector <font color='#BB00BB'>res</font><font face='Lucida Console'>(</font><font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+
+    <font color='#009900'>// now compute the gradient vector
+</font>    <font color='#BB00BB'>res</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>400</font><font color='#5555FF'>*</font>x<font color='#5555FF'>*</font><font face='Lucida Console'>(</font>y<font color='#5555FF'>-</font>x<font color='#5555FF'>*</font>x<font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> <font color='#979000'>2</font><font color='#5555FF'>*</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font color='#5555FF'>-</font>x<font face='Lucida Console'>)</font>; <font color='#009900'>// derivative of rosen() with respect to x
+</font>    <font color='#BB00BB'>res</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>200</font><font color='#5555FF'>*</font><font face='Lucida Console'>(</font>y<font color='#5555FF'>-</font>x<font color='#5555FF'>*</font>x<font face='Lucida Console'>)</font>;              <font color='#009900'>// derivative of rosen() with respect to y
+</font>    <font color='#0000FF'>return</font> res;
+<b>}</b>
+
+<font color='#009900'>// This function computes the Hessian matrix for the rosen() fuction.  This is
+</font><font color='#009900'>// the matrix of second derivatives.
+</font>matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font> <b><a name='rosen_hessian'></a>rosen_hessian</b> <font face='Lucida Console'>(</font><font color='#0000FF'>const</font> column_vector<font color='#5555FF'>&amp;</font> m<font face='Lucida Console'>)</font>
+<b>{</b>
+    <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> x <font color='#5555FF'>=</font> <font color='#BB00BB'>m</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+    <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> y <font color='#5555FF'>=</font> <font color='#BB00BB'>m</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+
+    matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font> <font color='#BB00BB'>res</font><font face='Lucida Console'>(</font><font color='#979000'>2</font>,<font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+
+    <font color='#009900'>// now compute the second derivatives 
+</font>    <font color='#BB00BB'>res</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>1200</font><font color='#5555FF'>*</font>x<font color='#5555FF'>*</font>x <font color='#5555FF'>-</font> <font color='#979000'>400</font><font color='#5555FF'>*</font>y <font color='#5555FF'>+</font> <font color='#979000'>2</font>; <font color='#009900'>// second derivative with respect to x
+</font>    <font color='#BB00BB'>res</font><font face='Lucida Console'>(</font><font color='#979000'>1</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#BB00BB'>res</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>,<font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>400</font><font color='#5555FF'>*</font>x;   <font color='#009900'>// derivative with respect to x and y
+</font>    <font color='#BB00BB'>res</font><font face='Lucida Console'>(</font><font color='#979000'>1</font>,<font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>200</font>;                 <font color='#009900'>// second derivative with respect to y
+</font>    <font color='#0000FF'>return</font> res;
+<b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<font color='#0000FF'>class</font> <b><a name='test_function'></a>test_function</b>
+<b>{</b>
+    <font color='#009900'>/*
+        This object is an example of what is known as a "function object" in C++.
+        It is simply an object with an overloaded operator().  This means it can 
+        be used in a way that is similar to a normal C function.  The interesting
+        thing about this sort of function is that it can have state.  
+        
+        In this example, our test_function object contains a column_vector 
+        as its state and it computes the mean squared error between this 
+        stored column_vector and the arguments to its operator() function.
+
+        This is a very simple function, however, in general you could compute
+        any function you wanted here.  An example of a typical use would be 
+        to find the parameters of some regression function that minimized 
+        the mean squared error on a set of data.  In this case the arguments
+        to the operator() function would be the parameters of your regression
+        function.  You would loop over all your data samples and compute the output 
+        of the regression function for each data sample given the parameters and 
+        return a measure of the total error.   The dlib optimization functions 
+        could then be used to find the parameters that minimized the error.
+    */</font>
+<font color='#0000FF'>public</font>:
+
+    <b><a name='test_function'></a>test_function</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> column_vector<font color='#5555FF'>&amp;</font> input
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        target <font color='#5555FF'>=</font> input;
+    <b>}</b>
+
+    <font color='#0000FF'><u>double</u></font> <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font> <font color='#0000FF'>const</font> column_vector<font color='#5555FF'>&amp;</font> arg<font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        <font color='#009900'>// return the mean squared error between the target vector and the input vector
+</font>        <font color='#0000FF'>return</font> <font color='#BB00BB'>mean</font><font face='Lucida Console'>(</font><font color='#BB00BB'>squared</font><font face='Lucida Console'>(</font>target<font color='#5555FF'>-</font>arg<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#0000FF'>private</font>:
+    column_vector target;
+<b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<font color='#0000FF'>class</font> <b><a name='rosen_model'></a>rosen_model</b> 
+<b>{</b>
+    <font color='#009900'>/*!
+        This object is a "function model" which can be used with the
+        find_min_trust_region() routine.  
+    !*/</font>
+
+<font color='#0000FF'>public</font>:
+    <font color='#0000FF'>typedef</font> ::column_vector column_vector;
+    <font color='#0000FF'>typedef</font> matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font> general_matrix;
+
+    <font color='#0000FF'><u>double</u></font> <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> column_vector<font color='#5555FF'>&amp;</font> x
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> <font color='#BB00BB'>rosen</font><font face='Lucida Console'>(</font>x<font face='Lucida Console'>)</font>; <b>}</b>
+
+    <font color='#0000FF'><u>void</u></font> <b><a name='get_derivative_and_hessian'></a>get_derivative_and_hessian</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> column_vector<font color='#5555FF'>&amp;</font> x,
+        column_vector<font color='#5555FF'>&amp;</font> der,
+        general_matrix<font color='#5555FF'>&amp;</font> hess
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        der <font color='#5555FF'>=</font> <font color='#BB00BB'>rosen_derivative</font><font face='Lucida Console'>(</font>x<font face='Lucida Console'>)</font>;
+        hess <font color='#5555FF'>=</font> <font color='#BB00BB'>rosen_hessian</font><font face='Lucida Console'>(</font>x<font face='Lucida Console'>)</font>;
+    <b>}</b>
+<b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<font color='#0000FF'><u>int</u></font> <b><a name='main'></a>main</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+<b>{</b>
+    <font color='#0000FF'>try</font>
+    <b>{</b>
+        <font color='#009900'>// make a column vector of length 2
+</font>        column_vector <font color='#BB00BB'>starting_point</font><font face='Lucida Console'>(</font><font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+
+
+        <font color='#009900'>// Set the starting point to (4,8).  This is the point the optimization algorithm
+</font>        <font color='#009900'>// will start out from and it will move it closer and closer to the function's 
+</font>        <font color='#009900'>// minimum point.   So generally you want to try and compute a good guess that is
+</font>        <font color='#009900'>// somewhat near the actual optimum value.
+</font>        starting_point <font color='#5555FF'>=</font> <font color='#979000'>4</font>, <font color='#979000'>8</font>;
+
+        <font color='#009900'>// The first example below finds the minimum of the rosen() function and uses the
+</font>        <font color='#009900'>// analytical derivative computed by rosen_derivative().  Since it is very easy to
+</font>        <font color='#009900'>// make a mistake while coding a function like rosen_derivative() it is a good idea
+</font>        <font color='#009900'>// to compare your derivative function against a numerical approximation and see if
+</font>        <font color='#009900'>// the results are similar.  If they are very different then you probably made a 
+</font>        <font color='#009900'>// mistake.  So the first thing we do is compare the results at a test point: 
+</font>        cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>Difference between analytic derivative and numerical approximation of derivative: </font>" 
+              <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>length</font><font face='Lucida Console'>(</font><font color='#BB00BB'>derivative</font><font face='Lucida Console'>(</font>rosen<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>starting_point<font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> <font color='#BB00BB'>rosen_derivative</font><font face='Lucida Console'>(</font>starting_point<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+
+
+        cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>Find the minimum of the rosen function()</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+        <font color='#009900'>// Now we use the find_min() function to find the minimum point.  The first argument
+</font>        <font color='#009900'>// to this routine is the search strategy we want to use.  The second argument is the 
+</font>        <font color='#009900'>// stopping strategy.  Below I'm using the objective_delta_stop_strategy which just 
+</font>        <font color='#009900'>// says that the search should stop when the change in the function being optimized 
+</font>        <font color='#009900'>// is small enough.
+</font>
+        <font color='#009900'>// The other arguments to find_min() are the function to be minimized, its derivative, 
+</font>        <font color='#009900'>// then the starting point, and the last is an acceptable minimum value of the rosen() 
+</font>        <font color='#009900'>// function.  That is, if the algorithm finds any inputs to rosen() that gives an output 
+</font>        <font color='#009900'>// value &lt;= -1 then it will stop immediately.  Usually you supply a number smaller than 
+</font>        <font color='#009900'>// the actual global minimum.  So since the smallest output of the rosen function is 0 
+</font>        <font color='#009900'>// we just put -1 here which effectively causes this last argument to be disregarded.
+</font>
+        <font color='#BB00BB'>find_min</font><font face='Lucida Console'>(</font><font color='#BB00BB'>bfgs_search_strategy</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,  <font color='#009900'>// Use BFGS search algorithm
+</font>                 <font color='#BB00BB'>objective_delta_stop_strategy</font><font face='Lucida Console'>(</font><font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>7</font><font face='Lucida Console'>)</font>, <font color='#009900'>// Stop when the change in rosen() is less than 1e-7
+</font>                 rosen, rosen_derivative, starting_point, <font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+        <font color='#009900'>// Once the function ends the starting_point vector will contain the optimum point 
+</font>        <font color='#009900'>// of (1,1).
+</font>        cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>rosen solution:\n</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> starting_point <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+
+
+        <font color='#009900'>// Now let's try doing it again with a different starting point and the version
+</font>        <font color='#009900'>// of find_min() that doesn't require you to supply a derivative function.  
+</font>        <font color='#009900'>// This version will compute a numerical approximation of the derivative since 
+</font>        <font color='#009900'>// we didn't supply one to it.
+</font>        starting_point <font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>94</font>, <font color='#979000'>5.2</font>;
+        <font color='#BB00BB'>find_min_using_approximate_derivatives</font><font face='Lucida Console'>(</font><font color='#BB00BB'>bfgs_search_strategy</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,
+                                               <font color='#BB00BB'>objective_delta_stop_strategy</font><font face='Lucida Console'>(</font><font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>7</font><font face='Lucida Console'>)</font>,
+                                               rosen, starting_point, <font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+        <font color='#009900'>// Again the correct minimum point is found and stored in starting_point
+</font>        cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>rosen solution:\n</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> starting_point <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+
+
+        <font color='#009900'>// Here we repeat the same thing as above but this time using the L-BFGS 
+</font>        <font color='#009900'>// algorithm.  L-BFGS is very similar to the BFGS algorithm, however, BFGS 
+</font>        <font color='#009900'>// uses O(N^2) memory where N is the size of the starting_point vector.  
+</font>        <font color='#009900'>// The L-BFGS algorithm however uses only O(N) memory.  So if you have a 
+</font>        <font color='#009900'>// function of a huge number of variables the L-BFGS algorithm is probably 
+</font>        <font color='#009900'>// a better choice.
+</font>        starting_point <font color='#5555FF'>=</font> <font color='#979000'>0.8</font>, <font color='#979000'>1.3</font>;
+        <font color='#BB00BB'>find_min</font><font face='Lucida Console'>(</font><font color='#BB00BB'>lbfgs_search_strategy</font><font face='Lucida Console'>(</font><font color='#979000'>10</font><font face='Lucida Console'>)</font>,  <font color='#009900'>// The 10 here is basically a measure of how much memory L-BFGS will use.
+</font>                 <font color='#BB00BB'>objective_delta_stop_strategy</font><font face='Lucida Console'>(</font><font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>7</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>be_verbose</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,  <font color='#009900'>// Adding be_verbose() causes a message to be 
+</font>                                                                    <font color='#009900'>// printed for each iteration of optimization.
+</font>                 rosen, rosen_derivative, starting_point, <font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+
+        cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>rosen solution: \n</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> starting_point <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+
+        starting_point <font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>94</font>, <font color='#979000'>5.2</font>;
+        <font color='#BB00BB'>find_min_using_approximate_derivatives</font><font face='Lucida Console'>(</font><font color='#BB00BB'>lbfgs_search_strategy</font><font face='Lucida Console'>(</font><font color='#979000'>10</font><font face='Lucida Console'>)</font>,
+                                               <font color='#BB00BB'>objective_delta_stop_strategy</font><font face='Lucida Console'>(</font><font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>7</font><font face='Lucida Console'>)</font>,
+                                               rosen, starting_point, <font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+        cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>rosen solution: \n</font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> starting_point <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+
+
+
+
+        <font color='#009900'>// dlib also supports solving functions subject to bounds constraints on
+</font>        <font color='#009900'>// the variables.  So for example, if you wanted to find the minimizer
+</font>        <font color='#009900'>// of the rosen function where both input variables were in the range
+</font>        <font color='#009900'>// 0.1 to 0.8 you would do it like this:
+</font>        starting_point <font color='#5555FF'>=</font> <font color='#979000'>0.1</font>, <font color='#979000'>0.1</font>; <font color='#009900'>// Start with a valid point inside the constraint box.
+</font>        <font color='#BB00BB'>find_min_box_constrained</font><font face='Lucida Console'>(</font><font color='#BB00BB'>lbfgs_search_strategy</font><font face='Lucida Console'>(</font><font color='#979000'>10</font><font face='Lucida Console'>)</font>,  
+                                 <font color='#BB00BB'>objective_delta_stop_strategy</font><font face='Lucida Console'>(</font><font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>9</font><font face='Lucida Console'>)</font>,  
+                                 rosen, rosen_derivative, starting_point, <font color='#979000'>0.1</font>, <font color='#979000'>0.8</font><font face='Lucida Console'>)</font>;
+        <font color='#009900'>// Here we put the same [0.1 0.8] range constraint on each variable, however, you
+</font>        <font color='#009900'>// can put different bounds on each variable by passing in column vectors of
+</font>        <font color='#009900'>// constraints for the last two arguments rather than scalars.  
+</font>
+        cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>constrained rosen solution: \n</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> starting_point <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+
+        <font color='#009900'>// You can also use an approximate derivative like so:
+</font>        starting_point <font color='#5555FF'>=</font> <font color='#979000'>0.1</font>, <font color='#979000'>0.1</font>; 
+        <font color='#BB00BB'>find_min_box_constrained</font><font face='Lucida Console'>(</font><font color='#BB00BB'>bfgs_search_strategy</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,  
+                                 <font color='#BB00BB'>objective_delta_stop_strategy</font><font face='Lucida Console'>(</font><font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>9</font><font face='Lucida Console'>)</font>,  
+                                 rosen, <font color='#BB00BB'>derivative</font><font face='Lucida Console'>(</font>rosen<font face='Lucida Console'>)</font>, starting_point, <font color='#979000'>0.1</font>, <font color='#979000'>0.8</font><font face='Lucida Console'>)</font>;
+        cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>constrained rosen solution: \n</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> starting_point <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+
+
+
+
+        <font color='#009900'>// In many cases, it is useful if we also provide second derivative information
+</font>        <font color='#009900'>// to the optimizers.  Two examples of how we can do that are shown below.  
+</font>        starting_point <font color='#5555FF'>=</font> <font color='#979000'>0.8</font>, <font color='#979000'>1.3</font>;
+        <font color='#BB00BB'>find_min</font><font face='Lucida Console'>(</font><font color='#BB00BB'>newton_search_strategy</font><font face='Lucida Console'>(</font>rosen_hessian<font face='Lucida Console'>)</font>,
+                 <font color='#BB00BB'>objective_delta_stop_strategy</font><font face='Lucida Console'>(</font><font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>7</font><font face='Lucida Console'>)</font>,
+                 rosen,
+                 rosen_derivative,
+                 starting_point,
+                 <font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+        cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>rosen solution: \n</font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> starting_point <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+
+        <font color='#009900'>// We can also use find_min_trust_region(), which is also a method which uses
+</font>        <font color='#009900'>// second derivatives.  For some kinds of non-convex function it may be more
+</font>        <font color='#009900'>// reliable than using a newton_search_strategy with find_min().
+</font>        starting_point <font color='#5555FF'>=</font> <font color='#979000'>0.8</font>, <font color='#979000'>1.3</font>;
+        <font color='#BB00BB'>find_min_trust_region</font><font face='Lucida Console'>(</font><font color='#BB00BB'>objective_delta_stop_strategy</font><font face='Lucida Console'>(</font><font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>7</font><font face='Lucida Console'>)</font>,
+            <font color='#BB00BB'>rosen_model</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, 
+            starting_point, 
+            <font color='#979000'>10</font> <font color='#009900'>// initial trust region radius
+</font>        <font face='Lucida Console'>)</font>;
+        cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>rosen solution: \n</font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> starting_point <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+
+
+
+
+        <font color='#009900'>// Now let's look at using the test_function object with the optimization 
+</font>        <font color='#009900'>// functions.  
+</font>        cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\nFind the minimum of the test_function</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+
+        column_vector <font color='#BB00BB'>target</font><font face='Lucida Console'>(</font><font color='#979000'>4</font><font face='Lucida Console'>)</font>;
+        starting_point.<font color='#BB00BB'>set_size</font><font face='Lucida Console'>(</font><font color='#979000'>4</font><font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// This variable will be used as the target of the test_function.   So,
+</font>        <font color='#009900'>// our simple test_function object will have a global minimum at the
+</font>        <font color='#009900'>// point given by the target.  We will then use the optimization 
+</font>        <font color='#009900'>// routines to find this minimum value.
+</font>        target <font color='#5555FF'>=</font> <font color='#979000'>3</font>, <font color='#979000'>5</font>, <font color='#979000'>1</font>, <font color='#979000'>7</font>;
+
+        <font color='#009900'>// set the starting point far from the global minimum
+</font>        starting_point <font color='#5555FF'>=</font> <font color='#979000'>1</font>,<font color='#979000'>2</font>,<font color='#979000'>3</font>,<font color='#979000'>4</font>;
+        <font color='#BB00BB'>find_min_using_approximate_derivatives</font><font face='Lucida Console'>(</font><font color='#BB00BB'>bfgs_search_strategy</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,
+                                               <font color='#BB00BB'>objective_delta_stop_strategy</font><font face='Lucida Console'>(</font><font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>7</font><font face='Lucida Console'>)</font>,
+                                               <font color='#BB00BB'>test_function</font><font face='Lucida Console'>(</font>target<font face='Lucida Console'>)</font>, starting_point, <font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+        <font color='#009900'>// At this point the correct value of (3,5,1,7) should be found and stored in starting_point
+</font>        cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>test_function solution:\n</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> starting_point <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+
+        <font color='#009900'>// Now let's try it again with the conjugate gradient algorithm.
+</font>        starting_point <font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>4</font>,<font color='#979000'>5</font>,<font color='#979000'>99</font>,<font color='#979000'>3</font>;
+        <font color='#BB00BB'>find_min_using_approximate_derivatives</font><font face='Lucida Console'>(</font><font color='#BB00BB'>cg_search_strategy</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,
+                                               <font color='#BB00BB'>objective_delta_stop_strategy</font><font face='Lucida Console'>(</font><font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>7</font><font face='Lucida Console'>)</font>,
+                                               <font color='#BB00BB'>test_function</font><font face='Lucida Console'>(</font>target<font face='Lucida Console'>)</font>, starting_point, <font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+        cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>test_function solution:\n</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> starting_point <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+
+
+
+        <font color='#009900'>// Finally, let's try the BOBYQA algorithm.  This is a technique specially
+</font>        <font color='#009900'>// designed to minimize a function in the absence of derivative information.  
+</font>        <font color='#009900'>// Generally speaking, it is the method of choice if derivatives are not available.
+</font>        starting_point <font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>4</font>,<font color='#979000'>5</font>,<font color='#979000'>99</font>,<font color='#979000'>3</font>;
+        <font color='#BB00BB'>find_min_bobyqa</font><font face='Lucida Console'>(</font><font color='#BB00BB'>test_function</font><font face='Lucida Console'>(</font>target<font face='Lucida Console'>)</font>, 
+                        starting_point, 
+                        <font color='#979000'>9</font>,    <font color='#009900'>// number of interpolation points
+</font>                        uniform_matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#979000'>4</font>,<font color='#979000'>1</font>, <font color='#5555FF'>-</font><font color='#979000'>1e100</font><font face='Lucida Console'>)</font>,  <font color='#009900'>// lower bound constraint
+</font>                        uniform_matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#979000'>4</font>,<font color='#979000'>1</font>, <font color='#979000'>1e100</font><font face='Lucida Console'>)</font>,   <font color='#009900'>// upper bound constraint
+</font>                        <font color='#979000'>10</font>,    <font color='#009900'>// initial trust region radius
+</font>                        <font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>6</font>,  <font color='#009900'>// stopping trust region radius
+</font>                        <font color='#979000'>100</font>    <font color='#009900'>// max number of objective function evaluations
+</font>        <font face='Lucida Console'>)</font>;
+        cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>test_function solution:\n</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> starting_point <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+
+    <b>}</b>
+    <font color='#0000FF'>catch</font> <font face='Lucida Console'>(</font>std::exception<font color='#5555FF'>&amp;</font> e<font face='Lucida Console'>)</font>
+    <b>{</b>
+        cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> e.<font color='#BB00BB'>what</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+    <b>}</b>
+<b>}</b>
+
+
+</pre></body></html>

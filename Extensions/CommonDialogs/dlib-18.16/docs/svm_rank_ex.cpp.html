@@ -1,0 +1,154 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - svm_rank_ex.cpp</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// The contents of this file are in the public domain. See LICENSE_FOR_EXAMPLE_PROGRAMS.txt
+</font><font color='#009900'>/*
+
+    This is an example illustrating the use of the SVM-Rank tool from the dlib
+    C++ Library.  This is a tool useful for learning to rank objects.  For
+    example, you might use it to learn to rank web pages in response to a
+    user's query.  The idea being to rank the most relevant pages higher than
+    non-relevant pages.
+
+
+    In this example, we will create a simple test dataset and show how to learn
+    a ranking function from it.  The purpose of the function will be to give
+    "relevant" objects higher scores than "non-relevant" objects.  The idea is
+    that you use this score to order the objects so that the most relevant
+    objects come to the top of the ranked list.
+    
+
+
+    Note that we use dense vectors (i.e. dlib::matrix objects) in this example,
+    however, the ranking tools can also use sparse vectors as well.  See
+    <a href="svm_sparse_ex.cpp.html">svm_sparse_ex.cpp</a> for an example.
+*/</font>
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>svm.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>iostream<font color='#5555FF'>&gt;</font>
+
+
+<font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> std;
+<font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> dlib;
+
+
+<font color='#0000FF'><u>int</u></font> <b><a name='main'></a>main</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+<b>{</b>
+    <font color='#0000FF'>try</font>
+    <b>{</b>
+        <font color='#009900'>// Make a typedef for the kind of object we will be ranking.  In this
+</font>        <font color='#009900'>// example, we are ranking 2-dimensional vectors.  
+</font>        <font color='#0000FF'>typedef</font> matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>2</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> sample_type;
+
+
+        <font color='#009900'>// Now let's make some testing data.  To make it really simple, let's
+</font>        <font color='#009900'>// suppose that vectors with positive values in the first dimension
+</font>        <font color='#009900'>// should rank higher than other vectors.  So what we do is make
+</font>        <font color='#009900'>// examples of relevant (i.e. high ranking) and non-relevant (i.e. low
+</font>        <font color='#009900'>// ranking) vectors and store them into a ranking_pair object like so:
+</font>        ranking_pair<font color='#5555FF'>&lt;</font>sample_type<font color='#5555FF'>&gt;</font> data;
+        sample_type samp;
+
+        <font color='#009900'>// Make one relevant example.
+</font>        samp <font color='#5555FF'>=</font> <font color='#979000'>1</font>, <font color='#979000'>0</font>; 
+        data.relevant.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>samp<font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// Now make a non-relevant example.
+</font>        samp <font color='#5555FF'>=</font> <font color='#979000'>0</font>, <font color='#979000'>1</font>; 
+        data.nonrelevant.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>samp<font face='Lucida Console'>)</font>;
+
+
+        <font color='#009900'>// Now that we have some data, we can use a machine learning method to
+</font>        <font color='#009900'>// learn a function that will give high scores to the relevant vectors
+</font>        <font color='#009900'>// and low scores to the non-relevant vectors.
+</font>
+        <font color='#009900'>// The first thing we do is select the kernel we want to use.  For the
+</font>        <font color='#009900'>// svm_rank_trainer there are only two options.  The linear_kernel and
+</font>        <font color='#009900'>// sparse_linear_kernel.  The later is used if you want to use sparse
+</font>        <font color='#009900'>// vectors to represent your objects.  Since we are using dense vectors
+</font>        <font color='#009900'>// (i.e. dlib::matrix objects to represent the vectors) we use the
+</font>        <font color='#009900'>// linear_kernel.
+</font>        <font color='#0000FF'>typedef</font> linear_kernel<font color='#5555FF'>&lt;</font>sample_type<font color='#5555FF'>&gt;</font> kernel_type;
+
+        <font color='#009900'>// Now make a trainer and tell it to learn a ranking function based on
+</font>        <font color='#009900'>// our data.
+</font>        svm_rank_trainer<font color='#5555FF'>&lt;</font>kernel_type<font color='#5555FF'>&gt;</font> trainer;
+        decision_function<font color='#5555FF'>&lt;</font>kernel_type<font color='#5555FF'>&gt;</font> rank <font color='#5555FF'>=</font> trainer.<font color='#BB00BB'>train</font><font face='Lucida Console'>(</font>data<font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// Now if you call rank on a vector it will output a ranking score.  In
+</font>        <font color='#009900'>// particular, the ranking score for relevant vectors should be larger
+</font>        <font color='#009900'>// than the score for non-relevant vectors.  
+</font>        cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>ranking score for a relevant vector:     </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>rank</font><font face='Lucida Console'>(</font>data.relevant[<font color='#979000'>0</font>]<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+        cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>ranking score for a non-relevant vector: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>rank</font><font face='Lucida Console'>(</font>data.nonrelevant[<font color='#979000'>0</font>]<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+        <font color='#009900'>// These output the following:
+</font>        <font color='#009900'>/*
+            ranking score for a relevant vector:     0.5
+            ranking score for a non-relevant vector: -0.5
+        */</font>
+
+
+        <font color='#009900'>// If we want an overall measure of ranking accuracy we can compute the
+</font>        <font color='#009900'>// ordering accuracy and mean average precision values by calling
+</font>        <font color='#009900'>// test_ranking_function().  In this case, the ordering accuracy tells
+</font>        <font color='#009900'>// us how often a non-relevant vector was ranked ahead of a relevant
+</font>        <font color='#009900'>// vector.  This function will return a 1 by 2 matrix containing these
+</font>        <font color='#009900'>// measures.  In this case, it returns 1 1 indicating that the rank
+</font>        <font color='#009900'>// function outputs a perfect ranking.
+</font>        cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>testing (ordering accuracy, mean average precision): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>test_ranking_function</font><font face='Lucida Console'>(</font>rank, data<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+
+        <font color='#009900'>// We can also see the ranking weights:
+</font>        cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>learned ranking weights: \n</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> rank.<font color='#BB00BB'>basis_vectors</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+        <font color='#009900'>// In this case they are:
+</font>        <font color='#009900'>//  0.5 
+</font>        <font color='#009900'>// -0.5 
+</font>
+
+
+
+
+        <font color='#009900'>// In the above example, our data contains just two sets of objects.
+</font>        <font color='#009900'>// The relevant set and non-relevant set.  The trainer is attempting to
+</font>        <font color='#009900'>// find a ranking function that gives every relevant vector a higher
+</font>        <font color='#009900'>// score than every non-relevant vector.  Sometimes what you want to do
+</font>        <font color='#009900'>// is a little more complex than this. 
+</font>        <font color='#009900'>//
+</font>        <font color='#009900'>// For example, in the web page ranking example we have to rank pages
+</font>        <font color='#009900'>// based on a user's query.  In this case, each query will have its own
+</font>        <font color='#009900'>// set of relevant and non-relevant documents.  What might be relevant
+</font>        <font color='#009900'>// to one query may well be non-relevant to another.  So in this case
+</font>        <font color='#009900'>// we don't have a single global set of relevant web pages and another
+</font>        <font color='#009900'>// set of non-relevant web pages.  
+</font>        <font color='#009900'>//
+</font>        <font color='#009900'>// To handle cases like this, we can simply give multiple ranking_pair
+</font>        <font color='#009900'>// instances to the trainer.  Therefore, each ranking_pair would
+</font>        <font color='#009900'>// represent the relevant/non-relevant sets for a particular query.  An
+</font>        <font color='#009900'>// example is shown below (for simplicity, we reuse our data from above
+</font>        <font color='#009900'>// to make 4 identical "queries").
+</font>
+        std::vector<font color='#5555FF'>&lt;</font>ranking_pair<font color='#5555FF'>&lt;</font>sample_type<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> queries;
+        queries.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>data<font face='Lucida Console'>)</font>;
+        queries.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>data<font face='Lucida Console'>)</font>;
+        queries.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>data<font face='Lucida Console'>)</font>;
+        queries.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>data<font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// We train just as before.  
+</font>        rank <font color='#5555FF'>=</font> trainer.<font color='#BB00BB'>train</font><font face='Lucida Console'>(</font>queries<font face='Lucida Console'>)</font>;
+
+
+        <font color='#009900'>// Now that we have multiple ranking_pair instances, we can also use
+</font>        <font color='#009900'>// cross_validate_ranking_trainer().  This performs cross-validation by
+</font>        <font color='#009900'>// splitting the queries up into folds.  That is, it lets the trainer
+</font>        <font color='#009900'>// train on a subset of ranking_pair instances and tests on the rest.
+</font>        <font color='#009900'>// It does this over 4 different splits and returns the overall ranking
+</font>        <font color='#009900'>// accuracy based on the held out data.  Just like test_ranking_function(),
+</font>        <font color='#009900'>// it reports both the ordering accuracy and mean average precision.
+</font>        cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>cross-validation (ordering accuracy, mean average precision): </font>" 
+             <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>cross_validate_ranking_trainer</font><font face='Lucida Console'>(</font>trainer, queries, <font color='#979000'>4</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+
+    <b>}</b>
+    <font color='#0000FF'>catch</font> <font face='Lucida Console'>(</font>std::exception<font color='#5555FF'>&amp;</font> e<font face='Lucida Console'>)</font>
+    <b>{</b>
+        cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> e.<font color='#BB00BB'>what</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+    <b>}</b>
+<b>}</b> 
+
+
+</pre></body></html>

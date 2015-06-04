@@ -1,0 +1,43 @@
+<?xml version='1.0' encoding='ISO-8859-1'?>
+<?xml-stylesheet type='text/xsl' href='image_metadata_stylesheet.xsl'?>
+<dataset>
+<name>Testing faces</name>
+<comment>These are images from the PASCAL VOC 2011 dataset.</comment>
+<images>
+  <image file='2008_002470.jpg'>
+    <box top='181' left='274' width='52' height='53'/>
+    <box top='156' left='55' width='44' height='44'/>
+    <box top='166' left='146' width='37' height='37'/>
+    <box top='55' left='329' width='44' height='44'/>
+    <box top='74' left='233' width='44' height='44'/>
+    <box top='86' left='178' width='37' height='37'/>
+  </image>
+  <image file='2008_002506.jpg'>
+    <box top='78' left='329' width='109' height='109'/>
+    <box top='95' left='224' width='91' height='91'/>
+    <box top='65' left='125' width='90' height='91'/>
+  </image>
+  <image file='2008_004176.jpg'>
+    <box top='230' left='206' width='37' height='37'/>
+    <box top='118' left='162' width='37' height='37'/>
+    <box top='82' left='190' width='37' height='37'/>
+    <box top='78' left='326' width='37' height='37'/>
+    <box top='98' left='222' width='37' height='37'/>
+    <box top='86' left='110' width='37' height='37'/>
+    <box top='102' left='282' width='37' height='37'/>
+  </image>
+  <image file='2008_007676.jpg'>
+    <box top='62' left='226' width='37' height='37'/>
+    <box top='113' left='194' width='44' height='44'/>
+    <box top='130' left='262' width='37' height='37'/>
+    <box top='134' left='366' width='37' height='37'/>
+    <box top='122' left='314' width='37' height='37'/>
+    <box top='141' left='107' width='52' height='53'/>
+    <box top='84' left='137' width='44' height='44'/>
+  </image>
+  <image file='2009_004587.jpg'>
+    <box top='46' left='154' width='75' height='76'/>
+    <box top='280' left='266' width='63' height='63'/>
+  </image>
+</images>
+</dataset>

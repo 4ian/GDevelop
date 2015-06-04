@@ -1,0 +1,99 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - svr_ex.cpp</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// The contents of this file are in the public domain. See LICENSE_FOR_EXAMPLE_PROGRAMS.txt
+</font><font color='#009900'>/*
+    This is an example illustrating the use of the epsilon-insensitive support vector 
+    regression object from the dlib C++ Library.
+
+    In this example we will draw some points from the sinc() function and do a
+    non-linear regression on them.
+*/</font>
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>iostream<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>vector<font color='#5555FF'>&gt;</font>
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>svm.h<font color='#5555FF'>&gt;</font>
+
+<font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> std;
+<font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> dlib;
+
+<font color='#009900'>// Here is the sinc function we will be trying to learn with the svr_trainer 
+</font><font color='#009900'>// object.
+</font><font color='#0000FF'><u>double</u></font> <b><a name='sinc'></a>sinc</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>double</u></font> x<font face='Lucida Console'>)</font>
+<b>{</b>
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>x <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+        <font color='#0000FF'>return</font> <font color='#979000'>1</font>;
+    <font color='#0000FF'>return</font> <font color='#BB00BB'>sin</font><font face='Lucida Console'>(</font>x<font face='Lucida Console'>)</font><font color='#5555FF'>/</font>x;
+<b>}</b>
+
+<font color='#0000FF'><u>int</u></font> <b><a name='main'></a>main</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+<b>{</b>
+    <font color='#009900'>// Here we declare that our samples will be 1 dimensional column vectors.  
+</font>    <font color='#0000FF'>typedef</font> matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>1</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> sample_type;
+
+    <font color='#009900'>// Now we are making a typedef for the kind of kernel we want to use.  I picked the
+</font>    <font color='#009900'>// radial basis kernel because it only has one parameter and generally gives good
+</font>    <font color='#009900'>// results without much fiddling.
+</font>    <font color='#0000FF'>typedef</font> radial_basis_kernel<font color='#5555FF'>&lt;</font>sample_type<font color='#5555FF'>&gt;</font> kernel_type;
+
+
+    std::vector<font color='#5555FF'>&lt;</font>sample_type<font color='#5555FF'>&gt;</font> samples;
+    std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font> targets;
+
+    <font color='#009900'>// The first thing we do is pick a few training points from the sinc() function.
+</font>    sample_type m;
+    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>double</u></font> x <font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>10</font>; x <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#979000'>4</font>; x <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#BB00BB'>m</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> x;
+
+        samples.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>m<font face='Lucida Console'>)</font>;
+        targets.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font><font color='#BB00BB'>sinc</font><font face='Lucida Console'>(</font>x<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+    <font color='#009900'>// Now setup a SVR trainer object.  It has three parameters, the kernel and
+</font>    <font color='#009900'>// two parameters specific to SVR.  
+</font>    svr_trainer<font color='#5555FF'>&lt;</font>kernel_type<font color='#5555FF'>&gt;</font> trainer;
+    trainer.<font color='#BB00BB'>set_kernel</font><font face='Lucida Console'>(</font><font color='#BB00BB'>kernel_type</font><font face='Lucida Console'>(</font><font color='#979000'>0.1</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+    <font color='#009900'>// This parameter is the usual regularization parameter.  It determines the trade-off 
+</font>    <font color='#009900'>// between trying to reduce the training error or allowing more errors but hopefully 
+</font>    <font color='#009900'>// improving the generalization of the resulting function.  Larger values encourage exact 
+</font>    <font color='#009900'>// fitting while smaller values of C may encourage better generalization.
+</font>    trainer.<font color='#BB00BB'>set_c</font><font face='Lucida Console'>(</font><font color='#979000'>10</font><font face='Lucida Console'>)</font>;
+
+    <font color='#009900'>// Epsilon-insensitive regression means we do regression but stop trying to fit a data 
+</font>    <font color='#009900'>// point once it is "close enough" to its target value.  This parameter is the value that 
+</font>    <font color='#009900'>// controls what we mean by "close enough".  In this case, I'm saying I'm happy if the
+</font>    <font color='#009900'>// resulting regression function gets within 0.001 of the target value.
+</font>    trainer.<font color='#BB00BB'>set_epsilon_insensitivity</font><font face='Lucida Console'>(</font><font color='#979000'>0.001</font><font face='Lucida Console'>)</font>;
+
+    <font color='#009900'>// Now do the training and save the results
+</font>    decision_function<font color='#5555FF'>&lt;</font>kernel_type<font color='#5555FF'>&gt;</font> df <font color='#5555FF'>=</font> trainer.<font color='#BB00BB'>train</font><font face='Lucida Console'>(</font>samples, targets<font face='Lucida Console'>)</font>;
+
+    <font color='#009900'>// now we output the value of the sinc function for a few test points as well as the 
+</font>    <font color='#009900'>// value predicted by SVR.
+</font>    <font color='#BB00BB'>m</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>2.5</font>; cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>sinc</font><font face='Lucida Console'>(</font><font color='#BB00BB'>m</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>   </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>df</font><font face='Lucida Console'>(</font>m<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+    <font color='#BB00BB'>m</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>0.1</font>; cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>sinc</font><font face='Lucida Console'>(</font><font color='#BB00BB'>m</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>   </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>df</font><font face='Lucida Console'>(</font>m<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+    <font color='#BB00BB'>m</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>4</font>;  cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>sinc</font><font face='Lucida Console'>(</font><font color='#BB00BB'>m</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>   </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>df</font><font face='Lucida Console'>(</font>m<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+    <font color='#BB00BB'>m</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>5.0</font>; cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>sinc</font><font face='Lucida Console'>(</font><font color='#BB00BB'>m</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>   </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>df</font><font face='Lucida Console'>(</font>m<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+
+    <font color='#009900'>// The output is as follows:
+</font>    <font color='#009900'>//  0.239389   0.23905
+</font>    <font color='#009900'>//  0.998334   0.997331
+</font>    <font color='#009900'>// -0.189201   -0.187636
+</font>    <font color='#009900'>// -0.191785   -0.218924
+</font>
+    <font color='#009900'>// The first column is the true value of the sinc function and the second
+</font>    <font color='#009900'>// column is the output from the SVR estimate.  
+</font>
+    <font color='#009900'>// We can also do 5-fold cross-validation and find the mean squared error and R-squared
+</font>    <font color='#009900'>// values.  Note that we need to randomly shuffle the samples first.  See the <a href="svm_ex.cpp.html">svm_ex.cpp</a> 
+</font>    <font color='#009900'>// for a discussion of why this is important. 
+</font>    <font color='#BB00BB'>randomize_samples</font><font face='Lucida Console'>(</font>samples, targets<font face='Lucida Console'>)</font>;
+    cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>MSE and R-Squared: </font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>cross_validate_regression_trainer</font><font face='Lucida Console'>(</font>trainer, samples, targets, <font color='#979000'>5</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+    <font color='#009900'>// The output is: 
+</font>    <font color='#009900'>// MSE and R-Squared: 1.65984e-05    0.999901
+</font><b>}</b>
+
+
+
+</pre></body></html>

@@ -1,0 +1,548 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - pixel.cpp</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2007  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font>
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>sstream<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>string<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>cstdlib<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>ctime<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>pixel.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>matrix.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>image_io.h<font color='#5555FF'>&gt;</font>
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='tester.h.html'>tester.h</a>"
+
+<font color='#0000FF'>namespace</font>  
+<b>{</b>
+    <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> test;
+    <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> dlib;
+    <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> std;
+
+    logger <b><a name='dlog'></a>dlog</b><font face='Lucida Console'>(</font>"<font color='#CC0000'>test.pixel</font>"<font face='Lucida Console'>)</font>;
+
+
+    <font color='#0000FF'><u>void</u></font> <b><a name='pixel_test'></a>pixel_test</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font>
+    <font color='#009900'>/*!
+        ensures
+            - runs tests on pixel objects and functions for compliance with the specs 
+    !*/</font>
+    <b>{</b>        
+
+        <font color='#BB00BB'>print_spinner</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> p_gray;
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>short</u></font> p_gray16;
+        <font color='#0000FF'><u>long</u></font> p_int;
+        <font color='#0000FF'><u>float</u></font> p_float;
+        <font color='#0000FF'><u>signed</u></font> <font color='#0000FF'><u>char</u></font> p_schar;
+        rgb_pixel p_rgb;
+        hsi_pixel p_hsi, p_hsi2;
+        rgb_alpha_pixel p_rgba;
+
+        <font color='#BB00BB'>assign_pixel</font><font face='Lucida Console'>(</font>p_int, <font color='#979000'>0.0f</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>assign_pixel</font><font face='Lucida Console'>(</font>p_float, <font color='#979000'>0.0f</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>assign_pixel</font><font face='Lucida Console'>(</font>p_schar, <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+
+        <font color='#BB00BB'>assign_pixel</font><font face='Lucida Console'>(</font>p_gray, <font color='#5555FF'>-</font><font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>assign_pixel</font><font face='Lucida Console'>(</font>p_rgb,<font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>assign_pixel</font><font face='Lucida Console'>(</font>p_hsi, <font color='#5555FF'>-</font><font color='#979000'>4</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>assign_pixel</font><font face='Lucida Console'>(</font>p_rgba, p_int<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>assign_pixel</font><font face='Lucida Console'>(</font>p_gray16,<font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>p_int <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>p_float <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>p_schar <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>p_gray <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>p_gray16 <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>p_rgb.red <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>p_rgb.green <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>p_rgb.blue <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>p_rgba.red <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>p_rgba.green <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>p_rgba.blue <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>p_rgba.alpha <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>255</font><font face='Lucida Console'>)</font>;
+
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>p_hsi.h <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>p_hsi.s <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>p_hsi.i <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+
+        <font color='#BB00BB'>assign_pixel</font><font face='Lucida Console'>(</font>p_gray,<font color='#979000'>10</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>assign_pixel</font><font face='Lucida Console'>(</font>p_gray16,<font color='#979000'>10</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>assign_pixel</font><font face='Lucida Console'>(</font>p_rgb,<font color='#979000'>10</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>assign_pixel</font><font face='Lucida Console'>(</font>p_hsi,<font color='#979000'>10</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>assign_pixel</font><font face='Lucida Console'>(</font>p_rgba,<font color='#979000'>10</font><font face='Lucida Console'>)</font>;
+
+        <font color='#BB00BB'>assign_pixel</font><font face='Lucida Console'>(</font>p_int, <font color='#5555FF'>-</font><font color='#979000'>10</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>assign_pixel</font><font face='Lucida Console'>(</font>p_float, <font color='#5555FF'>-</font><font color='#979000'>10</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>assign_pixel</font><font face='Lucida Console'>(</font>p_schar, <font color='#5555FF'>-</font><font color='#979000'>10</font><font face='Lucida Console'>)</font>;
+
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>p_int <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>10</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>p_float <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>10</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>p_schar <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>10</font><font face='Lucida Console'>)</font>;
+
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>p_gray <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>10</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>p_gray16 <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>10</font><font face='Lucida Console'>)</font>;
+
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>p_rgb.red <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>10</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>p_rgb.green <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>10</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>p_rgb.blue <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>10</font><font face='Lucida Console'>)</font>;
+
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>p_rgba.red <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>10</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>p_rgba.green <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>10</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>p_rgba.blue <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>10</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>p_rgba.alpha <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>255</font><font face='Lucida Console'>)</font>;
+
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>p_hsi.h <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>p_hsi.s <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>p_hsi.i <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>10</font><font face='Lucida Console'>)</font>;
+
+        <font color='#BB00BB'>assign_pixel</font><font face='Lucida Console'>(</font>p_gray16,<font color='#979000'>12345</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>p_gray16 <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>12345</font><font face='Lucida Console'>)</font>;
+
+        <font color='#BB00BB'>assign_pixel</font><font face='Lucida Console'>(</font>p_float,<font color='#979000'>3.141</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>p_float <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>3.141f</font><font face='Lucida Console'>)</font>;
+
+        p_rgb.red <font color='#5555FF'>=</font> <font color='#979000'>255</font>;
+        p_rgb.green <font color='#5555FF'>=</font> <font color='#979000'>100</font>;
+        p_rgb.blue <font color='#5555FF'>=</font> <font color='#979000'>50</font>;
+
+        p_rgba.alpha <font color='#5555FF'>=</font> <font color='#979000'>4</font>;
+        <font color='#BB00BB'>assign_pixel</font><font face='Lucida Console'>(</font>p_gray,p_rgb<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>assign_pixel</font><font face='Lucida Console'>(</font>p_rgb,p_rgb<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>assign_pixel</font><font face='Lucida Console'>(</font>p_rgba,p_rgb<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>assign_pixel</font><font face='Lucida Console'>(</font>p_hsi,p_rgb<font face='Lucida Console'>)</font>;
+
+        <font color='#BB00BB'>assign_pixel</font><font face='Lucida Console'>(</font>p_float,p_rgb<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>assign_pixel</font><font face='Lucida Console'>(</font>p_int,p_rgb<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>assign_pixel</font><font face='Lucida Console'>(</font>p_schar,p_rgb<font face='Lucida Console'>)</font>;
+
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>p_schar <font color='#5555FF'>=</font><font color='#5555FF'>=</font> std::numeric_limits<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>signed</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>max</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>p_int <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#979000'>255</font><font color='#5555FF'>+</font><font color='#979000'>100</font><font color='#5555FF'>+</font><font color='#979000'>50</font><font face='Lucida Console'>)</font><font color='#5555FF'>/</font><font color='#979000'>3</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST_MSG</font><font face='Lucida Console'>(</font>p_float <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#979000'>255</font><font color='#5555FF'>+</font><font color='#979000'>100</font><font color='#5555FF'>+</font><font color='#979000'>50</font><font face='Lucida Console'>)</font><font color='#5555FF'>/</font><font color='#979000'>3</font>, p_float <font color='#5555FF'>-</font> <font face='Lucida Console'>(</font><font color='#979000'>255</font><font color='#5555FF'>+</font><font color='#979000'>100</font><font color='#5555FF'>+</font><font color='#979000'>50</font><font face='Lucida Console'>)</font><font color='#5555FF'>/</font><font color='#979000'>3</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>p_gray <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#979000'>255</font><font color='#5555FF'>+</font><font color='#979000'>100</font><font color='#5555FF'>+</font><font color='#979000'>50</font><font face='Lucida Console'>)</font><font color='#5555FF'>/</font><font color='#979000'>3</font><font face='Lucida Console'>)</font>;
+
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>p_rgb.red <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>255</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>p_rgb.green <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>100</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>p_rgb.blue <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>50</font><font face='Lucida Console'>)</font>;
+
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>p_rgba.red <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>255</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>p_rgba.green <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>100</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>p_rgba.blue <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>50</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>p_rgba.alpha <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>255</font><font face='Lucida Console'>)</font>;
+
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>p_hsi.i <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>p_hsi.s <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>p_hsi.h <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+
+        <font color='#BB00BB'>assign_pixel</font><font face='Lucida Console'>(</font>p_rgb,<font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>p_rgb.red <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>p_rgb.green <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>p_rgb.blue <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>assign_pixel</font><font face='Lucida Console'>(</font>p_rgb, p_hsi<font face='Lucida Console'>)</font>;
+
+        <font color='#BB00BB'>DLIB_TEST_MSG</font><font face='Lucida Console'>(</font>p_rgb.red <font color='#5555FF'>&gt;</font> <font color='#979000'>251</font> ,<font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font>p_rgb.green<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST_MSG</font><font face='Lucida Console'>(</font>p_rgb.green <font color='#5555FF'>&gt;</font> <font color='#979000'>96</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> p_rgb.green <font color='#5555FF'>&lt;</font> <font color='#979000'>104</font>,<font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font>p_rgb.green<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST_MSG</font><font face='Lucida Console'>(</font>p_rgb.blue <font color='#5555FF'>&gt;</font> <font color='#979000'>47</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> p_rgb.blue <font color='#5555FF'>&lt;</font> <font color='#979000'>53</font>,<font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font>p_rgb.green<font face='Lucida Console'>)</font>;
+
+        <font color='#BB00BB'>assign_pixel</font><font face='Lucida Console'>(</font>p_hsi2, p_hsi<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>p_hsi.h <font color='#5555FF'>=</font><font color='#5555FF'>=</font> p_hsi2.h<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>p_hsi.s <font color='#5555FF'>=</font><font color='#5555FF'>=</font> p_hsi2.s<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>p_hsi.i <font color='#5555FF'>=</font><font color='#5555FF'>=</font> p_hsi2.i<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>assign_pixel</font><font face='Lucida Console'>(</font>p_hsi,<font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>p_hsi.h <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>p_hsi.s <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>p_hsi.i <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>assign_pixel</font><font face='Lucida Console'>(</font>p_hsi, p_rgba<font face='Lucida Console'>)</font>;
+
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>p_hsi.h <font color='#5555FF'>=</font><font color='#5555FF'>=</font> p_hsi2.h<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>p_hsi.s <font color='#5555FF'>=</font><font color='#5555FF'>=</font> p_hsi2.s<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>p_hsi.i <font color='#5555FF'>=</font><font color='#5555FF'>=</font> p_hsi2.i<font face='Lucida Console'>)</font>;
+
+        <font color='#BB00BB'>assign_pixel</font><font face='Lucida Console'>(</font>p_rgba, <font color='#979000'>100</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>assign_pixel</font><font face='Lucida Console'>(</font>p_gray, <font color='#979000'>10</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>assign_pixel</font><font face='Lucida Console'>(</font>p_rgb, <font color='#979000'>10</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>assign_pixel</font><font face='Lucida Console'>(</font>p_hsi, <font color='#979000'>10</font><font face='Lucida Console'>)</font>;
+
+        <font color='#BB00BB'>assign_pixel</font><font face='Lucida Console'>(</font>p_schar, <font color='#979000'>10</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>assign_pixel</font><font face='Lucida Console'>(</font>p_float, <font color='#979000'>10</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>assign_pixel</font><font face='Lucida Console'>(</font>p_int, <font color='#979000'>10</font><font face='Lucida Console'>)</font>;
+
+        p_rgba.alpha <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <font color='#BB00BB'>assign_pixel</font><font face='Lucida Console'>(</font>p_gray, p_rgba<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>p_gray <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>10</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>assign_pixel</font><font face='Lucida Console'>(</font>p_schar, p_rgba<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>p_schar <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>10</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>assign_pixel</font><font face='Lucida Console'>(</font>p_int, p_rgba<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>p_int <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>10</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>assign_pixel</font><font face='Lucida Console'>(</font>p_float, p_rgba<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>p_float <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>10</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>assign_pixel</font><font face='Lucida Console'>(</font>p_rgb, p_rgba<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>p_rgb.red <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>10</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>p_rgb.green <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>10</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>p_rgb.blue <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>10</font><font face='Lucida Console'>)</font>;
+
+        <font color='#BB00BB'>assign_pixel</font><font face='Lucida Console'>(</font>p_hsi, p_rgba<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>assign_pixel</font><font face='Lucida Console'>(</font>p_hsi2, p_rgb<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>p_hsi.h <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>p_hsi.s <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST_MSG</font><font face='Lucida Console'>(</font>p_hsi.i <font color='#5555FF'>&lt;</font> p_hsi2.i<font color='#5555FF'>+</font><font color='#979000'>2</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> p_hsi.i <font color='#5555FF'>&gt;</font> p_hsi2.i <font color='#5555FF'>-</font><font color='#979000'>2</font>,<font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font>p_hsi.i <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>   </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font>p_hsi2.i<font face='Lucida Console'>)</font>;
+
+        <font color='#BB00BB'>assign_pixel</font><font face='Lucida Console'>(</font>p_rgba, <font color='#979000'>100</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>assign_pixel</font><font face='Lucida Console'>(</font>p_gray, <font color='#979000'>10</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>assign_pixel</font><font face='Lucida Console'>(</font>p_schar, <font color='#979000'>10</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>assign_pixel</font><font face='Lucida Console'>(</font>p_float, <font color='#979000'>10</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>assign_pixel</font><font face='Lucida Console'>(</font>p_int, <font color='#979000'>10</font><font face='Lucida Console'>)</font>;
+
+        <font color='#BB00BB'>assign_pixel</font><font face='Lucida Console'>(</font>p_rgb, <font color='#979000'>10</font><font face='Lucida Console'>)</font>;
+        p_rgba.alpha <font color='#5555FF'>=</font> <font color='#979000'>128</font>;
+        <font color='#BB00BB'>assign_pixel</font><font face='Lucida Console'>(</font>p_gray, p_rgba<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>assign_pixel</font><font face='Lucida Console'>(</font>p_schar, p_rgba<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>assign_pixel</font><font face='Lucida Console'>(</font>p_float, p_rgba<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>assign_pixel</font><font face='Lucida Console'>(</font>p_int, p_rgba<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>assign_pixel</font><font face='Lucida Console'>(</font>p_rgb, p_rgba<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>p_gray <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#979000'>100</font> <font color='#5555FF'>+</font> <font color='#979000'>10</font><font face='Lucida Console'>)</font><font color='#5555FF'>/</font><font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>p_schar <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#979000'>100</font> <font color='#5555FF'>+</font> <font color='#979000'>10</font><font face='Lucida Console'>)</font><font color='#5555FF'>/</font><font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>p_int <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#979000'>100</font> <font color='#5555FF'>+</font> <font color='#979000'>10</font><font face='Lucida Console'>)</font><font color='#5555FF'>/</font><font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>p_float <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#979000'>100</font> <font color='#5555FF'>+</font> <font color='#979000'>10</font><font face='Lucida Console'>)</font><font color='#5555FF'>/</font><font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>p_rgb.red <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#979000'>100</font> <font color='#5555FF'>+</font> <font color='#979000'>10</font><font face='Lucida Console'>)</font><font color='#5555FF'>/</font><font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>p_rgb.green <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#979000'>100</font> <font color='#5555FF'>+</font> <font color='#979000'>10</font><font face='Lucida Console'>)</font><font color='#5555FF'>/</font><font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>p_rgb.blue <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#979000'>100</font> <font color='#5555FF'>+</font> <font color='#979000'>10</font><font face='Lucida Console'>)</font><font color='#5555FF'>/</font><font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+
+        <font color='#BB00BB'>assign_pixel</font><font face='Lucida Console'>(</font>p_rgba, <font color='#979000'>100</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>assign_pixel</font><font face='Lucida Console'>(</font>p_gray, <font color='#979000'>10</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>assign_pixel</font><font face='Lucida Console'>(</font>p_schar, <font color='#979000'>10</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>assign_pixel</font><font face='Lucida Console'>(</font>p_int, <font color='#979000'>10</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>assign_pixel</font><font face='Lucida Console'>(</font>p_float, <font color='#979000'>10</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>assign_pixel</font><font face='Lucida Console'>(</font>p_rgb, <font color='#979000'>10</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>p_rgba.alpha <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>255</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>assign_pixel</font><font face='Lucida Console'>(</font>p_gray, p_rgba<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>assign_pixel</font><font face='Lucida Console'>(</font>p_schar, p_rgba<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>assign_pixel</font><font face='Lucida Console'>(</font>p_int, p_rgba<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>assign_pixel</font><font face='Lucida Console'>(</font>p_float, p_rgba<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>assign_pixel</font><font face='Lucida Console'>(</font>p_rgb, p_rgba<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>p_gray <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>100</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>p_schar <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>100</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>p_int <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>100</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>p_float <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>100</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>p_rgb.red <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>100</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>p_rgb.green <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>100</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>p_rgb.blue <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>100</font><font face='Lucida Console'>)</font>;
+
+
+        p_rgb.red <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+        p_rgb.green <font color='#5555FF'>=</font> <font color='#979000'>2</font>;
+        p_rgb.blue <font color='#5555FF'>=</font> <font color='#979000'>3</font>;
+
+        p_rgba.red <font color='#5555FF'>=</font> <font color='#979000'>4</font>;
+        p_rgba.green <font color='#5555FF'>=</font> <font color='#979000'>5</font>;
+        p_rgba.blue <font color='#5555FF'>=</font> <font color='#979000'>6</font>;
+        p_rgba.alpha <font color='#5555FF'>=</font> <font color='#979000'>7</font>;
+
+        p_gray <font color='#5555FF'>=</font> <font color='#979000'>8</font>;
+        p_schar <font color='#5555FF'>=</font> <font color='#979000'>8</font>;
+        p_int <font color='#5555FF'>=</font> <font color='#979000'>8</font>;
+        p_float <font color='#5555FF'>=</font> <font color='#979000'>8</font>;
+
+        p_hsi.h <font color='#5555FF'>=</font> <font color='#979000'>9</font>;
+        p_hsi.s <font color='#5555FF'>=</font> <font color='#979000'>10</font>;
+        p_hsi.i <font color='#5555FF'>=</font> <font color='#979000'>11</font>;
+
+        ostringstream sout;
+        <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>p_rgb,sout<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>p_rgba,sout<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>p_gray,sout<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>p_schar,sout<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>p_int,sout<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>p_float,sout<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>p_hsi,sout<font face='Lucida Console'>)</font>;
+
+        <font color='#BB00BB'>assign_pixel</font><font face='Lucida Console'>(</font>p_rgb,<font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>assign_pixel</font><font face='Lucida Console'>(</font>p_rgba,<font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>assign_pixel</font><font face='Lucida Console'>(</font>p_gray,<font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>assign_pixel</font><font face='Lucida Console'>(</font>p_schar,<font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>assign_pixel</font><font face='Lucida Console'>(</font>p_int,<font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>assign_pixel</font><font face='Lucida Console'>(</font>p_float,<font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>assign_pixel</font><font face='Lucida Console'>(</font>p_hsi,<font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+
+        istringstream <font color='#BB00BB'>sin</font><font face='Lucida Console'>(</font>sout.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+        <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>p_rgb,sin<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>p_rgba,sin<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>p_gray,sin<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>p_schar,sin<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>p_int,sin<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>p_float,sin<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>p_hsi,sin<font face='Lucida Console'>)</font>;
+
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>p_rgb.red <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>p_rgb.green <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>p_rgb.blue <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>3</font><font face='Lucida Console'>)</font>;
+
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>p_rgba.red <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>4</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>p_rgba.green <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>5</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>p_rgba.blue <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>6</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>p_rgba.alpha <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>7</font><font face='Lucida Console'>)</font>;
+
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>p_gray <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>8</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>p_schar <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>8</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>p_int <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>8</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>p_float <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>8</font><font face='Lucida Console'>)</font>;
+
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>p_hsi.h <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>9</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>p_hsi.s <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>10</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>p_hsi.i <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>11</font><font face='Lucida Console'>)</font>;
+
+        <b>{</b>
+            matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>1</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> m_gray, m_schar, m_int, m_float;
+            matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>3</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> m_rgb, m_hsi;
+
+            m_gray <font color='#5555FF'>=</font> pixel_to_vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>p_gray<font face='Lucida Console'>)</font>;
+            m_schar <font color='#5555FF'>=</font> pixel_to_vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>p_schar<font face='Lucida Console'>)</font>;
+            m_int <font color='#5555FF'>=</font> pixel_to_vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>p_int<font face='Lucida Console'>)</font>;
+            m_float <font color='#5555FF'>=</font> pixel_to_vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>p_float<font face='Lucida Console'>)</font>;
+
+            m_hsi <font color='#5555FF'>=</font> pixel_to_vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>p_hsi<font face='Lucida Console'>)</font>;
+            m_rgb <font color='#5555FF'>=</font> pixel_to_vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>p_rgb<font face='Lucida Console'>)</font>;
+
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>m_gray</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> p_gray<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>m_float</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> p_float<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>m_int</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> p_int<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>m_schar</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> p_schar<font face='Lucida Console'>)</font>;
+
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>m_rgb</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> p_rgb.red<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>m_rgb</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> p_rgb.green<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>m_rgb</font><font face='Lucida Console'>(</font><font color='#979000'>2</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> p_rgb.blue<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>m_hsi</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> p_hsi.h<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>m_hsi</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> p_hsi.s<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>m_hsi</font><font face='Lucida Console'>(</font><font color='#979000'>2</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> p_hsi.i<font face='Lucida Console'>)</font>;
+
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>p_rgb.red <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>p_rgb.green <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>p_rgb.blue <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>3</font><font face='Lucida Console'>)</font>;
+
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>p_rgba.red <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>4</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>p_rgba.green <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>5</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>p_rgba.blue <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>6</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>p_rgba.alpha <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>7</font><font face='Lucida Console'>)</font>;
+
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>p_gray <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>8</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>p_int <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>8</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>p_float <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>8</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>p_schar <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>8</font><font face='Lucida Console'>)</font>;
+
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>p_hsi.h <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>9</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>p_hsi.s <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>10</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>p_hsi.i <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>11</font><font face='Lucida Console'>)</font>;
+
+            <font color='#BB00BB'>assign_pixel</font><font face='Lucida Console'>(</font>p_gray,<font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>assign_pixel</font><font face='Lucida Console'>(</font>p_hsi,<font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>assign_pixel</font><font face='Lucida Console'>(</font>p_rgb,<font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+
+            <font color='#BB00BB'>vector_to_pixel</font><font face='Lucida Console'>(</font>p_gray, m_gray<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>vector_to_pixel</font><font face='Lucida Console'>(</font>p_hsi, m_hsi<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>vector_to_pixel</font><font face='Lucida Console'>(</font>p_rgb, m_rgb<font face='Lucida Console'>)</font>;
+
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>p_rgb.red <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>p_rgb.green <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>p_rgb.blue <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>3</font><font face='Lucida Console'>)</font>;
+
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>p_rgba.red <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>4</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>p_rgba.green <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>5</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>p_rgba.blue <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>6</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>p_rgba.alpha <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>7</font><font face='Lucida Console'>)</font>;
+
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>p_gray <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>8</font><font face='Lucida Console'>)</font>;
+
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>p_hsi.h <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>9</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>p_hsi.s <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>10</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>p_hsi.i <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>11</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+
+
+
+        <b>{</b>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> p_gray;
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>short</u></font> p_gray16;
+            <font color='#0000FF'><u>long</u></font> p_int;
+            <font color='#0000FF'><u>float</u></font> p_float;
+            <font color='#0000FF'><u>signed</u></font> <font color='#0000FF'><u>char</u></font> p_schar;
+            rgb_pixel p_rgb;
+            hsi_pixel p_hsi, p_hsi2;
+            rgb_alpha_pixel p_rgba;
+
+
+            <font color='#BB00BB'>assign_pixel</font><font face='Lucida Console'>(</font>p_gray, <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>assign_pixel</font><font face='Lucida Console'>(</font>p_gray16, <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>assign_pixel</font><font face='Lucida Console'>(</font>p_int, <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>assign_pixel</font><font face='Lucida Console'>(</font>p_float, <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>assign_pixel</font><font face='Lucida Console'>(</font>p_schar, <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>assign_pixel</font><font face='Lucida Console'>(</font>p_rgb, <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>assign_pixel</font><font face='Lucida Console'>(</font>p_hsi, <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+
+
+            <font color='#BB00BB'>assign_pixel</font><font face='Lucida Console'>(</font>p_gray, <font color='#979000'>100</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>assign_pixel</font><font face='Lucida Console'>(</font>p_schar, p_gray<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>p_schar <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>100</font><font face='Lucida Console'>)</font>;
+
+            <font color='#BB00BB'>assign_pixel</font><font face='Lucida Console'>(</font>p_gray, <font color='#979000'>200</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>assign_pixel</font><font face='Lucida Console'>(</font>p_schar, p_gray<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>p_schar <font color='#5555FF'>=</font><font color='#5555FF'>=</font> std::numeric_limits<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>signed</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>max</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+            <font color='#BB00BB'>assign_pixel</font><font face='Lucida Console'>(</font>p_int, p_gray<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>p_int <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>200</font><font face='Lucida Console'>)</font>;
+
+            <font color='#BB00BB'>assign_pixel</font><font face='Lucida Console'>(</font>p_float, p_gray<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>p_float <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>200</font><font face='Lucida Console'>)</font>;
+
+            <font color='#BB00BB'>assign_pixel</font><font face='Lucida Console'>(</font>p_rgb, p_float<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>p_rgb.red <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>200</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>p_rgb.green <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>200</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>p_rgb.blue <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>200</font><font face='Lucida Console'>)</font>;
+
+            p_schar <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            <font color='#BB00BB'>assign_pixel</font><font face='Lucida Console'>(</font>p_schar, p_rgb<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>p_schar <font color='#5555FF'>=</font><font color='#5555FF'>=</font> std::numeric_limits<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>signed</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>max</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+
+            p_schar <font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>10</font>;
+            <font color='#BB00BB'>assign_pixel</font><font face='Lucida Console'>(</font>p_float, p_schar<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>p_float <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>10</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>assign_pixel</font><font face='Lucida Console'>(</font>p_int, p_schar<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>p_int <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>10</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>assign_pixel</font><font face='Lucida Console'>(</font>p_schar, p_schar<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>p_schar <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>10</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>assign_pixel</font><font face='Lucida Console'>(</font>p_gray, p_schar<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>p_gray <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+
+            <font color='#BB00BB'>assign_pixel</font><font face='Lucida Console'>(</font>p_rgb, p_schar<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>p_rgb.red <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>p_rgb.green <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>p_rgb.blue <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+            
+            <font color='#BB00BB'>assign_pixel</font><font face='Lucida Console'>(</font>p_gray16, p_schar<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>p_gray16 <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>get_pixel_intensity</font><font face='Lucida Console'>(</font>p_float<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>10</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>get_pixel_intensity</font><font face='Lucida Console'>(</font>p_int<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>10</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>get_pixel_intensity</font><font face='Lucida Console'>(</font>p_schar<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>10</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>get_pixel_intensity</font><font face='Lucida Console'>(</font>p_rgb<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>get_pixel_intensity</font><font face='Lucida Console'>(</font>p_gray16<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+
+            p_rgb.red <font color='#5555FF'>=</font> <font color='#979000'>100</font>;
+            p_rgb.green <font color='#5555FF'>=</font> <font color='#979000'>100</font>;
+            p_rgb.blue <font color='#5555FF'>=</font> <font color='#979000'>100</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>get_pixel_intensity</font><font face='Lucida Console'>(</font>p_rgb<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>100</font><font face='Lucida Console'>)</font>;
+            p_rgb.red <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+            p_rgb.green <font color='#5555FF'>=</font> <font color='#979000'>2</font>;
+            p_rgb.blue <font color='#5555FF'>=</font> <font color='#979000'>3</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>get_pixel_intensity</font><font face='Lucida Console'>(</font>p_rgb<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+            p_rgba.alpha <font color='#5555FF'>=</font> <font color='#979000'>100</font>;
+            p_rgba.red <font color='#5555FF'>=</font> <font color='#979000'>100</font>;
+            p_rgba.green <font color='#5555FF'>=</font> <font color='#979000'>100</font>;
+            p_rgba.blue <font color='#5555FF'>=</font> <font color='#979000'>100</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>get_pixel_intensity</font><font face='Lucida Console'>(</font>p_rgba<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>100</font><font face='Lucida Console'>)</font>;
+            p_rgba.red <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+            p_rgba.green <font color='#5555FF'>=</font> <font color='#979000'>2</font>;
+            p_rgba.blue <font color='#5555FF'>=</font> <font color='#979000'>3</font>;
+            p_rgba.alpha <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>get_pixel_intensity</font><font face='Lucida Console'>(</font>p_rgba<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+            p_hsi.h <font color='#5555FF'>=</font> <font color='#979000'>123</font>;
+            p_hsi.s <font color='#5555FF'>=</font> <font color='#979000'>100</font>;
+            p_hsi.i <font color='#5555FF'>=</font> <font color='#979000'>84</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>get_pixel_intensity</font><font face='Lucida Console'>(</font>p_hsi<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>84</font><font face='Lucida Console'>)</font>;
+
+            p_float <font color='#5555FF'>=</font> <font color='#979000'>54.25</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>get_pixel_intensity</font><font face='Lucida Console'>(</font>p_float<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>54.25</font><font face='Lucida Console'>)</font>;
+
+            <font color='#BB00BB'>assign_pixel</font><font face='Lucida Console'>(</font>p_gray, p_float<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>get_pixel_intensity</font><font face='Lucida Console'>(</font>p_gray<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>54</font><font face='Lucida Console'>)</font>;
+
+            <font color='#BB00BB'>assign_pixel_intensity</font><font face='Lucida Console'>(</font>p_float, <font color='#5555FF'>-</font><font color='#979000'>1000</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>assign_pixel_intensity</font><font face='Lucida Console'>(</font>p_schar, <font color='#5555FF'>-</font><font color='#979000'>100</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>assign_pixel_intensity</font><font face='Lucida Console'>(</font>p_int, <font color='#5555FF'>-</font><font color='#979000'>10000</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>assign_pixel_intensity</font><font face='Lucida Console'>(</font>p_gray, <font color='#5555FF'>-</font><font color='#979000'>100</font><font face='Lucida Console'>)</font>;
+
+            p_rgba.red <font color='#5555FF'>=</font> <font color='#979000'>10</font>;
+            p_rgba.green <font color='#5555FF'>=</font> <font color='#979000'>10</font>;
+            p_rgba.blue <font color='#5555FF'>=</font> <font color='#979000'>10</font>;
+            p_rgba.alpha <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            <font color='#BB00BB'>DLIB_TEST_MSG</font><font face='Lucida Console'>(</font><font color='#BB00BB'>get_pixel_intensity</font><font face='Lucida Console'>(</font>p_rgba<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>10</font>, <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font><font color='#BB00BB'>get_pixel_intensity</font><font face='Lucida Console'>(</font>p_rgba<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>assign_pixel_intensity</font><font face='Lucida Console'>(</font>p_rgba, <font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST_MSG</font><font face='Lucida Console'>(</font>p_rgba.red <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>2</font>, <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font>p_rgba.red<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST_MSG</font><font face='Lucida Console'>(</font>p_rgba.green <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>2</font>, <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font>p_rgba.green<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST_MSG</font><font face='Lucida Console'>(</font>p_rgba.blue <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>2</font>, <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font>p_rgba.blue<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST_MSG</font><font face='Lucida Console'>(</font>p_rgba.alpha <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font>, <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font>p_rgba.alpha<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST_MSG</font><font face='Lucida Console'>(</font><font color='#BB00BB'>get_pixel_intensity</font><font face='Lucida Console'>(</font>p_rgba<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>2</font>, <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font><font color='#BB00BB'>get_pixel_intensity</font><font face='Lucida Console'>(</font>p_rgba<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>p_float <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>1000</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>get_pixel_intensity</font><font face='Lucida Console'>(</font>p_float<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>1000</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>p_schar <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>100</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>get_pixel_intensity</font><font face='Lucida Console'>(</font>p_schar<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>100</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>p_int <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>10000</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>get_pixel_intensity</font><font face='Lucida Console'>(</font>p_int<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>10000</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>p_gray <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>assign_pixel_intensity</font><font face='Lucida Console'>(</font>p_gray, <font color='#979000'>1000</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>p_gray <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>255</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>get_pixel_intensity</font><font face='Lucida Console'>(</font>p_gray<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>255</font><font face='Lucida Console'>)</font>;
+
+            <font color='#BB00BB'>assign_pixel_intensity</font><font face='Lucida Console'>(</font>p_float, p_gray<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>p_float <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>255</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>get_pixel_intensity</font><font face='Lucida Console'>(</font>p_float<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>255</font><font face='Lucida Console'>)</font>;
+
+            <font color='#BB00BB'>assign_pixel_intensity</font><font face='Lucida Console'>(</font>p_int, p_gray<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>p_int <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>255</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>get_pixel_intensity</font><font face='Lucida Console'>(</font>p_int<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>255</font><font face='Lucida Console'>)</font>;
+
+
+            p_float <font color='#5555FF'>=</font> <font color='#979000'>1e10</font>;
+            <font color='#BB00BB'>assign_pixel</font><font face='Lucida Console'>(</font>p_schar, p_float<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>p_schar <font color='#5555FF'>=</font><font color='#5555FF'>=</font> std::numeric_limits<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>signed</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>max</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+            p_float <font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>1e10</font>;
+            <font color='#BB00BB'>assign_pixel</font><font face='Lucida Console'>(</font>p_schar, p_float<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>p_schar <font color='#5555FF'>=</font><font color='#5555FF'>=</font> std::numeric_limits<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>signed</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>min</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'><u>double</u></font> p_double <font color='#5555FF'>=</font> <font color='#979000'>1e200</font>;
+            <font color='#BB00BB'>assign_pixel</font><font face='Lucida Console'>(</font>p_float, p_double<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>p_float <font color='#5555FF'>=</font><font color='#5555FF'>=</font> std::numeric_limits<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>float</u></font><font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>max</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+            p_double <font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>1e200</font>;
+            <font color='#BB00BB'>assign_pixel</font><font face='Lucida Console'>(</font>p_float, p_double<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>p_float <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#5555FF'>-</font>std::numeric_limits<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>float</u></font><font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>max</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+
+    <b>}</b>
+
+
+
+
+    <font color='#0000FF'>class</font> <b><a name='pixel_tester'></a>pixel_tester</b> : <font color='#0000FF'>public</font> tester
+    <b>{</b>
+    <font color='#0000FF'>public</font>:
+        <b><a name='pixel_tester'></a>pixel_tester</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> :
+            tester <font face='Lucida Console'>(</font>"<font color='#CC0000'>test_pixel</font>",
+                    "<font color='#CC0000'>Runs tests on the pixel objects and functions.</font>"<font face='Lucida Console'>)</font>
+        <b>{</b><b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='perform_test'></a>perform_test</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#BB00BB'>pixel_test</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+    <b>}</b> a;
+
+<b>}</b>
+
+
+
+
+</pre></body></html>

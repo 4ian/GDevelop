@@ -1,0 +1,250 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - ranking_tools_abstract.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2012  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#undef</font> DLIB_RANKING_ToOLS_ABSTRACT_Hh_
+<font color='#0000FF'>#ifdef</font> DLIB_RANKING_ToOLS_ABSTRACT_Hh_
+
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../algs.h.html'>../algs.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../matrix.h.html'>../matrix.h</a>"
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>vector<font color='#5555FF'>&gt;</font>
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>struct</font> <b><a name='ranking_pair'></a>ranking_pair</b>
+    <b>{</b>
+        <font color='#009900'>/*!
+            WHAT THIS OBJECT REPRESENTS
+                This object is used to contain a ranking example.  In particular, we say
+                that a good ranking of T objects is one in which all the elements in
+                this-&gt;relevant are ranked higher than the elements of this-&gt;nonrelevant.
+                Therefore, ranking_pair objects are used to represent training examples for
+                learning-to-rank tasks.
+        !*/</font>
+
+        <b><a name='ranking_pair'></a>ranking_pair</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+        <font color='#009900'>/*!
+            ensures
+                - #relevant.size() == 0
+                - #nonrelevant.size() == 0
+        !*/</font>
+
+        <b><a name='ranking_pair'></a>ranking_pair</b><font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> r, 
+            <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> nr
+        <font face='Lucida Console'>)</font> : relevant<font face='Lucida Console'>(</font>r<font face='Lucida Console'>)</font>, nonrelevant<font face='Lucida Console'>(</font>nr<font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+        <font color='#009900'>/*!
+            ensures
+                - #relevant == r
+                - #nonrelevant == nr
+        !*/</font>
+
+        std::vector<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font> relevant;
+        std::vector<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font> nonrelevant;
+    <b>}</b>;
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='serialize'></a>serialize</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> ranking_pair<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> item,
+        std::ostream<font color='#5555FF'>&amp;</font> out
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        provides serialization support
+    !*/</font>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='deserialize'></a>deserialize</b> <font face='Lucida Console'>(</font>
+        ranking_pair<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> item,
+        std::istream<font color='#5555FF'>&amp;</font> in 
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        provides deserialization support
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>bool</u></font> <b><a name='is_ranking_problem'></a>is_ranking_problem</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>ranking_pair<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> samples
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        ensures
+            - returns true if the data in samples represents a valid learning-to-rank
+              learning problem.  That is, this function returns true if all of the
+              following are true and false otherwise:
+                - samples.size() &gt; 0
+                - for all valid i:
+                    - samples[i].relevant.size() &gt; 0
+                    - samples[i].nonrelevant.size() &gt; 0
+                - if (is_matrix&lt;T&gt;::value == true) then 
+                    - All the elements of samples::nonrelevant and samples::relevant must
+                      represent row or column vectors and they must be the same dimension.
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='max_index_plus_one'></a>max_index_plus_one</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> ranking_pair<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> item
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - T must be a dlib::matrix capable of storing column vectors or T must be a
+              sparse vector type as defined in dlib/svm/sparse_vector_abstract.h.
+        ensures
+            - returns std::max(max_index_plus_one(item.relevant), max_index_plus_one(item.nonrelevant)).
+              Therefore, this function can be used to find the dimensionality of the
+              vectors stored in item.
+    !*/</font>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='max_index_plus_one'></a>max_index_plus_one</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>ranking_pair<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> samples
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - T must be a dlib::matrix capable of storing column vectors or T must be a
+              sparse vector type as defined in dlib/svm/sparse_vector_abstract.h.
+        ensures
+            - returns the maximum of max_index_plus_one(samples[i]) over all valid values
+              of i.  Therefore, this function can be used to find the dimensionality of the
+              vectors stored in samples
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='count_ranking_inversions'></a>count_ranking_inversions</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> x,
+        <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> y,
+        std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> x_count,
+        std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> y_count
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - T objects must be copyable
+            - T objects must be comparable via operator&lt;
+        ensures
+            - This function counts how many times we see a y value greater than or equal to
+              an x value.  This is done efficiently in O(n*log(n)) time via the use of
+              quick sort.
+            - #x_count.size() == x.size()
+            - #y_count.size() == y.size()
+            - for all valid i:
+                - #x_count[i] == how many times a value in y was &gt;= x[i].
+            - for all valid j:
+                - #y_count[j] == how many times a value in x was &lt;= y[j].
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> ranking_function,
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>1</font>,<font color='#979000'>2</font><font color='#5555FF'>&gt;</font> <b><a name='test_ranking_function'></a>test_ranking_function</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> ranking_function<font color='#5555FF'>&amp;</font> funct,
+        <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>ranking_pair<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> samples
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - is_ranking_problem(samples) == true
+            - ranking_function == some kind of decision function object (e.g. decision_function)
+        ensures
+            - Tests the given ranking function on the supplied example ranking data and
+              returns the fraction of ranking pair orderings predicted correctly.  This is
+              a number in the range [0,1] where 0 means everything was incorrectly
+              predicted while 1 means everything was correctly predicted.  This function
+              also returns the mean average precision.
+            - In particular, this function returns a matrix M summarizing the results.
+              Specifically, it returns an M such that:
+                - M(0) == the fraction of times that the following is true:                
+                    - funct(samples[k].relevant[i]) &gt; funct(samples[k].nonrelevant[j])
+                      (for all valid i,j,k)
+                - M(1) == the mean average precision of the rankings induced by funct.
+                  (Mean average precision is a number in the range 0 to 1.  Moreover, a
+                  mean average precision of 1 means everything was correctly predicted
+                  while smaller values indicate worse rankings.  See the documentation
+                  for average_precision() for details of its computation.)
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> ranking_function,
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>1</font>,<font color='#979000'>2</font><font color='#5555FF'>&gt;</font> <b><a name='test_ranking_function'></a>test_ranking_function</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> ranking_function<font color='#5555FF'>&amp;</font> funct,
+        <font color='#0000FF'>const</font> ranking_pair<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> sample
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - is_ranking_problem(std::vector&lt;ranking_pair&lt;T&gt; &gt;(1, sample)) == true
+            - ranking_function == some kind of decision function object (e.g. decision_function)
+        ensures
+            - This is just a convenience routine for calling the above
+              test_ranking_function() routine.  That is, it just copies sample into a
+              std::vector object and invokes the above test_ranking_function() routine.
+              This means that calling this function is equivalent to invoking: 
+                return test_ranking_function(funct, std::vector&lt;ranking_pair&lt;T&gt; &gt;(1, sample));
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> trainer_type,
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>1</font>,<font color='#979000'>2</font><font color='#5555FF'>&gt;</font> <b><a name='cross_validate_ranking_trainer'></a>cross_validate_ranking_trainer</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> trainer_type<font color='#5555FF'>&amp;</font> trainer,
+        <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>ranking_pair<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> samples,
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> folds
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - is_ranking_problem(samples) == true
+            - 1 &lt; folds &lt;= samples.size()
+            - trainer_type == some kind of ranking trainer object (e.g. svm_rank_trainer)
+        ensures
+            - Performs k-fold cross validation by using the given trainer to solve the
+              given ranking problem for the given number of folds.  Each fold is tested
+              using the output of the trainer and the average ranking accuracy as well as
+              the mean average precision over the number of folds is returned.
+            - The accuracy is computed the same way test_ranking_function() computes its
+              accuracy.  Therefore, it is a number in the range [0,1] that represents the
+              fraction of times a ranking pair's ordering was predicted correctly.  Similarly,
+              the mean average precision is computed identically to test_ranking_function().
+              In particular, this means that this function returns a matrix M such that:
+                - M(0) == the ranking accuracy
+                - M(1) == the mean average precision
+            - The number of folds used is given by the folds argument.
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_RANKING_ToOLS_ABSTRACT_Hh_
+</font>
+
+
+</pre></body></html>

@@ -1,0 +1,733 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - segment_image.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2011  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_SEGMENT_ImAGE_Hh_
+<font color='#0000FF'>#define</font> DLIB_SEGMENT_ImAGE_Hh_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='segment_image_abstract.h.html'>segment_image_abstract.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../algs.h.html'>../algs.h</a>"
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>vector<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../geometry.h.html'>../geometry.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../disjoint_subsets.h.html'>../disjoint_subsets.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../set.h.html'>../set.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>namespace</font> impl
+    <b>{</b>
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>inline</font> T <b><a name='edge_diff_uint'></a>edge_diff_uint</b><font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> a,
+            <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> b
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>a <font color='#5555FF'>&gt;</font> b<font face='Lucida Console'>)</font>
+                <font color='#0000FF'>return</font> a <font color='#5555FF'>-</font> b;
+            <font color='#0000FF'>else</font>
+                <font color='#0000FF'>return</font> b <font color='#5555FF'>-</font> a;
+        <b>}</b>
+
+    <font color='#009900'>// ----------------------------------------
+</font>
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> enabled <font color='#5555FF'>=</font> <font color='#0000FF'><u>void</u></font><font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>struct</font> <b><a name='edge_diff_funct'></a>edge_diff_funct</b> 
+        <b>{</b>
+            <font color='#0000FF'>typedef</font> <font color='#0000FF'><u>double</u></font> diff_type;
+
+            <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> pixel_type<font color='#5555FF'>&gt;</font>
+            <font color='#0000FF'><u>double</u></font> <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>
+                <font color='#0000FF'>const</font> pixel_type<font color='#5555FF'>&amp;</font> a,
+                <font color='#0000FF'>const</font> pixel_type<font color='#5555FF'>&amp;</font> b
+            <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+            <b>{</b>
+                <font color='#0000FF'>return</font> <font color='#BB00BB'>length</font><font face='Lucida Console'>(</font>pixel_to_vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>a<font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> pixel_to_vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>b<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+        <b>}</b>;
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>struct</font> <b><a name='edge_diff_funct'></a>edge_diff_funct</b><font color='#5555FF'>&lt;</font>uint8,<font color='#0000FF'><u>void</u></font><font color='#5555FF'>&gt;</font>
+        <b>{</b> 
+            <font color='#0000FF'>typedef</font> uint8 diff_type; 
+            uint8 <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>(</font> <font color='#0000FF'>const</font> uint8<font color='#5555FF'>&amp;</font> a, <font color='#0000FF'>const</font> uint8<font color='#5555FF'>&amp;</font> b<font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> <font color='#BB00BB'>edge_diff_uint</font><font face='Lucida Console'>(</font>a,b<font face='Lucida Console'>)</font>; <b>}</b> 
+        <b>}</b>;
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>struct</font> <b><a name='edge_diff_funct'></a>edge_diff_funct</b><font color='#5555FF'>&lt;</font>uint16,<font color='#0000FF'><u>void</u></font><font color='#5555FF'>&gt;</font>
+        <b>{</b> 
+            <font color='#0000FF'>typedef</font> uint16 diff_type; 
+            uint16 <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>(</font> <font color='#0000FF'>const</font> uint16<font color='#5555FF'>&amp;</font> a, <font color='#0000FF'>const</font> uint16<font color='#5555FF'>&amp;</font> b<font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> <font color='#BB00BB'>edge_diff_uint</font><font face='Lucida Console'>(</font>a,b<font face='Lucida Console'>)</font>; <b>}</b> 
+        <b>}</b>;
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>struct</font> <b><a name='edge_diff_funct'></a>edge_diff_funct</b><font color='#5555FF'>&lt;</font>uint32,<font color='#0000FF'><u>void</u></font><font color='#5555FF'>&gt;</font>
+        <b>{</b> 
+            <font color='#0000FF'>typedef</font> uint32 diff_type; 
+            uint32 <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>(</font> <font color='#0000FF'>const</font> uint32<font color='#5555FF'>&amp;</font> a, <font color='#0000FF'>const</font> uint32<font color='#5555FF'>&amp;</font> b<font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> <font color='#BB00BB'>edge_diff_uint</font><font face='Lucida Console'>(</font>a,b<font face='Lucida Console'>)</font>; <b>}</b> 
+        <b>}</b>;
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>struct</font> <b><a name='edge_diff_funct'></a>edge_diff_funct</b><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#0000FF'><u>void</u></font><font color='#5555FF'>&gt;</font>
+        <b>{</b> 
+            <font color='#0000FF'>typedef</font> <font color='#0000FF'><u>double</u></font> diff_type; 
+            <font color='#0000FF'><u>double</u></font> <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>(</font> <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font><font color='#5555FF'>&amp;</font> a, <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font><font color='#5555FF'>&amp;</font> b<font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> std::<font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font>a<font color='#5555FF'>-</font>b<font face='Lucida Console'>)</font>; <b>}</b> 
+        <b>}</b>;
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>struct</font> <b><a name='edge_diff_funct'></a>edge_diff_funct</b><font color='#5555FF'>&lt;</font>T, <font color='#0000FF'>typename</font> enable_if<font color='#5555FF'>&lt;</font>is_matrix<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font>::type<font color='#5555FF'>&gt;</font>
+        <b>{</b>
+            <font color='#0000FF'>typedef</font> <font color='#0000FF'><u>double</u></font> diff_type;
+            <font color='#0000FF'><u>double</u></font> <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>
+                <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> a,
+                <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> b
+            <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+            <b>{</b>
+                <font color='#0000FF'>return</font> <font color='#BB00BB'>length</font><font face='Lucida Console'>(</font>a<font color='#5555FF'>-</font>b<font face='Lucida Console'>)</font>;
+            <b>}</b>
+        <b>}</b>;
+
+    <font color='#009900'>// ------------------------------------------------------------------------------------
+</font>
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>struct</font> <b><a name='graph_image_segmentation_data_T'></a>graph_image_segmentation_data_T</b>
+        <b>{</b>
+            <b><a name='graph_image_segmentation_data_T'></a>graph_image_segmentation_data_T</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> : component_size<font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>, internal_diff<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> component_size;
+            T internal_diff;
+        <b>}</b>;
+
+    <font color='#009900'>// ------------------------------------------------------------------------------------
+</font>
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>struct</font> <b><a name='segment_image_edge_data_T'></a>segment_image_edge_data_T</b>
+        <b>{</b>
+            <b><a name='segment_image_edge_data_T'></a>segment_image_edge_data_T</b> <font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><b>{</b><b>}</b>
+
+            <b><a name='segment_image_edge_data_T'></a>segment_image_edge_data_T</b> <font face='Lucida Console'>(</font>
+                <font color='#0000FF'>const</font> rectangle<font color='#5555FF'>&amp;</font> rect,
+                <font color='#0000FF'>const</font> point<font color='#5555FF'>&amp;</font> p1,
+                <font color='#0000FF'>const</font> point<font color='#5555FF'>&amp;</font> p2,
+                <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> diff_
+            <font face='Lucida Console'>)</font> :
+                idx1<font face='Lucida Console'>(</font>p1.y<font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>*</font>rect.width<font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> p1.x<font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>,
+                idx2<font face='Lucida Console'>(</font>p2.y<font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>*</font>rect.width<font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> p2.x<font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>,
+                diff<font face='Lucida Console'>(</font>diff_<font face='Lucida Console'>)</font>
+            <b>{</b><b>}</b>
+
+            <font color='#0000FF'><u>bool</u></font> <b><a name='operator'></a>operator</b><font color='#5555FF'>&lt;</font><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> segment_image_edge_data_T<font color='#5555FF'>&amp;</font> item<font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+            <b>{</b> <font color='#0000FF'>return</font> diff <font color='#5555FF'>&lt;</font> item.diff; <b>}</b>
+
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> idx1;
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> idx2;
+            T diff;
+        <b>}</b>;
+
+    <font color='#009900'>// ------------------------------------------------------------------------------------
+</font>
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> image_view_type<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>struct</font> <b><a name='uint8_or_uint16_pixels'></a>uint8_or_uint16_pixels</b>
+        <b>{</b>
+            <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> image_view_type::pixel_type pixel_type;
+            <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>bool</u></font> value <font color='#5555FF'>=</font> is_same_type<font color='#5555FF'>&lt;</font>pixel_type,uint8<font color='#5555FF'>&gt;</font>::value <font color='#5555FF'>|</font><font color='#5555FF'>|</font>
+                is_same_type<font color='#5555FF'>&lt;</font>pixel_type,uint16<font color='#5555FF'>&gt;</font>::value;
+        <b>}</b>;
+
+        <font color='#009900'>// This is an overload of get_pixel_edges() that is optimized to segment images
+</font>        <font color='#009900'>// with 8bit or 16bit  pixels very quickly.  We do this by using a radix sort
+</font>        <font color='#009900'>// instead of quicksort.
+</font>        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> in_image_type, <font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>typename</font> enable_if<font color='#5555FF'>&lt;</font>uint8_or_uint16_pixels<font color='#5555FF'>&lt;</font>in_image_type<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font>::type 
+        <b><a name='get_pixel_edges'></a>get_pixel_edges</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> in_image_type<font color='#5555FF'>&amp;</font> in_img,
+            std::vector<font color='#5555FF'>&lt;</font>segment_image_edge_data_T<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> sorted_edges
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> in_image_type::pixel_type ptype;
+            <font color='#0000FF'>typedef</font> T diff_type;
+            std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font> <font color='#BB00BB'>counts</font><font face='Lucida Console'>(</font>std::numeric_limits<font color='#5555FF'>&lt;</font>ptype<font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>max</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>+</font><font color='#979000'>1</font>, <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+
+            edge_diff_funct<font color='#5555FF'>&lt;</font>ptype<font color='#5555FF'>&gt;</font> edge_diff;
+
+            border_enumerator <font color='#BB00BB'>be</font><font face='Lucida Console'>(</font><font color='#BB00BB'>get_rect</font><font face='Lucida Console'>(</font>in_img<font face='Lucida Console'>)</font>, <font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+            <font color='#009900'>// we are going to do a radix sort on the edge weights.  So the first step
+</font>            <font color='#009900'>// is to accumulate them into count.
+</font>            <font color='#0000FF'>const</font> rectangle area <font color='#5555FF'>=</font> <font color='#BB00BB'>get_rect</font><font face='Lucida Console'>(</font>in_img<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>be.<font color='#BB00BB'>move_next</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> r <font color='#5555FF'>=</font> be.<font color='#BB00BB'>element</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>y</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> c <font color='#5555FF'>=</font> be.<font color='#BB00BB'>element</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>x</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>const</font> ptype pix <font color='#5555FF'>=</font> in_img[r][c];
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>area.<font color='#BB00BB'>contains</font><font face='Lucida Console'>(</font>c<font color='#5555FF'>-</font><font color='#979000'>1</font>,r<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>   counts[<font color='#BB00BB'>edge_diff</font><font face='Lucida Console'>(</font>pix, in_img[r  ][c<font color='#5555FF'>-</font><font color='#979000'>1</font>]<font face='Lucida Console'>)</font>] <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>area.<font color='#BB00BB'>contains</font><font face='Lucida Console'>(</font>c<font color='#5555FF'>+</font><font color='#979000'>1</font>,r<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>   counts[<font color='#BB00BB'>edge_diff</font><font face='Lucida Console'>(</font>pix, in_img[r  ][c<font color='#5555FF'>+</font><font color='#979000'>1</font>]<font face='Lucida Console'>)</font>] <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>area.<font color='#BB00BB'>contains</font><font face='Lucida Console'>(</font>c  ,r<font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> counts[<font color='#BB00BB'>edge_diff</font><font face='Lucida Console'>(</font>pix, in_img[r<font color='#5555FF'>-</font><font color='#979000'>1</font>][c  ]<font face='Lucida Console'>)</font>] <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>area.<font color='#BB00BB'>contains</font><font face='Lucida Console'>(</font>c  ,r<font color='#5555FF'>+</font><font color='#979000'>1</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> counts[<font color='#BB00BB'>edge_diff</font><font face='Lucida Console'>(</font>pix, in_img[r<font color='#5555FF'>+</font><font color='#979000'>1</font>][c  ]<font face='Lucida Console'>)</font>] <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+            <b>}</b>
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> r <font color='#5555FF'>=</font> <font color='#979000'>1</font>; r<font color='#5555FF'>+</font><font color='#979000'>1</font> <font color='#5555FF'>&lt;</font> in_img.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>r<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> c <font color='#5555FF'>=</font> <font color='#979000'>1</font>; c<font color='#5555FF'>+</font><font color='#979000'>1</font> <font color='#5555FF'>&lt;</font> in_img.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>c<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#0000FF'>const</font> ptype pix <font color='#5555FF'>=</font> in_img[r][c];
+                    counts[<font color='#BB00BB'>edge_diff</font><font face='Lucida Console'>(</font>pix, in_img[r<font color='#5555FF'>-</font><font color='#979000'>1</font>][c<font color='#5555FF'>+</font><font color='#979000'>1</font>]<font face='Lucida Console'>)</font>] <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+                    counts[<font color='#BB00BB'>edge_diff</font><font face='Lucida Console'>(</font>pix, in_img[r  ][c<font color='#5555FF'>+</font><font color='#979000'>1</font>]<font face='Lucida Console'>)</font>] <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+                    counts[<font color='#BB00BB'>edge_diff</font><font face='Lucida Console'>(</font>pix, in_img[r<font color='#5555FF'>+</font><font color='#979000'>1</font>][c  ]<font face='Lucida Console'>)</font>] <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+                    counts[<font color='#BB00BB'>edge_diff</font><font face='Lucida Console'>(</font>pix, in_img[r<font color='#5555FF'>+</font><font color='#979000'>1</font>][c<font color='#5555FF'>+</font><font color='#979000'>1</font>]<font face='Lucida Console'>)</font>] <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+                <b>}</b>
+            <b>}</b>
+
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> num_edges <font color='#5555FF'>=</font> <font color='#BB00BB'>shrink_rect</font><font face='Lucida Console'>(</font>area,<font color='#979000'>1</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>area</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>*</font><font color='#979000'>4</font> <font color='#5555FF'>+</font> in_img.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>*</font><font color='#979000'>2</font><font color='#5555FF'>*</font><font color='#979000'>3</font> <font color='#5555FF'>-</font> <font color='#979000'>4</font> <font color='#5555FF'>+</font> <font face='Lucida Console'>(</font>in_img.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#979000'>2</font><font face='Lucida Console'>)</font><font color='#5555FF'>*</font><font color='#979000'>2</font><font color='#5555FF'>*</font><font color='#979000'>3</font>;
+            <font color='#0000FF'>typedef</font> segment_image_edge_data_T<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font> segment_image_edge_data;
+            sorted_edges.<font color='#BB00BB'>resize</font><font face='Lucida Console'>(</font>num_edges<font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// integrate counts.  The idea is to have sorted_edges[counts[i]] be the location that edges
+</font>            <font color='#009900'>// with an edge_diff of i go.  So counts[0] == 0, counts[1] == number of 0 edge diff edges, etc.
+</font>            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> prev <font color='#5555FF'>=</font> counts[<font color='#979000'>0</font>];
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>1</font>; i <font color='#5555FF'>&lt;</font> counts.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> temp <font color='#5555FF'>=</font> counts[i];
+                counts[i] <font color='#5555FF'>+</font><font color='#5555FF'>=</font> counts[i<font color='#5555FF'>-</font><font color='#979000'>1</font>];
+                counts[i<font color='#5555FF'>-</font><font color='#979000'>1</font>] <font color='#5555FF'>-</font><font color='#5555FF'>=</font> prev;
+                prev <font color='#5555FF'>=</font> temp;
+            <b>}</b>
+            counts[counts.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#979000'>1</font>] <font color='#5555FF'>-</font><font color='#5555FF'>=</font> prev;
+
+
+            <font color='#009900'>// now build a sorted list of all the edges
+</font>            be.<font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>while</font><font face='Lucida Console'>(</font>be.<font color='#BB00BB'>move_next</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>const</font> point p <font color='#5555FF'>=</font> be.<font color='#BB00BB'>element</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> r <font color='#5555FF'>=</font> p.<font color='#BB00BB'>y</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> c <font color='#5555FF'>=</font> p.<font color='#BB00BB'>x</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>const</font> ptype pix <font color='#5555FF'>=</font> in_img[r][c];
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>area.<font color='#BB00BB'>contains</font><font face='Lucida Console'>(</font>c<font color='#5555FF'>-</font><font color='#979000'>1</font>,r<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#0000FF'>const</font> diff_type diff <font color='#5555FF'>=</font> <font color='#BB00BB'>edge_diff</font><font face='Lucida Console'>(</font>pix, in_img[r  ][c<font color='#5555FF'>-</font><font color='#979000'>1</font>]<font face='Lucida Console'>)</font>;
+                    sorted_edges[counts[diff]<font color='#5555FF'>+</font><font color='#5555FF'>+</font>] <font color='#5555FF'>=</font> <font color='#BB00BB'>segment_image_edge_data</font><font face='Lucida Console'>(</font>area,p,<font color='#BB00BB'>point</font><font face='Lucida Console'>(</font>c<font color='#5555FF'>-</font><font color='#979000'>1</font>,r<font face='Lucida Console'>)</font>,diff<font face='Lucida Console'>)</font>;
+                <b>}</b>
+
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>area.<font color='#BB00BB'>contains</font><font face='Lucida Console'>(</font>c<font color='#5555FF'>+</font><font color='#979000'>1</font>,r<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#0000FF'>const</font> diff_type diff <font color='#5555FF'>=</font> <font color='#BB00BB'>edge_diff</font><font face='Lucida Console'>(</font>pix, in_img[r  ][c<font color='#5555FF'>+</font><font color='#979000'>1</font>]<font face='Lucida Console'>)</font>;
+                    sorted_edges[counts[diff]<font color='#5555FF'>+</font><font color='#5555FF'>+</font>] <font color='#5555FF'>=</font> <font color='#BB00BB'>segment_image_edge_data</font><font face='Lucida Console'>(</font>area,p,<font color='#BB00BB'>point</font><font face='Lucida Console'>(</font>c<font color='#5555FF'>+</font><font color='#979000'>1</font>,r<font face='Lucida Console'>)</font>,diff<font face='Lucida Console'>)</font>;
+                <b>}</b>
+
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>area.<font color='#BB00BB'>contains</font><font face='Lucida Console'>(</font>c  ,r<font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#0000FF'>const</font> diff_type diff <font color='#5555FF'>=</font> <font color='#BB00BB'>edge_diff</font><font face='Lucida Console'>(</font>pix, in_img[r<font color='#5555FF'>-</font><font color='#979000'>1</font>][c  ]<font face='Lucida Console'>)</font>;
+                    sorted_edges[counts[diff]<font color='#5555FF'>+</font><font color='#5555FF'>+</font>] <font color='#5555FF'>=</font> <font color='#BB00BB'>segment_image_edge_data</font><font face='Lucida Console'>(</font>area,p,<font color='#BB00BB'>point</font><font face='Lucida Console'>(</font>c  ,r<font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>,diff<font face='Lucida Console'>)</font>;
+                <b>}</b>
+
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>area.<font color='#BB00BB'>contains</font><font face='Lucida Console'>(</font>c  ,r<font color='#5555FF'>+</font><font color='#979000'>1</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#0000FF'>const</font> diff_type diff <font color='#5555FF'>=</font> <font color='#BB00BB'>edge_diff</font><font face='Lucida Console'>(</font>pix, in_img[r<font color='#5555FF'>+</font><font color='#979000'>1</font>][c  ]<font face='Lucida Console'>)</font>;
+                    sorted_edges[counts[diff]<font color='#5555FF'>+</font><font color='#5555FF'>+</font>] <font color='#5555FF'>=</font> <font color='#BB00BB'>segment_image_edge_data</font><font face='Lucida Console'>(</font>area,p,<font color='#BB00BB'>point</font><font face='Lucida Console'>(</font>c  ,r<font color='#5555FF'>+</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>,diff<font face='Lucida Console'>)</font>;
+                <b>}</b>
+            <b>}</b>
+            <font color='#009900'>// same thing as the above loop but now we do it on the interior of the image and therefore
+</font>            <font color='#009900'>// don't have to include the boundary checking if statements used above.
+</font>            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> r <font color='#5555FF'>=</font> <font color='#979000'>1</font>; r<font color='#5555FF'>+</font><font color='#979000'>1</font> <font color='#5555FF'>&lt;</font> in_img.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>r<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> c <font color='#5555FF'>=</font> <font color='#979000'>1</font>; c<font color='#5555FF'>+</font><font color='#979000'>1</font> <font color='#5555FF'>&lt;</font> in_img.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>c<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#0000FF'>const</font> point <font color='#BB00BB'>p</font><font face='Lucida Console'>(</font>c,r<font face='Lucida Console'>)</font>;
+                    <font color='#0000FF'>const</font> ptype pix <font color='#5555FF'>=</font> in_img[r][c];
+                    diff_type diff;
+
+                    diff <font color='#5555FF'>=</font> <font color='#BB00BB'>edge_diff</font><font face='Lucida Console'>(</font>pix, in_img[r  ][c<font color='#5555FF'>+</font><font color='#979000'>1</font>]<font face='Lucida Console'>)</font>;
+                    sorted_edges[counts[diff]<font color='#5555FF'>+</font><font color='#5555FF'>+</font>] <font color='#5555FF'>=</font> <font color='#BB00BB'>segment_image_edge_data</font><font face='Lucida Console'>(</font>area,p,<font color='#BB00BB'>point</font><font face='Lucida Console'>(</font>c<font color='#5555FF'>+</font><font color='#979000'>1</font>,r<font face='Lucida Console'>)</font>,diff<font face='Lucida Console'>)</font>;
+                    diff <font color='#5555FF'>=</font> <font color='#BB00BB'>edge_diff</font><font face='Lucida Console'>(</font>pix, in_img[r<font color='#5555FF'>-</font><font color='#979000'>1</font>][c<font color='#5555FF'>+</font><font color='#979000'>1</font>]<font face='Lucida Console'>)</font>;
+                    sorted_edges[counts[diff]<font color='#5555FF'>+</font><font color='#5555FF'>+</font>] <font color='#5555FF'>=</font> <font color='#BB00BB'>segment_image_edge_data</font><font face='Lucida Console'>(</font>area,p,<font color='#BB00BB'>point</font><font face='Lucida Console'>(</font>c<font color='#5555FF'>+</font><font color='#979000'>1</font>,r<font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>,diff<font face='Lucida Console'>)</font>;
+                    diff <font color='#5555FF'>=</font> <font color='#BB00BB'>edge_diff</font><font face='Lucida Console'>(</font>pix, in_img[r<font color='#5555FF'>+</font><font color='#979000'>1</font>][c<font color='#5555FF'>+</font><font color='#979000'>1</font>]<font face='Lucida Console'>)</font>;
+                    sorted_edges[counts[diff]<font color='#5555FF'>+</font><font color='#5555FF'>+</font>] <font color='#5555FF'>=</font> <font color='#BB00BB'>segment_image_edge_data</font><font face='Lucida Console'>(</font>area,p,<font color='#BB00BB'>point</font><font face='Lucida Console'>(</font>c<font color='#5555FF'>+</font><font color='#979000'>1</font>,r<font color='#5555FF'>+</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>,diff<font face='Lucida Console'>)</font>;
+                    diff <font color='#5555FF'>=</font> <font color='#BB00BB'>edge_diff</font><font face='Lucida Console'>(</font>pix, in_img[r<font color='#5555FF'>+</font><font color='#979000'>1</font>][c  ]<font face='Lucida Console'>)</font>;
+                    sorted_edges[counts[diff]<font color='#5555FF'>+</font><font color='#5555FF'>+</font>] <font color='#5555FF'>=</font> <font color='#BB00BB'>segment_image_edge_data</font><font face='Lucida Console'>(</font>area,p,<font color='#BB00BB'>point</font><font face='Lucida Console'>(</font>c  ,r<font color='#5555FF'>+</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>,diff<font face='Lucida Console'>)</font>;
+                <b>}</b>
+            <b>}</b>
+        <b>}</b>
+        
+    <font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+        <font color='#009900'>// This is the general purpose version of get_pixel_edges().  It handles all pixel types.
+</font>        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> in_image_type, <font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>typename</font> disable_if<font color='#5555FF'>&lt;</font>uint8_or_uint16_pixels<font color='#5555FF'>&lt;</font>in_image_type<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font>::type 
+        <b><a name='get_pixel_edges'></a>get_pixel_edges</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> in_image_type<font color='#5555FF'>&amp;</font> in_img,
+            std::vector<font color='#5555FF'>&lt;</font>segment_image_edge_data_T<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> sorted_edges
+        <font face='Lucida Console'>)</font>
+        <b>{</b>   
+            <font color='#0000FF'>const</font> rectangle area <font color='#5555FF'>=</font> <font color='#BB00BB'>get_rect</font><font face='Lucida Console'>(</font>in_img<font face='Lucida Console'>)</font>;
+            sorted_edges.<font color='#BB00BB'>reserve</font><font face='Lucida Console'>(</font>area.<font color='#BB00BB'>area</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>*</font><font color='#979000'>4</font><font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> in_image_type::pixel_type ptype;
+            edge_diff_funct<font color='#5555FF'>&lt;</font>ptype<font color='#5555FF'>&gt;</font> edge_diff;
+            <font color='#0000FF'>typedef</font> T diff_type;
+            <font color='#0000FF'>typedef</font> segment_image_edge_data_T<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font> segment_image_edge_data;
+
+            border_enumerator <font color='#BB00BB'>be</font><font face='Lucida Console'>(</font><font color='#BB00BB'>get_rect</font><font face='Lucida Console'>(</font>in_img<font face='Lucida Console'>)</font>, <font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// now build a sorted list of all the edges
+</font>            be.<font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>while</font><font face='Lucida Console'>(</font>be.<font color='#BB00BB'>move_next</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>const</font> point p <font color='#5555FF'>=</font> be.<font color='#BB00BB'>element</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> r <font color='#5555FF'>=</font> p.<font color='#BB00BB'>y</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> c <font color='#5555FF'>=</font> p.<font color='#BB00BB'>x</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>const</font> ptype<font color='#5555FF'>&amp;</font> pix <font color='#5555FF'>=</font> in_img[r][c];
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>area.<font color='#BB00BB'>contains</font><font face='Lucida Console'>(</font>c<font color='#5555FF'>-</font><font color='#979000'>1</font>,r<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#0000FF'>const</font> diff_type diff <font color='#5555FF'>=</font> <font color='#BB00BB'>edge_diff</font><font face='Lucida Console'>(</font>pix, in_img[r  ][c<font color='#5555FF'>-</font><font color='#979000'>1</font>]<font face='Lucida Console'>)</font>;
+                    sorted_edges.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font><font color='#BB00BB'>segment_image_edge_data</font><font face='Lucida Console'>(</font>area,p,<font color='#BB00BB'>point</font><font face='Lucida Console'>(</font>c<font color='#5555FF'>-</font><font color='#979000'>1</font>,r<font face='Lucida Console'>)</font>,diff<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                <b>}</b>
+
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>area.<font color='#BB00BB'>contains</font><font face='Lucida Console'>(</font>c<font color='#5555FF'>+</font><font color='#979000'>1</font>,r<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#0000FF'>const</font> diff_type diff <font color='#5555FF'>=</font> <font color='#BB00BB'>edge_diff</font><font face='Lucida Console'>(</font>pix, in_img[r  ][c<font color='#5555FF'>+</font><font color='#979000'>1</font>]<font face='Lucida Console'>)</font>;
+                    sorted_edges.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font><font color='#BB00BB'>segment_image_edge_data</font><font face='Lucida Console'>(</font>area,p,<font color='#BB00BB'>point</font><font face='Lucida Console'>(</font>c<font color='#5555FF'>+</font><font color='#979000'>1</font>,r<font face='Lucida Console'>)</font>,diff<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                <b>}</b>
+
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>area.<font color='#BB00BB'>contains</font><font face='Lucida Console'>(</font>c  ,r<font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#0000FF'>const</font> diff_type diff <font color='#5555FF'>=</font> <font color='#BB00BB'>edge_diff</font><font face='Lucida Console'>(</font>pix, in_img[r<font color='#5555FF'>-</font><font color='#979000'>1</font>][c  ]<font face='Lucida Console'>)</font>;
+                    sorted_edges.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font> <font color='#BB00BB'>segment_image_edge_data</font><font face='Lucida Console'>(</font>area,p,<font color='#BB00BB'>point</font><font face='Lucida Console'>(</font>c  ,r<font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>,diff<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                <b>}</b>
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>area.<font color='#BB00BB'>contains</font><font face='Lucida Console'>(</font>c  ,r<font color='#5555FF'>+</font><font color='#979000'>1</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#0000FF'>const</font> diff_type diff <font color='#5555FF'>=</font> <font color='#BB00BB'>edge_diff</font><font face='Lucida Console'>(</font>pix, in_img[r<font color='#5555FF'>+</font><font color='#979000'>1</font>][c  ]<font face='Lucida Console'>)</font>;
+                    sorted_edges.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font> <font color='#BB00BB'>segment_image_edge_data</font><font face='Lucida Console'>(</font>area,p,<font color='#BB00BB'>point</font><font face='Lucida Console'>(</font>c  ,r<font color='#5555FF'>+</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>,diff<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                <b>}</b>
+            <b>}</b>
+            <font color='#009900'>// same thing as the above loop but now we do it on the interior of the image and therefore
+</font>            <font color='#009900'>// don't have to include the boundary checking if statements used above.
+</font>            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> r <font color='#5555FF'>=</font> <font color='#979000'>1</font>; r<font color='#5555FF'>+</font><font color='#979000'>1</font> <font color='#5555FF'>&lt;</font> in_img.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>r<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> c <font color='#5555FF'>=</font> <font color='#979000'>1</font>; c<font color='#5555FF'>+</font><font color='#979000'>1</font> <font color='#5555FF'>&lt;</font> in_img.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>c<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#0000FF'>const</font> point <font color='#BB00BB'>p</font><font face='Lucida Console'>(</font>c,r<font face='Lucida Console'>)</font>;
+                    <font color='#0000FF'>const</font> ptype<font color='#5555FF'>&amp;</font> pix <font color='#5555FF'>=</font> in_img[r][c];
+                    diff_type diff;
+
+                    diff <font color='#5555FF'>=</font> <font color='#BB00BB'>edge_diff</font><font face='Lucida Console'>(</font>pix, in_img[r  ][c<font color='#5555FF'>+</font><font color='#979000'>1</font>]<font face='Lucida Console'>)</font>;
+                    sorted_edges.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font> <font color='#BB00BB'>segment_image_edge_data</font><font face='Lucida Console'>(</font>area,p,<font color='#BB00BB'>point</font><font face='Lucida Console'>(</font>c<font color='#5555FF'>+</font><font color='#979000'>1</font>,r<font face='Lucida Console'>)</font>,diff<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                    diff <font color='#5555FF'>=</font> <font color='#BB00BB'>edge_diff</font><font face='Lucida Console'>(</font>pix, in_img[r<font color='#5555FF'>+</font><font color='#979000'>1</font>][c<font color='#5555FF'>+</font><font color='#979000'>1</font>]<font face='Lucida Console'>)</font>;
+                    sorted_edges.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font> <font color='#BB00BB'>segment_image_edge_data</font><font face='Lucida Console'>(</font>area,p,<font color='#BB00BB'>point</font><font face='Lucida Console'>(</font>c<font color='#5555FF'>+</font><font color='#979000'>1</font>,r<font color='#5555FF'>+</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>,diff<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                    diff <font color='#5555FF'>=</font> <font color='#BB00BB'>edge_diff</font><font face='Lucida Console'>(</font>pix, in_img[r<font color='#5555FF'>+</font><font color='#979000'>1</font>][c  ]<font face='Lucida Console'>)</font>;
+                    sorted_edges.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font> <font color='#BB00BB'>segment_image_edge_data</font><font face='Lucida Console'>(</font>area,p,<font color='#BB00BB'>point</font><font face='Lucida Console'>(</font>c  ,r<font color='#5555FF'>+</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>,diff<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                    diff <font color='#5555FF'>=</font> <font color='#BB00BB'>edge_diff</font><font face='Lucida Console'>(</font>pix, in_img[r<font color='#5555FF'>-</font><font color='#979000'>1</font>][c<font color='#5555FF'>+</font><font color='#979000'>1</font>]<font face='Lucida Console'>)</font>;
+                    sorted_edges.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font> <font color='#BB00BB'>segment_image_edge_data</font><font face='Lucida Console'>(</font>area,p,<font color='#BB00BB'>point</font><font face='Lucida Console'>(</font>c<font color='#5555FF'>+</font><font color='#979000'>1</font>,r<font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>,diff<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                <b>}</b>
+            <b>}</b>
+
+            std::<font color='#BB00BB'>sort</font><font face='Lucida Console'>(</font>sorted_edges.<font color='#BB00BB'>begin</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, sorted_edges.<font color='#BB00BB'>end</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+        <b>}</b>
+
+    <font color='#009900'>// ------------------------------------------------------------------------------------
+</font>
+    <b>}</b> <font color='#009900'>// end of namespace impl
+</font>
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> in_image_type,
+        <font color='#0000FF'>typename</font> out_image_type
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='segment_image'></a>segment_image</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> in_image_type<font color='#5555FF'>&amp;</font> in_img_,
+        out_image_type<font color='#5555FF'>&amp;</font> out_img_,
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> k <font color='#5555FF'>=</font> <font color='#979000'>200</font>,
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> min_size <font color='#5555FF'>=</font> <font color='#979000'>10</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> dlib::impl;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> image_traits<font color='#5555FF'>&lt;</font>in_image_type<font color='#5555FF'>&gt;</font>::pixel_type ptype;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> edge_diff_funct<font color='#5555FF'>&lt;</font>ptype<font color='#5555FF'>&gt;</font>::diff_type diff_type;
+
+        <font color='#009900'>// make sure requires clause is not broken
+</font>        <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font><font color='#BB00BB'>is_same_object</font><font face='Lucida Console'>(</font>in_img_, out_img_<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font>,
+            "<font color='#CC0000'>\t void segment_image()</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t The input images can't be the same object.</font>"
+            <font face='Lucida Console'>)</font>;
+
+        <font color='#BB00BB'>COMPILE_TIME_ASSERT</font><font face='Lucida Console'>(</font>is_unsigned_type<font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> image_traits<font color='#5555FF'>&lt;</font>out_image_type<font color='#5555FF'>&gt;</font>::pixel_type<font color='#5555FF'>&gt;</font>::value<font face='Lucida Console'>)</font>;
+
+        const_image_view<font color='#5555FF'>&lt;</font>in_image_type<font color='#5555FF'>&gt;</font> <font color='#BB00BB'>in_img</font><font face='Lucida Console'>(</font>in_img_<font face='Lucida Console'>)</font>;
+        image_view<font color='#5555FF'>&lt;</font>out_image_type<font color='#5555FF'>&gt;</font> <font color='#BB00BB'>out_img</font><font face='Lucida Console'>(</font>out_img_<font face='Lucida Console'>)</font>;
+
+        out_img.<font color='#BB00BB'>set_size</font><font face='Lucida Console'>(</font>in_img.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, in_img.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <font color='#009900'>// don't bother doing anything if the image is too small
+</font>        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>in_img.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> <font color='#979000'>2</font> <font color='#5555FF'>|</font><font color='#5555FF'>|</font> in_img.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> <font color='#979000'>2</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#BB00BB'>assign_all_pixels</font><font face='Lucida Console'>(</font>out_img,<font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>return</font>;
+        <b>}</b>
+
+        disjoint_subsets sets;
+        sets.<font color='#BB00BB'>set_size</font><font face='Lucida Console'>(</font>in_img.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+        std::vector<font color='#5555FF'>&lt;</font>segment_image_edge_data_T<font color='#5555FF'>&lt;</font>diff_type<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> sorted_edges;
+        <font color='#BB00BB'>get_pixel_edges</font><font face='Lucida Console'>(</font>in_img, sorted_edges<font face='Lucida Console'>)</font>;
+
+        std::vector<font color='#5555FF'>&lt;</font>graph_image_segmentation_data_T<font color='#5555FF'>&lt;</font>diff_type<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> <font color='#BB00BB'>data</font><font face='Lucida Console'>(</font>in_img.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// now start connecting blobs together to make a minimum spanning tree.
+</font>        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> sorted_edges.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> idx1 <font color='#5555FF'>=</font> sorted_edges[i].idx1;
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> idx2 <font color='#5555FF'>=</font> sorted_edges[i].idx2;
+
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> set1 <font color='#5555FF'>=</font> sets.<font color='#BB00BB'>find_set</font><font face='Lucida Console'>(</font>idx1<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> set2 <font color='#5555FF'>=</font> sets.<font color='#BB00BB'>find_set</font><font face='Lucida Console'>(</font>idx2<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>set1 <font color='#5555FF'>!</font><font color='#5555FF'>=</font> set2<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>const</font> diff_type diff <font color='#5555FF'>=</font> sorted_edges[i].diff;
+                <font color='#0000FF'>const</font> diff_type tau1 <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font>diff_type<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>k<font color='#5555FF'>/</font>data[set1].component_size<font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>const</font> diff_type tau2 <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font>diff_type<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>k<font color='#5555FF'>/</font>data[set2].component_size<font face='Lucida Console'>)</font>;
+
+                <font color='#0000FF'>const</font> diff_type mint <font color='#5555FF'>=</font> std::<font color='#BB00BB'>min</font><font face='Lucida Console'>(</font>data[set1].internal_diff <font color='#5555FF'>+</font> tau1, 
+                                                data[set2].internal_diff <font color='#5555FF'>+</font> tau2<font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>diff <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> mint<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> new_set <font color='#5555FF'>=</font> sets.<font color='#BB00BB'>merge_sets</font><font face='Lucida Console'>(</font>set1, set2<font face='Lucida Console'>)</font>;
+                    data[new_set].component_size <font color='#5555FF'>=</font> data[set1].component_size <font color='#5555FF'>+</font> data[set2].component_size;
+                    data[new_set].internal_diff <font color='#5555FF'>=</font> diff;
+                <b>}</b>
+            <b>}</b>
+        <b>}</b>
+
+        <font color='#009900'>// now merge any really small blobs
+</font>        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>min_size <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> sorted_edges.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> idx1 <font color='#5555FF'>=</font> sorted_edges[i].idx1;
+                <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> idx2 <font color='#5555FF'>=</font> sorted_edges[i].idx2;
+
+                <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> set1 <font color='#5555FF'>=</font> sets.<font color='#BB00BB'>find_set</font><font face='Lucida Console'>(</font>idx1<font face='Lucida Console'>)</font>;
+                <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> set2 <font color='#5555FF'>=</font> sets.<font color='#BB00BB'>find_set</font><font face='Lucida Console'>(</font>idx2<font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>set1 <font color='#5555FF'>!</font><font color='#5555FF'>=</font> set2 <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> <font face='Lucida Console'>(</font>data[set1].component_size <font color='#5555FF'>&lt;</font> min_size <font color='#5555FF'>|</font><font color='#5555FF'>|</font> data[set2].component_size <font color='#5555FF'>&lt;</font> min_size<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> new_set <font color='#5555FF'>=</font> sets.<font color='#BB00BB'>merge_sets</font><font face='Lucida Console'>(</font>set1, set2<font face='Lucida Console'>)</font>;
+                    data[new_set].component_size <font color='#5555FF'>=</font> data[set1].component_size <font color='#5555FF'>+</font> data[set2].component_size;
+                    <font color='#009900'>//data[new_set].internal_diff = sorted_edges[i].diff;
+</font>                <b>}</b>
+            <b>}</b>
+        <b>}</b>
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> idx <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> r <font color='#5555FF'>=</font> <font color='#979000'>0</font>; r <font color='#5555FF'>&lt;</font> out_img.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>r<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> c <font color='#5555FF'>=</font> <font color='#979000'>0</font>; c <font color='#5555FF'>&lt;</font> out_img.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>c<font face='Lucida Console'>)</font>
+            <b>{</b>
+                out_img[r][c] <font color='#5555FF'>=</font> sets.<font color='#BB00BB'>find_set</font><font face='Lucida Console'>(</font>idx<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+        <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>//                     Candidate object location generation code.
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>namespace</font> impl
+    <b>{</b>
+        <font color='#0000FF'>struct</font> <b><a name='edge_data'></a>edge_data</b>
+        <b>{</b>
+            <font color='#0000FF'><u>double</u></font> edge_diff;
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> set1;  
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> set2;
+            <font color='#0000FF'><u>bool</u></font> <b><a name='operator'></a>operator</b><font color='#5555FF'>&lt;</font><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> edge_data<font color='#5555FF'>&amp;</font> item<font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+            <b>{</b>
+                <font color='#0000FF'>return</font> edge_diff <font color='#5555FF'>&lt;</font> item.edge_diff;
+            <b>}</b>
+        <b>}</b>;
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'>typename</font> in_image_type,
+            <font color='#0000FF'>typename</font> diff_type
+            <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='find_basic_candidate_object_locations'></a>find_basic_candidate_object_locations</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> in_image_type<font color='#5555FF'>&amp;</font> in_img,
+            <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>dlib::impl::segment_image_edge_data_T<font color='#5555FF'>&lt;</font>diff_type<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> sorted_edges,
+            std::vector<font color='#5555FF'>&lt;</font>rectangle<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> out_rects,
+            std::vector<font color='#5555FF'>&lt;</font>edge_data<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> edges,
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> k,
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> min_size 
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> dlib::impl;
+
+            std::vector<font color='#5555FF'>&lt;</font>dlib::impl::segment_image_edge_data_T<font color='#5555FF'>&lt;</font>diff_type<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> rejected_edges;
+            rejected_edges.<font color='#BB00BB'>reserve</font><font face='Lucida Console'>(</font>sorted_edges.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+            out_rects.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            edges.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// don't bother doing anything if the image is too small
+</font>            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>in_img.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> <font color='#979000'>2</font> <font color='#5555FF'>|</font><font color='#5555FF'>|</font> in_img.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> <font color='#979000'>2</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>return</font>;
+            <b>}</b>
+
+            disjoint_subsets sets;
+            sets.<font color='#BB00BB'>set_size</font><font face='Lucida Console'>(</font>in_img.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+
+            std::vector<font color='#5555FF'>&lt;</font>graph_image_segmentation_data_T<font color='#5555FF'>&lt;</font>diff_type<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> <font color='#BB00BB'>data</font><font face='Lucida Console'>(</font>in_img.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+
+
+            std::pair<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font>,<font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font> <font color='#BB00BB'>last_blob_edge</font><font face='Lucida Console'>(</font>std::numeric_limits<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>max</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,
+                                                                  std::numeric_limits<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>max</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;;
+            <font color='#009900'>// now start connecting blobs together to make a minimum spanning tree.
+</font>            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> sorted_edges.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> idx1 <font color='#5555FF'>=</font> sorted_edges[i].idx1;
+                <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> idx2 <font color='#5555FF'>=</font> sorted_edges[i].idx2;
+
+                <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> set1 <font color='#5555FF'>=</font> sets.<font color='#BB00BB'>find_set</font><font face='Lucida Console'>(</font>idx1<font face='Lucida Console'>)</font>;
+                <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> set2 <font color='#5555FF'>=</font> sets.<font color='#BB00BB'>find_set</font><font face='Lucida Console'>(</font>idx2<font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>set1 <font color='#5555FF'>!</font><font color='#5555FF'>=</font> set2<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#0000FF'>const</font> diff_type diff <font color='#5555FF'>=</font> sorted_edges[i].diff;
+                    <font color='#0000FF'>const</font> diff_type tau1 <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font>diff_type<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>k<font color='#5555FF'>/</font>data[set1].component_size<font face='Lucida Console'>)</font>;
+                    <font color='#0000FF'>const</font> diff_type tau2 <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font>diff_type<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>k<font color='#5555FF'>/</font>data[set2].component_size<font face='Lucida Console'>)</font>;
+
+                    <font color='#0000FF'>const</font> diff_type mint <font color='#5555FF'>=</font> std::<font color='#BB00BB'>min</font><font face='Lucida Console'>(</font>data[set1].internal_diff <font color='#5555FF'>+</font> tau1, 
+                        data[set2].internal_diff <font color='#5555FF'>+</font> tau2<font face='Lucida Console'>)</font>;
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>diff <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> mint<font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> new_set <font color='#5555FF'>=</font> sets.<font color='#BB00BB'>merge_sets</font><font face='Lucida Console'>(</font>set1, set2<font face='Lucida Console'>)</font>;
+                        data[new_set].component_size <font color='#5555FF'>=</font> data[set1].component_size <font color='#5555FF'>+</font> data[set2].component_size;
+                        data[new_set].internal_diff <font color='#5555FF'>=</font> diff;
+                    <b>}</b>
+                    <font color='#0000FF'>else</font>
+                    <b>{</b>
+                        <font color='#009900'>// Don't bother keeping multiple edges from the same pair of blobs, we
+</font>                        <font color='#009900'>// only need one for what we will do later.
+</font>                        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>std::<font color='#BB00BB'>make_pair</font><font face='Lucida Console'>(</font>set1,set2<font face='Lucida Console'>)</font> <font color='#5555FF'>!</font><font color='#5555FF'>=</font> last_blob_edge<font face='Lucida Console'>)</font>
+                        <b>{</b>
+                            segment_image_edge_data_T<font color='#5555FF'>&lt;</font>diff_type<font color='#5555FF'>&gt;</font> temp <font color='#5555FF'>=</font> sorted_edges[i];
+                            temp.idx1 <font color='#5555FF'>=</font> set1;
+                            temp.idx2 <font color='#5555FF'>=</font> set2;
+                            rejected_edges.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font>;
+                            last_blob_edge <font color='#5555FF'>=</font> std::<font color='#BB00BB'>make_pair</font><font face='Lucida Console'>(</font>set1,set2<font face='Lucida Console'>)</font>;
+                        <b>}</b>
+                    <b>}</b>
+                <b>}</b>
+            <b>}</b>
+
+
+            <font color='#009900'>// merge small blobs
+</font>            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> rejected_edges.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> idx1 <font color='#5555FF'>=</font> rejected_edges[i].idx1;
+                <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> idx2 <font color='#5555FF'>=</font> rejected_edges[i].idx2;
+
+                <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> set1 <font color='#5555FF'>=</font> sets.<font color='#BB00BB'>find_set</font><font face='Lucida Console'>(</font>idx1<font face='Lucida Console'>)</font>;
+                <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> set2 <font color='#5555FF'>=</font> sets.<font color='#BB00BB'>find_set</font><font face='Lucida Console'>(</font>idx2<font face='Lucida Console'>)</font>;
+                rejected_edges[i].idx1 <font color='#5555FF'>=</font> set1;
+                rejected_edges[i].idx2 <font color='#5555FF'>=</font> set2;
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>set1 <font color='#5555FF'>!</font><font color='#5555FF'>=</font> set2 <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> <font face='Lucida Console'>(</font>data[set1].component_size <font color='#5555FF'>&lt;</font> min_size <font color='#5555FF'>|</font><font color='#5555FF'>|</font> data[set2].component_size <font color='#5555FF'>&lt;</font> min_size<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> new_set <font color='#5555FF'>=</font> sets.<font color='#BB00BB'>merge_sets</font><font face='Lucida Console'>(</font>set1, set2<font face='Lucida Console'>)</font>;
+                    data[new_set].component_size <font color='#5555FF'>=</font> data[set1].component_size <font color='#5555FF'>+</font> data[set2].component_size;
+                    data[new_set].internal_diff <font color='#5555FF'>=</font> rejected_edges[i].diff;
+                <b>}</b>
+            <b>}</b>
+
+            <font color='#009900'>// find bounding boxes of each blob
+</font>            std::map<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font>, rectangle<font color='#5555FF'>&gt;</font> boxes;
+            std::map<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font>, <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font> box_id_map;
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> idx <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> r <font color='#5555FF'>=</font> <font color='#979000'>0</font>; r <font color='#5555FF'>&lt;</font> in_img.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>r<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> c <font color='#5555FF'>=</font> <font color='#979000'>0</font>; c <font color='#5555FF'>&lt;</font> in_img.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>c<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> id <font color='#5555FF'>=</font> sets.<font color='#BB00BB'>find_set</font><font face='Lucida Console'>(</font>idx<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font>;
+                    <font color='#009900'>// Accumulate the current point into its box and if it is the first point
+</font>                    <font color='#009900'>// in the box then also record the id number for this box.
+</font>                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>boxes[id] <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#BB00BB'>point</font><font face='Lucida Console'>(</font>c,r<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>area</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>
+                        box_id_map[id] <font color='#5555FF'>=</font> boxes.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#979000'>1</font>;
+                <b>}</b>
+            <b>}</b>
+
+            <font color='#009900'>// copy boxes into out_rects
+</font>            out_rects.<font color='#BB00BB'>resize</font><font face='Lucida Console'>(</font>boxes.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>std::map<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font>,rectangle<font color='#5555FF'>&gt;</font>::iterator i <font color='#5555FF'>=</font> boxes.<font color='#BB00BB'>begin</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; i <font color='#5555FF'>!</font><font color='#5555FF'>=</font> boxes.<font color='#BB00BB'>end</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                out_rects[box_id_map[i<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>first]] <font color='#5555FF'>=</font> i<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>second;
+            <b>}</b>
+
+            <font color='#009900'>// Now find the edges between the boxes 
+</font>            <font color='#0000FF'>typedef</font> dlib::memory_manager<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font>::kernel_2c mm_type;
+            dlib::set<font color='#5555FF'>&lt;</font>std::pair<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font>, <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font>, mm_type<font color='#5555FF'>&gt;</font>::kernel_1a neighbors_final;
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> rejected_edges.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> idx1 <font color='#5555FF'>=</font> rejected_edges[i].idx1;
+                <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> idx2 <font color='#5555FF'>=</font> rejected_edges[i].idx2;
+
+                <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> set1 <font color='#5555FF'>=</font> sets.<font color='#BB00BB'>find_set</font><font face='Lucida Console'>(</font>idx1<font face='Lucida Console'>)</font>;
+                <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> set2 <font color='#5555FF'>=</font> sets.<font color='#BB00BB'>find_set</font><font face='Lucida Console'>(</font>idx2<font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>set1 <font color='#5555FF'>!</font><font color='#5555FF'>=</font> set2<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    std::pair<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font>, <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font> p <font color='#5555FF'>=</font> std::<font color='#BB00BB'>make_pair</font><font face='Lucida Console'>(</font>set1,set2<font face='Lucida Console'>)</font>;
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font>neighbors_final.<font color='#BB00BB'>is_member</font><font face='Lucida Console'>(</font>p<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        neighbors_final.<font color='#BB00BB'>add</font><font face='Lucida Console'>(</font>p<font face='Lucida Console'>)</font>;
+
+                        edge_data temp;
+                        <font color='#0000FF'>const</font> diff_type mint <font color='#5555FF'>=</font> std::<font color='#BB00BB'>min</font><font face='Lucida Console'>(</font>data[set1].internal_diff , 
+                                                        data[set2].internal_diff <font face='Lucida Console'>)</font>;
+                        temp.edge_diff <font color='#5555FF'>=</font> rejected_edges[i].diff <font color='#5555FF'>-</font> mint;
+                        temp.set1 <font color='#5555FF'>=</font> box_id_map[set1];
+                        temp.set2 <font color='#5555FF'>=</font> box_id_map[set2];
+                        edges.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font>;
+                    <b>}</b>
+                <b>}</b>
+            <b>}</b>
+
+            std::<font color='#BB00BB'>sort</font><font face='Lucida Console'>(</font>edges.<font color='#BB00BB'>begin</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, edges.<font color='#BB00BB'>end</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+    <b>}</b> <font color='#009900'>// end namespace impl
+</font>
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> alloc<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='remove_duplicates'></a>remove_duplicates</b> <font face='Lucida Console'>(</font>
+        std::vector<font color='#5555FF'>&lt;</font>rectangle,alloc<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> rects
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        std::<font color='#BB00BB'>sort</font><font face='Lucida Console'>(</font>rects.<font color='#BB00BB'>begin</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, rects.<font color='#BB00BB'>end</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, std::less<font color='#5555FF'>&lt;</font>rectangle<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> num_unique <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>1</font>; i <font color='#5555FF'>&lt;</font> rects.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>rects[i] <font color='#5555FF'>!</font><font color='#5555FF'>=</font> rects[i<font color='#5555FF'>-</font><font color='#979000'>1</font>]<font face='Lucida Console'>)</font>
+            <b>{</b>
+                rects[num_unique<font color='#5555FF'>+</font><font color='#5555FF'>+</font>] <font color='#5555FF'>=</font> rects[i];
+            <b>}</b>
+        <b>}</b>
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>rects.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+            rects.<font color='#BB00BB'>resize</font><font face='Lucida Console'>(</font>num_unique<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> in_image_type,
+        <font color='#0000FF'>typename</font> EXP
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='find_candidate_object_locations'></a>find_candidate_object_locations</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> in_image_type<font color='#5555FF'>&amp;</font> in_img_,
+        std::vector<font color='#5555FF'>&lt;</font>rectangle<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> rects,
+        <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&lt;</font>EXP<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> kvals,
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> min_size <font color='#5555FF'>=</font> <font color='#979000'>20</font>,
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> max_merging_iterations <font color='#5555FF'>=</font> <font color='#979000'>50</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#009900'>// make sure requires clause is not broken
+</font>        <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font><font color='#BB00BB'>is_vector</font><font face='Lucida Console'>(</font>kvals<font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> kvals.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font>,
+            "<font color='#CC0000'>\t void find_candidate_object_locations()</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t Invalid inputs were given to this function.</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t is_vector(kvals): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>is_vector</font><font face='Lucida Console'>(</font>kvals<font face='Lucida Console'>)</font>
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t kvals.size():     </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> kvals.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+            <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>typedef</font> dlib::memory_manager<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font>::kernel_2c mm_type;
+        <font color='#0000FF'>typedef</font> dlib::set<font color='#5555FF'>&lt;</font>rectangle, mm_type<font color='#5555FF'>&gt;</font>::kernel_1a set_of_rects;
+
+        <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> dlib::impl;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> image_traits<font color='#5555FF'>&lt;</font>in_image_type<font color='#5555FF'>&gt;</font>::pixel_type ptype;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> edge_diff_funct<font color='#5555FF'>&lt;</font>ptype<font color='#5555FF'>&gt;</font>::diff_type diff_type;
+
+        const_image_view<font color='#5555FF'>&lt;</font>in_image_type<font color='#5555FF'>&gt;</font> <font color='#BB00BB'>in_img</font><font face='Lucida Console'>(</font>in_img_<font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// don't bother doing anything if the image is too small
+</font>        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>in_img.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> <font color='#979000'>2</font> <font color='#5555FF'>|</font><font color='#5555FF'>|</font> in_img.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> <font color='#979000'>2</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>return</font>;
+        <b>}</b>
+
+        std::vector<font color='#5555FF'>&lt;</font>edge_data<font color='#5555FF'>&gt;</font> edges;
+        std::vector<font color='#5555FF'>&lt;</font>rectangle<font color='#5555FF'>&gt;</font> working_rects;
+        std::vector<font color='#5555FF'>&lt;</font>segment_image_edge_data_T<font color='#5555FF'>&lt;</font>diff_type<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> sorted_edges;
+        <font color='#BB00BB'>get_pixel_edges</font><font face='Lucida Console'>(</font>in_img, sorted_edges<font face='Lucida Console'>)</font>;
+
+        disjoint_subsets sets;
+
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> j <font color='#5555FF'>=</font> <font color='#979000'>0</font>; j <font color='#5555FF'>&lt;</font> kvals.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>j<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> k <font color='#5555FF'>=</font> <font color='#BB00BB'>kvals</font><font face='Lucida Console'>(</font>j<font face='Lucida Console'>)</font>;
+
+            <font color='#BB00BB'>find_basic_candidate_object_locations</font><font face='Lucida Console'>(</font>in_img, sorted_edges, working_rects, edges, k, min_size<font face='Lucida Console'>)</font>;
+            rects.<font color='#BB00BB'>insert</font><font face='Lucida Console'>(</font>rects.<font color='#BB00BB'>end</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, working_rects.<font color='#BB00BB'>begin</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, working_rects.<font color='#BB00BB'>end</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+
+            <font color='#009900'>// Now iteratively merge all the rectangles we have and record the results.
+</font>            <font color='#009900'>// Note that, unlike what is described in the paper 
+</font>            <font color='#009900'>//    Segmentation as Selective Search for Object Recognition" by Koen E. A. van de Sande, et al.
+</font>            <font color='#009900'>// we don't use any kind of histogram/SIFT like thing to order the edges
+</font>            <font color='#009900'>// between the blobs.  Here we simply order by the pixel difference value.
+</font>            <font color='#009900'>// Additionally, note that we keep progressively merging boxes in the outer
+</font>            <font color='#009900'>// loop rather than performing just a single iteration as indicated in the
+</font>            <font color='#009900'>// paper.
+</font>            set_of_rects detected_rects;
+            <font color='#0000FF'><u>bool</u></font> did_merge <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> iter <font color='#5555FF'>=</font> <font color='#979000'>0</font>; did_merge <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> iter <font color='#5555FF'>&lt;</font> max_merging_iterations; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>iter<font face='Lucida Console'>)</font> 
+            <b>{</b>
+                did_merge <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+                sets.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                sets.<font color='#BB00BB'>set_size</font><font face='Lucida Console'>(</font>working_rects.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+                <font color='#009900'>// recursively merge neighboring blobs until we have merged everything
+</font>                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> edges.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    edge_data temp <font color='#5555FF'>=</font> edges[i];
+
+                    temp.set1 <font color='#5555FF'>=</font> sets.<font color='#BB00BB'>find_set</font><font face='Lucida Console'>(</font>temp.set1<font face='Lucida Console'>)</font>;
+                    temp.set2 <font color='#5555FF'>=</font> sets.<font color='#BB00BB'>find_set</font><font face='Lucida Console'>(</font>temp.set2<font face='Lucida Console'>)</font>;
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>temp.set1 <font color='#5555FF'>!</font><font color='#5555FF'>=</font> temp.set2<font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        rectangle merged_rect <font color='#5555FF'>=</font> working_rects[temp.set1] <font color='#5555FF'>+</font> working_rects[temp.set2];
+                        <font color='#009900'>// Skip merging this pair of blobs if it was merged in a previous
+</font>                        <font color='#009900'>// iteration.  Doing this lets us consider other possible blob
+</font>                        <font color='#009900'>// merges.
+</font>                        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font>detected_rects.<font color='#BB00BB'>is_member</font><font face='Lucida Console'>(</font>merged_rect<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                        <b>{</b>
+                            <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> new_set <font color='#5555FF'>=</font> sets.<font color='#BB00BB'>merge_sets</font><font face='Lucida Console'>(</font>temp.set1, temp.set2<font face='Lucida Console'>)</font>;
+                            rects.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>merged_rect<font face='Lucida Console'>)</font>;
+                            working_rects[new_set] <font color='#5555FF'>=</font> merged_rect;
+                            did_merge <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+                            detected_rects.<font color='#BB00BB'>add</font><font face='Lucida Console'>(</font>merged_rect<font face='Lucida Console'>)</font>;
+                        <b>}</b>
+                    <b>}</b>
+                <b>}</b>
+            <b>}</b>
+        <b>}</b>
+
+        <font color='#BB00BB'>remove_duplicates</font><font face='Lucida Console'>(</font>rects<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> in_image_type
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='find_candidate_object_locations'></a>find_candidate_object_locations</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> in_image_type<font color='#5555FF'>&amp;</font> in_img,
+        std::vector<font color='#5555FF'>&lt;</font>rectangle<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> rects
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#BB00BB'>find_candidate_object_locations</font><font face='Lucida Console'>(</font>in_img, rects, <font color='#BB00BB'>linspace</font><font face='Lucida Console'>(</font><font color='#979000'>50</font>, <font color='#979000'>200</font>, <font color='#979000'>3</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_SEGMENT_ImAGE_Hh_
+</font>
+
+</pre></body></html>

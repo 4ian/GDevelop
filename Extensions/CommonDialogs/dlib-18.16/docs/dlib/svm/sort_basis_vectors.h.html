@@ -1,0 +1,227 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - sort_basis_vectors.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2010  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_SORT_BASIS_VECTORs_Hh_
+<font color='#0000FF'>#define</font> DLIB_SORT_BASIS_VECTORs_Hh_
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>vector<font color='#5555FF'>&gt;</font>
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='sort_basis_vectors_abstract.h.html'>sort_basis_vectors_abstract.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../matrix.h.html'>../matrix.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../statistics.h.html'>../statistics.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>namespace</font> bs_impl 
+    <b>{</b>
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> EXP<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>typename</font> EXP::matrix_type <b><a name='invert'></a>invert</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&lt;</font>EXP<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> m
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            eigenvalue_decomposition<font color='#5555FF'>&lt;</font>EXP<font color='#5555FF'>&gt;</font> <font color='#BB00BB'>eig</font><font face='Lucida Console'>(</font><font color='#BB00BB'>make_symmetric</font><font face='Lucida Console'>(</font>m<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> EXP::type scalar_type;
+            <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> EXP::mem_manager_type mm_type;
+
+            matrix<font color='#5555FF'>&lt;</font>scalar_type,<font color='#979000'>0</font>,<font color='#979000'>1</font>,mm_type<font color='#5555FF'>&gt;</font> vals <font color='#5555FF'>=</font> eig.<font color='#BB00BB'>get_real_eigenvalues</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>const</font> scalar_type max_eig <font color='#5555FF'>=</font> <font color='#BB00BB'>max</font><font face='Lucida Console'>(</font><font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font>vals<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>const</font> scalar_type thresh <font color='#5555FF'>=</font> max_eig<font color='#5555FF'>*</font>std::<font color='#BB00BB'>sqrt</font><font face='Lucida Console'>(</font>std::numeric_limits<font color='#5555FF'>&lt;</font>scalar_type<font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>epsilon</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// Since m might be singular or almost singular we need to do something about
+</font>            <font color='#009900'>// any very small eigenvalues.  So here we set the smallest eigenvalues to
+</font>            <font color='#009900'>// be equal to a large value to make the inversion stable.  We can't just set
+</font>            <font color='#009900'>// them to zero like in a normal pseudo-inverse since we want the resulting
+</font>            <font color='#009900'>// inverse matrix to be full rank.
+</font>            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> vals.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>std::<font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font><font color='#BB00BB'>vals</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> thresh<font face='Lucida Console'>)</font>
+                    <font color='#BB00BB'>vals</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> max_eig;
+            <b>}</b>
+
+            <font color='#009900'>// Build the inverse matrix.  This is basically a pseudo-inverse.
+</font>            <font color='#0000FF'>return</font> <font color='#BB00BB'>make_symmetric</font><font face='Lucida Console'>(</font>eig.<font color='#BB00BB'>get_pseudo_v</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>*</font><font color='#BB00BB'>diagm</font><font face='Lucida Console'>(</font><font color='#BB00BB'>reciprocal</font><font face='Lucida Console'>(</font>vals<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font color='#5555FF'>*</font><font color='#BB00BB'>trans</font><font face='Lucida Console'>(</font>eig.<font color='#BB00BB'>get_pseudo_v</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'>typename</font> kernel_type,
+            <font color='#0000FF'>typename</font> vect1_type,
+            <font color='#0000FF'>typename</font> vect2_type,
+            <font color='#0000FF'>typename</font> vect3_type
+            <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> kernel_type::sample_type<font color='#5555FF'>&gt;</font> <b><a name='sort_basis_vectors_impl'></a>sort_basis_vectors_impl</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> kernel_type<font color='#5555FF'>&amp;</font> kern,
+            <font color='#0000FF'>const</font> vect1_type<font color='#5555FF'>&amp;</font> samples,
+            <font color='#0000FF'>const</font> vect2_type<font color='#5555FF'>&amp;</font> labels,
+            <font color='#0000FF'>const</font> vect3_type<font color='#5555FF'>&amp;</font> basis,
+            <font color='#0000FF'><u>double</u></font> eps 
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font><font color='#BB00BB'>is_binary_classification_problem</font><font face='Lucida Console'>(</font>samples, labels<font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font>
+                        <font color='#979000'>0</font> <font color='#5555FF'>&lt;</font> eps <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> eps <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#979000'>1</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> 
+                        basis.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font>,
+                        "<font color='#CC0000'>\t void sort_basis_vectors()</font>"
+                        <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t Invalid arguments were given to this function.</font>"
+                        <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t is_binary_classification_problem(samples, labels): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>is_binary_classification_problem</font><font face='Lucida Console'>(</font>samples, labels<font face='Lucida Console'>)</font>
+                        <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t basis.size(): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> basis.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> 
+                        <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t eps:          </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> eps 
+            <font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> kernel_type::scalar_type scalar_type;
+            <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> kernel_type::mem_manager_type mm_type;
+
+            <font color='#0000FF'>typedef</font> matrix<font color='#5555FF'>&lt;</font>scalar_type,<font color='#979000'>0</font>,<font color='#979000'>1</font>,mm_type<font color='#5555FF'>&gt;</font> col_matrix;
+            <font color='#0000FF'>typedef</font> matrix<font color='#5555FF'>&lt;</font>scalar_type,<font color='#979000'>0</font>,<font color='#979000'>0</font>,mm_type<font color='#5555FF'>&gt;</font> gen_matrix;
+
+            col_matrix c1_mean, c2_mean, temp, delta;
+
+
+            col_matrix weights;
+
+            running_covariance<font color='#5555FF'>&lt;</font>gen_matrix<font color='#5555FF'>&gt;</font> cov;
+
+            <font color='#009900'>// compute the covariance matrix and the means of the two classes.
+</font>            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> samples.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                temp <font color='#5555FF'>=</font> <font color='#BB00BB'>kernel_matrix</font><font face='Lucida Console'>(</font>kern, basis, <font color='#BB00BB'>samples</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                cov.<font color='#BB00BB'>add</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>labels</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                    c1_mean <font color='#5555FF'>+</font><font color='#5555FF'>=</font> temp;
+                <font color='#0000FF'>else</font>
+                    c2_mean <font color='#5555FF'>+</font><font color='#5555FF'>=</font> temp;
+            <b>}</b>
+
+            c1_mean <font color='#5555FF'>/</font><font color='#5555FF'>=</font> <font color='#BB00BB'>sum</font><font face='Lucida Console'>(</font>labels <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+            c2_mean <font color='#5555FF'>/</font><font color='#5555FF'>=</font> <font color='#BB00BB'>sum</font><font face='Lucida Console'>(</font>labels <font color='#5555FF'>&lt;</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+
+            delta <font color='#5555FF'>=</font> c1_mean <font color='#5555FF'>-</font> c2_mean;
+
+            gen_matrix cov_inv <font color='#5555FF'>=</font> bs_impl::<font color='#BB00BB'>invert</font><font face='Lucida Console'>(</font>cov.<font color='#BB00BB'>covariance</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+
+            matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>long</u></font>,<font color='#979000'>0</font>,<font color='#979000'>1</font>,mm_type<font color='#5555FF'>&gt;</font> total_perm <font color='#5555FF'>=</font> <font color='#BB00BB'>trans</font><font face='Lucida Console'>(</font><font color='#BB00BB'>range</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>, delta.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>long</u></font>,<font color='#979000'>0</font>,<font color='#979000'>1</font>,mm_type<font color='#5555FF'>&gt;</font> perm <font color='#5555FF'>=</font> total_perm;
+
+            std::vector<font color='#5555FF'>&lt;</font>std::pair<font color='#5555FF'>&lt;</font>scalar_type,<font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> <font color='#BB00BB'>sorted_feats</font><font face='Lucida Console'>(</font>delta.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'><u>long</u></font> best_size <font color='#5555FF'>=</font> delta.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'><u>long</u></font> misses <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>long</u></font>,<font color='#979000'>0</font>,<font color='#979000'>1</font>,mm_type<font color='#5555FF'>&gt;</font> best_total_perm <font color='#5555FF'>=</font> perm;
+
+            <font color='#009900'>// Now we basically find fisher's linear discriminant over and over.  Each
+</font>            <font color='#009900'>// time sorting the features so that the most important ones pile up together.
+</font>            weights <font color='#5555FF'>=</font> <font color='#BB00BB'>trans</font><font face='Lucida Console'>(</font><font color='#BB00BB'>chol</font><font face='Lucida Console'>(</font>cov_inv<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font color='#5555FF'>*</font>delta;
+            <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font><font color='#979000'>true</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> sorted_feats.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                    sorted_feats[i] <font color='#5555FF'>=</font> <font color='#BB00BB'>make_pair</font><font face='Lucida Console'>(</font>std::<font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font><font color='#BB00BB'>weights</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>, i<font face='Lucida Console'>)</font>;
+
+                std::<font color='#BB00BB'>sort</font><font face='Lucida Console'>(</font>sorted_feats.<font color='#BB00BB'>begin</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, sorted_feats.<font color='#BB00BB'>end</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+                <font color='#009900'>// make a permutation vector according to the sorting
+</font>                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> perm.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                    <font color='#BB00BB'>perm</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> sorted_feats[i].second;
+
+
+                <font color='#009900'>// Apply the permutation.  Doing this gives the same result as permuting all the
+</font>                <font color='#009900'>// features and then recomputing the delta and cov_inv from scratch.
+</font>                cov_inv <font color='#5555FF'>=</font> <font color='#BB00BB'>subm</font><font face='Lucida Console'>(</font>cov_inv,perm,perm<font face='Lucida Console'>)</font>;
+                delta <font color='#5555FF'>=</font> <font color='#BB00BB'>rowm</font><font face='Lucida Console'>(</font>delta,perm<font face='Lucida Console'>)</font>;
+
+                <font color='#009900'>// Record all the permutations we have done so we will know how the final
+</font>                <font color='#009900'>// weights match up with the original basis vectors when we are done.
+</font>                total_perm <font color='#5555FF'>=</font> <font color='#BB00BB'>rowm</font><font face='Lucida Console'>(</font>total_perm, perm<font face='Lucida Console'>)</font>;
+
+                <font color='#009900'>// compute new Fisher weights for sorted features.
+</font>                weights <font color='#5555FF'>=</font> <font color='#BB00BB'>trans</font><font face='Lucida Console'>(</font><font color='#BB00BB'>chol</font><font face='Lucida Console'>(</font>cov_inv<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font color='#5555FF'>*</font>delta;
+
+                <font color='#009900'>// Measure how many features it takes to account for eps% of the weights vector.
+</font>                <font color='#0000FF'>const</font> scalar_type total_weight <font color='#5555FF'>=</font> <font color='#BB00BB'>length_squared</font><font face='Lucida Console'>(</font>weights<font face='Lucida Console'>)</font>;
+                scalar_type weight_accum <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                <font color='#0000FF'><u>long</u></font> size <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                <font color='#009900'>// figure out how to get eps% of the weights
+</font>                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> weights.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#979000'>1</font>; i <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#979000'>0</font>; <font color='#5555FF'>-</font><font color='#5555FF'>-</font>i<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#5555FF'>+</font><font color='#5555FF'>+</font>size;
+                    weight_accum <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#BB00BB'>weights</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font><font color='#5555FF'>*</font><font color='#BB00BB'>weights</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>;
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>weight_accum<font color='#5555FF'>/</font>total_weight <font color='#5555FF'>&gt;</font> eps<font face='Lucida Console'>)</font>
+                        <font color='#0000FF'>break</font>;
+                <b>}</b>
+
+                <font color='#009900'>// loop until the best_size stops dropping
+</font>                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>size <font color='#5555FF'>&lt;</font> best_size<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    misses <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                    best_size <font color='#5555FF'>=</font> size;
+                    best_total_perm <font color='#5555FF'>=</font> total_perm;
+                <b>}</b>
+                <font color='#0000FF'>else</font>
+                <b>{</b>
+                    <font color='#5555FF'>+</font><font color='#5555FF'>+</font>misses;
+
+                    <font color='#009900'>// Give up once we have had 10 rounds where we didn't find a weights vector with
+</font>                    <font color='#009900'>// a smaller concentration of good features. 
+</font>                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>misses <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#979000'>10</font><font face='Lucida Console'>)</font>
+                        <font color='#0000FF'>break</font>;
+                <b>}</b>
+
+            <b>}</b>
+
+            <font color='#009900'>// make sure best_size isn't zero
+</font>            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>best_size <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                best_size <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+
+            std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> kernel_type::sample_type<font color='#5555FF'>&gt;</font> sorted_basis;
+
+            <font color='#009900'>// permute the basis so that it matches up with the contents of the best weights 
+</font>            sorted_basis.<font color='#BB00BB'>resize</font><font face='Lucida Console'>(</font>best_size<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> sorted_basis.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#009900'>// Note that we load sorted_basis backwards so that the most important
+</font>                <font color='#009900'>// basis elements come first.  
+</font>                sorted_basis[i] <font color='#5555FF'>=</font> <font color='#BB00BB'>basis</font><font face='Lucida Console'>(</font><font color='#BB00BB'>best_total_perm</font><font face='Lucida Console'>(</font>basis.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font>i<font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+            <font color='#0000FF'>return</font> sorted_basis;
+        <b>}</b>
+
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> kernel_type,
+        <font color='#0000FF'>typename</font> vect1_type,
+        <font color='#0000FF'>typename</font> vect2_type,
+        <font color='#0000FF'>typename</font> vect3_type
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> kernel_type::sample_type<font color='#5555FF'>&gt;</font> <b><a name='sort_basis_vectors'></a>sort_basis_vectors</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> kernel_type<font color='#5555FF'>&amp;</font> kern,
+        <font color='#0000FF'>const</font> vect1_type<font color='#5555FF'>&amp;</font> samples,
+        <font color='#0000FF'>const</font> vect2_type<font color='#5555FF'>&amp;</font> labels,
+        <font color='#0000FF'>const</font> vect3_type<font color='#5555FF'>&amp;</font> basis,
+        <font color='#0000FF'><u>double</u></font> eps <font color='#5555FF'>=</font> <font color='#979000'>0.99</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>return</font> bs_impl::<font color='#BB00BB'>sort_basis_vectors_impl</font><font face='Lucida Console'>(</font>kern, 
+                                                <font color='#BB00BB'>mat</font><font face='Lucida Console'>(</font>samples<font face='Lucida Console'>)</font>,
+                                                <font color='#BB00BB'>mat</font><font face='Lucida Console'>(</font>labels<font face='Lucida Console'>)</font>,
+                                                <font color='#BB00BB'>mat</font><font face='Lucida Console'>(</font>basis<font face='Lucida Console'>)</font>,
+                                                eps<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_SORT_BASIS_VECTORs_Hh_
+</font>
+
+</pre></body></html>

@@ -1,0 +1,394 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html xmlns:gcse="googleCustomSearch"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><link rel="shortcut icon" href="dlib-icon.ico"><meta name="verify-v1" content="02MiiaFNVzS5/u0eQhsy3/knioFHsia1X3DXRpHkE6I="><meta name="google-site-verification" content="DGSSJMKDomaDaDTIRJ8jDkv0YMx9Cz7OESbXHjjr6Jw"><title>dlib C++ Library
+   - Suggested Books</title><script language="JavaScript">
+
+// ---------------------------------------------
+// --- Name:    Easy DHTML Treeview           --
+// --- Author:  D.D. de Kerf                  --
+// --- Version: 0.2          Date: 13-6-2001  --
+// ---------------------------------------------
+function Toggle(node)
+{
+   // Unfold the branch if it isn't visible
+   var next_node = node.nextSibling;
+   if (next_node.style.display == 'none')
+   {
+      // Change the image (if there is an image)
+      if (node.childNodes.length > 0)
+      {
+         if (node.childNodes.length > 0)
+         { 
+            if (node.childNodes.item(0).nodeName == "IMG")
+            {
+               node.childNodes.item(0).src = "minus.gif";
+            }
+         }
+      }
+
+      next_node.style.display = 'block';
+   }
+   // Collapse the branch if it IS visible
+   else
+   {
+      // Change the image (if there is an image)
+      if (node.childNodes.length > 0)
+      {
+         if (node.childNodes.length > 0)
+         { 
+            if (node.childNodes.item(0).nodeName == "IMG")
+            {
+               node.childNodes.item(0).src = "plus.gif";
+            }
+         }
+      }
+
+      next_node.style.display = 'none';
+   }
+
+}
+function BigToggle(node)
+{
+   // Unfold the branch if it isn't visible
+   var next_node = node.nextSibling;
+   if (next_node.style.display == 'none')
+   {
+      // Change the image (if there is an image)
+      if (node.childNodes.length > 0)
+      {
+         if (node.childNodes.length > 0)
+         { 
+            if (node.childNodes.item(0).nodeName == "IMG")
+            {
+               node.childNodes.item(0).src = "bigminus.gif";
+            }
+         }
+      }
+
+      next_node.style.display = 'block';
+   }
+   // Collapse the branch if it IS visible
+   else
+   {
+      // Change the image (if there is an image)
+      if (node.childNodes.length > 0)
+      {
+         if (node.childNodes.length > 0)
+         { 
+            if (node.childNodes.item(0).nodeName == "IMG")
+            {
+               node.childNodes.item(0).src = "bigplus.gif";
+            }
+         }
+      }
+
+      next_node.style.display = 'none';
+   }
+
+}
+</script><style type="text/css">
+   body {margin:0px;}
+   pre {margin:0px;}
+
+   ul.tree  li { list-style: none;  margin-left:10px;} 
+   ul.tree  { margin:0px; padding:0px; margin-left:5px; font-size:0.95em; }
+   ul.tree  li ul { margin-left:10px; padding:0px; }
+
+   li#term { list-style: none; }
+
+   div.component {
+      background-color:white; 
+      border: 2px solid rgb(102,102,102); 
+      text-align:left;
+      margin-top: 1.5em;
+      padding: 0.7em;
+   }
+
+   div.question {
+      background-color:white; 
+      border: 2px solid rgb(102,102,102); 
+      text-align:left;
+      margin-top: 1.5em;
+      margin-bottom: 90%;
+      padding: 0.7em;
+   }
+
+   div.function {
+      background-color:white; 
+      border: 2px solid rgb(102,102,255); 
+      text-align:left;
+      margin-top: 0.3em;
+      padding: 0.3em;
+   }
+
+   div.class {
+      background-color:white; 
+      border: 2px solid rgb(255,102,102); 
+      text-align:left;
+      margin-top: 0.3em;
+      padding: 0.3em;
+   }
+
+   div.extension {
+      background-color:#FDFDFD; 
+      border: 1px solid rgb(102,102,102); 
+      text-align:left;
+      margin-top: 1.0em;
+      padding: 0.7em;
+   }
+
+   div.logb {
+      text-align:left;
+      padding: 0.0em;
+      float: left;
+      background-color:#c0c0c0; 
+      border: double ; 
+      margin: 0.5em;
+   }
+
+   div.name {
+      float: left;
+   }
+   div.line1 {
+      float:left;
+      width:100%;
+      background-color:#dfdfdf; 
+   }
+   div.line2 {
+      float:left;
+      width:100%;
+   }
+   div.inc {
+      float: right;
+   }
+
+
+   .code_box
+   {
+      color: black;
+      margin: 1em 0.25in;
+      padding: 0.5em;
+      background: rgb(240,240,240);
+      border-top: black dotted 1px;
+      border-left: black dotted 1px;
+      border-right: black solid 2px;
+      border-bottom: black solid 2px;
+   }
+
+
+
+   .bdotted {border-bottom: 1px dotted}
+   .bdashed {border-bottom: 1px dashed}
+   .bsolid {border-bottom: 1px solid}
+   .bdouble {border-bottom: 1px double}
+   .bgroove {border-bottom: 1px groove}
+   .bridge {border-bottom: 1px ridge}
+   .binset {border-bottom: 1px inset}
+   .boutset {border-bottom: 1px outset}
+
+   div.row1 {
+      background-color:#dfdfdf; 
+   }
+   div.row2 {
+      background-color:#f2f2f2; 
+   }
+
+   div.typedefs {
+      margin-left: 1.5em;
+      margin-top: 0.2em;
+      border: 1px dotted;
+      width: 52em;
+   }
+
+   div.tdn {
+      width: 10em;
+   }
+
+   .fullhr {
+      clear: both;
+   }
+
+   body {
+      text-align: center;
+   }
+
+   div.entire_page_header {
+      width:62.5em;  
+      text-align: left;
+      margin-top: 0.4em;
+      margin-left: auto;
+      margin-right: auto;
+   }
+   div.entire_page {
+      width:62.5em;  
+      text-align: left;
+      margin-left: auto;
+      margin-right: auto;
+      clear:both;
+   }
+</style></head><body bgcolor="#EDF3EE"><a name="top"></a><div class="entire_page_header"><a href="http://dlib.net"><img src="dlib-logo.png"></a></div><div class="entire_page"><table bgcolor="white" height="100%" bordercolor="#EDF3EE" CELLSPACING="0" CELLPADDING="10" style="border:0px;margin-top:2px"><tr height="100%"><td BGCOLOR="#F5F5F5" style="padding:7px; border: 1px solid rgb(102,102,102);" VALIGN="TOP" height="100%"><br><table WIDTH="145" height="100%"><tr><td VALIGN="TOP"><b>The Library</b><ul class="tree"><li><a href="algorithms.html">Algorithms</a></li><li><a href="api.html">API Wrappers</a></li><li><a href="bayes.html">Bayesian Nets</a></li><li><a href="compression.html">Compression</a></li><li><a href="containers.html">Containers</a></li><li><a href="graph_tools.html">Graph Tools</a></li><li><a href="imaging.html">Image Processing</a></li><li><a href="linear_algebra.html">Linear Algebra</a></li><li><a href="ml.html">Machine Learning</a></li><li><a href="metaprogramming.html">Metaprogramming</a></li><li><a href="other.html">Miscellaneous</a></li><li><a href="network.html">Networking</a></li><li><a href="optimization.html">Optimization</a></li><li><a href="parsing.html">Parsing</a></li></ul><br><b>Help/Info</b><ul class="tree"><li><a onclick="Toggle(this)" style="cursor: pointer;margin-left:-9px"><img src="plus.gif"><font color="green"><u>Examples: C++</u></font></a><ul style="display:none;"><li><a href="3d_point_cloud_ex.cpp.html">3D_Point_Cloud</a></li><li><a href="assignment_learning_ex.cpp.html">Assignment_Learning</a></li><li><a href="file_to_code_ex.cpp.html">Base64_Encoder</a></li><li><a href="bayes_net_ex.cpp.html">Bayesian_Network</a></li><li><a href="bayes_net_from_disk_ex.cpp.html">Bayesian_Network_From_Disk</a></li><li><a href="bayes_net_gui_ex.cpp.html">Bayesian_Network_GUI</a></li><li><a href="bridge_ex.cpp.html">Bridge</a></li><li><a href="bsp_ex.cpp.html">BSP</a></li><li><a href="svm_c_ex.cpp.html">C-Support_Vector_Machine</a></li><li><a href="compress_stream_ex.cpp.html#_top">Cmd_Line_Parser</a></li><li><a href="compress_stream_ex.cpp.html">Compress_Stream</a></li><li><a href="config_reader_ex.cpp.html">Config_File_Reader</a></li><li><a href="custom_trainer_ex.cpp.html">Custom_Trainers</a></li><li><a href="dir_nav_ex.cpp.html">Directory_Navigation</a></li><li><a href="empirical_kernel_map_ex.cpp.html">Empirical_Kernel_Map</a></li><li><a href="face_detection_ex.cpp.html">Face_Detection</a></li><li><a href="face_landmark_detection_ex.cpp.html">Face_Landmark_Detection</a></li><li><a href="fhog_ex.cpp.html">FHOG_Feature_Extraction</a></li><li><a href="fhog_object_detector_ex.cpp.html">FHOG_Object_Detection</a></li><li><a href="graph_labeling_ex.cpp.html">Graph_Labeling</a></li><li><a href="gui_api_ex.cpp.html">GUI</a></li><li><a href="hough_transform_ex.cpp.html">Hough_Transform</a></li><li><a href="server_http_ex.cpp.html">HTTP_Server</a></li><li><a href="image_ex.cpp.html">Image</a></li><li><a href="iosockstream_ex.cpp.html">IO Socket Streams</a></li><li><a href="server_iostream_ex.cpp.html">IO Streams Server</a></li><li><a href="kcentroid_ex.cpp.html">Kernel_Centroid</a></li><li><a href="kkmeans_ex.cpp.html">Kernel_K-Means_Clustering</a></li><li><a href="krr_regression_ex.cpp.html">Kernel_Ridge_Regression</a></li><li><a href="krls_filter_ex.cpp.html">Kernel_RLS_Filtering</a></li><li><a href="krls_ex.cpp.html">Kernel_RLS_Regression</a></li><li><a href="krr_classification_ex.cpp.html">KRR_Classification</a></li><li><a href="learning_to_track_ex.cpp.html">Learning_to_Track</a></li><li><a href="max_cost_assignment_ex.cpp.html">Linear_Assignment_Problems</a></li><li><a href="linear_manifold_regularizer_ex.cpp.html">Linear_Manifold_Regularizer</a></li><li><a href="mpc_ex.cpp.html">Linear_Model_Predictive_Control</a></li><li><a href="logger_ex.cpp.html">Logger</a></li><li><a href="logger_ex_2.cpp.html">Logger_Advanced</a></li><li><a href="logger_custom_output_ex.cpp.html">Logger_Custom_Output</a></li><li><a href="matrix_ex.cpp.html">Matrix</a></li><li><a href="matrix_expressions_ex.cpp.html">Matrix_Expressions</a></li><li><a href="member_function_pointer_ex.cpp.html">Member_Function_Pointer</a></li><li><a href="model_selection_ex.cpp.html">Model_Selection</a></li><li><a href="multiclass_classification_ex.cpp.html">Multiclass_Classification</a></li><li><a href="multithreaded_object_ex.cpp.html">Multithreaded_Object</a></li><li><a href="mlp_ex.cpp.html">Neural_Network</a></li><li><a href="least_squares_ex.cpp.html">Non-Linear Least Squares</a></li><li><a href="svm_ex.cpp.html">Nu-Support_Vector_Machine</a></li><li><a href="integrate_function_adapt_simp_ex.cpp.html">Numerical_Integration</a></li><li><a href="object_detector_ex.cpp.html">Object_Detector</a></li><li><a href="object_detector_advanced_ex.cpp.html">Object_Detector_Advanced</a></li><li><a href="one_class_classifiers_ex.cpp.html">One_Class_Classifiers</a></li><li><a href="svm_pegasos_ex.cpp.html">Online_SVM</a></li><li><a href="optimization_ex.cpp.html">Optimization</a></li><li><a href="parallel_for_ex.cpp.html">Parallel_For_Loops</a></li><li><a href="pipe_ex.cpp.html">Pipe</a></li><li><a href="pipe_ex_2.cpp.html">Pipe_2</a></li><li><a href="quantum_computing_ex.cpp.html">Quantum_Computing</a></li><li><a href="queue_ex.cpp.html">Queue</a></li><li><a href="rank_features_ex.cpp.html">Rank_Features</a></li><li><a href="rvm_ex.cpp.html">Relevance_Vector_Classification</a></li><li><a href="rvm_regression_ex.cpp.html">Relevance_Vector_Regression</a></li><li><a href="running_stats_ex.cpp.html">Running_Stats</a></li><li><a href="sequence_labeler_ex.cpp.html">Sequence_Labeling</a></li><li><a href="sequence_segmenter_ex.cpp.html">Sequence_Segmentation</a></li><li><a href="sockets_ex.cpp.html">Sockets</a></li><li><a href="sockstreambuf_ex.cpp.html">Sockstreambuf</a></li><li><a href="svm_sparse_ex.cpp.html">Sparse_Vectors</a></li><li><a href="sqlite_ex.cpp.html">SQLite</a></li><li><a href="std_allocator_ex.cpp.html">Std_C++_Allocator</a></li><li><a href="svm_struct_ex.cpp.html">Structural_Support_Vector_Machines</a></li><li><a href="svr_ex.cpp.html">Support_Vector_Regression</a></li><li><a href="surf_ex.cpp.html">SURF</a></li><li><a href="svm_rank_ex.cpp.html">SVM-Rank</a></li><li><a href="threaded_object_ex.cpp.html">Threaded_Object</a></li><li><a href="threads_ex.cpp.html">Threads</a></li><li><a href="thread_function_ex.cpp.html">Thread_Function</a></li><li><a href="thread_pool_ex.cpp.html">Thread_Pool</a></li><li><a href="timer_ex.cpp.html">Timer</a></li><li><a href="train_object_detector.cpp.html">Train_Object_Detector</a></li><li><a href="train_shape_predictor_ex.cpp.html">Train_Shape_Predictor</a></li><li><a href="using_custom_kernels_ex.cpp.html">Using_Custom_Kernels</a></li><li><a href="video_tracking_ex.cpp.html">Video_Object_Tracking</a></li><li><a href="webcam_face_pose_ex.cpp.html">Webcam_Face_Pose_Estimation</a></li><li><a href="xml_parser_ex.cpp.html">XML_Parser</a></li></ul></li><li><a onclick="Toggle(this)" style="cursor: pointer;margin-left:-9px"><img src="plus.gif"><font color="green"><u>Examples: Python</u></font></a><ul style="display:none;"><li><a href="face_detector.py.html">Face_Detector</a></li><li><a href="face_landmark_detection.py.html">Face_Landmark_Detection</a></li><li><a href="find_candidate_object_locations.py.html">find_candidate_object_locations</a></li><li><a href="max_cost_assignment.py.html">Linear_Assignment_Problems</a></li><li><a href="sequence_segmenter.py.html">Sequence_Segmenter</a></li><li><a href="svm_struct.py.html">Structural_Support_Vector_Machines</a></li><li><a href="svm_rank.py.html">SVM-Rank</a></li><li><a href="train_object_detector.py.html">Train_Object_Detector</a></li><li><a href="train_shape_predictor.py.html">Train_Shape_Predictor</a></li><li><a href="correlation_tracker.py.html">Video_Object_Tracking</a></li></ul></li><li><a href="faq.html">FAQ</a></li><li><a href="index.html">Home</a></li><li><a href="compile.html">How to compile</a></li><li><a href="howto_contribute.html">How to contribute</a></li><li><a href="term_index.html">Index</a></li><li><a href="intro.html">Introduction</a></li><li><a href="license.html">License</a></li><li><a href="python/index.html">Python API</a></li><li><a href="books.html">Suggested Books</a></li></ul><br><b>Current Release</b><ul class="tree"><li><a href="change_log.html">Change Log</a></li><li><a href="release_notes.html">Release Notes</a></li><li>Version: 18.16</li></ul><br></td><td width="1"></td></tr><tr><td valign="bottom"><br><br><br><br><br><br><br><br><br>
+      Last Modified:<br>Nov 17, 2013<br><br></td></tr></table></td><td VALIGN="TOP" width="100%" style="border: 1px solid rgb(102,102,102);"><center><h1>Suggested Books</h1></center><br><br><p>
+         One of the major goals of dlib is to have documentation that enables
+         someone to easily make use of its various components.  Ideally,
+         you would read a short description of something, understand it immediately,
+         and begin using it in your application without any difficulty.  Obviously, this
+         depends partly on the background of the user.  For example, if you have 
+         never written C++ software before then it probably isn't going to be this easy.
+        </p><p>
+          This page is meant to complement the main library documentation by providing 
+          references to books, along with my commentary, which explain most of 
+          the background material needed to understand the various parts of the library.   
+          In most cases these are the books I learned from during the process
+          of creating dlib.  As always, if you disagree with anything or think I have left out 
+          an important text then shoot me an <a href="mailto:davis@dlib.net">email</a>. 
+        </p><br><br><a name="General%20Programming"></a><h2>General Programming</h2><ul><a name="C++"></a><h3>C++</h3><ul><li><i>Programming: Principles and Practice Using C++</i> by Bjarne Stroustrup 
+               <ul>  This is the sort of book you would use in a freshman introduction-to-programming class.  
+                  So if you are just beginning to study programming and are interested in C++ then I think
+               it is probably safe to say this is one of the best books you could read.   </ul><br></li><li><i>Accelerated C++: Practical Programming by Example</i> by Andrew Koenig and Barbara E. Moo 
+               <ul> If you are new to C++ but already know how to program then this is a great book.  It's also 
+                  about one fourth the size of the Stroustrup book.  </ul><br></li><li><i>Effective C++: 55 Specific Ways to Improve Your Programs and Designs</i> (3rd Edition) by Scott Meyers  
+               <ul>  This is a great intermediate level C++ book.  Most people have heard the jokes about 
+                  how easy it is to shoot yourself in the foot with C++.  This book explains many things you
+                  need to know about the language to avoid doing so on a regular basis.  So if you are
+                  writing C++ software then this is a must-read.  I would even claim that
+                  you are a danger to the C++ software you touch unless you know what is in this book.   
+                  I'm not kidding.  Finally, the book isn't just about the quirks of C++. It also discusses many general 
+                 software engineering ideas which have wide applicability.  So in this
+                  respect it is a great book for any software developer to read.  
+               </ul><br></li><li><i>More Effective C++: 35 New Ways to Improve Your Programs and Designs</i> by Scott Meyers  
+               <ul> Consider this an expansion to Effective C++.  If you are going to read the above
+                  book then you would almost certainly benefit from reading this one as well.
+               </ul><br></li><li><i>The C++ Standard Library: A Tutorial and Reference</i> by Nicolai M. Josuttis   
+               <ul> If you are going to buy a reference book on the C++ standard library then this 
+                  is the one to get.  I think you
+                  will find it is better than any of the available online references.    So if you find 
+                  yourself frustrated with the online resources, then this is the book for you.
+               </ul><br></li><li><a href="http://www.cplusplus.com/reference/">Online C++ Standard Library Reference</a><ul> What I said aside, this is a good online reference.   I often find myself referring to it
+                  when I do not have the Josuttis book on hand.
+               </ul><br></li></ul><a name="Multithreading"></a><h3>Multithreading</h3><ul><li><i>Programming with POSIX Threads</i> by  David R. Butenhof  
+               <ul> When I was an undergrad, this book was my main resource for learning about multithreading.  
+                  It was enjoyable to read, as are all the books on this list, and covered everything
+                  in great depth without becoming overbearing.  Also, despite what the title may suggest,
+                  this book is useful for understanding multithreading broadly, not just multithreading
+                  on POSIX systems.
+               </ul><br></li></ul><a name="Network%20Programming"></a><h3>Network Programming</h3><ul><li><i>Unix Network Programming, Volume 1: The Sockets Networking API</i> (3rd Edition) 
+                by  W. Richard Stevens
+               <ul> A lot of people call this book the network programming Bible and  
+                  this praise is well deserved.  If you want a deep understanding of how computer networks
+                  function, including the Internet, then this is the book to read.  As with 
+                   the Butenhof book above, this is an excellent choice even for people who do not
+                   intend to write software for Unix systems.   
+               </ul><br></li></ul><a name="WIN32%20Programming"></a><h3>WIN32 Programming</h3>
+              It has been a long time since I needed to refer to these two books.  However,
+              they contained information I couldn't find elsewhere no matter
+              how hard I looked.  So I recommend them in case you need to create or understand
+              some low level win32 code. 
+              <br><br><ul><li><i>Win32 Programming</i> by Brent E. Rector and Joseph M. Newcomer </li><li><i>Programming Windows</i> by  Charles Petzold </li><li><a href="http://msdn.microsoft.com/en-us/library/default.aspx">MSDN Library</a><ul>  This is Microsoft's online reference documentation.  It is very large and sometimes
+                  confusing.  But at the end of the day you should be able to find the documentation
+                  for just about every function in the entire Windows API.  
+               </ul><br></li></ul></ul><a name="Computer%20Science:%20Algorithms%20and%20Data%20Structures"></a><h2>Computer Science: Algorithms and Data Structures</h2><ul><li><i>Introduction to Algorithms</i> by  Cormen, Leiserson, Rivest and Stein
+               <ul> You should get this book if you are looking for a good discussion of the classic computer science
+                  algorithms and data structures (e.g. most of the components on the <a href="containers.html">containers</a>
+                  page).  
+               </ul><br></li><li><i>Algorithms in C++, Parts 1-4: Fundamentals, Data Structure, Sorting, Searching</i> 
+                  (3rd Edition) by Robert Sedgewick   
+               <ul>  This is another good algorithms book.  If you are going to get only one book on this
+                  subject then get the one above.  However, when I was learning about these topics I 
+                  used both these books and on many occasions I found it helpful to read the description
+                  of an algorithm or data structure in both.  Where one description was a little vague or 
+                  confusing the other generally filled in the gaps.
+               </ul><br></li></ul><a name="Lossless%20Data%20Compression"></a><h2>Lossless Data Compression</h2><ul><li><i>Text Compression</i> by Bell, Cleary, and Witten 
+               <ul> When I was studying data compression this was my most useful
+                  resource.  If you are looking to understand how lossless data compression
+                  algorithms work then this is the book you want.  It is completely self-contained 
+                  and an absolute joy to read.  Note that contrary to one of the reviews on
+                  amazon.com, the book <i>Managing Gigabytes</i> is not the second edition of this book;
+                  if this topic interests you then be sure you get the 318 page
+                  book published in 1990.
+               </ul><br></li></ul><a name="General%20Math"></a><h2>General Math</h2><ul><li><i>Linear Algebra Done Right</i> by Sheldon Jay Axler  
+               <ul> If a matrix seems like an arbitrary grid of numbers or you find that 
+                  you are confused by vectors, matrices, and the various things
+                  that get done with them then this book will change your whole view of this subject.  
+                  It doesn't teach you any algorithms.  Instead, it will give you a general 
+                  framework in which to think about all this stuff.  Once you have that down
+                  everything else will start to make a lot more sense.  If all goes well
+                  you will even start to agree with the following: linear algebra is beautiful. :) 
+               </ul><br></li><li><i>Numerical Linear Algebra</i> by Trefethen and Bau 
+               <ul> While <i>Linear Algebra Done Right</i> is fairly abstract, this book by
+                  Trefethen and Bau will 
+                  explain some of the actual algorithms that are often used.
+                  This is a great second book if you find that you want to know more about 
+                  the SVD, LU decomposition, or various other algorithms involving linear algebra.   
+               </ul><br></li><li><i>Calculus: Single and Multivariable</i> by Hughes-Hallett, Gleason, and McCallum 
+               <ul>
+                   Some of the books below will require and understanding of basic calculus.  So 
+                   I'm recommending this book.  It was the book I used as an undergrad and I 
+                   remember it being alright.  That isn't exactly a glowing review so if you
+                   are really considering buying a calculus book you may want to check out
+                   other reviews before picking this one. 
+               </ul><br></li><li><i>Introduction to Real Analysis</i> (third edition) by Bartle and Sherbert  
+               <ul> At some level real analysis is like a really rigorous repeat of calculus.  
+                  So if you already have an undergraduate education in calculus and 
+                  you are reading things that seem reminiscent of calculus but involve
+                  stuff you haven't seen before (e.g. sup, inf, "sets of numbers", sequences of points) 
+                  then you may be in need of a real analysis book.  This one is quite good and should
+                  be accessible to someone with the usual undergraduate computer science math background.
+               </ul><br></li></ul><a name="Optimization"></a><h2>Optimization</h2>
+
+        The subject of linear algebra is fundamental to optimization.  So you must be familiar
+        with the contents of a book like <i>Linear Algebra Done Right</i> if you are going to study
+        this area.  You will also need to know how to find the derivative of a function and
+        understand what a derivative is all about.  So you will need to know a little bit of
+        calculus.   Finally, once in a while you will need to know a little bit about real
+        analysis.   Ultimately, what you need all depends on how deep you want to go.  
+
+         <ul><li><i>Practical Methods of Optimization</i> (second edition) by R. Fletcher  1987 
+               <ul> I love this book.  When I got it I literally spent my weekends sitting around
+                  reading it for hours.  It is a fascinating and well written introduction to 
+                  the subject of optimization.  This has been my most valuable resource for
+                  learning the fundamentals of optimization and I cannot recommend it highly enough.    
+               </ul><br></li><li><i>Numerical Optimization</i>  by Jorge Nocedal and Stephen Wright 2006  
+               <ul>  This is a more recent text on optimization that is also very good.  It
+                  covers many algorithms not covered by the above book.   
+               </ul><br></li><li><i>Introduction to Derivative-Free Optimization</i>  by Conn, Scheinberg, and Vicente  
+            <ul>  If you want to understand algorithms like <a href="optimization.html#find_min_bobyqa">BOBYQA</a>
+            then this is a good recent book on the subject.  Note that a book like <i>Practical Methods of Optimization</i>
+                 is almost certainly a prerequisite for reading this book.  As an aside, BOBYQA is not discussed in this book but 
+                 its predecessor, NEWUOA is.  
+               </ul><br></li></ul><a name="Machine%20Learning"></a><h2>Machine Learning</h2><ul><li><i>Artificial Intelligence: A Modern Approach </i> (3rd Edition) by Stuart Russell and Peter Norvig
+               <ul> This book is about the much broader field of AI but it contains an excellent introduction
+                  to machine learning and it also covers other useful topics like <a href="bayes.html">bayesian networks</a>.  
+                  Moreover, it is very well written and self-contained.  So you don't need any particular 
+                  background to be able to learn from it apart from a typical undergraduate background
+                  in computer science. 
+               </ul><br></li><li><i>Learning with Kernels: Support Vector Machines, Regularization, Optimization, and Beyond </i> 
+               by Bernhard Schlkopf and Alexander J. Smola
+               <ul> Most of the machine learning tools in dlib are implementations of various kernel methods.
+                    So if you want a book that covers this topic in great depth as well as breadth then this is 
+                    probably the book for you.  The most important prerequisite for this book is linear
+                    algebra.  Virtually everything in this book depends on linear algebra in a fundamental way.  
+                    <p>
+                    The second important subject is optimization.  Whenever you see the text
+                    mention the KKT conditions, duality, "primal variables", or quadratic programming it
+                    is talking about ideas from optimization.  A good book which will explain all this to you
+                    is <i>Practical Methods of Optimization</i>.  Note that this book calls the KKT conditions
+                    just the "KT" conditions.  It is talking about the same thing.  Also, duality 
+                    is something that comes up a lot in optimization but in the context of machine learning
+                    usually people are talking about a particular form known as the Wolfe Dual.  
+                    </p>
+                    It would also be good (but maybe not critical depending on which parts you want to read) to 
+                    be familiar with real analysis.  
+               </ul><br></li><li><i>Kernel Methods for Pattern Analysis </i> by John Shawe-Taylor and Nello Cristianini 
+               <ul> This is another good book about kernel methods.  If you have to choose between 
+                  this book and <i>Learning with Kernels</i> I would go with <i>Learning with Kernels</i>.  However, it is
+                  good to have both since reading different presentations of difficult subjects 
+                  usually makes learning them easier.  
+               </ul><br></li><li><i>Structured Prediction and Learning in Computer Vision</i> by Sebastian Nowozin and Christoph H. Lampert 2011
+               <ul> If you are looking for a book discussing the background material necessary
+                  for understanding things like the <a href="ml.html#structural_svm_problem">Structural SVM</a>
+                  tools in dlib then this is a good book.  It is also available online 
+                  in <a href="http://www.nowozin.net/sebastian/papers/nowozin2011structured-tutorial.pdf">PDF form</a>.
+               </ul><br></li></ul><a name="Image%20Processing"></a><h2>Image Processing</h2><ul><li><i>Digital Image Processing</i> by Rafael C. Gonzalez and Richard E. Woods  
+               <ul> This is a terrific introduction to digital image processing.
+                  By and large this book doesn't require any special prerequisites.  Sometimes
+                  calculus shows up, but not too much.
+               </ul><br></li></ul></td></tr></table></div></body></html>

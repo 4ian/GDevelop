@@ -1,0 +1,189 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - multithreaded_object_extension_abstract.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2007  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#undef</font> DLIB_MULTITHREADED_OBJECT_EXTENSIOn_ABSTRACT_
+<font color='#0000FF'>#ifdef</font> DLIB_MULTITHREADED_OBJECT_EXTENSIOn_ABSTRACT_ 
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='threads_kernel_abstract.h.html'>threads_kernel_abstract.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>class</font> <b><a name='multithreaded_object'></a>multithreaded_object</b>
+    <b>{</b>
+        <font color='#009900'>/*!
+            INITIAL VALUE
+                - is_running() == false
+                - number_of_threads_alive() == 0
+                - number_of_threads_registered() == 0
+
+            WHAT THIS OBJECT REPRESENTS
+                This object represents a multithreaded object.  It is similar to 
+                the threaded_object except it allows you to have many threads in a 
+                single object rather than just one.  To use it you inherit from it 
+                and register the member functions in your new class that you want 
+                to run in their own threads by calling register_thread().  Then when 
+                you call start() it will spawn all the registered functions
+                in their own threads.
+        !*/</font>
+
+    <font color='#0000FF'>public</font>:
+
+        <b><a name='multithreaded_object'></a>multithreaded_object</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #*this is properly initialized
+            throws
+                - std::bad_alloc
+                - dlib::thread_error
+                    the constructor may throw this exception if there is a problem 
+                    gathering resources to create threading objects.
+        !*/</font>
+
+        <font color='#0000FF'>virtual</font> ~<b><a name='multithreaded_object'></a>multithreaded_object</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <font color='#009900'>/*!
+            requires
+                - number_of_threads_alive() == 0
+                  (i.e. in the destructor for the object you derive from this one you
+                  must wait for all the threads to end.)
+            ensures
+                - all resources allocated by *this have been freed.  
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='clear'></a>clear</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #*this has its initial value
+                - blocks until all threads have terminated
+            throws
+                - std::bad_alloc or dlib::thread_error
+                    if an exception is thrown then *this is unusable 
+                    until clear() is called and succeeds
+        !*/</font>
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='is_running'></a>is_running</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - if (number_of_threads_alive() &gt; 0 &amp;&amp; the threads are currently supposed to be executing) then
+                    - returns true
+                - else
+                    - returns false
+        !*/</font>
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='number_of_threads_alive'></a>number_of_threads_alive</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the number of threads that are currently alive (i.e.
+                  the number of threads that have started but not yet terminated)
+        !*/</font>
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='number_of_threads_registered'></a>number_of_threads_registered</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the number of threads that have been registered by
+                  calls to register_thread()
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='wait'></a>wait</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - is not called from one of this object's threads 
+            ensures
+                - if (number_of_threads_alive() &gt; 0) then
+                    - blocks until all the threads in this object have terminated 
+                      (i.e. blocks until number_of_threads_alive() == 0)
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='start'></a>start</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #number_of_threads_alive() == number_of_threads_registered()
+                - #is_running() == true
+                - #should_stop() == false
+                - all the threads registered are up and running. 
+            throws
+                - std::bad_alloc or dlib::thread_error
+                    If either of these exceptions are thrown then 
+                    #is_running() == false and should_stop() == true
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='pause'></a>pause</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #is_running() == false
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='stop'></a>stop</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #should_stop() == true
+                - #is_running() == false
+        !*/</font>
+
+    <font color='#0000FF'>protected</font>:
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'>typename</font> T
+            <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='register_thread'></a>register_thread</b> <font face='Lucida Console'>(</font>
+            T<font color='#5555FF'>&amp;</font> object,
+            <font color='#0000FF'><u>void</u></font> <font face='Lucida Console'>(</font>T::<font color='#5555FF'>*</font>thread<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - (object.*thread)() forms a valid function call
+                - the thread function does not throw
+            ensures
+                - registers the member function pointed to by thread as one of the threads
+                  that runs when is_running() == true
+                - #number_of_threads_registered() == number_of_threads_registered() + 1
+                - if (is_running() == true)
+                    - spawns this new member function in its own thread
+                    - #number_of_threads_alive() += number_of_threads_alive() + 1
+            throws
+                - std::bad_alloc or dlib::thread_error
+                    If either of these exceptions are thrown then 
+                    #is_running() == false and should_stop() == true
+        !*/</font>
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='should_stop'></a>should_stop</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - is only called from one of the registered threads in this object 
+            ensures
+                - if (is_running() == false &amp;&amp; should_stop() == false) then
+                    - blocks until (#is_running() == true || #should_stop() == true) 
+                - if (this thread is supposed to terminate) then
+                    - returns true
+                - else
+                    - returns false
+        !*/</font>
+
+    <font color='#0000FF'>private</font>:
+
+        <font color='#009900'>// restricted functions
+</font>        <b><a name='multithreaded_object'></a>multithreaded_object</b><font face='Lucida Console'>(</font>multithreaded_object<font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font>;        <font color='#009900'>// copy constructor
+</font>        multithreaded_object<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>=</font><font face='Lucida Console'>(</font>multithreaded_object<font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font>;    <font color='#009900'>// assignment operator
+</font>    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_MULTITHREADED_OBJECT_EXTENSIOn_ABSTRACT_
+</font>
+
+</pre></body></html>

@@ -1,0 +1,248 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - compress_stream_ex.cpp</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// The contents of this file are in the public domain. See LICENSE_FOR_EXAMPLE_PROGRAMS.txt
+</font><font color='#009900'>/*
+
+    This is an example illustrating the use of the compress_stream and
+    cmd_line_parser components from the dlib C++ Library.  
+
+    This example implements a simple command line compression utility.
+
+
+    The output from the program when the -h option is given is:
+
+        Usage: compress_stream_ex (-c|-d|-l) --in input_file --out output_file
+        Options:
+          -c            Indicates that we want to compress a file. 
+          -d            Indicates that we want to decompress a file. 
+          --in &lt;arg&gt;    This option takes one argument which specifies the name of the 
+                        file we want to compress/decompress. 
+          --out &lt;arg&gt;   This option takes one argument which specifies the name of the 
+                        output file. 
+
+        Miscellaneous Options:
+          -h            Display this help message. 
+          -l &lt;arg&gt;      Set the compression level [1-3], 3 is max compression, default 
+                        is 2. 
+
+*/</font>
+
+
+
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>compress_stream.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>cmd_line_parser.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>iostream<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>fstream<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>string<font color='#5555FF'>&gt;</font>
+
+<font color='#009900'>// I am making a typedefs for the versions of compress_stream I want to use.  
+</font><font color='#0000FF'>typedef</font> dlib::compress_stream::kernel_1da cs1;
+<font color='#0000FF'>typedef</font> dlib::compress_stream::kernel_1ea cs2;
+<font color='#0000FF'>typedef</font> dlib::compress_stream::kernel_1ec cs3;
+
+
+<font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> std;
+<font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> dlib;
+
+
+<font color='#0000FF'><u>int</u></font> <b><a name='main'></a>main</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> argc, <font color='#0000FF'><u>char</u></font><font color='#5555FF'>*</font><font color='#5555FF'>*</font> argv<font face='Lucida Console'>)</font>
+<b>{</b>  
+    <font color='#0000FF'>try</font>
+    <b>{</b>
+        command_line_parser parser;
+
+        <font color='#009900'>// first I will define the command line options I want.  
+</font>        <font color='#009900'>// Add a -c option and tell the parser what the option is for.
+</font>        parser.<font color='#BB00BB'>add_option</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>c</font>","<font color='#CC0000'>Indicates that we want to compress a file.</font>"<font face='Lucida Console'>)</font>;
+        parser.<font color='#BB00BB'>add_option</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>d</font>","<font color='#CC0000'>Indicates that we want to decompress a file.</font>"<font face='Lucida Console'>)</font>;
+        <font color='#009900'>// add a --in option that takes 1 argument
+</font>        parser.<font color='#BB00BB'>add_option</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>in</font>","<font color='#CC0000'>This option takes one argument which specifies the name of the file we want to compress/decompress.</font>",<font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+        <font color='#009900'>// add a --out option that takes 1 argument
+</font>        parser.<font color='#BB00BB'>add_option</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>out</font>","<font color='#CC0000'>This option takes one argument which specifies the name of the output file.</font>",<font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+        <font color='#009900'>// In the code below, we use the parser.print_options() method to print all our
+</font>        <font color='#009900'>// options to the screen.  We can tell it that we would like some options to be
+</font>        <font color='#009900'>// grouped together by calling set_group_name() before adding those options.  In
+</font>        <font color='#009900'>// general, you can make as many groups as you like by calling set_group_name().
+</font>        <font color='#009900'>// However, here we make only one named group.
+</font>        parser.<font color='#BB00BB'>set_group_name</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>Miscellaneous Options</font>"<font face='Lucida Console'>)</font>;
+        parser.<font color='#BB00BB'>add_option</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>h</font>","<font color='#CC0000'>Display this help message.</font>"<font face='Lucida Console'>)</font>;
+        parser.<font color='#BB00BB'>add_option</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>l</font>","<font color='#CC0000'>Set the compression level [1-3], 3 is max compression, default is 2.</font>",<font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+
+
+        <font color='#009900'>// now I will parse the command line
+</font>        parser.<font color='#BB00BB'>parse</font><font face='Lucida Console'>(</font>argc,argv<font face='Lucida Console'>)</font>;
+
+
+        <font color='#009900'>// Now I will use the parser to validate some things about the command line.
+</font>        <font color='#009900'>// If any of the following checks fail then an exception will be thrown and it will
+</font>        <font color='#009900'>// contain a message that tells the user what the problem was.
+</font>
+        <font color='#009900'>// First I want to check that none of the options were given on the command line
+</font>        <font color='#009900'>// more than once.  To do this I define an array that contains the options
+</font>        <font color='#009900'>// that shouldn't appear more than once and then I just call check_one_time_options()
+</font>        <font color='#0000FF'>const</font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>*</font> one_time_opts[] <font color='#5555FF'>=</font> <b>{</b>"<font color='#CC0000'>c</font>", "<font color='#CC0000'>d</font>", "<font color='#CC0000'>in</font>", "<font color='#CC0000'>out</font>", "<font color='#CC0000'>h</font>", "<font color='#CC0000'>l</font>"<b>}</b>;
+        parser.<font color='#BB00BB'>check_one_time_options</font><font face='Lucida Console'>(</font>one_time_opts<font face='Lucida Console'>)</font>;
+        <font color='#009900'>// Here I'm checking that the user didn't pick both the c and d options at the
+</font>        <font color='#009900'>// same time. 
+</font>        parser.<font color='#BB00BB'>check_incompatible_options</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>c</font>", "<font color='#CC0000'>d</font>"<font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// Here I'm checking that the argument to the l option is an integer in the range 1 to 3.  
+</font>        <font color='#009900'>// That is, it should be convertible to an int by dlib::string_assign and be either 
+</font>        <font color='#009900'>// 1, 2, or 3.  Note that if you wanted to allow floating point values in the range 1 to 
+</font>        <font color='#009900'>// 3 then you could give a range 1.0 to 3.0 or explicitly supply a type of float or double 
+</font>        <font color='#009900'>// to the template argument of the check_option_arg_range() function.
+</font>        parser.<font color='#BB00BB'>check_option_arg_range</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>l</font>", <font color='#979000'>1</font>, <font color='#979000'>3</font><font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// The 'l' option is a sub-option of the 'c' option. That is, you can only select the
+</font>        <font color='#009900'>// compression level when compressing.  This command below checks that the listed
+</font>        <font color='#009900'>// sub options are always given in the presence of their parent options.
+</font>        <font color='#0000FF'>const</font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>*</font> c_sub_opts[] <font color='#5555FF'>=</font> <b>{</b>"<font color='#CC0000'>l</font>"<b>}</b>;
+        parser.<font color='#BB00BB'>check_sub_options</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>c</font>", c_sub_opts<font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// check if the -h option was given on the command line
+</font>        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>parser.<font color='#BB00BB'>option</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>h</font>"<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#009900'>// display all the command line options
+</font>            cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>Usage: compress_stream_ex (-c|-d|-l) --in input_file --out output_file\n</font>";
+            <font color='#009900'>// This function prints out a nicely formatted list of
+</font>            <font color='#009900'>// all the options the parser has
+</font>            parser.<font color='#BB00BB'>print_options</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; 
+            <font color='#0000FF'>return</font> <font color='#979000'>0</font>;
+        <b>}</b>
+
+        <font color='#009900'>// Figure out what the compression level should be.  If the user didn't supply
+</font>        <font color='#009900'>// this command line option then a value of 2 will be used. 
+</font>        <font color='#0000FF'><u>int</u></font> compression_level <font color='#5555FF'>=</font> <font color='#BB00BB'>get_option</font><font face='Lucida Console'>(</font>parser,"<font color='#CC0000'>l</font>",<font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+
+
+        <font color='#009900'>// make sure one of the c or d options was given
+</font>        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font>parser.<font color='#BB00BB'>option</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>c</font>"<font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> <font color='#5555FF'>!</font>parser.<font color='#BB00BB'>option</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>d</font>"<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>Error in command line:\n   You must specify either the c option or the d option.\n</font>";
+            cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\nTry the -h option for more information.</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+            <font color='#0000FF'>return</font> <font color='#979000'>0</font>;
+        <b>}</b>
+
+
+        string in_file;
+        string out_file;
+
+        <font color='#009900'>// check if the user told us the input file and if they did then 
+</font>        <font color='#009900'>// get the file name
+</font>        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>parser.<font color='#BB00BB'>option</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>in</font>"<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            in_file <font color='#5555FF'>=</font> parser.<font color='#BB00BB'>option</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>in</font>"<font face='Lucida Console'>)</font>.<font color='#BB00BB'>argument</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+        <font color='#0000FF'>else</font>
+        <b>{</b>
+            cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>Error in command line:\n   You must specify an input file.\n</font>";
+            cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\nTry the -h option for more information.</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+            <font color='#0000FF'>return</font> <font color='#979000'>0</font>;
+        <b>}</b>
+
+
+        <font color='#009900'>// check if the user told us the output file and if they did then 
+</font>        <font color='#009900'>// get the file name
+</font>        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>parser.<font color='#BB00BB'>option</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>out</font>"<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            out_file <font color='#5555FF'>=</font> parser.<font color='#BB00BB'>option</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>out</font>"<font face='Lucida Console'>)</font>.<font color='#BB00BB'>argument</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+        <font color='#0000FF'>else</font>
+        <b>{</b>
+            cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>Error in command line:\n   You must specify an output file.\n</font>";
+            cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\nTry the -h option for more information.</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+            <font color='#0000FF'>return</font> <font color='#979000'>0</font>;
+        <b>}</b>
+
+
+        <font color='#009900'>// open the files we will be reading from and writing to
+</font>        ifstream <font color='#BB00BB'>fin</font><font face='Lucida Console'>(</font>in_file.<font color='#BB00BB'>c_str</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,ios::binary<font face='Lucida Console'>)</font>;
+        ofstream <font color='#BB00BB'>fout</font><font face='Lucida Console'>(</font>out_file.<font color='#BB00BB'>c_str</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,ios::binary<font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// make sure the files opened correctly
+</font>        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font>fin<font face='Lucida Console'>)</font>
+        <b>{</b>
+            cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>Error opening file </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> in_file <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>.\n</font>";
+            <font color='#0000FF'>return</font> <font color='#979000'>0</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font>fout<font face='Lucida Console'>)</font>
+        <b>{</b>
+            cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>Error creating file </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> out_file <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>.\n</font>";
+            <font color='#0000FF'>return</font> <font color='#979000'>0</font>;
+        <b>}</b>
+
+
+
+        <font color='#009900'>// now perform the actual compression or decompression.
+</font>        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>parser.<font color='#BB00BB'>option</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>c</font>"<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#009900'>// save the compression level to the output file
+</font>            <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>compression_level, fout<font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>switch</font> <font face='Lucida Console'>(</font>compression_level<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>case</font> <font color='#979000'>1</font>:
+                    <b>{</b>
+                        cs1 compressor;
+                        compressor.<font color='#BB00BB'>compress</font><font face='Lucida Console'>(</font>fin,fout<font face='Lucida Console'>)</font>;
+                    <b>}</b><font color='#0000FF'>break</font>;
+                <font color='#0000FF'>case</font> <font color='#979000'>2</font>:
+                    <b>{</b>
+                        cs2 compressor;
+                        compressor.<font color='#BB00BB'>compress</font><font face='Lucida Console'>(</font>fin,fout<font face='Lucida Console'>)</font>;
+                    <b>}</b><font color='#0000FF'>break</font>;
+                <font color='#0000FF'>case</font> <font color='#979000'>3</font>:
+                    <b>{</b>
+                        cs3 compressor;
+                        compressor.<font color='#BB00BB'>compress</font><font face='Lucida Console'>(</font>fin,fout<font face='Lucida Console'>)</font>;
+                    <b>}</b><font color='#0000FF'>break</font>;
+            <b>}</b>
+        <b>}</b>
+        <font color='#0000FF'>else</font>
+        <b>{</b>
+            <font color='#009900'>// obtain the compression level from the input file
+</font>            <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>compression_level, fin<font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>switch</font> <font face='Lucida Console'>(</font>compression_level<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>case</font> <font color='#979000'>1</font>:
+                    <b>{</b>
+                        cs1 compressor;
+                        compressor.<font color='#BB00BB'>decompress</font><font face='Lucida Console'>(</font>fin,fout<font face='Lucida Console'>)</font>;
+                    <b>}</b><font color='#0000FF'>break</font>;
+                <font color='#0000FF'>case</font> <font color='#979000'>2</font>:
+                    <b>{</b>
+                        cs2 compressor;
+                        compressor.<font color='#BB00BB'>decompress</font><font face='Lucida Console'>(</font>fin,fout<font face='Lucida Console'>)</font>;
+                    <b>}</b><font color='#0000FF'>break</font>;
+                <font color='#0000FF'>case</font> <font color='#979000'>3</font>:
+                    <b>{</b>
+                        cs3 compressor;
+                        compressor.<font color='#BB00BB'>decompress</font><font face='Lucida Console'>(</font>fin,fout<font face='Lucida Console'>)</font>;
+                    <b>}</b><font color='#0000FF'>break</font>;
+                <font color='#0000FF'>default</font>:
+                    <b>{</b>
+                        cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>Error in compressed file, invalid compression level</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+                    <b>}</b><font color='#0000FF'>break</font>;
+            <b>}</b>
+        <b>}</b>
+
+
+        
+
+    <b>}</b>
+    <font color='#0000FF'>catch</font> <font face='Lucida Console'>(</font>exception<font color='#5555FF'>&amp;</font> e<font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#009900'>// Note that this will catch any cmd_line_parse_error exceptions and print
+</font>        <font color='#009900'>// the default message.   
+</font>        cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> e.<font color='#BB00BB'>what</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+    <b>}</b>
+<b>}</b>
+
+
+
+
+
+
+</pre></body></html>

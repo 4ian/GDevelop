@@ -1,0 +1,171 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - box_overlap_testing.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2011  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_BOX_OVERlAP_TESTING_Hh_
+<font color='#0000FF'>#define</font> DLIB_BOX_OVERlAP_TESTING_Hh_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='box_overlap_testing_abstract.h.html'>box_overlap_testing_abstract.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../geometry.h.html'>../geometry.h</a>"
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>vector<font color='#5555FF'>&gt;</font>
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>class</font> <b><a name='test_box_overlap'></a>test_box_overlap</b>
+    <b>{</b>
+    <font color='#0000FF'>public</font>:
+        <b><a name='test_box_overlap'></a>test_box_overlap</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> : match_thresh<font face='Lucida Console'>(</font><font color='#979000'>0.5</font><font face='Lucida Console'>)</font>, overlap_thresh<font face='Lucida Console'>(</font><font color='#979000'>1.0</font><font face='Lucida Console'>)</font>
+        <b>{</b><b>}</b>
+
+        <font color='#0000FF'>explicit</font> <b><a name='test_box_overlap'></a>test_box_overlap</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>double</u></font> match_thresh_,
+            <font color='#0000FF'><u>double</u></font> overlap_thresh_ <font color='#5555FF'>=</font> <font color='#979000'>1.0</font>
+        <font face='Lucida Console'>)</font> : match_thresh<font face='Lucida Console'>(</font>match_thresh_<font face='Lucida Console'>)</font>, overlap_thresh<font face='Lucida Console'>(</font>overlap_thresh_<font face='Lucida Console'>)</font> 
+        <b>{</b>
+            <font color='#009900'>// make sure requires clause is not broken
+</font>            <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font><font color='#979000'>0</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> match_thresh <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> match_thresh <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#979000'>1</font>  <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font>
+                        <font color='#979000'>0</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> overlap_thresh <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> overlap_thresh <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#979000'>1</font>,
+                "<font color='#CC0000'>\t test_box_overlap::test_box_overlap(match_thresh, overlap_thresh)</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t Invalid inputs were given to this function </font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t match_thresh:   </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> match_thresh
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t overlap_thresh: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> overlap_thresh
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t this: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font>
+                <font face='Lucida Console'>)</font>;
+
+        <b>}</b>
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> dlib::rectangle<font color='#5555FF'>&amp;</font> a,
+            <font color='#0000FF'>const</font> dlib::rectangle<font color='#5555FF'>&amp;</font> b
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> inner <font color='#5555FF'>=</font> a.<font color='#BB00BB'>intersect</font><font face='Lucida Console'>(</font>b<font face='Lucida Console'>)</font>.<font color='#BB00BB'>area</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>inner <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                <font color='#0000FF'>return</font> <font color='#979000'>false</font>;
+
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> outer <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>a<font color='#5555FF'>+</font>b<font face='Lucida Console'>)</font>.<font color='#BB00BB'>area</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>inner<font color='#5555FF'>/</font>outer <font color='#5555FF'>&gt;</font> match_thresh <font color='#5555FF'>|</font><font color='#5555FF'>|</font> 
+                inner<font color='#5555FF'>/</font>a.<font color='#BB00BB'>area</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> overlap_thresh <font color='#5555FF'>|</font><font color='#5555FF'>|</font> 
+                inner<font color='#5555FF'>/</font>b.<font color='#BB00BB'>area</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> overlap_thresh<font face='Lucida Console'>)</font>
+                <font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+            <font color='#0000FF'>else</font>
+                <font color='#0000FF'>return</font> <font color='#979000'>false</font>;
+        <b>}</b>
+
+        <font color='#0000FF'><u>double</u></font> <b><a name='get_overlap_thresh'></a>get_overlap_thresh</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#0000FF'>return</font> overlap_thresh;
+        <b>}</b>
+
+        <font color='#0000FF'><u>double</u></font> <b><a name='get_match_thresh'></a>get_match_thresh</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#0000FF'>return</font> match_thresh;
+        <b>}</b>
+
+    <font color='#0000FF'>private</font>:
+        <font color='#0000FF'><u>double</u></font> match_thresh;
+        <font color='#0000FF'><u>double</u></font> overlap_thresh;
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='serialize'></a>serialize</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> test_box_overlap<font color='#5555FF'>&amp;</font> item,
+        std::ostream<font color='#5555FF'>&amp;</font> out
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item.<font color='#BB00BB'>get_match_thresh</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, out<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item.<font color='#BB00BB'>get_overlap_thresh</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, out<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='deserialize'></a>deserialize</b> <font face='Lucida Console'>(</font>
+        test_box_overlap<font color='#5555FF'>&amp;</font> item,
+        std::istream<font color='#5555FF'>&amp;</font> in 
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'><u>double</u></font> overlap_thresh, match_thresh;
+        <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>match_thresh, in<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>overlap_thresh, in<font face='Lucida Console'>)</font>;
+        item <font color='#5555FF'>=</font> <font color='#BB00BB'>test_box_overlap</font><font face='Lucida Console'>(</font>match_thresh, overlap_thresh<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>inline</font> test_box_overlap <b><a name='find_tight_overlap_tester'></a>find_tight_overlap_tester</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>std::vector<font color='#5555FF'>&lt;</font>rectangle<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> rects
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'><u>double</u></font> max_overlap <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <font color='#0000FF'><u>double</u></font> max_match_score <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> rects.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> j <font color='#5555FF'>=</font> <font color='#979000'>0</font>; j <font color='#5555FF'>&lt;</font> rects[i].<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>j<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> k <font color='#5555FF'>=</font> j<font color='#5555FF'>+</font><font color='#979000'>1</font>; k <font color='#5555FF'>&lt;</font> rects[i].<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>k<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#0000FF'>const</font> rectangle a <font color='#5555FF'>=</font> rects[i][j];
+                    <font color='#0000FF'>const</font> rectangle b <font color='#5555FF'>=</font> rects[i][k];
+                    <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> match_score <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>a.<font color='#BB00BB'>intersect</font><font face='Lucida Console'>(</font>b<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>area</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>/</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>double</u></font><font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>a<font color='#5555FF'>+</font>b<font face='Lucida Console'>)</font>.<font color='#BB00BB'>area</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                    <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> overlap_a   <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>a.<font color='#BB00BB'>intersect</font><font face='Lucida Console'>(</font>b<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>area</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>/</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>double</u></font><font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>a<font face='Lucida Console'>)</font>.<font color='#BB00BB'>area</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                    <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> overlap_b   <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>a.<font color='#BB00BB'>intersect</font><font face='Lucida Console'>(</font>b<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>area</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>/</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>double</u></font><font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>b<font face='Lucida Console'>)</font>.<font color='#BB00BB'>area</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>match_score <font color='#5555FF'>&gt;</font> max_match_score<font face='Lucida Console'>)</font>
+                        max_match_score <font color='#5555FF'>=</font> match_score;
+
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>overlap_a <font color='#5555FF'>&gt;</font> max_overlap<font face='Lucida Console'>)</font>
+                        max_overlap <font color='#5555FF'>=</font> overlap_a;
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>overlap_b <font color='#5555FF'>&gt;</font> max_overlap<font face='Lucida Console'>)</font>
+                        max_overlap <font color='#5555FF'>=</font> overlap_b;
+                <b>}</b>
+            <b>}</b>
+        <b>}</b>
+
+        <font color='#009900'>// Relax these thresholds very slightly.  We do this because on some systems the
+</font>        <font color='#009900'>// boxes that generated the max values erroneously trigger a box overlap match
+</font>        <font color='#009900'>// even though their overlap and match values are *equal* to the thresholds but not
+</font>        <font color='#009900'>// greater.  That is, sometimes when double values get moved around they change
+</font>        <font color='#009900'>// their values slightly, so this avoids the problems that can create.
+</font>        max_match_score <font color='#5555FF'>=</font> std::<font color='#BB00BB'>min</font><font face='Lucida Console'>(</font><font color='#979000'>1.0000001</font><font color='#5555FF'>*</font>max_match_score, <font color='#979000'>1.0</font><font face='Lucida Console'>)</font>;
+        max_overlap     <font color='#5555FF'>=</font> std::<font color='#BB00BB'>min</font><font face='Lucida Console'>(</font><font color='#979000'>1.0000001</font><font color='#5555FF'>*</font>max_overlap,     <font color='#979000'>1.0</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>return</font> <font color='#BB00BB'>test_box_overlap</font><font face='Lucida Console'>(</font>max_match_score, max_overlap<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>bool</u></font> <b><a name='overlaps_any_box'></a>overlaps_any_box</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> test_box_overlap<font color='#5555FF'>&amp;</font> tester,
+        <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>rectangle<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> rects,
+        <font color='#0000FF'>const</font> rectangle<font color='#5555FF'>&amp;</font> rect
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> rects.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>tester</font><font face='Lucida Console'>(</font>rects[i],rect<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                <font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+        <b>}</b>
+        <font color='#0000FF'>return</font> <font color='#979000'>false</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>bool</u></font> <b><a name='overlaps_any_box'></a>overlaps_any_box</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>rectangle<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> rects,
+        <font color='#0000FF'>const</font> rectangle<font color='#5555FF'>&amp;</font> rect
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>return</font> <font color='#BB00BB'>overlaps_any_box</font><font face='Lucida Console'>(</font><font color='#BB00BB'>test_box_overlap</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,rects,rect<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_BOX_OVERlAP_TESTING_Hh_
+</font>
+
+</pre></body></html>

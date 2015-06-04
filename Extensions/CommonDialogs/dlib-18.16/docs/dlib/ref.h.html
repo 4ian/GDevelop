@@ -1,0 +1,87 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - ref.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2010  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_REFERENCE_WRAPpER_H_
+<font color='#0000FF'>#define</font> DLIB_REFERENCE_WRAPpER_H_
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font><font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font> 
+    <font color='#0000FF'>class</font> <b><a name='reference_wrapper'></a>reference_wrapper</b> 
+    <b>{</b>
+        <font color='#009900'>/*!
+            WHAT THIS OBJECT REPRESENTS
+                This is a simple object that just holds a reference to another object. 
+                It is useful because it can serve as a kind of "copyable reference".  
+        !*/</font>
+
+    <font color='#0000FF'>public</font>:
+        <font color='#0000FF'>typedef</font> T type;
+
+        <font color='#0000FF'>explicit</font> <b><a name='reference_wrapper'></a>reference_wrapper</b><font face='Lucida Console'>(</font>T<font color='#5555FF'>&amp;</font> o<font face='Lucida Console'>)</font> : obj<font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>o<font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+
+        <b><a name='operator'></a>operator</b> T<font color='#5555FF'>&amp;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>    <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font>  <font color='#5555FF'>*</font>obj; <b>}</b>
+        T<font color='#5555FF'>&amp;</font> <b><a name='get'></a>get</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>         <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font>  <font color='#5555FF'>*</font>obj; <b>}</b>
+
+    <font color='#0000FF'>private</font>:
+        T<font color='#5555FF'>*</font> obj;
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+    reference_wrapper<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font> <b><a name='ref'></a>ref</b><font face='Lucida Console'>(</font>
+        T<font color='#5555FF'>&amp;</font> obj
+    <font face='Lucida Console'>)</font> <b>{</b> <font color='#0000FF'>return</font> reference_wrapper<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>obj<font face='Lucida Console'>)</font>; <b>}</b>
+    <font color='#009900'>/*!
+        ensures
+            - returns a reference_wrapper that contains a reference to obj.
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+    reference_wrapper<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font> <b><a name='ref'></a>ref</b><font face='Lucida Console'>(</font>
+        reference_wrapper<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font> obj
+    <font face='Lucida Console'>)</font> <b>{</b> <font color='#0000FF'>return</font> obj; <b>}</b>
+    <font color='#009900'>/*!
+        ensures
+            - returns the given reference_wrapper object without modification
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+    reference_wrapper<font color='#5555FF'>&lt;</font><font color='#0000FF'>const</font> T<font color='#5555FF'>&gt;</font> <b><a name='cref'></a>cref</b><font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> obj
+    <font face='Lucida Console'>)</font> <b>{</b> <font color='#0000FF'>return</font> reference_wrapper<font color='#5555FF'>&lt;</font><font color='#0000FF'>const</font> T<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>obj<font face='Lucida Console'>)</font>; <b>}</b>
+    <font color='#009900'>/*!
+        ensures
+            - returns a reference_wrapper that contains a constant reference to obj.
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+    reference_wrapper<font color='#5555FF'>&lt;</font><font color='#0000FF'>const</font> T<font color='#5555FF'>&gt;</font> <b><a name='cref'></a>cref</b><font face='Lucida Console'>(</font>
+        reference_wrapper<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font> obj
+    <font face='Lucida Console'>)</font> <b>{</b> <font color='#0000FF'>return</font> <font color='#BB00BB'>cref</font><font face='Lucida Console'>(</font>obj.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>; <b>}</b>
+    <font color='#009900'>/*!
+        ensures
+            - converts the given reference_wrapper into a reference_wrapper that contains a
+              constant reference.
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_REFERENCE_WRAPpER_H_
+</font>
+
+</pre></body></html>

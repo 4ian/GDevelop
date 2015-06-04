@@ -1,0 +1,193 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - sync_extension_kernel_abstract.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2003  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#undef</font> DLIB_SYNC_EXTENSION_KERNEl_ABSTRACT_
+<font color='#0000FF'>#ifdef</font> DLIB_SYNC_EXTENSION_KERNEl_ABSTRACT_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../threads/threads_kernel_abstract.h.html'>../threads/threads_kernel_abstract.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../threads/rmutex_extension_abstract.h.html'>../threads/rmutex_extension_abstract.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../threads/rsignaler_extension_abstract.h.html'>../threads/rsignaler_extension_abstract.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../algs.h.html'>../algs.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> base
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>class</font> <b><a name='sync_extension'></a>sync_extension</b> : <font color='#0000FF'>public</font> base
+    <b>{</b>
+
+        <font color='#009900'>/*!
+            REQUIREMENTS ON base
+                base must have a default constructor
+                base must implement swap(base&amp;)
+
+
+            WHAT THIS OBJECT REPRESENTS
+                This object represents a general extension to any object (given the
+                restrictions on base).  This object gives any object which it extends 
+                an integrated rmutex and rsignaler object.  The extended object will 
+                then be able to be treated as if it was also a rmutex and rsignaler.
+
+                NOTE that just like the threading api, this object does not check
+                its requires clauses so be careful with it.
+
+                Also note that swap() does not swap the rmutex and rsignaler objects.
+                the rmutex and rsignaler are associated with the object instance itself, 
+                not with whatever the object represents.  
+        !*/</font>
+
+
+        <font color='#0000FF'>public</font>:
+
+        <b><a name='sync_extension'></a>sync_extension</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #*this is properly initialized
+            throws
+                - std::bad_alloc
+                    this is thrown if there is a problem gathering memory
+                - dlib::thread_error
+                    this is thrown if there is a problem creating threading objects
+                - any exception thrown by the constructor for the parent class base
+        !*/</font>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'>typename</font> T
+            <font color='#5555FF'>&gt;</font>
+        <b><a name='sync_extension'></a>sync_extension</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> one
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #*this is properly initialized
+                - the argument one will be passed on to the constructor for the parent 
+                  class base.
+            throws
+                - std::bad_alloc
+                    this is thrown if there is a problem gathering memory
+                - dlib::thread_error
+                    this is thrown if there is a problem creating threading objects
+                - any exception thrown by the constructor for the parent class base
+        !*/</font>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'>typename</font> T,
+            <font color='#0000FF'>typename</font> U
+            <font color='#5555FF'>&gt;</font>
+        <b><a name='sync_extension'></a>sync_extension</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> one,
+            <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> two 
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #*this is properly initialized
+                - the argument one will be passed on to the constructor for the parent 
+                  class base as its first argument.
+                - the argument two will be passed on to the constructor for the parent 
+                  class base as its second argument.
+            throws
+                - std::bad_alloc
+                    this is thrown if there is a problem gathering memory
+                - dlib::thread_error
+                    this is thrown if there is a problem creating threading objects
+                - any exception thrown by the constructor for the parent class base
+        !*/</font>
+
+
+        <font color='#0000FF'>const</font> rmutex<font color='#5555FF'>&amp;</font> <b><a name='get_mutex'></a>get_mutex</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the rmutex embedded in this object
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='lock'></a>lock</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - the thread calling lock() does not already have a lock on *this
+            ensures
+                - if (*this is currently locked by another thread) then 
+                    - the thread that called lock() on *this is put to sleep until 
+                      it becomes available                  
+                - if (*this is currently unlocked) then 
+                    - #*this becomes locked and the current thread is NOT put to sleep 
+                      but now "owns" #*this
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='unlock'></a>unlock</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #*this is unlocked (i.e. other threads may now lock this object)
+        !*/</font>
+
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='wait'></a>wait</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - *this is locked and owned by the calling thread
+            ensures
+                - atomically unlocks *this and blocks the calling thread
+                - calling thread will wake if another thread calls signal() or broadcast() 
+                  on *this
+                - when wait returns the calling thread again has a lock on #*this
+        !*/</font>
+
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='wait_or_timeout'></a>wait_or_timeout</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> milliseconds
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - *this is locked and owned by the calling thread
+            ensures
+                - atomically unlocks *this and blocks the calling thread
+                - calling thread will wake if another thread calls signal() or broadcast() 
+                  on *this
+                - after the specified number of milliseconds has elapsed the calling thread
+                  will wake once *this is free to be locked
+                - when wait returns the calling thread again has a lock on #*this
+
+                - returns false if the call to wait_or_timeout timed out 
+                - returns true if the call did not time out
+        !*/</font>
+        
+        <font color='#0000FF'><u>void</u></font> <b><a name='signal'></a>signal</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - if (at least one thread is waiting on *this) then
+                    - at least one of the waiting threads will wake 
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='broadcast'></a>broadcast</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - any and all threads waiting on *this will wake 
+        !*/</font>
+
+    <b>}</b>;
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> base
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='swap'></a>swap</b> <font face='Lucida Console'>(</font>
+        sync_extension<font color='#5555FF'>&lt;</font>base<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> a, 
+        sync_extension<font color='#5555FF'>&lt;</font>base<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> b 
+    <font face='Lucida Console'>)</font> <b>{</b> a.<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>b<font face='Lucida Console'>)</font>; <b>}</b>
+    <font color='#009900'>/*!
+        provides a global swap function
+    !*/</font>
+
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_SYNC_EXTENSION_KERNEl_ABSTRACT_
+</font>
+
+</pre></body></html>

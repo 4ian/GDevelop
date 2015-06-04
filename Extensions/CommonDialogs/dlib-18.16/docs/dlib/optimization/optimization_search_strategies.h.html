@@ -1,0 +1,327 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - optimization_search_strategies.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2008  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_OPTIMIZATIOn_SEARCH_STRATEGIES_H_
+<font color='#0000FF'>#define</font> DLIB_OPTIMIZATIOn_SEARCH_STRATEGIES_H_
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>cmath<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>limits<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../matrix.h.html'>../matrix.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../algs.h.html'>../algs.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='optimization_search_strategies_abstract.h.html'>optimization_search_strategies_abstract.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../sequence.h.html'>../sequence.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>class</font> <b><a name='cg_search_strategy'></a>cg_search_strategy</b>
+    <b>{</b>
+    <font color='#0000FF'>public</font>:
+        <b><a name='cg_search_strategy'></a>cg_search_strategy</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> : been_used<font face='Lucida Console'>(</font><font color='#979000'>false</font><font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+
+        <font color='#0000FF'><u>double</u></font> <b><a name='get_wolfe_rho'></a>get_wolfe_rho</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> <font color='#979000'>0.001</font>; <b>}</b>
+
+        <font color='#0000FF'><u>double</u></font> <b><a name='get_wolfe_sigma'></a>get_wolfe_sigma</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> <font color='#979000'>0.01</font>; <b>}</b>
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='get_max_line_search_iterations'></a>get_max_line_search_iterations</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> <font color='#979000'>100</font>; <b>}</b>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>const</font> matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>0</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> <b><a name='get_next_direction'></a>get_next_direction</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> ,
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> ,
+            <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> funct_derivative
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>been_used <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                been_used <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+                prev_direction <font color='#5555FF'>=</font> <font color='#5555FF'>-</font>funct_derivative;
+            <b>}</b>
+            <font color='#0000FF'>else</font>
+            <b>{</b>
+                <font color='#009900'>// Use the Polak-Ribiere (4.1.12) conjugate gradient described by Fletcher on page 83
+</font>                <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> temp <font color='#5555FF'>=</font> <font color='#BB00BB'>trans</font><font face='Lucida Console'>(</font>prev_derivative<font face='Lucida Console'>)</font><font color='#5555FF'>*</font>prev_derivative;
+                <font color='#009900'>// If this value hits zero then just use the direction of steepest descent.
+</font>                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>std::<font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> std::numeric_limits<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>epsilon</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                <b>{</b>
+                    prev_derivative <font color='#5555FF'>=</font> funct_derivative;
+                    prev_direction <font color='#5555FF'>=</font> <font color='#5555FF'>-</font>funct_derivative;
+                    <font color='#0000FF'>return</font> prev_direction;
+                <b>}</b>
+
+                <font color='#0000FF'><u>double</u></font> b <font color='#5555FF'>=</font> <font color='#BB00BB'>trans</font><font face='Lucida Console'>(</font>funct_derivative<font color='#5555FF'>-</font>prev_derivative<font face='Lucida Console'>)</font><font color='#5555FF'>*</font>funct_derivative<font color='#5555FF'>/</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font>;
+                prev_direction <font color='#5555FF'>=</font> <font color='#5555FF'>-</font>funct_derivative <font color='#5555FF'>+</font> b<font color='#5555FF'>*</font>prev_direction;
+
+            <b>}</b>
+
+            prev_derivative <font color='#5555FF'>=</font> funct_derivative;
+            <font color='#0000FF'>return</font> prev_direction;
+        <b>}</b>
+
+    <font color='#0000FF'>private</font>:
+        <font color='#0000FF'><u>bool</u></font> been_used;
+        matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>0</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> prev_derivative;
+        matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>0</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> prev_direction;
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>class</font> <b><a name='bfgs_search_strategy'></a>bfgs_search_strategy</b>
+    <b>{</b>
+    <font color='#0000FF'>public</font>:
+        <b><a name='bfgs_search_strategy'></a>bfgs_search_strategy</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> : been_used<font face='Lucida Console'>(</font><font color='#979000'>false</font><font face='Lucida Console'>)</font>, been_used_twice<font face='Lucida Console'>(</font><font color='#979000'>false</font><font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+
+        <font color='#0000FF'><u>double</u></font> <b><a name='get_wolfe_rho'></a>get_wolfe_rho</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> <font color='#979000'>0.01</font>; <b>}</b>
+
+        <font color='#0000FF'><u>double</u></font> <b><a name='get_wolfe_sigma'></a>get_wolfe_sigma</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> <font color='#979000'>0.9</font>; <b>}</b>
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='get_max_line_search_iterations'></a>get_max_line_search_iterations</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> <font color='#979000'>100</font>; <b>}</b>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>const</font> matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>0</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> <b><a name='get_next_direction'></a>get_next_direction</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> x,
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> ,
+            <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> funct_derivative
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>been_used <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                been_used <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+                H <font color='#5555FF'>=</font> identity_matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>x.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+            <font color='#0000FF'>else</font>
+            <b>{</b>
+                <font color='#009900'>// update H with the BFGS formula from (3.2.12) on page 55 of Fletcher 
+</font>                delta <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>x<font color='#5555FF'>-</font>prev_x<font face='Lucida Console'>)</font>; 
+                gamma <font color='#5555FF'>=</font> funct_derivative<font color='#5555FF'>-</font>prev_derivative;
+
+                <font color='#0000FF'><u>double</u></font> dg <font color='#5555FF'>=</font> <font color='#BB00BB'>dot</font><font face='Lucida Console'>(</font>delta,gamma<font face='Lucida Console'>)</font>;
+
+                <font color='#009900'>// Try to set the initial value of the H matrix to something reasonable if we are still
+</font>                <font color='#009900'>// in the early stages of figuring out what it is.  This formula below is what is suggested
+</font>                <font color='#009900'>// in the book Numerical Optimization by Nocedal and Wright in the chapter on Quasi-Newton methods.
+</font>                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>been_used_twice <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font><font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#0000FF'><u>double</u></font> gg <font color='#5555FF'>=</font> <font color='#BB00BB'>trans</font><font face='Lucida Console'>(</font>gamma<font face='Lucida Console'>)</font><font color='#5555FF'>*</font>gamma;
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>std::<font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font>gg<font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> std::numeric_limits<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>epsilon</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> temp <font color='#5555FF'>=</font> <font color='#BB00BB'>put_in_range</font><font face='Lucida Console'>(</font><font color='#979000'>0.01</font>, <font color='#979000'>100</font>, dg<font color='#5555FF'>/</font>gg<font face='Lucida Console'>)</font>;
+                        H <font color='#5555FF'>=</font> <font color='#BB00BB'>diagm</font><font face='Lucida Console'>(</font>uniform_matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>x.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,<font color='#979000'>1</font>, temp<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                        been_used_twice <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+                    <b>}</b>
+                <b>}</b>
+
+                Hg <font color='#5555FF'>=</font> H<font color='#5555FF'>*</font>gamma;
+                gH <font color='#5555FF'>=</font> <font color='#BB00BB'>trans</font><font face='Lucida Console'>(</font><font color='#BB00BB'>trans</font><font face='Lucida Console'>(</font>gamma<font face='Lucida Console'>)</font><font color='#5555FF'>*</font>H<font face='Lucida Console'>)</font>;
+                <font color='#0000FF'><u>double</u></font> gHg <font color='#5555FF'>=</font> <font color='#BB00BB'>trans</font><font face='Lucida Console'>(</font>gamma<font face='Lucida Console'>)</font><font color='#5555FF'>*</font>H<font color='#5555FF'>*</font>gamma;
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>gHg <font color='#5555FF'>&lt;</font> std::numeric_limits<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>infinity</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> dg <font color='#5555FF'>&lt;</font> std::numeric_limits<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>infinity</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font>
+                    dg <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                <b>{</b>
+                    H <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#979000'>1</font> <font color='#5555FF'>+</font> gHg<font color='#5555FF'>/</font>dg<font face='Lucida Console'>)</font><font color='#5555FF'>*</font>delta<font color='#5555FF'>*</font><font color='#BB00BB'>trans</font><font face='Lucida Console'>(</font>delta<font face='Lucida Console'>)</font><font color='#5555FF'>/</font><font face='Lucida Console'>(</font>dg<font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> <font face='Lucida Console'>(</font>delta<font color='#5555FF'>*</font><font color='#BB00BB'>trans</font><font face='Lucida Console'>(</font>gH<font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> Hg<font color='#5555FF'>*</font><font color='#BB00BB'>trans</font><font face='Lucida Console'>(</font>delta<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font color='#5555FF'>/</font><font face='Lucida Console'>(</font>dg<font face='Lucida Console'>)</font>;
+                <b>}</b>
+                <font color='#0000FF'>else</font>
+                <b>{</b>
+                    H <font color='#5555FF'>=</font> identity_matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>H.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                    been_used_twice <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+                <b>}</b>
+            <b>}</b>
+
+            prev_x <font color='#5555FF'>=</font> x;
+            prev_direction <font color='#5555FF'>=</font> <font color='#5555FF'>-</font>H<font color='#5555FF'>*</font>funct_derivative;
+            prev_derivative <font color='#5555FF'>=</font> funct_derivative;
+            <font color='#0000FF'>return</font> prev_direction;
+        <b>}</b>
+
+    <font color='#0000FF'>private</font>:
+        <font color='#0000FF'><u>bool</u></font> been_used;
+        <font color='#0000FF'><u>bool</u></font> been_used_twice;
+        matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>0</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> prev_x;
+        matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>0</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> prev_derivative;
+        matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>0</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> prev_direction;
+        matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font> H;
+        matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>0</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> delta, gamma, Hg, gH;
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>class</font> <b><a name='lbfgs_search_strategy'></a>lbfgs_search_strategy</b>
+    <b>{</b>
+    <font color='#0000FF'>public</font>:
+        <font color='#0000FF'>explicit</font> <b><a name='lbfgs_search_strategy'></a>lbfgs_search_strategy</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> max_size_<font face='Lucida Console'>)</font> : max_size<font face='Lucida Console'>(</font>max_size_<font face='Lucida Console'>)</font>, been_used<font face='Lucida Console'>(</font><font color='#979000'>false</font><font face='Lucida Console'>)</font> 
+        <b>{</b>
+            <font color='#BB00BB'>DLIB_ASSERT</font> <font face='Lucida Console'>(</font>
+                max_size <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font>,
+                "<font color='#CC0000'>\t lbfgs_search_strategy(max_size)</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t max_size can't be zero</font>"
+            <font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <b><a name='lbfgs_search_strategy'></a>lbfgs_search_strategy</b><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> lbfgs_search_strategy<font color='#5555FF'>&amp;</font> item<font face='Lucida Console'>)</font> 
+        <b>{</b>
+            max_size <font color='#5555FF'>=</font> item.max_size;
+            been_used <font color='#5555FF'>=</font> item.been_used;
+            prev_x <font color='#5555FF'>=</font> item.prev_x;
+            prev_derivative <font color='#5555FF'>=</font> item.prev_derivative;
+            prev_direction <font color='#5555FF'>=</font> item.prev_direction;
+            alpha <font color='#5555FF'>=</font> item.alpha;
+            dh_temp <font color='#5555FF'>=</font> item.dh_temp;
+        <b>}</b>
+
+        <font color='#0000FF'><u>double</u></font> <b><a name='get_wolfe_rho'></a>get_wolfe_rho</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> <font color='#979000'>0.01</font>; <b>}</b>
+
+        <font color='#0000FF'><u>double</u></font> <b><a name='get_wolfe_sigma'></a>get_wolfe_sigma</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> <font color='#979000'>0.9</font>; <b>}</b>
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='get_max_line_search_iterations'></a>get_max_line_search_iterations</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> <font color='#979000'>100</font>; <b>}</b>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>const</font> matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>0</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> <b><a name='get_next_direction'></a>get_next_direction</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> x,
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> ,
+            <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> funct_derivative
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            prev_direction <font color='#5555FF'>=</font> <font color='#5555FF'>-</font>funct_derivative;
+
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>been_used <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                been_used <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+            <b>}</b>
+            <font color='#0000FF'>else</font>
+            <b>{</b>
+                <font color='#009900'>// add an element into the stored data sequence
+</font>                dh_temp.s <font color='#5555FF'>=</font> x <font color='#5555FF'>-</font> prev_x;
+                dh_temp.y <font color='#5555FF'>=</font> funct_derivative <font color='#5555FF'>-</font> prev_derivative;
+                <font color='#0000FF'><u>double</u></font> temp <font color='#5555FF'>=</font> <font color='#BB00BB'>dot</font><font face='Lucida Console'>(</font>dh_temp.s, dh_temp.y<font face='Lucida Console'>)</font>;
+                <font color='#009900'>// only accept this bit of data if temp isn't zero
+</font>                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>std::<font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> std::numeric_limits<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>epsilon</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                <b>{</b>
+                    dh_temp.rho <font color='#5555FF'>=</font> <font color='#979000'>1</font><font color='#5555FF'>/</font>temp;
+                    data.<font color='#BB00BB'>add</font><font face='Lucida Console'>(</font>data.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, dh_temp<font face='Lucida Console'>)</font>;
+                <b>}</b>
+                <font color='#0000FF'>else</font>
+                <b>{</b>
+                    data.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                <b>}</b>
+
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>data.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#009900'>// This block of code is from algorithm 7.4 in the Nocedal book.
+</font>
+                    alpha.<font color='#BB00BB'>resize</font><font face='Lucida Console'>(</font>data.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> data.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#979000'>1</font>; i <font color='#5555FF'>&lt;</font> data.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>-</font><font color='#5555FF'>-</font>i<font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        alpha[i] <font color='#5555FF'>=</font> data[i].rho<font color='#5555FF'>*</font><font color='#BB00BB'>dot</font><font face='Lucida Console'>(</font>data[i].s, prev_direction<font face='Lucida Console'>)</font>;
+                        prev_direction <font color='#5555FF'>-</font><font color='#5555FF'>=</font> alpha[i]<font color='#5555FF'>*</font>data[i].y;
+                    <b>}</b>
+
+                    <font color='#009900'>// Take a guess at what the first H matrix should be.  This formula below is what is suggested
+</font>                    <font color='#009900'>// in the book Numerical Optimization by Nocedal and Wright in the chapter on Large Scale 
+</font>                    <font color='#009900'>// Unconstrained Optimization (in the L-BFGS section).
+</font>                    <font color='#0000FF'><u>double</u></font> H_0 <font color='#5555FF'>=</font> <font color='#979000'>1.0</font><font color='#5555FF'>/</font>data[data.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#979000'>1</font>].rho<font color='#5555FF'>/</font><font color='#BB00BB'>dot</font><font face='Lucida Console'>(</font>data[data.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#979000'>1</font>].y, data[data.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#979000'>1</font>].y<font face='Lucida Console'>)</font>;
+                    H_0 <font color='#5555FF'>=</font> <font color='#BB00BB'>put_in_range</font><font face='Lucida Console'>(</font><font color='#979000'>0.001</font>, <font color='#979000'>1000.0</font>, H_0<font face='Lucida Console'>)</font>;
+                    prev_direction <font color='#5555FF'>*</font><font color='#5555FF'>=</font> H_0;
+
+                    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> data.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        <font color='#0000FF'><u>double</u></font> beta <font color='#5555FF'>=</font> data[i].rho<font color='#5555FF'>*</font><font color='#BB00BB'>dot</font><font face='Lucida Console'>(</font>data[i].y, prev_direction<font face='Lucida Console'>)</font>;
+                        prev_direction <font color='#5555FF'>+</font><font color='#5555FF'>=</font> data[i].s <font color='#5555FF'>*</font> <font face='Lucida Console'>(</font>alpha[i] <font color='#5555FF'>-</font> beta<font face='Lucida Console'>)</font>;
+                    <b>}</b>
+                <b>}</b>
+
+            <b>}</b>
+
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>data.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> max_size<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#009900'>// remove the oldest element in the data sequence
+</font>                data.<font color='#BB00BB'>remove</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>, dh_temp<font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+            prev_x <font color='#5555FF'>=</font> x;
+            prev_derivative <font color='#5555FF'>=</font> funct_derivative;
+            <font color='#0000FF'>return</font> prev_direction;
+        <b>}</b>
+
+    <font color='#0000FF'>private</font>:
+
+        <font color='#0000FF'>struct</font> <b><a name='data_helper'></a>data_helper</b>
+        <b>{</b>
+            matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>0</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> s;
+            matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>0</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> y;
+            <font color='#0000FF'><u>double</u></font> rho;
+
+            <font color='#0000FF'>friend</font> <font color='#0000FF'><u>void</u></font> <b><a name='swap'></a>swap</b><font face='Lucida Console'>(</font>data_helper<font color='#5555FF'>&amp;</font> a, data_helper<font color='#5555FF'>&amp;</font> b<font face='Lucida Console'>)</font>
+            <b>{</b>
+                a.s.<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>b.s<font face='Lucida Console'>)</font>;
+                a.y.<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>b.y<font face='Lucida Console'>)</font>;
+                std::<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>a.rho, b.rho<font face='Lucida Console'>)</font>;
+            <b>}</b>
+        <b>}</b>;
+        sequence<font color='#5555FF'>&lt;</font>data_helper<font color='#5555FF'>&gt;</font>::kernel_2a data;
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> max_size;
+        <font color='#0000FF'><u>bool</u></font> been_used;
+        matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>0</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> prev_x;
+        matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>0</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> prev_derivative;
+        matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>0</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> prev_direction;
+        std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font> alpha;
+
+        data_helper dh_temp;
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> hessian_funct<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>class</font> <b><a name='newton_search_strategy_obj'></a>newton_search_strategy_obj</b>
+    <b>{</b>
+    <font color='#0000FF'>public</font>:
+        <font color='#0000FF'>explicit</font> <b><a name='newton_search_strategy_obj'></a>newton_search_strategy_obj</b><font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> hessian_funct<font color='#5555FF'>&amp;</font> hess
+        <font face='Lucida Console'>)</font> : hessian<font face='Lucida Console'>(</font>hess<font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+
+        <font color='#0000FF'><u>double</u></font> <b><a name='get_wolfe_rho'></a>get_wolfe_rho</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> <font color='#979000'>0.01</font>; <b>}</b>
+
+        <font color='#0000FF'><u>double</u></font> <b><a name='get_wolfe_sigma'></a>get_wolfe_sigma</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> <font color='#979000'>0.9</font>; <b>}</b>
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='get_max_line_search_iterations'></a>get_max_line_search_iterations</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> <font color='#979000'>100</font>; <b>}</b>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>const</font> matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>0</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> <b><a name='get_next_direction'></a>get_next_direction</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> x,
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> ,
+            <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> funct_derivative
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>return</font> <font color='#5555FF'>-</font><font color='#BB00BB'>inv</font><font face='Lucida Console'>(</font><font color='#BB00BB'>hessian</font><font face='Lucida Console'>(</font>x<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font color='#5555FF'>*</font>funct_derivative;
+        <b>}</b>
+
+    <font color='#0000FF'>private</font>:
+        hessian_funct hessian;
+    <b>}</b>;
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> hessian_funct<font color='#5555FF'>&gt;</font>
+    newton_search_strategy_obj<font color='#5555FF'>&lt;</font>hessian_funct<font color='#5555FF'>&gt;</font> <b><a name='newton_search_strategy'></a>newton_search_strategy</b> <font face='Lucida Console'>(</font>
+        hessian_funct hessian
+    <font face='Lucida Console'>)</font> <b>{</b> <font color='#0000FF'>return</font> newton_search_strategy_obj<font color='#5555FF'>&lt;</font>hessian_funct<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>hessian<font face='Lucida Console'>)</font>; <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_OPTIMIZATIOn_SEARCH_STRATEGIES_H_
+</font>
+
+</pre></body></html>

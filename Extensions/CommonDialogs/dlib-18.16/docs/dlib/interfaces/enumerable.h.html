@@ -1,0 +1,133 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - enumerable.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2003  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_ENUMERABLe_INTERFACE_
+<font color='#0000FF'>#define</font> DLIB_ENUMERABLe_INTERFACE_
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>class</font> <b><a name='enumerable'></a>enumerable</b>
+    <b>{</b>
+        <font color='#009900'>/*!
+            POINTERS AND REFERENCES TO INTERNAL DATA
+                - if (at_start()) then
+                    - all pointers and references to data returned via element() are 
+                      invalid.
+                - calling move_next() or reset() invalidates pointers and references to 
+                  data returned via element() and only data returned via element().
+                - calling at_start(), current_element_valid(), size(), or element() 
+                  does NOT invalidate pointers or references to any internal data.
+
+            INITIAL VALUE
+                current_element_valid() == false 
+                at_start() == true
+
+            WHAT THIS OBJECT REPRESENTS
+                This object represent an interface for iterating through the 
+                elements in a container.  It starts out one before the first element
+                in the container. 
+
+
+                EXAMPLE:  The following loops though all elements in the container
+                          and prints them to cout.
+
+                    container.reset();
+                    while(container.move_next()) {
+                        cout &lt;&lt; container.element();
+                    }
+        !*/</font>
+
+    <font color='#0000FF'>public</font>:
+        <font color='#0000FF'>typedef</font> T type;
+
+        <font color='#0000FF'>inline</font> <font color='#0000FF'>virtual</font> ~<b><a name='enumerable'></a>enumerable</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+
+        <font color='#0000FF'>virtual</font> <font color='#0000FF'><u>bool</u></font> <b><a name='at_start'></a>at_start</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns true if *this represents one position before the first element
+                  in the container (this would also make the current element invalid) 
+                  else returns false                
+        !*/</font>
+
+        <font color='#0000FF'>virtual</font> <font color='#0000FF'><u>void</u></font> <b><a name='reset'></a>reset</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #current_element_valid() == false 
+                - #at_start() == true
+        !*/</font>
+
+        <font color='#0000FF'>virtual</font> <font color='#0000FF'><u>bool</u></font> <b><a name='current_element_valid'></a>current_element_valid</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns true if we are currently at a valid element else
+                  returns false 
+        !*/</font>
+
+        <font color='#0000FF'>virtual</font> <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> <b><a name='element'></a>element</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <font color='#009900'>/*!
+            requires
+                - current_element_valid() == true
+            ensures
+                - returns a const reference to the current element
+        !*/</font>
+
+        <font color='#0000FF'>virtual</font> T<font color='#5555FF'>&amp;</font> <b><a name='element'></a>element</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <font color='#009900'>/*!
+            requires
+                - current_element_valid() == true
+            ensures
+                - returns a non-const reference to the current element
+        !*/</font>
+
+        <font color='#0000FF'>virtual</font> <font color='#0000FF'><u>bool</u></font> <b><a name='move_next'></a>move_next</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <font color='#009900'>/*!
+            ensures
+                - moves to the next element.  i.e. #element() will now 
+                  return the next element in the container 
+                - the return value will be equal to #current_element_valid() 
+                - #at_start() == false 
+
+                - returns true if there is another element 
+                - returns false if there are no more elements in the container
+        !*/</font>
+
+        <font color='#0000FF'>virtual</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='size'></a>size</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the number of elements in *this
+        !*/</font>
+
+    <font color='#0000FF'>protected</font>:
+
+        <font color='#009900'>// restricted functions
+</font>        enumerable<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>=</font><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> enumerable<font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font> <b>{</b><font color='#0000FF'>return</font> <font color='#5555FF'>*</font><font color='#0000FF'>this</font>;<b>}</b> <font color='#009900'>// no assignment operator
+</font>
+    <b>}</b>;
+
+    <font color='#009900'>// destructor does nothing
+</font>    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+    enumerable<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font>::~<b><a name='enumerable'></a>enumerable</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_ENUMERABLe_INTERFACE_
+</font>
+
+</pre></body></html>

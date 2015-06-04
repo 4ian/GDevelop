@@ -1,0 +1,107 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - image_ex.cpp</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// The contents of this file are in the public domain. See LICENSE_FOR_EXAMPLE_PROGRAMS.txt
+</font><font color='#009900'>/*
+
+    This is an example illustrating the use of the GUI API as well as some 
+    aspects of image manipulation from the dlib C++ Library.
+
+
+    This is a pretty simple example.  It takes a BMP file on the command line
+    and opens it up, runs a simple edge detection algorithm on it, and 
+    displays the results on the screen.  
+*/</font>
+
+
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>gui_widgets.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>image_io.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>image_transforms.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>fstream<font color='#5555FF'>&gt;</font>
+
+
+<font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> std;
+<font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> dlib;
+
+<font color='#009900'>//  ----------------------------------------------------------------------------
+</font>
+<font color='#0000FF'><u>int</u></font> <b><a name='main'></a>main</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> argc, <font color='#0000FF'><u>char</u></font><font color='#5555FF'>*</font><font color='#5555FF'>*</font> argv<font face='Lucida Console'>)</font>
+<b>{</b>
+    <font color='#0000FF'>try</font>
+    <b>{</b>
+        <font color='#009900'>// make sure the user entered an argument to this program
+</font>        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>argc <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>2</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>error, you have to enter a BMP file as an argument to this program</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+            <font color='#0000FF'>return</font> <font color='#979000'>1</font>;
+        <b>}</b>
+
+        <font color='#009900'>// Here we declare an image object that can store rgb_pixels.  Note that in 
+</font>        <font color='#009900'>// dlib there is no explicit image object, just a 2D array and
+</font>        <font color='#009900'>// various pixel types.  
+</font>        array2d<font color='#5555FF'>&lt;</font>rgb_pixel<font color='#5555FF'>&gt;</font> img;
+
+        <font color='#009900'>// Now load the image file into our image.  If something is wrong then
+</font>        <font color='#009900'>// load_image() will throw an exception.  Also, if you linked with libpng
+</font>        <font color='#009900'>// and libjpeg then load_image() can load PNG and JPEG files in addition
+</font>        <font color='#009900'>// to BMP files.
+</font>        <font color='#BB00BB'>load_image</font><font face='Lucida Console'>(</font>img, argv[<font color='#979000'>1</font>]<font face='Lucida Console'>)</font>;
+
+
+        <font color='#009900'>// Now let's use some image functions.  First let's blur the image a little.
+</font>        array2d<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font> blurred_img;
+        <font color='#BB00BB'>gaussian_blur</font><font face='Lucida Console'>(</font>img, blurred_img<font face='Lucida Console'>)</font>; 
+
+        <font color='#009900'>// Now find the horizontal and vertical gradient images.
+</font>        array2d<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>short</u></font><font color='#5555FF'>&gt;</font> horz_gradient, vert_gradient;
+        array2d<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font> edge_image;
+        <font color='#BB00BB'>sobel_edge_detector</font><font face='Lucida Console'>(</font>blurred_img, horz_gradient, vert_gradient<font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// now we do the non-maximum edge suppression step so that our edges are nice and thin
+</font>        <font color='#BB00BB'>suppress_non_maximum_edges</font><font face='Lucida Console'>(</font>horz_gradient, vert_gradient, edge_image<font face='Lucida Console'>)</font>; 
+
+        <font color='#009900'>// Now we would like to see what our images look like.  So let's use a 
+</font>        <font color='#009900'>// window to display them on the screen.  (Note that you can zoom into 
+</font>        <font color='#009900'>// the window by holding CTRL and scrolling the mouse wheel)
+</font>        image_window <font color='#BB00BB'>my_window</font><font face='Lucida Console'>(</font>edge_image, "<font color='#CC0000'>Normal Edge Image</font>"<font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// We can also easily display the edge_image as a heatmap or using the jet color
+</font>        <font color='#009900'>// scheme like so.
+</font>        image_window <font color='#BB00BB'>win_hot</font><font face='Lucida Console'>(</font><font color='#BB00BB'>heatmap</font><font face='Lucida Console'>(</font>edge_image<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        image_window <font color='#BB00BB'>win_jet</font><font face='Lucida Console'>(</font><font color='#BB00BB'>jet</font><font face='Lucida Console'>(</font>edge_image<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// also make a window to display the original image
+</font>        image_window <font color='#BB00BB'>my_window2</font><font face='Lucida Console'>(</font>img, "<font color='#CC0000'>Original Image</font>"<font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// Sometimes you want to get input from the user about which pixels are important
+</font>        <font color='#009900'>// for some task.  You can do this easily by trapping user clicks as shown below.
+</font>        <font color='#009900'>// This loop executes every time the user double clicks on some image pixel and it
+</font>        <font color='#009900'>// will terminate once the user closes the window.
+</font>        point p;
+        <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>my_window.<font color='#BB00BB'>get_next_double_click</font><font face='Lucida Console'>(</font>p<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>User double clicked on pixel:         </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> p <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+            cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>edge pixel value at this location is: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font>edge_image[p.<font color='#BB00BB'>y</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>][p.<font color='#BB00BB'>x</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>] <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+        <b>}</b>
+
+        <font color='#009900'>// wait until the user closes the windows before we let the program 
+</font>        <font color='#009900'>// terminate.
+</font>        win_hot.<font color='#BB00BB'>wait_until_closed</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        my_window2.<font color='#BB00BB'>wait_until_closed</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+
+        <font color='#009900'>// Finally, note that you can access the elements of an image using the normal [row][column]
+</font>        <font color='#009900'>// operator like so:
+</font>        cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> horz_gradient[<font color='#979000'>0</font>][<font color='#979000'>3</font>] <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+        cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>number of rows in image:    </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> horz_gradient.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+        cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>number of columns in image: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> horz_gradient.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+    <b>}</b>
+    <font color='#0000FF'>catch</font> <font face='Lucida Console'>(</font>exception<font color='#5555FF'>&amp;</font> e<font face='Lucida Console'>)</font>
+    <b>{</b>
+        cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>exception thrown: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> e.<font color='#BB00BB'>what</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+    <b>}</b>
+<b>}</b>
+
+<font color='#009900'>//  ----------------------------------------------------------------------------
+</font>
+
+</pre></body></html>

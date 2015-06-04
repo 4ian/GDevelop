@@ -1,0 +1,99 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - set_compare_abstract.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2005  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#undef</font> DLIB_SET_COMPARe_ABSTRACT_
+<font color='#0000FF'>#ifdef</font> DLIB_SET_COMPARe_ABSTRACT_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='set_kernel_abstract.h.html'>set_kernel_abstract.h</a>"
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../algs.h.html'>../algs.h</a>"
+
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> set_base
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>class</font> <b><a name='set_compare'></a>set_compare</b> : <font color='#0000FF'>public</font> set_base
+    <b>{</b>
+
+        <font color='#009900'>/*!
+            REQUIREMENTS ON set_base
+                must be an implementation of set/set_kernel_abstract.h
+
+            POINTERS AND REFERENCES TO INTERNAL DATA
+                operator== and operator&lt; invalidate pointers or references to 
+                data members.
+
+            WHAT THIS EXTENSION DOES FOR set
+                This gives a set the ability to compare itself to other 
+                sets using the &lt; and == operators. 
+
+                The &lt; operator is conceptually weird for sets.  It is useful 
+                though because it allows you to make sets of sets since
+                sets require that their containing type implement operator&lt;.
+
+                Also note that it is the case that for any two sets a and b 
+                if (a&lt;b) == false and (b&lt;a) == false then a == b. 
+
+                Also note that unless specified otherwise, no member functions
+                of this object throw exceptions.
+               
+
+            NOTATION
+                For the purposes of defining what these operators do I will 
+                use the operator[] to reference the elements of the sets.
+                operator[] is defined to access the elements of the set in 
+                the same order they would be enumerated by the enumerable 
+                interface.
+        !*/</font>
+
+        <font color='#0000FF'>public</font>:
+
+            <font color='#0000FF'><u>bool</u></font> <b><a name='operator'></a>operator</b><font color='#5555FF'>&lt;</font> <font face='Lucida Console'>(</font>
+                <font color='#0000FF'>const</font> set_compare<font color='#5555FF'>&amp;</font> rhs
+            <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+            <font color='#009900'>/*!
+                ensures
+                    - #at_start() == true
+                    - if (size() &lt; rhs.size()) then
+                        - returns true
+                    - else if (size() &gt; rhs.size()) then
+                        - returns false
+                    - else
+                        - returns true if there exists an integer j such that 0 &lt;= j &lt; size() 
+                          and for all integers i such that 0 &lt;= i &lt; j where it is true that
+                          (*this)[i] == rhs[i] and (*this)[j] &lt; rhs[j] 
+                        - returns false if there is no j that will satisfy the above conditions.                    
+            !*/</font>
+
+            <font color='#0000FF'><u>bool</u></font> <b><a name='operator'></a>operator</b><font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>
+                <font color='#0000FF'>const</font> set_compare<font color='#5555FF'>&amp;</font> rhs
+            <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+            <font color='#009900'>/*!
+                ensures
+                    - #at_start() == true
+                    - returns true if *this and rhs contain the same elements.
+                      returns false otherwise.
+            !*/</font>
+    <b>}</b>;
+
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> set_base
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='swap'></a>swap</b> <font face='Lucida Console'>(</font>
+        set_compare<font color='#5555FF'>&lt;</font>set_base<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> a, 
+        set_compare<font color='#5555FF'>&lt;</font>set_base<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> b 
+    <font face='Lucida Console'>)</font> <b>{</b> a.<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>b<font face='Lucida Console'>)</font>; <b>}</b> 
+    <font color='#009900'>/*!
+        provides a global swap function
+    !*/</font>
+
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_SET_COMPARe_ABSTRACT_
+</font>
+
+</pre></body></html>

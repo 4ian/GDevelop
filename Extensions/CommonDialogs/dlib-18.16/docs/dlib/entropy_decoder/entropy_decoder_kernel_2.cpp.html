@@ -1,0 +1,227 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - entropy_decoder_kernel_2.cpp</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2004  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_ENTROPY_DECODER_KERNEL_2_CPp_
+<font color='#0000FF'>#define</font> DLIB_ENTROPY_DECODER_KERNEL_2_CPp_
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='entropy_decoder_kernel_2.h.html'>entropy_decoder_kernel_2.h</a>"
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>iostream<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>streambuf<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>sstream<font color='#5555FF'>&gt;</font>
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../assert.h.html'>../assert.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    entropy_decoder_kernel_2::
+    <b><a name='entropy_decoder_kernel_2'></a>entropy_decoder_kernel_2</b><font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font> :
+        initial_low<font face='Lucida Console'>(</font><font color='#979000'>0x00000001</font><font face='Lucida Console'>)</font>,
+        initial_high<font face='Lucida Console'>(</font><font color='#979000'>0xffffffff</font><font face='Lucida Console'>)</font>,
+        in<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>,
+        low<font face='Lucida Console'>(</font>initial_low<font face='Lucida Console'>)</font>,
+        high<font face='Lucida Console'>(</font>initial_high<font face='Lucida Console'>)</font>,
+        target<font face='Lucida Console'>(</font><font color='#979000'>0x00000000</font><font face='Lucida Console'>)</font>,
+        r<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>
+    <b>{</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    entropy_decoder_kernel_2::
+    ~<b><a name='entropy_decoder_kernel_2'></a>entropy_decoder_kernel_2</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>void</u></font> entropy_decoder_kernel_2::
+    <b><a name='clear'></a>clear</b><font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        in       <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        r        <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        low      <font color='#5555FF'>=</font> initial_low;
+        high     <font color='#5555FF'>=</font> initial_high;
+        target   <font color='#5555FF'>=</font> <font color='#979000'>0x00000000</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>void</u></font> entropy_decoder_kernel_2::
+    <b><a name='set_stream'></a>set_stream</b> <font face='Lucida Console'>(</font>
+        std::istream<font color='#5555FF'>&amp;</font> in_
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        r        <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        low      <font color='#5555FF'>=</font> initial_low;
+        high     <font color='#5555FF'>=</font> initial_high;
+        target   <font color='#5555FF'>=</font> <font color='#979000'>0x00000000</font>;
+
+        in <font color='#5555FF'>=</font> <font color='#5555FF'>&amp;</font>in_;
+        streambuf <font color='#5555FF'>=</font> in_.<font color='#BB00BB'>rdbuf</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> ch;
+
+        
+        streambuf<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>sgetn</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>char</u></font><font color='#5555FF'>*</font><font face='Lucida Console'>)</font><font color='#5555FF'>&amp;</font>ch,<font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+        target <font color='#5555FF'>=</font> ch;
+        
+        target <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#979000'>8</font>;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>streambuf<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>sgetn</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>char</u></font><font color='#5555FF'>*</font><font face='Lucida Console'>)</font><font color='#5555FF'>&amp;</font>ch,<font color='#979000'>1</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+            target <font color='#5555FF'>+</font><font color='#5555FF'>=</font> ch;
+
+
+        target <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#979000'>8</font>;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>streambuf<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>sgetn</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>char</u></font><font color='#5555FF'>*</font><font face='Lucida Console'>)</font><font color='#5555FF'>&amp;</font>ch,<font color='#979000'>1</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+            target <font color='#5555FF'>+</font><font color='#5555FF'>=</font> ch;
+
+
+        target <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#979000'>8</font>;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>streambuf<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>sgetn</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>char</u></font><font color='#5555FF'>*</font><font face='Lucida Console'>)</font><font color='#5555FF'>&amp;</font>ch,<font color='#979000'>1</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+            target <font color='#5555FF'>+</font><font color='#5555FF'>=</font> ch;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>bool</u></font> entropy_decoder_kernel_2::
+    <b><a name='stream_is_set'></a>stream_is_set</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>in <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+            <font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+        <font color='#0000FF'>else</font>
+            <font color='#0000FF'>return</font> <font color='#979000'>false</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    std::istream<font color='#5555FF'>&amp;</font> entropy_decoder_kernel_2::
+    <b><a name='get_stream'></a>get_stream</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        <font color='#0000FF'>return</font> <font color='#5555FF'>*</font>in;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>void</u></font> entropy_decoder_kernel_2::
+    <b><a name='decode'></a>decode</b> <font face='Lucida Console'>(</font>
+        uint32 low_count,
+        uint32 high_count
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#009900'>// note that we must subtract 1 to preserve the convention that
+</font>        <font color='#009900'>// high == the real upper range - 1
+</font>        high <font color='#5555FF'>=</font> low <font color='#5555FF'>+</font> r<font color='#5555FF'>*</font>high_count <font color='#5555FF'>-</font> <font color='#979000'>1</font>;
+        low <font color='#5555FF'>=</font> low <font color='#5555FF'>+</font> r<font color='#5555FF'>*</font>low_count;
+        r <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+
+
+        <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font><font color='#979000'>true</font> <font face='Lucida Console'>)</font>
+        <b>{</b>
+
+            <font color='#009900'>// if high and low don't have the same 8 high order bits
+</font>            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>high<font color='#5555FF'>&amp;</font><font color='#979000'>0xFF000000</font><font face='Lucida Console'>)</font> <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>low<font color='#5555FF'>&amp;</font><font color='#979000'>0xFF000000</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> 
+            <b>{</b>   
+                <font color='#009900'>// if the distance between high and low is small and there aren't
+</font>                <font color='#009900'>// any bits we can roll off then force high and low to have common high 
+</font>                <font color='#009900'>// order bits.
+</font>                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>high<font color='#5555FF'>-</font>low <font color='#5555FF'>&lt;</font> <font color='#979000'>0x10000</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>high<font color='#5555FF'>-</font>low <font color='#5555FF'>&gt;</font> <font color='#979000'>0x1000</font><font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        high<font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font><font color='#979000'>1</font>;
+                        low<font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font><font color='#979000'>1</font>;
+                        high <font color='#5555FF'>=</font> low <font color='#5555FF'>=</font> high<font color='#5555FF'>+</font>low;
+                        high <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#979000'>0xFF</font>;
+                        low <font color='#5555FF'>-</font><font color='#5555FF'>=</font> <font color='#979000'>0xFF</font>;
+                    <b>}</b> 
+                    <font color='#0000FF'>else</font> <font color='#009900'>/**/</font>
+                    <b>{</b>
+                        high<font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font><font color='#979000'>1</font>;
+                        low<font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font><font color='#979000'>1</font>;
+                        high <font color='#5555FF'>=</font> low <font color='#5555FF'>=</font> high<font color='#5555FF'>+</font>low;
+                    <b>}</b>
+                <b>}</b>
+                <font color='#0000FF'>else</font>
+                <b>{</b>
+                    <font color='#009900'>// there are no bits to roll off and high and low are not
+</font>                    <font color='#009900'>// too close so just quit the loop
+</font>                    <font color='#0000FF'>break</font>;
+                <b>}</b>
+                
+            <b>}</b>  
+            <font color='#009900'>// else if there are 8 bits we can roll off
+</font>            <font color='#0000FF'>else</font>
+            <b>{</b>
+                <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> buf;
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>streambuf<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>sgetn</font><font face='Lucida Console'>(</font><font color='#0000FF'>reinterpret_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>char</u></font><font color='#5555FF'>*</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>buf<font face='Lucida Console'>)</font>,<font color='#979000'>1</font><font face='Lucida Console'>)</font><font color='#5555FF'>=</font><font color='#5555FF'>=</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#009900'>// if there isn't anything else in the streambuffer then just
+</font>                    <font color='#009900'>// make buf zero.  
+</font>                    buf <font color='#5555FF'>=</font> <font color='#979000'>0</font>;      
+                <b>}</b>
+
+                <font color='#009900'>// also roll off the bits in target
+</font>                target <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#979000'>8</font>;  
+
+                <font color='#009900'>// roll off the bits
+</font>                high <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#979000'>8</font>;
+                low <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#979000'>8</font>;             
+                high <font color='#5555FF'>|</font><font color='#5555FF'>=</font> <font color='#979000'>0xFF</font>;  <font color='#009900'>// note that it is ok to add 0xFF to high here because
+</font>                            <font color='#009900'>// of the convention that high == real upper range - 1.
+</font>                            <font color='#009900'>// so that means that if we want to shift the upper range
+</font>                            <font color='#009900'>// left by one then we must shift a one into high also
+</font>                            <font color='#009900'>// since real upper range == high + 0.999999999...
+</font>
+                <font color='#009900'>// make sure low is never zero
+</font>                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>low <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                    low <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+        
+
+                <font color='#009900'>// put the new bits into target            
+</font>                target <font color='#5555FF'>|</font><font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font>uint32<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>buf<font face='Lucida Console'>)</font>;               
+            <b>}</b>
+
+        <b>}</b> <font color='#009900'>// while (true)
+</font>    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>bool</u></font> entropy_decoder_kernel_2::
+    <b><a name='get_target_called'></a>get_target_called</b> <font face='Lucida Console'>(</font>        
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>           
+        <font color='#0000FF'>return</font> <font face='Lucida Console'>(</font>r <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    uint32 entropy_decoder_kernel_2::
+    <b><a name='get_target'></a>get_target</b> <font face='Lucida Console'>(</font>
+        uint32 total
+    <font face='Lucida Console'>)</font> 
+    <b>{</b>   
+        <font color='#009900'>// note that we must add one because of the convention that
+</font>        <font color='#009900'>// high == the real upper range minus 1
+</font>        r <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>high<font color='#5555FF'>-</font>low<font color='#5555FF'>+</font><font color='#979000'>1</font><font face='Lucida Console'>)</font><font color='#5555FF'>/</font>total;   
+        uint32 temp <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>target<font color='#5555FF'>-</font>low<font face='Lucida Console'>)</font><font color='#5555FF'>/</font>r;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>temp <font color='#5555FF'>&lt;</font> total<font face='Lucida Console'>)</font>
+            <font color='#0000FF'>return</font> temp;
+        <font color='#0000FF'>else</font>
+            <font color='#0000FF'>return</font> total<font color='#5555FF'>-</font><font color='#979000'>1</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_ENTROPY_DECODER_KERNEL_2_CPp_
+</font>
+
+</pre></body></html>

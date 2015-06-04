@@ -1,0 +1,301 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - svm_rank_trainer_abstract.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2012  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#undef</font> DLIB_SVM_RANK_TrAINER_ABSTRACT_Hh_
+<font color='#0000FF'>#ifdef</font> DLIB_SVM_RANK_TrAINER_ABSTRACT_Hh_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='ranking_tools_abstract.h.html'>ranking_tools_abstract.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='sparse_vector_abstract.h.html'>sparse_vector_abstract.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='function_abstract.h.html'>function_abstract.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='kernel_abstract.h.html'>kernel_abstract.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../algs.h.html'>../algs.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> K 
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>class</font> <b><a name='svm_rank_trainer'></a>svm_rank_trainer</b>
+    <b>{</b>
+        <font color='#009900'>/*!
+            REQUIREMENTS ON K 
+                Is either linear_kernel or sparse_linear_kernel.  
+
+            WHAT THIS OBJECT REPRESENTS
+                This object represents a tool for training a ranking support vector machine
+                using linear kernels.  In particular, this object is a tool for training
+                the Ranking SVM described in the paper: 
+                    Optimizing Search Engines using Clickthrough Data by Thorsten Joachims
+
+                Note that we normalize the C parameter by multiplying it by 1/(number of ranking pairs).
+                Therefore, to make an exact comparison between this object and Equation 12
+                in the paper you must multiply C by the appropriate normalizing quantity. 
+    
+                Finally, note that the implementation of this object is done using the oca
+                optimizer and count_ranking_inversions() method.  This means that it runs
+                in O(n*log(n)) time, making it suitable for use with large datasets.
+        !*/</font>
+
+    <font color='#0000FF'>public</font>:
+        <font color='#0000FF'>typedef</font> K kernel_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> kernel_type::scalar_type scalar_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> kernel_type::sample_type sample_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> kernel_type::mem_manager_type mem_manager_type;
+        <font color='#0000FF'>typedef</font> decision_function<font color='#5555FF'>&lt;</font>kernel_type<font color='#5555FF'>&gt;</font> trained_function_type;
+
+        <b><a name='svm_rank_trainer'></a>svm_rank_trainer</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - This object is properly initialized and ready to be used to train a
+                  ranking support vector machine.
+                - #get_oca() == oca() (i.e. an instance of oca with default parameters) 
+                - #get_c() == 1
+                - #get_epsilon() == 0.001
+                - this object will not be verbose unless be_verbose() is called
+                - #get_max_iterations() == 10000
+                - #learns_nonnegative_weights() == false
+                - #forces_last_weight_to_1() == false
+                - #has_prior() == false
+        !*/</font>
+
+        <font color='#0000FF'>explicit</font> <b><a name='svm_rank_trainer'></a>svm_rank_trainer</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> scalar_type<font color='#5555FF'>&amp;</font> C
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - C &gt; 0
+            ensures
+                - This object is properly initialized and ready to be used to train a
+                  ranking support vector machine.
+                - #get_oca() == oca() (i.e. an instance of oca with default parameters) 
+                - #get_c() == C
+                - #get_epsilon() == 0.001
+                - this object will not be verbose unless be_verbose() is called
+                - #get_max_iterations() == 10000
+                - #learns_nonnegative_weights() == false
+                - #forces_last_weight_to_1() == false
+                - #has_prior() == false
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_epsilon'></a>set_epsilon</b> <font face='Lucida Console'>(</font>
+            scalar_type eps
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - eps &gt; 0
+            ensures
+                - #get_epsilon() == eps 
+        !*/</font>
+
+        <font color='#0000FF'>const</font> scalar_type <b><a name='get_epsilon'></a>get_epsilon</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the error epsilon that determines when training should stop.
+                  Smaller values may result in a more accurate solution but take longer to
+                  train.  You can think of this epsilon value as saying "solve the
+                  optimization problem until the average ranking accuracy is within epsilon
+                  of its optimal value".  Here we mean "ranking accuracy" in the same sense
+                  used by test_ranking_function() and cross_validate_ranking_trainer().
+        !*/</font>
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='get_max_iterations'></a>get_max_iterations</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>; 
+        <font color='#009900'>/*!
+            ensures
+                - returns the maximum number of iterations the SVM optimizer is allowed to
+                  run before it is required to stop and return a result.
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_max_iterations'></a>set_max_iterations</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> max_iter
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #get_max_iterations() == max_iter
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='be_verbose'></a>be_verbose</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - This object will print status messages to standard out so that a user can
+                  observe the progress of the algorithm.
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='be_quiet'></a>be_quiet</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - this object will not print anything to standard out
+        !*/</font>
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='forces_last_weight_to_1'></a>forces_last_weight_to_1</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns true if this trainer has the constraint that the last weight in
+                  the learned parameter vector must be 1.  This is the weight corresponding
+                  to the feature in the training vectors with the highest dimension.
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='force_last_weight_to_1'></a>force_last_weight_to_1</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>bool</u></font> should_last_weight_be_1
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #forces_last_weight_to_1() == should_last_weight_be_1
+                - if (should_last_weight_be_1 == true) then
+                    - #has_prior() == false
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_oca'></a>set_oca</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> oca<font color='#5555FF'>&amp;</font> item
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #get_oca() == item 
+        !*/</font>
+
+        <font color='#0000FF'>const</font> oca <b><a name='get_oca'></a>get_oca</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns a copy of the optimizer used to solve the SVM problem.  
+        !*/</font>
+
+        <font color='#0000FF'>const</font> kernel_type <b><a name='get_kernel'></a>get_kernel</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns a copy of the kernel function in use by this object.  Since the
+                  linear kernels don't have any parameters this function just returns
+                  kernel_type()
+        !*/</font>
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='learns_nonnegative_weights'></a>learns_nonnegative_weights</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>; 
+        <font color='#009900'>/*!
+            ensures
+                - The output of training is a weight vector that defines the behavior of
+                  the resulting decision function.  That is, the decision function simply
+                  takes the dot product between the learned weight vector and a test sample
+                  and returns the result.  Therefore, if learns_nonnegative_weights() == true 
+                  then the resulting learned weight vector will always have non-negative
+                  entries.  
+        !*/</font>
+       
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_learns_nonnegative_weights'></a>set_learns_nonnegative_weights</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>bool</u></font> value
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #learns_nonnegative_weights() == value
+                - if (value == true) then
+                    - #has_prior() == false
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_prior'></a>set_prior</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> trained_function_type<font color='#5555FF'>&amp;</font> prior
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - prior == a function produced by a call to this class's train() function.  
+                  Therefore, it must be the case that:
+                    - prior.basis_vectors.size() == 1
+                    - prior.alpha(0) == 1
+            ensures
+                - Subsequent calls to train() will try to learn a function similar to the
+                  given prior.
+                - #has_prior() == true
+                - #learns_nonnegative_weights() == false
+                - #forces_last_weight_to_1() == false
+        !*/</font>
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='has_prior'></a>has_prior</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <font color='#009900'>/*!
+            ensures
+                - returns true if a prior has been set and false otherwise.  Having a prior
+                  set means that you have called set_prior() and supplied a previously
+                  trained function as a reference.  In this case, any call to train() will
+                  try to learn a function that matches the behavior of the prior as close
+                  as possible but also fits the supplied training data.  In more technical
+                  detail, having a prior means we replace the ||w||^2 regularizer with one
+                  of the form ||w-prior||^2 where w is the set of parameters for a learned
+                  function.
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_c'></a>set_c</b> <font face='Lucida Console'>(</font>
+            scalar_type C 
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - C &gt; 0
+            ensures
+                - #get_c() == C 
+        !*/</font>
+
+        <font color='#0000FF'>const</font> scalar_type <b><a name='get_c'></a>get_c</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the SVM regularization parameter.  It is the parameter that
+                  determines the trade off between trying to fit the training data exactly
+                  or allowing more errors but hopefully improving the generalization of the
+                  resulting classifier.  Larger values encourage exact fitting while
+                  smaller values of C may encourage better generalization. 
+        !*/</font>
+
+        <font color='#0000FF'>const</font> decision_function<font color='#5555FF'>&lt;</font>kernel_type<font color='#5555FF'>&gt;</font> <b><a name='train'></a>train</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>ranking_pair<font color='#5555FF'>&lt;</font>sample_type<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> samples
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - is_ranking_problem(samples) == true
+                - if (has_prior()) then
+                    - The vectors in samples must have the same dimensionality as the
+                      vectors used to train the prior given to set_prior().  
+            ensures
+                - trains a ranking support vector classifier given the training samples.  
+                - returns a decision function F with the following properties:
+                    - F.alpha.size() == 1
+                    - F.basis_vectors.size() == 1
+                    - F.alpha(0) == 1
+                    - Given two vectors, A and B, then A is predicted to come before B 
+                      in the learned ranking if and only if F(A) &gt; F(B).
+                    - Based on the contents of samples, F will attempt to give relevant
+                      vectors higher scores than non-relevant vectors.
+        !*/</font>
+
+        <font color='#0000FF'>const</font> decision_function<font color='#5555FF'>&lt;</font>kernel_type<font color='#5555FF'>&gt;</font> <b><a name='train'></a>train</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> ranking_pair<font color='#5555FF'>&lt;</font>sample_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> sample
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - is_ranking_problem(std::vector&lt;ranking_pair&lt;sample_type&gt; &gt;(1, sample)) == true
+                - if (has_prior()) then
+                    - The vectors in samples must have the same dimensionality as the
+                      vectors used to train the prior given to set_prior().  
+            ensures
+                - This is just a convenience routine for calling the above train()
+                  function.  That is, it just copies sample into a std::vector object and
+                  invokes the above train() method.  This means that calling this function
+                  is equivalent to invoking: 
+                    return train(std::vector&lt;ranking_pair&lt;sample_type&gt; &gt;(1, sample));
+        !*/</font>
+
+    <b>}</b>; 
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_SVM_RANK_TrAINER_ABSTRACT_Hh_
+</font>
+
+</pre></body></html>

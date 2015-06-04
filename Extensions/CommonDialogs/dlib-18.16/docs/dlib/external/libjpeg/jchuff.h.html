@@ -1,0 +1,50 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - jchuff.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>/*
+ * jchuff.h
+ *
+ * Copyright (C) 1991-1997, Thomas G. Lane.
+ * This file is part of the Independent JPEG Group's software.
+ * For conditions of distribution and use, see the accompanying README file.
+ *
+ * This file contains declarations for Huffman entropy encoding routines
+ * that are shared between the sequential encoder (jchuff.c) and the
+ * progressive encoder (jcphuff.c).  No other modules need to see these.
+ */</font>
+
+<font color='#009900'>/* The legal range of a DCT coefficient is
+ *  -1024 .. +1023  for 8-bit data;
+ * -16384 .. +16383 for 12-bit data.
+ * Hence the magnitude should always fit in 10 or 14 bits respectively.
+ */</font>
+
+<font color='#0000FF'>#if</font> BITS_IN_JSAMPLE <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>8</font>
+<font color='#0000FF'>#define</font> MAX_COEF_BITS <font color='#979000'>10</font>
+<font color='#0000FF'>#else</font>
+<font color='#0000FF'>#define</font> MAX_COEF_BITS <font color='#979000'>14</font>
+<font color='#0000FF'>#endif</font>
+
+<font color='#009900'>/* Derived data constructed for each Huffman table */</font>
+
+<font color='#0000FF'>typedef</font> <font color='#0000FF'>struct</font> <b>{</b>
+  <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>int</u></font> ehufco[<font color='#979000'>256</font>];	<font color='#009900'>/* code for each symbol */</font>
+  <font color='#0000FF'><u>char</u></font> ehufsi[<font color='#979000'>256</font>];		<font color='#009900'>/* length of code for each symbol */</font>
+  <font color='#009900'>/* If no code has been allocated for a symbol S, ehufsi[S] contains 0 */</font>
+<b>}</b> c_derived_tbl;
+
+<font color='#009900'>/* Short forms of external names for systems with brain-damaged linkers. */</font>
+
+<font color='#0000FF'>#ifdef</font> NEED_SHORT_EXTERNAL_NAMES
+<font color='#0000FF'>#define</font> jpeg_make_c_derived_tbl	jMkCDerived
+<font color='#0000FF'>#define</font> jpeg_gen_optimal_table	jGenOptTbl
+<font color='#0000FF'>#endif</font> <font color='#009900'>/* NEED_SHORT_EXTERNAL_NAMES */</font>
+
+<font color='#009900'>/* Expand a Huffman table definition into the derived format */</font>
+<b><a name='EXTERN'></a>EXTERN</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font> jpeg_make_c_derived_tbl
+	<b><a name='JPP'></a>JPP</b><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>j_compress_ptr cinfo, <font color='#0000FF'><u>int</u></font> isDC, <font color='#0000FF'><u>int</u></font> tblno,
+	     c_derived_tbl <font color='#5555FF'>*</font><font color='#5555FF'>*</font> pdtbl<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+<font color='#009900'>/* Generate an optimal table definition given the specified counts */</font>
+<b><a name='EXTERN'></a>EXTERN</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font> jpeg_gen_optimal_table
+	<b><a name='JPP'></a>JPP</b><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>j_compress_ptr cinfo, JHUFF_TBL <font color='#5555FF'>*</font> htbl, <font color='#0000FF'><u>long</u></font> freq[]<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+</pre></body></html>

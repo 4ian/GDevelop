@@ -1,0 +1,279 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - matrix_ex.cpp</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// The contents of this file are in the public domain. See LICENSE_FOR_EXAMPLE_PROGRAMS.txt
+</font>
+<font color='#009900'>/*
+    This is an example illustrating the use of the matrix object 
+    from the dlib C++ Library.
+*/</font>
+
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>iostream<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>matrix.h<font color='#5555FF'>&gt;</font>
+
+<font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> dlib;
+<font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> std;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<font color='#0000FF'><u>int</u></font> <b><a name='main'></a>main</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+<b>{</b>
+    <font color='#009900'>// Let's begin this example by using the library to solve a simple 
+</font>    <font color='#009900'>// linear system.
+</font>    <font color='#009900'>// 
+</font>    <font color='#009900'>// We will find the value of x such that y = M*x where
+</font>    <font color='#009900'>//
+</font>    <font color='#009900'>//      3.5
+</font>    <font color='#009900'>// y =  1.2
+</font>    <font color='#009900'>//      7.8
+</font>    <font color='#009900'>//
+</font>    <font color='#009900'>// and M is
+</font>    <font color='#009900'>//
+</font>    <font color='#009900'>//      54.2   7.4   12.1
+</font>    <font color='#009900'>// M =  1      2     3
+</font>    <font color='#009900'>//      5.9    0.05  1
+</font>
+
+    <font color='#009900'>// First let's declare these 3 matrices.
+</font>    <font color='#009900'>// This declares a matrix that contains doubles and has 3 rows and 1 column.
+</font>    <font color='#009900'>// Moreover, it's size is a compile time constant since we put it inside the &lt;&gt;.
+</font>    matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>3</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> y;
+    <font color='#009900'>// Make a 3 by 3 matrix of doubles for the M matrix.  In this case, M is
+</font>    <font color='#009900'>// sized at runtime and can therefore be resized later by calling M.set_size(). 
+</font>    matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font> <font color='#BB00BB'>M</font><font face='Lucida Console'>(</font><font color='#979000'>3</font>,<font color='#979000'>3</font><font face='Lucida Console'>)</font>;
+    
+    <font color='#009900'>// You may be wondering why someone would want to specify the size of a
+</font>    <font color='#009900'>// matrix at compile time when you don't have to.  The reason is two fold.
+</font>    <font color='#009900'>// First, there is often a substantial performance improvement, especially
+</font>    <font color='#009900'>// for small matrices, because it enables a number of optimizations that
+</font>    <font color='#009900'>// otherwise would be impossible.  Second, the dlib::matrix object checks
+</font>    <font color='#009900'>// these compile time sizes to ensure that the matrices are being used
+</font>    <font color='#009900'>// correctly.  For example, if you attempt to compile the expression y*y you
+</font>    <font color='#009900'>// will get a compiler error since that is not a legal matrix operation (the
+</font>    <font color='#009900'>// matrix dimensions don't make sense as a matrix multiplication).  So if
+</font>    <font color='#009900'>// you know the size of a matrix at compile time then it is always a good
+</font>    <font color='#009900'>// idea to let the compiler know about it.
+</font>
+
+
+
+    <font color='#009900'>// Now we need to initialize the y and M matrices and we can do so like this:
+</font>    M <font color='#5555FF'>=</font> <font color='#979000'>54.2</font>,  <font color='#979000'>7.4</font>,  <font color='#979000'>12.1</font>,
+        <font color='#979000'>1</font>,     <font color='#979000'>2</font>,    <font color='#979000'>3</font>,
+        <font color='#979000'>5.9</font>,   <font color='#979000'>0.05</font>, <font color='#979000'>1</font>;
+
+    y <font color='#5555FF'>=</font> <font color='#979000'>3.5</font>,  
+        <font color='#979000'>1.2</font>,    
+        <font color='#979000'>7.8</font>;
+
+
+    <font color='#009900'>// The solution to y = M*x can be obtained by multiplying the inverse of M
+</font>    <font color='#009900'>// with y.  As an aside, you should *NEVER* use the auto keyword to capture
+</font>    <font color='#009900'>// the output from a matrix expression.  So don't do this: auto x = inv(M)*y; 
+</font>    <font color='#009900'>// To understand why, read the <a href="matrix_expressions_ex.cpp.html">matrix_expressions_ex.cpp</a> example program.
+</font>    matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font> x <font color='#5555FF'>=</font> <font color='#BB00BB'>inv</font><font face='Lucida Console'>(</font>M<font face='Lucida Console'>)</font><font color='#5555FF'>*</font>y;
+
+    cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>x: \n</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> x <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+
+    <font color='#009900'>// We can check that it really worked by plugging x back into the original equation 
+</font>    <font color='#009900'>// and subtracting y to see if we get a column vector with values all very close
+</font>    <font color='#009900'>// to zero (Which is what happens.  Also, the values may not be exactly zero because 
+</font>    <font color='#009900'>// there may be some numerical error and round off).
+</font>    cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>M*x - y: \n</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> M<font color='#5555FF'>*</font>x <font color='#5555FF'>-</font> y <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+
+
+    <font color='#009900'>// Also note that we can create run-time sized column or row vectors like so
+</font>    matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>0</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> runtime_sized_column_vector;
+    matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>1</font>,<font color='#979000'>0</font><font color='#5555FF'>&gt;</font> runtime_sized_row_vector;
+    <font color='#009900'>// and then they are sized by saying
+</font>    runtime_sized_column_vector.<font color='#BB00BB'>set_size</font><font face='Lucida Console'>(</font><font color='#979000'>3</font><font face='Lucida Console'>)</font>;
+
+    <font color='#009900'>// Similarly, the x matrix can be resized by calling set_size(num rows, num columns).  For example
+</font>    x.<font color='#BB00BB'>set_size</font><font face='Lucida Console'>(</font><font color='#979000'>3</font>,<font color='#979000'>4</font><font face='Lucida Console'>)</font>;  <font color='#009900'>// x now has 3 rows and 4 columns.
+</font>
+
+
+    <font color='#009900'>// The elements of a matrix are accessed using the () operator like so:
+</font>    cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>M</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>,<font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+    <font color='#009900'>// The above expression prints out the value 7.4.  That is, the value of
+</font>    <font color='#009900'>// the element at row 0 and column 1.
+</font>
+    <font color='#009900'>// If we have a matrix that is a row or column vector.  That is, it contains either 
+</font>    <font color='#009900'>// a single row or a single column then we know that any access is always either 
+</font>    <font color='#009900'>// to row 0 or column 0 so we can omit that 0 and use the following syntax.
+</font>    cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>y</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+    <font color='#009900'>// The above expression prints out the value 1.2
+</font>
+
+    <font color='#009900'>// Let's compute the sum of elements in the M matrix.
+</font>    <font color='#0000FF'><u>double</u></font> M_sum <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+    <font color='#009900'>// loop over all the rows
+</font>    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> r <font color='#5555FF'>=</font> <font color='#979000'>0</font>; r <font color='#5555FF'>&lt;</font> M.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>r<font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#009900'>// loop over all the columns
+</font>        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> c <font color='#5555FF'>=</font> <font color='#979000'>0</font>; c <font color='#5555FF'>&lt;</font> M.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>c<font face='Lucida Console'>)</font>
+        <b>{</b>
+            M_sum <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#BB00BB'>M</font><font face='Lucida Console'>(</font>r,c<font face='Lucida Console'>)</font>;
+        <b>}</b>
+    <b>}</b>
+    cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>sum of all elements in M is </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> M_sum <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+
+    <font color='#009900'>// The above code is just to show you how to loop over the elements of a matrix.  An 
+</font>    <font color='#009900'>// easier way to find this sum is to do the following:
+</font>    cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>sum of all elements in M is </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>sum</font><font face='Lucida Console'>(</font>M<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+
+
+
+
+    <font color='#009900'>// Note that you can always print a matrix to an output stream by saying:
+</font>    cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> M <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+    <font color='#009900'>// which will print:
+</font>    <font color='#009900'>//   54.2  7.4 12.1 
+</font>    <font color='#009900'>//      1    2    3 
+</font>    <font color='#009900'>//    5.9 0.05    1 
+</font>
+    <font color='#009900'>// However, if you want to print using comma separators instead of spaces you can say:
+</font>    cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> csv <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> M <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+    <font color='#009900'>// and you will instead get this as output:
+</font>    <font color='#009900'>//   54.2, 7.4, 12.1
+</font>    <font color='#009900'>//   1, 2, 3
+</font>    <font color='#009900'>//   5.9, 0.05, 1
+</font>
+    <font color='#009900'>// Conversely, you can also read in a matrix that uses either space, tab, or comma
+</font>    <font color='#009900'>// separated values by uncommenting the following:
+</font>    <font color='#009900'>// cin &gt;&gt; M;
+</font>
+
+
+    <font color='#009900'>// -----------------------------  Comparison with MATLAB ------------------------------
+</font>    <font color='#009900'>// Here I list a set of Matlab commands and their equivalent expressions using the dlib
+</font>    <font color='#009900'>// matrix.  Note that there are a lot more functions defined for the dlib::matrix.  See
+</font>    <font color='#009900'>// the HTML documentation for a full listing.
+</font>
+    matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font> A, B, C, D, E;
+    matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>int</u></font><font color='#5555FF'>&gt;</font> Aint;
+    matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font> Blong;
+
+    <font color='#009900'>// MATLAB: A = eye(3)
+</font>    A <font color='#5555FF'>=</font> identity_matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#979000'>3</font><font face='Lucida Console'>)</font>;
+
+    <font color='#009900'>// MATLAB: B = ones(3,4)
+</font>    B <font color='#5555FF'>=</font> ones_matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#979000'>3</font>,<font color='#979000'>4</font><font face='Lucida Console'>)</font>;
+
+    <font color='#009900'>// MATLAB: B = rand(3,4)
+</font>    B <font color='#5555FF'>=</font> <font color='#BB00BB'>randm</font><font face='Lucida Console'>(</font><font color='#979000'>3</font>,<font color='#979000'>4</font><font face='Lucida Console'>)</font>;
+
+    <font color='#009900'>// MATLAB: C = 1.4*A
+</font>    C <font color='#5555FF'>=</font> <font color='#979000'>1.4</font><font color='#5555FF'>*</font>A;
+
+    <font color='#009900'>// MATLAB: D = A.*C
+</font>    D <font color='#5555FF'>=</font> <font color='#BB00BB'>pointwise_multiply</font><font face='Lucida Console'>(</font>A,C<font face='Lucida Console'>)</font>;
+
+    <font color='#009900'>// MATLAB: E = A * B
+</font>    E <font color='#5555FF'>=</font> A<font color='#5555FF'>*</font>B;
+
+    <font color='#009900'>// MATLAB: E = A + B
+</font>    E <font color='#5555FF'>=</font> A <font color='#5555FF'>+</font> C;
+
+    <font color='#009900'>// MATLAB: E = A + 5
+</font>    E <font color='#5555FF'>=</font> A <font color='#5555FF'>+</font> <font color='#979000'>5</font>;
+
+    <font color='#009900'>// MATLAB: E = E'
+</font>    E <font color='#5555FF'>=</font> <font color='#BB00BB'>trans</font><font face='Lucida Console'>(</font>E<font face='Lucida Console'>)</font>;  <font color='#009900'>// Note that if you want a conjugate transpose then you need to say conj(trans(E))
+</font>
+    <font color='#009900'>// MATLAB: E = B' * B
+</font>    E <font color='#5555FF'>=</font> <font color='#BB00BB'>trans</font><font face='Lucida Console'>(</font>B<font face='Lucida Console'>)</font><font color='#5555FF'>*</font>B;
+
+    <font color='#0000FF'><u>double</u></font> var;
+    <font color='#009900'>// MATLAB: var = A(1,2)
+</font>    var <font color='#5555FF'>=</font> <font color='#BB00BB'>A</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>,<font color='#979000'>1</font><font face='Lucida Console'>)</font>; <font color='#009900'>// dlib::matrix is 0 indexed rather than starting at 1 like Matlab.
+</font>
+    <font color='#009900'>// MATLAB: C = round(C)
+</font>    C <font color='#5555FF'>=</font> <font color='#BB00BB'>round</font><font face='Lucida Console'>(</font>C<font face='Lucida Console'>)</font>;
+
+    <font color='#009900'>// MATLAB: C = floor(C)
+</font>    C <font color='#5555FF'>=</font> <font color='#BB00BB'>floor</font><font face='Lucida Console'>(</font>C<font face='Lucida Console'>)</font>;
+
+    <font color='#009900'>// MATLAB: C = ceil(C)
+</font>    C <font color='#5555FF'>=</font> <font color='#BB00BB'>ceil</font><font face='Lucida Console'>(</font>C<font face='Lucida Console'>)</font>;
+
+    <font color='#009900'>// MATLAB: C = diag(B)
+</font>    C <font color='#5555FF'>=</font> <font color='#BB00BB'>diag</font><font face='Lucida Console'>(</font>B<font face='Lucida Console'>)</font>;
+
+    <font color='#009900'>// MATLAB: B = cast(A, "int32")
+</font>    Aint <font color='#5555FF'>=</font> matrix_cast<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>int</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>A<font face='Lucida Console'>)</font>;
+
+    <font color='#009900'>// MATLAB: A = B(1,:)
+</font>    A <font color='#5555FF'>=</font> <font color='#BB00BB'>rowm</font><font face='Lucida Console'>(</font>B,<font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+
+    <font color='#009900'>// MATLAB: A = B([1:2],:)
+</font>    A <font color='#5555FF'>=</font> <font color='#BB00BB'>rowm</font><font face='Lucida Console'>(</font>B,<font color='#BB00BB'>range</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>,<font color='#979000'>1</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+    <font color='#009900'>// MATLAB: A = B(:,1)
+</font>    A <font color='#5555FF'>=</font> <font color='#BB00BB'>colm</font><font face='Lucida Console'>(</font>B,<font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+
+    <font color='#009900'>// MATLAB: A = [1:5]
+</font>    Blong <font color='#5555FF'>=</font> <font color='#BB00BB'>range</font><font face='Lucida Console'>(</font><font color='#979000'>1</font>,<font color='#979000'>5</font><font face='Lucida Console'>)</font>;
+
+    <font color='#009900'>// MATLAB: A = [1:2:5]
+</font>    Blong <font color='#5555FF'>=</font> <font color='#BB00BB'>range</font><font face='Lucida Console'>(</font><font color='#979000'>1</font>,<font color='#979000'>2</font>,<font color='#979000'>5</font><font face='Lucida Console'>)</font>;
+
+    <font color='#009900'>// MATLAB: A = B([1:3], [1:2])
+</font>    A <font color='#5555FF'>=</font> <font color='#BB00BB'>subm</font><font face='Lucida Console'>(</font>B, <font color='#BB00BB'>range</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>,<font color='#979000'>2</font><font face='Lucida Console'>)</font>, <font color='#BB00BB'>range</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>,<font color='#979000'>1</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+    <font color='#009900'>// or equivalently
+</font>    A <font color='#5555FF'>=</font> <font color='#BB00BB'>subm</font><font face='Lucida Console'>(</font>B, <font color='#BB00BB'>rectangle</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>1</font>,<font color='#979000'>2</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+
+    <font color='#009900'>// MATLAB: A = B([1:3], [1:2:4])
+</font>    A <font color='#5555FF'>=</font> <font color='#BB00BB'>subm</font><font face='Lucida Console'>(</font>B, <font color='#BB00BB'>range</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>,<font color='#979000'>2</font><font face='Lucida Console'>)</font>, <font color='#BB00BB'>range</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>,<font color='#979000'>2</font>,<font color='#979000'>3</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+    <font color='#009900'>// MATLAB: B(:,:) = 5
+</font>    B <font color='#5555FF'>=</font> <font color='#979000'>5</font>;
+    <font color='#009900'>// or equivalently
+</font>    <font color='#BB00BB'>set_all_elements</font><font face='Lucida Console'>(</font>B,<font color='#979000'>5</font><font face='Lucida Console'>)</font>;
+
+
+    <font color='#009900'>// MATLAB: B([1:2],[1,2]) = 7
+</font>    <font color='#BB00BB'>set_subm</font><font face='Lucida Console'>(</font>B,<font color='#BB00BB'>range</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>,<font color='#979000'>1</font><font face='Lucida Console'>)</font>, <font color='#BB00BB'>range</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>,<font color='#979000'>1</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>7</font>;
+
+    <font color='#009900'>// MATLAB: B([1:3],[2:3]) = A
+</font>    <font color='#BB00BB'>set_subm</font><font face='Lucida Console'>(</font>B,<font color='#BB00BB'>range</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>,<font color='#979000'>2</font><font face='Lucida Console'>)</font>, <font color='#BB00BB'>range</font><font face='Lucida Console'>(</font><font color='#979000'>1</font>,<font color='#979000'>2</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> A;
+
+    <font color='#009900'>// MATLAB: B(:,1) = 4
+</font>    <font color='#BB00BB'>set_colm</font><font face='Lucida Console'>(</font>B,<font color='#979000'>0</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>4</font>;
+
+    <font color='#009900'>// MATLAB: B(:,[1:2]) = 4
+</font>    <font color='#BB00BB'>set_colm</font><font face='Lucida Console'>(</font>B,<font color='#BB00BB'>range</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>,<font color='#979000'>1</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>4</font>;
+
+    <font color='#009900'>// MATLAB: B(:,1) = B(:,2)
+</font>    <font color='#BB00BB'>set_colm</font><font face='Lucida Console'>(</font>B,<font color='#979000'>0</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#BB00BB'>colm</font><font face='Lucida Console'>(</font>B,<font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+
+    <font color='#009900'>// MATLAB: B(1,:) = 4
+</font>    <font color='#BB00BB'>set_rowm</font><font face='Lucida Console'>(</font>B,<font color='#979000'>0</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>4</font>;
+
+    <font color='#009900'>// MATLAB: B(1,:) = B(2,:)
+</font>    <font color='#BB00BB'>set_rowm</font><font face='Lucida Console'>(</font>B,<font color='#979000'>0</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#BB00BB'>rowm</font><font face='Lucida Console'>(</font>B,<font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+
+    <font color='#009900'>// MATLAB: var = det(E' * E)
+</font>    var <font color='#5555FF'>=</font> <font color='#BB00BB'>det</font><font face='Lucida Console'>(</font><font color='#BB00BB'>trans</font><font face='Lucida Console'>(</font>E<font face='Lucida Console'>)</font><font color='#5555FF'>*</font>E<font face='Lucida Console'>)</font>;
+
+    <font color='#009900'>// MATLAB: C = pinv(E)
+</font>    C <font color='#5555FF'>=</font> <font color='#BB00BB'>pinv</font><font face='Lucida Console'>(</font>E<font face='Lucida Console'>)</font>;
+
+    <font color='#009900'>// MATLAB: C = inv(E)
+</font>    C <font color='#5555FF'>=</font> <font color='#BB00BB'>inv</font><font face='Lucida Console'>(</font>E<font face='Lucida Console'>)</font>;
+
+    <font color='#009900'>// MATLAB: [A,B,C] = svd(E)
+</font>    <font color='#BB00BB'>svd</font><font face='Lucida Console'>(</font>E,A,B,C<font face='Lucida Console'>)</font>;
+
+    <font color='#009900'>// MATLAB: A = chol(E,'lower') 
+</font>    A <font color='#5555FF'>=</font> <font color='#BB00BB'>chol</font><font face='Lucida Console'>(</font>E<font face='Lucida Console'>)</font>;
+
+    <font color='#009900'>// MATLAB: var = min(min(A))
+</font>    var <font color='#5555FF'>=</font> <font color='#BB00BB'>min</font><font face='Lucida Console'>(</font>A<font face='Lucida Console'>)</font>;
+<b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+
+
+</pre></body></html>

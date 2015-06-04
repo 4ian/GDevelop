@@ -1,0 +1,274 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - track_association_function_abstract.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2014  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#undef</font> DLIB_TRACK_ASSOCiATION_FUNCTION_ABSTRACT_Hh_
+<font color='#0000FF'>#ifdef</font> DLIB_TRACK_ASSOCiATION_FUNCTION_ABSTRACT_Hh_
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>vector<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='assignment_function_abstract.h.html'>assignment_function_abstract.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>class</font> <b><a name='example_detection'></a>example_detection</b>
+    <b>{</b>
+        <font color='#009900'>/*!
+            WHAT THIS OBJECT REPRESENTS
+                This object defines the interface a detection must implement if it is to be
+                used with the track_association_function defined at the bottom of this
+                file.  In this case, the interface is very simple.  A detection object is
+                only required to define the track_type typedef and it must also be possible
+                to store detection objects in a std::vector.
+        !*/</font>
+
+    <font color='#0000FF'>public</font>:
+        <font color='#009900'>// Each detection object should be designed to work with a specific track object.
+</font>        <font color='#009900'>// This typedef lets us determine which track type is meant for use with this
+</font>        <font color='#009900'>// detection object.
+</font>        <font color='#0000FF'>typedef</font> <font color='#0000FF'>class</font> example_track track_type;
+
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>class</font> <b><a name='example_track'></a>example_track</b>
+    <b>{</b>
+        <font color='#009900'>/*!
+            WHAT THIS OBJECT REPRESENTS
+                This object defines the interface a track must implement if it is to be
+                used with the track_association_function defined at the bottom of this
+                file.   
+        !*/</font>
+
+    <font color='#0000FF'>public</font>:
+        <font color='#009900'>// This type should be a dlib::matrix capable of storing column vectors or an
+</font>        <font color='#009900'>// unsorted sparse vector type as defined in dlib/svm/sparse_vector_abstract.h.
+</font>        <font color='#0000FF'>typedef</font> matrix_or_sparse_vector_type feature_vector_type;
+
+        <b><a name='example_track'></a>example_track</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - this object is properly initialized
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='get_similarity_features'></a>get_similarity_features</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> example_detection<font color='#5555FF'>&amp;</font> det,
+            feature_vector_type<font color='#5555FF'>&amp;</font> feats
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - update_track() has been called on this track at least once.
+            ensures
+                - #feats == A feature vector that contains information describing how
+                  likely it is that det is a detection from the object corresponding to
+                  this track.  That is, the feature vector should contain information that
+                  lets someone decide if det should be associated to this track.
+                - #feats.size() must be a constant.  That is, every time we call
+                  get_similarity_features() it must output a feature vector of the same
+                  dimensionality.
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='update_track'></a>update_track</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> example_detection<font color='#5555FF'>&amp;</font> det
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - Updates this track with the given detection assuming that det is the most
+                  current observation of the object under track. 
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='propagate_track'></a>propagate_track</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - propagates this track forward in time one time step.
+        !*/</font>
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> detection_type
+        <font color='#5555FF'>&gt;</font> 
+    <font color='#0000FF'>class</font> <b><a name='feature_extractor_track_association'></a>feature_extractor_track_association</b>
+    <b>{</b>
+        <font color='#009900'>/*!
+            REQUIREMENTS ON detection_type
+                It must be an object that implements an interface compatible with the
+                example_detection discussed above.  This also means that detection_type::track_type 
+                must be an object that implements an interface compatible with example_track 
+                defined above.
+
+            WHAT THIS OBJECT REPRESENTS 
+                This object is an adapter that converts from the detection/track style
+                interface defined above to the feature extraction interface required by the
+                association rule learning tools in dlib.  Specifically, it converts the
+                detection/track interface into a form usable by the assignment_function and
+                its trainer object structural_assignment_trainer.
+        !*/</font>
+
+    <font color='#0000FF'>public</font>:
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> detection_type::track_type track_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> track_type::feature_vector_type feature_vector_type;
+        <font color='#0000FF'>typedef</font> detection_type lhs_element;
+        <font color='#0000FF'>typedef</font> track_type rhs_element;
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='num_features'></a>num_features</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>; 
+        <font color='#009900'>/*!
+            ensures
+                - returns the dimensionality of the feature vectors produced by get_features().
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='get_features'></a>get_features</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> detection_type<font color='#5555FF'>&amp;</font> det,
+            <font color='#0000FF'>const</font> track_type<font color='#5555FF'>&amp;</font> track,
+            feature_vector_type<font color='#5555FF'>&amp;</font> feats
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - performs: track.get_similarity_features(det, feats);
+        !*/</font>
+    <b>}</b>;
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> detection_type
+        <font color='#5555FF'>&gt;</font> 
+    <font color='#0000FF'><u>void</u></font> <b><a name='serialize'></a>serialize</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> feature_extractor_track_association<font color='#5555FF'>&lt;</font>detection_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> item, 
+        std::ostream<font color='#5555FF'>&amp;</font> out
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        Provides serialization support.
+    !*/</font>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> detection_type
+        <font color='#5555FF'>&gt;</font> 
+    <font color='#0000FF'><u>void</u></font> <b><a name='deserialize'></a>deserialize</b> <font face='Lucida Console'>(</font>
+        feature_extractor_track_association<font color='#5555FF'>&lt;</font>detection_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> item,
+        std::istream<font color='#5555FF'>&amp;</font> in
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        Provides deserialization support.
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> detection_type_
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>class</font> <b><a name='track_association_function'></a>track_association_function</b>
+    <b>{</b>
+        <font color='#009900'>/*!
+            REQUIREMENTS ON detection_type
+                It must be an object that implements an interface compatible with the
+                example_detection discussed above.  This also means that detection_type::track_type 
+                must be an object that implements an interface compatible with example_track 
+                defined above.
+
+            WHAT THIS OBJECT REPRESENTS
+                This object is a tool that helps you implement an object tracker.  So for
+                example, if you wanted to track people moving around in a video then this
+                object can help.  In particular, imagine you have a tool for detecting the
+                positions of each person in an image.  Then you can run this person
+                detector on the video and at each time step, i.e. at each frame, you get a
+                set of person detections.  However, that by itself doesn't tell you how
+                many people there are in the video and where they are moving to and from.
+                To get that information you need to figure out which detections match each
+                other from frame to frame.  This is where the track_association_function
+                comes in.  It performs the detection to track association.  It will also do
+                some of the track management tasks like creating a new track when a
+                detection doesn't match any of the existing tracks.
+
+                Internally, this object is implemented using the assignment_function object.  
+                In fact, it's really just a thin wrapper around assignment_function and
+                exists just to provide a more convenient interface to users doing detection
+                to track association.   
+        !*/</font>
+    <font color='#0000FF'>public</font>:
+
+        <font color='#0000FF'>typedef</font> detection_type_ detection_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> detection_type::track_type track_type;
+        <font color='#0000FF'>typedef</font> assignment_function<font color='#5555FF'>&lt;</font>feature_extractor_track_association<font color='#5555FF'>&lt;</font>detection_type<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> association_function_type;
+
+        <b><a name='track_association_function'></a>track_association_function</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #get_assignment_function() will be default initialized.
+        !*/</font>
+
+        <b><a name='track_association_function'></a>track_association_function</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> association_function_type<font color='#5555FF'>&amp;</font> assoc
+        <font face='Lucida Console'>)</font>; 
+        <font color='#009900'>/*!
+            ensures
+                - #get_assignment_function() == assoc
+        !*/</font>
+
+        <font color='#0000FF'>const</font> association_function_type<font color='#5555FF'>&amp;</font> <b><a name='get_assignment_function'></a>get_assignment_function</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the assignment_function used by this object to assign detections
+                  to tracks.
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>
+            std::vector<font color='#5555FF'>&lt;</font>track_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> tracks,
+            <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>detection_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> dets
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - This function uses get_assignment_function() to assign each detection
+                  in dets to its appropriate track in tracks.  Then each track which
+                  associates to a detection is updated by calling update_track() with the
+                  associated detection.  
+                - Detections that don't associate with any of the elements of tracks will
+                  spawn new tracks.  For each unassociated detection, this is done by
+                  creating a new track_type object, calling update_track() on it with the
+                  new detection, and then adding the new track into tracks.
+                - Tracks that don't have a detection associate to them are propagated
+                  forward in time by calling propagate_track() on them.  That is, we call
+                  propagate_track() only on tracks that do not get associated with a
+                  detection.
+        !*/</font>
+    <b>}</b>;
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> detection_type
+        <font color='#5555FF'>&gt;</font> 
+    <font color='#0000FF'><u>void</u></font> <b><a name='serialize'></a>serialize</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> track_association_function<font color='#5555FF'>&lt;</font>detection_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> item,
+        std::ostream<font color='#5555FF'>&amp;</font> out
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        Provides serialization support.
+    !*/</font>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> detection_type
+        <font color='#5555FF'>&gt;</font> 
+    <font color='#0000FF'><u>void</u></font> <b><a name='deserialize'></a>deserialize</b> <font face='Lucida Console'>(</font>
+        track_association_function<font color='#5555FF'>&lt;</font>detection_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> item, 
+        std::istream<font color='#5555FF'>&amp;</font> in
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        Provides deserialization support.
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_TRACK_ASSOCiATION_FUNCTION_ABSTRACT_Hh_
+</font>
+
+
+</pre></body></html>

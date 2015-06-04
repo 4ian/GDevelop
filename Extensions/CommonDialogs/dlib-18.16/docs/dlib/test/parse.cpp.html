@@ -1,0 +1,236 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - parse.cpp</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2012  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>optimization.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>sstream<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>string<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>cstdlib<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>ctime<font color='#5555FF'>&gt;</font>
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='tester.h.html'>tester.h</a>"
+
+<font color='#0000FF'>namespace</font>  
+<b>{</b>
+
+    <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> test;
+    <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> dlib;
+    <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> std;
+
+
+    logger <b><a name='dlog'></a>dlog</b><font face='Lucida Console'>(</font>"<font color='#CC0000'>test.parse</font>"<font face='Lucida Console'>)</font>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> DET <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+    <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> N   <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+    <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> V   <font color='#5555FF'>=</font> <font color='#979000'>2</font>;
+    <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> NP  <font color='#5555FF'>=</font> <font color='#979000'>3</font>;
+    <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> VP  <font color='#5555FF'>=</font> <font color='#979000'>4</font>;
+    <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> S   <font color='#5555FF'>=</font> <font color='#979000'>5</font>;
+    <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> B   <font color='#5555FF'>=</font> <font color='#979000'>6</font>;
+    <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> G   <font color='#5555FF'>=</font> <font color='#979000'>7</font>;
+    <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> A   <font color='#5555FF'>=</font> <font color='#979000'>8</font>;
+
+    <font color='#0000FF'>typedef</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> tags;
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'><u>bool</u></font> has_glue_term<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='user_defined_ruleset'></a>user_defined_ruleset</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>tags<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> words,
+        <font color='#0000FF'>const</font> constituent<font color='#5555FF'>&lt;</font>tags<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> c,
+        std::vector<font color='#5555FF'>&lt;</font>std::pair<font color='#5555FF'>&lt;</font>tags,<font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> possible_ids
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>c.begin <font color='#5555FF'>&lt;</font> c.k <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> c.k <font color='#5555FF'>&lt;</font> c.end <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> c.end <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> words.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>possible_ids.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>c.left_tag <font color='#5555FF'>=</font><font color='#5555FF'>=</font> NP <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> c.right_tag <font color='#5555FF'>=</font><font color='#5555FF'>=</font> VP<font face='Lucida Console'>)</font>      possible_ids.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font><font color='#BB00BB'>make_pair</font><font face='Lucida Console'>(</font>S,<font color='#BB00BB'>log</font><font face='Lucida Console'>(</font><font color='#979000'>0.80</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>c.left_tag <font color='#5555FF'>=</font><font color='#5555FF'>=</font> DET <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> c.right_tag <font color='#5555FF'>=</font><font color='#5555FF'>=</font> N<font face='Lucida Console'>)</font> possible_ids.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font><font color='#BB00BB'>make_pair</font><font face='Lucida Console'>(</font>NP,<font color='#BB00BB'>log</font><font face='Lucida Console'>(</font><font color='#979000'>0.30</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>c.left_tag <font color='#5555FF'>=</font><font color='#5555FF'>=</font> VP <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> c.right_tag <font color='#5555FF'>=</font><font color='#5555FF'>=</font> A<font face='Lucida Console'>)</font> possible_ids.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font><font color='#BB00BB'>make_pair</font><font face='Lucida Console'>(</font>VP,<font color='#BB00BB'>log</font><font face='Lucida Console'>(</font><font color='#979000'>0.30</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>c.left_tag <font color='#5555FF'>=</font><font color='#5555FF'>=</font> V <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> c.right_tag <font color='#5555FF'>=</font><font color='#5555FF'>=</font> NP<font face='Lucida Console'>)</font>
+        <b>{</b>
+            possible_ids.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font><font color='#BB00BB'>make_pair</font><font face='Lucida Console'>(</font>VP,<font color='#BB00BB'>log</font><font face='Lucida Console'>(</font><font color='#979000'>0.20</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            possible_ids.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font><font color='#BB00BB'>make_pair</font><font face='Lucida Console'>(</font>B,<font color='#979000'>0.10</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+        <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>has_glue_term<font face='Lucida Console'>)</font>
+        <b>{</b>
+            possible_ids.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font><font color='#BB00BB'>make_pair</font><font face='Lucida Console'>(</font>G, <font color='#BB00BB'>log</font><font face='Lucida Console'>(</font><font color='#979000'>0.01</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='dotest1'></a>dotest1</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#BB00BB'>print_spinner</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>in dotest1()</font>";
+
+        std::vector<font color='#5555FF'>&lt;</font>std::string<font color='#5555FF'>&gt;</font> words;
+        std::vector<font color='#5555FF'>&lt;</font>tags<font color='#5555FF'>&gt;</font> sequence;
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> <font color='#979000'>8</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+        <b>{</b>
+            sequence.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>DET<font face='Lucida Console'>)</font>;
+            sequence.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>N<font face='Lucida Console'>)</font>;
+            sequence.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>V<font face='Lucida Console'>)</font>;
+            sequence.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>DET<font face='Lucida Console'>)</font>;
+            sequence.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>N<font face='Lucida Console'>)</font>;
+            sequence.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>A<font face='Lucida Console'>)</font>;
+
+            words.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>The</font>"<font face='Lucida Console'>)</font>;
+            words.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>flight</font>"<font face='Lucida Console'>)</font>;
+            words.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>includes</font>"<font face='Lucida Console'>)</font>;
+            words.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>a</font>"<font face='Lucida Console'>)</font>;
+            words.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>meal</font>"<font face='Lucida Console'>)</font>;
+            words.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>AWORD</font>"<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        std::vector<font color='#5555FF'>&lt;</font>parse_tree_element<font color='#5555FF'>&lt;</font>tags<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> parse_tree;
+
+        <font color='#BB00BB'>find_max_parse_cky</font><font face='Lucida Console'>(</font>sequence, user_defined_ruleset<font color='#5555FF'>&lt;</font><font color='#979000'>true</font><font color='#5555FF'>&gt;</font>, parse_tree<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>parse_tree.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+
+
+        std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font> roots;
+        <font color='#BB00BB'>find_trees_not_rooted_with_tag</font><font face='Lucida Console'>(</font>parse_tree, G, roots<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>roots.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>8</font><font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> roots.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+        <b>{</b>
+            dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>parse_tree_to_string</font><font face='Lucida Console'>(</font>parse_tree, words, roots[i]<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>parse_tree_to_string</font><font face='Lucida Console'>(</font>parse_tree, words, roots[i]<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'>[[The flight] [[includes [a meal]] AWORD]]</font>"<font face='Lucida Console'>)</font>;
+            dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>parse_tree_to_string_tagged</font><font face='Lucida Console'>(</font>parse_tree, words, roots[i]<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>parse_tree_to_string_tagged</font><font face='Lucida Console'>(</font>parse_tree, words, roots[i]<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'>[5 [3 The flight] [4 [4 includes [3 a meal]] AWORD]]</font>"<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+
+        words.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        sequence.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> <font color='#979000'>2</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+        <b>{</b>
+            sequence.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>DET<font face='Lucida Console'>)</font>;
+            sequence.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>N<font face='Lucida Console'>)</font>;
+            sequence.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>V<font face='Lucida Console'>)</font>;
+            sequence.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>DET<font face='Lucida Console'>)</font>;
+            sequence.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>N<font face='Lucida Console'>)</font>;
+
+            words.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>The</font>"<font face='Lucida Console'>)</font>;
+            words.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>flight</font>"<font face='Lucida Console'>)</font>;
+            words.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>includes</font>"<font face='Lucida Console'>)</font>;
+            words.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>a</font>"<font face='Lucida Console'>)</font>;
+            words.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>meal</font>"<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#BB00BB'>find_max_parse_cky</font><font face='Lucida Console'>(</font>sequence, user_defined_ruleset<font color='#5555FF'>&lt;</font><font color='#979000'>true</font><font color='#5555FF'>&gt;</font>, parse_tree<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>parse_tree.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>const</font> std::string str1 <font color='#5555FF'>=</font> "<font color='#CC0000'>[[[The flight] [includes [a meal]]] [[The flight] [includes [a meal]]]]</font>";
+        <font color='#0000FF'>const</font> std::string str2 <font color='#5555FF'>=</font> "<font color='#CC0000'>[7 [5 [3 The flight] [4 includes [3 a meal]]] [5 [3 The flight] [4 includes [3 a meal]]]]</font>";
+        dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>parse_tree_to_string</font><font face='Lucida Console'>(</font>parse_tree, words<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>parse_tree_to_string</font><font face='Lucida Console'>(</font>parse_tree, words<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> str1<font face='Lucida Console'>)</font>;
+        dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>parse_tree_to_string_tagged</font><font face='Lucida Console'>(</font>parse_tree, words<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>parse_tree_to_string_tagged</font><font face='Lucida Console'>(</font>parse_tree, words<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> str2<font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>const</font> std::string str3 <font color='#5555FF'>=</font> "<font color='#CC0000'>[[The flight] [includes [a meal]]] [[The flight] [includes [a meal]]]</font>";
+        <font color='#0000FF'>const</font> std::string str4 <font color='#5555FF'>=</font> "<font color='#CC0000'>[5 [3 The flight] [4 includes [3 a meal]]] [5 [3 The flight] [4 includes [3 a meal]]]</font>";
+        dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>parse_trees_to_string</font><font face='Lucida Console'>(</font>parse_tree, words, G<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>parse_trees_to_string</font><font face='Lucida Console'>(</font>parse_tree, words, G<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> str3<font face='Lucida Console'>)</font>;
+        dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>parse_trees_to_string_tagged</font><font face='Lucida Console'>(</font>parse_tree, words, G<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>parse_trees_to_string_tagged</font><font face='Lucida Console'>(</font>parse_tree, words, G<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> str4<font face='Lucida Console'>)</font>;
+
+        sequence.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>find_max_parse_cky</font><font face='Lucida Console'>(</font>sequence, user_defined_ruleset<font color='#5555FF'>&lt;</font><font color='#979000'>true</font><font color='#5555FF'>&gt;</font>, parse_tree<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>parse_tree.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='dotest2'></a>dotest2</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#BB00BB'>print_spinner</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>in dotest2()</font>";
+
+        std::vector<font color='#5555FF'>&lt;</font>std::string<font color='#5555FF'>&gt;</font> words;
+        std::vector<font color='#5555FF'>&lt;</font>tags<font color='#5555FF'>&gt;</font> sequence;
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> <font color='#979000'>8</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+        <b>{</b>
+            sequence.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>DET<font face='Lucida Console'>)</font>;
+            sequence.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>N<font face='Lucida Console'>)</font>;
+            sequence.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>V<font face='Lucida Console'>)</font>;
+            sequence.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>DET<font face='Lucida Console'>)</font>;
+            sequence.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>N<font face='Lucida Console'>)</font>;
+
+            words.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>The</font>"<font face='Lucida Console'>)</font>;
+            words.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>flight</font>"<font face='Lucida Console'>)</font>;
+            words.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>includes</font>"<font face='Lucida Console'>)</font>;
+            words.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>a</font>"<font face='Lucida Console'>)</font>;
+            words.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>meal</font>"<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        std::vector<font color='#5555FF'>&lt;</font>parse_tree_element<font color='#5555FF'>&lt;</font>tags<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> parse_tree;
+
+        <font color='#BB00BB'>find_max_parse_cky</font><font face='Lucida Console'>(</font>sequence, user_defined_ruleset<font color='#5555FF'>&lt;</font><font color='#979000'>false</font><font color='#5555FF'>&gt;</font>, parse_tree<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>parse_tree.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+
+
+        std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font> roots;
+        <font color='#BB00BB'>find_trees_not_rooted_with_tag</font><font face='Lucida Console'>(</font>parse_tree, G, roots<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>roots.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+
+
+        words.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        sequence.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> <font color='#979000'>2</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+        <b>{</b>
+            sequence.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>DET<font face='Lucida Console'>)</font>;
+            sequence.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>N<font face='Lucida Console'>)</font>;
+            sequence.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>V<font face='Lucida Console'>)</font>;
+            sequence.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>DET<font face='Lucida Console'>)</font>;
+            sequence.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>N<font face='Lucida Console'>)</font>;
+
+            words.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>The</font>"<font face='Lucida Console'>)</font>;
+            words.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>flight</font>"<font face='Lucida Console'>)</font>;
+            words.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>includes</font>"<font face='Lucida Console'>)</font>;
+            words.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>a</font>"<font face='Lucida Console'>)</font>;
+            words.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>meal</font>"<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#BB00BB'>find_max_parse_cky</font><font face='Lucida Console'>(</font>sequence, user_defined_ruleset<font color='#5555FF'>&lt;</font><font color='#979000'>false</font><font color='#5555FF'>&gt;</font>, parse_tree<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>parse_tree.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+
+        sequence.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>find_max_parse_cky</font><font face='Lucida Console'>(</font>sequence, user_defined_ruleset<font color='#5555FF'>&lt;</font><font color='#979000'>false</font><font color='#5555FF'>&gt;</font>, parse_tree<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>parse_tree.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>class</font> <b><a name='parse_tester'></a>parse_tester</b> : <font color='#0000FF'>public</font> tester
+    <b>{</b>
+    <font color='#0000FF'>public</font>:
+        <b><a name='parse_tester'></a>parse_tester</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> :
+            tester <font face='Lucida Console'>(</font>"<font color='#CC0000'>test_parse</font>",
+                    "<font color='#CC0000'>Runs tests on the parsing tools.</font>"<font face='Lucida Console'>)</font>
+        <b>{</b><b>}</b>
+
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='perform_test'></a>perform_test</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#BB00BB'>dotest1</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>dotest2</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+    <b>}</b> a;
+
+
+<b>}</b>
+
+
+
+
+
+</pre></body></html>

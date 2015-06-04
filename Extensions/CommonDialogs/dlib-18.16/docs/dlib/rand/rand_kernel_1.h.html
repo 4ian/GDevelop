@@ -1,0 +1,310 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - rand_kernel_1.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2007  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_RAND_KERNEl_1_
+<font color='#0000FF'>#define</font> DLIB_RAND_KERNEl_1_
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>string<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../algs.h.html'>../algs.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='rand_kernel_abstract.h.html'>rand_kernel_abstract.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='mersenne_twister.h.html'>mersenne_twister.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../is_kind.h.html'>../is_kind.h</a>"
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>iostream<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../serialize.h.html'>../serialize.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+
+    <font color='#0000FF'>class</font> <b><a name='rand'></a>rand</b>
+    <b>{</b>
+
+        <font color='#009900'>/*!       
+            INITIAL VALUE
+                - seed == ""
+
+            CONVENTION
+                - the random numbers come from the boost mersenne_twister code
+                - get_seed() == seed
+        !*/</font>
+        
+        <font color='#0000FF'>public</font>:
+
+            <font color='#009900'>// These typedefs are here for backwards compatibility with older versions of dlib.
+</font>            <font color='#0000FF'>typedef</font> rand kernel_1a;
+            <font color='#0000FF'>typedef</font> rand float_1a;
+
+            <b><a name='rand'></a>rand</b><font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font> 
+            <b>{</b>
+                <font color='#BB00BB'>init</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+            <b><a name='rand'></a>rand</b> <font face='Lucida Console'>(</font>
+                <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> seed_value
+            <font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#BB00BB'>init</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                <font color='#BB00BB'>set_seed</font><font face='Lucida Console'>(</font>seed_value<font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+            <font color='#0000FF'>virtual</font> ~<b><a name='rand'></a>rand</b><font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font>
+            <b>{</b><b>}</b>
+
+            <font color='#0000FF'><u>void</u></font> <b><a name='clear'></a>clear</b><font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font>
+            <b>{</b>
+                mt.<font color='#BB00BB'>seed</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                seed.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+                has_gaussian <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+                next_gaussian <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+
+                <font color='#009900'>// prime the generator a bit
+</font>                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> <font color='#979000'>10000</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                    <font color='#BB00BB'>mt</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+ 
+            <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> <b><a name='get_seed'></a>get_seed</b> <font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>return</font> seed;
+            <b>}</b>
+
+            <font color='#0000FF'><u>void</u></font> <b><a name='set_seed'></a>set_seed</b> <font face='Lucida Console'>(</font>
+                <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> value
+            <font face='Lucida Console'>)</font>
+            <b>{</b>
+                seed <font color='#5555FF'>=</font> value;
+
+                <font color='#009900'>// make sure we do the seeding so that using a seed of "" gives the same
+</font>                <font color='#009900'>// state as calling this-&gt;clear()
+</font>                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>value.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                <b>{</b>
+                    uint32 s <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>std::string::size_type i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> seed.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        s <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>s<font color='#5555FF'>*</font><font color='#979000'>37</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font>uint32<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>seed[i]<font face='Lucida Console'>)</font>;
+                    <b>}</b>
+                    mt.<font color='#BB00BB'>seed</font><font face='Lucida Console'>(</font>s<font face='Lucida Console'>)</font>;
+                <b>}</b>
+                <font color='#0000FF'>else</font>
+                <b>{</b>
+                    mt.<font color='#BB00BB'>seed</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                <b>}</b>
+
+                <font color='#009900'>// prime the generator a bit
+</font>                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> <font color='#979000'>10000</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                    <font color='#BB00BB'>mt</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+
+                has_gaussian <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+                next_gaussian <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            <b>}</b>
+
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> <b><a name='get_random_8bit_number'></a>get_random_8bit_number</b> <font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>return</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#BB00BB'>mt</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+            uint16 <b><a name='get_random_16bit_number'></a>get_random_16bit_number</b> <font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>return</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font>uint16<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#BB00BB'>mt</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+            <font color='#0000FF'>inline</font> uint32 <b><a name='get_random_32bit_number'></a>get_random_32bit_number</b> <font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>return</font> <font color='#BB00BB'>mt</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+            <font color='#0000FF'>inline</font> uint64 <b><a name='get_random_64bit_number'></a>get_random_64bit_number</b> <font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>const</font> uint64 a <font color='#5555FF'>=</font> <font color='#BB00BB'>get_random_32bit_number</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>const</font> uint64 b <font color='#5555FF'>=</font> <font color='#BB00BB'>get_random_32bit_number</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>return</font> <font face='Lucida Console'>(</font>a<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font><font color='#979000'>32</font><font face='Lucida Console'>)</font><font color='#5555FF'>|</font>b;
+            <b>}</b>
+
+            <font color='#0000FF'><u>double</u></font> <b><a name='get_random_double'></a>get_random_double</b> <font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font>
+            <b>{</b>
+                uint32 temp;
+
+                temp <font color='#5555FF'>=</font> rand::<font color='#BB00BB'>get_random_32bit_number</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                temp <font color='#5555FF'>&amp;</font><font color='#5555FF'>=</font> <font color='#979000'>0xFFFFFF</font>;
+
+                <font color='#0000FF'><u>double</u></font> val <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font>;
+
+                val <font color='#5555FF'>*</font><font color='#5555FF'>=</font> <font color='#979000'>0x1000000</font>;
+
+                temp <font color='#5555FF'>=</font> rand::<font color='#BB00BB'>get_random_32bit_number</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                temp <font color='#5555FF'>&amp;</font><font color='#5555FF'>=</font> <font color='#979000'>0xFFFFFF</font>;
+
+                val <font color='#5555FF'>+</font><font color='#5555FF'>=</font> temp;
+
+                val <font color='#5555FF'>/</font><font color='#5555FF'>=</font> max_val;
+
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>val <font color='#5555FF'>&lt;</font> <font color='#979000'>1.0</font><font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#0000FF'>return</font> val;
+                <b>}</b>
+                <font color='#0000FF'>else</font>
+                <b>{</b>
+                    <font color='#009900'>// return a value slightly less than 1.0
+</font>                    <font color='#0000FF'>return</font> <font color='#979000'>1.0</font> <font color='#5555FF'>-</font> std::numeric_limits<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>epsilon</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                <b>}</b>
+            <b>}</b>
+
+            <font color='#0000FF'><u>float</u></font> <b><a name='get_random_float'></a>get_random_float</b> <font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font>
+            <b>{</b>
+                uint32 temp;
+
+                temp <font color='#5555FF'>=</font> rand::<font color='#BB00BB'>get_random_32bit_number</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                temp <font color='#5555FF'>&amp;</font><font color='#5555FF'>=</font> <font color='#979000'>0xFFFFFF</font>;
+
+                <font color='#0000FF'>const</font> <font color='#0000FF'><u>float</u></font> scale <font color='#5555FF'>=</font> <font color='#979000'>1.0</font><font color='#5555FF'>/</font><font color='#979000'>0x1000000</font>;
+
+                <font color='#0000FF'>const</font> <font color='#0000FF'><u>float</u></font> val <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>float</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font><font color='#5555FF'>*</font>scale;
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>val <font color='#5555FF'>&lt;</font> <font color='#979000'>1.0f</font><font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#0000FF'>return</font> val;
+                <b>}</b>
+                <font color='#0000FF'>else</font>
+                <b>{</b>
+                    <font color='#009900'>// return a value slightly less than 1.0
+</font>                    <font color='#0000FF'>return</font> <font color='#979000'>1.0f</font> <font color='#5555FF'>-</font> std::numeric_limits<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>float</u></font><font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>epsilon</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                <b>}</b>
+            <b>}</b>
+
+            <font color='#0000FF'><u>double</u></font> <b><a name='get_random_gaussian'></a>get_random_gaussian</b> <font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>has_gaussian<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    has_gaussian <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+                    <font color='#0000FF'>return</font> next_gaussian;
+                <b>}</b>
+
+                <font color='#0000FF'><u>double</u></font> x1, x2, w;
+
+                <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> rndmax <font color='#5555FF'>=</font> std::numeric_limits<font color='#5555FF'>&lt;</font>dlib::uint32<font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>max</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+                <font color='#009900'>// Generate a pair of Gaussian random numbers using the Box-Muller transformation.
+</font>                <font color='#0000FF'>do</font> 
+                <b>{</b>
+                    <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> rnd1 <font color='#5555FF'>=</font> <font color='#BB00BB'>get_random_32bit_number</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>/</font>rndmax;
+                    <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> rnd2 <font color='#5555FF'>=</font> <font color='#BB00BB'>get_random_32bit_number</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>/</font>rndmax;
+
+                    x1 <font color='#5555FF'>=</font> <font color='#979000'>2.0</font> <font color='#5555FF'>*</font> rnd1 <font color='#5555FF'>-</font> <font color='#979000'>1.0</font>;
+                    x2 <font color='#5555FF'>=</font> <font color='#979000'>2.0</font> <font color='#5555FF'>*</font> rnd2 <font color='#5555FF'>-</font> <font color='#979000'>1.0</font>;
+                    w <font color='#5555FF'>=</font> x1 <font color='#5555FF'>*</font> x1 <font color='#5555FF'>+</font> x2 <font color='#5555FF'>*</font> x2;
+                <b>}</b> <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font> w <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#979000'>1.0</font> <font face='Lucida Console'>)</font>;
+
+                w <font color='#5555FF'>=</font> std::<font color='#BB00BB'>sqrt</font><font face='Lucida Console'>(</font> <font face='Lucida Console'>(</font><font color='#5555FF'>-</font><font color='#979000'>2.0</font> <font color='#5555FF'>*</font> std::<font color='#BB00BB'>log</font><font face='Lucida Console'>(</font> w <font face='Lucida Console'>)</font> <font face='Lucida Console'>)</font> <font color='#5555FF'>/</font> w <font face='Lucida Console'>)</font>;
+                next_gaussian <font color='#5555FF'>=</font> x2 <font color='#5555FF'>*</font> w;
+                has_gaussian <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+                <font color='#0000FF'>return</font> x1 <font color='#5555FF'>*</font> w;
+            <b>}</b>
+
+            <font color='#0000FF'><u>void</u></font> <b><a name='swap'></a>swap</b> <font face='Lucida Console'>(</font>
+                rand<font color='#5555FF'>&amp;</font> item
+            <font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#BB00BB'>exchange</font><font face='Lucida Console'>(</font>mt,item.mt<font face='Lucida Console'>)</font>;
+                <font color='#BB00BB'>exchange</font><font face='Lucida Console'>(</font>seed, item.seed<font face='Lucida Console'>)</font>;
+                <font color='#BB00BB'>exchange</font><font face='Lucida Console'>(</font>has_gaussian, item.has_gaussian<font face='Lucida Console'>)</font>;
+                <font color='#BB00BB'>exchange</font><font face='Lucida Console'>(</font>next_gaussian, item.next_gaussian<font face='Lucida Console'>)</font>;
+            <b>}</b>
+    
+            <font color='#0000FF'>friend</font> <font color='#0000FF'><u>void</u></font> <b><a name='serialize'></a>serialize</b><font face='Lucida Console'>(</font>
+                <font color='#0000FF'>const</font> rand<font color='#5555FF'>&amp;</font> item, 
+                std::ostream<font color='#5555FF'>&amp;</font> out
+            <font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>friend</font> <font color='#0000FF'><u>void</u></font> <b><a name='deserialize'></a>deserialize</b><font face='Lucida Console'>(</font>
+                rand<font color='#5555FF'>&amp;</font> item, 
+                std::istream<font color='#5555FF'>&amp;</font> in 
+            <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>private</font>:
+
+            <font color='#0000FF'><u>void</u></font> <b><a name='init'></a>init</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#009900'>// prime the generator a bit
+</font>                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> <font color='#979000'>10000</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                    <font color='#BB00BB'>mt</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+                max_val <font color='#5555FF'>=</font>  <font color='#979000'>0xFFFFFF</font>;
+                max_val <font color='#5555FF'>*</font><font color='#5555FF'>=</font> <font color='#979000'>0x1000000</font>;
+                max_val <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#979000'>0xFFFFFF</font>;
+                max_val <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#979000'>0.01</font>;
+
+
+                has_gaussian <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+                next_gaussian <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            <b>}</b>
+
+            mt19937 mt;
+
+            std::string seed;
+
+
+            <font color='#0000FF'><u>double</u></font> max_val;
+            <font color='#0000FF'><u>bool</u></font> has_gaussian;
+            <font color='#0000FF'><u>double</u></font> next_gaussian;
+    <b>}</b>;
+
+
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='swap'></a>swap</b> <font face='Lucida Console'>(</font>
+        rand<font color='#5555FF'>&amp;</font> a, 
+        rand<font color='#5555FF'>&amp;</font> b 
+    <font face='Lucida Console'>)</font> <b>{</b> a.<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>b<font face='Lucida Console'>)</font>; <b>}</b>   
+
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>struct</font> <b><a name='is_rand'></a>is_rand</b><font color='#5555FF'>&lt;</font>rand<font color='#5555FF'>&gt;</font>
+    <b>{</b>
+        <font color='#0000FF'>static</font> <font color='#0000FF'>const</font> <font color='#0000FF'><u>bool</u></font> value <font color='#5555FF'>=</font> <font color='#979000'>true</font>; 
+    <b>}</b>;
+
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='serialize'></a>serialize</b><font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> rand<font color='#5555FF'>&amp;</font> item, 
+        std::ostream<font color='#5555FF'>&amp;</font> out
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'><u>int</u></font> version <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+        <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>version, out<font face='Lucida Console'>)</font>;
+
+        <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item.mt, out<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item.seed, out<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item.has_gaussian, out<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item.next_gaussian, out<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='deserialize'></a>deserialize</b><font face='Lucida Console'>(</font>
+        rand<font color='#5555FF'>&amp;</font> item, 
+        std::istream<font color='#5555FF'>&amp;</font> in 
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'><u>int</u></font> version;
+        <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>version, in<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>version <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>
+            <font color='#0000FF'>throw</font> <font color='#BB00BB'>serialization_error</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>Error deserializing object of type rand: unexpected version.</font>"<font face='Lucida Console'>)</font>; 
+
+        <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item.mt, in<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item.seed, in<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item.has_gaussian, in<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item.next_gaussian, in<font face='Lucida Console'>)</font>;
+    <b>}</b>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_RAND_KERNEl_1_
+</font>
+
+
+</pre></body></html>

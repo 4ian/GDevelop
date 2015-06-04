@@ -1,0 +1,128 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - murmur_hash3_abstract.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2011  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#undef</font> DLIB_MURMUR_HAsH_3_ABSTRACT_Hh_ 
+<font color='#0000FF'>#ifdef</font> DLIB_MURMUR_HAsH_3_ABSTRACT_Hh_ 
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../uintn.h.html'>../uintn.h</a>"
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>utility<font color='#5555FF'>&gt;</font>
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    uint32 <b><a name='murmur_hash3'></a>murmur_hash3</b> <font face='Lucida Console'>(</font> 
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>void</u></font><font color='#5555FF'>*</font> key, 
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>int</u></font> len, 
+        <font color='#0000FF'>const</font> uint32 seed <font color='#5555FF'>=</font> <font color='#979000'>0</font>
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - key == a pointer to a block of memory len bytes long
+        ensures
+            - returns a 32bit hash of the len bytes pointed to by key.  
+            - Each value of seed results in a different hash function being used.  
+              (e.g. murmur_hash3(key,len,0) should generally not be equal to murmur_hash3(key,len,1))
+            - This function is machine architecture agnostic and should always give the same
+              hash value when presented with the same inputs.
+            - This hashing algorithm is Austin Appleby's excellent MurmurHash3_x86_32.  
+              See: http://code.google.com/p/smhasher/
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>inline</font> uint32 <b><a name='murmur_hash3_2'></a>murmur_hash3_2</b> <font face='Lucida Console'>(</font> 
+        <font color='#0000FF'>const</font> uint32 v1,
+        <font color='#0000FF'>const</font> uint32 v2 
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        ensures
+            - returns a 32bit hash of the two integers given to this function.  
+            - This function is machine architecture agnostic and should always give the same
+              hash value when presented with the same inputs.
+            - This hashing algorithm is Austin Appleby's excellent MurmurHash3_x86_32.  
+              See: http://code.google.com/p/smhasher/
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>inline</font> uint32 <b><a name='murmur_hash3_3'></a>murmur_hash3_3</b> <font face='Lucida Console'>(</font> 
+        <font color='#0000FF'>const</font> uint32 v1,
+        <font color='#0000FF'>const</font> uint32 v2,
+        <font color='#0000FF'>const</font> uint32 v3 
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        ensures
+            - returns a 32bit hash of the three integers given to this function.  
+            - This function is machine architecture agnostic and should always give the same
+              hash value when presented with the same inputs.
+            - This hashing algorithm is Austin Appleby's excellent MurmurHash3_x86_32.  
+              See: http://code.google.com/p/smhasher/
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    std::pair<font color='#5555FF'>&lt;</font>uint64,uint64<font color='#5555FF'>&gt;</font> <b><a name='murmur_hash3_128bit'></a>murmur_hash3_128bit</b> <font face='Lucida Console'>(</font> 
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>void</u></font><font color='#5555FF'>*</font> key, 
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>int</u></font> len,
+        <font color='#0000FF'>const</font> uint32 seed <font color='#5555FF'>=</font> <font color='#979000'>0</font>
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - key == a pointer to a block of memory len bytes long
+        ensures
+            - returns a 128bit hash (as two 64bit numbers) of the len bytes pointed to by key.  
+            - Each value of seed results in a different hash function being used.  
+              (e.g. murmur_hash3_128bit(key,len,0) should generally not be equal to 
+              murmur_hash3_128bit(key,len,1))
+            - This function is machine architecture agnostic and should always give the same
+              hash value when presented with the same inputs.
+            - This hashing algorithm is Austin Appleby's excellent MurmurHash3_x64_128.  
+              See: http://code.google.com/p/smhasher/
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    std::pair<font color='#5555FF'>&lt;</font>uint64,uint64<font color='#5555FF'>&gt;</font> <b><a name='murmur_hash3_128bit'></a>murmur_hash3_128bit</b> <font face='Lucida Console'>(</font> 
+        <font color='#0000FF'>const</font> uint32<font color='#5555FF'>&amp;</font> v1, 
+        <font color='#0000FF'>const</font> uint32<font color='#5555FF'>&amp;</font> v2, 
+        <font color='#0000FF'>const</font> uint32<font color='#5555FF'>&amp;</font> v3, 
+        <font color='#0000FF'>const</font> uint32<font color='#5555FF'>&amp;</font> v4 
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        ensures
+            - returns a 128bit hash (as two 64bit numbers) of the 4 integers given to this
+              function. 
+            - This function is machine architecture agnostic and should always give the
+              same hash value when presented with the same inputs.
+            - This hashing algorithm is Austin Appleby's excellent MurmurHash3_x64_128.  
+              See: http://code.google.com/p/smhasher/
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    std::pair<font color='#5555FF'>&lt;</font>uint64,uint64<font color='#5555FF'>&gt;</font> <b><a name='murmur_hash3_128bit_3'></a>murmur_hash3_128bit_3</b> <font face='Lucida Console'>(</font> 
+        uint64 k1, 
+        uint64 k2,
+        uint64 k3 
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        ensures
+            - returns a 128bit hash (as two 64bit numbers) of the 3 integers given to this
+              function. 
+            - This function is machine architecture agnostic and should always give the
+              same hash value when presented with the same inputs.
+            - This hashing algorithm is Austin Appleby's excellent MurmurHash3_x64_128.  
+              See: http://code.google.com/p/smhasher/
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_MURMUR_HAsH_3_ABSTRACT_Hh_
+</font>
+
+
+</pre></body></html>

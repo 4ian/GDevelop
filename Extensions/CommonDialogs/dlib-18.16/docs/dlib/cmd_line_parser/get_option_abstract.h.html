@@ -1,0 +1,149 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - get_option_abstract.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2012  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#undef</font> DLIB_GET_OPTiON_ABSTRACT_Hh_
+<font color='#0000FF'>#ifdef</font> DLIB_GET_OPTiON_ABSTRACT_Hh_
+
+#inclue <font color='#5555FF'>&lt;</font>string<font color='#5555FF'>&gt;</font>
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>class</font> <b><a name='option_parse_error'></a>option_parse_error</b> : <font color='#0000FF'>public</font> error 
+    <b>{</b> 
+        <font color='#009900'>/*!
+            WHAT THIS OBJECT REPRESENTS
+                This is the exception thrown by the get_option() functions.  It is
+                thrown when the option string given by a command line parser or
+                config reader can't be converted into the type T.
+        !*/</font>
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> config_reader_type, 
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    T <b><a name='get_option'></a>get_option</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> config_reader_type<font color='#5555FF'>&amp;</font> cr,
+        <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> option_name,
+        T default_value
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - T is a type which can be read from an input stream
+            - config_reader_type == an implementation of config_reader/config_reader_kernel_abstract.h
+        ensures
+            - option_name is used to index into the given config_reader.  
+            - if (cr contains an entry corresponding to option_name) then
+                - converts the string value in cr corresponding to option_name into
+                  an object of type T and returns it.
+            - else
+                - returns default_value
+            - The scheme for indexing into cr based on option_name is best
+              understood by looking at a few examples:
+                - an option name of "name" corresponds to cr["name"]
+                - an option name of "block1.name" corresponds to cr.block("block1")["name"]
+                - an option name of "block1.block2.name" corresponds to cr.block("block1").block("block2")["name"]
+        throws
+            - option_parse_error
+              This exception is thrown if we attempt but fail to convert the string value
+              in cr into an object of type T.
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> command_line_parser_type,
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    T <b><a name='get_option'></a>get_option</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> command_line_parser_type<font color='#5555FF'>&amp;</font> parser,
+        <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> option_name,
+        T default_value
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - parser.option_is_defined(option_name) == true
+            - parser.option(option_name).number_of_arguments() == 1   
+            - T is a type which can be read from an input stream
+            - command_line_parser_type == an implementation of cmd_line_parser/cmd_line_parser_kernel_abstract.h
+        ensures
+            - if (parser.option(option_name)) then 
+                - converts parser.option(option_name).argument() into an object
+                  of type T and returns it.  That is, the string argument to this
+                  command line option is converted into a T and returned.
+            - else
+                - returns default_value
+        throws
+            - option_parse_error
+              This exception is thrown if we attempt but fail to convert the string
+              argument into an object of type T.
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> command_line_parser_type, 
+        <font color='#0000FF'>typename</font> config_reader_type, 
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    T <b><a name='get_option'></a>get_option</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> command_line_parser_type<font color='#5555FF'>&amp;</font> parser,
+        <font color='#0000FF'>const</font> config_reader_type<font color='#5555FF'>&amp;</font> cr,
+        <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> option_name,
+        T default_value
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - parser.option_is_defined(option_name) == true
+            - parser.option(option_name).number_of_arguments() == 1   
+            - T is a type which can be read from an input stream
+            - command_line_parser_type == an implementation of cmd_line_parser/cmd_line_parser_kernel_abstract.h
+            - config_reader_type == an implementation of config_reader/config_reader_kernel_abstract.h
+        ensures
+            - if (parser.option(option_name)) then 
+                - returns get_option(parser, option_name, default_value)
+            - else
+                - returns get_option(cr, option_name, default_value)
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> command_line_parser_type, 
+        <font color='#0000FF'>typename</font> config_reader_type, 
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    T <b><a name='get_option'></a>get_option</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> config_reader_type<font color='#5555FF'>&amp;</font> cr,
+        <font color='#0000FF'>const</font> command_line_parser_type<font color='#5555FF'>&amp;</font> parser,
+        <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> option_name,
+        T default_value
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - parser.option_is_defined(option_name) == true
+            - parser.option(option_name).number_of_arguments() == 1   
+            - T is a type which can be read from an input stream
+            - command_line_parser_type == an implementation of cmd_line_parser/cmd_line_parser_kernel_abstract.h
+            - config_reader_type == an implementation of config_reader/config_reader_kernel_abstract.h
+        ensures
+            - if (parser.option(option_name)) then 
+                - returns get_option(parser, option_name, default_value)
+            - else
+                - returns get_option(cr, option_name, default_value)
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_GET_OPTiON_ABSTRACT_Hh_
+</font>
+
+
+</pre></body></html>

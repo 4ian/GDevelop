@@ -1,0 +1,291 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - max_cost_assignment.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2011  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_MAX_COST_ASSIgNMENT_Hh_
+<font color='#0000FF'>#define</font> DLIB_MAX_COST_ASSIgNMENT_Hh_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='max_cost_assignment_abstract.h.html'>max_cost_assignment_abstract.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../matrix.h.html'>../matrix.h</a>"
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>vector<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>deque<font color='#5555FF'>&gt;</font>
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> EXP<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>typename</font> EXP::type <b><a name='assignment_cost'></a>assignment_cost</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&lt;</font>EXP<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> cost,
+        <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> assignment
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font>cost.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> cost.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,
+            "<font color='#CC0000'>\t type assignment_cost(cost,assignment)</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t cost.nr(): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> cost.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t cost.nc(): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> cost.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+            <font face='Lucida Console'>)</font>;
+<font color='#0000FF'>#ifdef</font> ENABLE_ASSERTS
+        <font color='#009900'>// can't call max on an empty vector. So put an if here to guard against it.
+</font>        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>assignment.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font><font color='#979000'>0</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#BB00BB'>min</font><font face='Lucida Console'>(</font><font color='#BB00BB'>mat</font><font face='Lucida Console'>(</font>assignment<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> <font color='#BB00BB'>max</font><font face='Lucida Console'>(</font><font color='#BB00BB'>mat</font><font face='Lucida Console'>(</font>assignment<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> cost.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,
+                "<font color='#CC0000'>\t type assignment_cost(cost,assignment)</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t cost.nr(): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> cost.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t cost.nc(): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> cost.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t min(assignment): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>min</font><font face='Lucida Console'>(</font><font color='#BB00BB'>mat</font><font face='Lucida Console'>(</font>assignment<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> 
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t max(assignment): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>max</font><font face='Lucida Console'>(</font><font color='#BB00BB'>mat</font><font face='Lucida Console'>(</font>assignment<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> 
+                <font face='Lucida Console'>)</font>;
+        <b>}</b>
+<font color='#0000FF'>#endif</font>
+
+        <font color='#0000FF'>typename</font> EXP::type temp <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> assignment.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+        <b>{</b>
+            temp <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#BB00BB'>cost</font><font face='Lucida Console'>(</font>i, assignment[i]<font face='Lucida Console'>)</font>;
+        <b>}</b>
+        <font color='#0000FF'>return</font> temp;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>namespace</font> impl
+    <b>{</b>
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> EXP<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='compute_slack'></a>compute_slack</b><font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> x,
+            std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> EXP::type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> slack,
+            std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> slackx,
+            <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&lt;</font>EXP<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> cost,
+            <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> EXP::type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> lx,
+            <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> EXP::type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> ly
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> y <font color='#5555FF'>=</font> <font color='#979000'>0</font>; y <font color='#5555FF'>&lt;</font> cost.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>y<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>lx[x] <font color='#5555FF'>+</font> ly[y] <font color='#5555FF'>-</font> <font color='#BB00BB'>cost</font><font face='Lucida Console'>(</font>x,y<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> slack[y]<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    slack[y] <font color='#5555FF'>=</font> lx[x] <font color='#5555FF'>+</font> ly[y] <font color='#5555FF'>-</font> <font color='#BB00BB'>cost</font><font face='Lucida Console'>(</font>x,y<font face='Lucida Console'>)</font>;
+                    slackx[y] <font color='#5555FF'>=</font> x;
+                <b>}</b>
+            <b>}</b>
+        <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> EXP<font color='#5555FF'>&gt;</font>
+    std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font> <b><a name='max_cost_assignment'></a>max_cost_assignment</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&lt;</font>EXP<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> cost_
+    <font face='Lucida Console'>)</font>                         
+    <b>{</b>
+        const_temp_matrix<font color='#5555FF'>&lt;</font>EXP<font color='#5555FF'>&gt;</font> <font color='#BB00BB'>cost</font><font face='Lucida Console'>(</font>cost_<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> EXP::type type;
+        <font color='#009900'>// This algorithm only works if the elements of the cost matrix can be reliably 
+</font>        <font color='#009900'>// compared using operator==. However, comparing for equality with floating point
+</font>        <font color='#009900'>// numbers is not a stable operation. So you need to use an integer cost matrix.
+</font>        <font color='#BB00BB'>COMPILE_TIME_ASSERT</font><font face='Lucida Console'>(</font>std::numeric_limits<font color='#5555FF'>&lt;</font>type<font color='#5555FF'>&gt;</font>::is_integer<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font>cost.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> cost.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,
+            "<font color='#CC0000'>\t std::vector&lt;long&gt; max_cost_assignment(cost)</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t cost.nr(): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> cost.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t cost.nc(): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> cost.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+            <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> dlib::impl;
+        <font color='#009900'>/*
+            I based the implementation of this algorithm on the description of the
+            Hungarian algorithm on the following websites:
+                http://www.math.uwo.ca/~mdawes/courses/344/kuhn-munkres.pdf
+                http://www.topcoder.com/tc?module=Static&amp;d1=tutorials&amp;d2=hungarianAlgorithm
+
+            Note that this is the fast O(n^3) version of the algorithm.
+        */</font>
+
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>cost.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+            <font color='#0000FF'>return</font> std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+        std::vector<font color='#5555FF'>&lt;</font>type<font color='#5555FF'>&gt;</font> lx, ly;
+        std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font> xy;
+        std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font> yx;
+        std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font> S, T;
+        std::vector<font color='#5555FF'>&lt;</font>type<font color='#5555FF'>&gt;</font> slack;
+        std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font> slackx;
+        std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font> aug_path;
+
+
+
+
+        <font color='#009900'>// Initially, nothing is matched. 
+</font>        xy.<font color='#BB00BB'>assign</font><font face='Lucida Console'>(</font>cost.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, <font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+        yx.<font color='#BB00BB'>assign</font><font face='Lucida Console'>(</font>cost.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, <font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*
+            We maintain the following invariant:
+                Vertex x is matched to vertex xy[x] and
+                vertex y is matched to vertex yx[y].
+
+                A value of -1 means a vertex isn't matched to anything.  Moreover,
+                x corresponds to rows of the cost matrix and y corresponds to the
+                columns of the cost matrix.  So we are matching X to Y.
+        */</font>
+
+
+        <font color='#009900'>// Create an initial feasible labeling.  Moreover, in the following
+</font>        <font color='#009900'>// code we will always have: 
+</font>        <font color='#009900'>//     for all valid x and y:  lx[x] + ly[y] &gt;= cost(x,y)
+</font>        lx.<font color='#BB00BB'>resize</font><font face='Lucida Console'>(</font>cost.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        ly.<font color='#BB00BB'>assign</font><font face='Lucida Console'>(</font>cost.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> x <font color='#5555FF'>=</font> <font color='#979000'>0</font>; x <font color='#5555FF'>&lt;</font> cost.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>x<font face='Lucida Console'>)</font>
+            lx[x] <font color='#5555FF'>=</font> <font color='#BB00BB'>max</font><font face='Lucida Console'>(</font><font color='#BB00BB'>rowm</font><font face='Lucida Console'>(</font>cost,x<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// Now grow the match set by picking edges from the equality subgraph until
+</font>        <font color='#009900'>// we have a complete matching.
+</font>        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> match_size <font color='#5555FF'>=</font> <font color='#979000'>0</font>; match_size <font color='#5555FF'>&lt;</font> cost.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>match_size<font face='Lucida Console'>)</font>
+        <b>{</b>
+            std::deque<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font> q;
+
+            <font color='#009900'>// Empty out the S and T sets
+</font>            S.<font color='#BB00BB'>assign</font><font face='Lucida Console'>(</font>cost.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, <font color='#979000'>false</font><font face='Lucida Console'>)</font>;
+            T.<font color='#BB00BB'>assign</font><font face='Lucida Console'>(</font>cost.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, <font color='#979000'>false</font><font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// clear out old slack values
+</font>            slack.<font color='#BB00BB'>assign</font><font face='Lucida Console'>(</font>cost.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, std::numeric_limits<font color='#5555FF'>&lt;</font>type<font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>max</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            slackx.<font color='#BB00BB'>resize</font><font face='Lucida Console'>(</font>cost.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <font color='#009900'>/*
+                slack and slackx are maintained such that we always
+                have the following (once they get initialized by compute_slack() below):
+                    - for all y:
+                        - let x == slackx[y]
+                        - slack[y] == lx[x] + ly[y] - cost(x,y)
+            */</font>
+
+            aug_path.<font color='#BB00BB'>assign</font><font face='Lucida Console'>(</font>cost.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, <font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> x <font color='#5555FF'>=</font> <font color='#979000'>0</font>; x <font color='#5555FF'>&lt;</font> cost.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>x<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#009900'>// If x is not matched to anything
+</font>                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>xy[x] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>
+                <b>{</b>
+                    q.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>x<font face='Lucida Console'>)</font>;
+                    S[x] <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+
+                    <font color='#BB00BB'>compute_slack</font><font face='Lucida Console'>(</font>x, slack, slackx, cost, lx, ly<font face='Lucida Console'>)</font>;
+                    <font color='#0000FF'>break</font>;
+                <b>}</b>
+            <b>}</b>
+
+
+            <font color='#0000FF'><u>long</u></font> x_start <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            <font color='#0000FF'><u>long</u></font> y_start <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+
+            <font color='#009900'>// Find an augmenting path.  
+</font>            <font color='#0000FF'><u>bool</u></font> found_augmenting_path <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+            <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font>found_augmenting_path<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>q.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> <font color='#5555FF'>!</font>found_augmenting_path<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> x <font color='#5555FF'>=</font> q.<font color='#BB00BB'>front</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                    q.<font color='#BB00BB'>pop_front</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> y <font color='#5555FF'>=</font> <font color='#979000'>0</font>; y <font color='#5555FF'>&lt;</font> cost.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>y<font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>cost</font><font face='Lucida Console'>(</font>x,y<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> lx[x] <font color='#5555FF'>+</font> ly[y] <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> <font color='#5555FF'>!</font>T[y]<font face='Lucida Console'>)</font>
+                        <b>{</b>
+                            <font color='#009900'>// if vertex y isn't matched with anything
+</font>                            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>yx[y] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font> 
+                            <b>{</b>
+                                y_start <font color='#5555FF'>=</font> y;
+                                x_start <font color='#5555FF'>=</font> x;
+                                found_augmenting_path <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+                                <font color='#0000FF'>break</font>;
+                            <b>}</b>
+
+                            T[y] <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+                            q.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>yx[y]<font face='Lucida Console'>)</font>;
+
+                            aug_path[yx[y]] <font color='#5555FF'>=</font> x;
+                            S[yx[y]] <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+                            <font color='#BB00BB'>compute_slack</font><font face='Lucida Console'>(</font>yx[y], slack, slackx, cost, lx, ly<font face='Lucida Console'>)</font>;
+                        <b>}</b>
+                    <b>}</b>
+                <b>}</b>
+
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>found_augmenting_path<font face='Lucida Console'>)</font>
+                    <font color='#0000FF'>break</font>;
+
+
+                <font color='#009900'>// Since we didn't find an augmenting path we need to improve the 
+</font>                <font color='#009900'>// feasible labeling stored in lx and ly.  We also need to keep the
+</font>                <font color='#009900'>// slack updated accordingly.
+</font>                type delta <font color='#5555FF'>=</font> std::numeric_limits<font color='#5555FF'>&lt;</font>type<font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>max</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> T.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font>T[i]<font face='Lucida Console'>)</font>
+                        delta <font color='#5555FF'>=</font> std::<font color='#BB00BB'>min</font><font face='Lucida Console'>(</font>delta, slack[i]<font face='Lucida Console'>)</font>;
+                <b>}</b>
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> T.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>S[i]<font face='Lucida Console'>)</font>
+                        lx[i] <font color='#5555FF'>-</font><font color='#5555FF'>=</font> delta;
+
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>T[i]<font face='Lucida Console'>)</font>
+                        ly[i] <font color='#5555FF'>+</font><font color='#5555FF'>=</font> delta;
+                    <font color='#0000FF'>else</font>
+                        slack[i] <font color='#5555FF'>-</font><font color='#5555FF'>=</font> delta;
+                <b>}</b>
+
+
+
+                q.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> y <font color='#5555FF'>=</font> <font color='#979000'>0</font>; y <font color='#5555FF'>&lt;</font> cost.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>y<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font>T[y] <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> slack[y] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        <font color='#009900'>// if vertex y isn't matched with anything
+</font>                        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>yx[y] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>
+                        <b>{</b>
+                            x_start <font color='#5555FF'>=</font> slackx[y];
+                            y_start <font color='#5555FF'>=</font> y;
+                            found_augmenting_path <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+                            <font color='#0000FF'>break</font>;
+                        <b>}</b>
+                        <font color='#0000FF'>else</font>
+                        <b>{</b>
+                            T[y] <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+                            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font>S[yx[y]]<font face='Lucida Console'>)</font>
+                            <b>{</b>
+                                q.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>yx[y]<font face='Lucida Console'>)</font>;
+
+                                aug_path[yx[y]] <font color='#5555FF'>=</font> slackx[y];
+                                S[yx[y]] <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+                                <font color='#BB00BB'>compute_slack</font><font face='Lucida Console'>(</font>yx[y], slack, slackx, cost, lx, ly<font face='Lucida Console'>)</font>;
+                            <b>}</b>
+                        <b>}</b>
+                    <b>}</b>
+                <b>}</b>
+            <b>}</b> <font color='#009900'>// end while (!found_augmenting_path)
+</font>
+            <font color='#009900'>// Flip the edges along the augmenting path.  This means we will add one more
+</font>            <font color='#009900'>// item to our matching.
+</font>            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> cx <font color='#5555FF'>=</font> x_start, cy <font color='#5555FF'>=</font> y_start, ty; 
+                 cx <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>1</font>; 
+                 cx <font color='#5555FF'>=</font> aug_path[cx], cy <font color='#5555FF'>=</font> ty<font face='Lucida Console'>)</font>
+            <b>{</b>
+                ty <font color='#5555FF'>=</font> xy[cx];
+                yx[cy] <font color='#5555FF'>=</font> cx;
+                xy[cx] <font color='#5555FF'>=</font> cy;
+            <b>}</b>
+
+        <b>}</b>
+
+
+        <font color='#0000FF'>return</font> xy;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_MAX_COST_ASSIgNMENT_Hh_
+</font>
+
+
+</pre></body></html>

@@ -1,0 +1,259 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - cv_image_abstract.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2009  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#undef</font> DLIB_OPENCV_IMAGE_AbSTRACT_H_
+<font color='#0000FF'>#ifdef</font> DLIB_OPENCV_IMAGE_AbSTRACT_H_
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>opencv2<font color='#5555FF'>/</font>core<font color='#5555FF'>/</font>core.hpp<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>opencv2<font color='#5555FF'>/</font>core<font color='#5555FF'>/</font>types_c.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../algs.h.html'>../algs.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../pixel.h.html'>../pixel.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> pixel_type
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>class</font> <b><a name='cv_image'></a>cv_image</b>
+    <b>{</b>
+        <font color='#009900'>/*!
+            REQUIREMENTS ON pixel_type
+                pixel_type just needs to be something that matches the pixel memory
+                layout of whatever OpenCV image you are going to use with this object.
+                For example, you might use unsigned char or bgr_pixel depending
+                on what you needed.
+
+            WHAT THIS OBJECT REPRESENTS
+                This object is meant to be used as a simple wrapper around the OpenCV
+                IplImage struct or Mat object.  Using this class template you can turn
+                an OpenCV image into something that looks like a normal dlib style 
+                image object.
+
+                So you should be able to use cv_image objects with many of the image
+                processing functions in dlib as well as the GUI tools for displaying
+                images on the screen.
+
+                Note that this object does NOT take ownership of the image data you 
+                give to it.  This means it is up to you to make sure the OpenCV image
+                is properly freed at some point.  This also means that an instance of 
+                this object can only be used as long as the OpenCV image it references 
+                remains valid, since a cv_image just points to the OpenCV image's 
+                memory directly.
+        !*/</font>
+
+    <font color='#0000FF'>public</font>:
+        <font color='#0000FF'>typedef</font> pixel_type type;
+        <font color='#0000FF'>typedef</font> default_memory_manager mem_manager_type;
+
+        <b><a name='cv_image'></a>cv_image</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> IplImage<font color='#5555FF'>*</font> img
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - img-&gt;dataOrder == 0
+                  (i.e. Only interleaved color channels are supported with cv_image)
+                - (img-&gt;depth&amp;0xFF)/8*img-&gt;nChannels == sizeof(pixel_type)
+                  (i.e. The size of the pixel_type needs to match the size of the pixels 
+                  inside the OpenCV image)
+            ensures
+                - #nr() == img-&gt;height
+                  #nc() == img-&gt;width
+                - using the operator[] on this object you will be able to access the pixels
+                  inside this OpenCV image.
+        !*/</font>
+
+        <b><a name='cv_image'></a>cv_image</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> IplImage img
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - img.dataOrder == 0
+                  (i.e. Only interleaved color channels are supported with cv_image)
+                - (img.depth&amp;0xFF)/8*img.nChannels == sizeof(pixel_type)
+                  (i.e. The size of the pixel_type needs to match the size of the pixels 
+                  inside the OpenCV image)
+            ensures
+                - #nr() == img.height
+                  #nc() == img.width
+                - using the operator[] on this object you will be able to access the pixels
+                  inside this OpenCV image.
+        !*/</font>
+
+        <b><a name='cv_image'></a>cv_image</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> cv::Mat img
+        <font face='Lucida Console'>)</font>; 
+        <font color='#009900'>/*!
+            requires
+                - img.depth() == cv::DataType&lt;pixel_traits&lt;pixel_type&gt;::basic_pixel_type&gt;::depth
+                  (i.e. The pixel_type template argument needs to match the type of pixel 
+                  used inside the OpenCV image)
+                - img.channels() == pixel_traits&lt;pixel_type&gt;::num
+                  (i.e. the number of channels in the pixel_type needs to match the number of 
+                  channels in the OpenCV image)
+            ensures
+                - #nr() == img.rows
+                - #nc() == img.cols
+                - using the operator[] on this object you will be able to access the pixels
+                  inside this OpenCV image.
+        !*/</font>
+
+        <b><a name='cv_image'></a>cv_image</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>; 
+        <font color='#009900'>/*!
+            ensures
+                - #nr() == 0
+                - #nc() == 0
+        !*/</font>
+
+        ~<b><a name='cv_image'></a>cv_image</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - This function does nothing.  e.g. It doesn't delete the OpenCV 
+                  image used by this cv_image object
+        !*/</font>
+
+        <font color='#0000FF'><u>long</u></font> <b><a name='nr'></a>nr</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>; 
+        <font color='#009900'>/*!
+            ensures
+                - returns the number of rows in this image
+        !*/</font>
+
+        <font color='#0000FF'><u>long</u></font> <b><a name='nc'></a>nc</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the number of columns in this image
+        !*/</font>
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='size'></a>size</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>; 
+        <font color='#009900'>/*!
+            ensures
+                - returns nr()*nc()
+                  (i.e. returns the number of pixels in this image)
+        !*/</font>
+
+        <font color='#0000FF'>inline</font> pixel_type<font color='#5555FF'>*</font> <b><a name='operator'></a>operator</b>[] <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> row 
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - 0 &lt;= row &lt; nr()
+            ensures
+                - returns a pointer to the first pixel in the given row
+                  of this image
+        !*/</font>
+
+        <font color='#0000FF'>inline</font> <font color='#0000FF'>const</font> pixel_type<font color='#5555FF'>*</font> <b><a name='operator'></a>operator</b>[] <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> row 
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - 0 &lt;= row &lt; nr()
+            ensures
+                - returns a pointer to the first pixel in the given row
+                  of this image
+        !*/</font>
+
+        cv_image<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font> 
+            <font color='#0000FF'>const</font> cv_image<font color='#5555FF'>&amp;</font> item
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #*this is an identical copy of item
+                - returns #*this
+        !*/</font>
+
+        cv_image<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>=</font><font face='Lucida Console'>(</font> 
+            <font color='#0000FF'>const</font> IplImage<font color='#5555FF'>*</font> img
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - img-&gt;dataOrder == 0
+                  (i.e. Only interleaved color channels are supported with cv_image)
+                - (img-&gt;depth&amp;0xFF)/8*img-&gt;nChannels == sizeof(pixel_type)
+                  (i.e. The size of the pixel_type needs to match the size of the pixels 
+                  inside the OpenCV image)
+            ensures
+                - #nr() == img-&gt;height
+                  #nc() == img-&gt;width
+                - using the operator[] on this object you will be able to access the pixels
+                  inside this OpenCV image.
+                - returns #*this
+        !*/</font>
+
+        cv_image<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>=</font><font face='Lucida Console'>(</font> 
+            <font color='#0000FF'>const</font> IplImage img
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - img-&gt;dataOrder == 0
+                  (i.e. Only interleaved color channels are supported with cv_image)
+                - (img-&gt;depth&amp;0xFF)/8*img-&gt;nChannels == sizeof(pixel_type)
+                  (i.e. The size of the pixel_type needs to match the size of the pixels 
+                  inside the OpenCV image)
+            ensures
+                - #nr() == img-&gt;height
+                  #nc() == img-&gt;width
+                - using the operator[] on this object you will be able to access the pixels
+                  inside this OpenCV image.
+                - returns #*this
+        !*/</font>
+
+        cv_image<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>=</font><font face='Lucida Console'>(</font> 
+            <font color='#0000FF'>const</font> cv::Mat img
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - img.depth() == cv::DataType&lt;pixel_traits&lt;pixel_type&gt;::basic_pixel_type&gt;::depth
+                  (i.e. The pixel_type template argument needs to match the type of pixel 
+                  used inside the OpenCV image)
+                - img.channels() == pixel_traits&lt;pixel_type&gt;::num
+                  (i.e. the number of channels in the pixel_type needs to match the number of 
+                  channels in the OpenCV image)
+            ensures
+                - #nr() == img.rows
+                - #nc() == img.cols
+                - using the operator[] on this object you will be able to access the pixels
+                  inside this OpenCV image.
+                - returns #*this
+        !*/</font>
+
+        <font color='#0000FF'><u>long</u></font> <b><a name='width_step'></a>width_step</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the size of one row of the image, in bytes.  
+                  More precisely, return a number N such that:
+                  (char*)&amp;item[0][0] + N == (char*)&amp;item[1][0].
+        !*/</font>
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>const</font> matrix_exp <b><a name='mat'></a>mat</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> cv_image<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> img
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        ensures
+            - returns a matrix R such that:
+                - R.nr() == img.nr() 
+                - R.nc() == img.nc()
+                - for all valid r and c:
+                  R(r, c) == img[r][c]
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_OPENCV_IMAGE_AbSTRACT_H_
+</font>
+
+</pre></body></html>

@@ -1,0 +1,271 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - structural_track_association_trainer_abstract.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2014  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#undef</font> DLIB_STRUCTURAL_TRACK_ASSOCIATION_TRAnER_ABSTRACT_Hh_
+<font color='#0000FF'>#ifdef</font> DLIB_STRUCTURAL_TRACK_ASSOCIATION_TRAnER_ABSTRACT_Hh_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='track_association_function_abstract.h.html'>track_association_function_abstract.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='structural_assignment_trainer_abstract.h.html'>structural_assignment_trainer_abstract.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>class</font> <b><a name='structural_track_association_trainer'></a>structural_track_association_trainer</b>
+    <b>{</b>
+        <font color='#009900'>/*!
+            WHAT THIS OBJECT REPRESENTS
+                This object is a tool for learning to solve a track association problem.  That 
+                is, it takes in a set of training data and outputs a track_association_function 
+                you can use to do detection to track association.  The training data takes the
+                form of a set or sets of "track histories".  Each track history is a
+                std::vector where each element contains all the detections from a single time
+                step.  Moreover, each detection has a label that uniquely identifies which
+                object (e.g. person or whatever) the detection really corresponds to.  That is,
+                the labels indicate the correct detection to track associations.  The goal of
+                this object is then to produce a track_association_function that can perform a
+                correct detection to track association at each time step.
+        !*/</font>
+
+    <font color='#0000FF'>public</font>:
+
+        <b><a name='structural_track_association_trainer'></a>structural_track_association_trainer</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;  
+        <font color='#009900'>/*!
+            ensures
+                - #get_c() == 100
+                - this object isn't verbose
+                - #get_epsilon() == 0.001
+                - #get_num_threads() == 2
+                - #get_max_cache_size() == 5
+                - #learns_nonnegative_weights() == false
+                - #get_loss_per_track_break() == 1
+                - #get_loss_per_false_association() == 1
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_num_threads'></a>set_num_threads</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> num
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #get_num_threads() == num
+        !*/</font>
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='get_num_threads'></a>get_num_threads</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the number of threads used during training.  You should 
+                  usually set this equal to the number of processing cores on your
+                  machine.
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_epsilon'></a>set_epsilon</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>double</u></font> eps
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - eps &gt; 0
+            ensures
+                - #get_epsilon() == eps
+        !*/</font>
+
+        <font color='#0000FF'><u>double</u></font> <b><a name='get_epsilon'></a>get_epsilon</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>; 
+        <font color='#009900'>/*!
+            ensures
+                - returns the error epsilon that determines when training should stop.
+                  Smaller values may result in a more accurate solution but take longer to
+                  train.  You can think of this epsilon value as saying "solve the
+                  optimization problem until the average number of association mistakes per
+                  time step is within epsilon of its optimal value".
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_max_cache_size'></a>set_max_cache_size</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> max_size
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #get_max_cache_size() == max_size
+        !*/</font>
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='get_max_cache_size'></a>get_max_cache_size</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - During training, this object basically runs the track_association_function on 
+                  each training sample, over and over.  To speed this up, it is possible to 
+                  cache the results of these invocations.  This function returns the number 
+                  of cache elements per training sample kept in the cache.  Note that a value 
+                  of 0 means caching is not used at all.  
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='be_verbose'></a>be_verbose</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - This object will print status messages to standard out so that a user can
+                  observe the progress of the algorithm.
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='be_quiet'></a>be_quiet</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - this object will not print anything to standard out
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_loss_per_false_association'></a>set_loss_per_false_association</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>double</u></font> loss
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - loss &gt; 0
+            ensures
+                - #get_loss_per_false_association() == loss
+        !*/</font>
+
+        <font color='#0000FF'><u>double</u></font> <b><a name='get_loss_per_false_association'></a>get_loss_per_false_association</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the amount of loss experienced for assigning a detection to the
+                  wrong track.  If you care more about avoiding false associations than
+                  avoiding track breaks then you can increase this value.
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_loss_per_track_break'></a>set_loss_per_track_break</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>double</u></font> loss
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - loss &gt; 0
+            ensures
+                - #get_loss_per_track_break() == loss
+        !*/</font>
+
+        <font color='#0000FF'><u>double</u></font> <b><a name='get_loss_per_track_break'></a>get_loss_per_track_break</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the amount of loss experienced for incorrectly assigning a
+                  detection to a new track instead of assigning it to its existing track.
+                  If you care more about avoiding track breaks than avoiding things like
+                  track swaps then you can increase this value.
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_oca'></a>set_oca</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> oca<font color='#5555FF'>&amp;</font> item
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #get_oca() == item 
+        !*/</font>
+
+        <font color='#0000FF'>const</font> oca <b><a name='get_oca'></a>get_oca</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - Internally this object treats track association learning as a structural
+                  SVM problem.  This routine returns a copy of the optimizer used to solve
+                  the structural SVM problem.  
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_c'></a>set_c</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>double</u></font> C
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the SVM regularization parameter.  It is the parameter that
+                  determines the trade-off between trying to fit the training data (i.e.
+                  minimize the loss) or allowing more errors but hopefully improving the
+                  generalization of the resulting track_association_function.  Larger
+                  values encourage exact fitting while smaller values of C may encourage
+                  better generalization. 
+        !*/</font>
+
+        <font color='#0000FF'><u>double</u></font> <b><a name='get_c'></a>get_c</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - C &gt; 0
+            ensures
+                - #get_c() = C
+        !*/</font>
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='learns_nonnegative_weights'></a>learns_nonnegative_weights</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>; 
+        <font color='#009900'>/*!
+            ensures
+                - Ultimately, the output of training is a parameter vector that defines the
+                  behavior of the track_association_function.  If
+                  learns_nonnegative_weights() == true then the resulting learned parameter
+                  vector will always have non-negative entries.
+        !*/</font>
+       
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_learns_nonnegative_weights'></a>set_learns_nonnegative_weights</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>bool</u></font> value
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #learns_nonnegative_weights() == value
+        !*/</font>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'>typename</font> detection_type,
+            <font color='#0000FF'>typename</font> label_type
+            <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>const</font> track_association_function<font color='#5555FF'>&lt;</font>detection_type<font color='#5555FF'>&gt;</font> <b><a name='train'></a>train</b> <font face='Lucida Console'>(</font>  
+            <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>std::vector<font color='#5555FF'>&lt;</font>labeled_detection<font color='#5555FF'>&lt;</font>detection_type,label_type<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> sample
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - is_track_association_problem(sample) == true
+            ensures
+                - This function attempts to learn to do track association from the given
+                  training data.  Note that we interpret sample as a single track history such
+                  that sample[0] are all detections from the first time step, then sample[1]
+                  are detections from the second time step, and so on.  
+                - returns a function F such that:
+                    - Executing F(tracks, detections) will try to correctly associate the
+                      contents of detections to the contents of tracks and perform track
+                      updating and creation.
+                    - if (learns_nonnegative_weights() == true) then
+                        - min(F.get_assignment_function().get_weights()) &gt;= 0
+        !*/</font>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'>typename</font> detection_type,
+            <font color='#0000FF'>typename</font> label_type
+            <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>const</font> track_association_function<font color='#5555FF'>&lt;</font>detection_type<font color='#5555FF'>&gt;</font> <b><a name='train'></a>train</b> <font face='Lucida Console'>(</font>  
+            <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>std::vector<font color='#5555FF'>&lt;</font>std::vector<font color='#5555FF'>&lt;</font>labeled_detection<font color='#5555FF'>&lt;</font>detection_type,label_type<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> sample
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - is_track_association_problem(samples) == true
+            ensures
+                - This function attempts to learn to do track association from the given
+                  training data.  In this case, we take a set of track histories as
+                  training data instead of just one track history as with the above train()
+                  method.
+                - returns a function F such that:
+                    - Executing F(tracks, detections) will try to correctly associate the
+                      contents of detections to the contents of tracks and perform track
+                      updating and creation.
+                    - if (learns_nonnegative_weights() == true) then
+                        - min(F.get_assignment_function().get_weights()) &gt;= 0
+        !*/</font>
+
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_STRUCTURAL_TRACK_ASSOCIATION_TRAnER_ABSTRACT_Hh_
+</font>
+
+
+</pre></body></html>

@@ -1,0 +1,120 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - sammon_abstract.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2012  Emanuele Cesena (emanuele.cesena@gmail.com), Davis E. King
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#undef</font> DLIB_SAMMoN_ABSTRACT_Hh_
+<font color='#0000FF'>#ifdef</font> DLIB_SAMMoN_ABSTRACT_Hh_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../matrix/matrix_abstract.h.html'>../matrix/matrix_abstract.h</a>"
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>vector<font color='#5555FF'>&gt;</font>
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+    <font color='#0000FF'>class</font> <b><a name='sammon_projection'></a>sammon_projection</b>
+    <b>{</b>
+        <font color='#009900'>/*!
+            WHAT THIS OBJECT REPRESENTS
+                This is a function object that computes the Sammon projection of a set
+                of N points in a L-dimensional vector space onto a d-dimensional space
+                (d &lt; L), according to the paper:
+                    A Nonlinear Mapping for Data Structure Analysis (1969) by J.W. Sammon
+
+                The current implementation is a vectorized version of the original algorithm.
+        !*/</font>
+
+    <font color='#0000FF'>public</font>:
+
+        <b><a name='sammon_projection'></a>sammon_projection</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - this object is properly initialized 
+        !*/</font>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> matrix_type<font color='#5555FF'>&gt;</font>
+        std::vector<font color='#5555FF'>&lt;</font>matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>0</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>matrix_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> data,       
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> num_dims                      
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - num_dims &gt; 0
+                - matrix_type should be a kind of dlib::matrix of doubles capable
+                  of representing column vectors.
+                - for all valid i:
+                    - is_col_vector(data[i]) == true
+                    - data[0].size() == data[i].size()
+                      (i.e. all the vectors in data must have the same dimensionality)
+                - if (data.size() != 0) then
+                    - 0 &lt; num_dims &lt;= data[0].size()
+                      (i.e. you can't project into a higher dimension than the input data,
+                      only to a lower dimension.)
+            ensures
+                - This routine computes Sammon's dimensionality reduction method based on the
+                  given input data.  It will attempt to project the contents of data into a
+                  num_dims dimensional space that preserves relative distances between the
+                  input data points.
+                - This function returns a std::vector, OUT, such that:
+                    - OUT == a set of column vectors that represent the Sammon projection of 
+                      the input data vectors. 
+                    - OUT.size() == data.size()
+                    - for all valid i:
+                        - OUT[i].size() == num_dims
+                        - OUT[i] == the Sammon projection of the input vector data[i]
+        !*/</font>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> matrix_type<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>matrix_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> data,       
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> num_dims,                     
+            std::vector<font color='#5555FF'>&lt;</font>matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>0</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> result,   
+            <font color='#0000FF'><u>double</u></font> <font color='#5555FF'>&amp;</font>err,                                
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> num_iters <font color='#5555FF'>=</font> <font color='#979000'>1000</font>,             
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> err_delta <font color='#5555FF'>=</font> <font color='#979000'>1.0e</font><font color='#5555FF'>-</font><font color='#979000'>9</font>            
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - num_iters &gt; 0
+                - err_delta &gt; 0
+                - num_dims &gt; 0
+                - matrix_type should be a kind of dlib::matrix of doubles capable
+                  of representing column vectors.
+                - for all valid i:
+                    - is_col_vector(data[i]) == true
+                    - data[0].size() == data[i].size()
+                      (i.e. all the vectors in data must have the same dimensionality)
+                - if (data.size() != 0) then
+                    - 0 &lt; num_dims &lt;= data[0].size()
+                      (i.e. you can't project into a higher dimension than the input data,
+                      only to a lower dimension.)
+            ensures
+                - This routine computes Sammon's dimensionality reduction method based on the
+                  given input data.  It will attempt to project the contents of data into a
+                  num_dims dimensional space that preserves relative distances between the
+                  input data points.
+                - #err == the final error value at the end of the algorithm.  The goal of Sammon's
+                  algorithm is to find a lower dimensional projection of the input data that
+                  preserves the relative distances between points.  The value in #err is a measure
+                  of the total error at the end of the algorithm.  So smaller values indicate
+                  a better projection was found than if a large value is returned via #err.
+                - Sammon's algorithm will run until either num_iters iterations has executed
+                  or the change in error from one iteration to the next is less than err_delta.
+                - Upon completion, the output of Sammon's projection is stored into #result, in
+                  particular, we will have:
+                    - #result == a set of column vectors that represent the Sammon projection of 
+                      the input data vectors. 
+                    - #result.size() == data.size()
+                    - for all valid i:
+                        - #result[i].size() == num_dims
+                        - #result[i] == the Sammon projection of the input vector data[i]
+        !*/</font>
+
+    <b>}</b>;
+
+<b>}</b> 
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_SAMMoN_ABSTRACT_Hh_
+</font>
+
+
+</pre></body></html>

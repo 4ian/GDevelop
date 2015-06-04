@@ -1,0 +1,71 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - structural_svm_problem_threaded_abstract.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2011  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#undef</font> DLIB_STRUCTURAL_SVM_PRObLEM_THREADED_ABSTRACT_Hh_
+<font color='#0000FF'>#ifdef</font> DLIB_STRUCTURAL_SVM_PRObLEM_THREADED_ABSTRACT_Hh_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='structural_svm_problem_abstract.h.html'>structural_svm_problem_abstract.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../matrix.h.html'>../matrix.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> matrix_type_,
+        <font color='#0000FF'>typename</font> feature_vector_type_ <font color='#5555FF'>=</font> matrix_type_
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>class</font> <b><a name='structural_svm_problem_threaded'></a>structural_svm_problem_threaded</b> : <font color='#0000FF'>public</font> structural_svm_problem<font color='#5555FF'>&lt;</font>matrix_type_,feature_vector_type_<font color='#5555FF'>&gt;</font> 
+    <b>{</b>
+    <font color='#0000FF'>public</font>:
+        <font color='#009900'>/*!
+            WHAT THIS OBJECT REPRESENTS
+                This object is identical to the structural_svm_problem object defined in 
+                dlib/svm/structural_svm_problem_abstract.h except that its constructor
+                takes a number which defines how many threads will be used to make concurrent
+                calls to the separation_oracle() routine.  
+
+                So this object lets you take advantage of a multi-core system.  You should
+                set the num_threads parameter equal to the number of available cores.  Note
+                that the separation_oracle() function which you provide must be thread safe
+                if you are to use this version of the structural_svm_problem.  In
+                particular, it must be safe to call separation_oracle() concurrently from
+                different threads.  However, it is guaranteed that different threads will
+                never make concurrent calls to separation_oracle() using the same idx value
+                (i.e. the first argument).  
+        !*/</font>
+
+        <font color='#0000FF'>typedef</font> matrix_type_ matrix_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> matrix_type::type scalar_type;
+        <font color='#0000FF'>typedef</font> feature_vector_type_ feature_vector_type;
+
+        <b><a name='structural_svm_problem'></a>structural_svm_problem</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> num_threads
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - this object is properly initialized
+                - #get_num_threads() == num_threads
+        !*/</font>
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='get_num_threads'></a>get_num_threads</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>; 
+        <font color='#009900'>/*!
+            ensures
+                - Returns the number of threads which will be used to make concurrent
+                  calls to the separation_oracle() function.
+        !*/</font>
+
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_STRUCTURAL_SVM_PRObLEM_THREADED_ABSTRACT_Hh_
+</font>
+
+
+
+</pre></body></html>

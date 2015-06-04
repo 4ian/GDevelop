@@ -1,0 +1,106 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - bit_stream_multi_1.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2003  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_BIT_STREAM_MULTi_1_
+<font color='#0000FF'>#define</font> DLIB_BIT_STREAM_MULTi_1_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='bit_stream_multi_abstract.h.html'>bit_stream_multi_abstract.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> bit_stream_base
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>class</font> <b><a name='bit_stream_multi_1'></a>bit_stream_multi_1</b> : <font color='#0000FF'>public</font> bit_stream_base
+    <b>{</b>
+
+    <font color='#0000FF'>public</font>:
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='multi_write'></a>multi_write</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> data,
+            <font color='#0000FF'><u>int</u></font> num_to_write
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'><u>int</u></font> <b><a name='multi_read'></a>multi_read</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&amp;</font> data,
+            <font color='#0000FF'><u>int</u></font> num_to_read
+        <font face='Lucida Console'>)</font>;
+
+    <b>}</b>;
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> bit_stream_base
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='swap'></a>swap</b> <font face='Lucida Console'>(</font>
+        bit_stream_multi_1<font color='#5555FF'>&lt;</font>bit_stream_base<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> a, 
+        bit_stream_multi_1<font color='#5555FF'>&lt;</font>bit_stream_base<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> b 
+    <font face='Lucida Console'>)</font> <b>{</b> a.<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>b<font face='Lucida Console'>)</font>; <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>    <font color='#009900'>// member function definitions
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> bit_stream_base
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> bit_stream_multi_1<font color='#5555FF'>&lt;</font>bit_stream_base<font color='#5555FF'>&gt;</font>:: 
+    <b><a name='multi_write'></a>multi_write</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> data,
+        <font color='#0000FF'><u>int</u></font> num_to_write
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#009900'>// move the first bit into the most significant position
+</font>        data <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#979000'>32</font> <font color='#5555FF'>-</font> num_to_write;
+
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> num_to_write; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#009900'>// write the first bit from data
+</font>            <font color='#0000FF'>this</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>write</font><font face='Lucida Console'>(</font><font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>data <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font> <font color='#979000'>31</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// shift the next bit into position
+</font>            data <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+
+        <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> bit_stream_base
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>int</u></font> bit_stream_multi_1<font color='#5555FF'>&lt;</font>bit_stream_base<font color='#5555FF'>&gt;</font>:: 
+    <b><a name='multi_read'></a>multi_read</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&amp;</font> data,
+        <font color='#0000FF'><u>int</u></font> num_to_read
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'><u>int</u></font> bit, i;
+        data <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> num_to_read; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+        <b>{</b>
+
+            <font color='#009900'>// get a bit
+</font>            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#0000FF'>this</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>read</font><font face='Lucida Console'>(</font>bit<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font><font face='Lucida Console'>)</font>
+                <font color='#0000FF'>break</font>;
+
+            <font color='#009900'>// shift data to make room for this new bit
+</font>            data <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+
+            <font color='#009900'>// put bit into the least significant position in data
+</font>            data <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>bit<font face='Lucida Console'>)</font>;
+
+        <b>}</b>
+
+        <font color='#0000FF'>return</font> i;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_BIT_STREAM_MULTi_1_
+</font>
+
+</pre></body></html>

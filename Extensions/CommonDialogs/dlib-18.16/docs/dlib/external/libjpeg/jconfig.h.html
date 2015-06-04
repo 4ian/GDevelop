@@ -1,0 +1,48 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - jconfig.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>/* jconfig.h.  Generated automatically by configure.  */</font>
+<font color='#009900'>/* jconfig.cfg --- source file edited by configure script */</font>
+<font color='#009900'>/* see jconfig.doc for explanations */</font>
+
+<font color='#0000FF'>#define</font> HAVE_PROTOTYPES 
+<font color='#0000FF'>#define</font> HAVE_UNSIGNED_CHAR 
+<font color='#0000FF'>#define</font> HAVE_UNSIGNED_SHORT 
+<font color='#0000FF'>#undef</font> <font color='#0000FF'><u>void</u></font>
+<font color='#0000FF'>#undef</font> <font color='#0000FF'>const</font>
+<font color='#0000FF'>#undef</font> CHAR_IS_UNSIGNED
+<font color='#0000FF'>#define</font> HAVE_STDDEF_H 
+<font color='#0000FF'>#define</font> HAVE_STDLIB_H 
+<font color='#0000FF'>#undef</font> NEED_BSD_STRINGS
+<font color='#0000FF'>#undef</font> NEED_SYS_TYPES_H
+<font color='#0000FF'>#undef</font> NEED_FAR_POINTERS
+<font color='#0000FF'>#undef</font> NEED_SHORT_EXTERNAL_NAMES
+<font color='#009900'>/* Define this if you get warnings about undefined structures. */</font>
+<font color='#0000FF'>#undef</font> INCOMPLETE_TYPES_BROKEN
+
+<font color='#0000FF'>#ifdef</font> JPEG_INTERNALS
+
+<font color='#0000FF'>#undef</font> RIGHT_SHIFT_IS_UNSIGNED
+<font color='#0000FF'>#define</font> INLINE __inline__
+<font color='#009900'>/* These are for configuring the JPEG memory manager. */</font>
+<font color='#0000FF'>#undef</font> DEFAULT_MAX_MEM
+<font color='#0000FF'>#undef</font> NO_MKTEMP
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>/* JPEG_INTERNALS */</font>
+
+<font color='#0000FF'>#ifdef</font> JPEG_CJPEG_DJPEG
+
+<font color='#0000FF'>#define</font> BMP_SUPPORTED		<font color='#009900'>/* BMP image file format */</font>
+<font color='#0000FF'>#define</font> GIF_SUPPORTED		<font color='#009900'>/* GIF image file format */</font>
+<font color='#0000FF'>#define</font> PPM_SUPPORTED		<font color='#009900'>/* PBMPLUS PPM/PGM image file format */</font>
+<font color='#0000FF'>#undef</font> RLE_SUPPORTED		<font color='#009900'>/* Utah RLE image file format */</font>
+<font color='#0000FF'>#define</font> TARGA_SUPPORTED		<font color='#009900'>/* Targa image file format */</font>
+
+<font color='#0000FF'>#undef</font> TWO_FILE_COMMANDLINE
+<font color='#0000FF'>#undef</font> NEED_SIGNAL_CATCHER
+<font color='#0000FF'>#undef</font> DONT_USE_B_MODE
+
+<font color='#009900'>/* Define this if you want percent-done progress reports from cjpeg/djpeg. */</font>
+<font color='#0000FF'>#undef</font> PROGRESS_REPORT
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>/* JPEG_CJPEG_DJPEG */</font>
+
+</pre></body></html>

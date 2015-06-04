@@ -1,0 +1,24 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - config.h</title></head><body bgcolor='white'><pre>
+
+
+<font color='#009900'>// If you are compiling dlib as a shared library and installing it somewhere on your system
+</font><font color='#009900'>// then it is important that any programs that use dlib agree on the state of the
+</font><font color='#009900'>// DLIB_ASSERT statements (i.e. they are either always on or always off).  Therefore,
+</font><font color='#009900'>// uncomment one of the following lines to force all DLIB_ASSERTs to either always on or
+</font><font color='#009900'>// always off.  If you don't define one of these two macros then DLIB_ASSERT will toggle
+</font><font color='#009900'>// automatically depending on the state of certain other macros, which is not what you want
+</font><font color='#009900'>// when creating a shared library.
+</font><font color='#009900'>//#define ENABLE_ASSERTS       // asserts always enabled 
+</font><font color='#009900'>//#define DLIB_DISABLE_ASSERTS // asserts always disabled 
+</font>
+
+
+<font color='#009900'>// You should also consider telling dlib to link against libjpeg, libpng, fftw, and a BLAS
+</font><font color='#009900'>// and LAPACK library.  To do this you need to uncomment the following #defines.
+</font><font color='#009900'>// #define DLIB_JPEG_SUPPORT
+</font><font color='#009900'>// #define DLIB_PNG_SUPPORT
+</font><font color='#009900'>// #define DLIB_USE_FFTW
+</font><font color='#009900'>// #define DLIB_USE_BLAS
+</font><font color='#009900'>// #define DLIB_USE_LAPACK
+</font>
+</pre></body></html>

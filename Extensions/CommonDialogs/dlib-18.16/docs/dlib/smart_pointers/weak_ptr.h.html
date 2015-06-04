@@ -1,0 +1,228 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - weak_ptr.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2007  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_WEAK_PTr_
+<font color='#0000FF'>#define</font> DLIB_WEAK_PTr_ 
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>algorithm<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>memory<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='shared_ptr.h.html'>shared_ptr.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../algs.h.html'>../algs.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='weak_ptr_abstract.h.html'>weak_ptr_abstract.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib <b>{</b>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font> 
+    <font color='#0000FF'>class</font> <b><a name='weak_ptr'></a>weak_ptr</b> 
+    <b>{</b>
+
+        <font color='#009900'>/*!
+            CONVENTION
+                - if (weak_node != 0) then
+                    - data == valid pointer to shared data
+                    - weak_node-&gt;ref_count == the number of weak_ptrs that reference this-&gt;data
+                - else
+                    - data == 0
+
+                - expired() == ((weak_node == 0) || (weak_node-&gt;shared_node == 0))
+                - if (expired() == false) then
+                    - use_count() == weak_node-&gt;shared_node-&gt;ref_count
+                - else
+                    - use_count() == 0
+        !*/</font>
+
+    <font color='#0000FF'>public</font>:
+        <font color='#0000FF'>typedef</font> T element_type;
+
+        <b><a name='weak_ptr'></a>weak_ptr</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> : data<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>, weak_node<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+        <b>}</b>
+
+        <font color='#0000FF'>template</font><font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> Y<font color='#5555FF'>&gt;</font> 
+        <b><a name='weak_ptr'></a>weak_ptr</b><font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> shared_ptr<font color='#5555FF'>&lt;</font>Y<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> r
+        <font face='Lucida Console'>)</font> 
+        <b>{</b>
+            data <font color='#5555FF'>=</font> r.data;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>r.shared_node<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>r.shared_node<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>weak_node<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    weak_node <font color='#5555FF'>=</font> r.shared_node<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>weak_node;
+                    weak_node<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>ref_count <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+                <b>}</b>
+                <font color='#0000FF'>else</font>
+                <b>{</b>
+                    weak_node <font color='#5555FF'>=</font> <font color='#0000FF'>new</font> <font color='#BB00BB'>weak_ptr_node</font><font face='Lucida Console'>(</font>r.shared_node<font face='Lucida Console'>)</font>; 
+                    r.shared_node<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>weak_node <font color='#5555FF'>=</font> weak_node;
+                <b>}</b>
+            <b>}</b>
+            <font color='#0000FF'>else</font>
+            <b>{</b>
+                weak_node <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            <b>}</b>
+        <b>}</b>
+
+        <b><a name='weak_ptr'></a>weak_ptr</b><font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> weak_ptr<font color='#5555FF'>&amp;</font> r
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            data <font color='#5555FF'>=</font> r.data;
+            weak_node <font color='#5555FF'>=</font> r.weak_node;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>weak_node<font face='Lucida Console'>)</font>
+                weak_node<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>ref_count <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>template</font><font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> Y<font color='#5555FF'>&gt;</font> 
+        <b><a name='weak_ptr'></a>weak_ptr</b><font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> weak_ptr<font color='#5555FF'>&lt;</font>Y<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> r
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            data <font color='#5555FF'>=</font> r.data;
+            weak_node <font color='#5555FF'>=</font> r.weak_node;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>weak_node<font face='Lucida Console'>)</font>
+                weak_node<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>ref_count <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+        <b>}</b>
+
+        ~<b><a name='weak_ptr'></a>weak_ptr</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>weak_node<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#009900'>// make note that this weak_ptr is being destroyed
+</font>                weak_node<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>ref_count <font color='#5555FF'>-</font><font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+
+                <font color='#009900'>// if this is the last weak_ptr then we should clean up our stuff
+</font>                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>weak_node<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>ref_count <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>expired</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font><font face='Lucida Console'>)</font>
+                        weak_node<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>shared_node<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>weak_node <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                    <font color='#0000FF'>delete</font> weak_node;
+                <b>}</b>
+            <b>}</b>
+        <b>}</b>
+
+        weak_ptr<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> weak_ptr<font color='#5555FF'>&amp;</font> r
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#BB00BB'>weak_ptr</font><font face='Lucida Console'>(</font>r<font face='Lucida Console'>)</font>.<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>return</font> <font color='#5555FF'>*</font><font color='#0000FF'>this</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>template</font><font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> Y<font color='#5555FF'>&gt;</font> 
+        weak_ptr<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> weak_ptr<font color='#5555FF'>&lt;</font>Y<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> r
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#BB00BB'>weak_ptr</font><font face='Lucida Console'>(</font>r<font face='Lucida Console'>)</font>.<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>return</font> <font color='#5555FF'>*</font><font color='#0000FF'>this</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>template</font><font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> Y<font color='#5555FF'>&gt;</font> 
+        weak_ptr<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>=</font><font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> shared_ptr<font color='#5555FF'>&lt;</font>Y<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> r
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#BB00BB'>weak_ptr</font><font face='Lucida Console'>(</font>r<font face='Lucida Console'>)</font>.<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>return</font> <font color='#5555FF'>*</font><font color='#0000FF'>this</font>;
+        <b>}</b>
+
+        <font color='#0000FF'><u>long</u></font> <b><a name='use_count'></a>use_count</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>expired</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                <font color='#0000FF'>return</font> <font color='#979000'>0</font>;
+            <font color='#0000FF'>else</font>
+                <font color='#0000FF'>return</font> weak_node<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>shared_node<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>ref_count;
+        <b>}</b>
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='expired'></a>expired</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> weak_node <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font> <font color='#5555FF'>|</font><font color='#5555FF'>|</font> weak_node<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>shared_node <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font>; <b>}</b>
+
+        shared_ptr<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font> <b><a name='lock'></a>lock</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> 
+        <b>{</b>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>expired</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                <font color='#0000FF'>return</font> shared_ptr<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>else</font>
+                <font color='#0000FF'>return</font> shared_ptr<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='reset'></a>reset</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#BB00BB'>weak_ptr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='swap'></a>swap</b><font face='Lucida Console'>(</font>
+            weak_ptr<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> b
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            std::<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>data, b.data<font face='Lucida Console'>)</font>;
+            std::<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>weak_node, b.weak_node<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> Y<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>bool</u></font> <b><a name='_private_less'></a>_private_less</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> weak_ptr<font color='#5555FF'>&lt;</font>Y<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> rhs
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>expired</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>rhs.<font color='#BB00BB'>expired</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#0000FF'>return</font> <font color='#979000'>false</font>;
+                <b>}</b>
+                <font color='#0000FF'>else</font>
+                <b>{</b>
+                    <font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+                <b>}</b>
+            <b>}</b>
+            <font color='#0000FF'>else</font>
+            <b>{</b>
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>rhs.<font color='#BB00BB'>expired</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#0000FF'>return</font> <font color='#979000'>false</font>;
+                <b>}</b>
+                <font color='#0000FF'>else</font>
+                <b>{</b>
+                    <font color='#009900'>// in this case they have both not expired so lets
+</font>                    <font color='#009900'>// compare the shared_node pointers
+</font>                    <font color='#0000FF'>return</font> <font face='Lucida Console'>(</font>weak_node<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>shared_node<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> <font face='Lucida Console'>(</font>rhs.weak_node<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>shared_node<font face='Lucida Console'>)</font>;
+                <b>}</b>
+            <b>}</b>
+        <b>}</b>
+
+    <font color='#0000FF'>private</font>:
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> Y<font color='#5555FF'>&gt;</font> <font color='#0000FF'>friend</font> <font color='#0000FF'>class</font> shared_ptr;
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> Y<font color='#5555FF'>&gt;</font> <font color='#0000FF'>friend</font> <font color='#0000FF'>class</font> weak_ptr;
+
+        T<font color='#5555FF'>*</font> data;
+        weak_ptr_node<font color='#5555FF'>*</font> weak_node;
+    <b>}</b>;
+
+    <font color='#0000FF'>template</font><font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> U<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>bool</u></font> <b><a name='operator'></a>operator</b><font color='#5555FF'>&lt;</font> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> weak_ptr<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> a, 
+        <font color='#0000FF'>const</font> weak_ptr<font color='#5555FF'>&lt;</font>U<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> b
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>return</font> a.<font color='#BB00BB'>_private_less</font><font face='Lucida Console'>(</font>b<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+    <font color='#0000FF'>template</font><font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='swap'></a>swap</b><font face='Lucida Console'>(</font>
+        weak_ptr<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> a, 
+        weak_ptr<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&amp;</font> b
+    <font face='Lucida Console'>)</font> <b>{</b> a.<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>b<font face='Lucida Console'>)</font>; <b>}</b>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_WEAK_PTr_
+</font>
+
+
+</pre></body></html>

@@ -1,0 +1,80 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - bit_stream_multi_abstract.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2003  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#undef</font> DLIB_BIT_STREAM_MULTi_ABSTRACT_
+<font color='#0000FF'>#ifdef</font> DLIB_BIT_STREAM_MULTi_ABSTRACT_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='bit_stream_kernel_abstract.h.html'>bit_stream_kernel_abstract.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> bit_stream_base  
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>class</font> <b><a name='bit_stream_multi'></a>bit_stream_multi</b> : <font color='#0000FF'>public</font> bit_stream_base
+    <b>{</b>
+
+        <font color='#009900'>/*!
+            REQUIREMENTS ON BIT_STREAM_BASE
+                it is an implementation of bit_stream/bit_stream_kernel_abstract.h
+
+      
+            WHAT THIS EXTENSION DOES FOR BIT_STREAM
+                this gives a bit_stream object the ability to read/write multible bits 
+                at a time
+        !*/</font>
+
+
+        <font color='#0000FF'>public</font>:
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='multi_write'></a>multi_write</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> data,
+            <font color='#0000FF'><u>int</u></font> num_to_write
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - is_in_write_mode() == true 
+                - 0 &lt;= num_to_write &lt;= 32
+            ensures
+                - num_to_write low order bits from data will be written to the ostream 
+                - object associated with *this
+                  example: if data is 10010 then the bits will be written in the 
+                  order 1,0,0,1,0
+        !*/</font>
+
+
+        <font color='#0000FF'><u>int</u></font> <b><a name='multi_read'></a>multi_read</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&amp;</font> data,
+            <font color='#0000FF'><u>int</u></font> num_to_read
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - is_in_read_mode() == true 
+                - 0 &lt;= num_to_read &lt;= 32
+            ensures
+                - tries to read num_to_read bits into the low order end of #data       
+                  example:  if the incoming bits were 10010 then data would end 
+                  up with 10010 as its low order bits
+                - all of the bits in #data not filled in by multi_read() are zero             
+                - returns the number of bits actually read into #data
+        !*/</font>
+
+    <b>}</b>;
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> bit_stream_base
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='swap'></a>swap</b> <font face='Lucida Console'>(</font>
+        bit_stream_multi<font color='#5555FF'>&lt;</font>bit_stream_base<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> a, 
+        bit_stream_multi<font color='#5555FF'>&lt;</font>bit_stream_base<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> b 
+    <font face='Lucida Console'>)</font> <b>{</b> a.<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>b<font face='Lucida Console'>)</font>; <b>}</b>
+    <font color='#009900'>/*!
+        provides a global swap function
+    !*/</font>
+
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_BIT_STREAM_MULTi_ABSTRACT_
+</font>
+
+</pre></body></html>

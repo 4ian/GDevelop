@@ -1,0 +1,115 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - optimization_least_squares_abstract.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2010  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#undef</font> DLIB_OPTIMIZATIOn_LEAST_SQUARES_ABSTRACT_
+<font color='#0000FF'>#ifdef</font> DLIB_OPTIMIZATIOn_LEAST_SQUARES_ABSTRACT_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../matrix/matrix_abstract.h.html'>../matrix/matrix_abstract.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='optimization_trust_region_abstract.h.html'>optimization_trust_region_abstract.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> stop_strategy_type,
+        <font color='#0000FF'>typename</font> funct_type,
+        <font color='#0000FF'>typename</font> funct_der_type,
+        <font color='#0000FF'>typename</font> vector_type,
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>double</u></font> <b><a name='solve_least_squares'></a>solve_least_squares</b> <font face='Lucida Console'>(</font>
+        stop_strategy_type stop_strategy,
+        <font color='#0000FF'>const</font> funct_type<font color='#5555FF'>&amp;</font> f,
+        <font color='#0000FF'>const</font> funct_der_type<font color='#5555FF'>&amp;</font> der,
+        <font color='#0000FF'>const</font> vector_type<font color='#5555FF'>&amp;</font> list,
+        T<font color='#5555FF'>&amp;</font> x, 
+        <font color='#0000FF'><u>double</u></font> radius <font color='#5555FF'>=</font> <font color='#979000'>1</font>
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - stop_strategy == an object that defines a stop strategy such as one of 
+              the objects from dlib/optimization/optimization_stop_strategies_abstract.h
+            - list == a matrix or something convertible to a matrix via mat()
+              such as a std::vector.
+            - is_vector(list) == true
+            - list.size() &gt; 0
+            - is_col_vector(x) == true
+            - radius &gt; 0
+            - for all valid i:
+                - f(list(i),x) must be a valid expression that evaluates to a floating point value.
+                - der(list(i),x) must be a valid expression that evaluates to the derivative of f(list(i),x) 
+                  with respect to x. This derivative must take the form of a column vector.
+        ensures
+            - This function performs an unconstrained minimization of the least squares
+              function g(x) defined by:
+                - g(x) = sum over all i: 0.5*pow( f(list(i),x), 2 )
+            - This method combines the Levenberg-Marquardt method with a quasi-newton method
+              for approximating the second order terms of the hessian and is appropriate for
+              large residual problems (i.e. problems where the f() function isn't driven to 0).  
+              In particular, it uses the method of Dennis, Gay, and Welsch as described in 
+              Numerical Optimization by Nocedal and Wright (second edition).
+            - Since this is a trust region algorithm, the radius parameter defines the initial 
+              size of the trust region.  
+            - The function is optimized until stop_strategy decides that an acceptable 
+              point has been found or the trust region subproblem fails to make progress.
+            - #x == the value of x that was found to minimize g()
+            - returns g(#x). 
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> stop_strategy_type,
+        <font color='#0000FF'>typename</font> funct_type,
+        <font color='#0000FF'>typename</font> funct_der_type,
+        <font color='#0000FF'>typename</font> vector_type,
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>double</u></font> <b><a name='solve_least_squares_lm'></a>solve_least_squares_lm</b> <font face='Lucida Console'>(</font>
+        stop_strategy_type stop_strategy,
+        <font color='#0000FF'>const</font> funct_type<font color='#5555FF'>&amp;</font> f,
+        <font color='#0000FF'>const</font> funct_der_type<font color='#5555FF'>&amp;</font> der,
+        <font color='#0000FF'>const</font> vector_type<font color='#5555FF'>&amp;</font> list,
+        T<font color='#5555FF'>&amp;</font> x, 
+        <font color='#0000FF'><u>double</u></font> radius <font color='#5555FF'>=</font> <font color='#979000'>1</font>
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - stop_strategy == an object that defines a stop strategy such as one of 
+              the objects from dlib/optimization/optimization_stop_strategies_abstract.h
+            - list == a matrix or something convertible to a matrix via mat()
+              such as a std::vector.
+            - is_vector(list) == true
+            - list.size() &gt; 0
+            - is_col_vector(x) == true
+            - radius &gt; 0
+            - for all valid i:
+                - f(list(i),x) must be a valid expression that evaluates to a floating point value.
+                - der(list(i),x) must be a valid expression that evaluates to the derivative of f(list(i),x) 
+                  with respect to x.  This derivative must take the form of a column vector.
+        ensures
+            - This function performs an unconstrained minimization of the least squares
+              function g(x) defined by:
+                - g(x) = sum over all i: 0.5*pow( f(list(i),x), 2 )
+            - This method implements a plain Levenberg-Marquardt approach for approximating
+              the hessian of g().  Therefore, it is most appropriate for small residual problems
+              (i.e. problems where f() goes to 0 at the solution).
+            - Since this is a trust region algorithm, the radius parameter defines the initial 
+              size of the trust region.  
+            - The function is optimized until stop_strategy decides that an acceptable 
+              point has been found or the trust region subproblem fails to make progress.
+            - #x == the value of x that was found to minimize g()
+            - returns g(#x). 
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_OPTIMIZATIOn_LEAST_SQUARES_ABSTRACT_
+</font>
+
+
+</pre></body></html>

@@ -1,0 +1,191 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - lspi.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2015  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_LSPI_Hh_
+<font color='#0000FF'>#define</font> DLIB_LSPI_Hh_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='lspi_abstract.h.html'>lspi_abstract.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='approximate_linear_models.h.html'>approximate_linear_models.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> feature_extractor
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>class</font> <b><a name='lspi'></a>lspi</b>
+    <b>{</b>
+    <font color='#0000FF'>public</font>:
+        <font color='#0000FF'>typedef</font> feature_extractor feature_extractor_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> feature_extractor::state_type state_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> feature_extractor::action_type action_type;
+
+        <font color='#0000FF'>explicit</font> <b><a name='lspi'></a>lspi</b><font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> feature_extractor<font color='#5555FF'>&amp;</font> fe_
+        <font face='Lucida Console'>)</font> : fe<font face='Lucida Console'>(</font>fe_<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#BB00BB'>init</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <b><a name='lspi'></a>lspi</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#BB00BB'>init</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'><u>double</u></font> <b><a name='get_discount'></a>get_discount</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> discount; <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_discount'></a>set_discount</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>double</u></font> value
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#009900'>// make sure requires clause is not broken
+</font>            <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font><font color='#979000'>0</font> <font color='#5555FF'>&lt;</font> value <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> value <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#979000'>1</font>,
+                "<font color='#CC0000'>\t void lspi::set_discount(value)</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t invalid inputs were given to this function</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t value: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> value 
+                <font face='Lucida Console'>)</font>;
+            discount <font color='#5555FF'>=</font> value;
+        <b>}</b>
+
+        <font color='#0000FF'>const</font> feature_extractor<font color='#5555FF'>&amp;</font> <b><a name='get_feature_extractor'></a>get_feature_extractor</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> fe; <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='be_verbose'></a>be_verbose</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            verbose <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+        <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='be_quiet'></a>be_quiet</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            verbose <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+        <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_epsilon'></a>set_epsilon</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>double</u></font> eps_
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#009900'>// make sure requires clause is not broken
+</font>            <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font>eps_ <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font>,
+                "<font color='#CC0000'>\t void lspi::set_epsilon(eps_)</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t invalid inputs were given to this function</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t eps_: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> eps_ 
+                <font face='Lucida Console'>)</font>;
+            eps <font color='#5555FF'>=</font> eps_;
+        <b>}</b>
+
+        <font color='#0000FF'><u>double</u></font> <b><a name='get_epsilon'></a>get_epsilon</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b> 
+            <font color='#0000FF'>return</font> eps;
+        <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_lambda'></a>set_lambda</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>double</u></font> lambda_ 
+        <font face='Lucida Console'>)</font> 
+        <b>{</b>
+            <font color='#009900'>// make sure requires clause is not broken
+</font>            <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font>lambda_ <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#979000'>0</font>,
+                "<font color='#CC0000'>\t void lspi::set_lambda(lambda_)</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t invalid inputs were given to this function</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t lambda_: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> lambda_ 
+                <font face='Lucida Console'>)</font>;
+            lambda <font color='#5555FF'>=</font> lambda_;
+        <b>}</b>
+
+        <font color='#0000FF'><u>double</u></font> <b><a name='get_lambda'></a>get_lambda</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> 
+        <b>{</b> 
+            <font color='#0000FF'>return</font> lambda; 
+        <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_max_iterations'></a>set_max_iterations</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> max_iter
+        <font face='Lucida Console'>)</font> <b>{</b> max_iterations <font color='#5555FF'>=</font> max_iter; <b>}</b>
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='get_max_iterations'></a>get_max_iterations</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <b>{</b> <font color='#0000FF'>return</font> max_iterations; <b>}</b>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> vector_type<font color='#5555FF'>&gt;</font>
+        policy<font color='#5555FF'>&lt;</font>feature_extractor<font color='#5555FF'>&gt;</font> <b><a name='train'></a>train</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> vector_type<font color='#5555FF'>&amp;</font> samples
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#009900'>// make sure requires clause is not broken
+</font>            <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font>samples.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font>,
+                "<font color='#CC0000'>\t policy lspi::train(samples)</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t invalid inputs were given to this function</font>"
+                <font face='Lucida Console'>)</font>;
+
+            matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>0</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> <font color='#BB00BB'>w</font><font face='Lucida Console'>(</font>fe.<font color='#BB00BB'>num_features</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            w <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>0</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> prev_w, b, f1, f2;
+
+            matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font> A;
+
+            <font color='#0000FF'><u>double</u></font> change; 
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> iter <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            <font color='#0000FF'>do</font>
+            <b>{</b>
+                A <font color='#5555FF'>=</font> identity_matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>fe.<font color='#BB00BB'>num_features</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font color='#5555FF'>*</font>lambda;
+                b <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> samples.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    fe.<font color='#BB00BB'>get_features</font><font face='Lucida Console'>(</font>samples[i].state, samples[i].action, f1<font face='Lucida Console'>)</font>;
+                    fe.<font color='#BB00BB'>get_features</font><font face='Lucida Console'>(</font>samples[i].next_state, 
+                                    fe.<font color='#BB00BB'>find_best_action</font><font face='Lucida Console'>(</font>samples[i].next_state,w<font face='Lucida Console'>)</font>, 
+                                    f2<font face='Lucida Console'>)</font>;
+                    A <font color='#5555FF'>+</font><font color='#5555FF'>=</font> f1<font color='#5555FF'>*</font><font color='#BB00BB'>trans</font><font face='Lucida Console'>(</font>f1 <font color='#5555FF'>-</font> discount<font color='#5555FF'>*</font>f2<font face='Lucida Console'>)</font>;
+                    b <font color='#5555FF'>+</font><font color='#5555FF'>=</font> f1<font color='#5555FF'>*</font>samples[i].reward;
+                <b>}</b>
+
+                prev_w <font color='#5555FF'>=</font> w;
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>feature_extractor::force_last_weight_to_1<font face='Lucida Console'>)</font>
+                    w <font color='#5555FF'>=</font> <font color='#BB00BB'>join_cols</font><font face='Lucida Console'>(</font><font color='#BB00BB'>pinv</font><font face='Lucida Console'>(</font><font color='#BB00BB'>colm</font><font face='Lucida Console'>(</font>A,<font color='#BB00BB'>range</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>,A.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#979000'>2</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font color='#5555FF'>*</font><font face='Lucida Console'>(</font>b<font color='#5555FF'>-</font><font color='#BB00BB'>colm</font><font face='Lucida Console'>(</font>A,A.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>,<font color='#BB00BB'>mat</font><font face='Lucida Console'>(</font><font color='#979000'>1.0</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>else</font>
+                    w <font color='#5555FF'>=</font> <font color='#BB00BB'>pinv</font><font face='Lucida Console'>(</font>A<font face='Lucida Console'>)</font><font color='#5555FF'>*</font>b;
+
+                change <font color='#5555FF'>=</font> <font color='#BB00BB'>length</font><font face='Lucida Console'>(</font>w<font color='#5555FF'>-</font>prev_w<font face='Lucida Console'>)</font>;
+                <font color='#5555FF'>+</font><font color='#5555FF'>+</font>iter;
+
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>verbose<font face='Lucida Console'>)</font>
+                    std::cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>iteration: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> iter <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\tchange: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> change <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> std::endl;
+
+            <b>}</b> <font color='#0000FF'>while</font><font face='Lucida Console'>(</font>change <font color='#5555FF'>&gt;</font> eps <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> iter <font color='#5555FF'>&lt;</font> max_iterations<font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>return</font> policy<font color='#5555FF'>&lt;</font>feature_extractor<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>w,fe<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+
+    <font color='#0000FF'>private</font>:
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='init'></a>init</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            lambda <font color='#5555FF'>=</font> <font color='#979000'>0.01</font>;
+            discount <font color='#5555FF'>=</font> <font color='#979000'>0.8</font>;
+            eps <font color='#5555FF'>=</font> <font color='#979000'>0.01</font>;
+            verbose <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+            max_iterations <font color='#5555FF'>=</font> <font color='#979000'>100</font>;
+        <b>}</b>
+
+        <font color='#0000FF'><u>double</u></font> lambda;
+        <font color='#0000FF'><u>double</u></font> discount;
+        <font color='#0000FF'><u>double</u></font> eps;
+        <font color='#0000FF'><u>bool</u></font> verbose;
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> max_iterations;
+        feature_extractor fe;
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_LSPI_Hh_
+</font>
+
+</pre></body></html>

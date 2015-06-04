@@ -1,0 +1,384 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - compress_stream_kernel_3.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2005  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_COMPRESS_STREAM_KERNEl_3_
+<font color='#0000FF'>#define</font> DLIB_COMPRESS_STREAM_KERNEl_3_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../algs.h.html'>../algs.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='compress_stream_kernel_abstract.h.html'>compress_stream_kernel_abstract.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../assert.h.html'>../assert.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> lzp_buf,
+        <font color='#0000FF'>typename</font> crc32,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> buffer_size
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>class</font> <b><a name='compress_stream_kernel_3'></a>compress_stream_kernel_3</b>
+    <b>{</b>
+        <font color='#009900'>/*!
+            REQUIREMENTS ON lzp_buf
+                is an implementation of lzp_buffer/lzp_buffer_kernel_abstract.h
+
+            REQUIREMENTS ON buffer_size
+                10 &lt; buffer_size &lt; 32
+
+            REQUIREMENTS ON crc32
+                is an implementation of crc32/crc32_kernel_abstract.h
+
+
+            INITIAL VALUE
+                this object has no state
+
+            CONVENTION
+                this object has no state
+
+
+                This implementation uses the lzp_buffer and writes out matches
+                in a byte aligned format.
+
+        !*/</font>
+
+
+    <font color='#0000FF'>public</font>:
+
+        <font color='#0000FF'>class</font> <b><a name='decompression_error'></a>decompression_error</b> : <font color='#0000FF'>public</font> dlib::error 
+        <b>{</b> 
+            <font color='#0000FF'>public</font>: 
+                <b><a name='decompression_error'></a>decompression_error</b><font face='Lucida Console'>(</font>
+                    <font color='#0000FF'>const</font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>*</font> i
+                <font face='Lucida Console'>)</font> :
+                    dlib::error<font face='Lucida Console'>(</font>std::string<font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                <b>{</b><b>}</b>
+
+                <b><a name='decompression_error'></a>decompression_error</b><font face='Lucida Console'>(</font>
+                    <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> i
+                <font face='Lucida Console'>)</font> :
+                    dlib::error<font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>
+                <b>{</b><b>}</b>
+        <b>}</b>;
+
+
+        <b><a name='compress_stream_kernel_3'></a>compress_stream_kernel_3</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#BB00BB'>COMPILE_TIME_ASSERT</font><font face='Lucida Console'>(</font><font color='#979000'>10</font> <font color='#5555FF'>&lt;</font> buffer_size <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> buffer_size <font color='#5555FF'>&lt;</font> <font color='#979000'>32</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        ~<b><a name='compress_stream_kernel_3'></a>compress_stream_kernel_3</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>
+        <b>{</b><b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='compress'></a>compress</b> <font face='Lucida Console'>(</font>
+            std::istream<font color='#5555FF'>&amp;</font> in,
+            std::ostream<font color='#5555FF'>&amp;</font> out
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='decompress'></a>decompress</b> <font face='Lucida Console'>(</font>
+            std::istream<font color='#5555FF'>&amp;</font> in,
+            std::ostream<font color='#5555FF'>&amp;</font> out
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+
+
+    <font color='#0000FF'>private</font>:
+
+        <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='write'></a>write</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> symbol
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b> 
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>out<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>sputn</font><font face='Lucida Console'>(</font><font color='#0000FF'>reinterpret_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>char</u></font><font color='#5555FF'>*</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>symbol<font face='Lucida Console'>)</font>,<font color='#979000'>1</font><font face='Lucida Console'>)</font><font color='#5555FF'>=</font><font color='#5555FF'>=</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                <font color='#0000FF'>throw</font> std::ios_base::<font color='#BB00BB'>failure</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>error writing to output stream in compress_stream_kernel_3</font>"<font face='Lucida Console'>)</font>;        
+        <b>}</b>
+
+        <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='decode'></a>decode</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>&amp;</font> symbol,
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>&amp;</font> flag
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b> 
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>count <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>size_t</u></font><font face='Lucida Console'>)</font>in<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>sgetn</font><font face='Lucida Console'>(</font><font color='#0000FF'>reinterpret_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>char</u></font><font color='#5555FF'>*</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>buffer<font face='Lucida Console'>)</font>,<font color='#0000FF'>sizeof</font><font face='Lucida Console'>(</font>buffer<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font color='#5555FF'>!</font><font color='#5555FF'>=</font><font color='#0000FF'>sizeof</font><font face='Lucida Console'>(</font>buffer<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                    <font color='#0000FF'>throw</font> <font color='#BB00BB'>decompression_error</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>Error detected in compressed data stream.</font>"<font face='Lucida Console'>)</font>;
+                count <font color='#5555FF'>=</font> <font color='#979000'>8</font>;
+            <b>}</b>
+            <font color='#5555FF'>-</font><font color='#5555FF'>-</font>count;
+            symbol <font color='#5555FF'>=</font> buffer[<font color='#979000'>8</font><font color='#5555FF'>-</font>count];
+            flag <font color='#5555FF'>=</font> buffer[<font color='#979000'>0</font>] <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font> <font color='#979000'>7</font>; 
+            buffer[<font color='#979000'>0</font>] <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='encode'></a>encode</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> symbol,
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> flag
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <font color='#009900'>/*!
+            requires
+                - 0 &lt;= flag &lt;= 1
+            ensures
+                - writes symbol with the given one bit flag
+        !*/</font>
+        <b>{</b> 
+            <font color='#009900'>// add this symbol and flag to the buffer            
+</font>            <font color='#5555FF'>+</font><font color='#5555FF'>+</font>count;
+            buffer[<font color='#979000'>0</font>] <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+            buffer[count] <font color='#5555FF'>=</font> symbol;
+            buffer[<font color='#979000'>0</font>] <font color='#5555FF'>|</font><font color='#5555FF'>=</font> flag;
+
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>count <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>8</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>size_t</u></font><font face='Lucida Console'>)</font>out<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>sputn</font><font face='Lucida Console'>(</font><font color='#0000FF'>reinterpret_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>char</u></font><font color='#5555FF'>*</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>buffer<font face='Lucida Console'>)</font>,<font color='#0000FF'>sizeof</font><font face='Lucida Console'>(</font>buffer<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font color='#5555FF'>!</font><font color='#5555FF'>=</font><font color='#0000FF'>sizeof</font><font face='Lucida Console'>(</font>buffer<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                    <font color='#0000FF'>throw</font> std::ios_base::<font color='#BB00BB'>failure</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>error writing to output stream in compress_stream_kernel_3</font>"<font face='Lucida Console'>)</font>;        
+                count <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                buffer[<font color='#979000'>0</font>] <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            <b>}</b>
+        <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='clear'></a>clear</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <font color='#009900'>/*!
+            ensures
+                - resets the buffers
+        !*/</font>
+        <b>{</b>
+            count <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='flush'></a>flush</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <font color='#009900'>/*!
+            ensures
+                - flushes any data in the buffers to out
+        !*/</font>
+        <b>{</b>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>count <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                buffer[<font color='#979000'>0</font>] <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#979000'>8</font><font color='#5555FF'>-</font>count<font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>size_t</u></font><font face='Lucida Console'>)</font>out<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>sputn</font><font face='Lucida Console'>(</font><font color='#0000FF'>reinterpret_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>char</u></font><font color='#5555FF'>*</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>buffer<font face='Lucida Console'>)</font>,<font color='#0000FF'>sizeof</font><font face='Lucida Console'>(</font>buffer<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font color='#5555FF'>!</font><font color='#5555FF'>=</font><font color='#0000FF'>sizeof</font><font face='Lucida Console'>(</font>buffer<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                    <font color='#0000FF'>throw</font> std::ios_base::<font color='#BB00BB'>failure</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>error writing to output stream in compress_stream_kernel_3</font>"<font face='Lucida Console'>)</font>;        
+            <b>}</b>
+        <b>}</b>
+
+        <font color='#0000FF'>mutable</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>int</u></font> count;
+        <font color='#009900'>// count tells us how many bytes are buffered in buffer and how many flag
+</font>        <font color='#009900'>// bit are currently in buffer[0]
+</font>        <font color='#0000FF'>mutable</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> buffer[<font color='#979000'>9</font>];  
+        <font color='#009900'>// buffer[0] holds the flag bits to be writen.
+</font>        <font color='#009900'>// the rest of the buffer holds the bytes to be writen.
+</font>
+        <font color='#0000FF'>mutable</font> std::streambuf<font color='#5555FF'>*</font> in;
+        <font color='#0000FF'>mutable</font> std::streambuf<font color='#5555FF'>*</font> out;
+
+        <font color='#009900'>// restricted functions
+</font>        <b><a name='compress_stream_kernel_3'></a>compress_stream_kernel_3</b><font face='Lucida Console'>(</font>compress_stream_kernel_3<font color='#5555FF'>&lt;</font>lzp_buf,crc32,buffer_size<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font>;        <font color='#009900'>// copy constructor
+</font>        compress_stream_kernel_3<font color='#5555FF'>&lt;</font>lzp_buf,crc32,buffer_size<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>=</font><font face='Lucida Console'>(</font>compress_stream_kernel_3<font color='#5555FF'>&lt;</font>lzp_buf,crc32,buffer_size<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font>;    <font color='#009900'>// assignment operator
+</font>
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>    <font color='#009900'>// member function definitions
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> lzp_buf,
+        <font color='#0000FF'>typename</font> crc32,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> buffer_size
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> compress_stream_kernel_3<font color='#5555FF'>&lt;</font>lzp_buf,crc32,buffer_size<font color='#5555FF'>&gt;</font>::
+    <b><a name='compress'></a>compress</b> <font face='Lucida Console'>(</font>
+        std::istream<font color='#5555FF'>&amp;</font> in_,
+        std::ostream<font color='#5555FF'>&amp;</font> out_
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        in <font color='#5555FF'>=</font> in_.<font color='#BB00BB'>rdbuf</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        out <font color='#5555FF'>=</font> out_.<font color='#BB00BB'>rdbuf</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+        crc32 crc;
+     
+        lzp_buf <font color='#BB00BB'>buffer</font><font face='Lucida Console'>(</font>buffer_size<font face='Lucida Console'>)</font>;
+
+        std::streambuf::int_type temp <font color='#5555FF'>=</font> in<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>sbumpc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> index;
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> symbol;
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> length;
+
+        <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>temp <font color='#5555FF'>!</font><font color='#5555FF'>=</font> EOF<font face='Lucida Console'>)</font>
+        <b>{</b>
+            symbol <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>buffer.<font color='#BB00BB'>predict_match</font><font face='Lucida Console'>(</font>index<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>buffer[index] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> symbol<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#009900'>// this is a match so we must find out how long it is
+</font>                    length <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+                                        
+                    buffer.<font color='#BB00BB'>add</font><font face='Lucida Console'>(</font>symbol<font face='Lucida Console'>)</font>;
+                    crc.<font color='#BB00BB'>add</font><font face='Lucida Console'>(</font>symbol<font face='Lucida Console'>)</font>;
+
+                    temp <font color='#5555FF'>=</font> in<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>sbumpc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                    <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>length <font color='#5555FF'>&lt;</font> <font color='#979000'>255</font><font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>temp <font color='#5555FF'>=</font><font color='#5555FF'>=</font> EOF<font face='Lucida Console'>)</font>
+                        <b>{</b>                          
+                            <font color='#0000FF'>break</font>;
+                        <b>}</b>
+                        <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>length<font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> index<font face='Lucida Console'>)</font>
+                        <b>{</b>
+                            <font color='#0000FF'>break</font>;
+                        <b>}</b>
+                        <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> buffer[index]<font face='Lucida Console'>)</font>
+                        <b>{</b>
+                            <font color='#5555FF'>+</font><font color='#5555FF'>+</font>length;
+                            buffer.<font color='#BB00BB'>add</font><font face='Lucida Console'>(</font><font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                            crc.<font color='#BB00BB'>add</font><font face='Lucida Console'>(</font><font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                            temp <font color='#5555FF'>=</font> in<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>sbumpc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                        <b>}</b>
+                        <font color='#0000FF'>else</font>
+                        <b>{</b>
+                            <font color='#0000FF'>break</font>;
+                        <b>}</b>
+                    <b>}</b>                        
+
+                    <font color='#BB00BB'>encode</font><font face='Lucida Console'>(</font>length,<font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+                <b>}</b>
+                <font color='#0000FF'>else</font>
+                <b>{</b>
+                    <font color='#009900'>// this is also not a match
+</font>                    <font color='#BB00BB'>encode</font><font face='Lucida Console'>(</font>symbol,<font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+                    buffer.<font color='#BB00BB'>add</font><font face='Lucida Console'>(</font>symbol<font face='Lucida Console'>)</font>;
+                    crc.<font color='#BB00BB'>add</font><font face='Lucida Console'>(</font>symbol<font face='Lucida Console'>)</font>;
+
+                    <font color='#009900'>// get the next symbol
+</font>                    temp <font color='#5555FF'>=</font> in<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>sbumpc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                <b>}</b>
+            <b>}</b>
+            <font color='#0000FF'>else</font>
+            <b>{</b>
+                <font color='#009900'>// there wasn't a match so just write this symbol
+</font>                <font color='#BB00BB'>encode</font><font face='Lucida Console'>(</font>symbol,<font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+                buffer.<font color='#BB00BB'>add</font><font face='Lucida Console'>(</font>symbol<font face='Lucida Console'>)</font>;
+                crc.<font color='#BB00BB'>add</font><font face='Lucida Console'>(</font>symbol<font face='Lucida Console'>)</font>;
+
+                <font color='#009900'>// get the next symbol
+</font>                temp <font color='#5555FF'>=</font> in<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>sbumpc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+        <b>}</b>
+
+        <font color='#009900'>// use a match of zero length to indicate EOF
+</font>        <font color='#BB00BB'>encode</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>,<font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// now write the checksum
+</font>        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> checksum <font color='#5555FF'>=</font> crc.<font color='#BB00BB'>get_checksum</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> byte1 <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>checksum<font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font><font color='#979000'>24</font><font face='Lucida Console'>)</font><font color='#5555FF'>&amp;</font><font color='#979000'>0xFF</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> byte2 <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>checksum<font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font><font color='#979000'>16</font><font face='Lucida Console'>)</font><font color='#5555FF'>&amp;</font><font color='#979000'>0xFF</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> byte3 <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>checksum<font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font><font color='#979000'>8</font><font face='Lucida Console'>)</font><font color='#5555FF'>&amp;</font><font color='#979000'>0xFF</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> byte4 <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>checksum<font face='Lucida Console'>)</font><font color='#5555FF'>&amp;</font><font color='#979000'>0xFF</font><font face='Lucida Console'>)</font>;
+
+        <font color='#BB00BB'>encode</font><font face='Lucida Console'>(</font>byte1,<font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>encode</font><font face='Lucida Console'>(</font>byte2,<font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>encode</font><font face='Lucida Console'>(</font>byte3,<font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>encode</font><font face='Lucida Console'>(</font>byte4,<font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+
+        <font color='#BB00BB'>flush</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> lzp_buf,
+        <font color='#0000FF'>typename</font> crc32,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> buffer_size
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> compress_stream_kernel_3<font color='#5555FF'>&lt;</font>lzp_buf,crc32,buffer_size<font color='#5555FF'>&gt;</font>::
+    <b><a name='decompress'></a>decompress</b> <font face='Lucida Console'>(</font>
+        std::istream<font color='#5555FF'>&amp;</font> in_,
+        std::ostream<font color='#5555FF'>&amp;</font> out_
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b> 
+        in <font color='#5555FF'>=</font> in_.<font color='#BB00BB'>rdbuf</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        out <font color='#5555FF'>=</font> out_.<font color='#BB00BB'>rdbuf</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+     
+        crc32 crc;
+
+        lzp_buf <font color='#BB00BB'>buffer</font><font face='Lucida Console'>(</font>buffer_size<font face='Lucida Console'>)</font>;
+
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> index <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> symbol;
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> length;
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> flag;
+
+        <font color='#BB00BB'>decode</font><font face='Lucida Console'>(</font>symbol,flag<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>flag <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font> <font color='#5555FF'>|</font><font color='#5555FF'>|</font> symbol <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            buffer.<font color='#BB00BB'>predict_match</font><font face='Lucida Console'>(</font>index<font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>flag <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                length <font color='#5555FF'>=</font> symbol;
+                <font color='#0000FF'>do</font> 
+                <b>{</b>
+                    <font color='#5555FF'>-</font><font color='#5555FF'>-</font>length;
+                    symbol <font color='#5555FF'>=</font> buffer[index];
+                    <font color='#BB00BB'>write</font><font face='Lucida Console'>(</font>symbol<font face='Lucida Console'>)</font>;
+                    buffer.<font color='#BB00BB'>add</font><font face='Lucida Console'>(</font>symbol<font face='Lucida Console'>)</font>;   
+                    crc.<font color='#BB00BB'>add</font><font face='Lucida Console'>(</font>symbol<font face='Lucida Console'>)</font>;                    
+                <b>}</b> <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>length <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+            <font color='#0000FF'>else</font>
+            <b>{</b>
+                <font color='#009900'>// this is just a literal
+</font>                <font color='#BB00BB'>write</font><font face='Lucida Console'>(</font>symbol<font face='Lucida Console'>)</font>;
+                buffer.<font color='#BB00BB'>add</font><font face='Lucida Console'>(</font>symbol<font face='Lucida Console'>)</font>;
+                crc.<font color='#BB00BB'>add</font><font face='Lucida Console'>(</font>symbol<font face='Lucida Console'>)</font>;
+            <b>}</b>
+            <font color='#BB00BB'>decode</font><font face='Lucida Console'>(</font>symbol,flag<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+
+        <font color='#009900'>// now get the checksum and make sure it matches
+</font>        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> byte1;
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> byte2;
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> byte3;
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> byte4;
+
+        <font color='#BB00BB'>decode</font><font face='Lucida Console'>(</font>byte1,flag<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>flag <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+            <font color='#0000FF'>throw</font> <font color='#BB00BB'>decompression_error</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>Error detected in compressed data stream.</font>"<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>decode</font><font face='Lucida Console'>(</font>byte2,flag<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>flag <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+            <font color='#0000FF'>throw</font> <font color='#BB00BB'>decompression_error</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>Error detected in compressed data stream.</font>"<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>decode</font><font face='Lucida Console'>(</font>byte3,flag<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>flag <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+            <font color='#0000FF'>throw</font> <font color='#BB00BB'>decompression_error</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>Error detected in compressed data stream.</font>"<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>decode</font><font face='Lucida Console'>(</font>byte4,flag<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>flag <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+            <font color='#0000FF'>throw</font> <font color='#BB00BB'>decompression_error</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>Error detected in compressed data stream.</font>"<font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> checksum <font color='#5555FF'>=</font> byte1;
+        checksum <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#979000'>8</font>;
+        checksum <font color='#5555FF'>|</font><font color='#5555FF'>=</font> byte2;
+        checksum <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#979000'>8</font>;
+        checksum <font color='#5555FF'>|</font><font color='#5555FF'>=</font> byte3;
+        checksum <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#979000'>8</font>;
+        checksum <font color='#5555FF'>|</font><font color='#5555FF'>=</font> byte4;
+
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>checksum <font color='#5555FF'>!</font><font color='#5555FF'>=</font> crc.<font color='#BB00BB'>get_checksum</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+            <font color='#0000FF'>throw</font> <font color='#BB00BB'>decompression_error</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>Error detected in compressed data stream.</font>"<font face='Lucida Console'>)</font>;
+ 
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_COMPRESS_STREAM_KERNEl_3_
+</font>
+
+</pre></body></html>

@@ -1,0 +1,1173 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - sparse_vector.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2009  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_SVm_SPARSE_VECTOR
+<font color='#0000FF'>#define</font> DLIB_SVm_SPARSE_VECTOR
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='sparse_vector_abstract.h.html'>sparse_vector_abstract.h</a>"
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>cmath<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>limits<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../algs.h.html'>../algs.h</a>"
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>vector<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>map<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../graph_utils/edge_list_graphs.h.html'>../graph_utils/edge_list_graphs.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../matrix.h.html'>../matrix.h</a>"
+
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> U<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>typename</font> T::value_type::second_type <b><a name='distance_squared'></a>distance_squared</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> a,
+        <font color='#0000FF'>const</font> U<font color='#5555FF'>&amp;</font> b
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> T::value_type::second_type scalar_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> U::value_type::second_type scalar_typeU;
+        <font color='#009900'>// Both T and U must contain the same kinds of elements
+</font>        <font color='#BB00BB'>COMPILE_TIME_ASSERT</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>is_same_type<font color='#5555FF'>&lt;</font>scalar_type, scalar_typeU<font color='#5555FF'>&gt;</font>::value<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>typename</font> T::const_iterator ai <font color='#5555FF'>=</font> a.<font color='#BB00BB'>begin</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>typename</font> U::const_iterator bi <font color='#5555FF'>=</font> b.<font color='#BB00BB'>begin</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+        scalar_type sum <font color='#5555FF'>=</font> <font color='#979000'>0</font>, temp <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>ai <font color='#5555FF'>!</font><font color='#5555FF'>=</font> a.<font color='#BB00BB'>end</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> bi <font color='#5555FF'>!</font><font color='#5555FF'>=</font> b.<font color='#BB00BB'>end</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>ai<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>first <font color='#5555FF'>=</font><font color='#5555FF'>=</font> bi<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>first<font face='Lucida Console'>)</font>
+            <b>{</b>
+                temp <font color='#5555FF'>=</font> ai<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>second <font color='#5555FF'>-</font> bi<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>second;
+                <font color='#5555FF'>+</font><font color='#5555FF'>+</font>ai;
+                <font color='#5555FF'>+</font><font color='#5555FF'>+</font>bi;
+            <b>}</b>
+            <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>ai<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>first <font color='#5555FF'>&lt;</font> bi<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>first<font face='Lucida Console'>)</font>
+            <b>{</b>
+                temp <font color='#5555FF'>=</font> ai<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>second;
+                <font color='#5555FF'>+</font><font color='#5555FF'>+</font>ai;
+            <b>}</b>
+            <font color='#0000FF'>else</font> 
+            <b>{</b>
+                temp <font color='#5555FF'>=</font> bi<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>second;
+                <font color='#5555FF'>+</font><font color='#5555FF'>+</font>bi;
+            <b>}</b>
+
+            sum <font color='#5555FF'>+</font><font color='#5555FF'>=</font> temp<font color='#5555FF'>*</font>temp;
+        <b>}</b>
+
+        <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>ai <font color='#5555FF'>!</font><font color='#5555FF'>=</font> a.<font color='#BB00BB'>end</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            sum <font color='#5555FF'>+</font><font color='#5555FF'>=</font> ai<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>second<font color='#5555FF'>*</font>ai<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>second;
+            <font color='#5555FF'>+</font><font color='#5555FF'>+</font>ai;
+        <b>}</b>
+        <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>bi <font color='#5555FF'>!</font><font color='#5555FF'>=</font> b.<font color='#BB00BB'>end</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            sum <font color='#5555FF'>+</font><font color='#5555FF'>=</font> bi<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>second<font color='#5555FF'>*</font>bi<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>second;
+            <font color='#5555FF'>+</font><font color='#5555FF'>+</font>bi;
+        <b>}</b>
+
+        <font color='#0000FF'>return</font> sum;
+    <b>}</b>
+
+<font color='#009900'>// ------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> U, <font color='#0000FF'>typename</font> V, <font color='#0000FF'>typename</font> W<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>typename</font> T::value_type::second_type <b><a name='distance_squared'></a>distance_squared</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> V<font color='#5555FF'>&amp;</font> a_scale,
+        <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> a,
+        <font color='#0000FF'>const</font> W<font color='#5555FF'>&amp;</font> b_scale,
+        <font color='#0000FF'>const</font> U<font color='#5555FF'>&amp;</font> b
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> T::value_type::second_type scalar_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> U::value_type::second_type scalar_typeU;
+        <font color='#009900'>// Both T and U must contain the same kinds of elements
+</font>        <font color='#BB00BB'>COMPILE_TIME_ASSERT</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>is_same_type<font color='#5555FF'>&lt;</font>scalar_type, scalar_typeU<font color='#5555FF'>&gt;</font>::value<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>typename</font> T::const_iterator ai <font color='#5555FF'>=</font> a.<font color='#BB00BB'>begin</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>typename</font> U::const_iterator bi <font color='#5555FF'>=</font> b.<font color='#BB00BB'>begin</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+        scalar_type sum <font color='#5555FF'>=</font> <font color='#979000'>0</font>, temp <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>ai <font color='#5555FF'>!</font><font color='#5555FF'>=</font> a.<font color='#BB00BB'>end</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> bi <font color='#5555FF'>!</font><font color='#5555FF'>=</font> b.<font color='#BB00BB'>end</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>ai<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>first <font color='#5555FF'>=</font><font color='#5555FF'>=</font> bi<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>first<font face='Lucida Console'>)</font>
+            <b>{</b>
+                temp <font color='#5555FF'>=</font> a_scale<font color='#5555FF'>*</font>ai<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>second <font color='#5555FF'>-</font> b_scale<font color='#5555FF'>*</font>bi<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>second;
+                <font color='#5555FF'>+</font><font color='#5555FF'>+</font>ai;
+                <font color='#5555FF'>+</font><font color='#5555FF'>+</font>bi;
+            <b>}</b>
+            <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>ai<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>first <font color='#5555FF'>&lt;</font> bi<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>first<font face='Lucida Console'>)</font>
+            <b>{</b>
+                temp <font color='#5555FF'>=</font> a_scale<font color='#5555FF'>*</font>ai<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>second;
+                <font color='#5555FF'>+</font><font color='#5555FF'>+</font>ai;
+            <b>}</b>
+            <font color='#0000FF'>else</font> 
+            <b>{</b>
+                temp <font color='#5555FF'>=</font> b_scale<font color='#5555FF'>*</font>bi<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>second;
+                <font color='#5555FF'>+</font><font color='#5555FF'>+</font>bi;
+            <b>}</b>
+
+            sum <font color='#5555FF'>+</font><font color='#5555FF'>=</font> temp<font color='#5555FF'>*</font>temp;
+        <b>}</b>
+
+        <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>ai <font color='#5555FF'>!</font><font color='#5555FF'>=</font> a.<font color='#BB00BB'>end</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            sum <font color='#5555FF'>+</font><font color='#5555FF'>=</font> a_scale<font color='#5555FF'>*</font>a_scale<font color='#5555FF'>*</font>ai<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>second<font color='#5555FF'>*</font>ai<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>second;
+            <font color='#5555FF'>+</font><font color='#5555FF'>+</font>ai;
+        <b>}</b>
+        <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>bi <font color='#5555FF'>!</font><font color='#5555FF'>=</font> b.<font color='#BB00BB'>end</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            sum <font color='#5555FF'>+</font><font color='#5555FF'>=</font> b_scale<font color='#5555FF'>*</font>b_scale<font color='#5555FF'>*</font>bi<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>second<font color='#5555FF'>*</font>bi<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>second;
+            <font color='#5555FF'>+</font><font color='#5555FF'>+</font>bi;
+        <b>}</b>
+
+        <font color='#0000FF'>return</font> sum;
+    <b>}</b>
+
+<font color='#009900'>// ------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> U<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>typename</font> T::value_type::second_type <b><a name='distance'></a>distance</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> a,
+        <font color='#0000FF'>const</font> U<font color='#5555FF'>&amp;</font> b
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>return</font> std::<font color='#BB00BB'>sqrt</font><font face='Lucida Console'>(</font><font color='#BB00BB'>distance_squared</font><font face='Lucida Console'>(</font>a,b<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> U, <font color='#0000FF'>typename</font> V, <font color='#0000FF'>typename</font> W<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>typename</font> T::value_type::second_type <b><a name='distance'></a>distance</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> V<font color='#5555FF'>&amp;</font> a_scale,
+        <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> a,
+        <font color='#0000FF'>const</font> W<font color='#5555FF'>&amp;</font> b_scale,
+        <font color='#0000FF'>const</font> U<font color='#5555FF'>&amp;</font> b
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>return</font> std::<font color='#BB00BB'>sqrt</font><font face='Lucida Console'>(</font><font color='#BB00BB'>distance_squared</font><font face='Lucida Console'>(</font>a_scale,a,b_scale,b<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ------------------------------------------------------------------------------------
+</font>    <font color='#009900'>// ------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> EXP<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>typename</font> enable_if<font color='#5555FF'>&lt;</font>is_matrix<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font>::type <b><a name='assign'></a>assign</b> <font face='Lucida Console'>(</font>
+        T<font color='#5555FF'>&amp;</font> dest,
+        <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&lt;</font>EXP<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> src
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#009900'>// make sure requires clause is not broken
+</font>        <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font><font color='#BB00BB'>is_vector</font><font face='Lucida Console'>(</font>src<font face='Lucida Console'>)</font>,
+                    "<font color='#CC0000'>\t void assign(dest,src)</font>"
+                    <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t the src matrix must be a row or column vector</font>"
+        <font face='Lucida Console'>)</font>;
+
+        dest <font color='#5555FF'>=</font> src;
+    <b>}</b>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> EXP<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>typename</font> disable_if<font color='#5555FF'>&lt;</font>is_matrix<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font>::type <b><a name='assign'></a>assign</b> <font face='Lucida Console'>(</font>
+        T<font color='#5555FF'>&amp;</font> dest,
+        <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&lt;</font>EXP<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> src
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#009900'>// make sure requires clause is not broken
+</font>        <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font><font color='#BB00BB'>is_vector</font><font face='Lucida Console'>(</font>src<font face='Lucida Console'>)</font>,
+                    "<font color='#CC0000'>\t void assign(dest,src)</font>"
+                    <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t the src matrix must be a row or column vector</font>"
+        <font face='Lucida Console'>)</font>;
+
+        dest.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> T::value_type item_type;
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> src.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+        <b>{</b>
+            dest.<font color='#BB00BB'>insert</font><font face='Lucida Console'>(</font>dest.<font color='#BB00BB'>end</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,<font color='#BB00BB'>item_type</font><font face='Lucida Console'>(</font>i, <font color='#BB00BB'>src</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+    <b>}</b>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> U<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>typename</font> disable_if_c<font color='#5555FF'>&lt;</font>is_matrix<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font>::value <font color='#5555FF'>|</font><font color='#5555FF'>|</font> is_matrix<font color='#5555FF'>&lt;</font>U<font color='#5555FF'>&gt;</font>::value<font color='#5555FF'>&gt;</font>::type <b><a name='assign'></a>assign</b> <font face='Lucida Console'>(</font>
+        T<font color='#5555FF'>&amp;</font> dest,        <font color='#009900'>// sparse
+</font>        <font color='#0000FF'>const</font> U<font color='#5555FF'>&amp;</font> src    <font color='#009900'>// sparse
+</font>    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        dest.<font color='#BB00BB'>assign</font><font face='Lucida Console'>(</font>src.<font color='#BB00BB'>begin</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, src.<font color='#BB00BB'>end</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> U, <font color='#0000FF'>typename</font> Comp, <font color='#0000FF'>typename</font> Alloc, <font color='#0000FF'>typename</font> S<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>typename</font> disable_if<font color='#5555FF'>&lt;</font>is_matrix<font color='#5555FF'>&lt;</font>S<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font>::type <b><a name='assign'></a>assign</b> <font face='Lucida Console'>(</font>
+        std::map<font color='#5555FF'>&lt;</font>T,U,Comp,Alloc<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> dest, <font color='#009900'>// sparse
+</font>        <font color='#0000FF'>const</font> S<font color='#5555FF'>&amp;</font> src                    <font color='#009900'>// sparse
+</font>    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        dest.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        dest.<font color='#BB00BB'>insert</font><font face='Lucida Console'>(</font>src.<font color='#BB00BB'>begin</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, src.<font color='#BB00BB'>end</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ------------------------------------------------------------------------------------
+</font>    <font color='#009900'>// ------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>struct</font> <b><a name='has_unsigned_keys'></a>has_unsigned_keys</b>
+    <b>{</b>
+        <font color='#0000FF'>static</font> <font color='#0000FF'>const</font> <font color='#0000FF'><u>bool</u></font> value <font color='#5555FF'>=</font> is_unsigned_type<font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T::value_type::first_type<font color='#5555FF'>&gt;</font>::value;
+    <b>}</b>;
+
+<font color='#009900'>// ------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>namespace</font> impl
+    <b>{</b>
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> U<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>typename</font> T::value_type::second_type <b><a name='general_dot'></a>general_dot</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> a,
+            <font color='#0000FF'>const</font> U<font color='#5555FF'>&amp;</font> b
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> T::value_type::second_type scalar_type;
+
+            <font color='#0000FF'>typename</font> T::const_iterator ai <font color='#5555FF'>=</font> a.<font color='#BB00BB'>begin</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>typename</font> U::const_iterator bi <font color='#5555FF'>=</font> b.<font color='#BB00BB'>begin</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+            scalar_type sum <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>ai <font color='#5555FF'>!</font><font color='#5555FF'>=</font> a.<font color='#BB00BB'>end</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> bi <font color='#5555FF'>!</font><font color='#5555FF'>=</font> b.<font color='#BB00BB'>end</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>ai<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>first <font color='#5555FF'>=</font><font color='#5555FF'>=</font> bi<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>first<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    sum <font color='#5555FF'>+</font><font color='#5555FF'>=</font> ai<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>second <font color='#5555FF'>*</font> bi<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>second;
+                    <font color='#5555FF'>+</font><font color='#5555FF'>+</font>ai;
+                    <font color='#5555FF'>+</font><font color='#5555FF'>+</font>bi;
+                <b>}</b>
+                <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>ai<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>first <font color='#5555FF'>&lt;</font> bi<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>first<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#5555FF'>+</font><font color='#5555FF'>+</font>ai;
+                <b>}</b>
+                <font color='#0000FF'>else</font> 
+                <b>{</b>
+                    <font color='#5555FF'>+</font><font color='#5555FF'>+</font>bi;
+                <b>}</b>
+            <b>}</b>
+
+            <font color='#0000FF'>return</font> sum;
+        <b>}</b>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> U<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>inline</font> <font color='#0000FF'>typename</font> T::value_type::second_type <b><a name='dot'></a>dot</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> a,
+            <font color='#0000FF'>const</font> U<font color='#5555FF'>&amp;</font> b
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>return</font> <font color='#BB00BB'>general_dot</font><font face='Lucida Console'>(</font>a,b<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> U, <font color='#0000FF'>typename</font> alloc<font color='#5555FF'>&gt;</font>
+        U <b><a name='dot'></a>dot</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>std::pair<font color='#5555FF'>&lt;</font>T,U<font color='#5555FF'>&gt;</font>,alloc<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> a,
+            <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>std::pair<font color='#5555FF'>&lt;</font>T,U<font color='#5555FF'>&gt;</font>,alloc<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> b
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#009900'>// You are getting this error because you are attempting to use sparse sample vectors 
+</font>            <font color='#009900'>// but you aren't using an unsigned integer as your key type in the sparse vectors.
+</font>            <font color='#BB00BB'>COMPILE_TIME_ASSERT</font><font face='Lucida Console'>(</font>is_unsigned_type<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font>::value<font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>a.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font> <font color='#5555FF'>|</font><font color='#5555FF'>|</font> b.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                <font color='#0000FF'>return</font> <font color='#979000'>0</font>;
+
+            <font color='#009900'>// if a is really a dense vector but just represented in a sparse container
+</font>            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>a.<font color='#BB00BB'>back</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.first <font color='#5555FF'>=</font><font color='#5555FF'>=</font> a.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'><u>double</u></font> sum <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> b.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>b[i].first <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> a.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                        <font color='#0000FF'>break</font>;
+                    sum <font color='#5555FF'>+</font><font color='#5555FF'>=</font> a[b[i].first].second <font color='#5555FF'>*</font> b[i].second;
+                <b>}</b>
+                <font color='#0000FF'>return</font> sum;
+            <b>}</b>
+            <font color='#009900'>// if b is really a dense vector but just represented in a sparse container
+</font>            <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>b.<font color='#BB00BB'>back</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.first <font color='#5555FF'>=</font><font color='#5555FF'>=</font> b.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'><u>double</u></font> sum <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> a.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>a[i].first <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> b.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                        <font color='#0000FF'>break</font>;
+                    sum <font color='#5555FF'>+</font><font color='#5555FF'>=</font> b[a[i].first].second <font color='#5555FF'>*</font> a[i].second;
+                <b>}</b>
+                <font color='#0000FF'>return</font> sum;
+            <b>}</b>
+            <font color='#0000FF'>else</font>
+            <b>{</b>
+                <font color='#0000FF'>return</font> <font color='#BB00BB'>general_dot</font><font face='Lucida Console'>(</font>a,b<font face='Lucida Console'>)</font>;
+            <b>}</b>
+        <b>}</b>
+    <b>}</b>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>inline</font> <font color='#0000FF'>typename</font> T::value_type::second_type <b><a name='dot'></a>dot</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> a,
+        <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> b
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>return</font> impl::<font color='#BB00BB'>dot</font><font face='Lucida Console'>(</font>a,b<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T1, <font color='#0000FF'>typename</font> T2, <font color='#0000FF'>typename</font> T3, <font color='#0000FF'>typename</font> T4, <font color='#0000FF'>typename</font> T5, <font color='#0000FF'>typename</font> T6<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>inline</font> T4 <b><a name='dot'></a>dot</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>T1,T2<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> a,
+        <font color='#0000FF'>const</font> std::map<font color='#5555FF'>&lt;</font>T3,T4,T5,T6<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> b
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>return</font> impl::<font color='#BB00BB'>dot</font><font face='Lucida Console'>(</font>a,b<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T1, <font color='#0000FF'>typename</font> T2, <font color='#0000FF'>typename</font> T3, <font color='#0000FF'>typename</font> T4, <font color='#0000FF'>typename</font> T5, <font color='#0000FF'>typename</font> T6<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>inline</font> T4 <b><a name='dot'></a>dot</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> std::map<font color='#5555FF'>&lt;</font>T3,T4,T5,T6<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> a,
+        <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>T1,T2<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> b
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>return</font> impl::<font color='#BB00BB'>dot</font><font face='Lucida Console'>(</font>a,b<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> EXP<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>typename</font> T::value_type::second_type <b><a name='dot'></a>dot</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> a,
+        <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&lt;</font>EXP<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> b
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#009900'>// make sure requires clause is not broken
+</font>        <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font><font color='#BB00BB'>is_vector</font><font face='Lucida Console'>(</font>b<font face='Lucida Console'>)</font>,
+                    "<font color='#CC0000'>\t scalar_type dot(sparse_vector a, dense_vector b)</font>"
+                    <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t 'b' must be a vector to be used in a dot product.</font>" 
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> T::value_type::second_type scalar_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> T::value_type::first_type first_type;
+
+        scalar_type sum <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'>typename</font> T::const_iterator ai <font color='#5555FF'>=</font> a.<font color='#BB00BB'>begin</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; 
+             <font face='Lucida Console'>(</font>ai <font color='#5555FF'>!</font><font color='#5555FF'>=</font> a.<font color='#BB00BB'>end</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> <font face='Lucida Console'>(</font>ai<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>first <font color='#5555FF'>&lt;</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font>first_type<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>b.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>; 
+             <font color='#5555FF'>+</font><font color='#5555FF'>+</font>ai<font face='Lucida Console'>)</font>
+        <b>{</b>
+            sum <font color='#5555FF'>+</font><font color='#5555FF'>=</font> ai<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>second <font color='#5555FF'>*</font> <font color='#BB00BB'>b</font><font face='Lucida Console'>(</font>ai<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>first<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>return</font> sum;
+    <b>}</b>
+
+<font color='#009900'>// ------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> EXP<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>typename</font> T::value_type::second_type <b><a name='dot'></a>dot</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&lt;</font>EXP<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> b,
+        <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> a
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>return</font> <font color='#BB00BB'>dot</font><font face='Lucida Console'>(</font>a,b<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>typename</font> T::value_type::second_type <b><a name='length_squared'></a>length_squared</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> a
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> T::value_type::second_type scalar_type;
+
+        <font color='#0000FF'>typename</font> T::const_iterator i;
+
+        scalar_type sum <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>i <font color='#5555FF'>=</font> a.<font color='#BB00BB'>begin</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; i <font color='#5555FF'>!</font><font color='#5555FF'>=</font> a.<font color='#BB00BB'>end</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+        <b>{</b>
+            sum <font color='#5555FF'>+</font><font color='#5555FF'>=</font> i<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>second <font color='#5555FF'>*</font> i<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>second;
+        <b>}</b>
+
+        <font color='#0000FF'>return</font> sum;
+    <b>}</b>
+
+<font color='#009900'>// ------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>typename</font> T::value_type::second_type <b><a name='length'></a>length</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> a
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>return</font> std::<font color='#BB00BB'>sqrt</font><font face='Lucida Console'>(</font><font color='#BB00BB'>length_squared</font><font face='Lucida Console'>(</font>a<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> U<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>typename</font> disable_if<font color='#5555FF'>&lt;</font>is_matrix<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font>,<font color='#0000FF'><u>void</u></font><font color='#5555FF'>&gt;</font>::type <b><a name='scale_by'></a>scale_by</b> <font face='Lucida Console'>(</font>
+        T<font color='#5555FF'>&amp;</font> a,
+        <font color='#0000FF'>const</font> U<font color='#5555FF'>&amp;</font> value
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'>typename</font> T::iterator i <font color='#5555FF'>=</font> a.<font color='#BB00BB'>begin</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; i <font color='#5555FF'>!</font><font color='#5555FF'>=</font> a.<font color='#BB00BB'>end</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+        <b>{</b>
+            i<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>second <font color='#5555FF'>*</font><font color='#5555FF'>=</font> value;
+        <b>}</b>
+    <b>}</b>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> U<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>typename</font> enable_if<font color='#5555FF'>&lt;</font>is_matrix<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font>,<font color='#0000FF'><u>void</u></font><font color='#5555FF'>&gt;</font>::type <b><a name='scale_by'></a>scale_by</b> <font face='Lucida Console'>(</font>
+        T<font color='#5555FF'>&amp;</font> a,
+        <font color='#0000FF'>const</font> U<font color='#5555FF'>&amp;</font> value
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        a <font color='#5555FF'>*</font><font color='#5555FF'>=</font> value;
+    <b>}</b>
+
+<font color='#009900'>// ------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>typename</font> disable_if<font color='#5555FF'>&lt;</font>is_matrix<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font>,T<font color='#5555FF'>&gt;</font>::type <b><a name='add'></a>add</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> a,
+        <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> b
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        T temp;
+
+        <font color='#0000FF'>typename</font> T::const_iterator i <font color='#5555FF'>=</font> a.<font color='#BB00BB'>begin</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>typename</font> T::const_iterator j <font color='#5555FF'>=</font> b.<font color='#BB00BB'>begin</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>i <font color='#5555FF'>!</font><font color='#5555FF'>=</font> a.<font color='#BB00BB'>end</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> j <font color='#5555FF'>!</font><font color='#5555FF'>=</font> b.<font color='#BB00BB'>end</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>i<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>first <font color='#5555FF'>=</font><font color='#5555FF'>=</font> j<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>first<font face='Lucida Console'>)</font>
+            <b>{</b>
+                temp.<font color='#BB00BB'>insert</font><font face='Lucida Console'>(</font>temp.<font color='#BB00BB'>end</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, std::<font color='#BB00BB'>make_pair</font><font face='Lucida Console'>(</font>i<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>first, i<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>second <font color='#5555FF'>+</font> j<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>second<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i;
+                <font color='#5555FF'>+</font><font color='#5555FF'>+</font>j;
+            <b>}</b>
+            <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>i<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>first <font color='#5555FF'>&lt;</font> j<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>first<font face='Lucida Console'>)</font>
+            <b>{</b>
+                temp.<font color='#BB00BB'>insert</font><font face='Lucida Console'>(</font>temp.<font color='#BB00BB'>end</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, <font color='#5555FF'>*</font>i<font face='Lucida Console'>)</font>;
+                <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i;
+            <b>}</b>
+            <font color='#0000FF'>else</font>
+            <b>{</b>
+                temp.<font color='#BB00BB'>insert</font><font face='Lucida Console'>(</font>temp.<font color='#BB00BB'>end</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, <font color='#5555FF'>*</font>j<font face='Lucida Console'>)</font>;
+                <font color='#5555FF'>+</font><font color='#5555FF'>+</font>j;
+            <b>}</b>
+        <b>}</b>
+
+        <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>i <font color='#5555FF'>!</font><font color='#5555FF'>=</font> a.<font color='#BB00BB'>end</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            temp.<font color='#BB00BB'>insert</font><font face='Lucida Console'>(</font>temp.<font color='#BB00BB'>end</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, <font color='#5555FF'>*</font>i<font face='Lucida Console'>)</font>;
+            <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i;
+        <b>}</b>
+        <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>j <font color='#5555FF'>!</font><font color='#5555FF'>=</font> b.<font color='#BB00BB'>end</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            temp.<font color='#BB00BB'>insert</font><font face='Lucida Console'>(</font>temp.<font color='#BB00BB'>end</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, <font color='#5555FF'>*</font>j<font face='Lucida Console'>)</font>;
+            <font color='#5555FF'>+</font><font color='#5555FF'>+</font>j;
+        <b>}</b>
+
+        <font color='#0000FF'>return</font> temp;
+    <b>}</b>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> U<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>typename</font> enable_if_c<font color='#5555FF'>&lt;</font>is_matrix<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font>::value <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> is_matrix<font color='#5555FF'>&lt;</font>U<font color='#5555FF'>&gt;</font>::value, matrix_add_exp<font color='#5555FF'>&lt;</font>T,U<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font>::type <b><a name='add'></a>add</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> a,
+        <font color='#0000FF'>const</font> U<font color='#5555FF'>&amp;</font> b
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>return</font> matrix_add_exp<font color='#5555FF'>&lt;</font>T,U<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>a.<font color='#BB00BB'>ref</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,b.<font color='#BB00BB'>ref</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>typename</font> disable_if<font color='#5555FF'>&lt;</font>is_matrix<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font>,T<font color='#5555FF'>&gt;</font>::type <b><a name='subtract'></a>subtract</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> a,
+        <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> b
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        T temp;
+
+        <font color='#0000FF'>typename</font> T::const_iterator i <font color='#5555FF'>=</font> a.<font color='#BB00BB'>begin</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>typename</font> T::const_iterator j <font color='#5555FF'>=</font> b.<font color='#BB00BB'>begin</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>i <font color='#5555FF'>!</font><font color='#5555FF'>=</font> a.<font color='#BB00BB'>end</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> j <font color='#5555FF'>!</font><font color='#5555FF'>=</font> b.<font color='#BB00BB'>end</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>i<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>first <font color='#5555FF'>=</font><font color='#5555FF'>=</font> j<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>first<font face='Lucida Console'>)</font>
+            <b>{</b>
+                temp.<font color='#BB00BB'>insert</font><font face='Lucida Console'>(</font>temp.<font color='#BB00BB'>end</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, std::<font color='#BB00BB'>make_pair</font><font face='Lucida Console'>(</font>i<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>first, i<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>second <font color='#5555FF'>-</font> j<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>second<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i;
+                <font color='#5555FF'>+</font><font color='#5555FF'>+</font>j;
+            <b>}</b>
+            <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>i<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>first <font color='#5555FF'>&lt;</font> j<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>first<font face='Lucida Console'>)</font>
+            <b>{</b>
+                temp.<font color='#BB00BB'>insert</font><font face='Lucida Console'>(</font>temp.<font color='#BB00BB'>end</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, <font color='#5555FF'>*</font>i<font face='Lucida Console'>)</font>;
+                <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i;
+            <b>}</b>
+            <font color='#0000FF'>else</font>
+            <b>{</b>
+                temp.<font color='#BB00BB'>insert</font><font face='Lucida Console'>(</font>temp.<font color='#BB00BB'>end</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, std::<font color='#BB00BB'>make_pair</font><font face='Lucida Console'>(</font>j<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>first, <font color='#5555FF'>-</font>j<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>second<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                <font color='#5555FF'>+</font><font color='#5555FF'>+</font>j;
+            <b>}</b>
+        <b>}</b>
+
+        <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>i <font color='#5555FF'>!</font><font color='#5555FF'>=</font> a.<font color='#BB00BB'>end</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            temp.<font color='#BB00BB'>insert</font><font face='Lucida Console'>(</font>temp.<font color='#BB00BB'>end</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, <font color='#5555FF'>*</font>i<font face='Lucida Console'>)</font>;
+            <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i;
+        <b>}</b>
+        <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>j <font color='#5555FF'>!</font><font color='#5555FF'>=</font> b.<font color='#BB00BB'>end</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            temp.<font color='#BB00BB'>insert</font><font face='Lucida Console'>(</font>temp.<font color='#BB00BB'>end</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, std::<font color='#BB00BB'>make_pair</font><font face='Lucida Console'>(</font>j<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>first, <font color='#5555FF'>-</font>j<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>second<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <font color='#5555FF'>+</font><font color='#5555FF'>+</font>j;
+        <b>}</b>
+
+        <font color='#0000FF'>return</font> temp;
+    <b>}</b>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> U<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>typename</font> enable_if_c<font color='#5555FF'>&lt;</font>is_matrix<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font>::value <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> is_matrix<font color='#5555FF'>&lt;</font>U<font color='#5555FF'>&gt;</font>::value, matrix_subtract_exp<font color='#5555FF'>&lt;</font>T,U<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font>::type <b><a name='subtract'></a>subtract</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> a,
+        <font color='#0000FF'>const</font> U<font color='#5555FF'>&amp;</font> b
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>return</font> matrix_subtract_exp<font color='#5555FF'>&lt;</font>T,U<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>a.<font color='#BB00BB'>ref</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,b.<font color='#BB00BB'>ref</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ------------------------------------------------------------------------------------
+</font><font color='#009900'>// ------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>namespace</font> impl
+    <b>{</b>
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>typename</font> enable_if<font color='#5555FF'>&lt;</font>is_matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T::type<font color='#5555FF'>&gt;</font>,<font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font>::type <b><a name='max_index_plus_one'></a>max_index_plus_one</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> samples
+        <font face='Lucida Console'>)</font> 
+        <b>{</b>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>samples.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                <font color='#0000FF'>return</font> <font color='#BB00BB'>samples</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>else</font>
+                <font color='#0000FF'>return</font> <font color='#979000'>0</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>typename</font> enable_if<font color='#5555FF'>&lt;</font>is_built_in_scalar_type<font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T::type<font color='#5555FF'>&gt;</font>,<font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font>::type <b><a name='max_index_plus_one'></a>max_index_plus_one</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> sample
+        <font face='Lucida Console'>)</font> 
+        <b>{</b>
+            <font color='#0000FF'>return</font> sample.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#009900'>// This !is_built_in_scalar_type&lt;typename T::type&gt;::value is here to avoid an inexplicable bug in Vistual Studio 2005
+</font>        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>typename</font> enable_if_c<font color='#5555FF'>&lt;</font><font face='Lucida Console'>(</font><font color='#5555FF'>!</font>is_built_in_scalar_type<font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T::type<font color='#5555FF'>&gt;</font>::value<font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> <font face='Lucida Console'>(</font>is_pair<font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T::type::value_type<font color='#5555FF'>&gt;</font>::value<font face='Lucida Console'>)</font> ,<font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font>::type 
+        <b><a name='max_index_plus_one'></a>max_index_plus_one</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> samples
+        <font face='Lucida Console'>)</font> 
+        <b>{</b>
+            <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> T::type sample_type;
+            <font color='#009900'>// You are getting this error because you are attempting to use sparse sample vectors 
+</font>            <font color='#009900'>// but you aren't using an unsigned integer as your key type in the sparse vectors.
+</font>            <font color='#BB00BB'>COMPILE_TIME_ASSERT</font><font face='Lucida Console'>(</font>has_unsigned_keys<font color='#5555FF'>&lt;</font>sample_type<font color='#5555FF'>&gt;</font>::value<font face='Lucida Console'>)</font>;
+
+
+            <font color='#009900'>// these should be sparse samples so look over all them to find the max index.
+</font>            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> max_dim <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> samples.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>samples</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                    max_dim <font color='#5555FF'>=</font> std::max<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>max_dim, <font face='Lucida Console'>(</font><font color='#5555FF'>-</font><font color='#5555FF'>-</font><font color='#BB00BB'>samples</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>.<font color='#BB00BB'>end</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>first <font color='#5555FF'>+</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+            <font color='#0000FF'>return</font> max_dim;
+        <b>}</b>
+    <b>}</b>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>typename</font> enable_if<font color='#5555FF'>&lt;</font>is_pair<font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T::value_type<font color='#5555FF'>&gt;</font>,<font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font>::type <b><a name='max_index_plus_one'></a>max_index_plus_one</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> sample
+    <font face='Lucida Console'>)</font> 
+    <b>{</b>
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>sample.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+            <font color='#0000FF'>return</font> <font face='Lucida Console'>(</font><font color='#5555FF'>-</font><font color='#5555FF'>-</font>sample.<font color='#BB00BB'>end</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>first <font color='#5555FF'>+</font> <font color='#979000'>1</font>;
+        <font color='#0000FF'>return</font> <font color='#979000'>0</font>;
+    <b>}</b>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>typename</font> disable_if_c<font color='#5555FF'>&lt;</font>is_pair<font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T::value_type<font color='#5555FF'>&gt;</font>::value <font color='#5555FF'>|</font><font color='#5555FF'>|</font>
+                          is_same_type<font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T::value_type,sample_pair<font color='#5555FF'>&gt;</font>::value <font color='#5555FF'>|</font><font color='#5555FF'>|</font>
+                          is_same_type<font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T::value_type,ordered_sample_pair<font color='#5555FF'>&gt;</font>::value , <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font>::type 
+    <b><a name='max_index_plus_one'></a>max_index_plus_one</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> samples
+    <font face='Lucida Console'>)</font> 
+    <b>{</b>
+        <font color='#0000FF'>return</font> impl::<font color='#BB00BB'>max_index_plus_one</font><font face='Lucida Console'>(</font><font color='#BB00BB'>mat</font><font face='Lucida Console'>(</font>samples<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T, <font color='#0000FF'><u>long</u></font> NR, <font color='#0000FF'><u>long</u></font> NC, <font color='#0000FF'>typename</font> MM, <font color='#0000FF'>typename</font> L, <font color='#0000FF'>typename</font> EXP<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='add_to'></a>add_to</b> <font face='Lucida Console'>(</font>
+        matrix<font color='#5555FF'>&lt;</font>T,NR,NC,MM,L<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> dest,
+        <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&lt;</font>EXP<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> src 
+    <font face='Lucida Console'>)</font> 
+    <b>{</b>
+        <font color='#009900'>// make sure requires clause is not broken
+</font>        <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font><font color='#BB00BB'>is_vector</font><font face='Lucida Console'>(</font>dest<font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> <font color='#BB00BB'>max_index_plus_one</font><font face='Lucida Console'>(</font>src<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>dest.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>,
+                    "<font color='#CC0000'>\t void add_to(dest,src)</font>"
+                    <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t dest must be a vector large enough to hold the src vector.</font>"
+                    <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t is_vector(dest):         </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>is_vector</font><font face='Lucida Console'>(</font>dest<font face='Lucida Console'>)</font>
+                    <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t max_index_plus_one(src): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>max_index_plus_one</font><font face='Lucida Console'>(</font>src<font face='Lucida Console'>)</font>
+                    <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t dest.size():             </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> dest.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> 
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> r <font color='#5555FF'>=</font> <font color='#979000'>0</font>; r <font color='#5555FF'>&lt;</font> src.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>r<font face='Lucida Console'>)</font>
+            <font color='#BB00BB'>dest</font><font face='Lucida Console'>(</font>r<font face='Lucida Console'>)</font> <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#BB00BB'>src</font><font face='Lucida Console'>(</font>r<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T, <font color='#0000FF'><u>long</u></font> NR, <font color='#0000FF'><u>long</u></font> NC, <font color='#0000FF'>typename</font> MM, <font color='#0000FF'>typename</font> L, <font color='#0000FF'>typename</font> EXP<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>inline</font> <font color='#0000FF'>typename</font> disable_if<font color='#5555FF'>&lt;</font>is_matrix<font color='#5555FF'>&lt;</font>EXP<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font>::type <b><a name='add_to'></a>add_to</b> <font face='Lucida Console'>(</font>
+        matrix<font color='#5555FF'>&lt;</font>T,NR,NC,MM,L<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> dest,
+        <font color='#0000FF'>const</font> EXP<font color='#5555FF'>&amp;</font> src
+    <font face='Lucida Console'>)</font> 
+    <b>{</b>
+        <font color='#009900'>// make sure requires clause is not broken
+</font>        <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font><font color='#BB00BB'>is_vector</font><font face='Lucida Console'>(</font>dest<font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> <font color='#BB00BB'>max_index_plus_one</font><font face='Lucida Console'>(</font>src<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>dest.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>,
+                    "<font color='#CC0000'>\t void add_to(dest,src)</font>"
+                    <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t dest must be a vector large enough to hold the src vector.</font>"
+                    <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t is_vector(dest):         </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>is_vector</font><font face='Lucida Console'>(</font>dest<font face='Lucida Console'>)</font>
+                    <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t max_index_plus_one(src): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>max_index_plus_one</font><font face='Lucida Console'>(</font>src<font face='Lucida Console'>)</font>
+                    <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t dest.size():             </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> dest.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> 
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'>typename</font> EXP::const_iterator i <font color='#5555FF'>=</font> src.<font color='#BB00BB'>begin</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; i <font color='#5555FF'>!</font><font color='#5555FF'>=</font> src.<font color='#BB00BB'>end</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <font color='#BB00BB'>dest</font><font face='Lucida Console'>(</font>i<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>first<font face='Lucida Console'>)</font> <font color='#5555FF'>+</font><font color='#5555FF'>=</font> i<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>second;
+    <b>}</b>
+
+<font color='#009900'>// ------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T, <font color='#0000FF'><u>long</u></font> NR, <font color='#0000FF'><u>long</u></font> NC, <font color='#0000FF'>typename</font> MM, <font color='#0000FF'>typename</font> L, <font color='#0000FF'>typename</font> EXP, <font color='#0000FF'>typename</font> U<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='add_to'></a>add_to</b> <font face='Lucida Console'>(</font>
+        matrix<font color='#5555FF'>&lt;</font>T,NR,NC,MM,L<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> dest,
+        <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&lt;</font>EXP<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> src,
+        <font color='#0000FF'>const</font> U<font color='#5555FF'>&amp;</font> C
+    <font face='Lucida Console'>)</font> 
+    <b>{</b>
+        <font color='#009900'>// make sure requires clause is not broken
+</font>        <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font><font color='#BB00BB'>is_vector</font><font face='Lucida Console'>(</font>dest<font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> <font color='#BB00BB'>max_index_plus_one</font><font face='Lucida Console'>(</font>src<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>dest.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>,
+                    "<font color='#CC0000'>\t void add_to(dest,src)</font>"
+                    <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t dest must be a vector large enough to hold the src vector.</font>"
+                    <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t is_vector(dest):         </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>is_vector</font><font face='Lucida Console'>(</font>dest<font face='Lucida Console'>)</font>
+                    <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t max_index_plus_one(src): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>max_index_plus_one</font><font face='Lucida Console'>(</font>src<font face='Lucida Console'>)</font>
+                    <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t dest.size():             </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> dest.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> 
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> r <font color='#5555FF'>=</font> <font color='#979000'>0</font>; r <font color='#5555FF'>&lt;</font> src.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>r<font face='Lucida Console'>)</font>
+            <font color='#BB00BB'>dest</font><font face='Lucida Console'>(</font>r<font face='Lucida Console'>)</font> <font color='#5555FF'>+</font><font color='#5555FF'>=</font> C<font color='#5555FF'>*</font><font color='#BB00BB'>src</font><font face='Lucida Console'>(</font>r<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T, <font color='#0000FF'><u>long</u></font> NR, <font color='#0000FF'><u>long</u></font> NC, <font color='#0000FF'>typename</font> MM, <font color='#0000FF'>typename</font> L, <font color='#0000FF'>typename</font> EXP, <font color='#0000FF'>typename</font> U<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>inline</font> <font color='#0000FF'>typename</font> disable_if<font color='#5555FF'>&lt;</font>is_matrix<font color='#5555FF'>&lt;</font>EXP<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font>::type <b><a name='add_to'></a>add_to</b> <font face='Lucida Console'>(</font>
+        matrix<font color='#5555FF'>&lt;</font>T,NR,NC,MM,L<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> dest,
+        <font color='#0000FF'>const</font> EXP<font color='#5555FF'>&amp;</font> src,
+        <font color='#0000FF'>const</font> U<font color='#5555FF'>&amp;</font> C
+    <font face='Lucida Console'>)</font> 
+    <b>{</b>
+        <font color='#009900'>// make sure requires clause is not broken
+</font>        <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font><font color='#BB00BB'>is_vector</font><font face='Lucida Console'>(</font>dest<font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> <font color='#BB00BB'>max_index_plus_one</font><font face='Lucida Console'>(</font>src<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>dest.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>,
+                    "<font color='#CC0000'>\t void add_to(dest,src)</font>"
+                    <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t dest must be a vector large enough to hold the src vector.</font>"
+                    <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t is_vector(dest):         </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>is_vector</font><font face='Lucida Console'>(</font>dest<font face='Lucida Console'>)</font>
+                    <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t max_index_plus_one(src): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>max_index_plus_one</font><font face='Lucida Console'>(</font>src<font face='Lucida Console'>)</font>
+                    <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t dest.size():             </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> dest.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> 
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'>typename</font> EXP::const_iterator i <font color='#5555FF'>=</font> src.<font color='#BB00BB'>begin</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; i <font color='#5555FF'>!</font><font color='#5555FF'>=</font> src.<font color='#BB00BB'>end</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <font color='#BB00BB'>dest</font><font face='Lucida Console'>(</font>i<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>first<font face='Lucida Console'>)</font> <font color='#5555FF'>+</font><font color='#5555FF'>=</font> C<font color='#5555FF'>*</font>i<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>second;
+    <b>}</b>
+
+<font color='#009900'>// ------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T, <font color='#0000FF'><u>long</u></font> NR, <font color='#0000FF'><u>long</u></font> NC, <font color='#0000FF'>typename</font> MM, <font color='#0000FF'>typename</font> L, <font color='#0000FF'>typename</font> EXP<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='subtract_from'></a>subtract_from</b> <font face='Lucida Console'>(</font>
+        matrix<font color='#5555FF'>&lt;</font>T,NR,NC,MM,L<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> dest,
+        <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&lt;</font>EXP<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> src 
+    <font face='Lucida Console'>)</font> 
+    <b>{</b>
+        <font color='#009900'>// make sure requires clause is not broken
+</font>        <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font><font color='#BB00BB'>is_vector</font><font face='Lucida Console'>(</font>dest<font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> <font color='#BB00BB'>max_index_plus_one</font><font face='Lucida Console'>(</font>src<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>dest.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>,
+                    "<font color='#CC0000'>\t void subtract_from(dest,src)</font>"
+                    <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t dest must be a vector large enough to hold the src vector.</font>"
+                    <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t is_vector(dest):         </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>is_vector</font><font face='Lucida Console'>(</font>dest<font face='Lucida Console'>)</font>
+                    <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t max_index_plus_one(src): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>max_index_plus_one</font><font face='Lucida Console'>(</font>src<font face='Lucida Console'>)</font>
+                    <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t dest.size():             </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> dest.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> 
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> r <font color='#5555FF'>=</font> <font color='#979000'>0</font>; r <font color='#5555FF'>&lt;</font> src.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>r<font face='Lucida Console'>)</font>
+            <font color='#BB00BB'>dest</font><font face='Lucida Console'>(</font>r<font face='Lucida Console'>)</font> <font color='#5555FF'>-</font><font color='#5555FF'>=</font> <font color='#BB00BB'>src</font><font face='Lucida Console'>(</font>r<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T, <font color='#0000FF'><u>long</u></font> NR, <font color='#0000FF'><u>long</u></font> NC, <font color='#0000FF'>typename</font> MM, <font color='#0000FF'>typename</font> L, <font color='#0000FF'>typename</font> EXP<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>inline</font> <font color='#0000FF'>typename</font> disable_if<font color='#5555FF'>&lt;</font>is_matrix<font color='#5555FF'>&lt;</font>EXP<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font>::type <b><a name='subtract_from'></a>subtract_from</b> <font face='Lucida Console'>(</font>
+        matrix<font color='#5555FF'>&lt;</font>T,NR,NC,MM,L<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> dest,
+        <font color='#0000FF'>const</font> EXP<font color='#5555FF'>&amp;</font> src
+    <font face='Lucida Console'>)</font> 
+    <b>{</b>
+        <font color='#009900'>// make sure requires clause is not broken
+</font>        <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font><font color='#BB00BB'>is_vector</font><font face='Lucida Console'>(</font>dest<font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> <font color='#BB00BB'>max_index_plus_one</font><font face='Lucida Console'>(</font>src<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>dest.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>,
+                    "<font color='#CC0000'>\t void subtract_from(dest,src)</font>"
+                    <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t dest must be a vector large enough to hold the src vector.</font>"
+                    <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t is_vector(dest):         </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>is_vector</font><font face='Lucida Console'>(</font>dest<font face='Lucida Console'>)</font>
+                    <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t max_index_plus_one(src): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>max_index_plus_one</font><font face='Lucida Console'>(</font>src<font face='Lucida Console'>)</font>
+                    <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t dest.size():             </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> dest.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> 
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'>typename</font> EXP::const_iterator i <font color='#5555FF'>=</font> src.<font color='#BB00BB'>begin</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; i <font color='#5555FF'>!</font><font color='#5555FF'>=</font> src.<font color='#BB00BB'>end</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <font color='#BB00BB'>dest</font><font face='Lucida Console'>(</font>i<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>first<font face='Lucida Console'>)</font> <font color='#5555FF'>-</font><font color='#5555FF'>=</font> i<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>second;
+    <b>}</b>
+
+<font color='#009900'>// ------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T, <font color='#0000FF'><u>long</u></font> NR, <font color='#0000FF'><u>long</u></font> NC, <font color='#0000FF'>typename</font> MM, <font color='#0000FF'>typename</font> L, <font color='#0000FF'>typename</font> EXP, <font color='#0000FF'>typename</font> U<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='subtract_from'></a>subtract_from</b> <font face='Lucida Console'>(</font>
+        matrix<font color='#5555FF'>&lt;</font>T,NR,NC,MM,L<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> dest,
+        <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&lt;</font>EXP<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> src,
+        <font color='#0000FF'>const</font> U<font color='#5555FF'>&amp;</font> C
+    <font face='Lucida Console'>)</font> 
+    <b>{</b>
+        <font color='#009900'>// make sure requires clause is not broken
+</font>        <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font><font color='#BB00BB'>is_vector</font><font face='Lucida Console'>(</font>dest<font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> <font color='#BB00BB'>max_index_plus_one</font><font face='Lucida Console'>(</font>src<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>dest.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>,
+                    "<font color='#CC0000'>\t void subtract_from(dest,src)</font>"
+                    <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t dest must be a vector large enough to hold the src vector.</font>"
+                    <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t is_vector(dest):         </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>is_vector</font><font face='Lucida Console'>(</font>dest<font face='Lucida Console'>)</font>
+                    <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t max_index_plus_one(src): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>max_index_plus_one</font><font face='Lucida Console'>(</font>src<font face='Lucida Console'>)</font>
+                    <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t dest.size():             </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> dest.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> 
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> r <font color='#5555FF'>=</font> <font color='#979000'>0</font>; r <font color='#5555FF'>&lt;</font> src.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>r<font face='Lucida Console'>)</font>
+            <font color='#BB00BB'>dest</font><font face='Lucida Console'>(</font>r<font face='Lucida Console'>)</font> <font color='#5555FF'>-</font><font color='#5555FF'>=</font> C<font color='#5555FF'>*</font><font color='#BB00BB'>src</font><font face='Lucida Console'>(</font>r<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T, <font color='#0000FF'><u>long</u></font> NR, <font color='#0000FF'><u>long</u></font> NC, <font color='#0000FF'>typename</font> MM, <font color='#0000FF'>typename</font> L, <font color='#0000FF'>typename</font> EXP, <font color='#0000FF'>typename</font> U<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>inline</font> <font color='#0000FF'>typename</font> disable_if<font color='#5555FF'>&lt;</font>is_matrix<font color='#5555FF'>&lt;</font>EXP<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font>::type <b><a name='subtract_from'></a>subtract_from</b> <font face='Lucida Console'>(</font>
+        matrix<font color='#5555FF'>&lt;</font>T,NR,NC,MM,L<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> dest,
+        <font color='#0000FF'>const</font> EXP<font color='#5555FF'>&amp;</font> src,
+        <font color='#0000FF'>const</font> U<font color='#5555FF'>&amp;</font> C
+    <font face='Lucida Console'>)</font> 
+    <b>{</b>
+        <font color='#009900'>// make sure requires clause is not broken
+</font>        <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font><font color='#BB00BB'>is_vector</font><font face='Lucida Console'>(</font>dest<font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> <font color='#BB00BB'>max_index_plus_one</font><font face='Lucida Console'>(</font>src<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>dest.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>,
+                    "<font color='#CC0000'>\t void subtract_from(dest,src)</font>"
+                    <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t dest must be a vector large enough to hold the src vector.</font>"
+                    <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t is_vector(dest):         </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>is_vector</font><font face='Lucida Console'>(</font>dest<font face='Lucida Console'>)</font>
+                    <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t max_index_plus_one(src): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>max_index_plus_one</font><font face='Lucida Console'>(</font>src<font face='Lucida Console'>)</font>
+                    <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t dest.size():             </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> dest.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> 
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'>typename</font> EXP::const_iterator i <font color='#5555FF'>=</font> src.<font color='#BB00BB'>begin</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; i <font color='#5555FF'>!</font><font color='#5555FF'>=</font> src.<font color='#BB00BB'>end</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <font color='#BB00BB'>dest</font><font face='Lucida Console'>(</font>i<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>first<font face='Lucida Console'>)</font> <font color='#5555FF'>-</font><font color='#5555FF'>=</font> C<font color='#5555FF'>*</font>i<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>second;
+    <b>}</b>
+
+<font color='#009900'>// ------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>typename</font> T::value_type::second_type <b><a name='min'></a>min</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> a
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> T::value_type::second_type type;
+
+        type temp <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'>typename</font> T::const_iterator i <font color='#5555FF'>=</font> a.<font color='#BB00BB'>begin</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; i <font color='#5555FF'>!</font><font color='#5555FF'>=</font> a.<font color='#BB00BB'>end</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>temp <font color='#5555FF'>&gt;</font> i<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>second<font face='Lucida Console'>)</font>
+                temp <font color='#5555FF'>=</font> i<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>second;
+        <b>}</b>
+        <font color='#0000FF'>return</font> temp;
+    <b>}</b>
+
+<font color='#009900'>// ------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>typename</font> T::value_type::second_type <b><a name='max'></a>max</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> a
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> T::value_type::second_type type;
+
+        type temp <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'>typename</font> T::const_iterator i <font color='#5555FF'>=</font> a.<font color='#BB00BB'>begin</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; i <font color='#5555FF'>!</font><font color='#5555FF'>=</font> a.<font color='#BB00BB'>end</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>temp <font color='#5555FF'>&lt;</font> i<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>second<font face='Lucida Console'>)</font>
+                temp <font color='#5555FF'>=</font> i<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>second;
+        <b>}</b>
+        <font color='#0000FF'>return</font> temp;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>namespace</font> impl
+    <b>{</b>
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> sparse_vector_type<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>inline</font> matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> sparse_vector_type::value_type::second_type,<font color='#979000'>0</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> <b><a name='sparse_to_dense'></a>sparse_to_dense</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> sparse_vector_type<font color='#5555FF'>&amp;</font> vect,
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> num_dimensions 
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#009900'>// You must use unsigned integral key types in your sparse vectors
+</font>            <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> sparse_vector_type::value_type::first_type idx_type;
+            <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> sparse_vector_type::value_type::second_type value_type;
+            <font color='#BB00BB'>COMPILE_TIME_ASSERT</font><font face='Lucida Console'>(</font>is_unsigned_type<font color='#5555FF'>&lt;</font>idx_type<font color='#5555FF'>&gt;</font>::value<font face='Lucida Console'>)</font>;
+
+            matrix<font color='#5555FF'>&lt;</font>value_type,<font color='#979000'>0</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> result;
+
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>vect.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                <font color='#0000FF'>return</font> result;
+
+            result.<font color='#BB00BB'>set_size</font><font face='Lucida Console'>(</font>num_dimensions<font face='Lucida Console'>)</font>;
+            result <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'>typename</font> sparse_vector_type::const_iterator j <font color='#5555FF'>=</font> vect.<font color='#BB00BB'>begin</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; j <font color='#5555FF'>!</font><font color='#5555FF'>=</font> vect.<font color='#BB00BB'>end</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>j<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>j<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>first<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> result.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#BB00BB'>result</font><font face='Lucida Console'>(</font>j<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>first<font face='Lucida Console'>)</font> <font color='#5555FF'>+</font><font color='#5555FF'>=</font> j<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>second;
+                <b>}</b>
+            <b>}</b>
+
+            <font color='#0000FF'>return</font> result;
+        <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> idx_type, <font color='#0000FF'>typename</font> value_type, <font color='#0000FF'>typename</font> alloc<font color='#5555FF'>&gt;</font>
+    matrix<font color='#5555FF'>&lt;</font>value_type,<font color='#979000'>0</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> <b><a name='sparse_to_dense'></a>sparse_to_dense</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>std::pair<font color='#5555FF'>&lt;</font>idx_type,value_type<font color='#5555FF'>&gt;</font>,alloc<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> vect,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> num_dimensions 
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>return</font> impl::<font color='#BB00BB'>sparse_to_dense</font><font face='Lucida Console'>(</font>vect,num_dimensions<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> idx_type, <font color='#0000FF'>typename</font> value_type, <font color='#0000FF'>typename</font> alloc<font color='#5555FF'>&gt;</font>
+    matrix<font color='#5555FF'>&lt;</font>value_type,<font color='#979000'>0</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> <b><a name='sparse_to_dense'></a>sparse_to_dense</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>std::pair<font color='#5555FF'>&lt;</font>idx_type,value_type<font color='#5555FF'>&gt;</font>,alloc<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> vect
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>return</font> impl::<font color='#BB00BB'>sparse_to_dense</font><font face='Lucida Console'>(</font>vect, <font color='#BB00BB'>max_index_plus_one</font><font face='Lucida Console'>(</font>vect<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T1, <font color='#0000FF'>typename</font> T2, <font color='#0000FF'>typename</font> T3, <font color='#0000FF'>typename</font> T4<font color='#5555FF'>&gt;</font>
+    matrix<font color='#5555FF'>&lt;</font>T2,<font color='#979000'>0</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> <b><a name='sparse_to_dense'></a>sparse_to_dense</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> std::map<font color='#5555FF'>&lt;</font>T1,T2,T3,T4<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> vect,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> num_dimensions 
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>return</font> impl::<font color='#BB00BB'>sparse_to_dense</font><font face='Lucida Console'>(</font>vect,num_dimensions<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T1, <font color='#0000FF'>typename</font> T2, <font color='#0000FF'>typename</font> T3, <font color='#0000FF'>typename</font> T4<font color='#5555FF'>&gt;</font>
+    matrix<font color='#5555FF'>&lt;</font>T2,<font color='#979000'>0</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> <b><a name='sparse_to_dense'></a>sparse_to_dense</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> std::map<font color='#5555FF'>&lt;</font>T1,T2,T3,T4<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> vect
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>return</font> impl::<font color='#BB00BB'>sparse_to_dense</font><font face='Lucida Console'>(</font>vect, <font color='#BB00BB'>max_index_plus_one</font><font face='Lucida Console'>(</font>vect<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>typename</font> enable_if<font color='#5555FF'>&lt;</font>is_matrix<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font>,T<font color='#5555FF'>&amp;</font><font color='#5555FF'>&gt;</font>::type <b><a name='sparse_to_dense'></a>sparse_to_dense</b><font face='Lucida Console'>(</font>
+        T<font color='#5555FF'>&amp;</font> item
+    <font face='Lucida Console'>)</font> <b>{</b> <font color='#0000FF'>return</font> item; <b>}</b>
+    
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> EXP<font color='#5555FF'>&gt;</font>
+    matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> EXP::type,<font color='#979000'>0</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> <b><a name='sparse_to_dense'></a>sparse_to_dense</b><font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&lt;</font>EXP<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> item,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> num
+    <font face='Lucida Console'>)</font> 
+    <b>{</b> 
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> EXP::type type;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>item.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font>num<font face='Lucida Console'>)</font>
+            <font color='#0000FF'>return</font> item; 
+        <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>item.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font>num<font face='Lucida Console'>)</font>
+            <font color='#0000FF'>return</font> <font color='#BB00BB'>join_cols</font><font face='Lucida Console'>(</font>item, zeros_matrix<font color='#5555FF'>&lt;</font>type<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font>num<font color='#5555FF'>-</font>item.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,<font color='#979000'>1</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>else</font>
+            <font color='#0000FF'>return</font> <font color='#BB00BB'>colm</font><font face='Lucida Console'>(</font>item,<font color='#979000'>0</font>,<font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font>num<font face='Lucida Console'>)</font>;
+    <b>}</b>
+    
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> sample_type, <font color='#0000FF'>typename</font> alloc<font color='#5555FF'>&gt;</font>
+    std::vector<font color='#5555FF'>&lt;</font>matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> sample_type::value_type::second_type,<font color='#979000'>0</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> <b><a name='sparse_to_dense'></a>sparse_to_dense</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>sample_type, alloc<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> samples,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> num_dimensions
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> sample_type::value_type pair_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> pair_type::second_type value_type;
+
+        std::vector<font color='#5555FF'>&lt;</font> matrix<font color='#5555FF'>&lt;</font>value_type,<font color='#979000'>0</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> result;
+
+        <font color='#009900'>// now turn all the samples into dense samples
+</font>        result.<font color='#BB00BB'>resize</font><font face='Lucida Console'>(</font>samples.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> samples.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+        <b>{</b>
+            result[i] <font color='#5555FF'>=</font> <font color='#BB00BB'>sparse_to_dense</font><font face='Lucida Console'>(</font>samples[i],num_dimensions<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>return</font> result;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> sample_type, <font color='#0000FF'>typename</font> alloc<font color='#5555FF'>&gt;</font>
+    std::vector<font color='#5555FF'>&lt;</font>matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> sample_type::value_type::second_type,<font color='#979000'>0</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> <b><a name='sparse_to_dense'></a>sparse_to_dense</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>sample_type, alloc<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> samples
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>return</font> <font color='#BB00BB'>sparse_to_dense</font><font face='Lucida Console'>(</font>samples, <font color='#BB00BB'>max_index_plus_one</font><font face='Lucida Console'>(</font>samples<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    T <b><a name='make_sparse_vector'></a>make_sparse_vector</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> v
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#009900'>// You must use unsigned integral key types in your sparse vectors
+</font>        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> T::value_type::first_type idx_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> T::value_type::second_type value_type;
+        <font color='#BB00BB'>COMPILE_TIME_ASSERT</font><font face='Lucida Console'>(</font>is_unsigned_type<font color='#5555FF'>&lt;</font>idx_type<font color='#5555FF'>&gt;</font>::value<font face='Lucida Console'>)</font>;
+        std::map<font color='#5555FF'>&lt;</font>idx_type,value_type<font color='#5555FF'>&gt;</font> temp;
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'>typename</font> T::const_iterator i <font color='#5555FF'>=</font> v.<font color='#BB00BB'>begin</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; i <font color='#5555FF'>!</font><font color='#5555FF'>=</font> v.<font color='#BB00BB'>end</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+        <b>{</b>
+            temp[i<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>first] <font color='#5555FF'>+</font><font color='#5555FF'>=</font> i<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>second;
+        <b>}</b>
+
+        <font color='#0000FF'>return</font> <font color='#BB00BB'>T</font><font face='Lucida Console'>(</font>temp.<font color='#BB00BB'>begin</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, temp.<font color='#BB00BB'>end</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='make_sparse_vector_inplace'></a>make_sparse_vector_inplace</b><font face='Lucida Console'>(</font>
+        T<font color='#5555FF'>&amp;</font> vect
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        vect <font color='#5555FF'>=</font> <font color='#BB00BB'>make_sparse_vector</font><font face='Lucida Console'>(</font>vect<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T,
+        <font color='#0000FF'>typename</font> U,
+        <font color='#0000FF'>typename</font> alloc
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='make_sparse_vector_inplace'></a>make_sparse_vector_inplace</b> <font face='Lucida Console'>(</font>
+        std::vector<font color='#5555FF'>&lt;</font>std::pair<font color='#5555FF'>&lt;</font>T,U<font color='#5555FF'>&gt;</font>,alloc<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> vect
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>vect.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            std::<font color='#BB00BB'>sort</font><font face='Lucida Console'>(</font>vect.<font color='#BB00BB'>begin</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, vect.<font color='#BB00BB'>end</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// merge duplicates
+</font>            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>1</font>; i <font color='#5555FF'>&lt;</font> vect.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#009900'>// if we found a duplicate
+</font>                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>vect[i<font color='#5555FF'>-</font><font color='#979000'>1</font>].first <font color='#5555FF'>=</font><font color='#5555FF'>=</font> vect[i].first<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#009900'>// now start collapsing and merging the vector
+</font>                    <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> j <font color='#5555FF'>=</font> i<font color='#5555FF'>-</font><font color='#979000'>1</font>;
+                    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> k <font color='#5555FF'>=</font> i; k <font color='#5555FF'>&lt;</font> vect.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>k<font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>vect[j].first <font color='#5555FF'>=</font><font color='#5555FF'>=</font> vect[k].first<font face='Lucida Console'>)</font>
+                        <b>{</b>
+                            vect[j].second <font color='#5555FF'>+</font><font color='#5555FF'>=</font> vect[k].second;
+                        <b>}</b>
+                        <font color='#0000FF'>else</font>
+                        <b>{</b>
+                            <font color='#5555FF'>+</font><font color='#5555FF'>+</font>j;
+                            vect[j] <font color='#5555FF'>=</font> vect[k];
+                        <b>}</b>
+                    <b>}</b>
+
+
+                    <font color='#009900'>// we removed elements when we merged so we need to adjust the size.
+</font>                    vect.<font color='#BB00BB'>resize</font><font face='Lucida Console'>(</font>j<font color='#5555FF'>+</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+                    <font color='#0000FF'>return</font>;
+                <b>}</b>
+            <b>}</b>
+        <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> EXP, <font color='#0000FF'>typename</font> T, <font color='#0000FF'><u>long</u></font> NR, <font color='#0000FF'><u>long</u></font> NC, <font color='#0000FF'>typename</font> MM, <font color='#0000FF'>typename</font> L<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='sparse_matrix_vector_multiply'></a>sparse_matrix_vector_multiply</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>sample_pair<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> edges,
+        <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&lt;</font>EXP<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> v,
+        matrix<font color='#5555FF'>&lt;</font>T,NR,NC,MM,L<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> result
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#009900'>// make sure requires clause is not broken
+</font>        <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font><font color='#BB00BB'>max_index_plus_one</font><font face='Lucida Console'>(</font>edges<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font>v.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font>
+                    <font color='#BB00BB'>is_col_vector</font><font face='Lucida Console'>(</font>v<font face='Lucida Console'>)</font>,
+                    "<font color='#CC0000'>\t void sparse_matrix_vector_multiply()</font>"
+                    <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t Invalid inputs were given to this function</font>"
+                    <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t max_index_plus_one(edges): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>max_index_plus_one</font><font face='Lucida Console'>(</font>edges<font face='Lucida Console'>)</font>
+                    <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t v.size():                  </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> v.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> 
+                    <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t is_col_vector(v):          </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>is_col_vector</font><font face='Lucida Console'>(</font>v<font face='Lucida Console'>)</font> 
+        <font face='Lucida Console'>)</font>;
+
+        result.<font color='#BB00BB'>set_size</font><font face='Lucida Console'>(</font>v.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,v.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        result <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> k <font color='#5555FF'>=</font> <font color='#979000'>0</font>; k <font color='#5555FF'>&lt;</font> edges.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>k<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> edges[k].<font color='#BB00BB'>index1</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> j <font color='#5555FF'>=</font> edges[k].<font color='#BB00BB'>index2</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> d <font color='#5555FF'>=</font> edges[k].<font color='#BB00BB'>distance</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+            <font color='#BB00BB'>result</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font> <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#BB00BB'>v</font><font face='Lucida Console'>(</font>j<font face='Lucida Console'>)</font><font color='#5555FF'>*</font>d;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>i <font color='#5555FF'>!</font><font color='#5555FF'>=</font> j<font face='Lucida Console'>)</font>
+                <font color='#BB00BB'>result</font><font face='Lucida Console'>(</font>j<font face='Lucida Console'>)</font> <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#BB00BB'>v</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font><font color='#5555FF'>*</font>d;
+        <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> EXP<font color='#5555FF'>&gt;</font>
+    matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> EXP::type,<font color='#979000'>0</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> <b><a name='sparse_matrix_vector_multiply'></a>sparse_matrix_vector_multiply</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>sample_pair<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> edges,
+        <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&lt;</font>EXP<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> v
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> EXP::type,<font color='#979000'>0</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> result;
+        <font color='#BB00BB'>sparse_matrix_vector_multiply</font><font face='Lucida Console'>(</font>edges,v,result<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>return</font> result;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> EXP, <font color='#0000FF'>typename</font> T, <font color='#0000FF'><u>long</u></font> NR, <font color='#0000FF'><u>long</u></font> NC, <font color='#0000FF'>typename</font> MM, <font color='#0000FF'>typename</font> L<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='sparse_matrix_vector_multiply'></a>sparse_matrix_vector_multiply</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>ordered_sample_pair<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> edges,
+        <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&lt;</font>EXP<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> v,
+        matrix<font color='#5555FF'>&lt;</font>T,NR,NC,MM,L<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> result
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#009900'>// make sure requires clause is not broken
+</font>        <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font><font color='#BB00BB'>max_index_plus_one</font><font face='Lucida Console'>(</font>edges<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font>v.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font>
+                    <font color='#BB00BB'>is_col_vector</font><font face='Lucida Console'>(</font>v<font face='Lucida Console'>)</font>,
+                    "<font color='#CC0000'>\t void sparse_matrix_vector_multiply()</font>"
+                    <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t Invalid inputs were given to this function</font>"
+                    <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t max_index_plus_one(edges): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>max_index_plus_one</font><font face='Lucida Console'>(</font>edges<font face='Lucida Console'>)</font>
+                    <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t v.size():                  </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> v.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> 
+                    <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t is_col_vector(v):          </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>is_col_vector</font><font face='Lucida Console'>(</font>v<font face='Lucida Console'>)</font> 
+        <font face='Lucida Console'>)</font>;
+
+
+        result.<font color='#BB00BB'>set_size</font><font face='Lucida Console'>(</font>v.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,v.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        result <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> k <font color='#5555FF'>=</font> <font color='#979000'>0</font>; k <font color='#5555FF'>&lt;</font> edges.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>k<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> edges[k].<font color='#BB00BB'>index1</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> j <font color='#5555FF'>=</font> edges[k].<font color='#BB00BB'>index2</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> d <font color='#5555FF'>=</font> edges[k].<font color='#BB00BB'>distance</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+            <font color='#BB00BB'>result</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font> <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#BB00BB'>v</font><font face='Lucida Console'>(</font>j<font face='Lucida Console'>)</font><font color='#5555FF'>*</font>d;
+        <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> EXP<font color='#5555FF'>&gt;</font>
+    matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> EXP::type,<font color='#979000'>0</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> <b><a name='sparse_matrix_vector_multiply'></a>sparse_matrix_vector_multiply</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>ordered_sample_pair<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> edges,
+        <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&lt;</font>EXP<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> v
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> EXP::type,<font color='#979000'>0</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> result;
+        <font color='#BB00BB'>sparse_matrix_vector_multiply</font><font face='Lucida Console'>(</font>edges,v,result<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>return</font> result;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> EXP, 
+        <font color='#0000FF'>typename</font> sparse_vector_type,
+        <font color='#0000FF'>typename</font> T,
+        <font color='#0000FF'><u>long</u></font> NR,
+        <font color='#0000FF'><u>long</u></font> NC,
+        <font color='#0000FF'>typename</font> MM,
+        <font color='#0000FF'>typename</font> L
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='sparse_matrix_vector_multiply'></a>sparse_matrix_vector_multiply</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&lt;</font>EXP<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> m,
+        <font color='#0000FF'>const</font> sparse_vector_type<font color='#5555FF'>&amp;</font> v,
+        matrix<font color='#5555FF'>&lt;</font>T,NR,NC,MM,L<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> result
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#009900'>// make sure requires clause is not broken
+</font>        <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font><font color='#BB00BB'>max_index_plus_one</font><font face='Lucida Console'>(</font>v<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font>m.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,
+                    "<font color='#CC0000'>\t void sparse_matrix_vector_multiply()</font>"
+                    <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t Invalid inputs were given to this function</font>"
+                    <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t max_index_plus_one(v): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>max_index_plus_one</font><font face='Lucida Console'>(</font>v<font face='Lucida Console'>)</font>
+                    <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t m.size():              </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> m.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> 
+        <font face='Lucida Console'>)</font>;
+
+        result.<font color='#BB00BB'>set_size</font><font face='Lucida Console'>(</font>m.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,<font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+        result <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'>typename</font> sparse_vector_type::const_iterator i <font color='#5555FF'>=</font> v.<font color='#BB00BB'>begin</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; i <font color='#5555FF'>!</font><font color='#5555FF'>=</font> v.<font color='#BB00BB'>end</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> r <font color='#5555FF'>=</font> <font color='#979000'>0</font>; r <font color='#5555FF'>&lt;</font> result.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>r<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#BB00BB'>result</font><font face='Lucida Console'>(</font>r<font face='Lucida Console'>)</font> <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#BB00BB'>m</font><font face='Lucida Console'>(</font>r, i<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>first<font face='Lucida Console'>)</font><font color='#5555FF'>*</font>i<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>second;
+            <b>}</b>
+        <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> EXP, 
+        <font color='#0000FF'>typename</font> sparse_vector_type
+        <font color='#5555FF'>&gt;</font>
+    matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> EXP::type,<font color='#979000'>0</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> <b><a name='sparse_matrix_vector_multiply'></a>sparse_matrix_vector_multiply</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&lt;</font>EXP<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> m,
+        <font color='#0000FF'>const</font> sparse_vector_type<font color='#5555FF'>&amp;</font> v
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> EXP::type,<font color='#979000'>0</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> result;
+        <font color='#BB00BB'>sparse_matrix_vector_multiply</font><font face='Lucida Console'>(</font>m,v,result<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>return</font> result;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_SVm_SPARSE_VECTOR
+</font>
+
+</pre></body></html>

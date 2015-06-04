@@ -1,0 +1,183 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - assert.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2003  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_ASSERt_
+<font color='#0000FF'>#define</font> DLIB_ASSERt_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='config.h.html'>config.h</a>"
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>sstream<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>iosfwd<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='error.h.html'>error.h</a>"
+
+<font color='#009900'>// -----------------------------
+</font>
+<font color='#009900'>// Use some stuff from boost here
+</font><font color='#009900'>//  (C) Copyright John Maddock 2001 - 2003.
+</font><font color='#009900'>//  (C) Copyright Darin Adler 2001.
+</font><font color='#009900'>//  (C) Copyright Peter Dimov 2001.
+</font><font color='#009900'>//  (C) Copyright Bill Kempf 2002.
+</font><font color='#009900'>//  (C) Copyright Jens Maurer 2002.
+</font><font color='#009900'>//  (C) Copyright David Abrahams 2002 - 2003.
+</font><font color='#009900'>//  (C) Copyright Gennaro Prota 2003.
+</font><font color='#009900'>//  (C) Copyright Eric Friedman 2003.
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> BOOST_JOIN
+<font color='#0000FF'>#define</font> BOOST_JOIN<font face='Lucida Console'>(</font> X, Y <font face='Lucida Console'>)</font> BOOST_DO_JOIN<font face='Lucida Console'>(</font> X, Y <font face='Lucida Console'>)</font>
+<font color='#0000FF'>#define</font> BOOST_DO_JOIN<font face='Lucida Console'>(</font> X, Y <font face='Lucida Console'>)</font> BOOST_DO_JOIN2<font face='Lucida Console'>(</font>X,Y<font face='Lucida Console'>)</font>
+<font color='#0000FF'>#define</font> BOOST_DO_JOIN2<font face='Lucida Console'>(</font> X, Y <font face='Lucida Console'>)</font> X##Y
+<font color='#0000FF'>#endif</font>
+
+<font color='#009900'>// figure out if the compiler has static_assert. 
+</font><font color='#0000FF'>#if</font> defined<font face='Lucida Console'>(</font>__clang__<font face='Lucida Console'>)</font> 
+#   <font color='#0000FF'>if</font> <b><a name='__has_feature'></a>__has_feature</b><font face='Lucida Console'>(</font>cxx_static_assert<font face='Lucida Console'>)</font>
+#       define DLIB_HAS_STATIC_ASSERT
+#   endif
+<font color='#0000FF'>#elif</font> defined<font face='Lucida Console'>(</font>__GNUC__<font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> <font face='Lucida Console'>(</font>__GNUC__ <font color='#5555FF'>&gt;</font> <font color='#979000'>4</font> <font color='#5555FF'>|</font><font color='#5555FF'>|</font> <font face='Lucida Console'>(</font>__GNUC__ <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>4</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> __GNUC_MINOR__ <font color='#5555FF'>&gt;</font> <font color='#979000'>2</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> defined<font face='Lucida Console'>(</font>__GXX_EXPERIMENTAL_CXX0X__<font face='Lucida Console'>)</font> 
+#   define DLIB_HAS_STATIC_ASSERT
+<font color='#0000FF'>#elif</font> defined<font face='Lucida Console'>(</font>_MSC_VER<font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> _MSC_VER <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#979000'>1600</font>
+#   define DLIB_HAS_STATIC_ASSERT
+<font color='#0000FF'>#elif</font> defined<font face='Lucida Console'>(</font>__INTEL_COMPILER<font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> defined<font face='Lucida Console'>(</font>BOOST_INTEL_STDCXX0X<font face='Lucida Console'>)</font>
+#   define DLIB_HAS_STATIC_ASSERT
+<font color='#0000FF'>#endif</font>
+
+
+<font color='#009900'>// -----------------------------
+</font>
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'><u>bool</u></font> value<font color='#5555FF'>&gt;</font> <font color='#0000FF'>struct</font> compile_time_assert;
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&gt;</font> <font color='#0000FF'>struct</font> <b><a name='compile_time_assert'></a>compile_time_assert</b><font color='#5555FF'>&lt;</font><font color='#979000'>true</font><font color='#5555FF'>&gt;</font> <b>{</b> <font color='#0000FF'>enum</font> <b>{</b>value<font color='#5555FF'>=</font><font color='#979000'>1</font><b>}</b>;  <b>}</b>;
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> U<font color='#5555FF'>&gt;</font> <font color='#0000FF'>struct</font> assert_are_same_type;
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font> <font color='#0000FF'>struct</font> <b><a name='assert_are_same_type'></a>assert_are_same_type</b><font color='#5555FF'>&lt;</font>T,T<font color='#5555FF'>&gt;</font> <b>{</b><font color='#0000FF'>enum</font><b>{</b>value<font color='#5555FF'>=</font><font color='#979000'>1</font><b>}</b>;<b>}</b>;
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> U<font color='#5555FF'>&gt;</font> <font color='#0000FF'>struct</font> <b><a name='assert_are_not_same_type'></a>assert_are_not_same_type</b> <b>{</b><font color='#0000FF'>enum</font><b>{</b>value<font color='#5555FF'>=</font><font color='#979000'>1</font><b>}</b>; <b>}</b>;
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font> <font color='#0000FF'>struct</font> <b><a name='assert_are_not_same_type'></a>assert_are_not_same_type</b><font color='#5555FF'>&lt;</font>T,T<font color='#5555FF'>&gt;</font> <b>{</b><b>}</b>;
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> U<font color='#5555FF'>&gt;</font> <font color='#0000FF'>struct</font> <b><a name='assert_types_match'></a>assert_types_match</b> <b>{</b><font color='#0000FF'>enum</font><b>{</b>value<font color='#5555FF'>=</font><font color='#979000'>0</font><b>}</b>;<b>}</b>;
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font> <font color='#0000FF'>struct</font> <b><a name='assert_types_match'></a>assert_types_match</b><font color='#5555FF'>&lt;</font>T,T<font color='#5555FF'>&gt;</font> <b>{</b><font color='#0000FF'>enum</font><b>{</b>value<font color='#5555FF'>=</font><font color='#979000'>1</font><b>}</b>;<b>}</b>;
+<b>}</b>
+
+
+<font color='#009900'>// gcc 4.8 will warn about unused typedefs.  But we use typedefs in some of the compile
+</font><font color='#009900'>// time assert macros so we need to make it not complain about them "not being used".
+</font><font color='#0000FF'>#ifdef</font> __GNUC__
+<font color='#0000FF'>#define</font> DLIB_NO_WARN_UNUSED __attribute__ <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>unused<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+<font color='#0000FF'>#else</font>
+<font color='#0000FF'>#define</font> DLIB_NO_WARN_UNUSED 
+<font color='#0000FF'>#endif</font>
+
+<font color='#009900'>// Use the newer static_assert if it's available since it produces much more readable error
+</font><font color='#009900'>// messages.
+</font><font color='#0000FF'>#ifdef</font> DLIB_HAS_STATIC_ASSERT
+    <font color='#0000FF'>#define</font> COMPILE_TIME_ASSERT<font face='Lucida Console'>(</font>expression<font face='Lucida Console'>)</font> static_assert<font face='Lucida Console'>(</font>expression, "<font color='#CC0000'>Failed assertion</font>"<font face='Lucida Console'>)</font>
+    <font color='#0000FF'>#define</font> ASSERT_ARE_SAME_TYPE<font face='Lucida Console'>(</font>type1, type2<font face='Lucida Console'>)</font> static_assert<font face='Lucida Console'>(</font>::dlib::assert_types_match<font color='#5555FF'>&lt;</font>type1,type2<font color='#5555FF'>&gt;</font>::value, "<font color='#CC0000'>These types should be the same but aren't.</font>"<font face='Lucida Console'>)</font>
+    <font color='#0000FF'>#define</font> ASSERT_ARE_NOT_SAME_TYPE<font face='Lucida Console'>(</font>type1, type2<font face='Lucida Console'>)</font> static_assert<font face='Lucida Console'>(</font><font color='#5555FF'>!</font>::dlib::assert_types_match<font color='#5555FF'>&lt;</font>type1,type2<font color='#5555FF'>&gt;</font>::value, "<font color='#CC0000'>These types should NOT be the same.</font>"<font face='Lucida Console'>)</font>
+<font color='#0000FF'>#else</font>
+    <font color='#0000FF'>#define</font> COMPILE_TIME_ASSERT<font face='Lucida Console'>(</font>expression<font face='Lucida Console'>)</font> \
+        DLIB_NO_WARN_UNUSED <font color='#0000FF'>typedef</font> <font color='#0000FF'><u>char</u></font> <b><a name='BOOST_JOIN'></a>BOOST_JOIN</b><font face='Lucida Console'>(</font>DLIB_CTA, __LINE__<font face='Lucida Console'>)</font>[::dlib::compile_time_assert<font color='#5555FF'>&lt;</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>bool</u></font><font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>expression<font face='Lucida Console'>)</font><font color='#5555FF'>&gt;</font>::value] 
+
+    <font color='#0000FF'>#define</font> ASSERT_ARE_SAME_TYPE<font face='Lucida Console'>(</font>type1, type2<font face='Lucida Console'>)</font> \
+        DLIB_NO_WARN_UNUSED <font color='#0000FF'>typedef</font> <font color='#0000FF'><u>char</u></font> <b><a name='BOOST_JOIN'></a>BOOST_JOIN</b><font face='Lucida Console'>(</font>DLIB_AAST, __LINE__<font face='Lucida Console'>)</font>[::dlib::assert_are_same_type<font color='#5555FF'>&lt;</font>type1,type2<font color='#5555FF'>&gt;</font>::value] 
+
+    <font color='#0000FF'>#define</font> ASSERT_ARE_NOT_SAME_TYPE<font face='Lucida Console'>(</font>type1, type2<font face='Lucida Console'>)</font> \
+        DLIB_NO_WARN_UNUSED <font color='#0000FF'>typedef</font> <font color='#0000FF'><u>char</u></font> <b><a name='BOOST_JOIN'></a>BOOST_JOIN</b><font face='Lucida Console'>(</font>DLIB_AANST, __LINE__<font face='Lucida Console'>)</font>[::dlib::assert_are_not_same_type<font color='#5555FF'>&lt;</font>type1,type2<font color='#5555FF'>&gt;</font>::value] 
+<font color='#0000FF'>#endif</font>
+
+<font color='#009900'>// -----------------------------
+</font>
+<font color='#0000FF'>#if</font> defined DLIB_DISABLE_ASSERTS
+    <font color='#009900'>// if DLIB_DISABLE_ASSERTS is on then never enable DLIB_ASSERT no matter what.
+</font>    <font color='#0000FF'>#undef</font> ENABLE_ASSERTS
+<font color='#0000FF'>#endif</font>
+
+<font color='#0000FF'>#if</font> <font color='#5555FF'>!</font>defined<font face='Lucida Console'>(</font>DLIB_DISABLE_ASSERTS<font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> <font face='Lucida Console'>(</font> defined DEBUG <font color='#5555FF'>|</font><font color='#5555FF'>|</font> defined _DEBUG<font face='Lucida Console'>)</font>
+    <font color='#009900'>// make sure ENABLE_ASSERTS is defined if we are indeed using them.
+</font>    <font color='#0000FF'>#ifndef</font> ENABLE_ASSERTS
+        <font color='#0000FF'>#define</font> ENABLE_ASSERTS
+    <font color='#0000FF'>#endif</font>
+<font color='#0000FF'>#endif</font>
+
+<font color='#009900'>// -----------------------------
+</font>
+<font color='#0000FF'>#ifdef</font> __GNUC__
+<font color='#009900'>// There is a bug in version 4.4.5 of GCC on Ubuntu which causes GCC to segfault
+</font><font color='#009900'>// when __PRETTY_FUNCTION__ is used within certain templated functions.  So just
+</font><font color='#009900'>// don't use it with this version of GCC.
+</font>#  <font color='#0000FF'>if</font> <font color='#5555FF'>!</font><font face='Lucida Console'>(</font>__GNUC__ <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>4</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> __GNUC_MINOR__ <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>4</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> __GNUC_PATCHLEVEL__ <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>5</font><font face='Lucida Console'>)</font>
+#    define DLIB_FUNCTION_NAME __PRETTY_FUNCTION__
+#  <font color='#0000FF'>else</font>
+#    define DLIB_FUNCTION_NAME "<font color='#CC0000'>unknown function</font>" 
+#  endif
+<font color='#0000FF'>#elif</font> defined<font face='Lucida Console'>(</font>_MSC_VER<font face='Lucida Console'>)</font>
+<font color='#0000FF'>#define</font> DLIB_FUNCTION_NAME __FUNCSIG__
+<font color='#0000FF'>#else</font>
+<font color='#0000FF'>#define</font> DLIB_FUNCTION_NAME "<font color='#CC0000'>unknown function</font>" 
+<font color='#0000FF'>#endif</font>
+
+<font color='#0000FF'>#define</font> DLIB_CASSERT<font face='Lucida Console'>(</font>_exp,_message<font face='Lucida Console'>)</font>                                              \
+    <b>{</b><font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> <font color='#5555FF'>!</font><font face='Lucida Console'>(</font>_exp<font face='Lucida Console'>)</font> <font face='Lucida Console'>)</font>                                                         \
+    <b>{</b>                                                                       \
+        <font color='#BB00BB'>dlib_assert_breakpoint</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;                                           \
+        std::ostringstream dlib_o_out;                                       \
+        dlib_o_out <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\nError detected at line </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> __LINE__ <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>.\n</font>";    \
+        dlib_o_out <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>Error detected in file </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> __FILE__ <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>.\n</font>";      \
+        dlib_o_out <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>Error detected in function </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> DLIB_FUNCTION_NAME <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>.\n\n</font>";      \
+        dlib_o_out <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>Failing expression was </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> #_exp <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>.\n</font>";           \
+        dlib_o_out <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> std::boolalpha <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> _message <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n</font>";                    \
+        <font color='#0000FF'>throw</font> dlib::<font color='#BB00BB'>fatal_error</font><font face='Lucida Console'>(</font>dlib::EBROKEN_ASSERT,dlib_o_out.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;      \
+    <b>}</b><b>}</b>                                                                      
+
+
+<font color='#0000FF'>#ifdef</font> ENABLE_ASSERTS 
+    <font color='#0000FF'>#define</font> DLIB_ASSERT<font face='Lucida Console'>(</font>_exp,_message<font face='Lucida Console'>)</font> DLIB_CASSERT<font face='Lucida Console'>(</font>_exp,_message<font face='Lucida Console'>)</font>
+    <font color='#0000FF'>#define</font> DLIB_IF_ASSERT<font face='Lucida Console'>(</font>exp<font face='Lucida Console'>)</font> exp
+<font color='#0000FF'>#else</font>
+    <font color='#0000FF'>#define</font> DLIB_ASSERT<font face='Lucida Console'>(</font>_exp,_message<font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+    <font color='#0000FF'>#define</font> DLIB_IF_ASSERT<font face='Lucida Console'>(</font>exp<font face='Lucida Console'>)</font> 
+<font color='#0000FF'>#endif</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <a name='DLIB_ASSERT_HAS_STANDARD_LAYOUT'/><font color='#009900'>/*!A DLIB_ASSERT_HAS_STANDARD_LAYOUT 
+    
+        This macro is meant to cause a compiler error if a type doesn't have a simple
+        memory layout (like a C struct). In particular, types with simple layouts are
+        ones which can be copied via memcpy().
+        
+        
+        This was called a POD type in C++03 and in C++0x we are looking to check if 
+        it is a "standard layout type".  Once we can use C++0x we can change this macro 
+        to something that uses the std::is_standard_layout type_traits class.  
+        See: http://www2.research.att.com/~bs/C++0xFAQ.html#PODs
+    !*/</font>
+    <font color='#009900'>// Use the fact that in C++03 you can't put non-PODs into a union.
+</font><font color='#0000FF'>#define</font> DLIB_ASSERT_HAS_STANDARD_LAYOUT<font face='Lucida Console'>(</font>type<font face='Lucida Console'>)</font>   \
+    <font color='#0000FF'>union</font>  <b><a name='BOOST_JOIN'></a>BOOST_JOIN</b><font face='Lucida Console'>(</font>DAHSL_,__LINE__<font face='Lucida Console'>)</font> <b>{</b> type TYPE_NOT_STANDARD_LAYOUT; <b>}</b>;  \
+    DLIB_NO_WARN_UNUSED <font color='#0000FF'>typedef</font> <font color='#0000FF'><u>char</u></font> <b><a name='BOOST_JOIN'></a>BOOST_JOIN</b><font face='Lucida Console'>(</font>DAHSL2_,__LINE__<font face='Lucida Console'>)</font>[<font color='#0000FF'>sizeof</font><font face='Lucida Console'>(</font><font color='#BB00BB'>BOOST_JOIN</font><font face='Lucida Console'>(</font>DAHSL_,__LINE__<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>]; 
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<font color='#009900'>// breakpoints
+</font><font color='#0000FF'>extern</font> "<font color='#CC0000'>C</font>"
+<b>{</b>
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='dlib_assert_breakpoint'></a>dlib_assert_breakpoint</b><font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+    <font color='#009900'>/*!
+        ensures
+            - this function does nothing 
+              It exists just so you can put breakpoints on it in a debugging tool.
+              It is called only when an DLIB_ASSERT or DLIB_CASSERT fails and is about to
+              throw an exception.
+    !*/</font>
+<b>}</b>
+
+<font color='#009900'>// -----------------------------
+</font>
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='stack_trace.h.html'>stack_trace.h</a>"
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_ASSERt_
+</font>
+
+</pre></body></html>

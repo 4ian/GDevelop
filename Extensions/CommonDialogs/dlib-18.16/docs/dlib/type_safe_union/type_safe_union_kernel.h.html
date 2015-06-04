@@ -1,0 +1,714 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - type_safe_union_kernel.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2009  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_TYPE_SAFE_UNIOn_h_ 
+<font color='#0000FF'>#define</font> DLIB_TYPE_SAFE_UNIOn_h_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='type_safe_union_kernel_abstract.h.html'>type_safe_union_kernel_abstract.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../algs.h.html'>../algs.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../noncopyable.h.html'>../noncopyable.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../serialize.h.html'>../serialize.h</a>"
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>new<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>iostream<font color='#5555FF'>&gt;</font>
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>class</font> <b><a name='bad_type_safe_union_cast'></a>bad_type_safe_union_cast</b> : <font color='#0000FF'>public</font> std::bad_cast 
+    <b>{</b>
+    <font color='#0000FF'>public</font>:
+          <font color='#0000FF'>virtual</font> <font color='#0000FF'>const</font> <font color='#0000FF'><u>char</u></font> <font color='#5555FF'>*</font> <b><a name='what'></a>what</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <font color='#0000FF'>throw</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+          <b>{</b>
+              <font color='#0000FF'>return</font> "<font color='#CC0000'>bad_type_safe_union_cast</font>";
+          <b>}</b>
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>struct</font> <b><a name='_void'></a>_void</b><b>{</b><b>}</b>;
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='serialize'></a>serialize</b><font face='Lucida Console'>(</font> <font color='#0000FF'>const</font> _void<font color='#5555FF'>&amp;</font>, std::ostream<font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font><b>{</b><b>}</b>
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='deserialize'></a>deserialize</b><font face='Lucida Console'>(</font>  _void<font color='#5555FF'>&amp;</font>, std::istream<font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font><b>{</b><b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T1,
+        <font color='#0000FF'>typename</font> T2 <font color='#5555FF'>=</font> _void,
+        <font color='#0000FF'>typename</font> T3 <font color='#5555FF'>=</font> _void,
+        <font color='#0000FF'>typename</font> T4 <font color='#5555FF'>=</font> _void,
+        <font color='#0000FF'>typename</font> T5 <font color='#5555FF'>=</font> _void, 
+        <font color='#0000FF'>typename</font> T6 <font color='#5555FF'>=</font> _void,
+        <font color='#0000FF'>typename</font> T7 <font color='#5555FF'>=</font> _void,
+        <font color='#0000FF'>typename</font> T8 <font color='#5555FF'>=</font> _void,
+        <font color='#0000FF'>typename</font> T9 <font color='#5555FF'>=</font> _void,
+        <font color='#0000FF'>typename</font> T10 <font color='#5555FF'>=</font> _void,
+
+        <font color='#0000FF'>typename</font> T11 <font color='#5555FF'>=</font> _void,
+        <font color='#0000FF'>typename</font> T12 <font color='#5555FF'>=</font> _void,
+        <font color='#0000FF'>typename</font> T13 <font color='#5555FF'>=</font> _void,
+        <font color='#0000FF'>typename</font> T14 <font color='#5555FF'>=</font> _void,
+        <font color='#0000FF'>typename</font> T15 <font color='#5555FF'>=</font> _void,
+        <font color='#0000FF'>typename</font> T16 <font color='#5555FF'>=</font> _void,
+        <font color='#0000FF'>typename</font> T17 <font color='#5555FF'>=</font> _void,
+        <font color='#0000FF'>typename</font> T18 <font color='#5555FF'>=</font> _void,
+        <font color='#0000FF'>typename</font> T19 <font color='#5555FF'>=</font> _void,
+        <font color='#0000FF'>typename</font> T20 <font color='#5555FF'>=</font> _void
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>class</font> <b><a name='type_safe_union'></a>type_safe_union</b> : noncopyable
+    <b>{</b>
+        <font color='#009900'>/*!
+            CONVENTION
+                - is_empty() ==  (type_identity == 0)
+                - contains&lt;T&gt;() == (type_identity == get_type_id&lt;T&gt;())
+                - mem.get() == the block of memory on the stack which is
+                  where objects in the union are stored
+        !*/</font>
+
+    <font color='#0000FF'>private</font>:
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> U<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='invoke_on'></a>invoke_on</b> <font face='Lucida Console'>(</font>
+            T<font color='#5555FF'>&amp;</font> obj,
+            U<font color='#5555FF'>&amp;</font> item
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#BB00BB'>obj</font><font face='Lucida Console'>(</font>item<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='invoke_on'></a>invoke_on</b> <font face='Lucida Console'>(</font>
+            T<font color='#5555FF'>&amp;</font> ,
+            _void 
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+        <b>}</b>
+
+
+        <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>size_t</u></font> max_size <font color='#5555FF'>=</font> tmax<font color='#5555FF'>&lt;</font>tmax<font color='#5555FF'>&lt;</font>tmax<font color='#5555FF'>&lt;</font>tmax<font color='#5555FF'>&lt;</font>tmax<font color='#5555FF'>&lt;</font>tmax<font color='#5555FF'>&lt;</font>tmax<font color='#5555FF'>&lt;</font>tmax<font color='#5555FF'>&lt;</font>tmax<font color='#5555FF'>&lt;</font>tmax<font color='#5555FF'>&lt;</font>
+                                       tmax<font color='#5555FF'>&lt;</font>tmax<font color='#5555FF'>&lt;</font>tmax<font color='#5555FF'>&lt;</font>tmax<font color='#5555FF'>&lt;</font>tmax<font color='#5555FF'>&lt;</font>tmax<font color='#5555FF'>&lt;</font>tmax<font color='#5555FF'>&lt;</font>tmax<font color='#5555FF'>&lt;</font>tmax<font color='#5555FF'>&lt;</font><font color='#0000FF'>sizeof</font><font face='Lucida Console'>(</font>T1<font face='Lucida Console'>)</font>,
+                                                        <font color='#0000FF'>sizeof</font><font face='Lucida Console'>(</font>T2<font face='Lucida Console'>)</font><font color='#5555FF'>&gt;</font>::value,
+                                                        <font color='#0000FF'>sizeof</font><font face='Lucida Console'>(</font>T3<font face='Lucida Console'>)</font><font color='#5555FF'>&gt;</font>::value,
+                                                        <font color='#0000FF'>sizeof</font><font face='Lucida Console'>(</font>T4<font face='Lucida Console'>)</font><font color='#5555FF'>&gt;</font>::value,
+                                                        <font color='#0000FF'>sizeof</font><font face='Lucida Console'>(</font>T5<font face='Lucida Console'>)</font><font color='#5555FF'>&gt;</font>::value,
+                                                        <font color='#0000FF'>sizeof</font><font face='Lucida Console'>(</font>T6<font face='Lucida Console'>)</font><font color='#5555FF'>&gt;</font>::value,
+                                                        <font color='#0000FF'>sizeof</font><font face='Lucida Console'>(</font>T7<font face='Lucida Console'>)</font><font color='#5555FF'>&gt;</font>::value,
+                                                        <font color='#0000FF'>sizeof</font><font face='Lucida Console'>(</font>T8<font face='Lucida Console'>)</font><font color='#5555FF'>&gt;</font>::value,
+                                                        <font color='#0000FF'>sizeof</font><font face='Lucida Console'>(</font>T9<font face='Lucida Console'>)</font><font color='#5555FF'>&gt;</font>::value,
+                                                        <font color='#0000FF'>sizeof</font><font face='Lucida Console'>(</font>T10<font face='Lucida Console'>)</font><font color='#5555FF'>&gt;</font>::value,
+                                                        <font color='#0000FF'>sizeof</font><font face='Lucida Console'>(</font>T11<font face='Lucida Console'>)</font><font color='#5555FF'>&gt;</font>::value,
+                                                        <font color='#0000FF'>sizeof</font><font face='Lucida Console'>(</font>T12<font face='Lucida Console'>)</font><font color='#5555FF'>&gt;</font>::value,
+                                                        <font color='#0000FF'>sizeof</font><font face='Lucida Console'>(</font>T13<font face='Lucida Console'>)</font><font color='#5555FF'>&gt;</font>::value,
+                                                        <font color='#0000FF'>sizeof</font><font face='Lucida Console'>(</font>T14<font face='Lucida Console'>)</font><font color='#5555FF'>&gt;</font>::value,
+                                                        <font color='#0000FF'>sizeof</font><font face='Lucida Console'>(</font>T15<font face='Lucida Console'>)</font><font color='#5555FF'>&gt;</font>::value,
+                                                        <font color='#0000FF'>sizeof</font><font face='Lucida Console'>(</font>T16<font face='Lucida Console'>)</font><font color='#5555FF'>&gt;</font>::value,
+                                                        <font color='#0000FF'>sizeof</font><font face='Lucida Console'>(</font>T17<font face='Lucida Console'>)</font><font color='#5555FF'>&gt;</font>::value,
+                                                        <font color='#0000FF'>sizeof</font><font face='Lucida Console'>(</font>T18<font face='Lucida Console'>)</font><font color='#5555FF'>&gt;</font>::value,
+                                                        <font color='#0000FF'>sizeof</font><font face='Lucida Console'>(</font>T19<font face='Lucida Console'>)</font><font color='#5555FF'>&gt;</font>::value,
+                                                        <font color='#0000FF'>sizeof</font><font face='Lucida Console'>(</font>T20<font face='Lucida Console'>)</font><font color='#5555FF'>&gt;</font>::value;
+
+        <font color='#009900'>// --------------------------------------------
+</font>
+        <font color='#009900'>// member data
+</font>        stack_based_memory_block<font color='#5555FF'>&lt;</font>max_size<font color='#5555FF'>&gt;</font> mem;
+        <font color='#0000FF'><u>int</u></font> type_identity;
+
+        <font color='#009900'>// --------------------------------------------
+</font>
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='validate_type'></a>validate_type</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#009900'>// ERROR: You are trying to get a type of object that isn't
+</font>            <font color='#009900'>// representable by this type_safe_union.  I.e. The given
+</font>            <font color='#009900'>// type T isn't one of the ones given to this object's template
+</font>            <font color='#009900'>// arguments.
+</font>            <font color='#BB00BB'>COMPILE_TIME_ASSERT</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font> is_same_type<font color='#5555FF'>&lt;</font>T,T1<font color='#5555FF'>&gt;</font>::value <font color='#5555FF'>|</font><font color='#5555FF'>|</font>
+                                 is_same_type<font color='#5555FF'>&lt;</font>T,T2<font color='#5555FF'>&gt;</font>::value <font color='#5555FF'>|</font><font color='#5555FF'>|</font>
+                                 is_same_type<font color='#5555FF'>&lt;</font>T,T3<font color='#5555FF'>&gt;</font>::value <font color='#5555FF'>|</font><font color='#5555FF'>|</font>
+                                 is_same_type<font color='#5555FF'>&lt;</font>T,T4<font color='#5555FF'>&gt;</font>::value <font color='#5555FF'>|</font><font color='#5555FF'>|</font>
+                                 is_same_type<font color='#5555FF'>&lt;</font>T,T5<font color='#5555FF'>&gt;</font>::value <font color='#5555FF'>|</font><font color='#5555FF'>|</font>
+                                 is_same_type<font color='#5555FF'>&lt;</font>T,T6<font color='#5555FF'>&gt;</font>::value <font color='#5555FF'>|</font><font color='#5555FF'>|</font>
+                                 is_same_type<font color='#5555FF'>&lt;</font>T,T7<font color='#5555FF'>&gt;</font>::value <font color='#5555FF'>|</font><font color='#5555FF'>|</font>
+                                 is_same_type<font color='#5555FF'>&lt;</font>T,T8<font color='#5555FF'>&gt;</font>::value <font color='#5555FF'>|</font><font color='#5555FF'>|</font>
+                                 is_same_type<font color='#5555FF'>&lt;</font>T,T9<font color='#5555FF'>&gt;</font>::value <font color='#5555FF'>|</font><font color='#5555FF'>|</font>
+                                 is_same_type<font color='#5555FF'>&lt;</font>T,T10<font color='#5555FF'>&gt;</font>::value <font color='#5555FF'>|</font><font color='#5555FF'>|</font>
+
+                                 is_same_type<font color='#5555FF'>&lt;</font>T,T11<font color='#5555FF'>&gt;</font>::value <font color='#5555FF'>|</font><font color='#5555FF'>|</font>
+                                 is_same_type<font color='#5555FF'>&lt;</font>T,T12<font color='#5555FF'>&gt;</font>::value <font color='#5555FF'>|</font><font color='#5555FF'>|</font>
+                                 is_same_type<font color='#5555FF'>&lt;</font>T,T13<font color='#5555FF'>&gt;</font>::value <font color='#5555FF'>|</font><font color='#5555FF'>|</font>
+                                 is_same_type<font color='#5555FF'>&lt;</font>T,T14<font color='#5555FF'>&gt;</font>::value <font color='#5555FF'>|</font><font color='#5555FF'>|</font>
+                                 is_same_type<font color='#5555FF'>&lt;</font>T,T15<font color='#5555FF'>&gt;</font>::value <font color='#5555FF'>|</font><font color='#5555FF'>|</font>
+                                 is_same_type<font color='#5555FF'>&lt;</font>T,T16<font color='#5555FF'>&gt;</font>::value <font color='#5555FF'>|</font><font color='#5555FF'>|</font>
+                                 is_same_type<font color='#5555FF'>&lt;</font>T,T17<font color='#5555FF'>&gt;</font>::value <font color='#5555FF'>|</font><font color='#5555FF'>|</font>
+                                 is_same_type<font color='#5555FF'>&lt;</font>T,T18<font color='#5555FF'>&gt;</font>::value <font color='#5555FF'>|</font><font color='#5555FF'>|</font>
+                                 is_same_type<font color='#5555FF'>&lt;</font>T,T19<font color='#5555FF'>&gt;</font>::value <font color='#5555FF'>|</font><font color='#5555FF'>|</font>
+                                 is_same_type<font color='#5555FF'>&lt;</font>T,T20<font color='#5555FF'>&gt;</font>::value 
+                                    <font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+        <b>}</b>
+
+
+        <font color='#0000FF'>struct</font> <b><a name='destruct_helper'></a>destruct_helper</b>
+        <b>{</b>
+            <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+            <font color='#0000FF'><u>void</u></font> <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>T<font color='#5555FF'>&amp;</font> item<font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+            <b>{</b>
+                item.~<font color='#BB00BB'>T</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+        <b>}</b>;
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='destruct'></a>destruct</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> 
+        <font color='#009900'>/*!
+            ensures
+                - #is_empty() == true
+        !*/</font>
+        <b>{</b>
+            <font color='#009900'>// destruct whatever is in this object
+</font>            <font color='#BB00BB'>apply_to_contents</font><font face='Lucida Console'>(</font><font color='#BB00BB'>destruct_helper</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// mark this object as being empty
+</font>            type_identity <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='construct'></a>construct</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>  
+        <b>{</b> 
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>type_identity <font color='#5555FF'>!</font><font color='#5555FF'>=</font> get_type_id<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#BB00BB'>destruct</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; 
+                <font color='#0000FF'>new</font><font face='Lucida Console'>(</font>mem.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#BB00BB'>T</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; 
+                type_identity <font color='#5555FF'>=</font> get_type_id<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+        <b>}</b>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='construct'></a>construct</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> item
+        <font face='Lucida Console'>)</font>  
+        <b>{</b> 
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>type_identity <font color='#5555FF'>!</font><font color='#5555FF'>=</font> get_type_id<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#BB00BB'>destruct</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; 
+                <font color='#0000FF'>new</font><font face='Lucida Console'>(</font>mem.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#BB00BB'>T</font><font face='Lucida Console'>(</font>item<font face='Lucida Console'>)</font>; 
+                type_identity <font color='#5555FF'>=</font> get_type_id<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+        <b>}</b>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font> 
+        T<font color='#5555FF'>&amp;</font> <b><a name='unchecked_get'></a>unchecked_get</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> 
+        <font color='#009900'>/*!
+            requires
+                - contains&lt;T&gt;() == true
+            ensures
+                - returns a non-const reference to the T object
+        !*/</font>
+        <b>{</b> 
+            <font color='#0000FF'>return</font> <font color='#5555FF'>*</font><font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font>T<font color='#5555FF'>*</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>mem.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>; 
+        <b>}</b>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font> 
+        <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> <b><a name='unchecked_get'></a>unchecked_get</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <font color='#009900'>/*!
+            requires
+                - contains&lt;T&gt;() == true
+            ensures
+                - returns a const reference to the T object
+        !*/</font>
+        <b>{</b> 
+            <font color='#0000FF'>return</font> <font color='#5555FF'>*</font><font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'>const</font> T<font color='#5555FF'>*</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>mem.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>; 
+        <b>}</b>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>T<font color='#5555FF'>&amp;</font> item<font face='Lucida Console'>)</font> 
+        <font color='#009900'>/*
+            This function is used by the swap function of this class.  See that
+            function to see how this works.
+        */</font>
+        <b>{</b>
+            <font color='#BB00BB'>exchange</font><font face='Lucida Console'>(</font>get<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, item<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+    <font color='#0000FF'>public</font>:
+
+        <font color='#0000FF'>typedef</font> T1 type1;
+        <font color='#0000FF'>typedef</font> T2 type2;
+        <font color='#0000FF'>typedef</font> T3 type3;
+        <font color='#0000FF'>typedef</font> T4 type4;
+        <font color='#0000FF'>typedef</font> T5 type5;
+        <font color='#0000FF'>typedef</font> T6 type6;
+        <font color='#0000FF'>typedef</font> T7 type7;
+        <font color='#0000FF'>typedef</font> T8 type8;
+        <font color='#0000FF'>typedef</font> T9 type9;
+        <font color='#0000FF'>typedef</font> T10 type10;
+        <font color='#0000FF'>typedef</font> T11 type11;
+        <font color='#0000FF'>typedef</font> T12 type12;
+        <font color='#0000FF'>typedef</font> T13 type13;
+        <font color='#0000FF'>typedef</font> T14 type14;
+        <font color='#0000FF'>typedef</font> T15 type15;
+        <font color='#0000FF'>typedef</font> T16 type16;
+        <font color='#0000FF'>typedef</font> T17 type17;
+        <font color='#0000FF'>typedef</font> T18 type18;
+        <font color='#0000FF'>typedef</font> T19 type19;
+        <font color='#0000FF'>typedef</font> T20 type20;
+
+
+        <b><a name='type_safe_union'></a>type_safe_union</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> : type_identity<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font> 
+        <b>{</b> 
+        <b>}</b>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+        <b><a name='type_safe_union'></a>type_safe_union</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> item
+        <font face='Lucida Console'>)</font> : type_identity<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            validate_type<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>construct</font><font face='Lucida Console'>(</font>item<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        ~<b><a name='type_safe_union'></a>type_safe_union</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#BB00BB'>destruct</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>static</font> <font color='#0000FF'><u>int</u></font> <b><a name='get_type_id'></a>get_type_id</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> 
+        <b>{</b>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>is_same_type<font color='#5555FF'>&lt;</font>T,T1<font color='#5555FF'>&gt;</font>::value<font face='Lucida Console'>)</font> <font color='#0000FF'>return</font> <font color='#979000'>1</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>is_same_type<font color='#5555FF'>&lt;</font>T,T2<font color='#5555FF'>&gt;</font>::value<font face='Lucida Console'>)</font> <font color='#0000FF'>return</font> <font color='#979000'>2</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>is_same_type<font color='#5555FF'>&lt;</font>T,T3<font color='#5555FF'>&gt;</font>::value<font face='Lucida Console'>)</font> <font color='#0000FF'>return</font> <font color='#979000'>3</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>is_same_type<font color='#5555FF'>&lt;</font>T,T4<font color='#5555FF'>&gt;</font>::value<font face='Lucida Console'>)</font> <font color='#0000FF'>return</font> <font color='#979000'>4</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>is_same_type<font color='#5555FF'>&lt;</font>T,T5<font color='#5555FF'>&gt;</font>::value<font face='Lucida Console'>)</font> <font color='#0000FF'>return</font> <font color='#979000'>5</font>;
+
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>is_same_type<font color='#5555FF'>&lt;</font>T,T6<font color='#5555FF'>&gt;</font>::value<font face='Lucida Console'>)</font> <font color='#0000FF'>return</font> <font color='#979000'>6</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>is_same_type<font color='#5555FF'>&lt;</font>T,T7<font color='#5555FF'>&gt;</font>::value<font face='Lucida Console'>)</font> <font color='#0000FF'>return</font> <font color='#979000'>7</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>is_same_type<font color='#5555FF'>&lt;</font>T,T8<font color='#5555FF'>&gt;</font>::value<font face='Lucida Console'>)</font> <font color='#0000FF'>return</font> <font color='#979000'>8</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>is_same_type<font color='#5555FF'>&lt;</font>T,T9<font color='#5555FF'>&gt;</font>::value<font face='Lucida Console'>)</font> <font color='#0000FF'>return</font> <font color='#979000'>9</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>is_same_type<font color='#5555FF'>&lt;</font>T,T10<font color='#5555FF'>&gt;</font>::value<font face='Lucida Console'>)</font> <font color='#0000FF'>return</font> <font color='#979000'>10</font>;
+
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>is_same_type<font color='#5555FF'>&lt;</font>T,T11<font color='#5555FF'>&gt;</font>::value<font face='Lucida Console'>)</font> <font color='#0000FF'>return</font> <font color='#979000'>11</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>is_same_type<font color='#5555FF'>&lt;</font>T,T12<font color='#5555FF'>&gt;</font>::value<font face='Lucida Console'>)</font> <font color='#0000FF'>return</font> <font color='#979000'>12</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>is_same_type<font color='#5555FF'>&lt;</font>T,T13<font color='#5555FF'>&gt;</font>::value<font face='Lucida Console'>)</font> <font color='#0000FF'>return</font> <font color='#979000'>13</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>is_same_type<font color='#5555FF'>&lt;</font>T,T14<font color='#5555FF'>&gt;</font>::value<font face='Lucida Console'>)</font> <font color='#0000FF'>return</font> <font color='#979000'>14</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>is_same_type<font color='#5555FF'>&lt;</font>T,T15<font color='#5555FF'>&gt;</font>::value<font face='Lucida Console'>)</font> <font color='#0000FF'>return</font> <font color='#979000'>15</font>;
+
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>is_same_type<font color='#5555FF'>&lt;</font>T,T16<font color='#5555FF'>&gt;</font>::value<font face='Lucida Console'>)</font> <font color='#0000FF'>return</font> <font color='#979000'>16</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>is_same_type<font color='#5555FF'>&lt;</font>T,T17<font color='#5555FF'>&gt;</font>::value<font face='Lucida Console'>)</font> <font color='#0000FF'>return</font> <font color='#979000'>17</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>is_same_type<font color='#5555FF'>&lt;</font>T,T18<font color='#5555FF'>&gt;</font>::value<font face='Lucida Console'>)</font> <font color='#0000FF'>return</font> <font color='#979000'>18</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>is_same_type<font color='#5555FF'>&lt;</font>T,T19<font color='#5555FF'>&gt;</font>::value<font face='Lucida Console'>)</font> <font color='#0000FF'>return</font> <font color='#979000'>19</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>is_same_type<font color='#5555FF'>&lt;</font>T,T20<font color='#5555FF'>&gt;</font>::value<font face='Lucida Console'>)</font> <font color='#0000FF'>return</font> <font color='#979000'>20</font>;
+
+            <font color='#009900'>// return a number that doesn't match any of the
+</font>            <font color='#009900'>// valid states of type_identity
+</font>            <font color='#0000FF'>return</font> <font color='#5555FF'>-</font><font color='#979000'>1</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>bool</u></font> <b><a name='contains'></a>contains</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#0000FF'>return</font> type_identity <font color='#5555FF'>=</font><font color='#5555FF'>=</font> get_type_id<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='is_empty'></a>is_empty</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#0000FF'>return</font> type_identity <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <b>}</b>
+
+
+    <font color='#0000FF'>public</font>:
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'>typename</font> t1, <font color='#0000FF'>typename</font> t2, <font color='#0000FF'>typename</font> t3, <font color='#0000FF'>typename</font> t4, <font color='#0000FF'>typename</font> t5,
+            <font color='#0000FF'>typename</font> t6, <font color='#0000FF'>typename</font> t7, <font color='#0000FF'>typename</font> t8, <font color='#0000FF'>typename</font> t9, <font color='#0000FF'>typename</font> t10,
+            <font color='#0000FF'>typename</font> t11, <font color='#0000FF'>typename</font> t12, <font color='#0000FF'>typename</font> t13, <font color='#0000FF'>typename</font> t14, <font color='#0000FF'>typename</font> t15,
+            <font color='#0000FF'>typename</font> t16, <font color='#0000FF'>typename</font> t17, <font color='#0000FF'>typename</font> t18, <font color='#0000FF'>typename</font> t19, <font color='#0000FF'>typename</font> t20
+            <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>friend</font> <font color='#0000FF'><u>void</u></font> <b><a name='serialize'></a>serialize</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> type_safe_union<font color='#5555FF'>&lt;</font>t1,t2,t3,t4,t5,t6,t7,t8,t9,t10, t11,t12,t13,t14,t15,t16,t17,t18,t19,t20<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> item,
+            std::ostream<font color='#5555FF'>&amp;</font> out
+        <font face='Lucida Console'>)</font>;
+
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'>typename</font> T
+            <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='apply_to_contents'></a>apply_to_contents</b> <font face='Lucida Console'>(</font>
+            T<font color='#5555FF'>&amp;</font> obj
+        <font face='Lucida Console'>)</font> 
+        <b>{</b>
+            <font color='#0000FF'>switch</font> <font face='Lucida Console'>(</font>type_identity<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#009900'>// do nothing because we are empty
+</font>                <font color='#0000FF'>case</font> <font color='#979000'>0</font>: <font color='#0000FF'>break</font>;
+
+                <font color='#0000FF'>case</font> <font color='#979000'>1</font>: <font color='#BB00BB'>invoke_on</font><font face='Lucida Console'>(</font>obj,unchecked_get<font color='#5555FF'>&lt;</font>T1<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;  <font color='#0000FF'>break</font>;
+                <font color='#0000FF'>case</font> <font color='#979000'>2</font>: <font color='#BB00BB'>invoke_on</font><font face='Lucida Console'>(</font>obj,unchecked_get<font color='#5555FF'>&lt;</font>T2<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;  <font color='#0000FF'>break</font>;
+                <font color='#0000FF'>case</font> <font color='#979000'>3</font>: <font color='#BB00BB'>invoke_on</font><font face='Lucida Console'>(</font>obj,unchecked_get<font color='#5555FF'>&lt;</font>T3<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;  <font color='#0000FF'>break</font>;
+                <font color='#0000FF'>case</font> <font color='#979000'>4</font>: <font color='#BB00BB'>invoke_on</font><font face='Lucida Console'>(</font>obj,unchecked_get<font color='#5555FF'>&lt;</font>T4<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;  <font color='#0000FF'>break</font>;
+                <font color='#0000FF'>case</font> <font color='#979000'>5</font>: <font color='#BB00BB'>invoke_on</font><font face='Lucida Console'>(</font>obj,unchecked_get<font color='#5555FF'>&lt;</font>T5<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;  <font color='#0000FF'>break</font>;
+
+                <font color='#0000FF'>case</font> <font color='#979000'>6</font>: <font color='#BB00BB'>invoke_on</font><font face='Lucida Console'>(</font>obj,unchecked_get<font color='#5555FF'>&lt;</font>T6<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;  <font color='#0000FF'>break</font>;
+                <font color='#0000FF'>case</font> <font color='#979000'>7</font>: <font color='#BB00BB'>invoke_on</font><font face='Lucida Console'>(</font>obj,unchecked_get<font color='#5555FF'>&lt;</font>T7<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;  <font color='#0000FF'>break</font>;
+                <font color='#0000FF'>case</font> <font color='#979000'>8</font>: <font color='#BB00BB'>invoke_on</font><font face='Lucida Console'>(</font>obj,unchecked_get<font color='#5555FF'>&lt;</font>T8<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;  <font color='#0000FF'>break</font>;
+                <font color='#0000FF'>case</font> <font color='#979000'>9</font>: <font color='#BB00BB'>invoke_on</font><font face='Lucida Console'>(</font>obj,unchecked_get<font color='#5555FF'>&lt;</font>T9<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;  <font color='#0000FF'>break</font>;
+                <font color='#0000FF'>case</font> <font color='#979000'>10</font>: <font color='#BB00BB'>invoke_on</font><font face='Lucida Console'>(</font>obj,unchecked_get<font color='#5555FF'>&lt;</font>T10<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;  <font color='#0000FF'>break</font>;
+
+                <font color='#0000FF'>case</font> <font color='#979000'>11</font>: <font color='#BB00BB'>invoke_on</font><font face='Lucida Console'>(</font>obj,unchecked_get<font color='#5555FF'>&lt;</font>T11<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;  <font color='#0000FF'>break</font>;
+                <font color='#0000FF'>case</font> <font color='#979000'>12</font>: <font color='#BB00BB'>invoke_on</font><font face='Lucida Console'>(</font>obj,unchecked_get<font color='#5555FF'>&lt;</font>T12<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;  <font color='#0000FF'>break</font>;
+                <font color='#0000FF'>case</font> <font color='#979000'>13</font>: <font color='#BB00BB'>invoke_on</font><font face='Lucida Console'>(</font>obj,unchecked_get<font color='#5555FF'>&lt;</font>T13<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;  <font color='#0000FF'>break</font>;
+                <font color='#0000FF'>case</font> <font color='#979000'>14</font>: <font color='#BB00BB'>invoke_on</font><font face='Lucida Console'>(</font>obj,unchecked_get<font color='#5555FF'>&lt;</font>T14<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;  <font color='#0000FF'>break</font>;
+                <font color='#0000FF'>case</font> <font color='#979000'>15</font>: <font color='#BB00BB'>invoke_on</font><font face='Lucida Console'>(</font>obj,unchecked_get<font color='#5555FF'>&lt;</font>T15<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;  <font color='#0000FF'>break</font>;
+
+                <font color='#0000FF'>case</font> <font color='#979000'>16</font>: <font color='#BB00BB'>invoke_on</font><font face='Lucida Console'>(</font>obj,unchecked_get<font color='#5555FF'>&lt;</font>T16<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;  <font color='#0000FF'>break</font>;
+                <font color='#0000FF'>case</font> <font color='#979000'>17</font>: <font color='#BB00BB'>invoke_on</font><font face='Lucida Console'>(</font>obj,unchecked_get<font color='#5555FF'>&lt;</font>T17<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;  <font color='#0000FF'>break</font>;
+                <font color='#0000FF'>case</font> <font color='#979000'>18</font>: <font color='#BB00BB'>invoke_on</font><font face='Lucida Console'>(</font>obj,unchecked_get<font color='#5555FF'>&lt;</font>T18<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;  <font color='#0000FF'>break</font>;
+                <font color='#0000FF'>case</font> <font color='#979000'>19</font>: <font color='#BB00BB'>invoke_on</font><font face='Lucida Console'>(</font>obj,unchecked_get<font color='#5555FF'>&lt;</font>T19<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;  <font color='#0000FF'>break</font>;
+                <font color='#0000FF'>case</font> <font color='#979000'>20</font>: <font color='#BB00BB'>invoke_on</font><font face='Lucida Console'>(</font>obj,unchecked_get<font color='#5555FF'>&lt;</font>T20<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;  <font color='#0000FF'>break</font>;
+            <b>}</b>
+        <b>}</b>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'>typename</font> T
+            <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='apply_to_contents'></a>apply_to_contents</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> obj
+        <font face='Lucida Console'>)</font> 
+        <b>{</b>
+            <font color='#0000FF'>switch</font> <font face='Lucida Console'>(</font>type_identity<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#009900'>// do nothing because we are empty
+</font>                <font color='#0000FF'>case</font> <font color='#979000'>0</font>: <font color='#0000FF'>break</font>;
+
+                <font color='#0000FF'>case</font> <font color='#979000'>1</font>: <font color='#BB00BB'>invoke_on</font><font face='Lucida Console'>(</font>obj,unchecked_get<font color='#5555FF'>&lt;</font>T1<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;  <font color='#0000FF'>break</font>;
+                <font color='#0000FF'>case</font> <font color='#979000'>2</font>: <font color='#BB00BB'>invoke_on</font><font face='Lucida Console'>(</font>obj,unchecked_get<font color='#5555FF'>&lt;</font>T2<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;  <font color='#0000FF'>break</font>;
+                <font color='#0000FF'>case</font> <font color='#979000'>3</font>: <font color='#BB00BB'>invoke_on</font><font face='Lucida Console'>(</font>obj,unchecked_get<font color='#5555FF'>&lt;</font>T3<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;  <font color='#0000FF'>break</font>;
+                <font color='#0000FF'>case</font> <font color='#979000'>4</font>: <font color='#BB00BB'>invoke_on</font><font face='Lucida Console'>(</font>obj,unchecked_get<font color='#5555FF'>&lt;</font>T4<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;  <font color='#0000FF'>break</font>;
+                <font color='#0000FF'>case</font> <font color='#979000'>5</font>: <font color='#BB00BB'>invoke_on</font><font face='Lucida Console'>(</font>obj,unchecked_get<font color='#5555FF'>&lt;</font>T5<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;  <font color='#0000FF'>break</font>;
+
+                <font color='#0000FF'>case</font> <font color='#979000'>6</font>: <font color='#BB00BB'>invoke_on</font><font face='Lucida Console'>(</font>obj,unchecked_get<font color='#5555FF'>&lt;</font>T6<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;  <font color='#0000FF'>break</font>;
+                <font color='#0000FF'>case</font> <font color='#979000'>7</font>: <font color='#BB00BB'>invoke_on</font><font face='Lucida Console'>(</font>obj,unchecked_get<font color='#5555FF'>&lt;</font>T7<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;  <font color='#0000FF'>break</font>;
+                <font color='#0000FF'>case</font> <font color='#979000'>8</font>: <font color='#BB00BB'>invoke_on</font><font face='Lucida Console'>(</font>obj,unchecked_get<font color='#5555FF'>&lt;</font>T8<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;  <font color='#0000FF'>break</font>;
+                <font color='#0000FF'>case</font> <font color='#979000'>9</font>: <font color='#BB00BB'>invoke_on</font><font face='Lucida Console'>(</font>obj,unchecked_get<font color='#5555FF'>&lt;</font>T9<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;  <font color='#0000FF'>break</font>;
+                <font color='#0000FF'>case</font> <font color='#979000'>10</font>: <font color='#BB00BB'>invoke_on</font><font face='Lucida Console'>(</font>obj,unchecked_get<font color='#5555FF'>&lt;</font>T10<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;  <font color='#0000FF'>break</font>;
+
+                <font color='#0000FF'>case</font> <font color='#979000'>11</font>: <font color='#BB00BB'>invoke_on</font><font face='Lucida Console'>(</font>obj,unchecked_get<font color='#5555FF'>&lt;</font>T11<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;  <font color='#0000FF'>break</font>;
+                <font color='#0000FF'>case</font> <font color='#979000'>12</font>: <font color='#BB00BB'>invoke_on</font><font face='Lucida Console'>(</font>obj,unchecked_get<font color='#5555FF'>&lt;</font>T12<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;  <font color='#0000FF'>break</font>;
+                <font color='#0000FF'>case</font> <font color='#979000'>13</font>: <font color='#BB00BB'>invoke_on</font><font face='Lucida Console'>(</font>obj,unchecked_get<font color='#5555FF'>&lt;</font>T13<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;  <font color='#0000FF'>break</font>;
+                <font color='#0000FF'>case</font> <font color='#979000'>14</font>: <font color='#BB00BB'>invoke_on</font><font face='Lucida Console'>(</font>obj,unchecked_get<font color='#5555FF'>&lt;</font>T14<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;  <font color='#0000FF'>break</font>;
+                <font color='#0000FF'>case</font> <font color='#979000'>15</font>: <font color='#BB00BB'>invoke_on</font><font face='Lucida Console'>(</font>obj,unchecked_get<font color='#5555FF'>&lt;</font>T15<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;  <font color='#0000FF'>break</font>;
+
+                <font color='#0000FF'>case</font> <font color='#979000'>16</font>: <font color='#BB00BB'>invoke_on</font><font face='Lucida Console'>(</font>obj,unchecked_get<font color='#5555FF'>&lt;</font>T16<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;  <font color='#0000FF'>break</font>;
+                <font color='#0000FF'>case</font> <font color='#979000'>17</font>: <font color='#BB00BB'>invoke_on</font><font face='Lucida Console'>(</font>obj,unchecked_get<font color='#5555FF'>&lt;</font>T17<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;  <font color='#0000FF'>break</font>;
+                <font color='#0000FF'>case</font> <font color='#979000'>18</font>: <font color='#BB00BB'>invoke_on</font><font face='Lucida Console'>(</font>obj,unchecked_get<font color='#5555FF'>&lt;</font>T18<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;  <font color='#0000FF'>break</font>;
+                <font color='#0000FF'>case</font> <font color='#979000'>19</font>: <font color='#BB00BB'>invoke_on</font><font face='Lucida Console'>(</font>obj,unchecked_get<font color='#5555FF'>&lt;</font>T19<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;  <font color='#0000FF'>break</font>;
+                <font color='#0000FF'>case</font> <font color='#979000'>20</font>: <font color='#BB00BB'>invoke_on</font><font face='Lucida Console'>(</font>obj,unchecked_get<font color='#5555FF'>&lt;</font>T20<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;  <font color='#0000FF'>break</font>;
+            <b>}</b>
+        <b>}</b>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'>typename</font> T
+            <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='apply_to_contents'></a>apply_to_contents</b> <font face='Lucida Console'>(</font>
+            T<font color='#5555FF'>&amp;</font> obj
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#0000FF'>switch</font> <font face='Lucida Console'>(</font>type_identity<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#009900'>// do nothing because we are empty
+</font>                <font color='#0000FF'>case</font> <font color='#979000'>0</font>: <font color='#0000FF'>break</font>;
+
+                <font color='#0000FF'>case</font> <font color='#979000'>1</font>: <font color='#BB00BB'>invoke_on</font><font face='Lucida Console'>(</font>obj,unchecked_get<font color='#5555FF'>&lt;</font>T1<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;  <font color='#0000FF'>break</font>;
+                <font color='#0000FF'>case</font> <font color='#979000'>2</font>: <font color='#BB00BB'>invoke_on</font><font face='Lucida Console'>(</font>obj,unchecked_get<font color='#5555FF'>&lt;</font>T2<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;  <font color='#0000FF'>break</font>;
+                <font color='#0000FF'>case</font> <font color='#979000'>3</font>: <font color='#BB00BB'>invoke_on</font><font face='Lucida Console'>(</font>obj,unchecked_get<font color='#5555FF'>&lt;</font>T3<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;  <font color='#0000FF'>break</font>;
+                <font color='#0000FF'>case</font> <font color='#979000'>4</font>: <font color='#BB00BB'>invoke_on</font><font face='Lucida Console'>(</font>obj,unchecked_get<font color='#5555FF'>&lt;</font>T4<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;  <font color='#0000FF'>break</font>;
+                <font color='#0000FF'>case</font> <font color='#979000'>5</font>: <font color='#BB00BB'>invoke_on</font><font face='Lucida Console'>(</font>obj,unchecked_get<font color='#5555FF'>&lt;</font>T5<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;  <font color='#0000FF'>break</font>;
+
+                <font color='#0000FF'>case</font> <font color='#979000'>6</font>: <font color='#BB00BB'>invoke_on</font><font face='Lucida Console'>(</font>obj,unchecked_get<font color='#5555FF'>&lt;</font>T6<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;  <font color='#0000FF'>break</font>;
+                <font color='#0000FF'>case</font> <font color='#979000'>7</font>: <font color='#BB00BB'>invoke_on</font><font face='Lucida Console'>(</font>obj,unchecked_get<font color='#5555FF'>&lt;</font>T7<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;  <font color='#0000FF'>break</font>;
+                <font color='#0000FF'>case</font> <font color='#979000'>8</font>: <font color='#BB00BB'>invoke_on</font><font face='Lucida Console'>(</font>obj,unchecked_get<font color='#5555FF'>&lt;</font>T8<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;  <font color='#0000FF'>break</font>;
+                <font color='#0000FF'>case</font> <font color='#979000'>9</font>: <font color='#BB00BB'>invoke_on</font><font face='Lucida Console'>(</font>obj,unchecked_get<font color='#5555FF'>&lt;</font>T9<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;  <font color='#0000FF'>break</font>;
+                <font color='#0000FF'>case</font> <font color='#979000'>10</font>: <font color='#BB00BB'>invoke_on</font><font face='Lucida Console'>(</font>obj,unchecked_get<font color='#5555FF'>&lt;</font>T10<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;  <font color='#0000FF'>break</font>;
+
+                <font color='#0000FF'>case</font> <font color='#979000'>11</font>: <font color='#BB00BB'>invoke_on</font><font face='Lucida Console'>(</font>obj,unchecked_get<font color='#5555FF'>&lt;</font>T11<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;  <font color='#0000FF'>break</font>;
+                <font color='#0000FF'>case</font> <font color='#979000'>12</font>: <font color='#BB00BB'>invoke_on</font><font face='Lucida Console'>(</font>obj,unchecked_get<font color='#5555FF'>&lt;</font>T12<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;  <font color='#0000FF'>break</font>;
+                <font color='#0000FF'>case</font> <font color='#979000'>13</font>: <font color='#BB00BB'>invoke_on</font><font face='Lucida Console'>(</font>obj,unchecked_get<font color='#5555FF'>&lt;</font>T13<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;  <font color='#0000FF'>break</font>;
+                <font color='#0000FF'>case</font> <font color='#979000'>14</font>: <font color='#BB00BB'>invoke_on</font><font face='Lucida Console'>(</font>obj,unchecked_get<font color='#5555FF'>&lt;</font>T14<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;  <font color='#0000FF'>break</font>;
+                <font color='#0000FF'>case</font> <font color='#979000'>15</font>: <font color='#BB00BB'>invoke_on</font><font face='Lucida Console'>(</font>obj,unchecked_get<font color='#5555FF'>&lt;</font>T15<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;  <font color='#0000FF'>break</font>;
+
+                <font color='#0000FF'>case</font> <font color='#979000'>16</font>: <font color='#BB00BB'>invoke_on</font><font face='Lucida Console'>(</font>obj,unchecked_get<font color='#5555FF'>&lt;</font>T16<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;  <font color='#0000FF'>break</font>;
+                <font color='#0000FF'>case</font> <font color='#979000'>17</font>: <font color='#BB00BB'>invoke_on</font><font face='Lucida Console'>(</font>obj,unchecked_get<font color='#5555FF'>&lt;</font>T17<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;  <font color='#0000FF'>break</font>;
+                <font color='#0000FF'>case</font> <font color='#979000'>18</font>: <font color='#BB00BB'>invoke_on</font><font face='Lucida Console'>(</font>obj,unchecked_get<font color='#5555FF'>&lt;</font>T18<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;  <font color='#0000FF'>break</font>;
+                <font color='#0000FF'>case</font> <font color='#979000'>19</font>: <font color='#BB00BB'>invoke_on</font><font face='Lucida Console'>(</font>obj,unchecked_get<font color='#5555FF'>&lt;</font>T19<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;  <font color='#0000FF'>break</font>;
+                <font color='#0000FF'>case</font> <font color='#979000'>20</font>: <font color='#BB00BB'>invoke_on</font><font face='Lucida Console'>(</font>obj,unchecked_get<font color='#5555FF'>&lt;</font>T20<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;  <font color='#0000FF'>break</font>;
+            <b>}</b>
+        <b>}</b>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'>typename</font> T
+            <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='apply_to_contents'></a>apply_to_contents</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> obj
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#0000FF'>switch</font> <font face='Lucida Console'>(</font>type_identity<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#009900'>// do nothing because we are empty
+</font>                <font color='#0000FF'>case</font> <font color='#979000'>0</font>: <font color='#0000FF'>break</font>;
+
+                <font color='#0000FF'>case</font> <font color='#979000'>1</font>: <font color='#BB00BB'>invoke_on</font><font face='Lucida Console'>(</font>obj,unchecked_get<font color='#5555FF'>&lt;</font>T1<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;  <font color='#0000FF'>break</font>;
+                <font color='#0000FF'>case</font> <font color='#979000'>2</font>: <font color='#BB00BB'>invoke_on</font><font face='Lucida Console'>(</font>obj,unchecked_get<font color='#5555FF'>&lt;</font>T2<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;  <font color='#0000FF'>break</font>;
+                <font color='#0000FF'>case</font> <font color='#979000'>3</font>: <font color='#BB00BB'>invoke_on</font><font face='Lucida Console'>(</font>obj,unchecked_get<font color='#5555FF'>&lt;</font>T3<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;  <font color='#0000FF'>break</font>;
+                <font color='#0000FF'>case</font> <font color='#979000'>4</font>: <font color='#BB00BB'>invoke_on</font><font face='Lucida Console'>(</font>obj,unchecked_get<font color='#5555FF'>&lt;</font>T4<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;  <font color='#0000FF'>break</font>;
+                <font color='#0000FF'>case</font> <font color='#979000'>5</font>: <font color='#BB00BB'>invoke_on</font><font face='Lucida Console'>(</font>obj,unchecked_get<font color='#5555FF'>&lt;</font>T5<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;  <font color='#0000FF'>break</font>;
+
+                <font color='#0000FF'>case</font> <font color='#979000'>6</font>: <font color='#BB00BB'>invoke_on</font><font face='Lucida Console'>(</font>obj,unchecked_get<font color='#5555FF'>&lt;</font>T6<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;  <font color='#0000FF'>break</font>;
+                <font color='#0000FF'>case</font> <font color='#979000'>7</font>: <font color='#BB00BB'>invoke_on</font><font face='Lucida Console'>(</font>obj,unchecked_get<font color='#5555FF'>&lt;</font>T7<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;  <font color='#0000FF'>break</font>;
+                <font color='#0000FF'>case</font> <font color='#979000'>8</font>: <font color='#BB00BB'>invoke_on</font><font face='Lucida Console'>(</font>obj,unchecked_get<font color='#5555FF'>&lt;</font>T8<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;  <font color='#0000FF'>break</font>;
+                <font color='#0000FF'>case</font> <font color='#979000'>9</font>: <font color='#BB00BB'>invoke_on</font><font face='Lucida Console'>(</font>obj,unchecked_get<font color='#5555FF'>&lt;</font>T9<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;  <font color='#0000FF'>break</font>;
+                <font color='#0000FF'>case</font> <font color='#979000'>10</font>: <font color='#BB00BB'>invoke_on</font><font face='Lucida Console'>(</font>obj,unchecked_get<font color='#5555FF'>&lt;</font>T10<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;  <font color='#0000FF'>break</font>;
+
+                <font color='#0000FF'>case</font> <font color='#979000'>11</font>: <font color='#BB00BB'>invoke_on</font><font face='Lucida Console'>(</font>obj,unchecked_get<font color='#5555FF'>&lt;</font>T11<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;  <font color='#0000FF'>break</font>;
+                <font color='#0000FF'>case</font> <font color='#979000'>12</font>: <font color='#BB00BB'>invoke_on</font><font face='Lucida Console'>(</font>obj,unchecked_get<font color='#5555FF'>&lt;</font>T12<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;  <font color='#0000FF'>break</font>;
+                <font color='#0000FF'>case</font> <font color='#979000'>13</font>: <font color='#BB00BB'>invoke_on</font><font face='Lucida Console'>(</font>obj,unchecked_get<font color='#5555FF'>&lt;</font>T13<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;  <font color='#0000FF'>break</font>;
+                <font color='#0000FF'>case</font> <font color='#979000'>14</font>: <font color='#BB00BB'>invoke_on</font><font face='Lucida Console'>(</font>obj,unchecked_get<font color='#5555FF'>&lt;</font>T14<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;  <font color='#0000FF'>break</font>;
+                <font color='#0000FF'>case</font> <font color='#979000'>15</font>: <font color='#BB00BB'>invoke_on</font><font face='Lucida Console'>(</font>obj,unchecked_get<font color='#5555FF'>&lt;</font>T15<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;  <font color='#0000FF'>break</font>;
+
+                <font color='#0000FF'>case</font> <font color='#979000'>16</font>: <font color='#BB00BB'>invoke_on</font><font face='Lucida Console'>(</font>obj,unchecked_get<font color='#5555FF'>&lt;</font>T16<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;  <font color='#0000FF'>break</font>;
+                <font color='#0000FF'>case</font> <font color='#979000'>17</font>: <font color='#BB00BB'>invoke_on</font><font face='Lucida Console'>(</font>obj,unchecked_get<font color='#5555FF'>&lt;</font>T17<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;  <font color='#0000FF'>break</font>;
+                <font color='#0000FF'>case</font> <font color='#979000'>18</font>: <font color='#BB00BB'>invoke_on</font><font face='Lucida Console'>(</font>obj,unchecked_get<font color='#5555FF'>&lt;</font>T18<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;  <font color='#0000FF'>break</font>;
+                <font color='#0000FF'>case</font> <font color='#979000'>19</font>: <font color='#BB00BB'>invoke_on</font><font face='Lucida Console'>(</font>obj,unchecked_get<font color='#5555FF'>&lt;</font>T19<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;  <font color='#0000FF'>break</font>;
+                <font color='#0000FF'>case</font> <font color='#979000'>20</font>: <font color='#BB00BB'>invoke_on</font><font face='Lucida Console'>(</font>obj,unchecked_get<font color='#5555FF'>&lt;</font>T20<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;  <font color='#0000FF'>break</font>;
+            <b>}</b>
+        <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='swap'></a>swap</b> <font face='Lucida Console'>(</font>
+            type_safe_union<font color='#5555FF'>&amp;</font> item
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#009900'>// if both *this and item contain the same type of thing
+</font>            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>type_identity <font color='#5555FF'>=</font><font color='#5555FF'>=</font> item.type_identity<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#009900'>// swap the things in this and item.  
+</font>                item.<font color='#BB00BB'>apply_to_contents</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+            <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>type_identity <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#009900'>// *this doesn't contain anything.  So swap this and item and
+</font>                <font color='#009900'>// then destruct item.
+</font>                item.<font color='#BB00BB'>apply_to_contents</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font><font face='Lucida Console'>)</font>;
+                item.<font color='#BB00BB'>destruct</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+            <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>item.type_identity <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#009900'>// *this doesn't contain anything.  So swap this and item and
+</font>                <font color='#009900'>// then destruct this.
+</font>                <font color='#BB00BB'>apply_to_contents</font><font face='Lucida Console'>(</font>item<font face='Lucida Console'>)</font>;
+                <font color='#BB00BB'>destruct</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+            <font color='#0000FF'>else</font>
+            <b>{</b>
+                type_safe_union temp;
+                <font color='#009900'>// swap *this into temp
+</font>                <font color='#BB00BB'>apply_to_contents</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font>;
+                <font color='#009900'>// swap item into *this
+</font>                item.<font color='#BB00BB'>apply_to_contents</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font><font face='Lucida Console'>)</font>;
+                <font color='#009900'>// swap temp into item
+</font>                temp.<font color='#BB00BB'>apply_to_contents</font><font face='Lucida Console'>(</font>item<font face='Lucida Console'>)</font>;
+            <b>}</b>
+        <b>}</b>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font> 
+        T<font color='#5555FF'>&amp;</font> <b><a name='get'></a>get</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> 
+        <b>{</b> 
+            validate_type<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            construct<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;  
+            <font color='#0000FF'>return</font> <font color='#5555FF'>*</font><font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font>T<font color='#5555FF'>*</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>mem.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>; 
+        <b>}</b>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> <b><a name='cast_to'></a>cast_to</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            validate_type<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>contains<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                <font color='#0000FF'>return</font> <font color='#5555FF'>*</font><font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'>const</font> T<font color='#5555FF'>*</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>mem.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>else</font>
+                <font color='#0000FF'>throw</font> <font color='#BB00BB'>bad_type_safe_union_cast</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+        T<font color='#5555FF'>&amp;</font> <b><a name='cast_to'></a>cast_to</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> 
+        <b>{</b>
+            validate_type<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>contains<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                <font color='#0000FF'>return</font> <font color='#5555FF'>*</font><font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font>T<font color='#5555FF'>*</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>mem.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>else</font>
+                <font color='#0000FF'>throw</font> <font color='#BB00BB'>bad_type_safe_union_cast</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+        type_safe_union<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font> <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> item<font face='Lucida Console'>)</font> <b>{</b> get<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> item; <font color='#0000FF'>return</font> <font color='#5555FF'>*</font><font color='#0000FF'>this</font>; <b>}</b>
+
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T1, <font color='#0000FF'>typename</font> T2, <font color='#0000FF'>typename</font> T3, <font color='#0000FF'>typename</font> T4, <font color='#0000FF'>typename</font> T5,
+        <font color='#0000FF'>typename</font> T6, <font color='#0000FF'>typename</font> T7, <font color='#0000FF'>typename</font> T8, <font color='#0000FF'>typename</font> T9, <font color='#0000FF'>typename</font> T10,
+        <font color='#0000FF'>typename</font> T11, <font color='#0000FF'>typename</font> T12, <font color='#0000FF'>typename</font> T13, <font color='#0000FF'>typename</font> T14, <font color='#0000FF'>typename</font> T15,
+        <font color='#0000FF'>typename</font> T16, <font color='#0000FF'>typename</font> T17, <font color='#0000FF'>typename</font> T18, <font color='#0000FF'>typename</font> T19, <font color='#0000FF'>typename</font> T20
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='swap'></a>swap</b> <font face='Lucida Console'>(</font>
+        type_safe_union<font color='#5555FF'>&lt;</font>T1,T2,T3,T4,T5,T6,T7,T8,T9,T10, T11,T12,T13,T14,T15,T16,T17,T18,T19,T20<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> a, 
+        type_safe_union<font color='#5555FF'>&lt;</font>T1,T2,T3,T4,T5,T6,T7,T8,T9,T10, T11,T12,T13,T14,T15,T16,T17,T18,T19,T20<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> b 
+    <font face='Lucida Console'>)</font> <b>{</b> a.<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>b<font face='Lucida Console'>)</font>; <b>}</b>   
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> from, 
+        <font color='#0000FF'>typename</font> T1, <font color='#0000FF'>typename</font> T2, <font color='#0000FF'>typename</font> T3, <font color='#0000FF'>typename</font> T4, <font color='#0000FF'>typename</font> T5,
+        <font color='#0000FF'>typename</font> T6, <font color='#0000FF'>typename</font> T7, <font color='#0000FF'>typename</font> T8, <font color='#0000FF'>typename</font> T9, <font color='#0000FF'>typename</font> T10,
+        <font color='#0000FF'>typename</font> T11, <font color='#0000FF'>typename</font> T12, <font color='#0000FF'>typename</font> T13, <font color='#0000FF'>typename</font> T14, <font color='#0000FF'>typename</font> T15,
+        <font color='#0000FF'>typename</font> T16, <font color='#0000FF'>typename</font> T17, <font color='#0000FF'>typename</font> T18, <font color='#0000FF'>typename</font> T19, <font color='#0000FF'>typename</font> T20
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>struct</font> <b><a name='is_convertible'></a>is_convertible</b><font color='#5555FF'>&lt;</font>from,
+        type_safe_union<font color='#5555FF'>&lt;</font>T1,T2,T3,T4,T5,T6,T7,T8,T9,T10, T11,T12,T13,T14,T15,T16,T17,T18,T19,T20<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font>
+    <b>{</b>
+        <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>bool</u></font> value <font color='#5555FF'>=</font> is_convertible<font color='#5555FF'>&lt;</font>from,T1<font color='#5555FF'>&gt;</font>::value <font color='#5555FF'>|</font><font color='#5555FF'>|</font>
+                                  is_convertible<font color='#5555FF'>&lt;</font>from,T2<font color='#5555FF'>&gt;</font>::value <font color='#5555FF'>|</font><font color='#5555FF'>|</font>
+                                  is_convertible<font color='#5555FF'>&lt;</font>from,T3<font color='#5555FF'>&gt;</font>::value <font color='#5555FF'>|</font><font color='#5555FF'>|</font>
+                                  is_convertible<font color='#5555FF'>&lt;</font>from,T4<font color='#5555FF'>&gt;</font>::value <font color='#5555FF'>|</font><font color='#5555FF'>|</font>
+                                  is_convertible<font color='#5555FF'>&lt;</font>from,T5<font color='#5555FF'>&gt;</font>::value <font color='#5555FF'>|</font><font color='#5555FF'>|</font>
+                                  is_convertible<font color='#5555FF'>&lt;</font>from,T6<font color='#5555FF'>&gt;</font>::value <font color='#5555FF'>|</font><font color='#5555FF'>|</font>
+                                  is_convertible<font color='#5555FF'>&lt;</font>from,T7<font color='#5555FF'>&gt;</font>::value <font color='#5555FF'>|</font><font color='#5555FF'>|</font>
+                                  is_convertible<font color='#5555FF'>&lt;</font>from,T8<font color='#5555FF'>&gt;</font>::value <font color='#5555FF'>|</font><font color='#5555FF'>|</font>
+                                  is_convertible<font color='#5555FF'>&lt;</font>from,T9<font color='#5555FF'>&gt;</font>::value <font color='#5555FF'>|</font><font color='#5555FF'>|</font>
+                                  is_convertible<font color='#5555FF'>&lt;</font>from,T10<font color='#5555FF'>&gt;</font>::value <font color='#5555FF'>|</font><font color='#5555FF'>|</font>
+                                  is_convertible<font color='#5555FF'>&lt;</font>from,T11<font color='#5555FF'>&gt;</font>::value <font color='#5555FF'>|</font><font color='#5555FF'>|</font>
+                                  is_convertible<font color='#5555FF'>&lt;</font>from,T12<font color='#5555FF'>&gt;</font>::value <font color='#5555FF'>|</font><font color='#5555FF'>|</font>
+                                  is_convertible<font color='#5555FF'>&lt;</font>from,T13<font color='#5555FF'>&gt;</font>::value <font color='#5555FF'>|</font><font color='#5555FF'>|</font>
+                                  is_convertible<font color='#5555FF'>&lt;</font>from,T14<font color='#5555FF'>&gt;</font>::value <font color='#5555FF'>|</font><font color='#5555FF'>|</font>
+                                  is_convertible<font color='#5555FF'>&lt;</font>from,T15<font color='#5555FF'>&gt;</font>::value <font color='#5555FF'>|</font><font color='#5555FF'>|</font>
+                                  is_convertible<font color='#5555FF'>&lt;</font>from,T16<font color='#5555FF'>&gt;</font>::value <font color='#5555FF'>|</font><font color='#5555FF'>|</font>
+                                  is_convertible<font color='#5555FF'>&lt;</font>from,T17<font color='#5555FF'>&gt;</font>::value <font color='#5555FF'>|</font><font color='#5555FF'>|</font>
+                                  is_convertible<font color='#5555FF'>&lt;</font>from,T18<font color='#5555FF'>&gt;</font>::value <font color='#5555FF'>|</font><font color='#5555FF'>|</font>
+                                  is_convertible<font color='#5555FF'>&lt;</font>from,T19<font color='#5555FF'>&gt;</font>::value <font color='#5555FF'>|</font><font color='#5555FF'>|</font>
+                                  is_convertible<font color='#5555FF'>&lt;</font>from,T20<font color='#5555FF'>&gt;</font>::value;
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>namespace</font> impl_tsu
+    <b>{</b>
+        <font color='#0000FF'>struct</font> <b><a name='serialize_helper'></a>serialize_helper</b>
+        <b>{</b>
+            <font color='#009900'>/*
+                This is a function object to help us serialize type_safe_unions
+            */</font>
+
+            std::ostream<font color='#5555FF'>&amp;</font> out;
+            <b><a name='serialize_helper'></a>serialize_helper</b><font face='Lucida Console'>(</font>std::ostream<font color='#5555FF'>&amp;</font> out_<font face='Lucida Console'>)</font>: out<font face='Lucida Console'>(</font>out_<font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+            <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+            <font color='#0000FF'><u>void</u></font> <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font><font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> item<font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item, out<font face='Lucida Console'>)</font>; <b>}</b> 
+        <b>}</b>;
+    <b>}</b>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T1, <font color='#0000FF'>typename</font> T2, <font color='#0000FF'>typename</font> T3, <font color='#0000FF'>typename</font> T4, <font color='#0000FF'>typename</font> T5,
+        <font color='#0000FF'>typename</font> T6, <font color='#0000FF'>typename</font> T7, <font color='#0000FF'>typename</font> T8, <font color='#0000FF'>typename</font> T9, <font color='#0000FF'>typename</font> T10,
+        <font color='#0000FF'>typename</font> T11, <font color='#0000FF'>typename</font> T12, <font color='#0000FF'>typename</font> T13, <font color='#0000FF'>typename</font> T14, <font color='#0000FF'>typename</font> T15,
+        <font color='#0000FF'>typename</font> T16, <font color='#0000FF'>typename</font> T17, <font color='#0000FF'>typename</font> T18, <font color='#0000FF'>typename</font> T19, <font color='#0000FF'>typename</font> T20
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='serialize'></a>serialize</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> type_safe_union<font color='#5555FF'>&lt;</font>T1,T2,T3,T4,T5,T6,T7,T8,T9,T10, T11,T12,T13,T14,T15,T16,T17,T18,T19,T20<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> item,
+        std::ostream<font color='#5555FF'>&amp;</font> out
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>try</font>
+        <b>{</b>
+            <font color='#009900'>// save the type_identity
+</font>            <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item.type_identity, out<font face='Lucida Console'>)</font>;
+            item.<font color='#BB00BB'>apply_to_contents</font><font face='Lucida Console'>(</font>dlib::impl_tsu::<font color='#BB00BB'>serialize_helper</font><font face='Lucida Console'>(</font>out<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+        <font color='#0000FF'>catch</font> <font face='Lucida Console'>(</font>serialization_error<font color='#5555FF'>&amp;</font> e<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>throw</font> <font color='#BB00BB'>serialization_error</font><font face='Lucida Console'>(</font>e.info <font color='#5555FF'>+</font> "<font color='#CC0000'>\n   while serializing an object of type type_safe_union</font>"<font face='Lucida Console'>)</font>;
+        <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T1, <font color='#0000FF'>typename</font> T2, <font color='#0000FF'>typename</font> T3, <font color='#0000FF'>typename</font> T4, <font color='#0000FF'>typename</font> T5,
+        <font color='#0000FF'>typename</font> T6, <font color='#0000FF'>typename</font> T7, <font color='#0000FF'>typename</font> T8, <font color='#0000FF'>typename</font> T9, <font color='#0000FF'>typename</font> T10,
+        <font color='#0000FF'>typename</font> T11, <font color='#0000FF'>typename</font> T12, <font color='#0000FF'>typename</font> T13, <font color='#0000FF'>typename</font> T14, <font color='#0000FF'>typename</font> T15,
+        <font color='#0000FF'>typename</font> T16, <font color='#0000FF'>typename</font> T17, <font color='#0000FF'>typename</font> T18, <font color='#0000FF'>typename</font> T19, <font color='#0000FF'>typename</font> T20
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='deserialize'></a>deserialize</b> <font face='Lucida Console'>(</font>
+        type_safe_union<font color='#5555FF'>&lt;</font>T1,T2,T3,T4,T5,T6,T7,T8,T9,T10, T11,T12,T13,T14,T15,T16,T17,T18,T19,T20<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font>  item,
+        std::istream<font color='#5555FF'>&amp;</font> in
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>try</font>
+        <b>{</b>
+            <font color='#0000FF'>typedef</font> type_safe_union<font color='#5555FF'>&lt;</font>T1,T2,T3,T4,T5,T6,T7,T8,T9,T10, T11,T12,T13,T14,T15,T16,T17,T18,T19,T20<font color='#5555FF'>&gt;</font> tsu_type;
+
+            <font color='#0000FF'><u>int</u></font> type_identity;
+            <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>type_identity, in<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>switch</font> <font face='Lucida Console'>(</font>type_identity<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#009900'>// swap an empty type_safe_union into item since it should be in the empty state
+</font>                <font color='#0000FF'>case</font> <font color='#979000'>0</font>: <font color='#BB00BB'>tsu_type</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>item<font face='Lucida Console'>)</font>; <font color='#0000FF'>break</font>;
+
+                <font color='#0000FF'>case</font> <font color='#979000'>1</font>: <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item.<font color='#0000FF'>template</font> get<font color='#5555FF'>&lt;</font>T1<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, in<font face='Lucida Console'>)</font>;  <font color='#0000FF'>break</font>;
+                <font color='#0000FF'>case</font> <font color='#979000'>2</font>: <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item.<font color='#0000FF'>template</font> get<font color='#5555FF'>&lt;</font>T2<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, in<font face='Lucida Console'>)</font>;  <font color='#0000FF'>break</font>;
+                <font color='#0000FF'>case</font> <font color='#979000'>3</font>: <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item.<font color='#0000FF'>template</font> get<font color='#5555FF'>&lt;</font>T3<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, in<font face='Lucida Console'>)</font>;  <font color='#0000FF'>break</font>;
+                <font color='#0000FF'>case</font> <font color='#979000'>4</font>: <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item.<font color='#0000FF'>template</font> get<font color='#5555FF'>&lt;</font>T4<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, in<font face='Lucida Console'>)</font>;  <font color='#0000FF'>break</font>;
+                <font color='#0000FF'>case</font> <font color='#979000'>5</font>: <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item.<font color='#0000FF'>template</font> get<font color='#5555FF'>&lt;</font>T5<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, in<font face='Lucida Console'>)</font>;  <font color='#0000FF'>break</font>;
+
+                <font color='#0000FF'>case</font> <font color='#979000'>6</font>: <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item.<font color='#0000FF'>template</font> get<font color='#5555FF'>&lt;</font>T6<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, in<font face='Lucida Console'>)</font>;  <font color='#0000FF'>break</font>;
+                <font color='#0000FF'>case</font> <font color='#979000'>7</font>: <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item.<font color='#0000FF'>template</font> get<font color='#5555FF'>&lt;</font>T7<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, in<font face='Lucida Console'>)</font>;  <font color='#0000FF'>break</font>;
+                <font color='#0000FF'>case</font> <font color='#979000'>8</font>: <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item.<font color='#0000FF'>template</font> get<font color='#5555FF'>&lt;</font>T8<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, in<font face='Lucida Console'>)</font>;  <font color='#0000FF'>break</font>;
+                <font color='#0000FF'>case</font> <font color='#979000'>9</font>: <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item.<font color='#0000FF'>template</font> get<font color='#5555FF'>&lt;</font>T9<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, in<font face='Lucida Console'>)</font>;  <font color='#0000FF'>break</font>;
+                <font color='#0000FF'>case</font> <font color='#979000'>10</font>: <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item.<font color='#0000FF'>template</font> get<font color='#5555FF'>&lt;</font>T10<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, in<font face='Lucida Console'>)</font>;  <font color='#0000FF'>break</font>;
+
+                <font color='#0000FF'>case</font> <font color='#979000'>11</font>: <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item.<font color='#0000FF'>template</font> get<font color='#5555FF'>&lt;</font>T11<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, in<font face='Lucida Console'>)</font>;  <font color='#0000FF'>break</font>;
+                <font color='#0000FF'>case</font> <font color='#979000'>12</font>: <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item.<font color='#0000FF'>template</font> get<font color='#5555FF'>&lt;</font>T12<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, in<font face='Lucida Console'>)</font>;  <font color='#0000FF'>break</font>;
+                <font color='#0000FF'>case</font> <font color='#979000'>13</font>: <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item.<font color='#0000FF'>template</font> get<font color='#5555FF'>&lt;</font>T13<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, in<font face='Lucida Console'>)</font>;  <font color='#0000FF'>break</font>;
+                <font color='#0000FF'>case</font> <font color='#979000'>14</font>: <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item.<font color='#0000FF'>template</font> get<font color='#5555FF'>&lt;</font>T14<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, in<font face='Lucida Console'>)</font>;  <font color='#0000FF'>break</font>;
+                <font color='#0000FF'>case</font> <font color='#979000'>15</font>: <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item.<font color='#0000FF'>template</font> get<font color='#5555FF'>&lt;</font>T15<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, in<font face='Lucida Console'>)</font>;  <font color='#0000FF'>break</font>;
+
+                <font color='#0000FF'>case</font> <font color='#979000'>16</font>: <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item.<font color='#0000FF'>template</font> get<font color='#5555FF'>&lt;</font>T16<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, in<font face='Lucida Console'>)</font>;  <font color='#0000FF'>break</font>;
+                <font color='#0000FF'>case</font> <font color='#979000'>17</font>: <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item.<font color='#0000FF'>template</font> get<font color='#5555FF'>&lt;</font>T17<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, in<font face='Lucida Console'>)</font>;  <font color='#0000FF'>break</font>;
+                <font color='#0000FF'>case</font> <font color='#979000'>18</font>: <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item.<font color='#0000FF'>template</font> get<font color='#5555FF'>&lt;</font>T18<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, in<font face='Lucida Console'>)</font>;  <font color='#0000FF'>break</font>;
+                <font color='#0000FF'>case</font> <font color='#979000'>19</font>: <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item.<font color='#0000FF'>template</font> get<font color='#5555FF'>&lt;</font>T19<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, in<font face='Lucida Console'>)</font>;  <font color='#0000FF'>break</font>;
+                <font color='#0000FF'>case</font> <font color='#979000'>20</font>: <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item.<font color='#0000FF'>template</font> get<font color='#5555FF'>&lt;</font>T20<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, in<font face='Lucida Console'>)</font>;  <font color='#0000FF'>break</font>;
+
+                <font color='#0000FF'>default</font>: <font color='#0000FF'>throw</font> <font color='#BB00BB'>serialization_error</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>Corrupt data detected while deserializing type_safe_union</font>"<font face='Lucida Console'>)</font>;
+            <b>}</b>
+        <b>}</b>
+        <font color='#0000FF'>catch</font> <font face='Lucida Console'>(</font>serialization_error<font color='#5555FF'>&amp;</font> e<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>throw</font> <font color='#BB00BB'>serialization_error</font><font face='Lucida Console'>(</font>e.info <font color='#5555FF'>+</font> "<font color='#CC0000'>\n   while deserializing an object of type type_safe_union</font>"<font face='Lucida Console'>)</font>;
+        <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_TYPE_SAFE_UNIOn_h_
+</font>
+
+</pre></body></html>

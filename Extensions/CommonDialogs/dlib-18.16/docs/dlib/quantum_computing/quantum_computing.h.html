@@ -1,0 +1,866 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - quantum_computing.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2008  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_QUANTUM_COMPUTINg_1_
+<font color='#0000FF'>#define</font> DLIB_QUANTUM_COMPUTINg_1_
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>complex<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>cmath<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../matrix.h.html'>../matrix.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../rand.h.html'>../rand.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../enable_if.h.html'>../enable_if.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../algs.h.html'>../algs.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='quantum_computing_abstract.h.html'>quantum_computing_abstract.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>struct</font> <b><a name='gate_traits'></a>gate_traits</b> <b>{</b><b>}</b>;
+
+    <font color='#0000FF'>namespace</font> qc_helpers
+    <b>{</b>
+
+    <font color='#009900'>// ------------------------------------------------------------------------------------
+</font>
+    <font color='#009900'>// This is a template to compute the value of 2^n at compile time
+</font>        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'><u>long</u></font> n<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>struct</font> <b><a name='exp_2_n'></a>exp_2_n</b>
+        <b>{</b>
+            <b><a name='COMPILE_TIME_ASSERT'></a>COMPILE_TIME_ASSERT</b><font face='Lucida Console'>(</font><font color='#979000'>0</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> n <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> n <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#979000'>30</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>static</font> <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> value <font color='#5555FF'>=</font> exp_2_n<font color='#5555FF'>&lt;</font>n<font color='#5555FF'>-</font><font color='#979000'>1</font><font color='#5555FF'>&gt;</font>::value<font color='#5555FF'>*</font><font color='#979000'>2</font>;
+        <b>}</b>;
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>struct</font> <b><a name='exp_2_n'></a>exp_2_n</b><font color='#5555FF'>&lt;</font><font color='#979000'>0</font><font color='#5555FF'>&gt;</font>
+        <b>{</b>
+            <font color='#0000FF'>static</font> <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> value <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+        <b>}</b>;
+
+    <font color='#009900'>// ------------------------------------------------------------------------------------
+</font>
+    <b>}</b>
+
+    <font color='#0000FF'>typedef</font> std::complex<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font> qc_scalar_type;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>class</font> <b><a name='quantum_register'></a>quantum_register</b>
+    <b>{</b>
+    <font color='#0000FF'>public</font>:
+
+        <b><a name='quantum_register'></a>quantum_register</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#BB00BB'>set_num_bits</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'><u>int</u></font> <b><a name='num_bits'></a>num_bits</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#0000FF'>return</font> num_bits_in_register;
+        <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_num_bits'></a>set_num_bits</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>int</u></font> num_bits
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#009900'>// make sure requires clause is not broken
+</font>            <font color='#BB00BB'>DLIB_CASSERT</font><font face='Lucida Console'>(</font><font color='#979000'>1</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> num_bits <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> num_bits <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#979000'>30</font>,
+                "<font color='#CC0000'>\tvoid quantum_register::set_num_bits()</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tinvalid arguments to this function</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tnum_bits: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> num_bits 
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tthis:     </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font>
+                <font face='Lucida Console'>)</font>;
+
+            num_bits_in_register <font color='#5555FF'>=</font> num_bits;
+
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> size <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> num_bits; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                size <font color='#5555FF'>*</font><font color='#5555FF'>=</font> <font color='#979000'>2</font>;
+
+            state.<font color='#BB00BB'>set_size</font><font face='Lucida Console'>(</font>size<font face='Lucida Console'>)</font>;
+
+            <font color='#BB00BB'>zero_all_bits</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='zero_all_bits'></a>zero_all_bits</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#BB00BB'>set_all_elements</font><font face='Lucida Console'>(</font>state,<font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>state</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+        <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='append'></a>append</b> <font face='Lucida Console'>(</font> 
+            <font color='#0000FF'>const</font> quantum_register<font color='#5555FF'>&amp;</font> reg
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            num_bits_in_register <font color='#5555FF'>+</font><font color='#5555FF'>=</font> reg.num_bits_in_register;
+            state <font color='#5555FF'>=</font> <font color='#BB00BB'>tensor_product</font><font face='Lucida Console'>(</font>state, reg.state<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> rand_type<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>bool</u></font> <b><a name='measure_bit'></a>measure_bit</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>int</u></font> bit,
+            rand_type<font color='#5555FF'>&amp;</font> rnd
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#009900'>// make sure requires clause is not broken
+</font>            <font color='#BB00BB'>DLIB_CASSERT</font><font face='Lucida Console'>(</font><font color='#979000'>0</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> bit <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> bit <font color='#5555FF'>&lt;</font> <font color='#BB00BB'>num_bits</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,
+                "<font color='#CC0000'>\tbool quantum_register::measure_bit()</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tinvalid arguments to this function</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tbit:        </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> bit 
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tnum_bits(): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>num_bits</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> 
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tthis:       </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font>
+                <font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>bool</u></font> value <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>rnd.<font color='#BB00BB'>get_random_double</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> <font color='#BB00BB'>probability_of_bit</font><font face='Lucida Console'>(</font>bit<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// Next we set all the states where this bit doesn't have the given value to 0
+</font>
+            <font color='#009900'>// But first make a mask that selects our bit
+</font>            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> mask <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> bit; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                mask <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+
+            <font color='#009900'>// loop over all the elements in the state vector and zero out those that
+</font>            <font color='#009900'>// conflict with the measurement we just made.
+</font>            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> r <font color='#5555FF'>=</font> <font color='#979000'>0</font>; r <font color='#5555FF'>&lt;</font> state.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>r<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> field <font color='#5555FF'>=</font> r;
+                <font color='#009900'>// if this state indicates that the bit should be set and it isn't
+</font>                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>field <font color='#5555FF'>&amp;</font> mask<font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> <font color='#5555FF'>!</font>value<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#BB00BB'>state</font><font face='Lucida Console'>(</font>r<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                <b>}</b>
+                <font color='#009900'>// else if this state indicates that the bit should not be set and it is 
+</font>                <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font><font face='Lucida Console'>(</font>field <font color='#5555FF'>&amp;</font> mask<font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> value<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#BB00BB'>state</font><font face='Lucida Console'>(</font>r<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                <b>}</b>
+            <b>}</b>
+
+            <font color='#009900'>// normalize the state
+</font>            state <font color='#5555FF'>=</font> state<font color='#5555FF'>/</font><font face='Lucida Console'>(</font>std::<font color='#BB00BB'>sqrt</font><font face='Lucida Console'>(</font><font color='#BB00BB'>sum</font><font face='Lucida Console'>(</font><font color='#BB00BB'>norm</font><font face='Lucida Console'>(</font>state<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>return</font> value;
+        <b>}</b>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> rand_type<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>bool</u></font> <b><a name='measure_and_remove_bit'></a>measure_and_remove_bit</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>int</u></font> bit,
+            rand_type<font color='#5555FF'>&amp;</font> rnd
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#009900'>// make sure requires clause is not broken
+</font>            <font color='#BB00BB'>DLIB_CASSERT</font><font face='Lucida Console'>(</font><font color='#979000'>0</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> bit <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> bit <font color='#5555FF'>&lt;</font> <font color='#BB00BB'>num_bits</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> <font color='#BB00BB'>num_bits</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font>,
+                "<font color='#CC0000'>\tbool quantum_register::measure_and_remove_bit()</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tinvalid arguments to this function</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tbit:        </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> bit 
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tnum_bits(): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>num_bits</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> 
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tthis:       </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font>
+                <font face='Lucida Console'>)</font>;
+
+
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>bool</u></font> value <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>rnd.<font color='#BB00BB'>get_random_double</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> <font color='#BB00BB'>probability_of_bit</font><font face='Lucida Console'>(</font>bit<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            quantum_register temp;
+            temp.<font color='#BB00BB'>set_num_bits</font><font face='Lucida Console'>(</font><font color='#BB00BB'>num_bits</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+
+
+            <font color='#009900'>// Next we set all the states where this bit doesn't have the given value to 0
+</font>
+            <font color='#009900'>// But first make a mask that selects our bit
+</font>            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> mask <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> bit; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                mask <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+
+            <font color='#0000FF'><u>long</u></font> count <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> r <font color='#5555FF'>=</font> <font color='#979000'>0</font>; r <font color='#5555FF'>&lt;</font> state.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>r<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> field <font color='#5555FF'>=</font> r;
+                <font color='#009900'>// if this basis vector is one that matches the measured state then keep it
+</font>                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>field <font color='#5555FF'>&amp;</font> mask<font face='Lucida Console'>)</font> <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> value<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    temp.<font color='#BB00BB'>state</font><font face='Lucida Console'>(</font>count<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#BB00BB'>state</font><font face='Lucida Console'>(</font>r<font face='Lucida Console'>)</font>;
+                    <font color='#5555FF'>+</font><font color='#5555FF'>+</font>count;
+                <b>}</b>
+            <b>}</b>
+
+            <font color='#009900'>// normalize the state
+</font>            temp.state <font color='#5555FF'>=</font> temp.state<font color='#5555FF'>/</font>std::<font color='#BB00BB'>sqrt</font><font face='Lucida Console'>(</font><font color='#BB00BB'>sum</font><font face='Lucida Console'>(</font><font color='#BB00BB'>norm</font><font face='Lucida Console'>(</font>temp.state<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+            temp.<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font><font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>return</font> value;
+        <b>}</b>
+
+        <font color='#0000FF'><u>double</u></font> <b><a name='probability_of_bit'></a>probability_of_bit</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>int</u></font> bit
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#009900'>// make sure requires clause is not broken
+</font>            <font color='#BB00BB'>DLIB_CASSERT</font><font face='Lucida Console'>(</font><font color='#979000'>0</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> bit <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> bit <font color='#5555FF'>&lt;</font> <font color='#BB00BB'>num_bits</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,
+                "<font color='#CC0000'>\tdouble quantum_register::probability_of_bit()</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tinvalid arguments to this function</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tbit:        </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> bit 
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tnum_bits(): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>num_bits</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> 
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tthis:       </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font>
+                <font face='Lucida Console'>)</font>;
+
+
+            <font color='#009900'>// make a mask that selects our bit
+</font>            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> mask <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> bit; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                mask <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+
+            <font color='#009900'>// now find the total probability of all the states that have the given bit set
+</font>            <font color='#0000FF'><u>double</u></font> prob <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> r <font color='#5555FF'>=</font> <font color='#979000'>0</font>; r <font color='#5555FF'>&lt;</font> state.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>r<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> field <font color='#5555FF'>=</font> r;
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>field <font color='#5555FF'>&amp;</font> mask<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    prob <font color='#5555FF'>+</font><font color='#5555FF'>=</font> std::<font color='#BB00BB'>norm</font><font face='Lucida Console'>(</font><font color='#BB00BB'>state</font><font face='Lucida Console'>(</font>r<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                <b>}</b>
+            <b>}</b>
+
+
+            <font color='#0000FF'>return</font> prob;
+        <b>}</b>
+
+        <font color='#0000FF'>const</font> matrix<font color='#5555FF'>&lt;</font>qc_scalar_type,<font color='#979000'>0</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> <b><a name='state_vector'></a>state_vector</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> state; <b>}</b>
+        matrix<font color='#5555FF'>&lt;</font>qc_scalar_type,<font color='#979000'>0</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> <b><a name='state_vector'></a>state_vector</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <b>{</b> <font color='#0000FF'>return</font> state; <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='swap'></a>swap</b> <font face='Lucida Console'>(</font>
+            quantum_register<font color='#5555FF'>&amp;</font> item
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#BB00BB'>exchange</font><font face='Lucida Console'>(</font>num_bits_in_register, item.num_bits_in_register<font face='Lucida Console'>)</font>;
+            state.<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>item.state<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+    <font color='#0000FF'>private</font>:
+
+        <font color='#0000FF'><u>int</u></font> num_bits_in_register;
+        matrix<font color='#5555FF'>&lt;</font>qc_scalar_type,<font color='#979000'>0</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> state;
+    <b>}</b>;
+
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='swap'></a>swap</b> <font face='Lucida Console'>(</font>
+        quantum_register<font color='#5555FF'>&amp;</font> a,
+        quantum_register<font color='#5555FF'>&amp;</font> b
+    <font face='Lucida Console'>)</font> <b>{</b> a.<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>b<font face='Lucida Console'>)</font>; <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>class</font> <b><a name='gate_exp'></a>gate_exp</b>
+    <b>{</b>
+    <font color='#0000FF'>public</font>:
+        <font color='#0000FF'>static</font> <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> num_bits <font color='#5555FF'>=</font> gate_traits<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font>::num_bits;
+        <font color='#0000FF'>static</font> <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> dims <font color='#5555FF'>=</font> gate_traits<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font>::dims;
+
+        <b><a name='gate_exp'></a>gate_exp</b><font face='Lucida Console'>(</font>T<font color='#5555FF'>&amp;</font> exp_<font face='Lucida Console'>)</font> : exp<font face='Lucida Console'>(</font>exp_<font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+
+        <font color='#0000FF'>const</font> qc_scalar_type <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> r, <font color='#0000FF'><u>long</u></font> c<font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> <font color='#BB00BB'>exp</font><font face='Lucida Console'>(</font>r,c<font face='Lucida Console'>)</font>; <b>}</b>
+
+        <font color='#0000FF'>const</font> matrix<font color='#5555FF'>&lt;</font>qc_scalar_type<font color='#5555FF'>&gt;</font> <b><a name='mat'></a>mat</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            matrix<font color='#5555FF'>&lt;</font>qc_scalar_type,dims,dims<font color='#5555FF'>&gt;</font> m;
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> r <font color='#5555FF'>=</font> <font color='#979000'>0</font>; r <font color='#5555FF'>&lt;</font> m.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>r<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> c <font color='#5555FF'>=</font> <font color='#979000'>0</font>; c <font color='#5555FF'>&lt;</font> m.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>c<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#BB00BB'>m</font><font face='Lucida Console'>(</font>r,c<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#BB00BB'>exp</font><font face='Lucida Console'>(</font>r,c<font face='Lucida Console'>)</font>;
+                <b>}</b>
+            <b>}</b>
+            <font color='#0000FF'>return</font> m;
+        <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='apply_gate_to'></a>apply_gate_to</b> <font face='Lucida Console'>(</font>quantum_register<font color='#5555FF'>&amp;</font> reg<font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#009900'>// make sure requires clause is not broken
+</font>            <font color='#BB00BB'>DLIB_CASSERT</font><font face='Lucida Console'>(</font>reg.<font color='#BB00BB'>num_bits</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> num_bits,
+                "<font color='#CC0000'>\tvoid gate_exp::apply_gate_to()</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tinvalid arguments to this function</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\treg.num_bits(): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> reg.<font color='#BB00BB'>num_bits</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> 
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tnum_bits:       </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> num_bits 
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tthis:           </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font>
+                <font face='Lucida Console'>)</font>;
+
+
+            quantum_register <font color='#BB00BB'>temp</font><font face='Lucida Console'>(</font>reg<font face='Lucida Console'>)</font>;
+
+
+            <font color='#009900'>// check if any of the elements of the register are 1 and if so then
+</font>            <font color='#009900'>// we don't have to do the full matrix multiply.  Or check if only a small number are non-zero.
+</font>            <font color='#0000FF'><u>long</u></font> non_zero_elements <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> r <font color='#5555FF'>=</font> <font color='#979000'>0</font>; r <font color='#5555FF'>&lt;</font> dims; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>r<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>reg.<font color='#BB00BB'>state_vector</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>r<font face='Lucida Console'>)</font> <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#BB00BB'>qc_scalar_type</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                    <font color='#5555FF'>+</font><font color='#5555FF'>+</font>non_zero_elements;
+
+                reg.<font color='#BB00BB'>state_vector</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>r<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            <b>}</b>
+
+
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>non_zero_elements <font color='#5555FF'>&gt;</font> <font color='#979000'>3</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#009900'>// do a full matrix multiply to compute the output state
+</font>                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> r <font color='#5555FF'>=</font> <font color='#979000'>0</font>; r <font color='#5555FF'>&lt;</font> dims; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>r<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    reg.<font color='#BB00BB'>state_vector</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>r<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#BB00BB'>compute_state_element</font><font face='Lucida Console'>(</font>temp.<font color='#BB00BB'>state_vector</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,r<font face='Lucida Console'>)</font>;
+                <b>}</b>
+            <b>}</b>
+            <font color='#0000FF'>else</font>
+            <b>{</b>
+                <font color='#009900'>// do a matrix multiply but only use the columns in the gate matrix 
+</font>                <font color='#009900'>// that correspond to the non-zero register elements
+</font>                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> r <font color='#5555FF'>=</font> <font color='#979000'>0</font>; r <font color='#5555FF'>&lt;</font> dims; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>r<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>temp.<font color='#BB00BB'>state_vector</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>r<font face='Lucida Console'>)</font> <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#BB00BB'>qc_scalar_type</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> dims; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                        <b>{</b>
+                            reg.<font color='#BB00BB'>state_vector</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font> <font color='#5555FF'>+</font><font color='#5555FF'>=</font> temp.<font color='#BB00BB'>state_vector</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>r<font face='Lucida Console'>)</font><font color='#5555FF'>*</font><font color='#BB00BB'>exp</font><font face='Lucida Console'>(</font>i,r<font face='Lucida Console'>)</font>;
+                        <b>}</b>
+                    <b>}</b>
+                <b>}</b>
+            <b>}</b>
+        <b>}</b>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> exp<font color='#5555FF'>&gt;</font>
+        qc_scalar_type <b><a name='compute_state_element'></a>compute_state_element</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&lt;</font>exp<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> reg,
+            <font color='#0000FF'><u>long</u></font> row_idx
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#009900'>// make sure requires clause is not broken
+</font>            <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font>reg.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> dims <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> reg.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>1</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> 
+                         <font color='#979000'>0</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> row_idx <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> row_idx <font color='#5555FF'>&lt;</font> dims,
+                "<font color='#CC0000'>\tqc_scalar_type gate_exp::compute_state_element(reg,row_idx)</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tinvalid arguments to this function</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\treg.nr(): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> reg.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> 
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\treg.nc(): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> reg.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tdims:     </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> dims
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\trow_idx:  </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> row_idx 
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tthis:     </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font>
+                <font face='Lucida Console'>)</font>;
+
+
+            <font color='#0000FF'>return</font> <font color='#0000FF'>this</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>exp.<font color='#BB00BB'>compute_state_element</font><font face='Lucida Console'>(</font>reg,row_idx<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> <b><a name='ref'></a>ref</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> exp; <b>}</b>
+
+    <font color='#0000FF'>private</font>:
+        T<font color='#5555FF'>&amp;</font> exp;
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> U<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>class</font> composite_gate;
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> U<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>struct</font> <b><a name='gate_traits'></a>gate_traits</b><font color='#5555FF'>&lt;</font>composite_gate<font color='#5555FF'>&lt;</font>T,U<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font>
+    <b>{</b>
+        <font color='#0000FF'>static</font> <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> num_bits <font color='#5555FF'>=</font> T::num_bits <font color='#5555FF'>+</font> U::num_bits;
+        <font color='#0000FF'>static</font> <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> dims <font color='#5555FF'>=</font> qc_helpers::exp_2_n<font color='#5555FF'>&lt;</font>num_bits<font color='#5555FF'>&gt;</font>::value;
+    <b>}</b>;
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> U<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>class</font> <b><a name='composite_gate'></a>composite_gate</b> : <font color='#0000FF'>public</font> gate_exp<font color='#5555FF'>&lt;</font>composite_gate<font color='#5555FF'>&lt;</font>T,U<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font>
+    <b>{</b>
+    <font color='#0000FF'>public</font>:
+
+        <font color='#0000FF'>typedef</font> T lhs_type;
+        <font color='#0000FF'>typedef</font> U rhs_type;
+
+        <b><a name='composite_gate'></a>composite_gate</b><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> composite_gate<font color='#5555FF'>&amp;</font> g<font face='Lucida Console'>)</font> : gate_exp<font color='#5555FF'>&lt;</font>composite_gate<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font><font face='Lucida Console'>)</font>, lhs<font face='Lucida Console'>(</font>g.lhs<font face='Lucida Console'>)</font>, rhs<font face='Lucida Console'>(</font>g.rhs<font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+
+        <b><a name='composite_gate'></a>composite_gate</b><font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> gate_exp<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> lhs_,
+            <font color='#0000FF'>const</font> gate_exp<font color='#5555FF'>&lt;</font>U<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> rhs_
+        <font face='Lucida Console'>)</font> : gate_exp<font color='#5555FF'>&lt;</font>composite_gate<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font><font face='Lucida Console'>)</font>, lhs<font face='Lucida Console'>(</font>lhs_.ref<font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>, rhs<font face='Lucida Console'>(</font>rhs_.ref<font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+
+
+
+        <font color='#0000FF'>static</font> <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> num_bits <font color='#5555FF'>=</font> gate_traits<font color='#5555FF'>&lt;</font>composite_gate<font color='#5555FF'>&gt;</font>::num_bits;
+        <font color='#0000FF'>static</font> <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> dims <font color='#5555FF'>=</font> gate_traits<font color='#5555FF'>&lt;</font>composite_gate<font color='#5555FF'>&gt;</font>::dims;
+
+        <font color='#0000FF'>const</font> qc_scalar_type <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> r, <font color='#0000FF'><u>long</u></font> c<font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> <font color='#BB00BB'>lhs</font><font face='Lucida Console'>(</font>r<font color='#5555FF'>/</font>U::dims,c<font color='#5555FF'>/</font>U::dims<font face='Lucida Console'>)</font><font color='#5555FF'>*</font><font color='#BB00BB'>rhs</font><font face='Lucida Console'>(</font>r<font color='#5555FF'>%</font>U::dims, c<font color='#5555FF'>%</font>U::dims<font face='Lucida Console'>)</font>; <b>}</b>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> exp<font color='#5555FF'>&gt;</font>
+        qc_scalar_type <b><a name='compute_state_element'></a>compute_state_element</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&lt;</font>exp<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> reg,
+            <font color='#0000FF'><u>long</u></font> row_idx
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#009900'>// make sure requires clause is not broken
+</font>            <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font>reg.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> dims <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> reg.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>1</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> 
+                         <font color='#979000'>0</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> row_idx <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> row_idx <font color='#5555FF'>&lt;</font> dims,
+                "<font color='#CC0000'>\tqc_scalar_type composite_gate::compute_state_element(reg,row_idx)</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tinvalid arguments to this function</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\treg.nr(): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> reg.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> 
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\treg.nc(): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> reg.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tdims:     </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> dims
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\trow_idx:  </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> row_idx 
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tthis:     </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font>
+                <font face='Lucida Console'>)</font>;
+
+
+            qc_scalar_type result <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> c <font color='#5555FF'>=</font> <font color='#979000'>0</font>; c <font color='#5555FF'>&lt;</font> T::dims; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>c<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>lhs</font><font face='Lucida Console'>(</font>row_idx<font color='#5555FF'>/</font>U::dims,c<font face='Lucida Console'>)</font> <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#BB00BB'>qc_scalar_type</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                <b>{</b>
+                    result <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#BB00BB'>lhs</font><font face='Lucida Console'>(</font>row_idx<font color='#5555FF'>/</font>U::dims,c<font face='Lucida Console'>)</font> <font color='#5555FF'>*</font> rhs.<font color='#BB00BB'>compute_state_element</font><font face='Lucida Console'>(</font><font color='#BB00BB'>subm</font><font face='Lucida Console'>(</font>reg,c<font color='#5555FF'>*</font>U::dims,<font color='#979000'>0</font>,U::dims,<font color='#979000'>1</font><font face='Lucida Console'>)</font>, row_idx<font color='#5555FF'>%</font>U::dims<font face='Lucida Console'>)</font>;
+                <b>}</b>
+            <b>}</b>
+
+            <font color='#0000FF'>return</font> result;
+        <b>}</b>
+
+
+        <font color='#0000FF'>const</font> T lhs;
+        <font color='#0000FF'>const</font> U rhs;
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'><u>long</u></font> bits<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>class</font> gate;
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'><u>long</u></font> bits<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>struct</font> <b><a name='gate_traits'></a>gate_traits</b><font color='#5555FF'>&lt;</font>gate<font color='#5555FF'>&lt;</font>bits<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font>
+    <b>{</b>
+        <font color='#0000FF'>static</font> <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> num_bits <font color='#5555FF'>=</font> bits;
+        <font color='#0000FF'>static</font> <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> dims <font color='#5555FF'>=</font> qc_helpers::exp_2_n<font color='#5555FF'>&lt;</font>num_bits<font color='#5555FF'>&gt;</font>::value;
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'><u>long</u></font> bits<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>class</font> <b><a name='gate'></a>gate</b> : <font color='#0000FF'>public</font> gate_exp<font color='#5555FF'>&lt;</font>gate<font color='#5555FF'>&lt;</font>bits<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font>
+    <b>{</b>
+    <font color='#0000FF'>public</font>:
+        <b><a name='gate'></a>gate</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> : gate_exp<font color='#5555FF'>&lt;</font>gate<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font><font face='Lucida Console'>)</font> <b>{</b> <font color='#BB00BB'>set_all_elements</font><font face='Lucida Console'>(</font>data,<font color='#979000'>0</font><font face='Lucida Console'>)</font>; <b>}</b>
+        <b><a name='gate'></a>gate</b><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> gate<font color='#5555FF'>&amp;</font> g<font face='Lucida Console'>)</font> :gate_exp<font color='#5555FF'>&lt;</font>gate<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font><font face='Lucida Console'>)</font>, data<font face='Lucida Console'>(</font>g.data<font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>explicit</font> <b><a name='gate'></a>gate</b><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> gate_exp<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> g<font face='Lucida Console'>)</font> : gate_exp<font color='#5555FF'>&lt;</font>gate<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font><font face='Lucida Console'>)</font> 
+        <b>{</b>
+            <font color='#BB00BB'>COMPILE_TIME_ASSERT</font><font face='Lucida Console'>(</font>T::num_bits <font color='#5555FF'>=</font><font color='#5555FF'>=</font> num_bits<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> r <font color='#5555FF'>=</font> <font color='#979000'>0</font>; r <font color='#5555FF'>&lt;</font> dims; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>r<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> c <font color='#5555FF'>=</font> <font color='#979000'>0</font>; c <font color='#5555FF'>&lt;</font> dims; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>c<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#BB00BB'>data</font><font face='Lucida Console'>(</font>r,c<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#BB00BB'>g</font><font face='Lucida Console'>(</font>r,c<font face='Lucida Console'>)</font>;
+                <b>}</b>
+            <b>}</b>
+        <b>}</b>
+
+        <font color='#0000FF'>static</font> <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> num_bits <font color='#5555FF'>=</font> gate_traits<font color='#5555FF'>&lt;</font>gate<font color='#5555FF'>&gt;</font>::num_bits;
+        <font color='#0000FF'>static</font> <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> dims <font color='#5555FF'>=</font> gate_traits<font color='#5555FF'>&lt;</font>gate<font color='#5555FF'>&gt;</font>::dims;
+
+        <font color='#0000FF'>const</font> qc_scalar_type<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> r, <font color='#0000FF'><u>long</u></font> c<font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> <font color='#BB00BB'>data</font><font face='Lucida Console'>(</font>r,c<font face='Lucida Console'>)</font>; <b>}</b>
+        qc_scalar_type<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> r, <font color='#0000FF'><u>long</u></font> c<font face='Lucida Console'>)</font>  <b>{</b> <font color='#0000FF'>return</font> <font color='#BB00BB'>data</font><font face='Lucida Console'>(</font>r,c<font face='Lucida Console'>)</font>; <b>}</b>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> exp<font color='#5555FF'>&gt;</font>
+        qc_scalar_type <b><a name='compute_state_element'></a>compute_state_element</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&lt;</font>exp<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> reg,
+            <font color='#0000FF'><u>long</u></font> row_idx
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#009900'>// make sure requires clause is not broken
+</font>            <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font>reg.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> dims <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> reg.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>1</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> 
+                         <font color='#979000'>0</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> row_idx <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> row_idx <font color='#5555FF'>&lt;</font> dims,
+                "<font color='#CC0000'>\tqc_scalar_type gate::compute_state_element(reg,row_idx)</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tinvalid arguments to this function</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\treg.nr(): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> reg.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> 
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\treg.nc(): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> reg.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tdims:     </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> dims
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\trow_idx:  </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> row_idx 
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tthis:     </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font>
+                <font face='Lucida Console'>)</font>;
+
+
+            <font color='#0000FF'>return</font> <font face='Lucida Console'>(</font>data<font color='#5555FF'>*</font>reg<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>row_idx<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+    <font color='#0000FF'>private</font>:
+
+        matrix<font color='#5555FF'>&lt;</font>qc_scalar_type,dims,dims<font color='#5555FF'>&gt;</font> data;
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>namespace</font> qc_helpers
+    <b>{</b>
+        <font color='#009900'>// This is the maximum number of bits used for cached sub-matrices in composite_gate expressions
+</font>        <font color='#0000FF'>const</font> <font color='#0000FF'><u>int</u></font> qc_block_chunking_size <font color='#5555FF'>=</font> <font color='#979000'>8</font>;
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>struct</font> <b><a name='is_composite_gate'></a>is_composite_gate</b> <b>{</b> <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>bool</u></font> value <font color='#5555FF'>=</font> <font color='#979000'>false</font>; <b>}</b>;
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> U<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>struct</font> <b><a name='is_composite_gate'></a>is_composite_gate</b><font color='#5555FF'>&lt;</font>composite_gate<font color='#5555FF'>&lt;</font>T,U<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> <b>{</b> <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>bool</u></font> value <font color='#5555FF'>=</font> <font color='#979000'>true</font>; <b>}</b>;
+
+
+        <font color='#009900'>// These overloads all deal with intelligently composing chains of composite_gate expressions
+</font>        <font color='#009900'>// such that the resulting expression has the form:
+</font>        <font color='#009900'>//    (gate_exp,(gate_exp,(gate_exp,(gate_exp()))))
+</font>        <font color='#009900'>// and each gate_exp contains a cached gate matrix for a gate of at most qc_block_chunking_size bits.  
+</font>        <font color='#009900'>// This facilitates the optimizations in the compute_state_element() function. 
+</font>        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> U, <font color='#0000FF'>typename</font> V, <font color='#0000FF'>typename</font> enabled <font color='#5555FF'>=</font> <font color='#0000FF'><u>void</u></font><font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>struct</font> combine_gates;
+
+        <font color='#009900'>// This is a base case of this recursive template.  It takes care of converting small composite_gates into
+</font>        <font color='#009900'>// cached gate objects.
+</font>        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> U, <font color='#0000FF'>typename</font> V<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>struct</font> <b><a name='combine_gates'></a>combine_gates</b><font color='#5555FF'>&lt;</font>T,U,V,<font color='#0000FF'>typename</font> enable_if_c<font color='#5555FF'>&lt;</font><font face='Lucida Console'>(</font>T::num_bits <font color='#5555FF'>+</font> U::num_bits <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> qc_block_chunking_size<font face='Lucida Console'>)</font><font color='#5555FF'>&gt;</font>::type <font color='#5555FF'>&gt;</font>
+        <b>{</b>
+            <font color='#0000FF'>typedef</font> composite_gate<font color='#5555FF'>&lt;</font>gate<font color='#5555FF'>&lt;</font>T::num_bits <font color='#5555FF'>+</font> U::num_bits<font color='#5555FF'>&gt;</font>,V<font color='#5555FF'>&gt;</font>  result_type;
+
+            <font color='#0000FF'>static</font> <font color='#0000FF'>const</font> result_type <font color='#BB00BB'>eval</font> <font face='Lucida Console'>(</font>
+                <font color='#0000FF'>const</font> composite_gate<font color='#5555FF'>&lt;</font>T,U<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> lhs,
+                <font color='#0000FF'>const</font> gate_exp<font color='#5555FF'>&lt;</font>V<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> rhs
+            <font face='Lucida Console'>)</font> 
+            <b>{</b>
+                <font color='#0000FF'>typedef</font> gate<font color='#5555FF'>&lt;</font>T::num_bits <font color='#5555FF'>+</font> U::num_bits<font color='#5555FF'>&gt;</font> gate_type;
+                <font color='#0000FF'>return</font> composite_gate<font color='#5555FF'>&lt;</font>gate_type,V<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#BB00BB'>gate_type</font><font face='Lucida Console'>(</font>lhs<font face='Lucida Console'>)</font>, rhs<font face='Lucida Console'>)</font>;
+            <b>}</b>
+        <b>}</b>;
+
+        <font color='#009900'>// this is the recursive step of this template
+</font>        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> U, <font color='#0000FF'>typename</font> V<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>struct</font> <b><a name='combine_gates'></a>combine_gates</b><font color='#5555FF'>&lt;</font>T,U,V,<font color='#0000FF'>typename</font> enable_if_c<font color='#5555FF'>&lt;</font><font face='Lucida Console'>(</font>is_composite_gate<font color='#5555FF'>&lt;</font>U<font color='#5555FF'>&gt;</font>::value <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>true</font><font face='Lucida Console'>)</font><font color='#5555FF'>&gt;</font>::type <font color='#5555FF'>&gt;</font>
+        <b>{</b>
+            <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> combine_gates<font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> U::lhs_type, <font color='#0000FF'>typename</font> U::rhs_type, V<font color='#5555FF'>&gt;</font>::result_type inner_type;
+            <font color='#0000FF'>typedef</font> composite_gate<font color='#5555FF'>&lt;</font>T,inner_type<font color='#5555FF'>&gt;</font> result_type;
+
+            <font color='#0000FF'>static</font> <font color='#0000FF'>const</font> result_type <font color='#BB00BB'>eval</font> <font face='Lucida Console'>(</font>
+                <font color='#0000FF'>const</font> composite_gate<font color='#5555FF'>&lt;</font>T,U<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> lhs,
+                <font color='#0000FF'>const</font> gate_exp<font color='#5555FF'>&lt;</font>V<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> rhs
+            <font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>return</font> composite_gate<font color='#5555FF'>&lt;</font>T,inner_type<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>lhs.lhs, combine_gates<font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> U::lhs_type, <font color='#0000FF'>typename</font> U::rhs_type, V<font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>eval</font><font face='Lucida Console'>(</font>lhs.rhs,rhs<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+        <b>}</b>;
+
+        <font color='#009900'>// This is a base case of this recursive template.  It takes care of adding new gates when the left
+</font>        <font color='#009900'>// hand side is too big to just turn it into a cached gate object.
+</font>        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> U, <font color='#0000FF'>typename</font> V<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>struct</font> <b><a name='combine_gates'></a>combine_gates</b><font color='#5555FF'>&lt;</font>T,U,V,<font color='#0000FF'>typename</font> enable_if_c<font color='#5555FF'>&lt;</font><font face='Lucida Console'>(</font>T::num_bits <font color='#5555FF'>+</font> U::num_bits <font color='#5555FF'>&gt;</font> qc_block_chunking_size <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> 
+                                                         is_composite_gate<font color='#5555FF'>&lt;</font>U<font color='#5555FF'>&gt;</font>::value <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font><font face='Lucida Console'>)</font><font color='#5555FF'>&gt;</font>::type <font color='#5555FF'>&gt;</font>
+        <b>{</b>
+            <font color='#0000FF'>typedef</font> composite_gate<font color='#5555FF'>&lt;</font>T,composite_gate<font color='#5555FF'>&lt;</font>U, V<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> result_type;
+
+            <font color='#0000FF'>static</font> <font color='#0000FF'>const</font> result_type <font color='#BB00BB'>eval</font> <font face='Lucida Console'>(</font>
+                <font color='#0000FF'>const</font> composite_gate<font color='#5555FF'>&lt;</font>T,U<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> lhs,
+                <font color='#0000FF'>const</font> gate_exp<font color='#5555FF'>&lt;</font>V<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> rhs
+            <font face='Lucida Console'>)</font> 
+            <b>{</b>
+                <font color='#0000FF'>return</font> <font color='#BB00BB'>result_type</font><font face='Lucida Console'>(</font>lhs.lhs, composite_gate<font color='#5555FF'>&lt;</font>U,V<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>lhs.rhs, rhs<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>; 
+            <b>}</b>
+
+        <b>}</b>;
+
+    <b>}</b>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> U<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>const</font> composite_gate<font color='#5555FF'>&lt;</font>T,U<font color='#5555FF'>&gt;</font> <b><a name='operator'></a>operator</b>, <font face='Lucida Console'>(</font> 
+        <font color='#0000FF'>const</font> gate_exp<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> lhs,
+        <font color='#0000FF'>const</font> gate_exp<font color='#5555FF'>&lt;</font>U<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> rhs
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>return</font> composite_gate<font color='#5555FF'>&lt;</font>T,U<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>lhs,rhs<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> U, <font color='#0000FF'>typename</font> V<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>const</font> <font color='#0000FF'>typename</font> qc_helpers::combine_gates<font color='#5555FF'>&lt;</font>T,U,V<font color='#5555FF'>&gt;</font>::result_type <b><a name='operator'></a>operator</b>, <font face='Lucida Console'>(</font> 
+        <font color='#0000FF'>const</font> composite_gate<font color='#5555FF'>&lt;</font>T,U<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> lhs,
+        <font color='#0000FF'>const</font> gate_exp<font color='#5555FF'>&lt;</font>V<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> rhs
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>return</font> qc_helpers::combine_gates<font color='#5555FF'>&lt;</font>T,U,V<font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>eval</font><font face='Lucida Console'>(</font>lhs,rhs<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+    <font color='#009900'>// If you are getting an error here then it means that you are trying to combine a gate expression
+</font>    <font color='#009900'>// with an integer somewhere (and that is an error).  
+</font>    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font> <font color='#0000FF'><u>void</u></font> <b><a name='operator'></a>operator</b>, <font face='Lucida Console'>(</font> <font color='#0000FF'>const</font> gate_exp<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font>, <font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font> <b>{</b> <font color='#BB00BB'>COMPILE_TIME_ASSERT</font><font face='Lucida Console'>(</font><font color='#0000FF'>sizeof</font><font face='Lucida Console'>(</font>T<font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> <font color='#979000'>100000000</font><font face='Lucida Console'>)</font>; <b>}</b>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font> <font color='#0000FF'><u>void</u></font> <b><a name='operator'></a>operator</b>, <font face='Lucida Console'>(</font> <font color='#0000FF'><u>int</u></font>, <font color='#0000FF'>const</font> gate_exp<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font> <b>{</b> <font color='#BB00BB'>COMPILE_TIME_ASSERT</font><font face='Lucida Console'>(</font><font color='#0000FF'>sizeof</font><font face='Lucida Console'>(</font>T<font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> <font color='#979000'>100000000</font><font face='Lucida Console'>)</font>; <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>namespace</font> quantum_gates
+    <b>{</b>
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'><u>int</u></font> control_bit, <font color='#0000FF'><u>int</u></font> target_bit<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>class</font> cnot;
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'><u>int</u></font> control_bit1, <font color='#0000FF'><u>int</u></font> control_bit2, <font color='#0000FF'><u>int</u></font> target_bit<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>class</font> toffoli;
+    <b>}</b>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'><u>int</u></font> control_bit, <font color='#0000FF'><u>int</u></font> target_bit<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>struct</font> <b><a name='gate_traits'></a>gate_traits</b><font color='#5555FF'>&lt;</font>quantum_gates::cnot<font color='#5555FF'>&lt;</font>control_bit, target_bit<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font>
+    <b>{</b>
+        <font color='#0000FF'>static</font> <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> num_bits <font color='#5555FF'>=</font> tabs<font color='#5555FF'>&lt;</font>control_bit<font color='#5555FF'>-</font>target_bit<font color='#5555FF'>&gt;</font>::value<font color='#5555FF'>+</font><font color='#979000'>1</font>;
+        <font color='#0000FF'>static</font> <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> dims <font color='#5555FF'>=</font> qc_helpers::exp_2_n<font color='#5555FF'>&lt;</font>num_bits<font color='#5555FF'>&gt;</font>::value;
+    <b>}</b>;
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'><u>int</u></font> control_bit1, <font color='#0000FF'><u>int</u></font> control_bit2, <font color='#0000FF'><u>int</u></font> target_bit<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>struct</font> <b><a name='gate_traits'></a>gate_traits</b><font color='#5555FF'>&lt;</font>quantum_gates::toffoli<font color='#5555FF'>&lt;</font>control_bit1, control_bit2, target_bit<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font>
+    <b>{</b>
+        <font color='#0000FF'>static</font> <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> num_bits <font color='#5555FF'>=</font> tmax<font color='#5555FF'>&lt;</font>tabs<font color='#5555FF'>&lt;</font>control_bit1<font color='#5555FF'>-</font>target_bit<font color='#5555FF'>&gt;</font>::value, 
+                                            tabs<font color='#5555FF'>&lt;</font>control_bit2<font color='#5555FF'>-</font>target_bit<font color='#5555FF'>&gt;</font>::value<font color='#5555FF'>&gt;</font>::value<font color='#5555FF'>+</font><font color='#979000'>1</font>;
+        <font color='#0000FF'>static</font> <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> dims <font color='#5555FF'>=</font> qc_helpers::exp_2_n<font color='#5555FF'>&lt;</font>num_bits<font color='#5555FF'>&gt;</font>::value;
+    <b>}</b>;
+
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>namespace</font> quantum_gates
+    <b>{</b>
+
+        <font color='#0000FF'>inline</font> <font color='#0000FF'>const</font> gate<font color='#5555FF'>&lt;</font><font color='#979000'>1</font><font color='#5555FF'>&gt;</font> <b><a name='hadamard'></a>hadamard</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            gate<font color='#5555FF'>&lt;</font><font color='#979000'>1</font><font color='#5555FF'>&gt;</font> h;
+            <font color='#BB00BB'>h</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> std::<font color='#BB00BB'>sqrt</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font color='#5555FF'>/</font><font color='#979000'>2.0</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>h</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>,<font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> std::<font color='#BB00BB'>sqrt</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font color='#5555FF'>/</font><font color='#979000'>2.0</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>h</font><font face='Lucida Console'>(</font><font color='#979000'>1</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> std::<font color='#BB00BB'>sqrt</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font color='#5555FF'>/</font><font color='#979000'>2.0</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>h</font><font face='Lucida Console'>(</font><font color='#979000'>1</font>,<font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#5555FF'>-</font>std::<font color='#BB00BB'>sqrt</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font color='#5555FF'>/</font><font color='#979000'>2.0</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>return</font> h;
+        <b>}</b>
+
+    <font color='#009900'>// ------------------------------------------------------------------------------------
+</font>
+        <font color='#0000FF'>inline</font> <font color='#0000FF'>const</font> gate<font color='#5555FF'>&lt;</font><font color='#979000'>1</font><font color='#5555FF'>&gt;</font> <b><a name='x'></a>x</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            gate<font color='#5555FF'>&lt;</font><font color='#979000'>1</font><font color='#5555FF'>&gt;</font> x;
+            <font color='#BB00BB'>x</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>,<font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+            <font color='#BB00BB'>x</font><font face='Lucida Console'>(</font><font color='#979000'>1</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+            <font color='#0000FF'>return</font> x;
+        <b>}</b>
+
+    <font color='#009900'>// ------------------------------------------------------------------------------------
+</font>
+        <font color='#0000FF'>inline</font> <font color='#0000FF'>const</font> gate<font color='#5555FF'>&lt;</font><font color='#979000'>1</font><font color='#5555FF'>&gt;</font> <b><a name='y'></a>y</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            gate<font color='#5555FF'>&lt;</font><font color='#979000'>1</font><font color='#5555FF'>&gt;</font> x;
+            qc_scalar_type <font color='#BB00BB'>i</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>,<font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>x</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>,<font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#5555FF'>-</font>i;
+            <font color='#BB00BB'>x</font><font face='Lucida Console'>(</font><font color='#979000'>1</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> i;
+            <font color='#0000FF'>return</font> x;
+        <b>}</b>
+
+    <font color='#009900'>// ------------------------------------------------------------------------------------
+</font>
+        <font color='#0000FF'>inline</font> <font color='#0000FF'>const</font> gate<font color='#5555FF'>&lt;</font><font color='#979000'>1</font><font color='#5555FF'>&gt;</font> <b><a name='z'></a>z</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            gate<font color='#5555FF'>&lt;</font><font color='#979000'>1</font><font color='#5555FF'>&gt;</font> z;
+            <font color='#BB00BB'>z</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+            <font color='#BB00BB'>z</font><font face='Lucida Console'>(</font><font color='#979000'>1</font>,<font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>1</font>;
+            <font color='#0000FF'>return</font> z;
+        <b>}</b>
+
+    <font color='#009900'>// ------------------------------------------------------------------------------------
+</font>
+        <font color='#0000FF'>inline</font> <font color='#0000FF'>const</font> gate<font color='#5555FF'>&lt;</font><font color='#979000'>1</font><font color='#5555FF'>&gt;</font> <b><a name='noop'></a>noop</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            gate<font color='#5555FF'>&lt;</font><font color='#979000'>1</font><font color='#5555FF'>&gt;</font> i;
+            <font color='#BB00BB'>i</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+            <font color='#BB00BB'>i</font><font face='Lucida Console'>(</font><font color='#979000'>1</font>,<font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+            <font color='#0000FF'>return</font> i;
+        <b>}</b>
+
+    <font color='#009900'>// ------------------------------------------------------------------------------------
+</font>
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'><u>int</u></font> control_bit, <font color='#0000FF'><u>int</u></font> target_bit<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>class</font> <b><a name='cnot'></a>cnot</b> : <font color='#0000FF'>public</font> gate_exp<font color='#5555FF'>&lt;</font>cnot<font color='#5555FF'>&lt;</font>control_bit, target_bit<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font>
+        <b>{</b>
+        <font color='#0000FF'>public</font>:
+            <b><a name='COMPILE_TIME_ASSERT'></a>COMPILE_TIME_ASSERT</b><font face='Lucida Console'>(</font>control_bit <font color='#5555FF'>!</font><font color='#5555FF'>=</font> target_bit<font face='Lucida Console'>)</font>;
+
+            <b><a name='cnot'></a>cnot</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> : gate_exp<font color='#5555FF'>&lt;</font>cnot<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font><font face='Lucida Console'>)</font> 
+            <b>{</b>
+                <font color='#0000FF'>const</font> <font color='#0000FF'><u>int</u></font> min_bit <font color='#5555FF'>=</font> std::<font color='#BB00BB'>min</font><font face='Lucida Console'>(</font>control_bit, target_bit<font face='Lucida Console'>)</font>;
+
+                control_mask <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+                target_mask <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+
+                <font color='#009900'>// make the masks so that their only on bit corresponds to the given control_bit and target_bit bits
+</font>                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> control_bit<font color='#5555FF'>-</font>min_bit; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                    control_mask <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> target_bit<font color='#5555FF'>-</font>min_bit; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                    target_mask <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+            <b>}</b>
+
+            <font color='#0000FF'>static</font> <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> num_bits <font color='#5555FF'>=</font> gate_traits<font color='#5555FF'>&lt;</font>cnot<font color='#5555FF'>&gt;</font>::num_bits;
+            <font color='#0000FF'>static</font> <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> dims <font color='#5555FF'>=</font> gate_traits<font color='#5555FF'>&lt;</font>cnot<font color='#5555FF'>&gt;</font>::dims;
+
+            <font color='#0000FF'>const</font> qc_scalar_type <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> r, <font color='#0000FF'><u>long</u></font> c<font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> 
+            <b>{</b> 
+                <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> output;
+                <font color='#009900'>// if the input control bit is set
+</font>                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>control_mask<font color='#5555FF'>&amp;</font>c<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    output <font color='#5555FF'>=</font> c^target_mask;
+                <b>}</b>
+                <font color='#0000FF'>else</font>
+                <b>{</b>
+                    output <font color='#5555FF'>=</font> c;
+                <b>}</b>
+
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font>r <font color='#5555FF'>=</font><font color='#5555FF'>=</font> output<font face='Lucida Console'>)</font>
+                    <font color='#0000FF'>return</font> <font color='#979000'>1</font>;
+                <font color='#0000FF'>else</font>
+                    <font color='#0000FF'>return</font> <font color='#979000'>0</font>;
+            <b>}</b>
+
+            <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> exp<font color='#5555FF'>&gt;</font>
+            qc_scalar_type <b><a name='compute_state_element'></a>compute_state_element</b> <font face='Lucida Console'>(</font>
+                <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&lt;</font>exp<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> reg,
+                <font color='#0000FF'><u>long</u></font> row_idx
+            <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+            <b>{</b>
+                <font color='#009900'>// make sure requires clause is not broken
+</font>                <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font>reg.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> dims <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> reg.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>1</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> 
+                            <font color='#979000'>0</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> row_idx <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> row_idx <font color='#5555FF'>&lt;</font> dims,
+                    "<font color='#CC0000'>\tqc_scalar_type cnot::compute_state_element(reg,row_idx)</font>"
+                    <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tinvalid arguments to this function</font>"
+                    <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\treg.nr(): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> reg.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> 
+                    <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\treg.nc(): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> reg.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+                    <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tdims:     </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> dims
+                    <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\trow_idx:  </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> row_idx 
+                    <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tthis:     </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font>
+                    <font face='Lucida Console'>)</font>;
+
+
+                <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> output <font color='#5555FF'>=</font> row_idx;
+                <font color='#009900'>// if the input control bit is set
+</font>                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>control_mask<font color='#5555FF'>&amp;</font>output<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    output <font color='#5555FF'>=</font> output^target_mask;
+                <b>}</b>
+
+                <font color='#0000FF'>return</font> <font color='#BB00BB'>reg</font><font face='Lucida Console'>(</font>output<font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+        <font color='#0000FF'>private</font>:
+
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> control_mask;
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> target_mask;
+
+
+        <b>}</b>;
+
+    <font color='#009900'>// ------------------------------------------------------------------------------------
+</font>
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'><u>int</u></font> control_bit1, <font color='#0000FF'><u>int</u></font> control_bit2, <font color='#0000FF'><u>int</u></font> target_bit<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>class</font> <b><a name='toffoli'></a>toffoli</b> : <font color='#0000FF'>public</font> gate_exp<font color='#5555FF'>&lt;</font>toffoli<font color='#5555FF'>&lt;</font>control_bit1, control_bit2, target_bit<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font>
+        <b>{</b>
+        <font color='#0000FF'>public</font>:
+            <b><a name='COMPILE_TIME_ASSERT'></a>COMPILE_TIME_ASSERT</b><font face='Lucida Console'>(</font>control_bit1 <font color='#5555FF'>!</font><font color='#5555FF'>=</font> target_bit <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> control_bit2 <font color='#5555FF'>!</font><font color='#5555FF'>=</font> target_bit <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> control_bit1 <font color='#5555FF'>!</font><font color='#5555FF'>=</font> control_bit2<font face='Lucida Console'>)</font>;
+            <b><a name='COMPILE_TIME_ASSERT'></a>COMPILE_TIME_ASSERT</b><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>control_bit1 <font color='#5555FF'>&lt;</font> target_bit <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> control_bit2 <font color='#5555FF'>&lt;</font> target_bit<font face='Lucida Console'>)</font> <font color='#5555FF'>|</font><font color='#5555FF'>|</font><font face='Lucida Console'>(</font>control_bit1 <font color='#5555FF'>&gt;</font> target_bit <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> control_bit2 <font color='#5555FF'>&gt;</font> target_bit<font face='Lucida Console'>)</font> <font face='Lucida Console'>)</font>;
+
+            <b><a name='toffoli'></a>toffoli</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> : gate_exp<font color='#5555FF'>&lt;</font>toffoli<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font><font face='Lucida Console'>)</font> 
+            <b>{</b>
+                <font color='#0000FF'>const</font> <font color='#0000FF'><u>int</u></font> min_bit <font color='#5555FF'>=</font> std::<font color='#BB00BB'>min</font><font face='Lucida Console'>(</font>std::<font color='#BB00BB'>min</font><font face='Lucida Console'>(</font>control_bit1, control_bit2<font face='Lucida Console'>)</font>, target_bit<font face='Lucida Console'>)</font>;
+
+                control1_mask <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+                control2_mask <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+                target_mask <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+
+                <font color='#009900'>// make the masks so that their only on bit corresponds to the given control_bit1 and target_bit bits
+</font>                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> control_bit1<font color='#5555FF'>-</font>min_bit; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                    control1_mask <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> control_bit2<font color='#5555FF'>-</font>min_bit; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                    control2_mask <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> target_bit<font color='#5555FF'>-</font>min_bit; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                    target_mask <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+            <b>}</b>
+
+            <font color='#0000FF'>static</font> <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> num_bits <font color='#5555FF'>=</font> gate_traits<font color='#5555FF'>&lt;</font>toffoli<font color='#5555FF'>&gt;</font>::num_bits;
+            <font color='#0000FF'>static</font> <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> dims <font color='#5555FF'>=</font> gate_traits<font color='#5555FF'>&lt;</font>toffoli<font color='#5555FF'>&gt;</font>::dims;
+
+            <font color='#0000FF'>const</font> qc_scalar_type <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> r, <font color='#0000FF'><u>long</u></font> c<font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> 
+            <b>{</b> 
+                <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> output;
+                <font color='#009900'>// if the input control bits are set
+</font>                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>control1_mask<font color='#5555FF'>&amp;</font>c<font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> <font face='Lucida Console'>(</font>control2_mask<font color='#5555FF'>&amp;</font>c<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                <b>{</b>
+                    output <font color='#5555FF'>=</font> c^target_mask;
+                <b>}</b>
+                <font color='#0000FF'>else</font>
+                <b>{</b>
+                    output <font color='#5555FF'>=</font> c;
+                <b>}</b>
+
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font>r <font color='#5555FF'>=</font><font color='#5555FF'>=</font> output<font face='Lucida Console'>)</font>
+                    <font color='#0000FF'>return</font> <font color='#979000'>1</font>;
+                <font color='#0000FF'>else</font>
+                    <font color='#0000FF'>return</font> <font color='#979000'>0</font>;
+            <b>}</b>
+
+            <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> exp<font color='#5555FF'>&gt;</font>
+            qc_scalar_type <b><a name='compute_state_element'></a>compute_state_element</b> <font face='Lucida Console'>(</font>
+                <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&lt;</font>exp<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> reg,
+                <font color='#0000FF'><u>long</u></font> row_idx
+            <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+            <b>{</b>
+                <font color='#009900'>// make sure requires clause is not broken
+</font>                <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font>reg.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> dims <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> reg.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>1</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> 
+                            <font color='#979000'>0</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> row_idx <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> row_idx <font color='#5555FF'>&lt;</font> dims,
+                    "<font color='#CC0000'>\tqc_scalar_type toffoli::compute_state_element(reg,row_idx)</font>"
+                    <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tinvalid arguments to this function</font>"
+                    <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\treg.nr(): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> reg.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> 
+                    <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\treg.nc(): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> reg.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+                    <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tdims:     </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> dims
+                    <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\trow_idx:  </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> row_idx 
+                    <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tthis:     </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font>
+                    <font face='Lucida Console'>)</font>;
+
+
+                <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> output;
+                <font color='#009900'>// if the input control bits are set
+</font>                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>control1_mask<font color='#5555FF'>&amp;</font>row_idx<font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> <font face='Lucida Console'>(</font>control2_mask<font color='#5555FF'>&amp;</font>row_idx<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                <b>{</b>
+                    output <font color='#5555FF'>=</font> row_idx^target_mask;
+                <b>}</b>
+                <font color='#0000FF'>else</font>
+                <b>{</b>
+                    output <font color='#5555FF'>=</font> row_idx;
+                <b>}</b>
+
+                <font color='#0000FF'>return</font> <font color='#BB00BB'>reg</font><font face='Lucida Console'>(</font>output<font face='Lucida Console'>)</font>;
+
+            <b>}</b>
+
+        <font color='#0000FF'>private</font>:
+
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> control1_mask;
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> control2_mask;
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> target_mask;
+
+
+        <b>}</b>;
+
+
+    <font color='#009900'>// ------------------------------------------------------------------------------------
+</font>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_QUANTUM_COMPUTINg_1_
+</font>
+
+
+</pre></body></html>

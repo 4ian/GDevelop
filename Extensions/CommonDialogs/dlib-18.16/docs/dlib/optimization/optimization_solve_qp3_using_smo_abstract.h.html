@@ -1,0 +1,142 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - optimization_solve_qp3_using_smo_abstract.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2010  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#undef</font> DLIB_OPTIMIZATION_SOLVE_QP3_USING_SMO_ABSTRACT_H_
+<font color='#0000FF'>#ifdef</font> DLIB_OPTIMIZATION_SOLVE_QP3_USING_SMO_ABSTRACT_H_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../matrix/matrix_abstract.h.html'>../matrix/matrix_abstract.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../algs.h.html'>../algs.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>class</font> <b><a name='invalid_qp3_error'></a>invalid_qp3_error</b> : <font color='#0000FF'>public</font> dlib::error 
+    <b>{</b> 
+        <font color='#009900'>/*!
+            WHAT THIS OBJECT REPRESENTS
+                This object is an exception class used to indicate that the values 
+                of B, Cp, and Cn given to the solve_qp3_using_smo object are incompatible 
+                with the constraints of the quadratic program.
+
+                this-&gt;B, this-&gt;Cp, and this-&gt;Cn will be set to the invalid values used.
+        !*/</font>
+
+    <font color='#0000FF'>public</font>: 
+        <b><a name='invalid_qp3_error'></a>invalid_qp3_error</b><font face='Lucida Console'>(</font> <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> msg, <font color='#0000FF'><u>double</u></font> B_, <font color='#0000FF'><u>double</u></font> Cp_, <font color='#0000FF'><u>double</u></font> Cn_<font face='Lucida Console'>)</font> : 
+            dlib::error<font face='Lucida Console'>(</font>msg<font face='Lucida Console'>)</font>, B<font face='Lucida Console'>(</font>B_<font face='Lucida Console'>)</font>, Cp<font face='Lucida Console'>(</font>Cp_<font face='Lucida Console'>)</font>, Cn<font face='Lucida Console'>(</font>Cn_<font face='Lucida Console'>)</font> <b>{</b><b>}</b>;
+
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> B;
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> Cp;
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> Cn;
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> matrix_type
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>class</font> <b><a name='solve_qp3_using_smo'></a>solve_qp3_using_smo</b>
+    <b>{</b>
+        <font color='#009900'>/*!
+            REQUIREMENTS ON matrix_type
+                Must be some type of dlib::matrix.
+
+            WHAT THIS OBJECT REPRESENTS
+                This object is a tool for solving the following quadratic programming
+                problem using the sequential minimal optimization algorithm:  
+
+                  Minimize: f(alpha) == 0.5*trans(alpha)*Q*alpha + trans(p)*alpha
+                  subject to the following constraints:
+                    - for all i such that y(i) == +1:  0 &lt;= alpha(i) &lt;= Cp 
+                    - for all i such that y(i) == -1:  0 &lt;= alpha(i) &lt;= Cn 
+                    - trans(y)*alpha == B 
+
+                  Where all elements of y must be equal to +1 or -1 and f is convex.  
+                  This means that Q should be symmetric and positive-semidefinite.
+                
+                
+                This object implements the strategy used by the LIBSVM tool.  The following papers
+                can be consulted for additional details:
+                    - Chih-Chung Chang and Chih-Jen Lin, LIBSVM : a library for support vector 
+                      machines, 2001. Software available at http://www.csie.ntu.edu.tw/~cjlin/libsvm
+                    - Working Set Selection Using Second Order Information for Training Support Vector Machines by
+                      Fan, Chen, and Lin.  In the Journal of Machine Learning Research 2005.
+        !*/</font>
+
+    <font color='#0000FF'>public</font>:
+
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> matrix_type::mem_manager_type mem_manager_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> matrix_type::type scalar_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> matrix_type::layout_type layout_type;
+        <font color='#0000FF'>typedef</font> matrix<font color='#5555FF'>&lt;</font>scalar_type,<font color='#979000'>0</font>,<font color='#979000'>0</font>,mem_manager_type,layout_type<font color='#5555FF'>&gt;</font> general_matrix;
+        <font color='#0000FF'>typedef</font> matrix<font color='#5555FF'>&lt;</font>scalar_type,<font color='#979000'>0</font>,<font color='#979000'>1</font>,mem_manager_type,layout_type<font color='#5555FF'>&gt;</font> column_matrix;
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'>typename</font> EXP1,
+            <font color='#0000FF'>typename</font> EXP2,
+            <font color='#0000FF'>typename</font> EXP3,
+            <font color='#0000FF'><u>long</u></font> NR
+            <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font> 
+            <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&lt;</font>EXP1<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> Q,
+            <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&lt;</font>EXP2<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> p,
+            <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&lt;</font>EXP3<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> y,
+            <font color='#0000FF'>const</font> scalar_type B,
+            <font color='#0000FF'>const</font> scalar_type Cp,
+            <font color='#0000FF'>const</font> scalar_type Cn,
+            matrix<font color='#5555FF'>&lt;</font>scalar_type,NR,<font color='#979000'>1</font>,mem_manager_type, layout_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> alpha,
+            scalar_type eps
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - Q.nr() == Q.nc()
+                - is_col_vector(y) == true
+                - is_col_vector(p) == true
+                - p.size() == y.size() == Q.nr()
+                - y.size() &gt; 0
+                - sum((y == +1) + (y == -1)) == y.size()
+                  (i.e. all elements of y must be equal to +1 or -1)
+                - alpha must be capable of representing a vector of size y.size() elements
+                - Cp &gt; 0
+                - Cn &gt; 0
+                - eps &gt; 0
+            ensures
+                - This function solves the quadratic program defined in this class's main comment.
+                - The solution to the quadratic program will be stored in #alpha.
+                - #alpha.size() == y.size()
+                - This function uses an implementation of the sequential minimal optimization 
+                  algorithm.  It runs until the KKT violation is less than eps.  So eps controls 
+                  how accurate the solution is and smaller values result in better solutions.
+                  (a reasonable eps is usually about 1e-3)
+                - #get_gradient() == Q*(#alpha)
+                  (i.e. stores the gradient of f() at #alpha in get_gradient())
+                - returns the number of iterations performed.  
+            throws
+                - invalid_qp3_error
+                  This exception is thrown if the given parameters cause the constraints
+                  of the quadratic programming problem to be impossible to satisfy. 
+        !*/</font>
+
+        <font color='#0000FF'>const</font> column_matrix<font color='#5555FF'>&amp;</font> <b><a name='get_gradient'></a>get_gradient</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the gradient vector at the solution of the last problem solved
+                  by this object.  If no problem has been solved then returns an empty
+                  vector.
+        !*/</font>
+
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_OPTIMIZATION_SOLVE_QP3_USING_SMO_ABSTRACT_H_
+</font>
+
+
+
+</pre></body></html>

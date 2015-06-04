@@ -1,0 +1,258 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - rr_trainer_abstract.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2010  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#undef</font> DLIB_RR_TRAInER_ABSTRACT_Hh_
+<font color='#0000FF'>#ifdef</font> DLIB_RR_TRAInER_ABSTRACT_Hh_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../algs.h.html'>../algs.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='function_abstract.h.html'>function_abstract.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> K 
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>class</font> <b><a name='rr_trainer'></a>rr_trainer</b>
+    <b>{</b>
+        <font color='#009900'>/*!
+            REQUIREMENTS ON K 
+                is the dlib::linear_kernel instantiated with some kind of column vector.
+
+            INITIAL VALUE
+                - get_lambda() == 0
+                - will_use_regression_loss_for_loo_cv() == true
+                - get_search_lambdas() == logspace(-9, 2, 50) 
+                - this object will not be verbose unless be_verbose() is called
+
+            WHAT THIS OBJECT REPRESENTS
+                This object represents a tool for performing linear ridge regression 
+                (This basic algorithm is also known my many other names, e.g. regularized 
+                least squares or least squares SVM). 
+
+                The exact definition of what this algorithm does is this:
+                    Find w and b that minimizes the following (x_i are input samples and y_i are target values):
+                        lambda*dot(w,w) + sum_over_i( (f(x_i) - y_i)^2 )
+                        where f(x) == dot(x,w) - b
+
+                    So this algorithm is just regular old least squares regression but 
+                    with the addition of a regularization term which encourages small w.
+
+
+                It is capable of estimating the lambda parameter using leave-one-out cross-validation.
+
+
+                The leave-one-out cross-validation implementation is based on the techniques
+                discussed in this paper:
+                    Notes on Regularized Least Squares by Ryan M. Rifkin and Ross A. Lippert.
+        !*/</font>
+
+    <font color='#0000FF'>public</font>:
+        <font color='#0000FF'>typedef</font> K kernel_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> kernel_type::scalar_type scalar_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> kernel_type::sample_type sample_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> kernel_type::mem_manager_type mem_manager_type;
+        <font color='#0000FF'>typedef</font> decision_function<font color='#5555FF'>&lt;</font>kernel_type<font color='#5555FF'>&gt;</font> trained_function_type;
+
+        <b><a name='rr_trainer'></a>rr_trainer</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - This object is properly initialized and ready to be used.
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='be_verbose'></a>be_verbose</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - This object will print status messages to standard out.
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='be_quiet'></a>be_quiet</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - this object will not print anything to standard out
+        !*/</font>
+
+        <font color='#0000FF'>const</font> kernel_type <b><a name='get_kernel'></a>get_kernel</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns a copy of the kernel function in use by this object.  Since
+                  the linear kernels don't have any parameters this function just
+                  returns kernel_type()
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_lambda'></a>set_lambda</b> <font face='Lucida Console'>(</font>
+            scalar_type lambda 
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - lambda &gt;= 0
+            ensures
+                - #get_lambda() == lambda 
+        !*/</font>
+
+        <font color='#0000FF'>const</font> scalar_type <b><a name='get_lambda'></a>get_lambda</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the regularization parameter.  It is the parameter that 
+                  determines the trade off between trying to fit the training data 
+                  exactly or allowing more errors but hopefully improving the 
+                  generalization ability of the resulting function.  Smaller values 
+                  encourage exact fitting while larger values of lambda may encourage 
+                  better generalization. 
+
+                  Note that a lambda of 0 has a special meaning.  It indicates to this
+                  object that it should automatically determine an appropriate lambda
+                  value.  This is done using leave-one-out cross-validation.
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='use_regression_loss_for_loo_cv'></a>use_regression_loss_for_loo_cv</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #will_use_regression_loss_for_loo_cv() == true
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='use_classification_loss_for_loo_cv'></a>use_classification_loss_for_loo_cv</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #will_use_regression_loss_for_loo_cv() == false 
+        !*/</font>
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='will_use_regression_loss_for_loo_cv'></a>will_use_regression_loss_for_loo_cv</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns true if the automatic lambda estimation will attempt to estimate a lambda
+                  appropriate for a regression task.  Otherwise it will try and find one which
+                  minimizes the number of classification errors.
+        !*/</font>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> EXP<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_search_lambdas'></a>set_search_lambdas</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&lt;</font>EXP<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> lambdas
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - is_vector(lambdas) == true
+                - lambdas.size() &gt; 0
+                - min(lambdas) &gt; 0
+                - lambdas must contain floating point numbers
+            ensures
+                - #get_search_lambdas() == lambdas
+        !*/</font>
+
+        <font color='#0000FF'>const</font> matrix<font color='#5555FF'>&lt;</font>scalar_type,<font color='#979000'>0</font>,<font color='#979000'>0</font>,mem_manager_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> <b><a name='get_search_lambdas'></a>get_search_lambdas</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns a matrix M such that:
+                    - is_vector(M) == true
+                    - M == a list of all the lambda values which will be tried when performing
+                      LOO cross-validation for determining the best lambda. 
+        !*/</font>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'>typename</font> in_sample_vector_type,
+            <font color='#0000FF'>typename</font> in_scalar_vector_type
+            <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>const</font> decision_function<font color='#5555FF'>&lt;</font>kernel_type<font color='#5555FF'>&gt;</font> <b><a name='train'></a>train</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> in_sample_vector_type<font color='#5555FF'>&amp;</font> x,
+            <font color='#0000FF'>const</font> in_scalar_vector_type<font color='#5555FF'>&amp;</font> y
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - x == a matrix or something convertible to a matrix via mat().
+                  Also, x should contain sample_type objects.
+                - y == a matrix or something convertible to a matrix via mat().
+                  Also, y should contain scalar_type objects.
+                - is_learning_problem(x,y) == true
+                - if (get_lambda() == 0 &amp;&amp; will_use_regression_loss_for_loo_cv() == false) then
+                    - is_binary_classification_problem(x,y) == true
+                      (i.e. if you want this algorithm to estimate a lambda appropriate for
+                      classification functions then you had better give a valid classification
+                      problem)
+            ensures
+                - performs linear ridge regression given the training samples in x and target values in y.  
+                - returns a decision_function F with the following properties:
+                    - F(new_x) == predicted y value
+                    - F.alpha.size() == 1
+                    - F.basis_vectors.size() == 1
+                    - F.alpha(0) == 1
+
+                - if (get_lambda() == 0) then
+                    - This object will perform internal leave-one-out cross-validation to determine an 
+                      appropriate lambda automatically.  It will compute the LOO error for each lambda
+                      in get_search_lambdas() and select the best one.
+                    - if (will_use_regression_loss_for_loo_cv()) then
+                        - the lambda selected will be the one that minimizes the mean squared error.
+                    - else
+                        - the lambda selected will be the one that minimizes the number classification 
+                          mistakes.  We say a point is classified correctly if the output of the
+                          decision_function has the same sign as its label.
+                    - #get_lambda() == 0
+                      (i.e. we don't change the get_lambda() value.  If you want to know what the
+                      automatically selected lambda value was then call the version of train()
+                      defined below)
+                - else
+                    - The user supplied value of get_lambda() will be used to perform the ridge regression.
+        !*/</font>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'>typename</font> in_sample_vector_type,
+            <font color='#0000FF'>typename</font> in_scalar_vector_type
+            <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>const</font> decision_function<font color='#5555FF'>&lt;</font>kernel_type<font color='#5555FF'>&gt;</font> <b><a name='train'></a>train</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> in_sample_vector_type<font color='#5555FF'>&amp;</font> x,
+            <font color='#0000FF'>const</font> in_scalar_vector_type<font color='#5555FF'>&amp;</font> y,
+            std::vector<font color='#5555FF'>&lt;</font>scalar_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> loo_values
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - all the requirements for train(x,y) must be satisfied
+            ensures
+                - returns train(x,y)
+                  (i.e. executes train(x,y) and returns its result)
+                - #loo_values.size() == y.size()
+                - for all valid i:
+                    - #loo_values[i] == leave-one-out prediction for the value of y(i) based 
+                      on all the training samples other than (x(i),y(i)).
+        !*/</font>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'>typename</font> in_sample_vector_type,
+            <font color='#0000FF'>typename</font> in_scalar_vector_type
+            <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>const</font> decision_function<font color='#5555FF'>&lt;</font>kernel_type<font color='#5555FF'>&gt;</font> <b><a name='train'></a>train</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> in_sample_vector_type<font color='#5555FF'>&amp;</font> x,
+            <font color='#0000FF'>const</font> in_scalar_vector_type<font color='#5555FF'>&amp;</font> y,
+            std::vector<font color='#5555FF'>&lt;</font>scalar_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> loo_values,
+            scalar_type<font color='#5555FF'>&amp;</font> lambda_used 
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - all the requirements for train(x,y) must be satisfied
+            ensures
+                - returns train(x,y)
+                  (i.e. executes train(x,y) and returns its result)
+                - #loo_values.size() == y.size()
+                - for all valid i:
+                    - #loo_values[i] == leave-one-out prediction for the value of y(i) based 
+                      on all the training samples other than (x(i),y(i)).
+                - #lambda_used == the value of lambda used to generate the 
+                  decision_function.  Note that this lambda value is always 
+                  equal to get_lambda() if get_lambda() isn't 0.
+        !*/</font>
+
+    <b>}</b>; 
+
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_RR_TRAInER_ABSTRACT_Hh_
+</font>
+
+</pre></body></html>

@@ -1,0 +1,475 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - graph_labeler.cpp</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2012  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>sstream<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>string<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>cstdlib<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>ctime<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>svm_threaded.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>data_io.h<font color='#5555FF'>&gt;</font>
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='tester.h.html'>tester.h</a>"
+
+<font color='#0000FF'>namespace</font>  
+<b>{</b>
+
+    <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> test;
+    <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> dlib;
+    <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> std;
+
+
+
+    logger <b><a name='dlog'></a>dlog</b><font face='Lucida Console'>(</font>"<font color='#CC0000'>test.graph_cuts</font>"<font face='Lucida Console'>)</font>;
+
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> graph_type,
+        <font color='#0000FF'>typename</font> samples_type,
+        <font color='#0000FF'>typename</font> labels_type
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='make_data'></a>make_data</b><font face='Lucida Console'>(</font>
+        samples_type<font color='#5555FF'>&amp;</font> samples,
+        labels_type<font color='#5555FF'>&amp;</font> labels
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#009900'>//samples.clear();
+</font>        <font color='#009900'>//labels.clear();
+</font>
+        std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>bool</u></font><font color='#5555FF'>&gt;</font> label;
+        graph_type g;
+
+    <font color='#009900'>// ---------------------------
+</font>        g.<font color='#BB00BB'>set_number_of_nodes</font><font face='Lucida Console'>(</font><font color='#979000'>4</font><font face='Lucida Console'>)</font>;
+        label.<font color='#BB00BB'>resize</font><font face='Lucida Console'>(</font>g.<font color='#BB00BB'>number_of_nodes</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        g.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>.data <font color='#5555FF'>=</font> <font color='#979000'>0</font>, <font color='#979000'>0</font>, <font color='#979000'>1</font>; label[<font color='#979000'>0</font>] <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+        g.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>.data <font color='#5555FF'>=</font> <font color='#979000'>0</font>, <font color='#979000'>0</font>, <font color='#979000'>1</font>; label[<font color='#979000'>1</font>] <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+        g.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font><font color='#979000'>2</font><font face='Lucida Console'>)</font>.data <font color='#5555FF'>=</font> <font color='#979000'>0</font>, <font color='#979000'>1</font>, <font color='#979000'>0</font>; label[<font color='#979000'>2</font>] <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+        g.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font><font color='#979000'>3</font><font face='Lucida Console'>)</font>.data <font color='#5555FF'>=</font> <font color='#979000'>0</font>, <font color='#979000'>1</font>, <font color='#979000'>0</font>; label[<font color='#979000'>3</font>] <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+
+        g.<font color='#BB00BB'>add_edge</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>,<font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+        g.<font color='#BB00BB'>add_edge</font><font face='Lucida Console'>(</font><font color='#979000'>1</font>,<font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+        g.<font color='#BB00BB'>add_edge</font><font face='Lucida Console'>(</font><font color='#979000'>2</font>,<font color='#979000'>3</font><font face='Lucida Console'>)</font>;
+        g.<font color='#BB00BB'>add_edge</font><font face='Lucida Console'>(</font><font color='#979000'>3</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+
+        <font color='#BB00BB'>edge</font><font face='Lucida Console'>(</font>g,<font color='#979000'>0</font>,<font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>1</font>, <font color='#979000'>1</font>;
+        <font color='#BB00BB'>edge</font><font face='Lucida Console'>(</font>g,<font color='#979000'>1</font>,<font color='#979000'>2</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>1</font>, <font color='#979000'>1</font>;
+        <font color='#BB00BB'>edge</font><font face='Lucida Console'>(</font>g,<font color='#979000'>2</font>,<font color='#979000'>3</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>1</font>, <font color='#979000'>1</font>;
+        <font color='#BB00BB'>edge</font><font face='Lucida Console'>(</font>g,<font color='#979000'>3</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>1</font>, <font color='#979000'>1</font>;
+        samples.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>g<font face='Lucida Console'>)</font>;
+        labels.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>label<font face='Lucida Console'>)</font>;
+    <font color='#009900'>// ---------------------------
+</font>
+        g.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        g.<font color='#BB00BB'>set_number_of_nodes</font><font face='Lucida Console'>(</font><font color='#979000'>4</font><font face='Lucida Console'>)</font>;
+        label.<font color='#BB00BB'>resize</font><font face='Lucida Console'>(</font>g.<font color='#BB00BB'>number_of_nodes</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        g.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>.data <font color='#5555FF'>=</font> <font color='#979000'>0</font>, <font color='#979000'>0</font>, <font color='#979000'>1</font>; label[<font color='#979000'>0</font>] <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+        g.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>.data <font color='#5555FF'>=</font> <font color='#979000'>0</font>, <font color='#979000'>0</font>, <font color='#979000'>0</font>; label[<font color='#979000'>1</font>] <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+        g.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font><font color='#979000'>2</font><font face='Lucida Console'>)</font>.data <font color='#5555FF'>=</font> <font color='#979000'>0</font>, <font color='#979000'>1</font>, <font color='#979000'>0</font>; label[<font color='#979000'>2</font>] <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+        g.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font><font color='#979000'>3</font><font face='Lucida Console'>)</font>.data <font color='#5555FF'>=</font> <font color='#979000'>0</font>, <font color='#979000'>0</font>, <font color='#979000'>0</font>; label[<font color='#979000'>3</font>] <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+
+        g.<font color='#BB00BB'>add_edge</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>,<font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+        g.<font color='#BB00BB'>add_edge</font><font face='Lucida Console'>(</font><font color='#979000'>1</font>,<font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+        g.<font color='#BB00BB'>add_edge</font><font face='Lucida Console'>(</font><font color='#979000'>2</font>,<font color='#979000'>3</font><font face='Lucida Console'>)</font>;
+        g.<font color='#BB00BB'>add_edge</font><font face='Lucida Console'>(</font><font color='#979000'>3</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+
+        <font color='#BB00BB'>edge</font><font face='Lucida Console'>(</font>g,<font color='#979000'>0</font>,<font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>1</font>, <font color='#979000'>0</font>;
+        <font color='#BB00BB'>edge</font><font face='Lucida Console'>(</font>g,<font color='#979000'>1</font>,<font color='#979000'>2</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>0</font>, <font color='#979000'>1</font>;
+        <font color='#BB00BB'>edge</font><font face='Lucida Console'>(</font>g,<font color='#979000'>2</font>,<font color='#979000'>3</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>1</font>, <font color='#979000'>0</font>;
+        <font color='#BB00BB'>edge</font><font face='Lucida Console'>(</font>g,<font color='#979000'>3</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>0</font>, <font color='#979000'>1</font>;
+        samples.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>g<font face='Lucida Console'>)</font>;
+        labels.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>label<font face='Lucida Console'>)</font>;
+    <font color='#009900'>// ---------------------------
+</font>
+        g.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        g.<font color='#BB00BB'>set_number_of_nodes</font><font face='Lucida Console'>(</font><font color='#979000'>4</font><font face='Lucida Console'>)</font>;
+        label.<font color='#BB00BB'>resize</font><font face='Lucida Console'>(</font>g.<font color='#BB00BB'>number_of_nodes</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        g.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>.data <font color='#5555FF'>=</font> <font color='#979000'>0</font>, <font color='#979000'>1</font>, <font color='#979000'>0</font>; label[<font color='#979000'>0</font>] <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+        g.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>.data <font color='#5555FF'>=</font> <font color='#979000'>0</font>, <font color='#979000'>1</font>, <font color='#979000'>0</font>; label[<font color='#979000'>1</font>] <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+        g.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font><font color='#979000'>2</font><font face='Lucida Console'>)</font>.data <font color='#5555FF'>=</font> <font color='#979000'>0</font>, <font color='#979000'>1</font>, <font color='#979000'>0</font>; label[<font color='#979000'>2</font>] <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+        g.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font><font color='#979000'>3</font><font face='Lucida Console'>)</font>.data <font color='#5555FF'>=</font> <font color='#979000'>0</font>, <font color='#979000'>0</font>, <font color='#979000'>0</font>; label[<font color='#979000'>3</font>] <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+
+        g.<font color='#BB00BB'>add_edge</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>,<font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+        g.<font color='#BB00BB'>add_edge</font><font face='Lucida Console'>(</font><font color='#979000'>1</font>,<font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+        g.<font color='#BB00BB'>add_edge</font><font face='Lucida Console'>(</font><font color='#979000'>2</font>,<font color='#979000'>3</font><font face='Lucida Console'>)</font>;
+        g.<font color='#BB00BB'>add_edge</font><font face='Lucida Console'>(</font><font color='#979000'>3</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+
+        <font color='#BB00BB'>edge</font><font face='Lucida Console'>(</font>g,<font color='#979000'>0</font>,<font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>1</font>, <font color='#979000'>0</font>;
+        <font color='#BB00BB'>edge</font><font face='Lucida Console'>(</font>g,<font color='#979000'>1</font>,<font color='#979000'>2</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>0</font>, <font color='#979000'>1</font>;
+        <font color='#BB00BB'>edge</font><font face='Lucida Console'>(</font>g,<font color='#979000'>2</font>,<font color='#979000'>3</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>1</font>, <font color='#979000'>0</font>;
+        <font color='#BB00BB'>edge</font><font face='Lucida Console'>(</font>g,<font color='#979000'>3</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>0</font>, <font color='#979000'>1</font>;
+        samples.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>g<font face='Lucida Console'>)</font>;
+        labels.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>label<font face='Lucida Console'>)</font>;
+    <font color='#009900'>// ---------------------------
+</font>    <b>}</b>
+
+
+
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> graph_type,
+        <font color='#0000FF'>typename</font> samples_type,
+        <font color='#0000FF'>typename</font> labels_type
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='make_data_sparse'></a>make_data_sparse</b><font face='Lucida Console'>(</font>
+        samples_type<font color='#5555FF'>&amp;</font> samples,
+        labels_type<font color='#5555FF'>&amp;</font> labels
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#009900'>//samples.clear();
+</font>        <font color='#009900'>//labels.clear();
+</font>
+        std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>bool</u></font><font color='#5555FF'>&gt;</font> label;
+        graph_type g;
+        <font color='#0000FF'>typename</font> graph_type::edge_type v;
+
+    <font color='#009900'>// ---------------------------
+</font>        g.<font color='#BB00BB'>set_number_of_nodes</font><font face='Lucida Console'>(</font><font color='#979000'>4</font><font face='Lucida Console'>)</font>;
+        label.<font color='#BB00BB'>resize</font><font face='Lucida Console'>(</font>g.<font color='#BB00BB'>number_of_nodes</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        g.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>.data[<font color='#979000'>2</font>] <font color='#5555FF'>=</font> <font color='#979000'>1</font>; label[<font color='#979000'>0</font>] <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+        g.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>.data[<font color='#979000'>2</font>] <font color='#5555FF'>=</font> <font color='#979000'>1</font>; label[<font color='#979000'>1</font>] <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+        g.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font><font color='#979000'>2</font><font face='Lucida Console'>)</font>.data[<font color='#979000'>1</font>] <font color='#5555FF'>=</font> <font color='#979000'>1</font>; label[<font color='#979000'>2</font>] <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+        g.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font><font color='#979000'>3</font><font face='Lucida Console'>)</font>.data[<font color='#979000'>1</font>] <font color='#5555FF'>=</font> <font color='#979000'>1</font>; label[<font color='#979000'>3</font>] <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+
+        g.<font color='#BB00BB'>add_edge</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>,<font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+        g.<font color='#BB00BB'>add_edge</font><font face='Lucida Console'>(</font><font color='#979000'>1</font>,<font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+        g.<font color='#BB00BB'>add_edge</font><font face='Lucida Console'>(</font><font color='#979000'>2</font>,<font color='#979000'>3</font><font face='Lucida Console'>)</font>;
+        g.<font color='#BB00BB'>add_edge</font><font face='Lucida Console'>(</font><font color='#979000'>3</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+        g.<font color='#BB00BB'>add_edge</font><font face='Lucida Console'>(</font><font color='#979000'>3</font>,<font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+
+        v[<font color='#979000'>0</font>] <font color='#5555FF'>=</font> <font color='#979000'>1</font>; v[<font color='#979000'>1</font>] <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+        <font color='#BB00BB'>edge</font><font face='Lucida Console'>(</font>g,<font color='#979000'>0</font>,<font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> v;
+        <font color='#BB00BB'>edge</font><font face='Lucida Console'>(</font>g,<font color='#979000'>1</font>,<font color='#979000'>2</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> v;
+        <font color='#BB00BB'>edge</font><font face='Lucida Console'>(</font>g,<font color='#979000'>2</font>,<font color='#979000'>3</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> v;
+        <font color='#BB00BB'>edge</font><font face='Lucida Console'>(</font>g,<font color='#979000'>3</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> v;
+        samples.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>g<font face='Lucida Console'>)</font>;
+        labels.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>label<font face='Lucida Console'>)</font>;
+    <font color='#009900'>// ---------------------------
+</font>
+        g.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        g.<font color='#BB00BB'>set_number_of_nodes</font><font face='Lucida Console'>(</font><font color='#979000'>5</font><font face='Lucida Console'>)</font>;
+        label.<font color='#BB00BB'>resize</font><font face='Lucida Console'>(</font>g.<font color='#BB00BB'>number_of_nodes</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        g.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>.data[<font color='#979000'>2</font>] <font color='#5555FF'>=</font> <font color='#979000'>1</font>; label[<font color='#979000'>0</font>] <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+        g.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>.data[<font color='#979000'>0</font>] <font color='#5555FF'>=</font> <font color='#979000'>0</font>; label[<font color='#979000'>1</font>] <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+        g.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font><font color='#979000'>2</font><font face='Lucida Console'>)</font>.data[<font color='#979000'>1</font>] <font color='#5555FF'>=</font> <font color='#979000'>1</font>; label[<font color='#979000'>2</font>] <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+        g.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font><font color='#979000'>3</font><font face='Lucida Console'>)</font>.data[<font color='#979000'>0</font>] <font color='#5555FF'>=</font> <font color='#979000'>0</font>; label[<font color='#979000'>3</font>] <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+                               label[<font color='#979000'>4</font>] <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+
+        g.<font color='#BB00BB'>add_edge</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>,<font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+        g.<font color='#BB00BB'>add_edge</font><font face='Lucida Console'>(</font><font color='#979000'>1</font>,<font color='#979000'>4</font><font face='Lucida Console'>)</font>;
+        g.<font color='#BB00BB'>add_edge</font><font face='Lucida Console'>(</font><font color='#979000'>1</font>,<font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+        g.<font color='#BB00BB'>add_edge</font><font face='Lucida Console'>(</font><font color='#979000'>2</font>,<font color='#979000'>3</font><font face='Lucida Console'>)</font>;
+        g.<font color='#BB00BB'>add_edge</font><font face='Lucida Console'>(</font><font color='#979000'>3</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+
+        <font color='#BB00BB'>edge</font><font face='Lucida Console'>(</font>g,<font color='#979000'>0</font>,<font color='#979000'>1</font><font face='Lucida Console'>)</font>[<font color='#979000'>0</font>] <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+        <font color='#BB00BB'>edge</font><font face='Lucida Console'>(</font>g,<font color='#979000'>1</font>,<font color='#979000'>4</font><font face='Lucida Console'>)</font>[<font color='#979000'>0</font>] <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+        <font color='#BB00BB'>edge</font><font face='Lucida Console'>(</font>g,<font color='#979000'>1</font>,<font color='#979000'>2</font><font face='Lucida Console'>)</font>[<font color='#979000'>1</font>] <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+        <font color='#BB00BB'>edge</font><font face='Lucida Console'>(</font>g,<font color='#979000'>2</font>,<font color='#979000'>3</font><font face='Lucida Console'>)</font>[<font color='#979000'>0</font>] <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+        <font color='#BB00BB'>edge</font><font face='Lucida Console'>(</font>g,<font color='#979000'>3</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font>[<font color='#979000'>1</font>] <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+        samples.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>g<font face='Lucida Console'>)</font>;
+        labels.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>label<font face='Lucida Console'>)</font>;
+    <font color='#009900'>// ---------------------------
+</font>
+        g.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        g.<font color='#BB00BB'>set_number_of_nodes</font><font face='Lucida Console'>(</font><font color='#979000'>4</font><font face='Lucida Console'>)</font>;
+        label.<font color='#BB00BB'>resize</font><font face='Lucida Console'>(</font>g.<font color='#BB00BB'>number_of_nodes</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        g.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>.data[<font color='#979000'>1</font>] <font color='#5555FF'>=</font> <font color='#979000'>1</font>; label[<font color='#979000'>0</font>] <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+        g.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>.data[<font color='#979000'>1</font>] <font color='#5555FF'>=</font> <font color='#979000'>1</font>; label[<font color='#979000'>1</font>] <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+        g.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font><font color='#979000'>2</font><font face='Lucida Console'>)</font>.data[<font color='#979000'>1</font>] <font color='#5555FF'>=</font> <font color='#979000'>1</font>; label[<font color='#979000'>2</font>] <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+        g.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font><font color='#979000'>3</font><font face='Lucida Console'>)</font>.data[<font color='#979000'>1</font>] <font color='#5555FF'>=</font> <font color='#979000'>0</font>; label[<font color='#979000'>3</font>] <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+
+        g.<font color='#BB00BB'>add_edge</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>,<font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+        g.<font color='#BB00BB'>add_edge</font><font face='Lucida Console'>(</font><font color='#979000'>1</font>,<font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+        g.<font color='#BB00BB'>add_edge</font><font face='Lucida Console'>(</font><font color='#979000'>2</font>,<font color='#979000'>3</font><font face='Lucida Console'>)</font>;
+        g.<font color='#BB00BB'>add_edge</font><font face='Lucida Console'>(</font><font color='#979000'>3</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+
+        <font color='#BB00BB'>edge</font><font face='Lucida Console'>(</font>g,<font color='#979000'>0</font>,<font color='#979000'>1</font><font face='Lucida Console'>)</font>[<font color='#979000'>0</font>] <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+        <font color='#BB00BB'>edge</font><font face='Lucida Console'>(</font>g,<font color='#979000'>1</font>,<font color='#979000'>2</font><font face='Lucida Console'>)</font>[<font color='#979000'>1</font>] <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+        <font color='#BB00BB'>edge</font><font face='Lucida Console'>(</font>g,<font color='#979000'>2</font>,<font color='#979000'>3</font><font face='Lucida Console'>)</font>[<font color='#979000'>0</font>] <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+        <font color='#BB00BB'>edge</font><font face='Lucida Console'>(</font>g,<font color='#979000'>3</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font>[<font color='#979000'>1</font>] <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+        samples.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>g<font face='Lucida Console'>)</font>;
+        labels.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>label<font face='Lucida Console'>)</font>;
+    <font color='#009900'>// ---------------------------
+</font>    <b>}</b>
+
+
+
+
+
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> graph_type,
+        <font color='#0000FF'>typename</font> samples_type,
+        <font color='#0000FF'>typename</font> labels_type
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='make_data2'></a>make_data2</b><font face='Lucida Console'>(</font>
+        samples_type<font color='#5555FF'>&amp;</font> samples,
+        labels_type<font color='#5555FF'>&amp;</font> labels
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#009900'>//samples.clear();
+</font>        <font color='#009900'>//labels.clear();
+</font>
+        std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>bool</u></font><font color='#5555FF'>&gt;</font> label;
+        graph_type g;
+
+    <font color='#009900'>// ---------------------------
+</font>        g.<font color='#BB00BB'>set_number_of_nodes</font><font face='Lucida Console'>(</font><font color='#979000'>4</font><font face='Lucida Console'>)</font>;
+        label.<font color='#BB00BB'>resize</font><font face='Lucida Console'>(</font>g.<font color='#BB00BB'>number_of_nodes</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        g.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>.data <font color='#5555FF'>=</font> <font color='#979000'>0</font>, <font color='#979000'>0</font>, <font color='#979000'>1</font>; label[<font color='#979000'>0</font>] <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+        g.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>.data <font color='#5555FF'>=</font> <font color='#979000'>0</font>, <font color='#979000'>0</font>, <font color='#979000'>1</font>; label[<font color='#979000'>1</font>] <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+        g.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font><font color='#979000'>2</font><font face='Lucida Console'>)</font>.data <font color='#5555FF'>=</font> <font color='#979000'>0</font>, <font color='#979000'>1</font>, <font color='#979000'>0</font>; label[<font color='#979000'>2</font>] <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+        g.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font><font color='#979000'>3</font><font face='Lucida Console'>)</font>.data <font color='#5555FF'>=</font> <font color='#979000'>0</font>, <font color='#979000'>1</font>, <font color='#979000'>0</font>; label[<font color='#979000'>3</font>] <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+
+        g.<font color='#BB00BB'>add_edge</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>,<font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+        g.<font color='#BB00BB'>add_edge</font><font face='Lucida Console'>(</font><font color='#979000'>1</font>,<font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+        g.<font color='#BB00BB'>add_edge</font><font face='Lucida Console'>(</font><font color='#979000'>2</font>,<font color='#979000'>3</font><font face='Lucida Console'>)</font>;
+        g.<font color='#BB00BB'>add_edge</font><font face='Lucida Console'>(</font><font color='#979000'>3</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+
+        <font color='#BB00BB'>edge</font><font face='Lucida Console'>(</font>g,<font color='#979000'>0</font>,<font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>1</font>, <font color='#979000'>1</font>;
+        <font color='#BB00BB'>edge</font><font face='Lucida Console'>(</font>g,<font color='#979000'>1</font>,<font color='#979000'>2</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>1</font>, <font color='#979000'>1</font>;
+        <font color='#BB00BB'>edge</font><font face='Lucida Console'>(</font>g,<font color='#979000'>2</font>,<font color='#979000'>3</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>1</font>, <font color='#979000'>1</font>;
+        <font color='#BB00BB'>edge</font><font face='Lucida Console'>(</font>g,<font color='#979000'>3</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>1</font>, <font color='#979000'>1</font>;
+        samples.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>g<font face='Lucida Console'>)</font>;
+        labels.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>label<font face='Lucida Console'>)</font>;
+    <font color='#009900'>// ---------------------------
+</font>    <b>}</b>
+
+
+
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> graph_type,
+        <font color='#0000FF'>typename</font> samples_type,
+        <font color='#0000FF'>typename</font> labels_type
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='make_data2_sparse'></a>make_data2_sparse</b><font face='Lucida Console'>(</font>
+        samples_type<font color='#5555FF'>&amp;</font> samples,
+        labels_type<font color='#5555FF'>&amp;</font> labels
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#009900'>//samples.clear();
+</font>        <font color='#009900'>//labels.clear();
+</font>
+        std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>bool</u></font><font color='#5555FF'>&gt;</font> label;
+        graph_type g;
+        <font color='#0000FF'>typename</font> graph_type::edge_type v;
+
+    <font color='#009900'>// ---------------------------
+</font>        g.<font color='#BB00BB'>set_number_of_nodes</font><font face='Lucida Console'>(</font><font color='#979000'>4</font><font face='Lucida Console'>)</font>;
+        label.<font color='#BB00BB'>resize</font><font face='Lucida Console'>(</font>g.<font color='#BB00BB'>number_of_nodes</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        g.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>.data[<font color='#979000'>2</font>] <font color='#5555FF'>=</font> <font color='#979000'>1</font>; label[<font color='#979000'>0</font>] <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+        g.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>.data[<font color='#979000'>2</font>] <font color='#5555FF'>=</font> <font color='#979000'>1</font>; label[<font color='#979000'>1</font>] <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+        g.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font><font color='#979000'>2</font><font face='Lucida Console'>)</font>.data[<font color='#979000'>1</font>] <font color='#5555FF'>=</font> <font color='#979000'>1</font>; label[<font color='#979000'>2</font>] <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+        g.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font><font color='#979000'>3</font><font face='Lucida Console'>)</font>.data[<font color='#979000'>1</font>] <font color='#5555FF'>=</font> <font color='#979000'>1</font>; label[<font color='#979000'>3</font>] <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+
+        g.<font color='#BB00BB'>add_edge</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>,<font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+        g.<font color='#BB00BB'>add_edge</font><font face='Lucida Console'>(</font><font color='#979000'>1</font>,<font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+        g.<font color='#BB00BB'>add_edge</font><font face='Lucida Console'>(</font><font color='#979000'>2</font>,<font color='#979000'>3</font><font face='Lucida Console'>)</font>;
+        g.<font color='#BB00BB'>add_edge</font><font face='Lucida Console'>(</font><font color='#979000'>3</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+
+        v[<font color='#979000'>0</font>] <font color='#5555FF'>=</font> <font color='#979000'>1</font>; v[<font color='#979000'>1</font>] <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+        <font color='#BB00BB'>edge</font><font face='Lucida Console'>(</font>g,<font color='#979000'>0</font>,<font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> v;
+        <font color='#BB00BB'>edge</font><font face='Lucida Console'>(</font>g,<font color='#979000'>1</font>,<font color='#979000'>2</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> v;
+        <font color='#BB00BB'>edge</font><font face='Lucida Console'>(</font>g,<font color='#979000'>2</font>,<font color='#979000'>3</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> v;
+        <font color='#BB00BB'>edge</font><font face='Lucida Console'>(</font>g,<font color='#979000'>3</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> v;
+        samples.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>g<font face='Lucida Console'>)</font>;
+        labels.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>label<font face='Lucida Console'>)</font>;
+    <font color='#009900'>// ---------------------------
+</font>
+    <b>}</b>
+
+
+
+
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> node_vector_type,
+        <font color='#0000FF'>typename</font> edge_vector_type,
+        <font color='#0000FF'>typename</font> vector_type,
+        <font color='#0000FF'>typename</font> graph_type
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='test1'></a>test1</b><font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> dlib::array<font color='#5555FF'>&lt;</font>graph_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> samples,
+        <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>bool</u></font><font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> labels
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>begin test1()</font>";
+
+        structural_graph_labeling_trainer<font color='#5555FF'>&lt;</font>vector_type<font color='#5555FF'>&gt;</font> trainer;
+        <font color='#009900'>//trainer.be_verbose();
+</font>        trainer.<font color='#BB00BB'>set_epsilon</font><font face='Lucida Console'>(</font><font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>12</font><font face='Lucida Console'>)</font>;
+        graph_labeler<font color='#5555FF'>&lt;</font>vector_type<font color='#5555FF'>&gt;</font> labeler <font color='#5555FF'>=</font> trainer.<font color='#BB00BB'>train</font><font face='Lucida Console'>(</font>samples, labels<font face='Lucida Console'>)</font>;
+
+
+        <font color='#009900'>// test serialization code for the labeler.
+</font>        std::ostringstream sout;
+        <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>labeler, sout<font face='Lucida Console'>)</font>;
+        std::istringstream <font color='#BB00BB'>sin</font><font face='Lucida Console'>(</font>sout.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        labeler <font color='#5555FF'>=</font> graph_labeler<font color='#5555FF'>&lt;</font>vector_type<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>labeler, sin<font face='Lucida Console'>)</font>;
+
+        std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>bool</u></font><font color='#5555FF'>&gt;</font> temp;
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> k <font color='#5555FF'>=</font> <font color='#979000'>0</font>; k <font color='#5555FF'>&lt;</font> samples.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>k<font face='Lucida Console'>)</font>
+        <b>{</b>
+            temp <font color='#5555FF'>=</font> <font color='#BB00BB'>labeler</font><font face='Lucida Console'>(</font>samples[k]<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> temp.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>const</font> <font color='#0000FF'><u>bool</u></font> true_label <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>labels[k][i] <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>const</font> <font color='#0000FF'><u>bool</u></font> pred_label <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>temp[i] <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+                <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>true_label <font color='#5555FF'>=</font><font color='#5555FF'>=</font> pred_label<font face='Lucida Console'>)</font>;
+            <b>}</b>
+        <b>}</b>
+
+        matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font> cv;
+
+        cv <font color='#5555FF'>=</font> <font color='#BB00BB'>test_graph_labeling_function</font><font face='Lucida Console'>(</font>labeler, samples, labels<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>sum</font><font face='Lucida Console'>(</font>cv<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+        cv <font color='#5555FF'>=</font> <font color='#BB00BB'>cross_validate_graph_labeling_trainer</font><font face='Lucida Console'>(</font>trainer, samples, labels, <font color='#979000'>4</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>sum</font><font face='Lucida Console'>(</font>cv<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+
+        dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>edge weights: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>trans</font><font face='Lucida Console'>(</font><font color='#BB00BB'>sparse_to_dense</font><font face='Lucida Console'>(</font>labeler.<font color='#BB00BB'>get_edge_weights</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>node weights: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>trans</font><font face='Lucida Console'>(</font><font color='#BB00BB'>sparse_to_dense</font><font face='Lucida Console'>(</font>labeler.<font color='#BB00BB'>get_node_weights</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+
+
+    <font color='#0000FF'>class</font> <b><a name='graph_labeling_tester'></a>graph_labeling_tester</b> : <font color='#0000FF'>public</font> tester
+    <b>{</b>
+    <font color='#0000FF'>public</font>:
+        <b><a name='graph_labeling_tester'></a>graph_labeling_tester</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> :
+            tester <font face='Lucida Console'>(</font>"<font color='#CC0000'>test_graph_labeling</font>",
+                    "<font color='#CC0000'>Runs tests on the graph labeling component.</font>"<font face='Lucida Console'>)</font>
+        <b>{</b><b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='perform_test'></a>perform_test</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#BB00BB'>print_spinner</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#009900'>// test with dense vectors
+</font>            <b>{</b>
+                <font color='#0000FF'>typedef</font> matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>3</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> node_vector_type;
+                <font color='#0000FF'>typedef</font> matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>2</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> edge_vector_type;
+                <font color='#0000FF'>typedef</font> matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>0</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> vector_type;
+                <font color='#0000FF'>typedef</font> dlib::graph<font color='#5555FF'>&lt;</font>node_vector_type, edge_vector_type<font color='#5555FF'>&gt;</font>::kernel_1a_c graph_type;
+
+                dlib::array<font color='#5555FF'>&lt;</font>graph_type<font color='#5555FF'>&gt;</font> samples;
+                std::vector<font color='#5555FF'>&lt;</font>std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>bool</u></font><font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> labels;
+
+                make_data<font color='#5555FF'>&lt;</font>graph_type<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>samples, labels<font face='Lucida Console'>)</font>;
+                make_data<font color='#5555FF'>&lt;</font>graph_type<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>samples, labels<font face='Lucida Console'>)</font>;
+                make_data<font color='#5555FF'>&lt;</font>graph_type<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>samples, labels<font face='Lucida Console'>)</font>;
+                make_data<font color='#5555FF'>&lt;</font>graph_type<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>samples, labels<font face='Lucida Console'>)</font>;
+
+
+                test1<font color='#5555FF'>&lt;</font>node_vector_type,edge_vector_type,vector_type<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>samples, labels<font face='Lucida Console'>)</font>;
+            <b>}</b>
+            <font color='#BB00BB'>print_spinner</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#009900'>// test with dense vectors and sparse vectors together 
+</font>            <b>{</b>
+                <font color='#0000FF'>typedef</font> matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>3</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> node_vector_type;
+                <font color='#0000FF'>typedef</font> matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>2</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> edge_vector_type;
+                <font color='#0000FF'>typedef</font> std::map<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font>,<font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font> vector_type;
+                <font color='#0000FF'>typedef</font> dlib::graph<font color='#5555FF'>&lt;</font>node_vector_type, edge_vector_type<font color='#5555FF'>&gt;</font>::kernel_1a_c graph_type;
+
+                dlib::array<font color='#5555FF'>&lt;</font>graph_type<font color='#5555FF'>&gt;</font> samples;
+                std::vector<font color='#5555FF'>&lt;</font>std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>bool</u></font><font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> labels;
+
+                make_data<font color='#5555FF'>&lt;</font>graph_type<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>samples, labels<font face='Lucida Console'>)</font>;
+                make_data<font color='#5555FF'>&lt;</font>graph_type<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>samples, labels<font face='Lucida Console'>)</font>;
+                make_data<font color='#5555FF'>&lt;</font>graph_type<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>samples, labels<font face='Lucida Console'>)</font>;
+                make_data<font color='#5555FF'>&lt;</font>graph_type<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>samples, labels<font face='Lucida Console'>)</font>;
+
+
+                test1<font color='#5555FF'>&lt;</font>node_vector_type,edge_vector_type,vector_type<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>samples, labels<font face='Lucida Console'>)</font>;
+            <b>}</b>
+            <font color='#BB00BB'>print_spinner</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#009900'>// test with sparse vectors
+</font>            <b>{</b>
+                <font color='#0000FF'>typedef</font> std::vector<font color='#5555FF'>&lt;</font>std::pair<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font>,<font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> vector_type;
+                <font color='#0000FF'>typedef</font> std::map<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font>, <font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font> edge_vector_type;
+                <font color='#0000FF'>typedef</font> std::map<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font>, <font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font> node_vector_type;
+                <font color='#0000FF'>typedef</font> dlib::graph<font color='#5555FF'>&lt;</font>node_vector_type, edge_vector_type<font color='#5555FF'>&gt;</font>::kernel_1a_c graph_type;
+
+                dlib::array<font color='#5555FF'>&lt;</font>graph_type<font color='#5555FF'>&gt;</font> samples;
+                std::vector<font color='#5555FF'>&lt;</font>std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>bool</u></font><font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> labels;
+
+                make_data_sparse<font color='#5555FF'>&lt;</font>graph_type<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>samples, labels<font face='Lucida Console'>)</font>;
+                make_data_sparse<font color='#5555FF'>&lt;</font>graph_type<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>samples, labels<font face='Lucida Console'>)</font>;
+                make_data_sparse<font color='#5555FF'>&lt;</font>graph_type<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>samples, labels<font face='Lucida Console'>)</font>;
+                make_data_sparse<font color='#5555FF'>&lt;</font>graph_type<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>samples, labels<font face='Lucida Console'>)</font>;
+
+
+                test1<font color='#5555FF'>&lt;</font>node_vector_type,edge_vector_type,vector_type<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>samples, labels<font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+
+
+            <font color='#BB00BB'>print_spinner</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#009900'>// test with dense vectors
+</font>            <b>{</b>
+                <font color='#0000FF'>typedef</font> matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>3</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> node_vector_type;
+                <font color='#0000FF'>typedef</font> matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>2</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> edge_vector_type;
+                <font color='#0000FF'>typedef</font> matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>0</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> vector_type;
+                <font color='#0000FF'>typedef</font> dlib::graph<font color='#5555FF'>&lt;</font>node_vector_type, edge_vector_type<font color='#5555FF'>&gt;</font>::kernel_1a_c graph_type;
+
+                dlib::array<font color='#5555FF'>&lt;</font>graph_type<font color='#5555FF'>&gt;</font> samples;
+                std::vector<font color='#5555FF'>&lt;</font>std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>bool</u></font><font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> labels;
+
+                make_data2<font color='#5555FF'>&lt;</font>graph_type<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>samples, labels<font face='Lucida Console'>)</font>;
+                make_data2<font color='#5555FF'>&lt;</font>graph_type<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>samples, labels<font face='Lucida Console'>)</font>;
+                make_data2<font color='#5555FF'>&lt;</font>graph_type<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>samples, labels<font face='Lucida Console'>)</font>;
+                make_data2<font color='#5555FF'>&lt;</font>graph_type<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>samples, labels<font face='Lucida Console'>)</font>;
+
+
+                test1<font color='#5555FF'>&lt;</font>node_vector_type,edge_vector_type,vector_type<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>samples, labels<font face='Lucida Console'>)</font>;
+            <b>}</b>
+            <font color='#BB00BB'>print_spinner</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#009900'>// test with sparse vectors
+</font>            <b>{</b>
+                <font color='#0000FF'>typedef</font> std::vector<font color='#5555FF'>&lt;</font>std::pair<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font>,<font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> vector_type;
+                <font color='#0000FF'>typedef</font> std::map<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font>, <font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font> edge_vector_type;
+                <font color='#0000FF'>typedef</font> std::map<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font>, <font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font> node_vector_type;
+                <font color='#0000FF'>typedef</font> dlib::graph<font color='#5555FF'>&lt;</font>node_vector_type, edge_vector_type<font color='#5555FF'>&gt;</font>::kernel_1a_c graph_type;
+
+                dlib::array<font color='#5555FF'>&lt;</font>graph_type<font color='#5555FF'>&gt;</font> samples;
+                std::vector<font color='#5555FF'>&lt;</font>std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>bool</u></font><font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> labels;
+
+                make_data2_sparse<font color='#5555FF'>&lt;</font>graph_type<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>samples, labels<font face='Lucida Console'>)</font>;
+                make_data2_sparse<font color='#5555FF'>&lt;</font>graph_type<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>samples, labels<font face='Lucida Console'>)</font>;
+                make_data2_sparse<font color='#5555FF'>&lt;</font>graph_type<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>samples, labels<font face='Lucida Console'>)</font>;
+                make_data2_sparse<font color='#5555FF'>&lt;</font>graph_type<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>samples, labels<font face='Lucida Console'>)</font>;
+
+
+                test1<font color='#5555FF'>&lt;</font>node_vector_type,edge_vector_type,vector_type<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>samples, labels<font face='Lucida Console'>)</font>;
+            <b>}</b>
+            <font color='#BB00BB'>print_spinner</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#009900'>// test with sparse vectors and dense mix
+</font>            <b>{</b>
+                <font color='#0000FF'>typedef</font> matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>0</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> vector_type;
+                <font color='#0000FF'>typedef</font> std::map<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font>, <font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font> edge_vector_type;
+                <font color='#0000FF'>typedef</font> std::map<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font>, <font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font> node_vector_type;
+                <font color='#0000FF'>typedef</font> dlib::graph<font color='#5555FF'>&lt;</font>node_vector_type, edge_vector_type<font color='#5555FF'>&gt;</font>::kernel_1a_c graph_type;
+
+                dlib::array<font color='#5555FF'>&lt;</font>graph_type<font color='#5555FF'>&gt;</font> samples;
+                std::vector<font color='#5555FF'>&lt;</font>std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>bool</u></font><font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> labels;
+
+                make_data2_sparse<font color='#5555FF'>&lt;</font>graph_type<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>samples, labels<font face='Lucida Console'>)</font>;
+                make_data2_sparse<font color='#5555FF'>&lt;</font>graph_type<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>samples, labels<font face='Lucida Console'>)</font>;
+                make_data2_sparse<font color='#5555FF'>&lt;</font>graph_type<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>samples, labels<font face='Lucida Console'>)</font>;
+                make_data2_sparse<font color='#5555FF'>&lt;</font>graph_type<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>samples, labels<font face='Lucida Console'>)</font>;
+
+
+                test1<font color='#5555FF'>&lt;</font>node_vector_type,edge_vector_type,vector_type<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>samples, labels<font face='Lucida Console'>)</font>;
+            <b>}</b>
+        <b>}</b>
+    <b>}</b> a;
+
+
+<b>}</b>
+
+
+
+
+
+</pre></body></html>

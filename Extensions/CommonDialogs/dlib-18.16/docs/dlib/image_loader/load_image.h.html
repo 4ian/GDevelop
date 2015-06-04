@@ -1,0 +1,96 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - load_image.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2011  Davis E. King (davis@dlib.net), Nils Labugt, Changjiang Yang (yangcha@leidos.com)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_LOAd_IMAGE_Hh_
+<font color='#0000FF'>#define</font> DLIB_LOAd_IMAGE_Hh_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='load_image_abstract.h.html'>load_image_abstract.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../string.h.html'>../string.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='png_loader.h.html'>png_loader.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='jpeg_loader.h.html'>jpeg_loader.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='image_loader.h.html'>image_loader.h</a>"
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>fstream<font color='#5555FF'>&gt;</font>
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+    <font color='#0000FF'>namespace</font> image_file_type
+    <b>{</b>
+        <font color='#0000FF'>enum</font> <b><a name='type'></a>type</b>
+        <b>{</b>
+            BMP,
+            JPG,
+            PNG,
+            DNG,
+            UNKNOWN
+        <b>}</b>;
+
+        <font color='#0000FF'>inline</font> type <b><a name='read_type'></a>read_type</b><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> file_name<font face='Lucida Console'>)</font> 
+        <b>{</b>
+            std::ifstream <font color='#BB00BB'>file</font><font face='Lucida Console'>(</font>file_name.<font color='#BB00BB'>c_str</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, std::ios::in<font color='#5555FF'>|</font>std::ios::binary<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font>file<font face='Lucida Console'>)</font>
+                <font color='#0000FF'>throw</font> <font color='#BB00BB'>image_load_error</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>Unable to open file: </font>" <font color='#5555FF'>+</font> file_name<font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'><u>char</u></font> buffer[<font color='#979000'>9</font>];
+            file.<font color='#BB00BB'>read</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>char</u></font><font color='#5555FF'>*</font><font face='Lucida Console'>)</font>buffer, <font color='#979000'>8</font><font face='Lucida Console'>)</font>;
+            buffer[<font color='#979000'>8</font>] <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+
+            <font color='#009900'>// Determine the true image type using link:
+</font>            <font color='#009900'>// http://en.wikipedia.org/wiki/List_of_file_signatures
+</font>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>strcmp</font><font face='Lucida Console'>(</font>buffer, "<font color='#CC0000'>\x89\x50\x4E\x47\x0D\x0A\x1A\x0A</font>"<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font> 
+                <font color='#0000FF'>return</font> PNG;
+            <font color='#0000FF'>else</font> <font color='#0000FF'>if</font><font face='Lucida Console'>(</font>buffer[<font color='#979000'>0</font>]<font color='#5555FF'>=</font><font color='#5555FF'>=</font>'<font color='#FF0000'>\xff</font>' <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> buffer[<font color='#979000'>1</font>]<font color='#5555FF'>=</font><font color='#5555FF'>=</font>'<font color='#FF0000'>\xd8</font>' <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> buffer[<font color='#979000'>2</font>]<font color='#5555FF'>=</font><font color='#5555FF'>=</font>'<font color='#FF0000'>\xff</font>'<font face='Lucida Console'>)</font> 
+                <font color='#0000FF'>return</font> JPG;
+            <font color='#0000FF'>else</font> <font color='#0000FF'>if</font><font face='Lucida Console'>(</font>buffer[<font color='#979000'>0</font>]<font color='#5555FF'>=</font><font color='#5555FF'>=</font>'<font color='#FF0000'>B</font>' <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> buffer[<font color='#979000'>1</font>]<font color='#5555FF'>=</font><font color='#5555FF'>=</font>'<font color='#FF0000'>M</font>'<font face='Lucida Console'>)</font> 
+                <font color='#0000FF'>return</font> BMP;
+            <font color='#0000FF'>else</font> <font color='#0000FF'>if</font><font face='Lucida Console'>(</font>buffer[<font color='#979000'>0</font>]<font color='#5555FF'>=</font><font color='#5555FF'>=</font>'<font color='#FF0000'>D</font>' <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> buffer[<font color='#979000'>1</font>]<font color='#5555FF'>=</font><font color='#5555FF'>=</font>'<font color='#FF0000'>N</font>' <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> buffer[<font color='#979000'>2</font>] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> '<font color='#FF0000'>G</font>'<font face='Lucida Console'>)</font> 
+                <font color='#0000FF'>return</font> DNG;
+
+            <font color='#0000FF'>return</font> UNKNOWN;
+        <b>}</b>
+    <b>}</b>;
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> image_type<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='load_image'></a>load_image</b> <font face='Lucida Console'>(</font>
+        image_type<font color='#5555FF'>&amp;</font> image,
+        <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> file_name
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>const</font> image_file_type::type im_type <font color='#5555FF'>=</font> image_file_type::<font color='#BB00BB'>read_type</font><font face='Lucida Console'>(</font>file_name<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>switch</font> <font face='Lucida Console'>(</font>im_type<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>case</font> image_file_type::BMP: <font color='#BB00BB'>load_bmp</font><font face='Lucida Console'>(</font>image, file_name<font face='Lucida Console'>)</font>; <font color='#0000FF'>return</font>;
+            <font color='#0000FF'>case</font> image_file_type::DNG: <font color='#BB00BB'>load_dng</font><font face='Lucida Console'>(</font>image, file_name<font face='Lucida Console'>)</font>; <font color='#0000FF'>return</font>;
+<font color='#0000FF'>#ifdef</font> DLIB_PNG_SUPPORT
+            <font color='#0000FF'>case</font> image_file_type::PNG: <font color='#BB00BB'>load_png</font><font face='Lucida Console'>(</font>image, file_name<font face='Lucida Console'>)</font>; <font color='#0000FF'>return</font>;
+<font color='#0000FF'>#endif</font>
+<font color='#0000FF'>#ifdef</font> DLIB_JPEG_SUPPORT
+            <font color='#0000FF'>case</font> image_file_type::JPG: <font color='#BB00BB'>load_jpeg</font><font face='Lucida Console'>(</font>image, file_name<font face='Lucida Console'>)</font>; <font color='#0000FF'>return</font>;
+<font color='#0000FF'>#endif</font>
+            <font color='#0000FF'>default</font>:  ;
+        <b>}</b>
+
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>im_type <font color='#5555FF'>=</font><font color='#5555FF'>=</font> image_file_type::JPG<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>throw</font> <font color='#BB00BB'>image_load_error</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>Unable to load image in file </font>" <font color='#5555FF'>+</font> file_name <font color='#5555FF'>+</font> "<font color='#CC0000'>.\n</font>" <font color='#5555FF'>+</font>
+                "<font color='#CC0000'>You must #define DLIB_JPEG_SUPPORT and link to libjpeg to read JPEG files.\n</font>" <font color='#5555FF'>+</font>
+                "<font color='#CC0000'>Do this by following the instructions at http://dlib.net/compile.html.</font>"<font face='Lucida Console'>)</font>;
+        <b>}</b>
+        <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>im_type <font color='#5555FF'>=</font><font color='#5555FF'>=</font> image_file_type::PNG<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>throw</font> <font color='#BB00BB'>image_load_error</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>Unable to load image in file </font>" <font color='#5555FF'>+</font> file_name <font color='#5555FF'>+</font> "<font color='#CC0000'>.\n</font>" <font color='#5555FF'>+</font>
+                "<font color='#CC0000'>You must #define DLIB_PNG_SUPPORT and link to libpng to read PNG files.\n</font>" <font color='#5555FF'>+</font>
+                "<font color='#CC0000'>Do this by following the instructions at http://dlib.net/compile.html.</font>"<font face='Lucida Console'>)</font>;
+        <b>}</b>
+        <font color='#0000FF'>else</font>
+        <b>{</b>
+            <font color='#0000FF'>throw</font> <font color='#BB00BB'>image_load_error</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>Unknown image file format: Unable to load image in file </font>" <font color='#5555FF'>+</font> file_name<font face='Lucida Console'>)</font>;
+        <b>}</b>
+    <b>}</b>
+
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_LOAd_IMAGE_Hh_ 
+</font>
+
+</pre></body></html>

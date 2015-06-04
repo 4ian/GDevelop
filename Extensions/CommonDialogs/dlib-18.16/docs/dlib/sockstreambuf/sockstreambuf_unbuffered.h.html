@@ -1,0 +1,121 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - sockstreambuf_unbuffered.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2003  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_SOCKSTrEAMBUF_UNBUFFERED_Hh_
+<font color='#0000FF'>#define</font> DLIB_SOCKSTrEAMBUF_UNBUFFERED_Hh_
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>iosfwd<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>streambuf<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../sockets.h.html'>../sockets.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='sockstreambuf_abstract.h.html'>sockstreambuf_abstract.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ---------------------------------------------------------------------------------------- 
+</font>
+    <font color='#0000FF'>class</font> <b><a name='sockstreambuf_unbuffered'></a>sockstreambuf_unbuffered</b> : <font color='#0000FF'>public</font> std::streambuf
+    <b>{</b>
+        <font color='#009900'>/*!
+            WHAT THIS OBJECT REPRESENTS
+                This is an implementation of the interface defined in
+                sockstreambuf_abstract.h except that it doesn't do any kind of buffering at
+                all.  It just writes data directly to a connection.  However, note that we
+                don't implement the flushes_output_on_read() routine as this object always
+                flushes immediately (since it isn't buffers.  Moreover, it should be
+                pointed out that this object is deprecated and only present for backwards
+                compatibility with previous versions of dlib.  So you really should use the
+                sockstreambuf object instead.  
+
+            INITIAL VALUE
+                con == a connection
+                lastread_next == false
+                peek == EOF
+
+            CONVENTION
+                if (peek != EOF) then
+                    peek == the last character read from the connection object and
+                            is used to store the char in the event the user peeks by
+                            calling sgetc()
+                if (lastread != EOF) then
+                    lastread == the last character read and consumed by the user
+
+                if (lastread_next) then
+                    the next character to be returned to the user is lastread because
+                    the user put it back into the buffer
+
+        !*/</font>
+
+    <font color='#0000FF'>public</font>:
+
+
+        <b><a name='sockstreambuf_unbuffered'></a>sockstreambuf_unbuffered</b> <font face='Lucida Console'>(</font>
+            connection<font color='#5555FF'>*</font> con_
+        <font face='Lucida Console'>)</font> :
+            con<font face='Lucida Console'>(</font><font color='#5555FF'>*</font>con_<font face='Lucida Console'>)</font>,
+            peek<font face='Lucida Console'>(</font>EOF<font face='Lucida Console'>)</font>,
+            lastread_next<font face='Lucida Console'>(</font><font color='#979000'>false</font><font face='Lucida Console'>)</font>
+        <b>{</b><b>}</b>
+
+        <b><a name='sockstreambuf_unbuffered'></a>sockstreambuf_unbuffered</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> scoped_ptr<font color='#5555FF'>&lt;</font>connection<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> con_
+        <font face='Lucida Console'>)</font> :
+            con<font face='Lucida Console'>(</font><font color='#5555FF'>*</font>con_<font face='Lucida Console'>)</font>,
+            peek<font face='Lucida Console'>(</font>EOF<font face='Lucida Console'>)</font>,
+            lastread_next<font face='Lucida Console'>(</font><font color='#979000'>false</font><font face='Lucida Console'>)</font>
+        <b>{</b><b>}</b>
+
+        connection<font color='#5555FF'>*</font> <b><a name='get_connection'></a>get_connection</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <b>{</b> <font color='#0000FF'>return</font> <font color='#5555FF'>&amp;</font>con; <b>}</b>
+
+
+    <font color='#0000FF'>protected</font>:
+
+        <font color='#009900'>// output functions
+</font>        int_type <b><a name='overflow'></a>overflow</b> <font face='Lucida Console'>(</font>
+            int_type c
+        <font face='Lucida Console'>)</font>;
+
+        std::streamsize <b><a name='xsputn'></a>xsputn</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>*</font> s,
+            std::streamsize num
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// input functions
+</font>        int_type <b><a name='underflow'></a>underflow</b><font face='Lucida Console'>(</font> 
+        <font face='Lucida Console'>)</font>;
+
+        int_type <b><a name='uflow'></a>uflow</b><font face='Lucida Console'>(</font> 
+        <font face='Lucida Console'>)</font>;
+
+        int_type <b><a name='pbackfail'></a>pbackfail</b><font face='Lucida Console'>(</font>
+            int_type c
+        <font face='Lucida Console'>)</font>;
+
+        std::streamsize <b><a name='xsgetn'></a>xsgetn</b> <font face='Lucida Console'>(</font>
+            char_type<font color='#5555FF'>*</font> s, 
+            std::streamsize n
+        <font face='Lucida Console'>)</font>;
+
+    <font color='#0000FF'>private</font>:
+
+        <font color='#009900'>// member data
+</font>        connection<font color='#5555FF'>&amp;</font>  con;
+        int_type peek;
+        int_type lastread;
+        <font color='#0000FF'><u>bool</u></font> lastread_next;
+    
+    <b>}</b>;
+
+<font color='#009900'>// ---------------------------------------------------------------------------------------- 
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#ifdef</font> NO_MAKEFILE
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='sockstreambuf_unbuffered.cpp.html'>sockstreambuf_unbuffered.cpp</a>"
+<font color='#0000FF'>#endif</font>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_SOCKSTrEAMBUF_UNBUFFERED_Hh_
+</font>
+
+</pre></body></html>

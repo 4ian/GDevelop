@@ -1,0 +1,66 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - hash_map.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2003  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_HASH_MAp_
+<font color='#0000FF'>#define</font> DLIB_HASH_MAp_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='hash_map/hash_map_kernel_1.h.html'>hash_map/hash_map_kernel_1.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='hash_map/hash_map_kernel_c.h.html'>hash_map/hash_map_kernel_c.h</a>"
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='hash_table.h.html'>hash_table.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='algs.h.html'>algs.h</a>"
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='algs.h.html'>algs.h</a>"
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>functional<font color='#5555FF'>&gt;</font>
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> domain,
+        <font color='#0000FF'>typename</font> range,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> expnum,
+        <font color='#0000FF'>typename</font> mem_manager <font color='#5555FF'>=</font> default_memory_manager,
+        <font color='#0000FF'>typename</font> compare <font color='#5555FF'>=</font> std::less<font color='#5555FF'>&lt;</font>domain<font color='#5555FF'>&gt;</font>
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>class</font> <b><a name='hash_map'></a>hash_map</b>
+    <b>{</b>
+        <b><a name='hash_map'></a>hash_map</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> hash_table<font color='#5555FF'>&lt;</font>domain,range,mem_manager,compare<font color='#5555FF'>&gt;</font>::kernel_1a
+                hash_table_1;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> hash_table<font color='#5555FF'>&lt;</font>domain,range,mem_manager,compare<font color='#5555FF'>&gt;</font>::kernel_2a
+                hash_table_2;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> hash_table<font color='#5555FF'>&lt;</font>domain,range,mem_manager,compare<font color='#5555FF'>&gt;</font>::kernel_2b
+                hash_table_3;
+
+    <font color='#0000FF'>public</font>:
+        
+        <font color='#009900'>//----------- kernels ---------------
+</font>
+        <font color='#009900'>// kernel_1a        
+</font>        <font color='#0000FF'>typedef</font>     hash_map_kernel_1<font color='#5555FF'>&lt;</font>domain,range,expnum,hash_table_1,mem_manager<font color='#5555FF'>&gt;</font>
+                    kernel_1a;
+        <font color='#0000FF'>typedef</font>     hash_map_kernel_c<font color='#5555FF'>&lt;</font>kernel_1a<font color='#5555FF'>&gt;</font>
+                    kernel_1a_c;
+
+        <font color='#009900'>// kernel_1b        
+</font>        <font color='#0000FF'>typedef</font>     hash_map_kernel_1<font color='#5555FF'>&lt;</font>domain,range,expnum,hash_table_2,mem_manager<font color='#5555FF'>&gt;</font>
+                    kernel_1b;
+        <font color='#0000FF'>typedef</font>     hash_map_kernel_c<font color='#5555FF'>&lt;</font>kernel_1b<font color='#5555FF'>&gt;</font>
+                    kernel_1b_c;
+ 
+        <font color='#009900'>// kernel_1c        
+</font>        <font color='#0000FF'>typedef</font>     hash_map_kernel_1<font color='#5555FF'>&lt;</font>domain,range,expnum,hash_table_3,mem_manager<font color='#5555FF'>&gt;</font>
+                    kernel_1c;
+        <font color='#0000FF'>typedef</font>     hash_map_kernel_c<font color='#5555FF'>&lt;</font>kernel_1c<font color='#5555FF'>&gt;</font>
+                    kernel_1c_c;
+
+
+    <b>}</b>;
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_HASH_MAp_
+</font>
+
+</pre></body></html>

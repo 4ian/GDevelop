@@ -1,0 +1,211 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - base64.cpp</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2006  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>sstream<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>string<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>cstdlib<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>ctime<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>base64.h<font color='#5555FF'>&gt;</font>
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='tester.h.html'>tester.h</a>"
+
+<font color='#0000FF'>namespace</font>  
+<b>{</b>
+    <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> test;
+    <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> dlib;
+    <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> std;
+
+    logger <b><a name='dlog'></a>dlog</b><font face='Lucida Console'>(</font>"<font color='#CC0000'>test.base64</font>"<font face='Lucida Console'>)</font>;
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> base64
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='base64_kernel_test'></a>base64_kernel_test</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font>
+    <font color='#009900'>/*!
+        requires
+            - base64 is an implementation of base64/base64_kernel_abstract.h 
+        ensures
+            - runs tests on base64 for compliance with the specs
+    !*/</font>
+    <b>{</b>        
+
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>int</u></font> seed <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>int</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#BB00BB'>time</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>try</font> 
+        <b>{</b>
+ 
+            <font color='#BB00BB'>srand</font><font face='Lucida Console'>(</font>seed<font face='Lucida Console'>)</font>;
+
+            base64 test;
+
+            <font color='#0000FF'>const</font> string wiki_normal <font color='#5555FF'>=</font> "<font color='#CC0000'>\
+Man is distinguished, not only by his reason, but by this singular passion from other \
+animals, which is a lust of the mind, that by a perseverance of delight in the continued \
+and indefatigable generation of knowledge, exceeds the short vehemence of any carnal pleasure.</font>";
+
+            <font color='#0000FF'>const</font> string wiki_encoded <font color='#5555FF'>=</font> "<font color='#CC0000'>\
+TWFuIGlzIGRpc3Rpbmd1aXNoZWQsIG5vdCBvbmx5IGJ5IGhpcyByZWFzb24sIGJ1dCBieSB0\n\
+aGlzIHNpbmd1bGFyIHBhc3Npb24gZnJvbSBvdGhlciBhbmltYWxzLCB3aGljaCBpcyBhIGx1\n\
+c3Qgb2YgdGhlIG1pbmQsIHRoYXQgYnkgYSBwZXJzZXZlcmFuY2Ugb2YgZGVsaWdodCBpbiB0\n\
+aGUgY29udGludWVkIGFuZCBpbmRlZmF0aWdhYmxlIGdlbmVyYXRpb24gb2Yga25vd2xlZGdl\n\
+LCBleGNlZWRzIHRoZSBzaG9ydCB2ZWhlbWVuY2Ugb2YgYW55IGNhcm5hbCBwbGVhc3VyZS4=</font>";
+
+
+
+            string str;
+
+            istringstream sin;
+            ostringstream sout;
+
+            sin.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font>wiki_encoded<font face='Lucida Console'>)</font>;
+            test.<font color='#BB00BB'>decode</font><font face='Lucida Console'>(</font>sin,sout<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST_MSG</font><font face='Lucida Console'>(</font>sout.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> wiki_normal,
+                   "<font color='#CC0000'>sout.str(): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> sout.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font>
+                   "<font color='#CC0000'>\nwiki_normal: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> wiki_normal<font face='Lucida Console'>)</font>;
+
+
+            sout.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font>"<font color='#CC0000'></font>"<font face='Lucida Console'>)</font>;
+            sin.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font>wiki_normal<font face='Lucida Console'>)</font>;
+            sin.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            test.<font color='#BB00BB'>encode</font><font face='Lucida Console'>(</font>sin,sout<font face='Lucida Console'>)</font>;
+
+            string <font color='#BB00BB'>a</font><font face='Lucida Console'>(</font>sout.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>, <font color='#BB00BB'>b</font><font face='Lucida Console'>(</font>wiki_encoded<font face='Lucida Console'>)</font>;
+            <font color='#009900'>// we want to strip all the whitespace from a and b now
+</font>            sin.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font>a<font face='Lucida Console'>)</font>;
+            a.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            sin <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font> str;
+            <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>sin<font face='Lucida Console'>)</font>
+            <b>{</b>
+                a <font color='#5555FF'>+</font><font color='#5555FF'>=</font> str;
+                sin <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font> str;
+            <b>}</b>
+
+            sin.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            sin.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font>b<font face='Lucida Console'>)</font>;
+            b.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            sin <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font> str;
+            <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>sin<font face='Lucida Console'>)</font>
+            <b>{</b>
+                b <font color='#5555FF'>+</font><font color='#5555FF'>=</font> str;
+                sin <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font> str;
+            <b>}</b>
+            sin.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+            <font color='#BB00BB'>DLIB_TEST_MSG</font><font face='Lucida Console'>(</font>a <font color='#5555FF'>=</font><font color='#5555FF'>=</font> b,
+                   "<font color='#CC0000'>a: \n</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> a <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font>
+                   "<font color='#CC0000'>\n\nb: \n</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> b<font face='Lucida Console'>)</font>;
+
+
+
+            sin.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            sin.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font>"<font color='#CC0000'></font>"<font face='Lucida Console'>)</font>;
+            sout.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font>"<font color='#CC0000'></font>"<font face='Lucida Console'>)</font>;
+            test.<font color='#BB00BB'>encode</font><font face='Lucida Console'>(</font>sin,sout<font face='Lucida Console'>)</font>;
+            sin.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font>sout.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            sout.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font>"<font color='#CC0000'></font>"<font face='Lucida Console'>)</font>;
+            test.<font color='#BB00BB'>decode</font><font face='Lucida Console'>(</font>sin,sout<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>sout.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'></font>"<font face='Lucida Console'>)</font>;
+
+            sin.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            sin.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>a</font>"<font face='Lucida Console'>)</font>;
+            sout.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font>"<font color='#CC0000'></font>"<font face='Lucida Console'>)</font>;
+            test.<font color='#BB00BB'>encode</font><font face='Lucida Console'>(</font>sin,sout<font face='Lucida Console'>)</font>;
+            sin.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font>sout.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            sout.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font>"<font color='#CC0000'></font>"<font face='Lucida Console'>)</font>;
+            test.<font color='#BB00BB'>decode</font><font face='Lucida Console'>(</font>sin,sout<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>sout.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'>a</font>"<font face='Lucida Console'>)</font>;
+
+            sin.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            sin.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>da</font>"<font face='Lucida Console'>)</font>;
+            sout.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font>"<font color='#CC0000'></font>"<font face='Lucida Console'>)</font>;
+            test.<font color='#BB00BB'>encode</font><font face='Lucida Console'>(</font>sin,sout<font face='Lucida Console'>)</font>;
+            sin.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font>sout.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            sout.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font>"<font color='#CC0000'></font>"<font face='Lucida Console'>)</font>;
+            test.<font color='#BB00BB'>decode</font><font face='Lucida Console'>(</font>sin,sout<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>sout.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'>da</font>"<font face='Lucida Console'>)</font>;
+
+            sin.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            sin.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>dav</font>"<font face='Lucida Console'>)</font>;
+            sout.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font>"<font color='#CC0000'></font>"<font face='Lucida Console'>)</font>;
+            test.<font color='#BB00BB'>encode</font><font face='Lucida Console'>(</font>sin,sout<font face='Lucida Console'>)</font>;
+            sin.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font>sout.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            sout.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font>"<font color='#CC0000'></font>"<font face='Lucida Console'>)</font>;
+            test.<font color='#BB00BB'>decode</font><font face='Lucida Console'>(</font>sin,sout<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>sout.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'>dav</font>"<font face='Lucida Console'>)</font>;
+
+            sin.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            sin.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>davi</font>"<font face='Lucida Console'>)</font>;
+            sout.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font>"<font color='#CC0000'></font>"<font face='Lucida Console'>)</font>;
+            test.<font color='#BB00BB'>encode</font><font face='Lucida Console'>(</font>sin,sout<font face='Lucida Console'>)</font>;
+            sin.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font>sout.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            sout.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font>"<font color='#CC0000'></font>"<font face='Lucida Console'>)</font>;
+            test.<font color='#BB00BB'>decode</font><font face='Lucida Console'>(</font>sin,sout<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>sout.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'>davi</font>"<font face='Lucida Console'>)</font>;
+
+
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> <font color='#979000'>1000</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                str.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                sin.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                sout.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font>"<font color='#CC0000'></font>"<font face='Lucida Console'>)</font>;
+                sin.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font>"<font color='#CC0000'></font>"<font face='Lucida Console'>)</font>;
+                
+                <font color='#009900'>// fill str with random garbage
+</font>                <font color='#0000FF'>const</font> <font color='#0000FF'><u>int</u></font> size <font color='#5555FF'>=</font> <font color='#BB00BB'>rand</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>%</font><font color='#979000'>2000</font>;
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> j <font color='#5555FF'>=</font> <font color='#979000'>0</font>; j <font color='#5555FF'>&lt;</font> size; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>j<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> ch <font color='#5555FF'>=</font> <font color='#BB00BB'>rand</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>&amp;</font><font color='#979000'>0xFF</font>;
+                    str <font color='#5555FF'>+</font><font color='#5555FF'>=</font> ch;
+                <b>}</b>
+
+                sin.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font>str<font face='Lucida Console'>)</font>;
+                test.<font color='#BB00BB'>encode</font><font face='Lucida Console'>(</font>sin,sout<font face='Lucida Console'>)</font>;
+                sin.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                sin.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font>sout.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                sout.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font>"<font color='#CC0000'></font>"<font face='Lucida Console'>)</font>;
+                test.<font color='#BB00BB'>decode</font><font face='Lucida Console'>(</font>sin,sout<font face='Lucida Console'>)</font>;
+
+                <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>str <font color='#5555FF'>=</font><font color='#5555FF'>=</font> sout.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+
+            <b>}</b>
+
+
+
+
+        <b>}</b>
+        <font color='#0000FF'>catch</font> <font face='Lucida Console'>(</font><font color='#0000FF'>typename</font> base64::decode_error<font color='#5555FF'>&amp;</font> e<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#BB00BB'>DLIB_TEST_MSG</font><font face='Lucida Console'>(</font><font color='#979000'>false</font>, 
+                "<font color='#CC0000'>decode_error thrown when it shouldn't have been (</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> seed <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>):\n </font>" 
+                 <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> e.info<font face='Lucida Console'>)</font>;
+        <b>}</b>
+    <b>}</b>
+
+
+    <font color='#0000FF'>class</font> <b><a name='base64_tester'></a>base64_tester</b> : <font color='#0000FF'>public</font> tester
+    <b>{</b>
+    <font color='#0000FF'>public</font>:
+        <b><a name='base64_tester'></a>base64_tester</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> :
+            tester <font face='Lucida Console'>(</font>"<font color='#CC0000'>test_base64</font>",
+                    "<font color='#CC0000'>Runs tests on the base64 component.</font>"<font face='Lucida Console'>)</font>
+        <b>{</b><b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='perform_test'></a>perform_test</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#BB00BB'>print_spinner</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            base64_kernel_test<font color='#5555FF'>&lt;</font>base64<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+    <b>}</b> a;
+
+
+
+<b>}</b>
+
+
+
+
+</pre></body></html>

@@ -1,0 +1,90 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - thread_specific_data_extension_abstract.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2006  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#undef</font> DLIB_THREAD_SPECIFIC_DATA_EXTENSIOn_ABSTRACT_
+<font color='#0000FF'>#ifdef</font> DLIB_THREAD_SPECIFIC_DATA_EXTENSIOn_ABSTRACT_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='threads_kernel_abstract.h.html'>threads_kernel_abstract.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>class</font> <b><a name='thread_specific_data'></a>thread_specific_data</b>
+    <b>{</b>
+        <font color='#009900'>/*!
+            WHAT THIS OBJECT REPRESENTS
+                This object represents a container of thread specific data.  When
+                a thread calls the data() member function it gets a reference to a T object
+                that is specific to its own thread.  Each subsequent call to data() from that
+                thread returns the same instance.  Also note that when a thread ends
+                the instance of its data() object gets destroyed and freed (if the thread
+                was created by the dlib library).  So any pointers or references to the object 
+                will be invalid after the thread has ended.
+        !*/</font>
+    <font color='#0000FF'>public</font>:
+
+        <b><a name='thread_specific_data'></a>thread_specific_data</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #*this is properly initialized
+        !*/</font>
+
+        ~<b><a name='thread_specific_data'></a>thread_specific_data</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - all resources allocated by *this have been freed.  This includes
+                  all the thread specific data returned by the data() functions.
+        !*/</font>
+
+        T<font color='#5555FF'>&amp;</font> <b><a name='data'></a>data</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - if (the calling thread has NOT called this-&gt;data() before) then
+                    - constructs an instance of T that is specific to the calling
+                      thread.
+                - returns a reference to the T instance that was constructed for 
+                  the calling thread.
+            throws
+                - std::bad_alloc or any exception thrown by T's constructor
+                  If an exception is thrown then the call to data() will have
+                  no effect on *this.
+        !*/</font>
+
+        <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> <b><a name='data'></a>data</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - if (the calling thread has NOT called this-&gt;data() before) then
+                    - constructs an instance of T that is specific to the calling
+                      thread.
+                - returns a const reference to the T instance that was constructed for 
+                  the calling thread.
+            throws
+                - std::bad_alloc or any exception thrown by T's constructor
+                  If an exception is thrown then the call to data() will have
+                  no effect on *this.
+        !*/</font>
+
+    <font color='#0000FF'>private</font>:
+        <font color='#009900'>// restricted functions
+</font>        <b><a name='thread_specific_data'></a>thread_specific_data</b><font face='Lucida Console'>(</font>thread_specific_data<font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font>;        <font color='#009900'>// copy constructor
+</font>        thread_specific_data<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>=</font><font face='Lucida Console'>(</font>thread_specific_data<font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font>;    <font color='#009900'>// assignment operator
+</font>    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_THREAD_SPECIFIC_DATA_EXTENSIOn_ABSTRACT_
+</font>
+
+
+</pre></body></html>

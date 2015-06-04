@@ -1,0 +1,133 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - lzp_buffer_kernel_abstract.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2005  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#undef</font> DLIB_LZP_BUFFER_KERNEl_ABSTRACT_
+<font color='#0000FF'>#ifdef</font> DLIB_LZP_BUFFER_KERNEl_ABSTRACT_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../algs.h.html'>../algs.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+    <font color='#0000FF'>class</font> <b><a name='lzp_buffer'></a>lzp_buffer</b> 
+    <b>{</b>
+        <font color='#009900'>/*!
+            INITIAL VALUE
+                size() == some value defined by the constructor argument
+                Initially this object is at some predefined empty or ground state.
+                for all i: (*this)[i] == 0
+
+            WHAT THIS OBJECT REPRESENTS
+                This object represents some varation on the LZP algorithm
+                described by Charles Bloom in his paper "LZP: a new data
+                compression algorithm"
+
+                The LZP algorithm is a lot like lz77 except there is no need to pass
+                the location of matches in the history buffer to the decoder because
+                LZP uses the data it has already seen to predict the location of the
+                next match.  
+
+            NOTE
+                The add() and predict_match() functions must be called in the same
+                order by the coder and decoder.  If they aren't the state of the 
+                lzp_buffer objects in the coder and decoder may differ and the decoder 
+                won't be able to correctly decode the data stream.
+        !*/</font>
+
+    <font color='#0000FF'>public</font>:
+
+        <font color='#0000FF'>explicit</font> <b><a name='lzp_buffer'></a>lzp_buffer</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> buffer_size           
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - 10 &lt; buffer_size &lt; 32
+            ensures                
+                - #*this is properly initialized
+                - #size() == 2^buffer_size
+            throws
+                - std::bad_alloc
+        !*/</font>
+
+        <font color='#0000FF'>virtual</font> ~<b><a name='lzp_buffer'></a>lzp_buffer</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - any resources associated with *this have been released
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='clear'></a>clear</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #*this has its initial value
+            throws
+                - std::bad_alloc
+                    if this exception is thrown then #*this is unusable 
+                    until clear() is called and succeeds
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='add'></a>add</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> symbol
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - shifts everything in the history buffer left 1.
+                  (i.e. #(*this)[i+1] == (*this)[i])
+                - #(*this)[0] == symbol
+            throws
+                - std::bad_alloc
+                    if this exception is thrown then #*this is unusable 
+                    until clear() is called and succeeds  
+        !*/</font>
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='predict_match'></a>predict_match</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&amp;</font> index
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - updates the prediction for the current context.
+                  (the current context is the last few symbols seen. i.e. (*this)[0], 
+                   (*this)[1], etc.)
+                - if (*this can generate a prediction) then
+                    - #index == the predicted location of a match in the history buffer.
+                      (i.e. (*this)[#index] is the first symbol of the predicted match)
+                    - returns the order this prediction came from
+                - else
+                    - returns 0
+            throws
+                - std::bad_alloc
+                    if this exception is thrown then #*this is unusable 
+                    until clear() is called and succeeds            
+        !*/</font>
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='size'></a>size</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the size of the history buffer
+        !*/</font>
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> <b><a name='operator'></a>operator</b>[] <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> index
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - index &lt; size()
+            ensures
+                - returns the symbol at the given index in the history buffer
+        !*/</font>
+
+    <font color='#0000FF'>private</font>:
+
+        <font color='#009900'>// restricted functions
+</font>        <b><a name='lzp_buffer'></a>lzp_buffer</b><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> lzp_buffer<font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font>;        <font color='#009900'>// copy constructor
+</font>        lzp_buffer<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>=</font><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> lzp_buffer<font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font>;    <font color='#009900'>// assignment operator
+</font>
+    <b>}</b>;      
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_LZP_BUFFER_KERNEl_ABSTRACT_
+</font>
+
+</pre></body></html>

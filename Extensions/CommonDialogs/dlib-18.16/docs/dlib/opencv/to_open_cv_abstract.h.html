@@ -1,0 +1,37 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - to_open_cv_abstract.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2012  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#undef</font> DLIB_TO_OPEN_Cv_ABSTRACTh_
+<font color='#0000FF'>#ifdef</font> DLIB_TO_OPEN_Cv_ABSTRACTh_
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>opencv2<font color='#5555FF'>/</font>core<font color='#5555FF'>/</font>core.hpp<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../pixel.h.html'>../pixel.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> image_type
+        <font color='#5555FF'>&gt;</font>
+    cv::Mat <b><a name='toMat'></a>toMat</b> <font face='Lucida Console'>(</font>
+        image_type<font color='#5555FF'>&amp;</font> img
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - image_type == an image object that implements the interface defined in
+              dlib/image_processing/generic_image.h or a dlib::matrix object which uses a
+              row_major_layout.
+            - pixel_traits is defined for the contents of img.
+        ensures
+            - returns an OpenCV Mat object which represents the same image as img.  This
+              is done by setting up the Mat object to point to the same memory as img.
+              Therefore, the returned Mat object is valid only as long as pointers
+              to the pixels in img remain valid.
+    !*/</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_TO_OPEN_Cv_ABSTRACTh_
+</font>
+
+
+
+</pre></body></html>

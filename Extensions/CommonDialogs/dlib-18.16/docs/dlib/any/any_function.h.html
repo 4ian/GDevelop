@@ -1,0 +1,384 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - any_function.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2011  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_AnY_FUNCTION_Hh_
+<font color='#0000FF'>#define</font> DLIB_AnY_FUNCTION_Hh_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='any.h.html'>any.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../smart_pointers.h.html'>../smart_pointers.h</a>"
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='any_function_abstract.h.html'>any_function_abstract.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>struct</font> <b><a name='sig_traits'></a>sig_traits</b> <b>{</b><b>}</b>;
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>struct</font> <b><a name='sig_traits'></a>sig_traits</b><font color='#5555FF'>&lt;</font><b><a name='T'></a>T</b> <font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>&gt;</font> 
+    <b>{</b> 
+        <font color='#0000FF'>typedef</font> T result_type; 
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'><u>void</u></font> arg1_type; 
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'><u>void</u></font> arg2_type; 
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'><u>void</u></font> arg3_type; 
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'><u>void</u></font> arg4_type; 
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'><u>void</u></font> arg5_type; 
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'><u>void</u></font> arg6_type; 
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'><u>void</u></font> arg7_type; 
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'><u>void</u></font> arg8_type; 
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'><u>void</u></font> arg9_type; 
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'><u>void</u></font> arg10_type; 
+
+        <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> num_args <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+    <b>}</b>;
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T,
+        <font color='#0000FF'>typename</font> A1
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>struct</font> <b><a name='sig_traits'></a>sig_traits</b><font color='#5555FF'>&lt;</font><b><a name='T'></a>T</b> <font face='Lucida Console'>(</font>A1<font face='Lucida Console'>)</font><font color='#5555FF'>&gt;</font> 
+    <b>{</b> 
+        <font color='#0000FF'>typedef</font> T result_type; 
+        <font color='#0000FF'>typedef</font> A1 arg1_type; 
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'><u>void</u></font> arg2_type; 
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'><u>void</u></font> arg3_type; 
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'><u>void</u></font> arg4_type; 
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'><u>void</u></font> arg5_type; 
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'><u>void</u></font> arg6_type; 
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'><u>void</u></font> arg7_type; 
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'><u>void</u></font> arg8_type; 
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'><u>void</u></font> arg9_type; 
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'><u>void</u></font> arg10_type; 
+
+        <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> num_args <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+    <b>}</b>;
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T,
+        <font color='#0000FF'>typename</font> A1, <font color='#0000FF'>typename</font> A2
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>struct</font> <b><a name='sig_traits'></a>sig_traits</b><font color='#5555FF'>&lt;</font><b><a name='T'></a>T</b> <font face='Lucida Console'>(</font>A1,A2<font face='Lucida Console'>)</font><font color='#5555FF'>&gt;</font> 
+    <b>{</b> 
+        <font color='#0000FF'>typedef</font> T result_type; 
+        <font color='#0000FF'>typedef</font> A1 arg1_type; 
+        <font color='#0000FF'>typedef</font> A2 arg2_type; 
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'><u>void</u></font> arg3_type; 
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'><u>void</u></font> arg4_type; 
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'><u>void</u></font> arg5_type; 
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'><u>void</u></font> arg6_type; 
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'><u>void</u></font> arg7_type; 
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'><u>void</u></font> arg8_type; 
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'><u>void</u></font> arg9_type; 
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'><u>void</u></font> arg10_type; 
+
+        <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> num_args <font color='#5555FF'>=</font> <font color='#979000'>2</font>;
+    <b>}</b>;
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T,
+        <font color='#0000FF'>typename</font> A1, <font color='#0000FF'>typename</font> A2, <font color='#0000FF'>typename</font> A3
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>struct</font> <b><a name='sig_traits'></a>sig_traits</b><font color='#5555FF'>&lt;</font><b><a name='T'></a>T</b> <font face='Lucida Console'>(</font>A1,A2,A3<font face='Lucida Console'>)</font><font color='#5555FF'>&gt;</font> 
+    <b>{</b> 
+        <font color='#0000FF'>typedef</font> T result_type; 
+        <font color='#0000FF'>typedef</font> A1 arg1_type; 
+        <font color='#0000FF'>typedef</font> A2 arg2_type; 
+        <font color='#0000FF'>typedef</font> A3 arg3_type; 
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'><u>void</u></font> arg4_type; 
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'><u>void</u></font> arg5_type; 
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'><u>void</u></font> arg6_type; 
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'><u>void</u></font> arg7_type; 
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'><u>void</u></font> arg8_type; 
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'><u>void</u></font> arg9_type; 
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'><u>void</u></font> arg10_type; 
+
+        <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> num_args <font color='#5555FF'>=</font> <font color='#979000'>3</font>;
+    <b>}</b>;
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T,
+        <font color='#0000FF'>typename</font> A1, <font color='#0000FF'>typename</font> A2, <font color='#0000FF'>typename</font> A3,
+        <font color='#0000FF'>typename</font> A4
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>struct</font> <b><a name='sig_traits'></a>sig_traits</b><font color='#5555FF'>&lt;</font><b><a name='T'></a>T</b> <font face='Lucida Console'>(</font>A1,A2,A3,A4<font face='Lucida Console'>)</font><font color='#5555FF'>&gt;</font> 
+    <b>{</b> 
+        <font color='#0000FF'>typedef</font> T result_type; 
+        <font color='#0000FF'>typedef</font> A1 arg1_type; 
+        <font color='#0000FF'>typedef</font> A2 arg2_type; 
+        <font color='#0000FF'>typedef</font> A3 arg3_type; 
+        <font color='#0000FF'>typedef</font> A4 arg4_type; 
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'><u>void</u></font> arg5_type; 
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'><u>void</u></font> arg6_type; 
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'><u>void</u></font> arg7_type; 
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'><u>void</u></font> arg8_type; 
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'><u>void</u></font> arg9_type; 
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'><u>void</u></font> arg10_type; 
+
+        <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> num_args <font color='#5555FF'>=</font> <font color='#979000'>4</font>;
+    <b>}</b>;
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T,
+        <font color='#0000FF'>typename</font> A1, <font color='#0000FF'>typename</font> A2, <font color='#0000FF'>typename</font> A3,
+        <font color='#0000FF'>typename</font> A4, <font color='#0000FF'>typename</font> A5
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>struct</font> <b><a name='sig_traits'></a>sig_traits</b><font color='#5555FF'>&lt;</font><b><a name='T'></a>T</b> <font face='Lucida Console'>(</font>A1,A2,A3,A4,A5<font face='Lucida Console'>)</font><font color='#5555FF'>&gt;</font> 
+    <b>{</b> 
+        <font color='#0000FF'>typedef</font> T result_type; 
+        <font color='#0000FF'>typedef</font> A1 arg1_type; 
+        <font color='#0000FF'>typedef</font> A2 arg2_type; 
+        <font color='#0000FF'>typedef</font> A3 arg3_type; 
+        <font color='#0000FF'>typedef</font> A4 arg4_type; 
+        <font color='#0000FF'>typedef</font> A5 arg5_type; 
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'><u>void</u></font> arg6_type; 
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'><u>void</u></font> arg7_type; 
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'><u>void</u></font> arg8_type; 
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'><u>void</u></font> arg9_type; 
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'><u>void</u></font> arg10_type; 
+
+        <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> num_args <font color='#5555FF'>=</font> <font color='#979000'>5</font>;
+    <b>}</b>;
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T,
+        <font color='#0000FF'>typename</font> A1, <font color='#0000FF'>typename</font> A2, <font color='#0000FF'>typename</font> A3,
+        <font color='#0000FF'>typename</font> A4, <font color='#0000FF'>typename</font> A5, <font color='#0000FF'>typename</font> A6
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>struct</font> <b><a name='sig_traits'></a>sig_traits</b><font color='#5555FF'>&lt;</font><b><a name='T'></a>T</b> <font face='Lucida Console'>(</font>A1,A2,A3,A4,A5,A6<font face='Lucida Console'>)</font><font color='#5555FF'>&gt;</font> 
+    <b>{</b> 
+        <font color='#0000FF'>typedef</font> T result_type; 
+        <font color='#0000FF'>typedef</font> A1 arg1_type; 
+        <font color='#0000FF'>typedef</font> A2 arg2_type; 
+        <font color='#0000FF'>typedef</font> A3 arg3_type; 
+        <font color='#0000FF'>typedef</font> A4 arg4_type; 
+        <font color='#0000FF'>typedef</font> A5 arg5_type; 
+        <font color='#0000FF'>typedef</font> A6 arg6_type; 
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'><u>void</u></font> arg7_type; 
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'><u>void</u></font> arg8_type; 
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'><u>void</u></font> arg9_type; 
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'><u>void</u></font> arg10_type; 
+
+        <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> num_args <font color='#5555FF'>=</font> <font color='#979000'>6</font>;
+    <b>}</b>;
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T,
+        <font color='#0000FF'>typename</font> A1, <font color='#0000FF'>typename</font> A2, <font color='#0000FF'>typename</font> A3,
+        <font color='#0000FF'>typename</font> A4, <font color='#0000FF'>typename</font> A5, <font color='#0000FF'>typename</font> A6,
+        <font color='#0000FF'>typename</font> A7
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>struct</font> <b><a name='sig_traits'></a>sig_traits</b><font color='#5555FF'>&lt;</font><b><a name='T'></a>T</b> <font face='Lucida Console'>(</font>A1,A2,A3,A4,A5,A6,A7<font face='Lucida Console'>)</font><font color='#5555FF'>&gt;</font> 
+    <b>{</b> 
+        <font color='#0000FF'>typedef</font> T result_type; 
+        <font color='#0000FF'>typedef</font> A1 arg1_type; 
+        <font color='#0000FF'>typedef</font> A2 arg2_type; 
+        <font color='#0000FF'>typedef</font> A3 arg3_type; 
+        <font color='#0000FF'>typedef</font> A4 arg4_type; 
+        <font color='#0000FF'>typedef</font> A5 arg5_type; 
+        <font color='#0000FF'>typedef</font> A6 arg6_type; 
+        <font color='#0000FF'>typedef</font> A7 arg7_type; 
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'><u>void</u></font> arg8_type; 
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'><u>void</u></font> arg9_type; 
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'><u>void</u></font> arg10_type; 
+
+        <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> num_args <font color='#5555FF'>=</font> <font color='#979000'>7</font>;
+    <b>}</b>;
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T,
+        <font color='#0000FF'>typename</font> A1, <font color='#0000FF'>typename</font> A2, <font color='#0000FF'>typename</font> A3,
+        <font color='#0000FF'>typename</font> A4, <font color='#0000FF'>typename</font> A5, <font color='#0000FF'>typename</font> A6,
+        <font color='#0000FF'>typename</font> A7, <font color='#0000FF'>typename</font> A8
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>struct</font> <b><a name='sig_traits'></a>sig_traits</b><font color='#5555FF'>&lt;</font><b><a name='T'></a>T</b> <font face='Lucida Console'>(</font>A1,A2,A3,A4,A5,A6,A7,A8<font face='Lucida Console'>)</font><font color='#5555FF'>&gt;</font> 
+    <b>{</b> 
+        <font color='#0000FF'>typedef</font> T result_type; 
+        <font color='#0000FF'>typedef</font> A1 arg1_type; 
+        <font color='#0000FF'>typedef</font> A2 arg2_type; 
+        <font color='#0000FF'>typedef</font> A3 arg3_type; 
+        <font color='#0000FF'>typedef</font> A4 arg4_type; 
+        <font color='#0000FF'>typedef</font> A5 arg5_type; 
+        <font color='#0000FF'>typedef</font> A6 arg6_type; 
+        <font color='#0000FF'>typedef</font> A7 arg7_type; 
+        <font color='#0000FF'>typedef</font> A8 arg8_type; 
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'><u>void</u></font> arg9_type; 
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'><u>void</u></font> arg10_type; 
+
+        <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> num_args <font color='#5555FF'>=</font> <font color='#979000'>8</font>;
+    <b>}</b>;
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T,
+        <font color='#0000FF'>typename</font> A1, <font color='#0000FF'>typename</font> A2, <font color='#0000FF'>typename</font> A3,
+        <font color='#0000FF'>typename</font> A4, <font color='#0000FF'>typename</font> A5, <font color='#0000FF'>typename</font> A6,
+        <font color='#0000FF'>typename</font> A7, <font color='#0000FF'>typename</font> A8, <font color='#0000FF'>typename</font> A9
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>struct</font> <b><a name='sig_traits'></a>sig_traits</b><font color='#5555FF'>&lt;</font><b><a name='T'></a>T</b> <font face='Lucida Console'>(</font>A1,A2,A3,A4,A5,A6,A7,A8,A9<font face='Lucida Console'>)</font><font color='#5555FF'>&gt;</font> 
+    <b>{</b> 
+        <font color='#0000FF'>typedef</font> T result_type; 
+        <font color='#0000FF'>typedef</font> A1 arg1_type; 
+        <font color='#0000FF'>typedef</font> A2 arg2_type; 
+        <font color='#0000FF'>typedef</font> A3 arg3_type; 
+        <font color='#0000FF'>typedef</font> A4 arg4_type; 
+        <font color='#0000FF'>typedef</font> A5 arg5_type; 
+        <font color='#0000FF'>typedef</font> A6 arg6_type; 
+        <font color='#0000FF'>typedef</font> A7 arg7_type; 
+        <font color='#0000FF'>typedef</font> A8 arg8_type; 
+        <font color='#0000FF'>typedef</font> A9 arg9_type; 
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'><u>void</u></font> arg10_type; 
+
+        <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> num_args <font color='#5555FF'>=</font> <font color='#979000'>9</font>;
+    <b>}</b>;
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T,
+        <font color='#0000FF'>typename</font> A1, <font color='#0000FF'>typename</font> A2, <font color='#0000FF'>typename</font> A3,
+        <font color='#0000FF'>typename</font> A4, <font color='#0000FF'>typename</font> A5, <font color='#0000FF'>typename</font> A6,
+        <font color='#0000FF'>typename</font> A7, <font color='#0000FF'>typename</font> A8, <font color='#0000FF'>typename</font> A9,
+        <font color='#0000FF'>typename</font> A10
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>struct</font> <b><a name='sig_traits'></a>sig_traits</b><font color='#5555FF'>&lt;</font><b><a name='T'></a>T</b> <font face='Lucida Console'>(</font>A1,A2,A3,A4,A5,A6,A7,A8,A9,A10<font face='Lucida Console'>)</font><font color='#5555FF'>&gt;</font> 
+    <b>{</b> 
+        <font color='#0000FF'>typedef</font> T result_type; 
+        <font color='#0000FF'>typedef</font> A1 arg1_type; 
+        <font color='#0000FF'>typedef</font> A2 arg2_type; 
+        <font color='#0000FF'>typedef</font> A3 arg3_type; 
+        <font color='#0000FF'>typedef</font> A4 arg4_type; 
+        <font color='#0000FF'>typedef</font> A5 arg5_type; 
+        <font color='#0000FF'>typedef</font> A6 arg6_type; 
+        <font color='#0000FF'>typedef</font> A7 arg7_type; 
+        <font color='#0000FF'>typedef</font> A8 arg8_type; 
+        <font color='#0000FF'>typedef</font> A9 arg9_type; 
+        <font color='#0000FF'>typedef</font> A10 arg10_type; 
+
+        <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> num_args <font color='#5555FF'>=</font> <font color='#979000'>10</font>;
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> function_type, 
+        <font color='#009900'>// These arguments are used to control the overloading.  A user should
+</font>        <font color='#009900'>// not mess with them.  
+</font>        <font color='#0000FF'>typename</font> Enabled <font color='#5555FF'>=</font> <font color='#0000FF'><u>void</u></font>,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> Num_args <font color='#5555FF'>=</font> sig_traits<font color='#5555FF'>&lt;</font>function_type<font color='#5555FF'>&gt;</font>::num_args
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>class</font> <b><a name='any_function'></a>any_function</b>
+    <b>{</b>
+    <font color='#0000FF'>private</font>:
+        <b><a name='any_function'></a>any_function</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+    <font color='#009900'>/* !!!!!!!!    ERRORS ON THE ABOVE LINE    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        An error on this line means you are trying to use a function signature
+        with more than the supported number of arguments.  The current version
+        of dlib only supports up to 10 arguments.
+    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/</font>
+    <b>}</b>;
+
+
+    <font color='#009900'>// The following preprocessor commands build the various overloaded versions
+</font>    <font color='#009900'>// of any_function for different numbers of commands and void vs. non-void return
+</font>    <font color='#009900'>// types.
+</font>
+<font color='#009900'>//  0 arguments
+</font><font color='#0000FF'>#define</font> DLIB_ANY_FUNCTION_ARG_LIST
+<font color='#0000FF'>#define</font> DLIB_ANY_FUNCTION_ARGS 
+<font color='#0000FF'>#define</font> DLIB_ANY_FUNCTION_NUM_ARGS <font color='#979000'>0</font>
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='any_function_impl2.h.html'>any_function_impl2.h</a>"
+
+<font color='#009900'>//  1 argument
+</font><font color='#0000FF'>#define</font> DLIB_ANY_FUNCTION_ARG_LIST arg1_type a1
+<font color='#0000FF'>#define</font> DLIB_ANY_FUNCTION_ARGS a1
+<font color='#0000FF'>#define</font> DLIB_ANY_FUNCTION_NUM_ARGS <font color='#979000'>1</font>
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='any_function_impl2.h.html'>any_function_impl2.h</a>"
+
+<font color='#009900'>//  2 arguments
+</font><font color='#0000FF'>#define</font> DLIB_ANY_FUNCTION_ARG_LIST arg1_type a1, arg2_type a2
+<font color='#0000FF'>#define</font> DLIB_ANY_FUNCTION_ARGS a1,a2
+<font color='#0000FF'>#define</font> DLIB_ANY_FUNCTION_NUM_ARGS <font color='#979000'>2</font>
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='any_function_impl2.h.html'>any_function_impl2.h</a>"
+
+<font color='#009900'>//  3 arguments
+</font><font color='#0000FF'>#define</font> DLIB_ANY_FUNCTION_ARG_LIST arg1_type a1, arg2_type a2, arg3_type a3
+<font color='#0000FF'>#define</font> DLIB_ANY_FUNCTION_ARGS a1,a2,a3
+<font color='#0000FF'>#define</font> DLIB_ANY_FUNCTION_NUM_ARGS <font color='#979000'>3</font>
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='any_function_impl2.h.html'>any_function_impl2.h</a>"
+
+<font color='#009900'>//  4 arguments
+</font><font color='#0000FF'>#define</font> DLIB_ANY_FUNCTION_ARG_LIST arg1_type a1, arg2_type a2, arg3_type a3, arg4_type a4
+<font color='#0000FF'>#define</font> DLIB_ANY_FUNCTION_ARGS a1,a2,a3,a4
+<font color='#0000FF'>#define</font> DLIB_ANY_FUNCTION_NUM_ARGS <font color='#979000'>4</font>
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='any_function_impl2.h.html'>any_function_impl2.h</a>"
+
+<font color='#009900'>//  5 arguments
+</font><font color='#0000FF'>#define</font> DLIB_ANY_FUNCTION_ARG_LIST arg1_type a1, arg2_type a2, arg3_type a3, arg4_type a4, \
+                                   arg5_type a5
+<font color='#0000FF'>#define</font> DLIB_ANY_FUNCTION_ARGS a1,a2,a3,a4,a5
+<font color='#0000FF'>#define</font> DLIB_ANY_FUNCTION_NUM_ARGS <font color='#979000'>5</font>
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='any_function_impl2.h.html'>any_function_impl2.h</a>"
+
+<font color='#009900'>//  6 arguments
+</font><font color='#0000FF'>#define</font> DLIB_ANY_FUNCTION_ARG_LIST arg1_type a1, arg2_type a2, arg3_type a3, arg4_type a4, \
+                                   arg5_type a5, arg6_type a6
+<font color='#0000FF'>#define</font> DLIB_ANY_FUNCTION_ARGS a1,a2,a3,a4,a5,a6
+<font color='#0000FF'>#define</font> DLIB_ANY_FUNCTION_NUM_ARGS <font color='#979000'>6</font>
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='any_function_impl2.h.html'>any_function_impl2.h</a>"
+
+<font color='#009900'>//  7 arguments
+</font><font color='#0000FF'>#define</font> DLIB_ANY_FUNCTION_ARG_LIST arg1_type a1, arg2_type a2, arg3_type a3, arg4_type a4, \
+                                   arg5_type a5, arg6_type a6, arg7_type a7
+<font color='#0000FF'>#define</font> DLIB_ANY_FUNCTION_ARGS a1,a2,a3,a4,a5,a6,a7
+<font color='#0000FF'>#define</font> DLIB_ANY_FUNCTION_NUM_ARGS <font color='#979000'>7</font>
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='any_function_impl2.h.html'>any_function_impl2.h</a>"
+
+<font color='#009900'>//  8 arguments
+</font><font color='#0000FF'>#define</font> DLIB_ANY_FUNCTION_ARG_LIST arg1_type a1, arg2_type a2, arg3_type a3, arg4_type a4, \
+                                   arg5_type a5, arg6_type a6, arg7_type a7, arg8_type a8
+<font color='#0000FF'>#define</font> DLIB_ANY_FUNCTION_ARGS a1,a2,a3,a4,a5,a6,a7,a8
+<font color='#0000FF'>#define</font> DLIB_ANY_FUNCTION_NUM_ARGS <font color='#979000'>8</font>
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='any_function_impl2.h.html'>any_function_impl2.h</a>"
+
+<font color='#009900'>//  9 arguments
+</font><font color='#0000FF'>#define</font> DLIB_ANY_FUNCTION_ARG_LIST arg1_type a1, arg2_type a2, arg3_type a3, arg4_type a4, \
+                                   arg5_type a5, arg6_type a6, arg7_type a7, arg8_type a8, \
+                                   arg9_type a9
+<font color='#0000FF'>#define</font> DLIB_ANY_FUNCTION_ARGS a1,a2,a3,a4,a5,a6,a7,a8,a9
+<font color='#0000FF'>#define</font> DLIB_ANY_FUNCTION_NUM_ARGS <font color='#979000'>9</font>
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='any_function_impl2.h.html'>any_function_impl2.h</a>"
+
+<font color='#009900'>//  10 arguments
+</font><font color='#0000FF'>#define</font> DLIB_ANY_FUNCTION_ARG_LIST arg1_type a1, arg2_type a2, arg3_type a3, arg4_type a4, \
+                                   arg5_type a5, arg6_type a6, arg7_type a7, arg8_type a8, \
+                                   arg9_type a9, arg10_type a10
+<font color='#0000FF'>#define</font> DLIB_ANY_FUNCTION_ARGS a1,a2,a3,a4,a5,a6,a7,a8,a9,a10
+<font color='#0000FF'>#define</font> DLIB_ANY_FUNCTION_NUM_ARGS <font color='#979000'>10</font> 
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='any_function_impl2.h.html'>any_function_impl2.h</a>"
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> function_type<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='swap'></a>swap</b> <font face='Lucida Console'>(</font>
+        any_function<font color='#5555FF'>&lt;</font>function_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> a,
+        any_function<font color='#5555FF'>&lt;</font>function_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> b
+    <font face='Lucida Console'>)</font> <b>{</b> a.<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>b<font face='Lucida Console'>)</font>; <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> function_type<font color='#5555FF'>&gt;</font> 
+    T<font color='#5555FF'>&amp;</font> <b><a name='any_cast'></a>any_cast</b><font face='Lucida Console'>(</font>any_function<font color='#5555FF'>&lt;</font>function_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> a<font face='Lucida Console'>)</font> <b>{</b> <font color='#0000FF'>return</font> a.<font color='#0000FF'>template</font> cast_to<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <b>}</b>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> function_type<font color='#5555FF'>&gt;</font> 
+    <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> <b><a name='any_cast'></a>any_cast</b><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> any_function<font color='#5555FF'>&lt;</font>function_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> a<font face='Lucida Console'>)</font> <b>{</b> <font color='#0000FF'>return</font> a.<font color='#0000FF'>template</font> cast_to<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_AnY_FUNCTION_Hh_
+</font>
+
+</pre></body></html>

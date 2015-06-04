@@ -1,0 +1,196 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - weak_ptr_abstract.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2007  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#undef</font> DLIB_WEAK_PTr_ABSTRACT_
+<font color='#0000FF'>#ifdef</font> DLIB_WEAK_PTr_ABSTRACT_ 
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='shared_ptr_abstract.h.html'>shared_ptr_abstract.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib <b>{</b>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font> 
+    <font color='#0000FF'>class</font> <b><a name='weak_ptr'></a>weak_ptr</b> 
+    <b>{</b>
+
+        <font color='#009900'>/*!
+            INITIAL VALUE
+                defined by constructor
+
+            WHAT THIS OBJECT REPRESENTS
+                The weak_ptr class template stores a weak reference to an object that is 
+                already managed by a shared_ptr. To access the object, a weak_ptr can 
+                be converted to a shared_ptr using the member function lock().  
+
+                This is an implementation of the std::tr1::weak_ptr template from the 
+                document ISO/IEC PDTR 19768, Proposed Draft Technical Report on C++
+                Library Extensions.  The only deviation from that document is that this 
+                shared_ptr is declared inside the dlib namespace rather than std::tr1.
+        !*/</font>
+
+    <font color='#0000FF'>public</font>:
+        <font color='#0000FF'>typedef</font> T element_type;
+
+        <b><a name='weak_ptr'></a>weak_ptr</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #use_count() == 0
+                - creates an empty weak_ptr
+        !*/</font>
+
+        <font color='#0000FF'>template</font><font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> Y<font color='#5555FF'>&gt;</font> 
+        <b><a name='weak_ptr'></a>weak_ptr</b><font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> shared_ptr<font color='#5555FF'>&lt;</font>Y<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> r
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - Y* must be convertible to T*
+            ensures
+                - if (r is empty) then
+                    - constructs an empty weak_ptr object
+                - else 
+                    - constructs a weak_ptr object that shares ownership with r and 
+                      stores a copy of the pointer stored in r.
+                - #use_count() == #r.use_count()
+        !*/</font>
+
+        <b><a name='weak_ptr'></a>weak_ptr</b><font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> weak_ptr<font color='#5555FF'>&amp;</font> r
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - if (r is empty) then
+                    - constructs an empty weak_ptr object
+                - else 
+                    - constructs a weak_ptr object that shares ownership with r and 
+                      stores a copy of the pointer stored in r.
+                - #use_count() == #r.use_count()
+        !*/</font>
+
+        <font color='#0000FF'>template</font><font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> Y<font color='#5555FF'>&gt;</font> 
+        <b><a name='weak_ptr'></a>weak_ptr</b><font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> weak_ptr<font color='#5555FF'>&lt;</font>Y<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> r
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - Y* must be convertible to T*
+            ensures
+                - if (r is empty) then
+                    - constructs an empty weak_ptr object
+                - else 
+                    - constructs a weak_ptr object that shares ownership with r and 
+                      stores a copy of the pointer stored in r.
+                - #use_count() == #r.use_count()
+        !*/</font>
+
+        ~<b><a name='weak_ptr'></a>weak_ptr</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - destroys this weak_ptr object but has no effect on the object its 
+                  stored pointer points to.
+        !*/</font>
+
+        weak_ptr<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> weak_ptr<font color='#5555FF'>&amp;</font> r
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - equivalent to weak_ptr(r).swap(*this)
+        !*/</font>
+
+        <font color='#0000FF'>template</font><font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> Y<font color='#5555FF'>&gt;</font> 
+        weak_ptr<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> weak_ptr<font color='#5555FF'>&lt;</font>Y<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> r
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - Y* must be convertible to T*
+            ensures
+                - equivalent to weak_ptr(r).swap(*this)
+        !*/</font>
+
+        <font color='#0000FF'>template</font><font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> Y<font color='#5555FF'>&gt;</font> 
+        weak_ptr<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>=</font><font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> shared_ptr<font color='#5555FF'>&lt;</font>Y<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> r
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - Y* must be convertible to T*
+            ensures
+                - equivalent to weak_ptr(r).swap(*this)
+        !*/</font>
+
+        <font color='#0000FF'><u>long</u></font> <b><a name='use_count'></a>use_count</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - if (*this is empty) then
+                    - returns 0
+                - else 
+                    - returns the number of shared_ptr instances that share ownership 
+                      with *this
+        !*/</font>
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='expired'></a>expired</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns (use_count() == 0)
+        !*/</font>
+
+        shared_ptr<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font> <b><a name='lock'></a>lock</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - if (expired()) then
+                    - returns shared_ptr&lt;T&gt;()
+                - else
+                    - returns shared_ptr&lt;T&gt;(*this)
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='reset'></a>reset</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - equivalent to weak_ptr().swap(*this)
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='swap'></a>swap</b><font face='Lucida Console'>(</font>
+            weak_ptr<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> b
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - swaps *this and item
+        !*/</font>
+
+    <b>}</b>;
+
+    <font color='#0000FF'>template</font><font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> U<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>bool</u></font> <b><a name='operator'></a>operator</b><font color='#5555FF'>&lt;</font> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> weak_ptr<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> a, 
+        <font color='#0000FF'>const</font> weak_ptr<font color='#5555FF'>&lt;</font>U<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> b
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        ensures
+            - Defines an operator&lt; on shared_ptr types appropriate for use in the associative 
+              containers.  
+    !*/</font>
+
+    <font color='#0000FF'>template</font><font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='swap'></a>swap</b><font face='Lucida Console'>(</font>
+        weak_ptr<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> a, 
+        weak_ptr<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&amp;</font> b
+    <font face='Lucida Console'>)</font> <b>{</b> a.<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>b<font face='Lucida Console'>)</font>; <b>}</b>
+    <font color='#009900'>/*!
+        provides a global swap function
+    !*/</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_WEAK_PTr_ABSTRACT_
+</font>
+
+
+</pre></body></html>

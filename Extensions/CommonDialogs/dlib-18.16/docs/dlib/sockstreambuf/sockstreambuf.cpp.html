@@ -1,0 +1,180 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - sockstreambuf.cpp</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2003  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_SOCKStREAMBUF_CPp_
+<font color='#0000FF'>#define</font> DLIB_SOCKStREAMBUF_CPp_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='sockstreambuf.h.html'>sockstreambuf.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../assert.h.html'>../assert.h</a>"
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>cstring<font color='#5555FF'>&gt;</font>
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ---------------------------------------------------------------------------------------- 
+</font>    <font color='#009900'>// output functions
+</font><font color='#009900'>// ---------------------------------------------------------------------------------------- 
+</font>
+    sockstreambuf::int_type sockstreambuf::
+    <b><a name='overflow'></a>overflow</b> <font face='Lucida Console'>(</font>
+        int_type c
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>c <font color='#5555FF'>!</font><font color='#5555FF'>=</font> EOF<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#5555FF'>*</font><font color='#BB00BB'>pptr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> c;
+            <font color='#BB00BB'>pbump</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>flush_out_buffer</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> EOF<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#009900'>// an error occurred
+</font>            <font color='#0000FF'>return</font> EOF;
+        <b>}</b>
+        <font color='#0000FF'>return</font> c;
+    <b>}</b>
+
+<font color='#009900'>// ---------------------------------------------------------------------------------------- 
+</font>
+    std::streamsize sockstreambuf::
+    <b><a name='xsputn'></a>xsputn</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>*</font> s,
+        std::streamsize num
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#009900'>// Add a sanity check here 
+</font>        <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font>num <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#979000'>0</font>,
+            "<font color='#CC0000'>\tstd::streamsize sockstreambuf::xsputn</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tThe number of bytes to write can't be negative</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tnum:  </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> num 
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tthis: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font>
+            <font face='Lucida Console'>)</font>;
+
+        std::streamsize space_left <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font>std::streamsize<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#BB00BB'>epptr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#BB00BB'>pptr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>num <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> space_left<font face='Lucida Console'>)</font>
+        <b>{</b>
+            std::<font color='#BB00BB'>memcpy</font><font face='Lucida Console'>(</font><font color='#BB00BB'>pptr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,s,<font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>size_t</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>num<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>pbump</font><font face='Lucida Console'>(</font><font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>int</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>num<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>return</font> num;
+        <b>}</b>
+        <font color='#0000FF'>else</font>
+        <b>{</b>
+            std::<font color='#BB00BB'>memcpy</font><font face='Lucida Console'>(</font><font color='#BB00BB'>pptr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,s,<font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>size_t</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>space_left<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            s <font color='#5555FF'>+</font><font color='#5555FF'>=</font> space_left;
+            <font color='#BB00BB'>pbump</font><font face='Lucida Console'>(</font>space_left<font face='Lucida Console'>)</font>;
+            std::streamsize num_left <font color='#5555FF'>=</font> num <font color='#5555FF'>-</font> space_left;
+
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>flush_out_buffer</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> EOF<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#009900'>// the write was not successful so return that 0 bytes were written
+</font>                <font color='#0000FF'>return</font> <font color='#979000'>0</font>;
+            <b>}</b>
+
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>num_left <font color='#5555FF'>&lt;</font> out_buffer_size<font face='Lucida Console'>)</font>
+            <b>{</b>
+                std::<font color='#BB00BB'>memcpy</font><font face='Lucida Console'>(</font><font color='#BB00BB'>pptr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,s,<font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>size_t</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>num_left<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                <font color='#BB00BB'>pbump</font><font face='Lucida Console'>(</font>num_left<font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>return</font> num;
+            <b>}</b>
+            <font color='#0000FF'>else</font>
+            <b>{</b>
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>con.<font color='#BB00BB'>write</font><font face='Lucida Console'>(</font>s,num_left<font face='Lucida Console'>)</font> <font color='#5555FF'>!</font><font color='#5555FF'>=</font> num_left<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#009900'>// the write was not successful so return that 0 bytes were written
+</font>                    <font color='#0000FF'>return</font> <font color='#979000'>0</font>;
+                <b>}</b> 
+                <font color='#0000FF'>return</font> num;
+            <b>}</b>
+        <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// ---------------------------------------------------------------------------------------- 
+</font>    <font color='#009900'>// input functions
+</font><font color='#009900'>// ---------------------------------------------------------------------------------------- 
+</font>
+    sockstreambuf::int_type sockstreambuf::
+    <b><a name='underflow'></a>underflow</b><font face='Lucida Console'>(</font> 
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>gptr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> <font color='#BB00BB'>egptr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>return</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#BB00BB'>gptr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'><u>int</u></font> num_put_back <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>int</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#BB00BB'>gptr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> <font color='#BB00BB'>eback</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>num_put_back <font color='#5555FF'>&gt;</font> max_putback<font face='Lucida Console'>)</font>
+        <b>{</b>
+            num_put_back <font color='#5555FF'>=</font> max_putback;
+        <b>}</b>
+
+        <font color='#009900'>// copy the putback characters into the putback end of the in_buffer
+</font>        std::<font color='#BB00BB'>memmove</font><font face='Lucida Console'>(</font>in_buffer<font color='#5555FF'>+</font><font face='Lucida Console'>(</font>max_putback<font color='#5555FF'>-</font>num_put_back<font face='Lucida Console'>)</font>, <font color='#BB00BB'>gptr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font>num_put_back, num_put_back<font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>flushes_output_on_read</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>flush_out_buffer</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> EOF<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#009900'>// an error occurred
+</font>                <font color='#0000FF'>return</font> EOF;
+            <b>}</b>
+        <b>}</b>
+
+        <font color='#0000FF'><u>int</u></font> num <font color='#5555FF'>=</font> con.<font color='#BB00BB'>read</font><font face='Lucida Console'>(</font>in_buffer<font color='#5555FF'>+</font>max_putback, in_buffer_size<font color='#5555FF'>-</font>max_putback<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>num <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#009900'>// an error occurred or the connection is over which is EOF
+</font>            <font color='#0000FF'>return</font> EOF;
+        <b>}</b>
+
+        <font color='#009900'>// reset in_buffer pointers
+</font>        <font color='#BB00BB'>setg</font> <font face='Lucida Console'>(</font>in_buffer<font color='#5555FF'>+</font><font face='Lucida Console'>(</font>max_putback<font color='#5555FF'>-</font>num_put_back<font face='Lucida Console'>)</font>,
+              in_buffer<font color='#5555FF'>+</font>max_putback,
+              in_buffer<font color='#5555FF'>+</font>max_putback<font color='#5555FF'>+</font>num<font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>return</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#BB00BB'>gptr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ---------------------------------------------------------------------------------------- 
+</font>
+    std::streamsize sockstreambuf::
+    <b><a name='xsgetn'></a>xsgetn</b> <font face='Lucida Console'>(</font>
+        char_type<font color='#5555FF'>*</font> s, 
+        std::streamsize n
+    <font face='Lucida Console'>)</font>
+    <b>{</b> 
+        std::streamsize temp <font color='#5555FF'>=</font> n;
+        <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>n <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'><u>int</u></font> num <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>int</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#BB00BB'>egptr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> <font color='#BB00BB'>gptr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>num <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> n<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#009900'>// copy data from our buffer 
+</font>                std::<font color='#BB00BB'>memcpy</font><font face='Lucida Console'>(</font>s, <font color='#BB00BB'>gptr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>size_t</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>n<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                <font color='#BB00BB'>gbump</font><font face='Lucida Console'>(</font><font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>int</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>n<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>return</font> temp;
+            <b>}</b>
+
+            <font color='#009900'>// read more data into our buffer  
+</font>            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>num <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>underflow</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> EOF<font face='Lucida Console'>)</font>
+                    <font color='#0000FF'>break</font>;
+                <font color='#0000FF'>continue</font>;
+            <b>}</b>
+
+            <font color='#009900'>// copy all the data from our buffer 
+</font>            std::<font color='#BB00BB'>memcpy</font><font face='Lucida Console'>(</font>s, <font color='#BB00BB'>gptr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, num<font face='Lucida Console'>)</font>;
+            n <font color='#5555FF'>-</font><font color='#5555FF'>=</font> num;
+            <font color='#BB00BB'>gbump</font><font face='Lucida Console'>(</font>num<font face='Lucida Console'>)</font>;
+            s <font color='#5555FF'>+</font><font color='#5555FF'>=</font> num;
+        <b>}</b>
+        <font color='#0000FF'>return</font> temp<font color='#5555FF'>-</font>n;       
+    <b>}</b>
+
+<font color='#009900'>// ---------------------------------------------------------------------------------------- 
+</font>
+<b>}</b>
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_SOCKStREAMBUF_CPp_
+</font>
+
+</pre></body></html>

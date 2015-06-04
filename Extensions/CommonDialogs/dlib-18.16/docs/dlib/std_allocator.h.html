@@ -1,0 +1,202 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - std_allocator.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2007  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_STD_ALLOc_H_
+<font color='#0000FF'>#define</font> DLIB_STD_ALLOc_H_
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>limits<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>memory<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='enable_if.h.html'>enable_if.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='algs.h.html'>algs.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T,
+        <font color='#0000FF'>typename</font> M
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>class</font> <b><a name='std_allocator'></a>std_allocator</b> 
+    <b>{</b>
+        <font color='#009900'>/*!
+            REQUIREMENTS ON M 
+                must be an implementation of memory_manager/memory_manager_kernel_abstract.h or
+                must be an implementation of memory_manager_global/memory_manager_global_kernel_abstract.h or
+                must be an implementation of memory_manager_stateless/memory_manager_stateless_kernel_abstract.h 
+                M::type can be set to anything.
+
+            WHAT THIS OBJECT REPRESENTS
+                This object is an implementation of an allocator that conforms to the C++ standard 
+                requirements for allocator objects.  The M template argument is one of the dlib
+                memory manager objects and this allocator implementation will do all of its memory allocations
+                using whatever dlib memory manager you supply.   
+
+                Thus, using this allocator object you can use any of the dlib memory manager objects with
+                the containers in the STL or with any other object that requires a C++ allocator object.
+
+                It is important to note that many STL implementations make the assumption that the memory
+                allocated by one allocator can be freed by another.  This effectively means that you should
+                only use a global or stateless memory manager with the std_allocator.  Either that or you
+                have to verify that your version of the STL isn't going to try and allocate and deallocate
+                memory with different allocators.
+        !*/</font>
+
+    <font color='#0000FF'>public</font>:
+        <font color='#009900'>//type definitions
+</font>        <font color='#0000FF'>typedef</font> std::<font color='#0000FF'><u>size_t</u></font>     size_type;
+        <font color='#0000FF'>typedef</font> std::ptrdiff_t  difference_type;
+        <font color='#0000FF'>typedef</font> T<font color='#5555FF'>*</font>              pointer;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>const</font> T<font color='#5555FF'>*</font>        const_pointer;
+        <font color='#0000FF'>typedef</font> T<font color='#5555FF'>&amp;</font>              reference;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font>        const_reference;
+        <font color='#0000FF'>typedef</font> T               value_type;
+
+        <font color='#009900'>//rebind std_allocator to type U
+</font>        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> U<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>struct</font> <b><a name='rebind'></a>rebind</b> <b>{</b>
+            <font color='#0000FF'>typedef</font> std_allocator<font color='#5555FF'>&lt;</font>U,M<font color='#5555FF'>&gt;</font> other;
+        <b>}</b>;
+
+        <font color='#009900'>//return address of values
+</font>        pointer <b><a name='address'></a>address</b> <font face='Lucida Console'>(</font>reference value<font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> <font color='#5555FF'>&amp;</font>value; <b>}</b>
+
+        const_pointer <b><a name='address'></a>address</b> <font face='Lucida Console'>(</font>const_reference value<font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> <font color='#5555FF'>&amp;</font>value; <b>}</b>
+
+        <font color='#009900'>/*constructors and destructor
+         *-nothing to do because the std_allocator has no state
+        */</font>
+        <b><a name='std_allocator'></a>std_allocator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#0000FF'>throw</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <b>{</b> <b>}</b>
+
+        <b><a name='std_allocator'></a>std_allocator</b><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> std_allocator<font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font> <font color='#0000FF'>throw</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <b>{</b> <b>}</b> 
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> U<font color='#5555FF'>&gt;</font>
+        <b><a name='std_allocator'></a>std_allocator</b> <font face='Lucida Console'>(</font><font color='#0000FF'>const</font> std_allocator<font color='#5555FF'>&lt;</font>U,M<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font> <font color='#0000FF'>throw</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <b>{</b> <b>}</b>
+
+        ~<b><a name='std_allocator'></a>std_allocator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#0000FF'>throw</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <b>{</b> <b>}</b>
+
+        <font color='#009900'>//return maximum number of elements that can be allocated
+</font>        size_type <b><a name='max_size'></a>max_size</b> <font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <font color='#0000FF'>throw</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> 
+        <b>{</b>
+            <font color='#009900'>//for numeric_limits see Section 4.3, page 59
+</font>            <font color='#0000FF'>return</font> std::numeric_limits<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>size_t</u></font><font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>max</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>/</font> <font color='#0000FF'>sizeof</font><font face='Lucida Console'>(</font>T<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#009900'>//allocate but don't initialize num elements of type T
+</font>        pointer <b><a name='allocate'></a>allocate</b> <font face='Lucida Console'>(</font>
+            size_type num,
+            <font color='#0000FF'>typename</font> std_allocator<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>void</u></font>,M<font color='#5555FF'>&gt;</font>::const_pointer  <font color='#5555FF'>=</font> <font color='#979000'>0</font>
+        <font face='Lucida Console'>)</font> 
+        <b>{</b>
+            <font color='#0000FF'>return</font> <font face='Lucida Console'>(</font>pointer<font face='Lucida Console'>)</font> pool.<font color='#BB00BB'>allocate_array</font><font face='Lucida Console'>(</font>num<font color='#5555FF'>*</font><font color='#0000FF'>sizeof</font><font face='Lucida Console'>(</font>T<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#009900'>// This function is not required by the C++ standard but some versions of the STL
+</font>        <font color='#009900'>// distributed with gcc erroneously require it.  See the bug report for further
+</font>        <font color='#009900'>// details: http://gcc.gnu.org/bugzilla/show_bug.cgi?id=51626
+</font>        <font color='#0000FF'><u>void</u></font> <b><a name='construct'></a>construct</b><font face='Lucida Console'>(</font>pointer p<font face='Lucida Console'>)</font> <b>{</b> <font color='#0000FF'>return</font> <font color='#BB00BB'>construct</font><font face='Lucida Console'>(</font>p, <font color='#BB00BB'>value_type</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>; <b>}</b>
+
+        <font color='#009900'>//initialize elements of allocated storage p with value value
+</font>        <font color='#0000FF'><u>void</u></font> <b><a name='construct'></a>construct</b> <font face='Lucida Console'>(</font>pointer p, <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> value<font face='Lucida Console'>)</font> 
+        <b>{</b>
+            <font color='#009900'>//initialize memory with placement new
+</font>            <font color='#0000FF'>new</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font color='#5555FF'>*</font><font face='Lucida Console'>)</font>p<font face='Lucida Console'>)</font><font color='#BB00BB'>T</font><font face='Lucida Console'>(</font>value<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+
+        <font color='#009900'>//destroy elements of initialized storage p
+</font>        <font color='#0000FF'><u>void</u></font> <b><a name='destroy'></a>destroy</b> <font face='Lucida Console'>(</font>pointer p<font face='Lucida Console'>)</font> 
+        <b>{</b>
+            <font color='#009900'>// destroy objects by calling their destructor
+</font>            p<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>~<font color='#BB00BB'>T</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#009900'>//deallocate storage p of deleted elements
+</font>        <font color='#0000FF'><u>void</u></font> <b><a name='deallocate'></a>deallocate</b> <font face='Lucida Console'>(</font>pointer p, size_type <font face='Lucida Console'>)</font> 
+        <b>{</b>
+            pool.<font color='#BB00BB'>deallocate_array</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>char</u></font><font color='#5555FF'>*</font><font face='Lucida Console'>)</font>p<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='swap'></a>swap</b> <font face='Lucida Console'>(</font>
+            std_allocator<font color='#5555FF'>&amp;</font> item
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            pool.<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>item.pool<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        std_allocator<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'>const</font> std_allocator<font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font> <b>{</b> <font color='#0000FF'>return</font> <font color='#5555FF'>*</font><font color='#0000FF'>this</font>;<b>}</b>
+
+    <font color='#0000FF'>private</font>:
+        <font color='#0000FF'>typename</font> M::<font color='#0000FF'>template</font> rebind<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font>::other pool; 
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> M
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>class</font> <b><a name='std_allocator'></a>std_allocator</b><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>void</u></font>,M<font color='#5555FF'>&gt;</font> 
+    <b>{</b>
+    <font color='#0000FF'>public</font>:
+        <font color='#009900'>//type definitions
+</font>        <font color='#0000FF'>typedef</font> std::<font color='#0000FF'><u>size_t</u></font>     size_type;
+        <font color='#0000FF'>typedef</font> std::ptrdiff_t  difference_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'><u>void</u></font><font color='#5555FF'>*</font>              pointer;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>const</font> <font color='#0000FF'><u>void</u></font><font color='#5555FF'>*</font>        const_pointer;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'><u>void</u></font>               value_type;
+
+        <font color='#009900'>//rebind std_allocator to type U
+</font>        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> U<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>struct</font> <b><a name='rebind'></a>rebind</b> <b>{</b>
+            <font color='#0000FF'>typedef</font> std_allocator<font color='#5555FF'>&lt;</font>U,M<font color='#5555FF'>&gt;</font> other;
+        <b>}</b>;
+
+    <b>}</b>;
+    
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> M1, <font color='#0000FF'>typename</font> M2, <font color='#0000FF'>typename</font> enabled <font color='#5555FF'>=</font> <font color='#0000FF'><u>void</u></font><font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>struct</font> <b><a name='std_alloc_compare'></a>std_alloc_compare</b>
+    <b>{</b> <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>bool</u></font> are_interchangeable <font color='#5555FF'>=</font> <font color='#979000'>false</font>; <b>}</b>;
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> M1, <font color='#0000FF'>typename</font> M2<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>struct</font> <b><a name='std_alloc_compare'></a>std_alloc_compare</b><font color='#5555FF'>&lt;</font>M1,M2,<font color='#0000FF'>typename</font> enable_if<font color='#5555FF'>&lt;</font>is_same_type<font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> M1::mm_global_type, <font color='#0000FF'>typename</font> M2::mm_global_type<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font>::type<font color='#5555FF'>&gt;</font>
+    <b>{</b> <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>bool</u></font> are_interchangeable <font color='#5555FF'>=</font> <font color='#979000'>true</font>; <b>}</b>;
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> M<font color='#5555FF'>&gt;</font>
+	<font color='#0000FF'>struct</font> <b><a name='std_alloc_compare'></a>std_alloc_compare</b><font color='#5555FF'>&lt;</font>M,M,<font color='#0000FF'>typename</font> enable_if_c<font color='#5555FF'>&lt;</font>M::is_stateless<font color='#5555FF'>&gt;</font>::type<font color='#5555FF'>&gt;</font>
+    <b>{</b> <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>bool</u></font> are_interchangeable <font color='#5555FF'>=</font> <font color='#979000'>true</font>; <b>}</b>;
+
+    <font color='#009900'>//return that all specializations of this std_allocator are interchangeable if they use memory_manager_global
+</font>    <font color='#009900'>// instances with the same mm_global_type
+</font>    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T1, <font color='#0000FF'>typename</font> M1, <font color='#0000FF'>typename</font> T2, <font color='#0000FF'>typename</font> M2<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>bool</u></font> <b><a name='operator'></a>operator</b><font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> std_allocator<font color='#5555FF'>&lt;</font>T1,M1<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font>,
+        <font color='#0000FF'>const</font> std_allocator<font color='#5555FF'>&lt;</font>T2,M2<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font>
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>throw</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> 
+    <b>{</b> <font color='#0000FF'>return</font> std_alloc_compare<font color='#5555FF'>&lt;</font>M1,M2<font color='#5555FF'>&gt;</font>::are_interchangeable; <b>}</b>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T1, <font color='#0000FF'>typename</font> M1, <font color='#0000FF'>typename</font> T2, <font color='#0000FF'>typename</font> M2<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>bool</u></font> <b><a name='operator'></a>operator</b><font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> std_allocator<font color='#5555FF'>&lt;</font>T1,M1<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font>,
+        <font color='#0000FF'>const</font> std_allocator<font color='#5555FF'>&lt;</font>T2,M2<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font>
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>throw</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> 
+    <b>{</b> <font color='#0000FF'>return</font> <font color='#5555FF'>!</font>std_alloc_compare<font color='#5555FF'>&lt;</font>M1,M2<font color='#5555FF'>&gt;</font>::are_interchangeable; <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> M<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='swap'></a>swap</b> <font face='Lucida Console'>(</font>
+        std_allocator<font color='#5555FF'>&lt;</font>T,M<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> a,
+        std_allocator<font color='#5555FF'>&lt;</font>T,M<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> b
+    <font face='Lucida Console'>)</font> <b>{</b> a.<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>b<font face='Lucida Console'>)</font>; <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_STD_ALLOc_H_
+</font>
+
+</pre></body></html>

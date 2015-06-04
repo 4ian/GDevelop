@@ -1,0 +1,308 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - memory_manager_kernel_1.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2004  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_MEMORY_MANAGER_KERNEl_1_
+<font color='#0000FF'>#define</font> DLIB_MEMORY_MANAGER_KERNEl_1_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../algs.h.html'>../algs.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='memory_manager_kernel_abstract.h.html'>memory_manager_kernel_abstract.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../assert.h.html'>../assert.h</a>"
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>new<font color='#5555FF'>&gt;</font>
+
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> max_pool_size
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>class</font> <b><a name='memory_manager_kernel_1'></a>memory_manager_kernel_1</b>
+    <b>{</b>
+        <font color='#009900'>/*!            
+            INITIAL VALUE
+                allocations == 0
+                next == 0
+                pool_size == 0
+
+            REQUIREMENTS ON max_pool_size 
+                max_pool_size is the maximum number of nodes we will keep in our linked list at once.
+                So you can put any value in for this argument.
+
+            CONVENTION
+                This memory manager implementation allocates T objects one at a time when there are
+                allocation requests.  Then when there is a deallocate request the returning T object
+                is place into a list of free blocks if that list has less than max_pool_size 
+                blocks in it.  subsequent allocation requests will be serviced by drawing from the
+                free list whenever it isn't empty.
+
+
+                allocations == get_number_of_allocations()
+
+                - if (next != 0) then
+                    - next == the next pointer to return from allocate()
+                      and next == pointer to the first node in a linked list.  each node
+                      is one item in the memory pool.    
+                    - the last node in the linked list has next set to 0
+                    - pool_size == the number of nodes in the linked list
+                    - pool_size &lt;= max_pool_size
+                - else
+                    - we need to call new to get the next pointer to return from allocate()
+
+        !*/</font>
+
+        <font color='#0000FF'>union</font> node
+        <b>{</b>
+            node<font color='#5555FF'>*</font> next;
+            <font color='#0000FF'><u>char</u></font> item[<font color='#0000FF'>sizeof</font><font face='Lucida Console'>(</font>T<font face='Lucida Console'>)</font>];
+        <b>}</b>;
+
+    <font color='#0000FF'>public</font>:
+
+        <font color='#0000FF'>typedef</font> T type;
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> U<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>struct</font> <b><a name='rebind'></a>rebind</b> <b>{</b>
+            <font color='#0000FF'>typedef</font> memory_manager_kernel_1<font color='#5555FF'>&lt;</font>U,max_pool_size<font color='#5555FF'>&gt;</font> other;
+        <b>}</b>;
+
+
+        <b><a name='memory_manager_kernel_1'></a>memory_manager_kernel_1</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> :
+            allocations<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>,
+            next<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>,
+            pool_size<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+        <b>}</b>
+
+        <font color='#0000FF'>virtual</font> ~<b><a name='memory_manager_kernel_1'></a>memory_manager_kernel_1</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+
+            <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>next <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                node<font color='#5555FF'>*</font> temp <font color='#5555FF'>=</font> next;
+                next <font color='#5555FF'>=</font> next<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>next;
+                ::<font color='#0000FF'>operator</font> <font color='#0000FF'>delete</font> <font face='Lucida Console'>(</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>void</u></font><font color='#5555FF'>*</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+        <b>}</b>
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='get_number_of_allocations'></a>get_number_of_allocations</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> allocations; <b>}</b>
+
+        T<font color='#5555FF'>*</font> <b><a name='allocate_array'></a>allocate_array</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> size
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            T<font color='#5555FF'>*</font> temp <font color='#5555FF'>=</font> <font color='#0000FF'>new</font> T[size];
+            <font color='#5555FF'>+</font><font color='#5555FF'>+</font>allocations;
+            <font color='#0000FF'>return</font> temp;
+        <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='deallocate_array'></a>deallocate_array</b> <font face='Lucida Console'>(</font>
+            T<font color='#5555FF'>*</font> item
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#5555FF'>-</font><font color='#5555FF'>-</font>allocations;
+            <font color='#0000FF'>delete</font> [] item;
+        <b>}</b>
+
+        T<font color='#5555FF'>*</font> <b><a name='allocate'></a>allocate</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> 
+        <b>{</b>              
+            T<font color='#5555FF'>*</font> temp;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>next <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                temp <font color='#5555FF'>=</font> <font color='#0000FF'>reinterpret_cast</font><font color='#5555FF'>&lt;</font>T<font color='#5555FF'>*</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>next<font face='Lucida Console'>)</font>;
+
+                node<font color='#5555FF'>*</font> n <font color='#5555FF'>=</font> next<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>next;
+
+                <font color='#0000FF'>try</font>
+                <b>{</b>
+                    <font color='#009900'>// construct this new T object with placement new.
+</font>                    <font color='#0000FF'>new</font> <font face='Lucida Console'>(</font><font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>void</u></font><font color='#5555FF'>*</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font color='#BB00BB'>T</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                <b>}</b>
+                <font color='#0000FF'>catch</font> <font face='Lucida Console'>(</font>...<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    next<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>next <font color='#5555FF'>=</font> n;
+                    <font color='#0000FF'>throw</font>;
+                <b>}</b>
+
+                next <font color='#5555FF'>=</font> n;
+
+                <font color='#5555FF'>-</font><font color='#5555FF'>-</font>pool_size;
+            <b>}</b>
+            <font color='#0000FF'>else</font>
+            <b>{</b>
+                temp <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font>T<font color='#5555FF'>*</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>::<font color='#0000FF'>operator</font> <font color='#0000FF'>new</font><font face='Lucida Console'>(</font><font color='#0000FF'>sizeof</font><font face='Lucida Console'>(</font>node<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>try</font>
+                <b>{</b>
+                    <font color='#009900'>// construct this new T object with placement new.
+</font>                    <font color='#0000FF'>new</font> <font face='Lucida Console'>(</font><font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>void</u></font><font color='#5555FF'>*</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font color='#BB00BB'>T</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                <b>}</b>
+                <font color='#0000FF'>catch</font> <font face='Lucida Console'>(</font>...<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#009900'>// construction of the new object threw so delete the block of memory
+</font>                    ::<font color='#0000FF'>operator</font> <font color='#0000FF'>delete</font> <font face='Lucida Console'>(</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>void</u></font><font color='#5555FF'>*</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                    <font color='#0000FF'>throw</font>;
+                <b>}</b>
+            <b>}</b>
+
+            <font color='#5555FF'>+</font><font color='#5555FF'>+</font>allocations;
+            <font color='#0000FF'>return</font> temp;
+        <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='deallocate'></a>deallocate</b> <font face='Lucida Console'>(</font>
+            T<font color='#5555FF'>*</font> item
+        <font face='Lucida Console'>)</font> 
+        <b>{</b> 
+            <font color='#5555FF'>-</font><font color='#5555FF'>-</font>allocations;  
+            item<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>~<font color='#BB00BB'>T</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>pool_size <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> max_pool_size<font face='Lucida Console'>)</font>
+            <b>{</b>
+                ::<font color='#0000FF'>operator</font> <font color='#0000FF'>delete</font> <font face='Lucida Console'>(</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>void</u></font><font color='#5555FF'>*</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>item<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>return</font>;
+            <b>}</b>
+
+            <font color='#009900'>// add this memory chunk into our linked list.
+</font>            node<font color='#5555FF'>*</font> temp <font color='#5555FF'>=</font> <font color='#0000FF'>reinterpret_cast</font><font color='#5555FF'>&lt;</font>node<font color='#5555FF'>*</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>item<font face='Lucida Console'>)</font>;
+            temp<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>next <font color='#5555FF'>=</font> next;
+            next <font color='#5555FF'>=</font> temp;                
+            <font color='#5555FF'>+</font><font color='#5555FF'>+</font>pool_size;
+        <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='swap'></a>swap</b> <font face='Lucida Console'>(</font>
+            memory_manager_kernel_1<font color='#5555FF'>&amp;</font> item
+        <font face='Lucida Console'>)</font> 
+        <b>{</b> 
+            <font color='#BB00BB'>exchange</font><font face='Lucida Console'>(</font>allocations,item.allocations<font face='Lucida Console'>)</font>; 
+            <font color='#BB00BB'>exchange</font><font face='Lucida Console'>(</font>next,item.next<font face='Lucida Console'>)</font>; 
+            <font color='#BB00BB'>exchange</font><font face='Lucida Console'>(</font>pool_size,item.pool_size<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+    <font color='#0000FF'>private</font>:
+
+        <font color='#009900'>// data members
+</font>        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> allocations;
+        node<font color='#5555FF'>*</font> next;
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> pool_size;
+
+        <font color='#009900'>// restricted functions
+</font>        <b><a name='memory_manager_kernel_1'></a>memory_manager_kernel_1</b><font face='Lucida Console'>(</font>memory_manager_kernel_1<font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font>;        <font color='#009900'>// copy constructor
+</font>        memory_manager_kernel_1<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>=</font><font face='Lucida Console'>(</font>memory_manager_kernel_1<font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font>;    <font color='#009900'>// assignment operator
+</font>    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>class</font> <b><a name='memory_manager_kernel_1'></a>memory_manager_kernel_1</b><font color='#5555FF'>&lt;</font>T,<font color='#979000'>0</font><font color='#5555FF'>&gt;</font>
+    <b>{</b>
+        <font color='#009900'>/*!            
+            INITIAL VALUE
+                allocations == 0
+
+            CONVENTION
+                This memory manager just calls new and delete directly so it doesn't 
+                really do anything.
+
+                allocations == get_number_of_allocations()
+        !*/</font>
+
+    <font color='#0000FF'>public</font>:
+
+        <font color='#0000FF'>typedef</font> T type;
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> U<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>struct</font> <b><a name='rebind'></a>rebind</b> <b>{</b>
+            <font color='#0000FF'>typedef</font> memory_manager_kernel_1<font color='#5555FF'>&lt;</font>U,<font color='#979000'>0</font><font color='#5555FF'>&gt;</font> other;
+        <b>}</b>;
+
+
+        <b><a name='memory_manager_kernel_1'></a>memory_manager_kernel_1</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> :
+            allocations<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+        <b>}</b>
+
+        <font color='#0000FF'>virtual</font> ~<b><a name='memory_manager_kernel_1'></a>memory_manager_kernel_1</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+        <b>}</b>
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='get_number_of_allocations'></a>get_number_of_allocations</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> allocations; <b>}</b>
+
+        T<font color='#5555FF'>*</font> <b><a name='allocate_array'></a>allocate_array</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> size
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            T<font color='#5555FF'>*</font> temp <font color='#5555FF'>=</font> <font color='#0000FF'>new</font> T[size];
+            <font color='#5555FF'>+</font><font color='#5555FF'>+</font>allocations;
+            <font color='#0000FF'>return</font> temp;
+        <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='deallocate_array'></a>deallocate_array</b> <font face='Lucida Console'>(</font>
+            T<font color='#5555FF'>*</font> item
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#5555FF'>-</font><font color='#5555FF'>-</font>allocations;
+            <font color='#0000FF'>delete</font> [] item;
+        <b>}</b>
+
+        T<font color='#5555FF'>*</font> <b><a name='allocate'></a>allocate</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> 
+        <b>{</b>              
+            T<font color='#5555FF'>*</font> temp <font color='#5555FF'>=</font> <font color='#0000FF'>new</font> T;
+            <font color='#5555FF'>+</font><font color='#5555FF'>+</font>allocations;
+            <font color='#0000FF'>return</font> temp;
+        <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='deallocate'></a>deallocate</b> <font face='Lucida Console'>(</font>
+            T<font color='#5555FF'>*</font> item
+        <font face='Lucida Console'>)</font> 
+        <b>{</b> 
+            <font color='#0000FF'>delete</font> item;
+            <font color='#5555FF'>-</font><font color='#5555FF'>-</font>allocations;  
+        <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='swap'></a>swap</b> <font face='Lucida Console'>(</font>
+            memory_manager_kernel_1<font color='#5555FF'>&amp;</font> item
+        <font face='Lucida Console'>)</font> 
+        <b>{</b> 
+            <font color='#BB00BB'>exchange</font><font face='Lucida Console'>(</font>allocations,item.allocations<font face='Lucida Console'>)</font>; 
+        <b>}</b>
+
+    <font color='#0000FF'>private</font>:
+
+        <font color='#009900'>// data members
+</font>        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> allocations;
+
+        <font color='#009900'>// restricted functions
+</font>        <b><a name='memory_manager_kernel_1'></a>memory_manager_kernel_1</b><font face='Lucida Console'>(</font>memory_manager_kernel_1<font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font>;        <font color='#009900'>// copy constructor
+</font>        memory_manager_kernel_1<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>=</font><font face='Lucida Console'>(</font>memory_manager_kernel_1<font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font>;    <font color='#009900'>// assignment operator
+</font>    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> max_pool_size
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='swap'></a>swap</b> <font face='Lucida Console'>(</font>
+        memory_manager_kernel_1<font color='#5555FF'>&lt;</font>T,max_pool_size<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> a, 
+        memory_manager_kernel_1<font color='#5555FF'>&lt;</font>T,max_pool_size<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> b 
+    <font face='Lucida Console'>)</font> <b>{</b> a.<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>b<font face='Lucida Console'>)</font>; <b>}</b>   
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_MEMORY_MANAGER_KERNEl_1_
+</font>
+
+
+
+</pre></body></html>

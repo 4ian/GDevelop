@@ -1,0 +1,157 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - track_association_function.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2014  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_TRACK_ASSOCiATION_FUNCTION_Hh_
+<font color='#0000FF'>#define</font> DLIB_TRACK_ASSOCiATION_FUNCTION_Hh_
+
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='track_association_function_abstract.h.html'>track_association_function_abstract.h</a>"
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>vector<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>iostream<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../algs.h.html'>../algs.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../serialize.h.html'>../serialize.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='assignment_function.h.html'>assignment_function.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> detection_type
+        <font color='#5555FF'>&gt;</font> 
+    <font color='#0000FF'>class</font> <b><a name='feature_extractor_track_association'></a>feature_extractor_track_association</b>
+    <b>{</b>
+    <font color='#0000FF'>public</font>:
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> detection_type::track_type track_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> track_type::feature_vector_type feature_vector_type;
+
+        <font color='#0000FF'>typedef</font> detection_type lhs_element;
+        <font color='#0000FF'>typedef</font> track_type rhs_element;
+
+        <b><a name='feature_extractor_track_association'></a>feature_extractor_track_association</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> : num_dims<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>, num_nonnegative<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+
+        <font color='#0000FF'>explicit</font> <b><a name='feature_extractor_track_association'></a>feature_extractor_track_association</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> num_dims_,
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> num_nonnegative_
+        <font face='Lucida Console'>)</font> : num_dims<font face='Lucida Console'>(</font>num_dims_<font face='Lucida Console'>)</font>, num_nonnegative<font face='Lucida Console'>(</font>num_nonnegative_<font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='num_features'></a>num_features</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> num_dims; <b>}</b>
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='num_nonnegative_weights'></a>num_nonnegative_weights</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> num_nonnegative; <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='get_features'></a>get_features</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> detection_type<font color='#5555FF'>&amp;</font> det,
+            <font color='#0000FF'>const</font> track_type<font color='#5555FF'>&amp;</font> track,
+            feature_vector_type<font color='#5555FF'>&amp;</font> feats
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            track.<font color='#BB00BB'>get_similarity_features</font><font face='Lucida Console'>(</font>det, feats<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>friend</font> <font color='#0000FF'><u>void</u></font> <b><a name='serialize'></a>serialize</b> <font face='Lucida Console'>(</font><font color='#0000FF'>const</font> feature_extractor_track_association<font color='#5555FF'>&amp;</font> item, std::ostream<font color='#5555FF'>&amp;</font> out<font face='Lucida Console'>)</font> 
+        <b>{</b> 
+            <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item.num_dims, out<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item.num_nonnegative, out<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>friend</font> <font color='#0000FF'><u>void</u></font> <b><a name='deserialize'></a>deserialize</b> <font face='Lucida Console'>(</font>feature_extractor_track_association<font color='#5555FF'>&amp;</font> item, std::istream<font color='#5555FF'>&amp;</font> in<font face='Lucida Console'>)</font> 
+        <b>{</b>
+            <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item.num_dims, in<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item.num_nonnegative, in<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+    <font color='#0000FF'>private</font>:
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> num_dims;
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> num_nonnegative;
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> detection_type_
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>class</font> <b><a name='track_association_function'></a>track_association_function</b>
+    <b>{</b>
+    <font color='#0000FF'>public</font>:
+
+        <font color='#0000FF'>typedef</font> detection_type_ detection_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> detection_type::track_type track_type;
+        <font color='#0000FF'>typedef</font> assignment_function<font color='#5555FF'>&lt;</font>feature_extractor_track_association<font color='#5555FF'>&lt;</font>detection_type<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> association_function_type;
+
+        <b><a name='track_association_function'></a>track_association_function</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+
+        <b><a name='track_association_function'></a>track_association_function</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> association_function_type<font color='#5555FF'>&amp;</font> assoc_
+        <font face='Lucida Console'>)</font> : assoc<font face='Lucida Console'>(</font>assoc_<font face='Lucida Console'>)</font>
+        <b>{</b>
+        <b>}</b>
+
+        <font color='#0000FF'>const</font> association_function_type<font color='#5555FF'>&amp;</font> <b><a name='get_assignment_function'></a>get_assignment_function</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#0000FF'>return</font> assoc;
+        <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>
+            std::vector<font color='#5555FF'>&lt;</font>track_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> tracks,
+            <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>detection_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> dets
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font> assignments <font color='#5555FF'>=</font> <font color='#BB00BB'>assoc</font><font face='Lucida Console'>(</font>dets, tracks<font face='Lucida Console'>)</font>;
+            std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>bool</u></font><font color='#5555FF'>&gt;</font> <font color='#BB00BB'>updated_track</font><font face='Lucida Console'>(</font>tracks.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, <font color='#979000'>false</font><font face='Lucida Console'>)</font>;
+            <font color='#009900'>// now update all the tracks with the detections that associated to them.
+</font>            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> assignments.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>assignments[i] <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>
+                <b>{</b>
+                    tracks[assignments[i]].<font color='#BB00BB'>update_track</font><font face='Lucida Console'>(</font>dets[i]<font face='Lucida Console'>)</font>;
+                    updated_track[assignments[i]] <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+                <b>}</b>
+                <font color='#0000FF'>else</font>
+                <b>{</b>
+                    track_type new_track;
+                    new_track.<font color='#BB00BB'>update_track</font><font face='Lucida Console'>(</font>dets[i]<font face='Lucida Console'>)</font>;
+                    tracks.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>new_track<font face='Lucida Console'>)</font>;
+                <b>}</b>
+            <b>}</b>
+
+            <font color='#009900'>// Now propagate all the tracks that didn't get any detections.
+</font>            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> updated_track.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font>updated_track[i]<font face='Lucida Console'>)</font>
+                    tracks[i].<font color='#BB00BB'>propagate_track</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+        <b>}</b>
+
+        <font color='#0000FF'>friend</font> <font color='#0000FF'><u>void</u></font> <b><a name='serialize'></a>serialize</b> <font face='Lucida Console'>(</font><font color='#0000FF'>const</font> track_association_function<font color='#5555FF'>&amp;</font> item, std::ostream<font color='#5555FF'>&amp;</font> out<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'><u>int</u></font> version <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+            <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>version, out<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item.assoc, out<font face='Lucida Console'>)</font>;
+        <b>}</b>
+        <font color='#0000FF'>friend</font> <font color='#0000FF'><u>void</u></font> <b><a name='deserialize'></a>deserialize</b> <font face='Lucida Console'>(</font>track_association_function<font color='#5555FF'>&amp;</font> item, std::istream<font color='#5555FF'>&amp;</font> in<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'><u>int</u></font> version <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>version, in<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>version <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>
+                <font color='#0000FF'>throw</font> <font color='#BB00BB'>serialization_error</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>Unexpected version found while deserializing dlib::track_association_function.</font>"<font face='Lucida Console'>)</font>;
+
+            <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item.assoc, in<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+    <font color='#0000FF'>private</font>:
+
+        assignment_function<font color='#5555FF'>&lt;</font>feature_extractor_track_association<font color='#5555FF'>&lt;</font>detection_type<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> assoc;
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_TRACK_ASSOCiATION_FUNCTION_Hh_
+</font>
+
+</pre></body></html>

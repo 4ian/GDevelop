@@ -1,0 +1,144 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - reference_counter_kernel_abstract.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2003  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#undef</font> DLIB_REFERENCE_COUNTER_KERNEl_ABSTRACT_
+<font color='#0000FF'>#ifdef</font> DLIB_REFERENCE_COUNTER_KERNEl_ABSTRACT_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../algs.h.html'>../algs.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T,
+        <font color='#0000FF'>typename</font> copy <font color='#5555FF'>=</font> copy_functor<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font>
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>class</font> <b><a name='reference_counter'></a>reference_counter</b>
+    <b>{</b>
+
+        <font color='#009900'>/*!
+            REQUIREMENTS ON T
+                T must have a default constructor
+
+            REQUIREMENTS ON copy
+                it should be a function object that copies an object of type T. and
+                it must have a default constructor and
+                operator() should be overloaded as 
+                void operator()(const T&amp; source, T&amp; destination);
+                copy may throw any exception 
+
+            POINTERS AND REFERENCES TO INTERNAL DATA
+                swap() and access() functions do not invalidate pointers or 
+                references to internal data.
+                All other functions have no such guarantee
+  
+
+            INITIAL VALUE
+                reference_counter contains one object of type T and
+                this object of type T has its initial value
+
+            WHAT THIS OBJECT REPRESENTS
+                This object represents a container for an object of type T and 
+                provides reference counting capabilities for the object it contains   
+
+                Also note that unless specified otherwise, no member functions
+                of this object throw exceptions.
+
+        !*/</font>
+
+        <font color='#0000FF'>public</font>:
+
+            <font color='#0000FF'>typedef</font> T type;
+
+            <b><a name='reference_counter'></a>reference_counter</b> <font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font>;
+            <font color='#009900'>/*!
+                ensures 
+                    - #*this is properly initialized
+                throws
+                    - std::bad_alloc or any exception thrown by T's constructor
+            !*/</font>
+
+            <b><a name='reference_counter'></a>reference_counter</b> <font face='Lucida Console'>(</font> 
+                <font color='#0000FF'>const</font> reference_counter<font color='#5555FF'>&amp;</font> item
+            <font face='Lucida Console'>)</font>;
+            <font color='#009900'>/*!
+                ensures
+                    - #access() == item.access()
+            !*/</font>
+
+            <font color='#0000FF'>virtual</font> ~<b><a name='reference_counter'></a>reference_counter</b> <font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font>; 
+            <font color='#009900'>/*!
+                ensures
+                    - all memory associated with *this has been released
+            !*/</font>
+
+            <font color='#0000FF'><u>void</u></font> <b><a name='clear'></a>clear</b> <font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font>;
+            <font color='#009900'>/*!
+                ensures
+                    - #*this has its initial value
+                throws
+                    - std::bad_alloc or any exception thrown by T's constructor
+                        if this exception is thrown then *this is unusable 
+                        until clear() is called and succeeds
+            !*/</font>
+
+            T<font color='#5555FF'>&amp;</font> <b><a name='modify'></a>modify</b> <font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font>;
+            <font color='#009900'>/*!
+                ensures
+                    - returns a non-const reference to the item contained in *this 
+                    - the item is ok to modify.  i.e. there are no other references to it
+                throws
+                    - std::bad_alloc or any exception thrown by T's constructor
+                        modify() may throw this exception if there are other references
+                        to the item and there is not enough memory to copy it. If modify()
+                        throws then it has no effect.    
+            !*/</font>
+
+            <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> <b><a name='access'></a>access</b> <font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+            <font color='#009900'>/*!
+                ensures
+                    - returns a const reference to the item contained in *this 
+                    - there may be other references to to the item
+            !*/</font>
+
+            reference_counter<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>
+                <font color='#0000FF'>const</font> reference_counter<font color='#5555FF'>&amp;</font> rhs
+            <font face='Lucida Console'>)</font>;
+            <font color='#009900'>/*!
+                ensures
+                    - #access() == rhs.access() 
+            !*/</font>
+
+            <font color='#0000FF'><u>void</u></font> <b><a name='swap'></a>swap</b> <font face='Lucida Console'>(</font>
+                reference_counter<font color='#5555FF'>&amp;</font> item
+            <font face='Lucida Console'>)</font>;
+            <font color='#009900'>/*!
+                ensures
+                    - swaps *this and item
+            !*/</font> 
+
+    <b>}</b>;
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T,
+        <font color='#0000FF'>typename</font> copy
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='swap'></a>swap</b> <font face='Lucida Console'>(</font>
+        reference_counter<font color='#5555FF'>&lt;</font>T,copy<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> a, 
+        reference_counter<font color='#5555FF'>&lt;</font>T,copy<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> b 
+    <font face='Lucida Console'>)</font> <b>{</b> a.<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>b<font face='Lucida Console'>)</font>; <b>}</b>  
+    <font color='#009900'>/*!
+        provides a global swap function
+    !*/</font>
+
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_REFERENCE_COUNTER_KERNEl_ABSTRACT_
+</font>
+
+</pre></body></html>

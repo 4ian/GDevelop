@@ -1,0 +1,840 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - main.cpp</title></head><body bgcolor='white'><pre>
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='dlib/image_io.h.html'>dlib/image_io.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='dlib/array2d.h.html'>dlib/array2d.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='dlib/gui_core.h.html'>dlib/gui_core.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='dlib/assert.h.html'>dlib/assert.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='dlib/misc_api.h.html'>dlib/misc_api.h</a>"
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>string<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='dlib/image_transforms.h.html'>dlib/image_transforms.h</a>"
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='dlib/timer.h.html'>dlib/timer.h</a>"
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='dlib/gui_widgets.h.html'>dlib/gui_widgets.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='dlib/queue.h.html'>dlib/queue.h</a>"
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>sstream<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>iostream<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>fstream<font color='#5555FF'>&gt;</font>
+
+<font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> dlib;
+<font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> std;
+
+
+<font color='#0000FF'>typedef</font> dlib::array2d<font color='#5555FF'>&lt;</font>hsi_pixel<font color='#5555FF'>&gt;</font> image;
+
+
+
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='dlib/base64.h.html'>dlib/base64.h</a>"
+
+
+
+
+<font color='#0000FF'>class</font> <b><a name='color_box'></a>color_box</b> : <font color='#0000FF'>public</font> draggable 
+<b>{</b>
+    <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> red, green,blue;
+
+<font color='#0000FF'>public</font>:
+    <b><a name='color_box'></a>color_box</b> <font face='Lucida Console'>(</font>
+        drawable_window<font color='#5555FF'>&amp;</font> w,
+        rectangle area,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> red_,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> green_,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> blue_
+    <font face='Lucida Console'>)</font> :
+        draggable<font face='Lucida Console'>(</font>w, MOUSE_WHEEL<font face='Lucida Console'>)</font>,
+        red<font face='Lucida Console'>(</font>red_<font face='Lucida Console'>)</font>,
+        green<font face='Lucida Console'>(</font>green_<font face='Lucida Console'>)</font>,
+        blue<font face='Lucida Console'>(</font>blue_<font face='Lucida Console'>)</font>,
+        t<font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font>,<font color='#5555FF'>&amp;</font>color_box::action<font face='Lucida Console'>)</font>
+    <b>{</b>
+        rect <font color='#5555FF'>=</font> area;
+
+        t.<font color='#BB00BB'>set_delay_time</font><font face='Lucida Console'>(</font><font color='#979000'>4</font><font face='Lucida Console'>)</font>;
+        <font color='#009900'>// t.start();
+</font>
+        <font color='#BB00BB'>set_draggable_area</font><font face='Lucida Console'>(</font><font color='#BB00BB'>rectangle</font><font face='Lucida Console'>(</font><font color='#979000'>10</font>,<font color='#979000'>10</font>,<font color='#979000'>500</font>,<font color='#979000'>500</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+        <font color='#BB00BB'>enable_events</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+    ~<b><a name='color_box'></a>color_box</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#BB00BB'>disable_events</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#0000FF'>private</font>:
+
+    <font color='#0000FF'><u>void</u></font> <b><a name='action'></a>action</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#5555FF'>+</font><font color='#5555FF'>+</font>red;
+        parent.<font color='#BB00BB'>invalidate_rectangle</font><font face='Lucida Console'>(</font>rect<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+    <font color='#0000FF'><u>void</u></font> <b><a name='draw'></a>draw</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> canvas<font color='#5555FF'>&amp;</font> c
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>hidden <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font> <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#BB00BB'>fill_rect</font><font face='Lucida Console'>(</font>c,rect,<font color='#BB00BB'>rgb_pixel</font><font face='Lucida Console'>(</font>red,green,blue<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            std::vector<font color='#5555FF'>&lt;</font>point<font color='#5555FF'>&gt;</font> poly;
+            poly.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>rect.<font color='#BB00BB'>tl_corner</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>+</font>rect.<font color='#BB00BB'>tr_corner</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font color='#5555FF'>/</font><font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+            poly.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>rect.<font color='#BB00BB'>tr_corner</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>+</font>rect.<font color='#BB00BB'>br_corner</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font color='#5555FF'>/</font><font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+            poly.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>rect.<font color='#BB00BB'>br_corner</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>+</font>rect.<font color='#BB00BB'>bl_corner</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font color='#5555FF'>/</font><font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+            poly.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>rect.<font color='#BB00BB'>bl_corner</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>+</font>rect.<font color='#BB00BB'>tl_corner</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font color='#5555FF'>/</font><font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>draw_solid_convex_polygon</font><font face='Lucida Console'>(</font>c,poly,<font color='#BB00BB'>rgb_alpha_pixel</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>70</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+    <b>}</b>
+
+    <font color='#0000FF'><u>void</u></font> <b><a name='on_wheel_up'></a>on_wheel_up</b><font face='Lucida Console'>(</font>
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> state
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>state <font color='#5555FF'>=</font><font color='#5555FF'>=</font> base_window::NONE<font face='Lucida Console'>)</font>
+            cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>up scroll, NONE</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+        <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>state<font color='#5555FF'>&amp;</font>base_window::LEFT<font face='Lucida Console'>)</font>
+            cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>up scroll, LEFT</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+        <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>state<font color='#5555FF'>&amp;</font>base_window::RIGHT<font face='Lucida Console'>)</font>
+            cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>up scroll, RIGHT</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+        <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>state<font color='#5555FF'>&amp;</font>base_window::MIDDLE<font face='Lucida Console'>)</font>
+            cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>up scroll, MIDDLE</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+        <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>state<font color='#5555FF'>&amp;</font>base_window::SHIFT<font face='Lucida Console'>)</font>
+            cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>up scroll, SHIFT</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+        <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>state<font color='#5555FF'>&amp;</font>base_window::CONTROL<font face='Lucida Console'>)</font>
+            cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>up scroll, CONTROL</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+
+    <b>}</b>
+
+    <font color='#0000FF'><u>void</u></font> <b><a name='on_wheel_down'></a>on_wheel_down</b><font face='Lucida Console'>(</font>
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> state
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>state <font color='#5555FF'>=</font><font color='#5555FF'>=</font> base_window::NONE<font face='Lucida Console'>)</font>
+            cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>down scroll, NONE</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+        <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>state<font color='#5555FF'>&amp;</font>base_window::LEFT<font face='Lucida Console'>)</font>
+            cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>down scroll, LEFT</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+        <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>state<font color='#5555FF'>&amp;</font>base_window::RIGHT<font face='Lucida Console'>)</font>
+            cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>down scroll, RIGHT</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+        <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>state<font color='#5555FF'>&amp;</font>base_window::MIDDLE<font face='Lucida Console'>)</font>
+            cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>down scroll, MIDDLE</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+        <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>state<font color='#5555FF'>&amp;</font>base_window::SHIFT<font face='Lucida Console'>)</font>
+            cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>down scroll, SHIFT</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+        <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>state<font color='#5555FF'>&amp;</font>base_window::CONTROL<font face='Lucida Console'>)</font>
+            cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>down scroll, CONTROL</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+
+    <b>}</b>
+
+
+    <font color='#0000FF'><u>void</u></font> <b><a name='on_window_resized'></a>on_window_resized</b> <font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+    <b>{</b>
+        draggable::<font color='#BB00BB'>on_window_resized</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+    timer<font color='#5555FF'>&lt;</font>color_box<font color='#5555FF'>&gt;</font> t;
+<b>}</b>;
+
+
+
+
+
+
+<font color='#0000FF'>class</font> <b><a name='win'></a>win</b> : <font color='#0000FF'>public</font> drawable_window
+<b>{</b>
+
+    label lbl_last_keydown;
+    label lbl_mod_shift;
+    label lbl_mod_control;
+    label lbl_mod_alt;
+    label lbl_mod_meta;
+    label lbl_mod_caps_lock;
+    label lbl_mod_num_lock;
+    label lbl_mod_scroll_lock;
+    <font color='#0000FF'><u>void</u></font> <b><a name='on_keydown'></a>on_keydown</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> key,
+        <font color='#0000FF'><u>bool</u></font> is_printable,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> state
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>is_printable<font face='Lucida Console'>)</font>
+            lbl_last_keydown.<font color='#BB00BB'>set_text</font><font face='Lucida Console'>(</font><font color='#BB00BB'>string</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>last keydown: </font>"<font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>char</u></font><font face='Lucida Console'>)</font>key<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>else</font>
+            lbl_last_keydown.<font color='#BB00BB'>set_text</font><font face='Lucida Console'>(</font><font color='#BB00BB'>string</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>last keydown: nonprintable</font>"<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>state<font color='#5555FF'>&amp;</font>base_window::KBD_MOD_SHIFT<font face='Lucida Console'>)</font>
+            lbl_mod_shift.<font color='#BB00BB'>set_text</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>shift is on</font>"<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>else</font>
+            lbl_mod_shift.<font color='#BB00BB'>set_text</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>shift is off</font>"<font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>state<font color='#5555FF'>&amp;</font>base_window::KBD_MOD_CONTROL<font face='Lucida Console'>)</font>
+            lbl_mod_control.<font color='#BB00BB'>set_text</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>control is on</font>"<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>else</font>
+            lbl_mod_control.<font color='#BB00BB'>set_text</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>control is off</font>"<font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>state<font color='#5555FF'>&amp;</font>base_window::KBD_MOD_ALT<font face='Lucida Console'>)</font>
+            lbl_mod_alt.<font color='#BB00BB'>set_text</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>alt is on</font>"<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>else</font>
+            lbl_mod_alt.<font color='#BB00BB'>set_text</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>alt is off</font>"<font face='Lucida Console'>)</font>;
+
+
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>state<font color='#5555FF'>&amp;</font>base_window::KBD_MOD_META<font face='Lucida Console'>)</font>
+            lbl_mod_meta.<font color='#BB00BB'>set_text</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>meta is on</font>"<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>else</font>
+            lbl_mod_meta.<font color='#BB00BB'>set_text</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>meta is off</font>"<font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>state<font color='#5555FF'>&amp;</font>base_window::KBD_MOD_CAPS_LOCK<font face='Lucida Console'>)</font>
+            lbl_mod_caps_lock.<font color='#BB00BB'>set_text</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>caps_lock is on</font>"<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>else</font>
+            lbl_mod_caps_lock.<font color='#BB00BB'>set_text</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>caps_lock is off</font>"<font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>state<font color='#5555FF'>&amp;</font>base_window::KBD_MOD_NUM_LOCK<font face='Lucida Console'>)</font>
+            lbl_mod_num_lock.<font color='#BB00BB'>set_text</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>num_lock is on</font>"<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>else</font>
+            lbl_mod_num_lock.<font color='#BB00BB'>set_text</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>num_lock is off</font>"<font face='Lucida Console'>)</font>;
+
+
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>state<font color='#5555FF'>&amp;</font>base_window::KBD_MOD_SCROLL_LOCK<font face='Lucida Console'>)</font>
+            lbl_mod_scroll_lock.<font color='#BB00BB'>set_text</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>scroll_lock is on</font>"<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>else</font>
+            lbl_mod_scroll_lock.<font color='#BB00BB'>set_text</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>scroll_lock is off</font>"<font face='Lucida Console'>)</font>;
+
+        drawable_window::<font color='#BB00BB'>on_keydown</font><font face='Lucida Console'>(</font>key,is_printable,state<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+    <font color='#0000FF'><u>void</u></font> <b><a name='rb_click'></a>rb_click</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>rb.<font color='#BB00BB'>is_checked</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+            rb.<font color='#BB00BB'>set_name</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>radio button checked</font>"<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>else</font>
+            rb.<font color='#BB00BB'>set_name</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>radio button</font>"<font face='Lucida Console'>)</font>;
+        rb.<font color='#BB00BB'>set_checked</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+    <font color='#0000FF'><u>void</u></font> <b><a name='cb_sb_enabled'></a>cb_sb_enabled</b> <font face='Lucida Console'>(</font>
+        toggle_button<font color='#5555FF'>&amp;</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>sb_enabled.<font color='#BB00BB'>is_checked</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+        <b>{</b> 
+            sb.<font color='#BB00BB'>enable</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            lb.<font color='#BB00BB'>enable</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            b.<font color='#BB00BB'>enable</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+        <font color='#0000FF'>else</font>
+        <b>{</b>
+            lb.<font color='#BB00BB'>disable</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            sb.<font color='#BB00BB'>disable</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            b.<font color='#BB00BB'>disable</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>sb_enabled.<font color='#BB00BB'>is_checked</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+            rb.<font color='#BB00BB'>enable</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>else</font>
+            rb.<font color='#BB00BB'>disable</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>sb_enabled.<font color='#BB00BB'>is_checked</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+            tabs.<font color='#BB00BB'>enable</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>else</font>
+            tabs.<font color='#BB00BB'>disable</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>sb_enabled.<font color='#BB00BB'>is_checked</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+            tf.<font color='#BB00BB'>enable</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>else</font>
+            tf.<font color='#BB00BB'>disable</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>sb_enabled.<font color='#BB00BB'>is_checked</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+            tb.<font color='#BB00BB'>enable</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>else</font>
+            tb.<font color='#BB00BB'>disable</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+    <b>}</b>
+
+    <font color='#0000FF'><u>void</u></font> <b><a name='cb_sb_shown'></a>cb_sb_shown</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>sb_shown.<font color='#BB00BB'>is_checked</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            sb.<font color='#BB00BB'>show</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            tabs.<font color='#BB00BB'>show</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            lb.<font color='#BB00BB'>show</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+        <font color='#0000FF'>else</font>
+        <b>{</b>
+            sb.<font color='#BB00BB'>hide</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            tabs.<font color='#BB00BB'>hide</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            lb.<font color='#BB00BB'>hide</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+    <b>}</b>
+
+
+    <font color='#0000FF'><u>void</u></font> <b><a name='tab_change'></a>tab_change</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> new_idx,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> 
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        tab_label.<font color='#BB00BB'>set_text</font><font face='Lucida Console'>(</font>tabs.<font color='#BB00BB'>tab_name</font><font face='Lucida Console'>(</font>new_idx<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+    <font color='#0000FF'><u>void</u></font> <b><a name='scroll_handler'></a>scroll_handler</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        ostringstream sout;
+        sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>scroll bar pos: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> sb.<font color='#BB00BB'>slider_pos</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        sbl.<font color='#BB00BB'>set_text</font><font face='Lucida Console'>(</font>sout.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+    <font color='#0000FF'><u>void</u></font> <b><a name='scroll2_handler'></a>scroll2_handler</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        sb.<font color='#BB00BB'>set_length</font><font face='Lucida Console'>(</font>sb2.<font color='#BB00BB'>slider_pos</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        ostringstream sout;
+        sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>scroll bar2 pos: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> sb2.<font color='#BB00BB'>slider_pos</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        sbl2.<font color='#BB00BB'>set_text</font><font face='Lucida Console'>(</font>sout.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>scroll_handler</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+    <font color='#0000FF'><u>void</u></font> <b><a name='scroll3_handler'></a>scroll3_handler</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        sb.<font color='#BB00BB'>set_max_slider_pos</font><font face='Lucida Console'>(</font>sb3.<font color='#BB00BB'>slider_pos</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        ostringstream sout;
+        sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>scroll bar3 pos: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> sb3.<font color='#BB00BB'>slider_pos</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        sbl3.<font color='#BB00BB'>set_text</font><font face='Lucida Console'>(</font>sout.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>scroll_handler</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+    <font color='#0000FF'><u>void</u></font> <b><a name='lb_double_click'></a>lb_double_click</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> 
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        dlib::queue<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font>::kernel_2a_c sel;
+        lb.<font color='#BB00BB'>get_selected</font><font face='Lucida Console'>(</font>sel<font face='Lucida Console'>)</font>;
+        sel.<font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>sel.<font color='#BB00BB'>move_next</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> lb[sel.<font color='#BB00BB'>element</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>] <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+        <b>}</b>
+        <font color='#009900'>//message_box("list_box",lb[idx]);
+</font>    <b>}</b>
+
+    <font color='#0000FF'><u>void</u></font> <b><a name='msg_box'></a>msg_box</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#BB00BB'>message_box</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>title</font>","<font color='#CC0000'>you clicked the ok button!\n HURRAY!</font>"<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+	<font color='#0000FF'>static</font> <font color='#0000FF'><u>void</u></font> <b><a name='try_this_junk'></a>try_this_junk</b> <font face='Lucida Console'>(</font>
+		<font color='#0000FF'><u>void</u></font><font color='#5555FF'>*</font> param
+		<font face='Lucida Console'>)</font>
+	<b>{</b>
+		win<font color='#5555FF'>&amp;</font> p <font color='#5555FF'>=</font> <font color='#5555FF'>*</font><font color='#0000FF'>reinterpret_cast</font><font color='#5555FF'>&lt;</font>win<font color='#5555FF'>*</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>param<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>put_on_clipboard</font><font face='Lucida Console'>(</font>p.tf.<font color='#BB00BB'>text</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> "<font color='#CC0000'>\nfoobar</font>"<font face='Lucida Console'>)</font>;
+
+		
+	<b>}</b>
+
+    <font color='#0000FF'><u>void</u></font> <b><a name='on_set_clipboard'></a>on_set_clipboard</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#BB00BB'>create_new_thread</font><font face='Lucida Console'>(</font>try_this_junk,<font color='#0000FF'>this</font><font face='Lucida Console'>)</font>;
+		<font color='#009900'>//try_this_junk(this);
+</font>    <b>}</b>
+
+	<font color='#0000FF'>static</font> <font color='#0000FF'><u>void</u></font> <b><a name='try_this_junk2'></a>try_this_junk2</b> <font face='Lucida Console'>(</font>
+		<font color='#0000FF'><u>void</u></font><font color='#5555FF'>*</font> 
+		<font face='Lucida Console'>)</font>
+	<b>{</b>
+
+        string temp;
+        <font color='#BB00BB'>get_from_clipboard</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>message_box</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>clipboard</font>",temp<font face='Lucida Console'>)</font>;
+		
+	<b>}</b>
+    <font color='#0000FF'><u>void</u></font> <b><a name='on_get_clipboard'></a>on_get_clipboard</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#BB00BB'>create_new_thread</font><font face='Lucida Console'>(</font>try_this_junk2,<font color='#0000FF'>this</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+
+    <font color='#0000FF'><u>void</u></font> <b><a name='on_show_msg_click'></a>on_show_msg_click</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#BB00BB'>message_box</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>title</font>","<font color='#CC0000'>This is a test message.</font>",<font color='#5555FF'>*</font><font color='#0000FF'>this</font>,<font color='#5555FF'>&amp;</font>win::msg_box<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+    <font color='#0000FF'><u>void</u></font> <b><a name='on_menu_help'></a>on_menu_help</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#BB00BB'>message_box</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>About</font>","<font color='#CC0000'>This is the messy dlib gui regression test program</font>"<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#0000FF'>public</font>:
+
+    ~<b><a name='win'></a>win</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#BB00BB'>close_window</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+    <font color='#0000FF'><u>void</u></font> <b><a name='cbox_clicked'></a>cbox_clicked</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>cbox.<font color='#BB00BB'>is_checked</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+            cbl.<font color='#BB00BB'>set_text</font><font face='Lucida Console'>(</font>cbox.<font color='#BB00BB'>name</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> "<font color='#CC0000'> box is checked</font>"<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>else</font>
+            cbl.<font color='#BB00BB'>set_text</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>box NOT is checked</font>"<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+    <b><a name='win'></a>win</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font>: 
+        drawable_window<font face='Lucida Console'>(</font><font color='#979000'>true</font><font face='Lucida Console'>)</font>,
+        lbl_last_keydown<font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font><font face='Lucida Console'>)</font>,
+        lbl_mod_shift<font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font><font face='Lucida Console'>)</font>,
+        lbl_mod_control<font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font><font face='Lucida Console'>)</font>,
+        lbl_mod_alt<font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font><font face='Lucida Console'>)</font>,
+        lbl_mod_meta<font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font><font face='Lucida Console'>)</font>,
+        lbl_mod_caps_lock<font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font><font face='Lucida Console'>)</font>,
+        lbl_mod_num_lock<font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font><font face='Lucida Console'>)</font>,
+        lbl_mod_scroll_lock<font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font><font face='Lucida Console'>)</font>,
+        b<font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font><font face='Lucida Console'>)</font>,
+        btn_count<font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font><font face='Lucida Console'>)</font>,
+        btn_get_clipboard<font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font><font face='Lucida Console'>)</font>,
+        btn_set_clipboard<font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font><font face='Lucida Console'>)</font>,
+        btn_show_message<font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font><font face='Lucida Console'>)</font>,
+        cb1<font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font>,rectangle<font face='Lucida Console'>(</font><font color='#979000'>100</font>,<font color='#979000'>100</font>,<font color='#979000'>200</font>,<font color='#979000'>200</font><font face='Lucida Console'>)</font>,<font color='#979000'>255</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font>,
+        cb2<font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font>,rectangle<font face='Lucida Console'>(</font><font color='#979000'>150</font>,<font color='#979000'>150</font>,<font color='#979000'>250</font>,<font color='#979000'>240</font><font face='Lucida Console'>)</font>,<font color='#979000'>0</font>,<font color='#979000'>255</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font>,
+        cbl<font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font><font face='Lucida Console'>)</font>,
+        cbox<font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font><font face='Lucida Console'>)</font>,
+        group1<font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font><font face='Lucida Console'>)</font>,
+        group2<font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font><font face='Lucida Console'>)</font>,
+        group3<font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font><font face='Lucida Console'>)</font>,
+        keyboard_count<font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>,
+        keydown<font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font><font face='Lucida Console'>)</font>,
+        keyup<font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font><font face='Lucida Console'>)</font>,
+        l1<font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font><font face='Lucida Console'>)</font>,
+        l2<font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font><font face='Lucida Console'>)</font>,
+        l3<font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font><font face='Lucida Console'>)</font>,
+        lb<font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font><font face='Lucida Console'>)</font>,
+        leave_count<font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font><font face='Lucida Console'>)</font>,
+        left_down<font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font><font face='Lucida Console'>)</font>,
+        left_up<font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font><font face='Lucida Console'>)</font>,
+        middle_down<font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font><font face='Lucida Console'>)</font>,
+        middle_up<font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font><font face='Lucida Console'>)</font>,
+        mouse_state<font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font><font face='Lucida Console'>)</font>,
+        mt<font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font><font face='Lucida Console'>)</font>,
+        nrect<font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font><font face='Lucida Console'>)</font>,
+        pos<font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font><font face='Lucida Console'>)</font>,
+        rb<font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font><font face='Lucida Console'>)</font>,
+        right_down<font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font><font face='Lucida Console'>)</font>,
+        right_up<font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font><font face='Lucida Console'>)</font>,
+        sb2<font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font>,scroll_bar::VERTICAL<font face='Lucida Console'>)</font>,
+        sb3<font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font>,scroll_bar::VERTICAL<font face='Lucida Console'>)</font>,
+        sb_enabled<font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font><font face='Lucida Console'>)</font>,
+        sbl2<font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font><font face='Lucida Console'>)</font>,
+        sbl3<font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font><font face='Lucida Console'>)</font>,
+        sbl<font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font><font face='Lucida Console'>)</font>,
+        sb_shown<font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font><font face='Lucida Console'>)</font>,
+        sb<font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font>,scroll_bar::HORIZONTAL<font face='Lucida Console'>)</font>,
+        scroll<font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font><font face='Lucida Console'>)</font>,
+        tab_label<font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font><font face='Lucida Console'>)</font>,
+        tabs<font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font><font face='Lucida Console'>)</font>,
+        tf<font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font><font face='Lucida Console'>)</font>,
+        tb<font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font><font face='Lucida Console'>)</font>,
+        mbar<font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font><font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'><u>bool</u></font> use_bdf_fonts <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+
+        shared_ptr_thread_safe<font color='#5555FF'>&lt;</font>bdf_font<font color='#5555FF'>&gt;</font> <font color='#BB00BB'>f</font><font face='Lucida Console'>(</font><font color='#0000FF'>new</font> bdf_font<font face='Lucida Console'>)</font>;
+        
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>use_bdf_fonts<font face='Lucida Console'>)</font>
+        <b>{</b>
+
+            ifstream <font color='#BB00BB'>fin</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>/home/davis/source/10x20.bdf</font>"<font face='Lucida Console'>)</font>;
+            f<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>read_bdf_file</font><font face='Lucida Console'>(</font>fin,<font color='#979000'>0xFFFF</font><font face='Lucida Console'>)</font>;
+
+            mt.<font color='#BB00BB'>set_main_font</font><font face='Lucida Console'>(</font>f<font face='Lucida Console'>)</font>;
+        <b>}</b>
+        <font color='#009900'>//mt.hide();
+</font>        mt.<font color='#BB00BB'>set_pos</font><font face='Lucida Console'>(</font><font color='#979000'>5</font>,<font color='#979000'>200</font><font face='Lucida Console'>)</font>;
+
+
+        lbl_last_keydown.<font color='#BB00BB'>set_text</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>?</font>"<font face='Lucida Console'>)</font>;
+        lbl_mod_shift.<font color='#BB00BB'>set_text</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>?</font>"<font face='Lucida Console'>)</font>;
+        lbl_mod_control.<font color='#BB00BB'>set_text</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>?</font>"<font face='Lucida Console'>)</font>;
+        lbl_mod_alt.<font color='#BB00BB'>set_text</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>?</font>"<font face='Lucida Console'>)</font>;
+        lbl_mod_meta.<font color='#BB00BB'>set_text</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>?</font>"<font face='Lucida Console'>)</font>;
+        lbl_mod_caps_lock.<font color='#BB00BB'>set_text</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>?</font>"<font face='Lucida Console'>)</font>;
+        lbl_mod_num_lock.<font color='#BB00BB'>set_text</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>?</font>"<font face='Lucida Console'>)</font>;
+        lbl_mod_scroll_lock.<font color='#BB00BB'>set_text</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>?</font>"<font face='Lucida Console'>)</font>;
+
+        lbl_last_keydown.<font color='#BB00BB'>set_pos</font><font face='Lucida Console'>(</font><font color='#979000'>20</font>,<font color='#979000'>420</font><font face='Lucida Console'>)</font>;
+        lbl_mod_shift.<font color='#BB00BB'>set_pos</font><font face='Lucida Console'>(</font><font color='#979000'>20</font>,lbl_last_keydown.<font color='#BB00BB'>bottom</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>+</font><font color='#979000'>5</font><font face='Lucida Console'>)</font>;
+        lbl_mod_control.<font color='#BB00BB'>set_pos</font><font face='Lucida Console'>(</font><font color='#979000'>20</font>,lbl_mod_shift.<font color='#BB00BB'>bottom</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>+</font><font color='#979000'>5</font><font face='Lucida Console'>)</font>;
+        lbl_mod_alt.<font color='#BB00BB'>set_pos</font><font face='Lucida Console'>(</font><font color='#979000'>20</font>,lbl_mod_control.<font color='#BB00BB'>bottom</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>+</font><font color='#979000'>5</font><font face='Lucida Console'>)</font>;
+        lbl_mod_meta.<font color='#BB00BB'>set_pos</font><font face='Lucida Console'>(</font><font color='#979000'>20</font>,lbl_mod_alt.<font color='#BB00BB'>bottom</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>+</font><font color='#979000'>5</font><font face='Lucida Console'>)</font>;
+        lbl_mod_caps_lock.<font color='#BB00BB'>set_pos</font><font face='Lucida Console'>(</font><font color='#979000'>20</font>,lbl_mod_meta.<font color='#BB00BB'>bottom</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>+</font><font color='#979000'>5</font><font face='Lucida Console'>)</font>;
+        lbl_mod_num_lock.<font color='#BB00BB'>set_pos</font><font face='Lucida Console'>(</font><font color='#979000'>20</font>,lbl_mod_caps_lock.<font color='#BB00BB'>bottom</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>+</font><font color='#979000'>5</font><font face='Lucida Console'>)</font>;
+        lbl_mod_scroll_lock.<font color='#BB00BB'>set_pos</font><font face='Lucida Console'>(</font><font color='#979000'>20</font>,lbl_mod_num_lock.<font color='#BB00BB'>bottom</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>+</font><font color='#979000'>5</font><font face='Lucida Console'>)</font>;
+
+        lb.<font color='#BB00BB'>set_pos</font><font face='Lucida Console'>(</font><font color='#979000'>580</font>,<font color='#979000'>200</font><font face='Lucida Console'>)</font>;
+        lb.<font color='#BB00BB'>set_size</font><font face='Lucida Console'>(</font><font color='#979000'>200</font>,<font color='#979000'>300</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>use_bdf_fonts<font face='Lucida Console'>)</font>
+            lb.<font color='#BB00BB'>set_main_font</font><font face='Lucida Console'>(</font>f<font face='Lucida Console'>)</font>;
+
+        dlib::queue<font color='#5555FF'>&lt;</font>string<font color='#5555FF'>&gt;</font>::kernel_2a_c qos;
+        string a;
+        a <font color='#5555FF'>=</font> "<font color='#CC0000'>Davis</font>"; qos.<font color='#BB00BB'>enqueue</font><font face='Lucida Console'>(</font>a<font face='Lucida Console'>)</font>;
+        a <font color='#5555FF'>=</font> "<font color='#CC0000'>king</font>"; qos.<font color='#BB00BB'>enqueue</font><font face='Lucida Console'>(</font>a<font face='Lucida Console'>)</font>;
+        a <font color='#5555FF'>=</font> "<font color='#CC0000'>one</font>"; qos.<font color='#BB00BB'>enqueue</font><font face='Lucida Console'>(</font>a<font face='Lucida Console'>)</font>;
+        a <font color='#5555FF'>=</font> "<font color='#CC0000'>two</font>"; qos.<font color='#BB00BB'>enqueue</font><font face='Lucida Console'>(</font>a<font face='Lucida Console'>)</font>;
+        a <font color='#5555FF'>=</font> "<font color='#CC0000'>three</font>"; qos.<font color='#BB00BB'>enqueue</font><font face='Lucida Console'>(</font>a<font face='Lucida Console'>)</font>;
+        a <font color='#5555FF'>=</font> "<font color='#CC0000'>yo yo yo alsdkjf asfj lsa jfsf\n this is a long phrase</font>"; qos.<font color='#BB00BB'>enqueue</font><font face='Lucida Console'>(</font>a<font face='Lucida Console'>)</font>;
+        a <font color='#5555FF'>=</font> "<font color='#CC0000'>four</font>"; qos.<font color='#BB00BB'>enqueue</font><font face='Lucida Console'>(</font>a<font face='Lucida Console'>)</font>;
+        a <font color='#5555FF'>=</font> "<font color='#CC0000'>five</font>"; qos.<font color='#BB00BB'>enqueue</font><font face='Lucida Console'>(</font>a<font face='Lucida Console'>)</font>;
+        a <font color='#5555FF'>=</font> "<font color='#CC0000'>six</font>"; qos.<font color='#BB00BB'>enqueue</font><font face='Lucida Console'>(</font>a<font face='Lucida Console'>)</font>;
+        a <font color='#5555FF'>=</font> "<font color='#CC0000'>seven</font>"; qos.<font color='#BB00BB'>enqueue</font><font face='Lucida Console'>(</font>a<font face='Lucida Console'>)</font>;
+        a <font color='#5555FF'>=</font> "<font color='#CC0000'>eight</font>"; qos.<font color='#BB00BB'>enqueue</font><font face='Lucida Console'>(</font>a<font face='Lucida Console'>)</font>;
+        a <font color='#5555FF'>=</font> "<font color='#CC0000'>nine</font>"; qos.<font color='#BB00BB'>enqueue</font><font face='Lucida Console'>(</font>a<font face='Lucida Console'>)</font>;
+        a <font color='#5555FF'>=</font> "<font color='#CC0000'>ten</font>"; qos.<font color='#BB00BB'>enqueue</font><font face='Lucida Console'>(</font>a<font face='Lucida Console'>)</font>;
+        a <font color='#5555FF'>=</font> "<font color='#CC0000'>eleven</font>"; qos.<font color='#BB00BB'>enqueue</font><font face='Lucida Console'>(</font>a<font face='Lucida Console'>)</font>;
+        a <font color='#5555FF'>=</font> "<font color='#CC0000'>twelve</font>"; qos.<font color='#BB00BB'>enqueue</font><font face='Lucida Console'>(</font>a<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> <font color='#979000'>1000</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+        <b>{</b>
+            a <font color='#5555FF'>=</font> "<font color='#CC0000'>thirteen</font>"; qos.<font color='#BB00BB'>enqueue</font><font face='Lucida Console'>(</font>a<font face='Lucida Console'>)</font>;
+        <b>}</b>
+        lb.<font color='#BB00BB'>load</font><font face='Lucida Console'>(</font>qos<font face='Lucida Console'>)</font>;
+        lb.<font color='#BB00BB'>select</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+        lb.<font color='#BB00BB'>select</font><font face='Lucida Console'>(</font><font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+        lb.<font color='#BB00BB'>select</font><font face='Lucida Console'>(</font><font color='#979000'>3</font><font face='Lucida Console'>)</font>;
+        lb.<font color='#BB00BB'>select</font><font face='Lucida Console'>(</font><font color='#979000'>5</font><font face='Lucida Console'>)</font>;
+        lb.<font color='#BB00BB'>enable_multiple_select</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        lb.<font color='#BB00BB'>set_double_click_handler</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font>,<font color='#5555FF'>&amp;</font>win::lb_double_click<font face='Lucida Console'>)</font>;
+        <font color='#009900'>//        lb.disable_multiple_select();
+</font>
+        btn_show_message.<font color='#BB00BB'>set_pos</font><font face='Lucida Console'>(</font><font color='#979000'>50</font>,<font color='#979000'>350</font><font face='Lucida Console'>)</font>;
+        btn_show_message.<font color='#BB00BB'>set_name</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>message_box()</font>"<font face='Lucida Console'>)</font>;
+        mbar.<font color='#BB00BB'>set_number_of_menus</font><font face='Lucida Console'>(</font><font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+        mbar.<font color='#BB00BB'>set_menu_name</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>,"<font color='#CC0000'>File</font>",'<font color='#FF0000'>F</font>'<font face='Lucida Console'>)</font>;
+        mbar.<font color='#BB00BB'>set_menu_name</font><font face='Lucida Console'>(</font><font color='#979000'>1</font>,"<font color='#CC0000'>Help</font>",'<font color='#FF0000'>H</font>'<font face='Lucida Console'>)</font>;
+        mbar.<font color='#BB00BB'>menu</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>add_menu_item</font><font face='Lucida Console'>(</font><font color='#BB00BB'>menu_item_text</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>show msg click</font>",<font color='#5555FF'>*</font><font color='#0000FF'>this</font>,<font color='#5555FF'>&amp;</font>win::on_show_msg_click,'<font color='#FF0000'>s</font>'<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        mbar.<font color='#BB00BB'>menu</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>add_menu_item</font><font face='Lucida Console'>(</font><font color='#BB00BB'>menu_item_text</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>get clipboard</font>",<font color='#5555FF'>*</font><font color='#0000FF'>this</font>,<font color='#5555FF'>&amp;</font>win::on_get_clipboard,'<font color='#FF0000'>g</font>'<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        mbar.<font color='#BB00BB'>menu</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>add_menu_item</font><font face='Lucida Console'>(</font><font color='#BB00BB'>menu_item_text</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>set clipboard</font>",<font color='#5555FF'>*</font><font color='#0000FF'>this</font>,<font color='#5555FF'>&amp;</font>win::on_set_clipboard,'<font color='#FF0000'>c</font>'<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        mbar.<font color='#BB00BB'>menu</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>add_menu_item</font><font face='Lucida Console'>(</font><font color='#BB00BB'>menu_item_separator</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        mbar.<font color='#BB00BB'>menu</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>add_submenu</font><font face='Lucida Console'>(</font><font color='#BB00BB'>menu_item_submenu</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>submenu</font>",'<font color='#FF0000'>m</font>'<font face='Lucida Console'>)</font>, submenu<font face='Lucida Console'>)</font>;
+        submenu.<font color='#BB00BB'>add_menu_item</font><font face='Lucida Console'>(</font><font color='#BB00BB'>menu_item_separator</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        submenu.<font color='#BB00BB'>add_menu_item</font><font face='Lucida Console'>(</font><font color='#BB00BB'>menu_item_separator</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        submenu.<font color='#BB00BB'>add_menu_item</font><font face='Lucida Console'>(</font><font color='#BB00BB'>menu_item_text</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>show msg click</font>",<font color='#5555FF'>*</font><font color='#0000FF'>this</font>,<font color='#5555FF'>&amp;</font>win::on_show_msg_click,'<font color='#FF0000'>s</font>'<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        submenu.<font color='#BB00BB'>add_menu_item</font><font face='Lucida Console'>(</font><font color='#BB00BB'>menu_item_text</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>get clipboard</font>",<font color='#5555FF'>*</font><font color='#0000FF'>this</font>,<font color='#5555FF'>&amp;</font>win::on_get_clipboard,'<font color='#FF0000'>g</font>'<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        submenu.<font color='#BB00BB'>add_menu_item</font><font face='Lucida Console'>(</font><font color='#BB00BB'>menu_item_text</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>set clipboard</font>",<font color='#5555FF'>*</font><font color='#0000FF'>this</font>,<font color='#5555FF'>&amp;</font>win::on_set_clipboard,'<font color='#FF0000'>c</font>'<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        submenu.<font color='#BB00BB'>add_menu_item</font><font face='Lucida Console'>(</font><font color='#BB00BB'>menu_item_separator</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        submenu.<font color='#BB00BB'>add_menu_item</font><font face='Lucida Console'>(</font><font color='#BB00BB'>menu_item_separator</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        mbar.<font color='#BB00BB'>menu</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>add_menu_item</font><font face='Lucida Console'>(</font><font color='#BB00BB'>menu_item_text</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>About</font>",<font color='#5555FF'>*</font><font color='#0000FF'>this</font>,<font color='#5555FF'>&amp;</font>win::on_menu_help,'<font color='#FF0000'>A</font>'<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+        btn_show_message.<font color='#BB00BB'>set_click_handler</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font>,<font color='#5555FF'>&amp;</font>win::on_show_msg_click<font face='Lucida Console'>)</font>;
+        btn_get_clipboard.<font color='#BB00BB'>set_pos</font><font face='Lucida Console'>(</font>btn_show_message.<font color='#BB00BB'>right</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>+</font><font color='#979000'>5</font>,btn_show_message.<font color='#BB00BB'>top</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        btn_get_clipboard.<font color='#BB00BB'>set_name</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>get_from_clipboard()</font>"<font face='Lucida Console'>)</font>;
+        btn_get_clipboard.<font color='#BB00BB'>set_click_handler</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font>,<font color='#5555FF'>&amp;</font>win::on_get_clipboard<font face='Lucida Console'>)</font>;
+
+        btn_get_clipboard.<font color='#BB00BB'>set_style</font><font face='Lucida Console'>(</font><font color='#BB00BB'>button_style_toolbar1</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        btn_set_clipboard.<font color='#BB00BB'>set_pos</font><font face='Lucida Console'>(</font>btn_get_clipboard.<font color='#BB00BB'>right</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>+</font><font color='#979000'>5</font>,btn_get_clipboard.<font color='#BB00BB'>top</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        btn_set_clipboard.<font color='#BB00BB'>set_name</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>put_on_clipboard()</font>"<font face='Lucida Console'>)</font>;
+        btn_set_clipboard.<font color='#BB00BB'>set_click_handler</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font>,<font color='#5555FF'>&amp;</font>win::on_set_clipboard<font face='Lucida Console'>)</font>;
+
+        nrect.<font color='#BB00BB'>set_size</font><font face='Lucida Console'>(</font><font color='#979000'>700</font>,<font color='#979000'>500</font><font face='Lucida Console'>)</font>;
+        nrect.<font color='#BB00BB'>set_name</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>test widgets</font>"<font face='Lucida Console'>)</font>;
+        nrect.<font color='#BB00BB'>set_pos</font><font face='Lucida Console'>(</font><font color='#979000'>2</font>,mbar.<font color='#BB00BB'>bottom</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>+</font><font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>//throw dlib::error("holy crap batman");
+</font>        tab_label.<font color='#BB00BB'>set_pos</font><font face='Lucida Console'>(</font><font color='#979000'>10</font>,<font color='#979000'>440</font><font face='Lucida Console'>)</font>;
+
+        tabs.<font color='#BB00BB'>set_click_handler</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font>,<font color='#5555FF'>&amp;</font>win::tab_change<font face='Lucida Console'>)</font>; 
+        tabs.<font color='#BB00BB'>set_pos</font><font face='Lucida Console'>(</font><font color='#979000'>5</font>,mbar.<font color='#BB00BB'>bottom</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>+</font><font color='#979000'>10</font><font face='Lucida Console'>)</font>;
+        tabs.<font color='#BB00BB'>set_size</font><font face='Lucida Console'>(</font><font color='#979000'>280</font>,<font color='#979000'>100</font><font face='Lucida Console'>)</font>;
+        tabs.<font color='#BB00BB'>set_number_of_tabs</font><font face='Lucida Console'>(</font><font color='#979000'>3</font><font face='Lucida Console'>)</font>;
+        tabs.<font color='#BB00BB'>set_tab_name</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>,"<font color='#CC0000'>davis</font>"<font face='Lucida Console'>)</font>;
+        tabs.<font color='#BB00BB'>set_tab_name</font><font face='Lucida Console'>(</font><font color='#979000'>1</font>,"<font color='#CC0000'>edward</font>"<font face='Lucida Console'>)</font>;
+        tabs.<font color='#BB00BB'>set_tab_name</font><font face='Lucida Console'>(</font><font color='#979000'>2</font>,"<font color='#CC0000'>king alsklsdkfj asfd</font>"<font face='Lucida Console'>)</font>;
+        tabs.<font color='#BB00BB'>set_tab_group</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>,group1<font face='Lucida Console'>)</font>;
+        tabs.<font color='#BB00BB'>set_tab_group</font><font face='Lucida Console'>(</font><font color='#979000'>1</font>,group2<font face='Lucida Console'>)</font>;
+        tabs.<font color='#BB00BB'>set_tab_group</font><font face='Lucida Console'>(</font><font color='#979000'>2</font>,group3<font face='Lucida Console'>)</font>;
+
+        l1.<font color='#BB00BB'>set_text</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>group one</font>"<font face='Lucida Console'>)</font>;
+        l2.<font color='#BB00BB'>set_text</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>group two</font>"<font face='Lucida Console'>)</font>;
+        l3.<font color='#BB00BB'>set_text</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>group three</font>"<font face='Lucida Console'>)</font>;
+
+        group1.<font color='#BB00BB'>add</font><font face='Lucida Console'>(</font>l1,<font color='#979000'>0</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+        group2.<font color='#BB00BB'>add</font><font face='Lucida Console'>(</font>l2,<font color='#979000'>20</font>,<font color='#979000'>10</font><font face='Lucida Console'>)</font>;
+        group3.<font color='#BB00BB'>add</font><font face='Lucida Console'>(</font>l3,<font color='#979000'>0</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+
+
+
+        sb_enabled.<font color='#BB00BB'>set_name</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>enabled</font>"<font face='Lucida Console'>)</font>;
+        sb_shown.<font color='#BB00BB'>set_name</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>shown</font>"<font face='Lucida Console'>)</font>;
+        sb_shown.<font color='#BB00BB'>set_checked</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        sb_enabled.<font color='#BB00BB'>set_checked</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        sb_shown.<font color='#BB00BB'>set_click_handler</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font>,<font color='#5555FF'>&amp;</font>win::cb_sb_shown<font face='Lucida Console'>)</font>;
+        sb_enabled.<font color='#BB00BB'>set_click_handler</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font>,<font color='#5555FF'>&amp;</font>win::cb_sb_enabled<font face='Lucida Console'>)</font>;
+        
+        sb_shown.<font color='#BB00BB'>set_tooltip_text</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>I'm a checkbox</font>"<font face='Lucida Console'>)</font>;
+
+        rb.<font color='#BB00BB'>set_click_handler</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font>,<font color='#5555FF'>&amp;</font>win::rb_click<font face='Lucida Console'>)</font>;
+
+
+        sb3.<font color='#BB00BB'>set_pos</font><font face='Lucida Console'>(</font><font color='#979000'>440</font>,mbar.<font color='#BB00BB'>bottom</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>+</font><font color='#979000'>10</font><font face='Lucida Console'>)</font>;
+        sb3.<font color='#BB00BB'>set_max_slider_pos</font><font face='Lucida Console'>(</font><font color='#979000'>300</font><font face='Lucida Console'>)</font>;
+        sb3.<font color='#BB00BB'>set_slider_pos</font><font face='Lucida Console'>(</font><font color='#979000'>150</font><font face='Lucida Console'>)</font>;
+        sb3.<font color='#BB00BB'>set_length</font><font face='Lucida Console'>(</font><font color='#979000'>300</font><font face='Lucida Console'>)</font>;
+        sb2.<font color='#BB00BB'>set_pos</font><font face='Lucida Console'>(</font><font color='#979000'>470</font>,mbar.<font color='#BB00BB'>bottom</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>+</font><font color='#979000'>10</font><font face='Lucida Console'>)</font>;
+        sb2.<font color='#BB00BB'>set_max_slider_pos</font><font face='Lucida Console'>(</font><font color='#979000'>300</font><font face='Lucida Console'>)</font>;
+        sb2.<font color='#BB00BB'>set_length</font><font face='Lucida Console'>(</font><font color='#979000'>300</font><font face='Lucida Console'>)</font>;
+        sb.<font color='#BB00BB'>set_pos</font><font face='Lucida Console'>(</font><font color='#979000'>500</font>,mbar.<font color='#BB00BB'>bottom</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>+</font><font color='#979000'>10</font><font face='Lucida Console'>)</font>;
+        sb.<font color='#BB00BB'>set_max_slider_pos</font><font face='Lucida Console'>(</font><font color='#979000'>30</font><font face='Lucida Console'>)</font>;
+        sb.<font color='#BB00BB'>set_length</font><font face='Lucida Console'>(</font><font color='#979000'>300</font><font face='Lucida Console'>)</font>;
+
+
+        sb.<font color='#BB00BB'>set_scroll_handler</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font>,<font color='#5555FF'>&amp;</font>win::scroll_handler<font face='Lucida Console'>)</font>;
+        sb2.<font color='#BB00BB'>set_scroll_handler</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font>,<font color='#5555FF'>&amp;</font>win::scroll2_handler<font face='Lucida Console'>)</font>;
+        sb3.<font color='#BB00BB'>set_scroll_handler</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font>,<font color='#5555FF'>&amp;</font>win::scroll3_handler<font face='Lucida Console'>)</font>;
+        sbl.<font color='#BB00BB'>set_pos</font><font face='Lucida Console'>(</font><font color='#979000'>540</font>,mbar.<font color='#BB00BB'>bottom</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>+</font><font color='#979000'>20</font><font face='Lucida Console'>)</font>;
+        sbl2.<font color='#BB00BB'>set_pos</font><font face='Lucida Console'>(</font><font color='#979000'>540</font>,mbar.<font color='#BB00BB'>bottom</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>+</font><font color='#979000'>40</font><font face='Lucida Console'>)</font>;
+        sbl3.<font color='#BB00BB'>set_pos</font><font face='Lucida Console'>(</font><font color='#979000'>540</font>,mbar.<font color='#BB00BB'>bottom</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>+</font><font color='#979000'>60</font><font face='Lucida Console'>)</font>;
+
+        cbox.<font color='#BB00BB'>set_pos</font><font face='Lucida Console'>(</font><font color='#979000'>300</font>,mbar.<font color='#BB00BB'>bottom</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>+</font><font color='#979000'>30</font><font face='Lucida Console'>)</font>;
+        cbox.<font color='#BB00BB'>set_name</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>davis king</font>"<font face='Lucida Console'>)</font>;
+        cbox.<font color='#BB00BB'>set_click_handler</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font>,<font color='#5555FF'>&amp;</font>win::cbox_clicked<font face='Lucida Console'>)</font>;
+
+        cbl.<font color='#BB00BB'>set_pos</font><font face='Lucida Console'>(</font><font color='#979000'>300</font>,cbox.<font color='#BB00BB'>get_rect</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>bottom</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>+</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+        cbox.<font color='#BB00BB'>set_checked</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        sb_enabled.<font color='#BB00BB'>set_pos</font><font face='Lucida Console'>(</font>cbox.<font color='#BB00BB'>get_rect</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>left</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,cbox.<font color='#BB00BB'>get_rect</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>bottom</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>+</font><font color='#979000'>20</font><font face='Lucida Console'>)</font>;
+        sb_shown.<font color='#BB00BB'>set_pos</font><font face='Lucida Console'>(</font>sb_enabled.<font color='#BB00BB'>get_rect</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>left</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,sb_enabled.<font color='#BB00BB'>get_rect</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>bottom</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>+</font><font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+
+
+
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>use_bdf_fonts<font face='Lucida Console'>)</font>
+            rb.<font color='#BB00BB'>set_main_font</font><font face='Lucida Console'>(</font>f<font face='Lucida Console'>)</font>;
+        rb.<font color='#BB00BB'>set_name</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>radio button</font>"<font face='Lucida Console'>)</font>;
+        rb.<font color='#BB00BB'>set_pos</font><font face='Lucida Console'>(</font>sb_shown.<font color='#BB00BB'>get_rect</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>left</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,sb_shown.<font color='#BB00BB'>get_rect</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>bottom</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>+</font><font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+
+
+        cb1.<font color='#BB00BB'>set_z_order</font><font face='Lucida Console'>(</font><font color='#979000'>10</font><font face='Lucida Console'>)</font>;
+        cb2.<font color='#BB00BB'>set_z_order</font><font face='Lucida Console'>(</font><font color='#979000'>20</font><font face='Lucida Console'>)</font>;
+
+        pos.<font color='#BB00BB'>set_pos</font><font face='Lucida Console'>(</font><font color='#979000'>50</font>,<font color='#979000'>50</font><font face='Lucida Console'>)</font>;
+        left_up.<font color='#BB00BB'>set_pos</font><font face='Lucida Console'>(</font><font color='#979000'>50</font>,<font color='#979000'>70</font><font face='Lucida Console'>)</font>;
+        left_down.<font color='#BB00BB'>set_pos</font><font face='Lucida Console'>(</font><font color='#979000'>50</font>,<font color='#979000'>90</font><font face='Lucida Console'>)</font>;
+        middle_up.<font color='#BB00BB'>set_pos</font><font face='Lucida Console'>(</font><font color='#979000'>50</font>,<font color='#979000'>110</font><font face='Lucida Console'>)</font>;
+        middle_down.<font color='#BB00BB'>set_pos</font><font face='Lucida Console'>(</font><font color='#979000'>50</font>,<font color='#979000'>130</font><font face='Lucida Console'>)</font>;
+        right_up.<font color='#BB00BB'>set_pos</font><font face='Lucida Console'>(</font><font color='#979000'>50</font>,<font color='#979000'>150</font><font face='Lucida Console'>)</font>;
+        right_down.<font color='#BB00BB'>set_pos</font><font face='Lucida Console'>(</font><font color='#979000'>50</font>,<font color='#979000'>170</font><font face='Lucida Console'>)</font>;
+
+        mouse_state.<font color='#BB00BB'>set_pos</font><font face='Lucida Console'>(</font><font color='#979000'>50</font>,<font color='#979000'>190</font><font face='Lucida Console'>)</font>;
+
+        leave_count.<font color='#BB00BB'>set_pos</font><font face='Lucida Console'>(</font><font color='#979000'>50</font>,<font color='#979000'>210</font><font face='Lucida Console'>)</font>;
+
+        scroll_count <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        scroll.<font color='#BB00BB'>set_pos</font><font face='Lucida Console'>(</font><font color='#979000'>50</font>,<font color='#979000'>230</font><font face='Lucida Console'>)</font>;
+
+        btn_count.<font color='#BB00BB'>set_pos</font><font face='Lucida Console'>(</font><font color='#979000'>50</font>,<font color='#979000'>250</font><font face='Lucida Console'>)</font>;
+
+
+        keydown.<font color='#BB00BB'>set_pos</font><font face='Lucida Console'>(</font><font color='#979000'>50</font>,<font color='#979000'>270</font><font face='Lucida Console'>)</font>;
+        keyup.<font color='#BB00BB'>set_pos</font><font face='Lucida Console'>(</font><font color='#979000'>50</font>,<font color='#979000'>290</font><font face='Lucida Console'>)</font>;
+
+        tf.<font color='#BB00BB'>set_pos</font><font face='Lucida Console'>(</font><font color='#979000'>50</font>,<font color='#979000'>310</font><font face='Lucida Console'>)</font>;
+        tf.<font color='#BB00BB'>set_text</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>Davis685g@</font>"<font face='Lucida Console'>)</font>;
+        tf.<font color='#BB00BB'>set_width</font><font face='Lucida Console'>(</font><font color='#979000'>500</font><font face='Lucida Console'>)</font>;
+        tf.<font color='#BB00BB'>set_text_color</font><font face='Lucida Console'>(</font><font color='#BB00BB'>rgb_pixel</font><font face='Lucida Console'>(</font><font color='#979000'>255</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        tf.<font color='#BB00BB'>set_enter_key_handler</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font>,<font color='#5555FF'>&amp;</font>win::on_enter_key<font face='Lucida Console'>)</font>;
+        tf.<font color='#BB00BB'>set_focus_lost_handler</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font>,<font color='#5555FF'>&amp;</font>win::on_tf_focus_lost<font face='Lucida Console'>)</font>;
+        
+        tb.<font color='#BB00BB'>set_pos</font><font face='Lucida Console'>(</font><font color='#979000'>250</font>,<font color='#979000'>400</font><font face='Lucida Console'>)</font>;
+        tb.<font color='#BB00BB'>set_text</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>initial test\nstring</font>"<font face='Lucida Console'>)</font>;
+        tb.<font color='#BB00BB'>set_size</font><font face='Lucida Console'>(</font><font color='#979000'>300</font>,<font color='#979000'>300</font><font face='Lucida Console'>)</font>;
+        tb.<font color='#BB00BB'>set_text_color</font><font face='Lucida Console'>(</font><font color='#BB00BB'>rgb_pixel</font><font face='Lucida Console'>(</font><font color='#979000'>255</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        tb.<font color='#BB00BB'>set_enter_key_handler</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font>,<font color='#5555FF'>&amp;</font>win::on_enter_key<font face='Lucida Console'>)</font>;
+        tb.<font color='#BB00BB'>set_focus_lost_handler</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font>,<font color='#5555FF'>&amp;</font>win::on_tf_focus_lost<font face='Lucida Console'>)</font>;
+        
+
+        button_count <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        count <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        b.<font color='#BB00BB'>set_name</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>button</font>"<font face='Lucida Console'>)</font>;
+        b.<font color='#BB00BB'>set_pos</font><font face='Lucida Console'>(</font><font color='#979000'>540</font>,<font color='#979000'>100</font><font face='Lucida Console'>)</font>;
+        b.<font color='#BB00BB'>set_click_handler</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font>,<font color='#5555FF'>&amp;</font>win::on_click<font face='Lucida Console'>)</font>;
+        b.<font color='#BB00BB'>set_tooltip_text</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>hurray i'm a button!</font>"<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>use_bdf_fonts<font face='Lucida Console'>)</font>
+            b.<font color='#BB00BB'>set_main_font</font><font face='Lucida Console'>(</font>f<font face='Lucida Console'>)</font>;
+
+
+        <font color='#BB00BB'>set_size</font><font face='Lucida Console'>(</font><font color='#979000'>815</font>,<font color='#979000'>730</font><font face='Lucida Console'>)</font>;
+
+        nrect.<font color='#BB00BB'>wrap_around</font><font face='Lucida Console'>(</font>
+            cbox.<font color='#BB00BB'>get_rect</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font>
+            rb.<font color='#BB00BB'>get_rect</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> 
+            sb_enabled.<font color='#BB00BB'>get_rect</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> 
+            sb_shown.<font color='#BB00BB'>get_rect</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+        flip <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <font color='#BB00BB'>open_file_box</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font>,<font color='#5555FF'>&amp;</font>win::on_open_file<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>open_existing_file_box</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font>,<font color='#5555FF'>&amp;</font>win::on_open_file<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>save_file_box</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font>,<font color='#5555FF'>&amp;</font>win::on_open_file<font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>use_bdf_fonts<font face='Lucida Console'>)</font>
+        <b>{</b>
+            tf.<font color='#BB00BB'>set_main_font</font><font face='Lucida Console'>(</font>f<font face='Lucida Console'>)</font>;
+            tb.<font color='#BB00BB'>set_main_font</font><font face='Lucida Console'>(</font>f<font face='Lucida Console'>)</font>;
+        <b>}</b>
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>use_bdf_fonts<font face='Lucida Console'>)</font>
+            tabs.<font color='#BB00BB'>set_main_font</font><font face='Lucida Console'>(</font>f<font face='Lucida Console'>)</font>;
+
+    <b>}</b>
+
+<font color='#0000FF'>private</font>:
+
+
+    <font color='#0000FF'><u>void</u></font> <b><a name='on_enter_key'></a>on_enter_key</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+    <b>{</b>
+        cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>enter key pressed</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+    <b>}</b>
+
+    <font color='#0000FF'><u>void</u></font> <b><a name='on_tf_focus_lost'></a>on_tf_focus_lost</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+    <b>{</b>
+        cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>text field/box lost focus</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+    <b>}</b>
+
+
+    <font color='#0000FF'><u>void</u></font> <b><a name='on_open_file'></a>on_open_file</b> <font face='Lucida Console'>(</font><font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> file<font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#BB00BB'>message_box</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>file opened</font>",file<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+
+
+
+    <font color='#0000FF'><u>void</u></font> <b><a name='on_click'></a>on_click</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        ostringstream sout;
+        sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>text field: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> tf.<font color='#BB00BB'>text</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <font color='#5555FF'>+</font><font color='#5555FF'>+</font>button_count;
+        btn_count.<font color='#BB00BB'>set_text</font><font face='Lucida Console'>(</font>sout.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>flip <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            flip <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+            lb.<font color='#BB00BB'>set_size</font><font face='Lucida Console'>(</font><font color='#979000'>200</font>,<font color='#979000'>200</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+        <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>flip <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            flip <font color='#5555FF'>=</font> <font color='#979000'>2</font>;
+            lb.<font color='#BB00BB'>set_size</font><font face='Lucida Console'>(</font><font color='#979000'>150</font>,<font color='#979000'>200</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+        <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>flip <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>2</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            flip <font color='#5555FF'>=</font> <font color='#979000'>3</font>;
+            lb.<font color='#BB00BB'>set_size</font><font face='Lucida Console'>(</font><font color='#979000'>150</font>,<font color='#979000'>300</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+        <font color='#0000FF'>else</font>
+        <b>{</b>
+            flip <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            lb.<font color='#BB00BB'>set_size</font><font face='Lucida Console'>(</font><font color='#979000'>200</font>,<font color='#979000'>300</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+    <b>}</b>
+
+
+    button b;
+    label btn_count;
+    button btn_get_clipboard;
+    button btn_set_clipboard;
+    button btn_show_message;
+    <font color='#0000FF'><u>int</u></font> button_count;
+    color_box cb1;
+    color_box cb2;
+    label cbl;
+    check_box cbox;
+    <font color='#0000FF'><u>int</u></font> count;
+    <font color='#0000FF'><u>int</u></font> flip;
+    widget_group group1;
+    widget_group group2;
+    widget_group group3;
+    <font color='#0000FF'><u>int</u></font> keyboard_count;
+    label keydown;
+    label keyup;
+    label l1;
+    label l2;
+    label l3;
+    list_box lb;
+    label leave_count;
+    label left_down;
+    label left_up;
+    label middle_down;
+    label middle_up;
+    label mouse_state;
+    mouse_tracker mt;
+    named_rectangle nrect;
+    label pos;
+    radio_button rb;
+    label right_down;
+    label right_up;
+    scroll_bar sb2;
+    scroll_bar sb3;
+    check_box sb_enabled;
+    label sbl2;
+    label sbl3;
+    label sbl;
+    check_box sb_shown;
+    scroll_bar sb;
+    <font color='#0000FF'><u>int</u></font> scroll_count;
+    label scroll;
+    label tab_label;
+    tabbed_display tabs;
+    text_field tf;
+    text_box tb;
+    menu_bar mbar;
+    popup_menu submenu;
+
+<b>}</b>;
+
+
+win w;
+
+<font color='#0000FF'><u>int</u></font> <b><a name='main'></a>main</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+<b>{</b>
+
+    <font color='#0000FF'>try</font>
+    <b>{</b>
+
+        image_window win;
+
+        array2d<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font> img;
+        img.<font color='#BB00BB'>set_size</font><font face='Lucida Console'>(</font><font color='#979000'>100</font>,<font color='#979000'>100</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>assign_all_pixels</font><font face='Lucida Console'>(</font>img,<font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+
+        <font color='#BB00BB'>fill_rect</font><font face='Lucida Console'>(</font>img, <font color='#BB00BB'>rectangle</font><font face='Lucida Console'>(</font><font color='#979000'>1</font>,<font color='#979000'>1</font>,<font color='#979000'>1</font>,<font color='#979000'>1</font><font face='Lucida Console'>)</font>, <font color='#979000'>255</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>fill_rect</font><font face='Lucida Console'>(</font>img, <font color='#BB00BB'>rectangle</font><font face='Lucida Console'>(</font><font color='#979000'>1</font>,<font color='#979000'>3</font>,<font color='#979000'>2</font>,<font color='#979000'>5</font><font face='Lucida Console'>)</font>, <font color='#979000'>255</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>fill_rect</font><font face='Lucida Console'>(</font>img, <font color='#BB00BB'>rectangle</font><font face='Lucida Console'>(</font><font color='#979000'>4</font>,<font color='#979000'>3</font>,<font color='#979000'>5</font>,<font color='#979000'>4</font><font face='Lucida Console'>)</font>, <font color='#979000'>255</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>fill_rect</font><font face='Lucida Console'>(</font>img, <font color='#BB00BB'>rectangle</font><font face='Lucida Console'>(</font><font color='#979000'>9</font>,<font color='#979000'>9</font>,<font color='#979000'>13</font>,<font color='#979000'>10</font><font face='Lucida Console'>)</font>, <font color='#979000'>255</font><font face='Lucida Console'>)</font>;
+
+        win.<font color='#BB00BB'>set_image</font><font face='Lucida Console'>(</font>img<font face='Lucida Console'>)</font>;
+
+        win.<font color='#BB00BB'>add_overlay</font><font face='Lucida Console'>(</font>image_display::<font color='#BB00BB'>overlay_rect</font><font face='Lucida Console'>(</font><font color='#BB00BB'>rectangle</font><font face='Lucida Console'>(</font><font color='#979000'>1</font>,<font color='#979000'>1</font>,<font color='#979000'>1</font>,<font color='#979000'>1</font><font face='Lucida Console'>)</font>, <font color='#BB00BB'>rgb_pixel</font><font face='Lucida Console'>(</font><font color='#979000'>255</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        win.<font color='#BB00BB'>add_overlay</font><font face='Lucida Console'>(</font>image_display::<font color='#BB00BB'>overlay_rect</font><font face='Lucida Console'>(</font><font color='#BB00BB'>rectangle</font><font face='Lucida Console'>(</font><font color='#979000'>1</font>,<font color='#979000'>3</font>,<font color='#979000'>2</font>,<font color='#979000'>5</font><font face='Lucida Console'>)</font>, <font color='#BB00BB'>rgb_pixel</font><font face='Lucida Console'>(</font><font color='#979000'>255</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        win.<font color='#BB00BB'>add_overlay</font><font face='Lucida Console'>(</font>image_display::<font color='#BB00BB'>overlay_rect</font><font face='Lucida Console'>(</font><font color='#BB00BB'>rectangle</font><font face='Lucida Console'>(</font><font color='#979000'>4</font>,<font color='#979000'>3</font>,<font color='#979000'>5</font>,<font color='#979000'>4</font><font face='Lucida Console'>)</font>, <font color='#BB00BB'>rgb_pixel</font><font face='Lucida Console'>(</font><font color='#979000'>255</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        win.<font color='#BB00BB'>add_overlay</font><font face='Lucida Console'>(</font>image_display::<font color='#BB00BB'>overlay_rect</font><font face='Lucida Console'>(</font><font color='#BB00BB'>rectangle</font><font face='Lucida Console'>(</font><font color='#979000'>9</font>,<font color='#979000'>9</font>,<font color='#979000'>13</font>,<font color='#979000'>10</font><font face='Lucida Console'>)</font>, <font color='#BB00BB'>rgb_pixel</font><font face='Lucida Console'>(</font><font color='#979000'>255</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+
+
+        w.<font color='#BB00BB'>set_pos</font> <font face='Lucida Console'>(</font><font color='#979000'>100</font>,<font color='#979000'>200</font><font face='Lucida Console'>)</font>;
+        w.<font color='#BB00BB'>set_title</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>test window</font>"<font face='Lucida Console'>)</font>;
+        w.<font color='#BB00BB'>show</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+        w.<font color='#BB00BB'>wait_until_closed</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+    <font color='#0000FF'>catch</font> <font face='Lucida Console'>(</font>exception<font color='#5555FF'>&amp;</font> e<font face='Lucida Console'>)</font>
+    <b>{</b>
+        cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> e.<font color='#BB00BB'>what</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+    <b>}</b>
+
+<b>}</b>
+
+</pre></body></html>

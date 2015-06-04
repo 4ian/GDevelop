@@ -1,0 +1,615 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - hash_table_kernel_2.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2003  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_HASH_TABLE_KERNEl_2_
+<font color='#0000FF'>#define</font> DLIB_HASH_TABLE_KERNEl_2_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='hash_table_kernel_abstract.h.html'>hash_table_kernel_abstract.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../general_hash/general_hash.h.html'>../general_hash/general_hash.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../algs.h.html'>../algs.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../interfaces/map_pair.h.html'>../interfaces/map_pair.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../interfaces/enumerable.h.html'>../interfaces/enumerable.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../interfaces/remover.h.html'>../interfaces/remover.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../assert.h.html'>../assert.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../serialize.h.html'>../serialize.h</a>"
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>functional<font color='#5555FF'>&gt;</font>
+
+<font color='#0000FF'>namespace</font> dlib 
+<b>{</b>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> domain,
+        <font color='#0000FF'>typename</font> range,
+        <font color='#0000FF'>typename</font> bst_base,
+        <font color='#0000FF'>typename</font> mem_manager <font color='#5555FF'>=</font> default_memory_manager,
+        <font color='#0000FF'>typename</font> compare <font color='#5555FF'>=</font> std::less<font color='#5555FF'>&lt;</font>domain<font color='#5555FF'>&gt;</font>
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>class</font> <b><a name='hash_table_kernel_2'></a>hash_table_kernel_2</b> : <font color='#0000FF'>public</font> enumerable<font color='#5555FF'>&lt;</font>map_pair<font color='#5555FF'>&lt;</font>domain,range<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font>,
+                                <font color='#0000FF'>public</font> pair_remover<font color='#5555FF'>&lt;</font>domain,range<font color='#5555FF'>&gt;</font>
+    <b>{</b>
+
+        <font color='#009900'>/*!
+            REQUIREMENTS ON bst_base
+                bst_base is instantiated with domain and range and
+                implements binray_search_tree/binary_search_tree_kernel_abstract.h
+
+             INITIAL VALUE
+                hash_size == 0
+                table == pointer to an array of num_of_buckets bst_base objects
+                num_of_buckets == the number of buckets in the hash table
+                current_bucket == 0
+                at_start_ == true
+
+            CONVENTION
+                current_element_valid() == (current_bucket != 0)
+                element() == current_bucket-&gt;element()
+                at_start_ == at_start()
+
+                mask == num_of_buckets-1
+
+                for all integers i where &amp;table[i] != current_bucket
+                    table[i].at_start() == true
+
+
+                hash_size = size() == the number of elements in the hash_table and
+                table == pointer to an array of num_of_buckets bst_base objects
+                num_of_buckets == the number of buckets in the hash table and
+                the elements in this hash table are stored in the bst_base objects in the
+                array table
+
+        !*/</font>
+        
+
+ 
+        <font color='#0000FF'>public</font>:
+
+            <font color='#0000FF'>typedef</font> domain domain_type;
+            <font color='#0000FF'>typedef</font> range range_type;
+            <font color='#0000FF'>typedef</font> compare compare_type;
+            <font color='#0000FF'>typedef</font> mem_manager mem_manager_type;
+
+            <font color='#0000FF'>explicit</font> <b><a name='hash_table_kernel_2'></a>hash_table_kernel_2</b><font face='Lucida Console'>(</font>
+                <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> expnum
+            <font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>virtual</font> ~<b><a name='hash_table_kernel_2'></a>hash_table_kernel_2</b><font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font>
+            <b>{</b> pool.<font color='#BB00BB'>deallocate_array</font><font face='Lucida Console'>(</font>table<font face='Lucida Console'>)</font>; <b>}</b>
+
+            <font color='#0000FF'><u>void</u></font> <b><a name='clear'></a>clear</b><font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='count'></a>count</b> <font face='Lucida Console'>(</font>
+                <font color='#0000FF'>const</font> domain<font color='#5555FF'>&amp;</font> item
+            <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+            <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='add'></a>add</b> <font face='Lucida Console'>(</font>
+                domain<font color='#5555FF'>&amp;</font> d,
+                range<font color='#5555FF'>&amp;</font> r
+            <font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'><u>void</u></font> <b><a name='destroy'></a>destroy</b> <font face='Lucida Console'>(</font>
+                <font color='#0000FF'>const</font> domain<font color='#5555FF'>&amp;</font> d
+            <font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'><u>void</u></font> <b><a name='remove'></a>remove</b> <font face='Lucida Console'>(</font>
+                <font color='#0000FF'>const</font> domain<font color='#5555FF'>&amp;</font> d,
+                domain<font color='#5555FF'>&amp;</font> d_copy,
+                range<font color='#5555FF'>&amp;</font> r
+            <font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>const</font> range<font color='#5555FF'>*</font> <b><a name='operator'></a>operator</b>[] <font face='Lucida Console'>(</font>
+                <font color='#0000FF'>const</font> domain<font color='#5555FF'>&amp;</font> item
+            <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+            range<font color='#5555FF'>*</font> <b><a name='operator'></a>operator</b>[] <font face='Lucida Console'>(</font>
+                <font color='#0000FF'>const</font> domain<font color='#5555FF'>&amp;</font> item
+            <font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='swap'></a>swap</b> <font face='Lucida Console'>(</font>
+                hash_table_kernel_2<font color='#5555FF'>&amp;</font> item
+            <font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// functions from the remover interface
+</font>            <font color='#0000FF'><u>void</u></font> <b><a name='remove_any'></a>remove_any</b> <font face='Lucida Console'>(</font>
+                domain<font color='#5555FF'>&amp;</font> d,
+                range<font color='#5555FF'>&amp;</font> r
+            <font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// functions from the enumerable interface
+</font>            <font color='#0000FF'>inline</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='size'></a>size</b> <font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+            <font color='#0000FF'>inline</font> <font color='#0000FF'><u>bool</u></font> <b><a name='at_start'></a>at_start</b> <font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+            <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='reset'></a>reset</b> <font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+            <font color='#0000FF'><u>bool</u></font> <b><a name='current_element_valid'></a>current_element_valid</b> <font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+            <font color='#0000FF'>inline</font> <font color='#0000FF'>const</font> map_pair<font color='#5555FF'>&lt;</font>domain,range<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> <b><a name='element'></a>element</b> <font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+            <font color='#0000FF'>inline</font> map_pair<font color='#5555FF'>&lt;</font>domain,range<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> <b><a name='element'></a>element</b> <font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'><u>bool</u></font> <b><a name='move_next'></a>move_next</b> <font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+        <font color='#0000FF'>private</font>:
+
+            <font color='#009900'>// data members   
+</font>            <font color='#0000FF'>typename</font> mem_manager::<font color='#0000FF'>template</font> rebind<font color='#5555FF'>&lt;</font>bst_base<font color='#5555FF'>&gt;</font>::other pool;         
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> mask;
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> hash_size;
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> num_of_buckets;
+            bst_base<font color='#5555FF'>*</font> table;
+            general_hash<font color='#5555FF'>&lt;</font>domain<font color='#5555FF'>&gt;</font> hash;
+            <font color='#0000FF'>mutable</font> bst_base<font color='#5555FF'>*</font> current_bucket;
+            <font color='#0000FF'>mutable</font> <font color='#0000FF'><u>bool</u></font> at_start_;
+            compare comp;
+
+            <font color='#009900'>// restricted functions
+</font>            <b><a name='hash_table_kernel_2'></a>hash_table_kernel_2</b><font face='Lucida Console'>(</font>hash_table_kernel_2<font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font>;      
+            hash_table_kernel_2<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>=</font><font face='Lucida Console'>(</font>hash_table_kernel_2<font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font>;
+
+    <b>}</b>;
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> domain,
+        <font color='#0000FF'>typename</font> range,
+        <font color='#0000FF'>typename</font> bst_base,
+        <font color='#0000FF'>typename</font> mem_manager,
+        <font color='#0000FF'>typename</font> compare
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='swap'></a>swap</b> <font face='Lucida Console'>(</font>
+        hash_table_kernel_2<font color='#5555FF'>&lt;</font>domain,range,bst_base,mem_manager,compare<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> a, 
+        hash_table_kernel_2<font color='#5555FF'>&lt;</font>domain,range,bst_base,mem_manager,compare<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> b 
+    <font face='Lucida Console'>)</font> <b>{</b> a.<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>b<font face='Lucida Console'>)</font>; <b>}</b>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> domain,
+        <font color='#0000FF'>typename</font> range,
+        <font color='#0000FF'>typename</font> bst_base,
+        <font color='#0000FF'>typename</font> mem_manager,
+        <font color='#0000FF'>typename</font> compare
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='deserialize'></a>deserialize</b> <font face='Lucida Console'>(</font>
+        hash_table_kernel_2<font color='#5555FF'>&lt;</font>domain,range,bst_base,mem_manager,compare<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> item, 
+        std::istream<font color='#5555FF'>&amp;</font> in
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>try</font>
+        <b>{</b>
+            item.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> size;
+            <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>size,in<font face='Lucida Console'>)</font>;
+            domain d;
+            range r;
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> size; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>d,in<font face='Lucida Console'>)</font>;
+                <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>r,in<font face='Lucida Console'>)</font>;
+                item.<font color='#BB00BB'>add</font><font face='Lucida Console'>(</font>d,r<font face='Lucida Console'>)</font>;
+            <b>}</b>
+        <b>}</b>
+        <font color='#0000FF'>catch</font> <font face='Lucida Console'>(</font>serialization_error e<font face='Lucida Console'>)</font>
+        <b>{</b> 
+            item.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>throw</font> <font color='#BB00BB'>serialization_error</font><font face='Lucida Console'>(</font>e.info <font color='#5555FF'>+</font> "<font color='#CC0000'>\n   while deserializing object of type hash_table_kernel_2</font>"<font face='Lucida Console'>)</font>; 
+        <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>    <font color='#009900'>// member function definitions
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> domain,
+        <font color='#0000FF'>typename</font> range,
+        <font color='#0000FF'>typename</font> bst_base,
+        <font color='#0000FF'>typename</font> mem_manager,
+        <font color='#0000FF'>typename</font> compare
+        <font color='#5555FF'>&gt;</font>
+    hash_table_kernel_2<font color='#5555FF'>&lt;</font>domain,range,bst_base,mem_manager,compare<font color='#5555FF'>&gt;</font>::
+    <b><a name='hash_table_kernel_2'></a>hash_table_kernel_2</b><font face='Lucida Console'>(</font>
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> expnum
+    <font face='Lucida Console'>)</font> :
+        hash_size<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>,
+        current_bucket<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>,
+        at_start_<font face='Lucida Console'>(</font><font color='#979000'>true</font><font face='Lucida Console'>)</font>
+    <b>{</b>
+
+        num_of_buckets <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+        <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>expnum <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#5555FF'>-</font><font color='#5555FF'>-</font>expnum;
+            num_of_buckets <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#979000'>1</font>;            
+        <b>}</b>
+        mask <font color='#5555FF'>=</font> num_of_buckets<font color='#5555FF'>-</font><font color='#979000'>1</font>;
+
+        table <font color='#5555FF'>=</font> pool.<font color='#BB00BB'>allocate_array</font><font face='Lucida Console'>(</font>num_of_buckets<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> domain,
+        <font color='#0000FF'>typename</font> range,
+        <font color='#0000FF'>typename</font> bst_base,
+        <font color='#0000FF'>typename</font> mem_manager,
+        <font color='#0000FF'>typename</font> compare
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> hash_table_kernel_2<font color='#5555FF'>&lt;</font>domain,range,bst_base,mem_manager,compare<font color='#5555FF'>&gt;</font>::
+    <b><a name='clear'></a>clear</b><font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>hash_size <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            hash_size <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> num_of_buckets; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                table[i].<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+        <font color='#009900'>// reset the enumerator
+</font>        <font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> domain,
+        <font color='#0000FF'>typename</font> range,
+        <font color='#0000FF'>typename</font> bst_base,
+        <font color='#0000FF'>typename</font> mem_manager,
+        <font color='#0000FF'>typename</font> compare
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> hash_table_kernel_2<font color='#5555FF'>&lt;</font>domain,range,bst_base,mem_manager,compare<font color='#5555FF'>&gt;</font>::
+    <b><a name='size'></a>size</b><font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        <font color='#0000FF'>return</font> hash_size;
+    <b>}</b>
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> domain,
+        <font color='#0000FF'>typename</font> range,
+        <font color='#0000FF'>typename</font> bst_base,
+        <font color='#0000FF'>typename</font> mem_manager,
+        <font color='#0000FF'>typename</font> compare
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> hash_table_kernel_2<font color='#5555FF'>&lt;</font>domain,range,bst_base,mem_manager,compare<font color='#5555FF'>&gt;</font>::
+    <b><a name='count'></a>count</b><font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> domain<font color='#5555FF'>&amp;</font> item
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        <font color='#0000FF'>return</font> table[<font color='#BB00BB'>hash</font><font face='Lucida Console'>(</font>item<font face='Lucida Console'>)</font><font color='#5555FF'>&amp;</font>mask].<font color='#BB00BB'>count</font><font face='Lucida Console'>(</font>item<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> domain,
+        <font color='#0000FF'>typename</font> range,
+        <font color='#0000FF'>typename</font> bst_base,
+        <font color='#0000FF'>typename</font> mem_manager,
+        <font color='#0000FF'>typename</font> compare
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> hash_table_kernel_2<font color='#5555FF'>&lt;</font>domain,range,bst_base,mem_manager,compare<font color='#5555FF'>&gt;</font>::
+    <b><a name='destroy'></a>destroy</b><font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> domain<font color='#5555FF'>&amp;</font> item
+    <font face='Lucida Console'>)</font> 
+    <b>{</b>
+        table[<font color='#BB00BB'>hash</font><font face='Lucida Console'>(</font>item<font face='Lucida Console'>)</font><font color='#5555FF'>&amp;</font>mask].<font color='#BB00BB'>destroy</font><font face='Lucida Console'>(</font>item<font face='Lucida Console'>)</font>;
+        <font color='#5555FF'>-</font><font color='#5555FF'>-</font>hash_size;
+
+        <font color='#009900'>// reset the enumerator
+</font>        <font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> domain,
+        <font color='#0000FF'>typename</font> range,
+        <font color='#0000FF'>typename</font> bst_base,
+        <font color='#0000FF'>typename</font> mem_manager,
+        <font color='#0000FF'>typename</font> compare
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> hash_table_kernel_2<font color='#5555FF'>&lt;</font>domain,range,bst_base,mem_manager,compare<font color='#5555FF'>&gt;</font>::
+    <b><a name='add'></a>add</b><font face='Lucida Console'>(</font>
+        domain<font color='#5555FF'>&amp;</font> d,
+        range<font color='#5555FF'>&amp;</font> r
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        table[<font color='#BB00BB'>hash</font><font face='Lucida Console'>(</font>d<font face='Lucida Console'>)</font><font color='#5555FF'>&amp;</font>mask].<font color='#BB00BB'>add</font><font face='Lucida Console'>(</font>d,r<font face='Lucida Console'>)</font>;
+        <font color='#5555FF'>+</font><font color='#5555FF'>+</font>hash_size;
+
+        <font color='#009900'>// reset the enumerator
+</font>        <font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> domain,
+        <font color='#0000FF'>typename</font> range,
+        <font color='#0000FF'>typename</font> bst_base,
+        <font color='#0000FF'>typename</font> mem_manager,
+        <font color='#0000FF'>typename</font> compare
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> hash_table_kernel_2<font color='#5555FF'>&lt;</font>domain,range,bst_base,mem_manager,compare<font color='#5555FF'>&gt;</font>::
+    <b><a name='remove'></a>remove</b><font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> domain<font color='#5555FF'>&amp;</font> d,
+        domain<font color='#5555FF'>&amp;</font> d_copy,
+        range<font color='#5555FF'>&amp;</font> r
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        table[<font color='#BB00BB'>hash</font><font face='Lucida Console'>(</font>d<font face='Lucida Console'>)</font><font color='#5555FF'>&amp;</font>mask].<font color='#BB00BB'>remove</font><font face='Lucida Console'>(</font>d,d_copy,r<font face='Lucida Console'>)</font>;
+        <font color='#5555FF'>-</font><font color='#5555FF'>-</font>hash_size;
+
+        <font color='#009900'>// reset the enumerator
+</font>        <font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> domain,
+        <font color='#0000FF'>typename</font> range,
+        <font color='#0000FF'>typename</font> bst_base,
+        <font color='#0000FF'>typename</font> mem_manager,
+        <font color='#0000FF'>typename</font> compare
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> hash_table_kernel_2<font color='#5555FF'>&lt;</font>domain,range,bst_base,mem_manager,compare<font color='#5555FF'>&gt;</font>::
+    <b><a name='remove_any'></a>remove_any</b><font face='Lucida Console'>(</font>
+        domain<font color='#5555FF'>&amp;</font> d,
+        range<font color='#5555FF'>&amp;</font> r
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>table[i].<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i;
+        <b>}</b>
+        table[i].<font color='#BB00BB'>remove_any</font><font face='Lucida Console'>(</font>d,r<font face='Lucida Console'>)</font>;
+        <font color='#5555FF'>-</font><font color='#5555FF'>-</font>hash_size;
+
+        <font color='#009900'>// reset the enumerator
+</font>        <font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> domain,
+        <font color='#0000FF'>typename</font> range,
+        <font color='#0000FF'>typename</font> bst_base,
+        <font color='#0000FF'>typename</font> mem_manager,
+        <font color='#0000FF'>typename</font> compare
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>const</font> range<font color='#5555FF'>*</font> hash_table_kernel_2<font color='#5555FF'>&lt;</font>domain,range,bst_base,mem_manager,compare<font color='#5555FF'>&gt;</font>::
+    <b><a name='operator'></a>operator</b>[]<font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> domain<font color='#5555FF'>&amp;</font> d
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        <font color='#0000FF'>return</font> table[<font color='#BB00BB'>hash</font><font face='Lucida Console'>(</font>d<font face='Lucida Console'>)</font><font color='#5555FF'>&amp;</font>mask][d];
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> domain,
+        <font color='#0000FF'>typename</font> range,
+        <font color='#0000FF'>typename</font> bst_base,
+        <font color='#0000FF'>typename</font> mem_manager,
+        <font color='#0000FF'>typename</font> compare
+        <font color='#5555FF'>&gt;</font>
+    range<font color='#5555FF'>*</font> hash_table_kernel_2<font color='#5555FF'>&lt;</font>domain,range,bst_base,mem_manager,compare<font color='#5555FF'>&gt;</font>::
+    <b><a name='operator'></a>operator</b>[]<font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> domain<font color='#5555FF'>&amp;</font> d
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>return</font> table[<font color='#BB00BB'>hash</font><font face='Lucida Console'>(</font>d<font face='Lucida Console'>)</font><font color='#5555FF'>&amp;</font>mask][d];
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> domain,
+        <font color='#0000FF'>typename</font> range,
+        <font color='#0000FF'>typename</font> bst_base,
+        <font color='#0000FF'>typename</font> mem_manager,
+        <font color='#0000FF'>typename</font> compare
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> hash_table_kernel_2<font color='#5555FF'>&lt;</font>domain,range,bst_base,mem_manager,compare<font color='#5555FF'>&gt;</font>::
+    <b><a name='swap'></a>swap</b><font face='Lucida Console'>(</font>
+        hash_table_kernel_2<font color='#5555FF'>&lt;</font>domain,range,bst_base,mem_manager,compare<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> item
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        pool.<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>item.pool<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>exchange</font><font face='Lucida Console'>(</font>mask,item.mask<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>exchange</font><font face='Lucida Console'>(</font>hash_size,item.hash_size<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>exchange</font><font face='Lucida Console'>(</font>num_of_buckets,item.num_of_buckets<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>exchange</font><font face='Lucida Console'>(</font>table,item.table<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>exchange</font><font face='Lucida Console'>(</font>current_bucket,item.current_bucket<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>exchange</font><font face='Lucida Console'>(</font>at_start_,item.at_start_<font face='Lucida Console'>)</font>;        
+        <font color='#BB00BB'>exchange</font><font face='Lucida Console'>(</font>comp,item.comp<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>    <font color='#009900'>// enumerable function definitions
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> domain,
+        <font color='#0000FF'>typename</font> range,
+        <font color='#0000FF'>typename</font> bst_base,
+        <font color='#0000FF'>typename</font> mem_manager,
+        <font color='#0000FF'>typename</font> compare
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>bool</u></font> hash_table_kernel_2<font color='#5555FF'>&lt;</font>domain,range,bst_base,mem_manager,compare<font color='#5555FF'>&gt;</font>::
+    <b><a name='at_start'></a>at_start</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        <font color='#0000FF'>return</font> at_start_;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> domain,
+        <font color='#0000FF'>typename</font> range,
+        <font color='#0000FF'>typename</font> bst_base,
+        <font color='#0000FF'>typename</font> mem_manager,
+        <font color='#0000FF'>typename</font> compare
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> hash_table_kernel_2<font color='#5555FF'>&lt;</font>domain,range,bst_base,mem_manager,compare<font color='#5555FF'>&gt;</font>::
+    <b><a name='reset'></a>reset</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        at_start_ <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>current_bucket <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            current_bucket<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            current_bucket <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> domain,
+        <font color='#0000FF'>typename</font> range,
+        <font color='#0000FF'>typename</font> bst_base,
+        <font color='#0000FF'>typename</font> mem_manager,
+        <font color='#0000FF'>typename</font> compare
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>bool</u></font> hash_table_kernel_2<font color='#5555FF'>&lt;</font>domain,range,bst_base,mem_manager,compare<font color='#5555FF'>&gt;</font>::
+    <b><a name='current_element_valid'></a>current_element_valid</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        <font color='#0000FF'>return</font> <font face='Lucida Console'>(</font>current_bucket <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> domain,
+        <font color='#0000FF'>typename</font> range,
+        <font color='#0000FF'>typename</font> bst_base,
+        <font color='#0000FF'>typename</font> mem_manager,
+        <font color='#0000FF'>typename</font> compare
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>const</font> map_pair<font color='#5555FF'>&lt;</font>domain,range<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> hash_table_kernel_2<font color='#5555FF'>&lt;</font>domain,range,bst_base,mem_manager,compare<font color='#5555FF'>&gt;</font>::
+    <b><a name='element'></a>element</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        <font color='#0000FF'>return</font> current_bucket<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>element</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> domain,
+        <font color='#0000FF'>typename</font> range,
+        <font color='#0000FF'>typename</font> bst_base,
+        <font color='#0000FF'>typename</font> mem_manager,
+        <font color='#0000FF'>typename</font> compare
+        <font color='#5555FF'>&gt;</font>
+    map_pair<font color='#5555FF'>&lt;</font>domain,range<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> hash_table_kernel_2<font color='#5555FF'>&lt;</font>domain,range,bst_base,mem_manager,compare<font color='#5555FF'>&gt;</font>::
+    <b><a name='element'></a>element</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>return</font> current_bucket<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>element</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> domain,
+        <font color='#0000FF'>typename</font> range,
+        <font color='#0000FF'>typename</font> bst_base,
+        <font color='#0000FF'>typename</font> mem_manager,
+        <font color='#0000FF'>typename</font> compare
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>bool</u></font> hash_table_kernel_2<font color='#5555FF'>&lt;</font>domain,range,bst_base,mem_manager,compare<font color='#5555FF'>&gt;</font>::
+    <b><a name='move_next'></a>move_next</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>at_start_<font face='Lucida Console'>)</font>
+        <b>{</b>
+            at_start_ <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+            <font color='#009900'>// if the queue is empty then there is nothing to do
+</font>            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>hash_size <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>return</font> <font color='#979000'>false</font>;
+            <b>}</b>
+            <font color='#0000FF'>else</font>
+            <b>{</b>
+                <font color='#009900'>// find the first element in the hash table
+</font>                current_bucket <font color='#5555FF'>=</font> table;
+                <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>current_bucket<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#5555FF'>+</font><font color='#5555FF'>+</font>current_bucket;
+                <b>}</b>
+
+                current_bucket<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>move_next</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                
+                <font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+            <b>}</b>
+        <b>}</b>
+        <font color='#0000FF'>else</font>
+        <b>{</b>
+            <font color='#009900'>// if we have already enumerated every element
+</font>            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>current_bucket <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>return</font> <font color='#979000'>false</font>;
+            <b>}</b>
+            <font color='#0000FF'>else</font>
+            <b>{</b>
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>current_bucket<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>move_next</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#009900'>// if there is another element in this current bucket then use that
+</font>                    <font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+                <b>}</b>
+                <font color='#0000FF'>else</font>
+                <b>{</b>
+                    <font color='#009900'>// find the next bucket
+</font>                    bst_base<font color='#5555FF'>*</font> end <font color='#5555FF'>=</font> table <font color='#5555FF'>+</font> num_of_buckets;
+                    current_bucket<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                    
+                    <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font><font color='#979000'>true</font><font face='Lucida Console'>)</font>
+                    <b>{</b>   
+                        <font color='#5555FF'>+</font><font color='#5555FF'>+</font>current_bucket;
+                        <font color='#009900'>// if we ran out of buckets and didn't find anything
+</font>                        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>current_bucket <font color='#5555FF'>=</font><font color='#5555FF'>=</font> end<font face='Lucida Console'>)</font>
+                        <b>{</b>
+                            current_bucket <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                            <font color='#0000FF'>return</font> <font color='#979000'>false</font>;
+                        <b>}</b>
+                        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>current_bucket<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                        <b>{</b>
+                            current_bucket<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>move_next</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                            <font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+                        <b>}</b>
+                    <b>}</b>
+                <b>}</b>
+            <b>}</b>
+        <b>}</b>
+    <b>}</b>
+    
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_HASH_TABLE_KERNEl_2_
+</font>
+
+</pre></body></html>

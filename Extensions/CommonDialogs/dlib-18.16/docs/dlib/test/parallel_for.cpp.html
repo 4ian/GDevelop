@@ -1,0 +1,337 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - parallel_for.cpp</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2013  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font>
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='tester.h.html'>tester.h</a>"
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>threads.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>vector<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>sstream<font color='#5555FF'>&gt;</font>
+
+<font color='#0000FF'>namespace</font>  
+<b>{</b>
+    <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> test;
+    <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> dlib;
+    <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> std;
+    dlib::logger <b><a name='dlog'></a>dlog</b><font face='Lucida Console'>(</font>"<font color='#CC0000'>test.parallel_for</font>"<font face='Lucida Console'>)</font>;
+
+    <font color='#0000FF'>class</font> <b><a name='assign_element'></a>assign_element</b>
+    <b>{</b>
+    <font color='#0000FF'>public</font>:
+
+        <b><a name='assign_element'></a>assign_element</b><font face='Lucida Console'>(</font>
+            std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>int</u></font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> vect_
+        <font face='Lucida Console'>)</font> : vect<font face='Lucida Console'>(</font>vect_<font face='Lucida Console'>)</font><b>{</b><b>}</b>
+
+        std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>int</u></font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> vect;
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='go'></a>go</b> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> i <font face='Lucida Console'>)</font> 
+        <b>{</b>
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font> <font color='#979000'>0</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> i <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> i <font color='#5555FF'>&lt;</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font>vect.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            vect[i] <font color='#5555FF'>=</font> i;
+        <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> i <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font> <font color='#979000'>0</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> i <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> i <font color='#5555FF'>&lt;</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font>vect.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            vect[i] <font color='#5555FF'>=</font> i;
+        <b>}</b>
+
+    <b>}</b>;
+
+    <font color='#0000FF'><u>void</u></font> <b><a name='test_parallel_for'></a>test_parallel_for</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> start<font face='Lucida Console'>)</font>
+    <b>{</b>
+        std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>int</u></font><font color='#5555FF'>&gt;</font> <font color='#BB00BB'>vect</font><font face='Lucida Console'>(</font><font color='#979000'>200</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+
+        <font color='#BB00BB'>parallel_for</font><font face='Lucida Console'>(</font><font color='#979000'>4</font>, start, vect.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, <font color='#BB00BB'>assign_element</font><font face='Lucida Console'>(</font>vect<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> start;  <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>vect[i] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> start; i <font color='#5555FF'>&lt;</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font>vect.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>vect[i] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> i<font face='Lucida Console'>)</font>;
+        <b>}</b>
+    <b>}</b>
+
+    <font color='#0000FF'><u>void</u></font> <b><a name='test_parallel_for2'></a>test_parallel_for2</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> start<font face='Lucida Console'>)</font>
+    <b>{</b>
+        std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>int</u></font><font color='#5555FF'>&gt;</font> <font color='#BB00BB'>vect</font><font face='Lucida Console'>(</font><font color='#979000'>200</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+
+        assign_element <font color='#BB00BB'>temp</font><font face='Lucida Console'>(</font>vect<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>parallel_for</font><font face='Lucida Console'>(</font><font color='#979000'>4</font>, start, vect.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, temp, <font color='#5555FF'>&amp;</font>assign_element::go<font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> start;  <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>vect[i] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> start; i <font color='#5555FF'>&lt;</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font>vect.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>vect[i] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> i<font face='Lucida Console'>)</font>;
+        <b>}</b>
+    <b>}</b>
+
+    <font color='#0000FF'>struct</font> <b><a name='parfor_test_helper'></a>parfor_test_helper</b>
+    <b>{</b>
+        <font color='#0000FF'>mutable</font> std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>int</u></font><font color='#5555FF'>&gt;</font> test;
+
+        <b><a name='parfor_test_helper'></a>parfor_test_helper</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> : test<font face='Lucida Console'>(</font><font color='#979000'>400</font>,<font color='#979000'>100000</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+        <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='go'></a>go</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> begin, <font color='#0000FF'><u>long</u></font> end<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> begin; i <font color='#5555FF'>&lt;</font> end; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                test[i] <font color='#5555FF'>=</font> i;
+        <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> begin, <font color='#0000FF'><u>long</u></font> end<font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> begin; i <font color='#5555FF'>&lt;</font> end; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                test[i] <font color='#5555FF'>=</font> i;
+        <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='go2'></a>go2</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> i<font face='Lucida Console'>)</font>
+        <b>{</b>
+            test[i] <font color='#5555FF'>=</font> i;
+        <b>}</b>
+
+    <b>}</b>;
+
+    <font color='#0000FF'>struct</font> <b><a name='parfor_test_helper2'></a>parfor_test_helper2</b>
+    <b>{</b>
+        <font color='#0000FF'>mutable</font> std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>int</u></font><font color='#5555FF'>&gt;</font> test;
+
+        <b><a name='parfor_test_helper2'></a>parfor_test_helper2</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> : test<font face='Lucida Console'>(</font><font color='#979000'>400</font>,<font color='#979000'>100000</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+        <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> i<font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            test[i] <font color='#5555FF'>=</font> i;
+        <b>}</b>
+
+    <b>}</b>;
+
+    <font color='#0000FF'><u>void</u></font> <b><a name='test_parallel_for_additional'></a>test_parallel_for_additional</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+    <b>{</b>
+        <b>{</b>
+            parfor_test_helper helper;
+            <font color='#BB00BB'>parallel_for</font><font face='Lucida Console'>(</font><font color='#979000'>4</font>, <font color='#979000'>0</font>, helper.test.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, helper, <font color='#5555FF'>&amp;</font>parfor_test_helper::go2<font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> helper.test.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#BB00BB'>DLIB_CASSERT</font><font face='Lucida Console'>(</font>helper.test[i] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font>i, helper.test[i]<font face='Lucida Console'>)</font>;
+            <b>}</b>
+        <b>}</b>
+        <b>{</b>
+            parfor_test_helper helper;
+            <font color='#BB00BB'>parallel_for</font><font face='Lucida Console'>(</font><font color='#979000'>4</font>, <font color='#979000'>10</font>, helper.test.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, helper, <font color='#5555FF'>&amp;</font>parfor_test_helper::go2<font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> <font color='#979000'>10</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#BB00BB'>DLIB_CASSERT</font><font face='Lucida Console'>(</font>helper.test[i] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>100000</font>, helper.test[i]<font face='Lucida Console'>)</font>;
+            <b>}</b>
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>10</font>; i <font color='#5555FF'>&lt;</font> helper.test.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#BB00BB'>DLIB_CASSERT</font><font face='Lucida Console'>(</font>helper.test[i] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font>i, helper.test[i]<font face='Lucida Console'>)</font>;
+            <b>}</b>
+        <b>}</b>
+        <b>{</b>
+            parfor_test_helper helper;
+            <font color='#BB00BB'>parallel_for_blocked</font><font face='Lucida Console'>(</font><font color='#979000'>4</font>, <font color='#979000'>0</font>, helper.test.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, helper, <font color='#5555FF'>&amp;</font>parfor_test_helper::go<font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> helper.test.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#BB00BB'>DLIB_CASSERT</font><font face='Lucida Console'>(</font>helper.test[i] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font>i, helper.test[i]<font face='Lucida Console'>)</font>;
+            <b>}</b>
+        <b>}</b>
+        <b>{</b>
+            parfor_test_helper helper;
+            <font color='#BB00BB'>parallel_for_blocked</font><font face='Lucida Console'>(</font><font color='#979000'>4</font>, <font color='#979000'>10</font>, helper.test.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, helper, <font color='#5555FF'>&amp;</font>parfor_test_helper::go<font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> <font color='#979000'>10</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#BB00BB'>DLIB_CASSERT</font><font face='Lucida Console'>(</font>helper.test[i] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>100000</font>, helper.test[i]<font face='Lucida Console'>)</font>;
+            <b>}</b>
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>10</font>; i <font color='#5555FF'>&lt;</font> helper.test.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#BB00BB'>DLIB_CASSERT</font><font face='Lucida Console'>(</font>helper.test[i] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font>i, helper.test[i]<font face='Lucida Console'>)</font>;
+            <b>}</b>
+        <b>}</b>
+        <b>{</b>
+            parfor_test_helper helper;
+            <font color='#BB00BB'>parallel_for_blocked</font><font face='Lucida Console'>(</font><font color='#979000'>4</font>, <font color='#979000'>0</font>, helper.test.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, helper<font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> helper.test.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#BB00BB'>DLIB_CASSERT</font><font face='Lucida Console'>(</font>helper.test[i] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font>i, helper.test[i]<font face='Lucida Console'>)</font>;
+            <b>}</b>
+        <b>}</b>
+        <b>{</b>
+            parfor_test_helper helper;
+            <font color='#BB00BB'>parallel_for_blocked</font><font face='Lucida Console'>(</font><font color='#979000'>4</font>, <font color='#979000'>10</font>, helper.test.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, helper<font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> <font color='#979000'>10</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#BB00BB'>DLIB_CASSERT</font><font face='Lucida Console'>(</font>helper.test[i] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>100000</font>, helper.test[i]<font face='Lucida Console'>)</font>;
+            <b>}</b>
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>10</font>; i <font color='#5555FF'>&lt;</font> helper.test.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#BB00BB'>DLIB_CASSERT</font><font face='Lucida Console'>(</font>helper.test[i] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font>i, helper.test[i]<font face='Lucida Console'>)</font>;
+            <b>}</b>
+        <b>}</b>
+        <b>{</b>
+            parfor_test_helper2 helper;
+            <font color='#BB00BB'>parallel_for</font><font face='Lucida Console'>(</font><font color='#979000'>4</font>, <font color='#979000'>0</font>, helper.test.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, helper<font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> helper.test.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#BB00BB'>DLIB_CASSERT</font><font face='Lucida Console'>(</font>helper.test[i] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font>i, helper.test[i]<font face='Lucida Console'>)</font>;
+            <b>}</b>
+        <b>}</b>
+        <b>{</b>
+            parfor_test_helper2 helper;
+            <font color='#BB00BB'>parallel_for</font><font face='Lucida Console'>(</font><font color='#979000'>4</font>, <font color='#979000'>10</font>, helper.test.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, helper<font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> <font color='#979000'>10</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#BB00BB'>DLIB_CASSERT</font><font face='Lucida Console'>(</font>helper.test[i] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>100000</font>, helper.test[i]<font face='Lucida Console'>)</font>;
+            <b>}</b>
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>10</font>; i <font color='#5555FF'>&lt;</font> helper.test.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#BB00BB'>DLIB_CASSERT</font><font face='Lucida Console'>(</font>helper.test[i] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font>i, helper.test[i]<font face='Lucida Console'>)</font>;
+            <b>}</b>
+        <b>}</b>
+
+
+
+
+
+
+        <b>{</b>
+            parfor_test_helper helper;
+            <font color='#BB00BB'>parallel_for_verbose</font><font face='Lucida Console'>(</font><font color='#979000'>4</font>, <font color='#979000'>0</font>, helper.test.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, helper, <font color='#5555FF'>&amp;</font>parfor_test_helper::go2<font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> helper.test.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#BB00BB'>DLIB_CASSERT</font><font face='Lucida Console'>(</font>helper.test[i] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font>i, helper.test[i]<font face='Lucida Console'>)</font>;
+            <b>}</b>
+        <b>}</b>
+        <b>{</b>
+            parfor_test_helper helper;
+            <font color='#BB00BB'>parallel_for_verbose</font><font face='Lucida Console'>(</font><font color='#979000'>4</font>, <font color='#979000'>10</font>, helper.test.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, helper, <font color='#5555FF'>&amp;</font>parfor_test_helper::go2<font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> <font color='#979000'>10</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#BB00BB'>DLIB_CASSERT</font><font face='Lucida Console'>(</font>helper.test[i] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>100000</font>, helper.test[i]<font face='Lucida Console'>)</font>;
+            <b>}</b>
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>10</font>; i <font color='#5555FF'>&lt;</font> helper.test.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#BB00BB'>DLIB_CASSERT</font><font face='Lucida Console'>(</font>helper.test[i] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font>i, helper.test[i]<font face='Lucida Console'>)</font>;
+            <b>}</b>
+        <b>}</b>
+        <b>{</b>
+            parfor_test_helper helper;
+            <font color='#BB00BB'>parallel_for_blocked_verbose</font><font face='Lucida Console'>(</font><font color='#979000'>4</font>, <font color='#979000'>0</font>, helper.test.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, helper, <font color='#5555FF'>&amp;</font>parfor_test_helper::go<font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> helper.test.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#BB00BB'>DLIB_CASSERT</font><font face='Lucida Console'>(</font>helper.test[i] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font>i, helper.test[i]<font face='Lucida Console'>)</font>;
+            <b>}</b>
+        <b>}</b>
+        <b>{</b>
+            parfor_test_helper helper;
+            <font color='#BB00BB'>parallel_for_blocked_verbose</font><font face='Lucida Console'>(</font><font color='#979000'>4</font>, <font color='#979000'>10</font>, helper.test.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, helper, <font color='#5555FF'>&amp;</font>parfor_test_helper::go<font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> <font color='#979000'>10</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#BB00BB'>DLIB_CASSERT</font><font face='Lucida Console'>(</font>helper.test[i] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>100000</font>, helper.test[i]<font face='Lucida Console'>)</font>;
+            <b>}</b>
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>10</font>; i <font color='#5555FF'>&lt;</font> helper.test.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#BB00BB'>DLIB_CASSERT</font><font face='Lucida Console'>(</font>helper.test[i] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font>i, helper.test[i]<font face='Lucida Console'>)</font>;
+            <b>}</b>
+        <b>}</b>
+        <b>{</b>
+            parfor_test_helper helper;
+            <font color='#BB00BB'>parallel_for_blocked_verbose</font><font face='Lucida Console'>(</font><font color='#979000'>4</font>, <font color='#979000'>0</font>, helper.test.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, helper<font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> helper.test.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#BB00BB'>DLIB_CASSERT</font><font face='Lucida Console'>(</font>helper.test[i] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font>i, helper.test[i]<font face='Lucida Console'>)</font>;
+            <b>}</b>
+        <b>}</b>
+        <b>{</b>
+            parfor_test_helper helper;
+            <font color='#BB00BB'>parallel_for_blocked_verbose</font><font face='Lucida Console'>(</font><font color='#979000'>4</font>, <font color='#979000'>10</font>, helper.test.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, helper<font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> <font color='#979000'>10</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#BB00BB'>DLIB_CASSERT</font><font face='Lucida Console'>(</font>helper.test[i] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>100000</font>, helper.test[i]<font face='Lucida Console'>)</font>;
+            <b>}</b>
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>10</font>; i <font color='#5555FF'>&lt;</font> helper.test.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#BB00BB'>DLIB_CASSERT</font><font face='Lucida Console'>(</font>helper.test[i] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font>i, helper.test[i]<font face='Lucida Console'>)</font>;
+            <b>}</b>
+        <b>}</b>
+        <b>{</b>
+            parfor_test_helper2 helper;
+            <font color='#BB00BB'>parallel_for_verbose</font><font face='Lucida Console'>(</font><font color='#979000'>4</font>, <font color='#979000'>0</font>, helper.test.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, helper<font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> helper.test.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#BB00BB'>DLIB_CASSERT</font><font face='Lucida Console'>(</font>helper.test[i] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font>i, helper.test[i]<font face='Lucida Console'>)</font>;
+            <b>}</b>
+        <b>}</b>
+        <b>{</b>
+            parfor_test_helper2 helper;
+            <font color='#BB00BB'>parallel_for_verbose</font><font face='Lucida Console'>(</font><font color='#979000'>4</font>, <font color='#979000'>10</font>, helper.test.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, helper<font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> <font color='#979000'>10</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#BB00BB'>DLIB_CASSERT</font><font face='Lucida Console'>(</font>helper.test[i] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>100000</font>, helper.test[i]<font face='Lucida Console'>)</font>;
+            <b>}</b>
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>10</font>; i <font color='#5555FF'>&lt;</font> helper.test.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#BB00BB'>DLIB_CASSERT</font><font face='Lucida Console'>(</font>helper.test[i] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font>i, helper.test[i]<font face='Lucida Console'>)</font>;
+            <b>}</b>
+        <b>}</b>
+    <b>}</b>
+
+    <font color='#0000FF'>class</font> <b><a name='test_parallel_for_routines'></a>test_parallel_for_routines</b> : <font color='#0000FF'>public</font> tester
+    <b>{</b>
+    <font color='#0000FF'>public</font>:
+        <b><a name='test_parallel_for_routines'></a>test_parallel_for_routines</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> :
+            tester <font face='Lucida Console'>(</font>
+                "<font color='#CC0000'>test_parallel_for</font>",       <font color='#009900'>// the command line argument name for this test
+</font>                "<font color='#CC0000'>Run tests on the parallel_for routines.</font>", <font color='#009900'>// the command line argument description
+</font>                <font color='#979000'>0</font>                     <font color='#009900'>// the number of command line arguments for this test
+</font>            <font face='Lucida Console'>)</font>
+        <b>{</b>
+        <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='perform_test'></a>perform_test</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#BB00BB'>test_parallel_for</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>test_parallel_for</font><font face='Lucida Console'>(</font><font color='#979000'>30</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>test_parallel_for</font><font face='Lucida Console'>(</font><font color='#979000'>50</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>test_parallel_for2</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>test_parallel_for2</font><font face='Lucida Console'>(</font><font color='#979000'>30</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>test_parallel_for2</font><font face='Lucida Console'>(</font><font color='#979000'>50</font><font face='Lucida Console'>)</font>;
+
+            <font color='#BB00BB'>test_parallel_for_additional</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+    <b>}</b>;
+
+    test_parallel_for_routines a;
+
+<b>}</b>
+
+
+
+
+
+</pre></body></html>

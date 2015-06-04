@@ -1,0 +1,126 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - rsignaler_extension_abstract.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2006  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#undef</font> DLIB_RSIGNALER_EXTENSIOn_ABSTRACT_
+<font color='#0000FF'>#ifdef</font> DLIB_RSIGNALER_EXTENSIOn_ABSTRACT_ 
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='threads_kernel_abstract.h.html'>threads_kernel_abstract.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='rmutex_extension_abstract.h.html'>rmutex_extension_abstract.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>class</font> <b><a name='rsignaler'></a>rsignaler</b>
+    <b>{</b>
+        <font color='#009900'>/*!
+            WHAT THIS OBJECT REPRESENTS
+                This object represents an event signaling system for threads.  It gives 
+                a thread the ability to wake up other threads that are waiting for a 
+                particular signal. 
+
+                Each rsignaler object is associated with one and only one rmutex object.  
+                More than one rsignaler object may be associated with a single rmutex
+                but a signaler object may only be associated with a single rmutex.
+
+                NOTE:
+                You must guard against spurious wakeups.  This means that a thread
+                might return from a call to wait even if no other thread called
+                signal.  This is rare but must be guarded against. 
+
+                Also note that this object is identical to the signaler object 
+                except that it works with rmutex objects rather than mutex objects.
+        !*/</font>
+
+    <font color='#0000FF'>public</font>:
+
+        <b><a name='rsignaler'></a>rsignaler</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> rmutex<font color='#5555FF'>&amp;</font> associated_mutex
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #*this is properly initialized 
+                - #get_mutex() == associated_mutex
+            throws
+                - dlib::thread_error
+                    the constructor may throw this exception if there is a problem 
+                    gathering resources to create the signaler.    
+        !*/</font>
+
+
+        ~<b><a name='rsignaler'></a>rsignaler</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - all resources allocated by *this have been freed
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='wait'></a>wait</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - get_mutex() is locked and owned by the calling thread
+            ensures
+                - atomically unlocks get_mutex() and blocks the calling thread                      
+                - calling thread may wake if another thread calls signal() or broadcast()
+                  on *this
+                - when wait() returns the calling thread again has a lock on get_mutex()
+        !*/</font>
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='wait_or_timeout'></a>wait_or_timeout</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> milliseconds
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - get_mutex() is locked and owned by the calling thread
+            ensures
+                - atomically unlocks get_mutex() and blocks the calling thread
+                - calling thread may wake if another thread calls signal() or broadcast()
+                  on *this
+                - after the specified number of milliseconds has elapsed the calling thread
+                  will wake once get_mutex() is free
+                - when wait returns the calling thread again has a lock on get_mutex()
+
+                - returns false if the call to wait_or_timeout timed out 
+                - returns true if the call did not time out
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='signal'></a>signal</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - if (at least one thread is waiting on *this) then
+                    - at least one of the waiting threads will wake 
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='broadcast'></a>broadcast</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - any and all threads waiting on *this will wake 
+        !*/</font>
+
+        <font color='#0000FF'>const</font> rmutex<font color='#5555FF'>&amp;</font> <b><a name='get_mutex'></a>get_mutex</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns a const reference to the rmutex associated with *this
+        !*/</font>
+
+
+    <font color='#0000FF'>private</font>:
+        <font color='#009900'>// restricted functions
+</font>        <b><a name='rsignaler'></a>rsignaler</b><font face='Lucida Console'>(</font>rsignaler<font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font>;        <font color='#009900'>// copy constructor
+</font>        rsignaler<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>=</font><font face='Lucida Console'>(</font>rsignaler<font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font>;    <font color='#009900'>// assignment operator
+</font>    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_RSIGNALER_EXTENSIOn_ABSTRACT_ 
+</font>
+
+
+</pre></body></html>

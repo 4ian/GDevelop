@@ -1,0 +1,205 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - sockets2.cpp</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2008  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font>
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='tester.h.html'>tester.h</a>"
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>sockets.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>threads.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>array.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>algorithm<font color='#5555FF'>&gt;</font>
+
+<font color='#009900'>// This is called an unnamed-namespace and it has the effect of making everything 
+</font><font color='#009900'>// inside this file "private" so that everything you declare will have static linkage.  
+</font><font color='#009900'>// Thus we won't have any multiply defined symbol errors coming out of the linker when 
+</font><font color='#009900'>// we try to compile the test suite.
+</font><font color='#0000FF'>namespace</font>  
+<b>{</b>
+    <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> test;
+    <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> dlib;
+    <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> std;
+    <font color='#009900'>// Declare the logger we will use in this test.  The name of the logger 
+</font>    <font color='#009900'>// should start with "test."
+</font>    dlib::logger <b><a name='dlog'></a>dlog</b><font face='Lucida Console'>(</font>"<font color='#CC0000'>test.sockets2</font>"<font face='Lucida Console'>)</font>;
+
+
+    <font color='#0000FF'>class</font> <b><a name='sockets2_tester'></a>sockets2_tester</b> : <font color='#0000FF'>public</font> tester, <font color='#0000FF'>private</font> multithreaded_object 
+    <b>{</b>
+        <font color='#009900'>/*!
+            WHAT THIS OBJECT REPRESENTS
+                This object represents a unit test.  When it is constructed
+                it adds itself into the testing framework.
+        !*/</font>
+
+        <font color='#0000FF'><u>short</u></font> port_num;
+        string data_to_send;
+
+        <font color='#0000FF'><u>bool</u></font> test_failed;
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='write_thread'></a>write_thread</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>try</font>
+            <b>{</b>
+                scoped_ptr<font color='#5555FF'>&lt;</font>connection<font color='#5555FF'>&gt;</font> <font color='#BB00BB'>con</font><font face='Lucida Console'>(</font><font color='#BB00BB'>connect</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>127.0.0.1</font>", port_num<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+                <font color='#009900'>// Send a copy of the data down the connection so we can test our the read() function
+</font>                <font color='#009900'>// that uses timeouts in the main thread.
+</font>                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>con<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>write</font><font face='Lucida Console'>(</font>data_to_send.<font color='#BB00BB'>data</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, data_to_send.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font>data_to_send.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                <b>{</b>
+                    test_failed <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+                    dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LERROR <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>failed to send all the data down the connection</font>";
+                <b>}</b>
+
+                <font color='#BB00BB'>close_gracefully</font><font face='Lucida Console'>(</font>con,<font color='#979000'>300000</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+            <font color='#0000FF'>catch</font> <font face='Lucida Console'>(</font>exception<font color='#5555FF'>&amp;</font> e<font face='Lucida Console'>)</font>
+            <b>{</b>
+                test_failed <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+                dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LERROR <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> e.<font color='#BB00BB'>what</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+        <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='no_write_thread'></a>no_write_thread</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>try</font>
+            <b>{</b>
+                scoped_ptr<font color='#5555FF'>&lt;</font>connection<font color='#5555FF'>&gt;</font> <font color='#BB00BB'>con</font><font face='Lucida Console'>(</font><font color='#BB00BB'>connect</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>127.0.0.1</font>", port_num<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+                <font color='#009900'>// just do nothing until the connection closes
+</font>                <font color='#0000FF'><u>char</u></font> ch;
+                con<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>read</font><font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>ch, <font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+                dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LDEBUG <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>silent connection finally closing</font>";
+            <b>}</b>
+            <font color='#0000FF'>catch</font> <font face='Lucida Console'>(</font>exception<font color='#5555FF'>&amp;</font> e<font face='Lucida Console'>)</font>
+            <b>{</b>
+                test_failed <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+                dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LERROR <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> e.<font color='#BB00BB'>what</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+        <b>}</b>
+
+    <font color='#0000FF'>public</font>:
+        <b><a name='sockets2_tester'></a>sockets2_tester</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> :
+            tester <font face='Lucida Console'>(</font>
+                "<font color='#CC0000'>test_sockets2</font>",       <font color='#009900'>// the command line argument name for this test
+</font>                "<font color='#CC0000'>Run sockets2 tests.</font>", <font color='#009900'>// the command line argument description
+</font>                <font color='#979000'>0</font>                     <font color='#009900'>// the number of command line arguments for this test
+</font>            <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#BB00BB'>register_thread</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font>, <font color='#5555FF'>&amp;</font>sockets2_tester::write_thread<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>register_thread</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font>, <font color='#5555FF'>&amp;</font>sockets2_tester::write_thread<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>register_thread</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font>, <font color='#5555FF'>&amp;</font>sockets2_tester::write_thread<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>register_thread</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font>, <font color='#5555FF'>&amp;</font>sockets2_tester::write_thread<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>register_thread</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font>, <font color='#5555FF'>&amp;</font>sockets2_tester::write_thread<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>register_thread</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font>, <font color='#5555FF'>&amp;</font>sockets2_tester::no_write_thread<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='perform_test'></a>perform_test</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#BB00BB'>run_tests</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>run_tests</font><font face='Lucida Console'>(</font><font color='#979000'>40</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='run_tests'></a>run_tests</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> timeout_to_use
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#009900'>// make sure there aren't any threads running
+</font>            <font color='#BB00BB'>wait</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+            port_num <font color='#5555FF'>=</font> <font color='#979000'>5000</font>;
+            test_failed <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+
+            <font color='#BB00BB'>print_spinner</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            data_to_send <font color='#5555FF'>=</font> "<font color='#CC0000'>oi 2m3ormao2m fo2im3fo23mi o2mi3 foa2m3fao23ifm2o3fmia23oima23iom3giugbiua</font>";
+            <font color='#009900'>// make the block of data much larger
+</font>            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> <font color='#979000'>11</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                data_to_send <font color='#5555FF'>=</font> data_to_send <font color='#5555FF'>+</font> data_to_send;
+
+            dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>data block size: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> data_to_send.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+
+            scoped_ptr<font color='#5555FF'>&lt;</font>listener<font color='#5555FF'>&gt;</font> list;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>create_listener</font><font face='Lucida Console'>(</font>list, port_num, "<font color='#CC0000'>127.0.0.1</font>"<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>list<font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// kick off the sending threads
+</font>            <font color='#BB00BB'>start</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+
+            dlib::array<font color='#5555FF'>&lt;</font>scoped_ptr<font color='#5555FF'>&lt;</font>connection<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> cons;
+            std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font> <font color='#BB00BB'>bytes_received</font><font face='Lucida Console'>(</font><font color='#979000'>6</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+            scoped_ptr<font color='#5555FF'>&lt;</font>connection<font color='#5555FF'>&gt;</font> con_temp;
+            
+            <font color='#009900'>// accept the 6 connections we should get
+</font>            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> <font color='#979000'>6</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>list<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>accept</font><font face='Lucida Console'>(</font>con_temp<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+                cons.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>con_temp<font face='Lucida Console'>)</font>;
+                <font color='#BB00BB'>print_spinner</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+            <font color='#0000FF'><u>int</u></font> finished_cons <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+
+            <font color='#009900'>// now receive all the bytes from the sending threads
+</font>            <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>finished_cons <font color='#5555FF'>&lt;</font> <font color='#979000'>5</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> cons.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>cons[i]<font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        <font color='#0000FF'>const</font> <font color='#0000FF'><u>int</u></font> buf_size <font color='#5555FF'>=</font> <font color='#979000'>3000</font>;
+                        <font color='#0000FF'><u>char</u></font> buf[buf_size];
+
+                        <font color='#0000FF'><u>int</u></font> status <font color='#5555FF'>=</font> cons[i]<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>read</font><font face='Lucida Console'>(</font>buf, buf_size, timeout_to_use<font face='Lucida Console'>)</font>;
+
+                        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>status <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                        <b>{</b>
+                            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>equal</font><font face='Lucida Console'>(</font>buf, buf<font color='#5555FF'>+</font>status, data_to_send.<font color='#BB00BB'>begin</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>+</font>bytes_received[i]<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                            bytes_received[i] <font color='#5555FF'>+</font><font color='#5555FF'>=</font> status;
+                        <b>}</b>
+                        <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>status <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                        <b>{</b>
+                            <font color='#009900'>// the connection is closed to kill it
+</font>                            cons[i].<font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                            <font color='#5555FF'>+</font><font color='#5555FF'>+</font>finished_cons;
+                        <b>}</b>
+                    <b>}</b>
+                <b>}</b>
+                <font color='#BB00BB'>print_spinner</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> bytes_received.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>bytes_received[i] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font>data_to_send.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>|</font><font color='#5555FF'>|</font> cons[i]<font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+
+            dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>All data received correctly</font>";
+
+            cons.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+
+            <font color='#BB00BB'>print_spinner</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>test_failed <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font><font face='Lucida Console'>)</font>;
+
+
+            <font color='#009900'>// wait for all the sending threads to terminate
+</font>            <font color='#BB00BB'>wait</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+    <b>}</b>;
+
+    <font color='#009900'>// Create an instance of this object.  Doing this causes this test
+</font>    <font color='#009900'>// to be automatically inserted into the testing framework whenever this cpp file
+</font>    <font color='#009900'>// is linked into the project.  Note that since we are inside an unnamed-namespace 
+</font>    <font color='#009900'>// we won't get any linker errors about the symbol a being defined multiple times. 
+</font>    sockets2_tester a;
+
+<b>}</b>
+
+
+
+</pre></body></html>

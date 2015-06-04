@@ -1,0 +1,158 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - server_iostream.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2006  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_SERVER_IOSTREAm_1_
+<font color='#0000FF'>#define</font> DLIB_SERVER_IOSTREAm_1_
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>iostream<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='server_iostream_abstract.h.html'>server_iostream_abstract.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../logger.h.html'>../logger.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../uintn.h.html'>../uintn.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='server_kernel.h.html'>server_kernel.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../sockstreambuf.h.html'>../sockstreambuf.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../map.h.html'>../map.h</a>"
+
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+    <font color='#0000FF'>class</font> <b><a name='server_iostream'></a>server_iostream</b> : <font color='#0000FF'>public</font> server 
+    <b>{</b>
+
+        <font color='#009900'>/*!
+            INITIAL VALUE
+                - next_id == 0
+                - con_map.size() == 0
+
+            CONVENTION
+                - next_id == the id of the next connection 
+                - for all current connections
+                    - con_map[id] == the connection object with the given id
+                - m == the mutex that protects the members of this object
+        !*/</font>
+
+        <font color='#0000FF'>typedef</font> map<font color='#5555FF'>&lt;</font>uint64,connection<font color='#5555FF'>*</font>,memory_manager<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font>::kernel_2a<font color='#5555FF'>&gt;</font>::kernel_1b id_map;
+
+    <font color='#0000FF'>public</font>:
+        <b><a name='server_iostream'></a>server_iostream</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> :
+            next_id<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>
+        <b>{</b><b>}</b>
+
+        ~<b><a name='server_iostream'></a>server_iostream</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            server::<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+    <font color='#0000FF'>protected</font>:
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='shutdown_connection'></a>shutdown_connection</b> <font face='Lucida Console'>(</font>
+            uint64 id
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            auto_mutex <font color='#BB00BB'>M</font><font face='Lucida Console'>(</font>m<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>con_map.<font color='#BB00BB'>is_in_domain</font><font face='Lucida Console'>(</font>id<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                con_map[id]<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>shutdown</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+        <b>}</b>
+
+    <font color='#0000FF'>private</font>:
+
+        <font color='#0000FF'>virtual</font> <font color='#0000FF'><u>void</u></font> <b><a name='on_connect'></a>on_connect</b> <font face='Lucida Console'>(</font>
+            std::istream<font color='#5555FF'>&amp;</font> in,
+            std::ostream<font color='#5555FF'>&amp;</font> out,
+            <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> foreign_ip,
+            <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> local_ip,
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>short</u></font> foreign_port,
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>short</u></font> local_port,
+            uint64 connection_id
+        <font face='Lucida Console'>)</font><font color='#5555FF'>=</font><font color='#979000'>0</font>;
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='on_connect'></a>on_connect</b> <font face='Lucida Console'>(</font>
+            connection<font color='#5555FF'>&amp;</font> con
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'><u>bool</u></font> my_fault <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+            uint64 this_con_id;
+            <font color='#0000FF'>try</font>
+            <b>{</b>
+                sockstreambuf <font color='#BB00BB'>buf</font><font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>con<font face='Lucida Console'>)</font>;
+                std::istream <font color='#BB00BB'>in</font><font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>buf<font face='Lucida Console'>)</font>;
+                std::ostream <font color='#BB00BB'>out</font><font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>buf<font face='Lucida Console'>)</font>;
+                in.<font color='#BB00BB'>tie</font><font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>out<font face='Lucida Console'>)</font>;
+
+                <font color='#009900'>// add this connection to the con_map
+</font>                <b>{</b>
+                    auto_mutex <font color='#BB00BB'>M</font><font face='Lucida Console'>(</font>m<font face='Lucida Console'>)</font>;
+                    this_con_id <font color='#5555FF'>=</font> next_id;
+                    connection<font color='#5555FF'>*</font> this_con <font color='#5555FF'>=</font> <font color='#5555FF'>&amp;</font>con;
+                    con_map.<font color='#BB00BB'>add</font><font face='Lucida Console'>(</font>this_con_id,this_con<font face='Lucida Console'>)</font>;
+                    this_con_id <font color='#5555FF'>=</font> next_id;
+                    <font color='#5555FF'>+</font><font color='#5555FF'>+</font>next_id;
+                <b>}</b>
+
+                my_fault <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+                <font color='#BB00BB'>on_connect</font><font face='Lucida Console'>(</font>
+                    in,
+                    out,
+                    con.<font color='#BB00BB'>get_foreign_ip</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,
+                    con.<font color='#BB00BB'>get_local_ip</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,
+                    con.<font color='#BB00BB'>get_foreign_port</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,
+                    con.<font color='#BB00BB'>get_local_port</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,
+                    this_con_id
+                <font face='Lucida Console'>)</font>;
+
+                <font color='#009900'>// remove this connection from the con_map
+</font>                <b>{</b>
+                    auto_mutex <font color='#BB00BB'>M</font><font face='Lucida Console'>(</font>m<font face='Lucida Console'>)</font>;
+                    connection<font color='#5555FF'>*</font> this_con;
+                    uint64 junk;
+                    con_map.<font color='#BB00BB'>remove</font><font face='Lucida Console'>(</font>this_con_id,junk,this_con<font face='Lucida Console'>)</font>;
+                <b>}</b>
+
+            <b>}</b>
+            <font color='#0000FF'>catch</font> <font face='Lucida Console'>(</font>std::bad_alloc<font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#009900'>// make sure we remove this connection from the con_map
+</font>                <b>{</b>
+                    auto_mutex <font color='#BB00BB'>M</font><font face='Lucida Console'>(</font>m<font face='Lucida Console'>)</font>;
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>con_map.<font color='#BB00BB'>is_in_domain</font><font face='Lucida Console'>(</font>this_con_id<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        connection<font color='#5555FF'>*</font> this_con;
+                        uint64 junk;
+                        con_map.<font color='#BB00BB'>remove</font><font face='Lucida Console'>(</font>this_con_id,junk,this_con<font face='Lucida Console'>)</font>;
+                    <b>}</b>
+                <b>}</b>
+
+                _dLog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LERROR <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>We ran out of memory in server_iostream::on_connect()</font>";
+                <font color='#009900'>// if this is an escaped exception from on_connect then let it fly! 
+</font>                <font color='#009900'>// Seriously though, this way it is obvious to the user that something bad happened
+</font>                <font color='#009900'>// since they probably won't have the dlib logger enabled.
+</font>                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font>my_fault<font face='Lucida Console'>)</font>
+                    <font color='#0000FF'>throw</font>;
+            <b>}</b>
+        <b>}</b>
+
+        uint64 next_id;
+        id_map con_map;
+        <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> logger _dLog;
+        mutex m;
+        
+
+    <b>}</b>;
+
+
+<b>}</b>
+
+<font color='#0000FF'>#ifdef</font> NO_MAKEFILE
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='server_iostream.cpp.html'>server_iostream.cpp</a>"
+<font color='#0000FF'>#endif</font>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_SERVER_IOSTREAm_1_
+</font>
+
+
+
+</pre></body></html>

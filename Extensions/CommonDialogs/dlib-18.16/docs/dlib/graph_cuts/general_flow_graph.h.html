@@ -1,0 +1,175 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - general_flow_graph.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2012  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_GENERAL_FLOW_GRaPH_Hh_
+<font color='#0000FF'>#define</font> DLIB_GENERAL_FLOW_GRaPH_Hh_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../graph_utils.h.html'>../graph_utils.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>namespace</font> impl
+    <b>{</b>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'>typename</font> directed_graph_type
+            <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>class</font> <b><a name='general_flow_graph'></a>general_flow_graph</b> 
+        <b>{</b>
+            <font color='#009900'>/*!
+                this is a utility class used by dlib::min_cut to convert a directed_graph
+                into the kind of flow graph expected by the min_cut object's main block
+                of code.
+            !*/</font>
+
+            directed_graph_type<font color='#5555FF'>&amp;</font> g;
+
+            <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> directed_graph_type::node_type node_type;
+            <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> directed_graph_type::type node_label;
+
+        <font color='#0000FF'>public</font>:
+
+            <b><a name='general_flow_graph'></a>general_flow_graph</b><font face='Lucida Console'>(</font>
+                directed_graph_type<font color='#5555FF'>&amp;</font> g_
+            <font face='Lucida Console'>)</font> : g<font face='Lucida Console'>(</font>g_<font face='Lucida Console'>)</font>
+            <b>{</b>
+            <b>}</b>
+
+            <font color='#0000FF'>class</font> <b><a name='out_edge_iterator'></a>out_edge_iterator</b>
+            <b>{</b>
+                <font color='#0000FF'>friend</font> <font color='#0000FF'>class</font> general_flow_graph;
+                <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> idx; <font color='#009900'>// base node idx
+</font>                <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> cnt; <font color='#009900'>// count over the neighbors of idx
+</font>            <font color='#0000FF'>public</font>:
+
+                <b><a name='out_edge_iterator'></a>out_edge_iterator</b><font face='Lucida Console'>(</font>
+                <font face='Lucida Console'>)</font>:idx<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>,cnt<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+
+                <b><a name='out_edge_iterator'></a>out_edge_iterator</b><font face='Lucida Console'>(</font>
+                    <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> idx_,
+                    <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> cnt_
+                <font face='Lucida Console'>)</font>:idx<font face='Lucida Console'>(</font>idx_<font face='Lucida Console'>)</font>,cnt<font face='Lucida Console'>(</font>cnt_<font face='Lucida Console'>)</font>
+                <b>{</b><b>}</b>
+
+                <font color='#0000FF'><u>bool</u></font> <b><a name='operator'></a>operator</b><font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>
+                    <font color='#0000FF'>const</font> out_edge_iterator<font color='#5555FF'>&amp;</font> item
+                <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> cnt <font color='#5555FF'>!</font><font color='#5555FF'>=</font> item.cnt; <b>}</b>
+
+                out_edge_iterator<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>(</font>
+                <font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#5555FF'>+</font><font color='#5555FF'>+</font>cnt;
+                    <font color='#0000FF'>return</font> <font color='#5555FF'>*</font><font color='#0000FF'>this</font>;
+                <b>}</b>
+            <b>}</b>;
+
+            <font color='#0000FF'>class</font> <b><a name='in_edge_iterator'></a>in_edge_iterator</b>
+            <b>{</b>
+
+                <font color='#0000FF'>friend</font> <font color='#0000FF'>class</font> general_flow_graph;
+                <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> idx; <font color='#009900'>// base node idx
+</font>                <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> cnt; <font color='#009900'>// count over the neighbors of idx
+</font>            <font color='#0000FF'>public</font>:
+
+                <b><a name='in_edge_iterator'></a>in_edge_iterator</b><font face='Lucida Console'>(</font>
+                <font face='Lucida Console'>)</font>:idx<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>,cnt<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+
+                <b><a name='in_edge_iterator'></a>in_edge_iterator</b><font face='Lucida Console'>(</font>
+                    <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> idx_,
+                    <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> cnt_
+                <font face='Lucida Console'>)</font>:idx<font face='Lucida Console'>(</font>idx_<font face='Lucida Console'>)</font>,cnt<font face='Lucida Console'>(</font>cnt_<font face='Lucida Console'>)</font>
+                <b>{</b><b>}</b>
+
+                <font color='#0000FF'><u>bool</u></font> <b><a name='operator'></a>operator</b><font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>
+                    <font color='#0000FF'>const</font> in_edge_iterator<font color='#5555FF'>&amp;</font> item
+                <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> cnt <font color='#5555FF'>!</font><font color='#5555FF'>=</font> item.cnt; <b>}</b>
+
+                in_edge_iterator<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>(</font>
+                <font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#5555FF'>+</font><font color='#5555FF'>+</font>cnt;
+                    <font color='#0000FF'>return</font> <font color='#5555FF'>*</font><font color='#0000FF'>this</font>;
+                <b>}</b>
+            <b>}</b>;
+
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='number_of_nodes'></a>number_of_nodes</b> <font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> g.<font color='#BB00BB'>number_of_nodes</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <b>}</b>
+
+            out_edge_iterator <b><a name='out_begin'></a>out_begin</b><font face='Lucida Console'>(</font>
+                <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&amp;</font> it
+            <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> <font color='#BB00BB'>out_edge_iterator</font><font face='Lucida Console'>(</font>it, <font color='#979000'>0</font><font face='Lucida Console'>)</font>; <b>}</b>
+
+            in_edge_iterator <b><a name='in_begin'></a>in_begin</b><font face='Lucida Console'>(</font>
+                <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&amp;</font> it
+            <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> <font color='#BB00BB'>in_edge_iterator</font><font face='Lucida Console'>(</font>it, <font color='#979000'>0</font><font face='Lucida Console'>)</font>; <b>}</b>
+
+            out_edge_iterator <b><a name='out_end'></a>out_end</b><font face='Lucida Console'>(</font>
+                <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&amp;</font> it
+            <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> <font color='#BB00BB'>out_edge_iterator</font><font face='Lucida Console'>(</font>it, g.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font>it<font face='Lucida Console'>)</font>.<font color='#BB00BB'>number_of_children</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>; <b>}</b>
+
+            in_edge_iterator <b><a name='in_end'></a>in_end</b><font face='Lucida Console'>(</font>
+                <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&amp;</font> it
+            <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> <font color='#BB00BB'>in_edge_iterator</font><font face='Lucida Console'>(</font>it, g.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font>it<font face='Lucida Console'>)</font>.<font color='#BB00BB'>number_of_parents</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>; <b>}</b>
+
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='node_id'></a>node_id</b> <font face='Lucida Console'>(</font>
+                <font color='#0000FF'>const</font> out_edge_iterator<font color='#5555FF'>&amp;</font> it
+            <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> g.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font>it.idx<font face='Lucida Console'>)</font>.<font color='#BB00BB'>child</font><font face='Lucida Console'>(</font>it.cnt<font face='Lucida Console'>)</font>.<font color='#BB00BB'>index</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <b>}</b>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='node_id'></a>node_id</b> <font face='Lucida Console'>(</font>
+                <font color='#0000FF'>const</font> in_edge_iterator<font color='#5555FF'>&amp;</font> it
+            <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> g.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font>it.idx<font face='Lucida Console'>)</font>.<font color='#BB00BB'>parent</font><font face='Lucida Console'>(</font>it.cnt<font face='Lucida Console'>)</font>.<font color='#BB00BB'>index</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <b>}</b>
+
+            <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> directed_graph_type::edge_type edge_type;
+
+            edge_type <b><a name='get_flow'></a>get_flow</b> <font face='Lucida Console'>(</font><font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&amp;</font> it1,     <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&amp;</font> it2<font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+            <b>{</b>
+                <font color='#0000FF'>return</font> <font color='#BB00BB'>edge</font><font face='Lucida Console'>(</font>g, it1, it2<font face='Lucida Console'>)</font>;
+            <b>}</b>
+            edge_type <b><a name='get_flow'></a>get_flow</b> <font face='Lucida Console'>(</font><font color='#0000FF'>const</font> out_edge_iterator<font color='#5555FF'>&amp;</font> it<font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+            <b>{</b>
+                <font color='#0000FF'>return</font> g.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font>it.idx<font face='Lucida Console'>)</font>.<font color='#BB00BB'>child_edge</font><font face='Lucida Console'>(</font>it.cnt<font face='Lucida Console'>)</font>;
+            <b>}</b>
+            edge_type <b><a name='get_flow'></a>get_flow</b> <font face='Lucida Console'>(</font><font color='#0000FF'>const</font> in_edge_iterator<font color='#5555FF'>&amp;</font> it<font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+            <b>{</b>
+                <font color='#0000FF'>return</font> g.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font>it.idx<font face='Lucida Console'>)</font>.<font color='#BB00BB'>parent_edge</font><font face='Lucida Console'>(</font>it.cnt<font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+            <font color='#0000FF'><u>void</u></font> <b><a name='adjust_flow'></a>adjust_flow</b> <font face='Lucida Console'>(</font>
+                <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&amp;</font> it1,
+                <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&amp;</font> it2,
+                <font color='#0000FF'>const</font> edge_type<font color='#5555FF'>&amp;</font> value
+            <font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#BB00BB'>edge</font><font face='Lucida Console'>(</font>g, it1, it2<font face='Lucida Console'>)</font> <font color='#5555FF'>+</font><font color='#5555FF'>=</font> value;
+                <font color='#BB00BB'>edge</font><font face='Lucida Console'>(</font>g, it2, it1<font face='Lucida Console'>)</font> <font color='#5555FF'>-</font><font color='#5555FF'>=</font> value;
+            <b>}</b>
+
+            <font color='#0000FF'><u>void</u></font> <b><a name='set_label'></a>set_label</b> <font face='Lucida Console'>(</font>
+                <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&amp;</font> it,
+                node_label value
+            <font face='Lucida Console'>)</font>
+            <b>{</b>
+                g.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font>it<font face='Lucida Console'>)</font>.data <font color='#5555FF'>=</font> value;
+            <b>}</b>
+
+            node_label <b><a name='get_label'></a>get_label</b> <font face='Lucida Console'>(</font>
+                <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&amp;</font> it
+            <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+            <b>{</b>
+                <font color='#0000FF'>return</font> g.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font>it<font face='Lucida Console'>)</font>.data;
+            <b>}</b>
+
+        <b>}</b>;
+
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_GENERAL_FLOW_GRaPH_Hh_
+</font>
+
+</pre></body></html>

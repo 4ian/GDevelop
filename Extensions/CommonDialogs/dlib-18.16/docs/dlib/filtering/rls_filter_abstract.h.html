@@ -1,0 +1,174 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - rls_filter_abstract.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2012  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#undef</font> DLIB_RLS_FiLTER_ABSTRACT_Hh_
+<font color='#0000FF'>#ifdef</font> DLIB_RLS_FiLTER_ABSTRACT_Hh_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../svm/rls_abstract.h.html'>../svm/rls_abstract.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../matrix/matrix_abstract.h.html'>../matrix/matrix_abstract.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>class</font> <b><a name='rls_filter'></a>rls_filter</b>
+    <b>{</b>
+        <font color='#009900'>/*!
+            WHAT THIS OBJECT REPRESENTS
+                This object is a tool for doing time series prediction using linear 
+                recursive least squares.  In particular, this object takes a sequence 
+                of points from the user and, at each step, attempts to predict the 
+                value of the next point.  
+
+                To accomplish this, this object maintains a fixed size buffer of recent 
+                points.  Each prediction is a linear combination of the points in this 
+                history buffer.  It uses the recursive least squares algorithm to 
+                determine how to best combine the contents of the history buffer to
+                predict each point.  Therefore, each time update() is called with
+                a point, recursive least squares updates the linear combination weights,
+                and then it inserts the point into the history buffer.  After that, the 
+                next prediction is based on these updated weights and the current history 
+                buffer.
+        !*/</font>
+
+    <font color='#0000FF'>public</font>:
+
+        <b><a name='rls_filter'></a>rls_filter</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #get_window_size() == 5
+                - #get_forget_factor() == 0.8
+                - #get_c() == 100
+                - #get_predicted_next_state().size() == 0
+        !*/</font>
+
+        <font color='#0000FF'>explicit</font> <b><a name='rls_filter'></a>rls_filter</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> size,
+            <font color='#0000FF'><u>double</u></font> forget_factor <font color='#5555FF'>=</font> <font color='#979000'>0.8</font>,
+            <font color='#0000FF'><u>double</u></font> C <font color='#5555FF'>=</font> <font color='#979000'>100</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - 0 &lt; forget_factor &lt;= 1
+                - 0 &lt; C
+                - size &gt;= 2
+            ensures
+                - #get_window_size() == size
+                - #get_forget_factor() == forget_factor
+                - #get_c() == C
+                - #get_predicted_next_state().size() == 0
+        !*/</font>
+
+        <font color='#0000FF'><u>double</u></font> <b><a name='get_c'></a>get_c</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the regularization parameter.  It is the parameter that determines 
+                  the trade-off between trying to fit the data points given to update() or 
+                  allowing more errors but hopefully improving the generalization of the 
+                  predictions.  Larger values encourage exact fitting while smaller values 
+                  of C may encourage better generalization. 
+        !*/</font>
+
+        <font color='#0000FF'><u>double</u></font> <b><a name='get_forget_factor'></a>get_forget_factor</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - This object uses exponential forgetting in its implementation of recursive 
+                  least squares.  Therefore, this function returns the "forget factor". 
+                - if (get_forget_factor() == 1) then
+                    - In this case, exponential forgetting is disabled.
+                    - The recursive least squares algorithm will implicitly take all previous
+                      calls to update(z) into account when estimating the optimal weights for
+                      linearly combining the history buffer into a prediction of the next point.
+                - else
+                    - Old calls to update(z) are eventually forgotten.  That is, the smaller
+                      the forget factor, the less recursive least squares will care about 
+                      attempting to find linear combination weights which would have make 
+                      good predictions on old points.  It will care more about fitting recent 
+                      points.  This is appropriate if the statistical properties of the time 
+                      series we are modeling are not constant.
+        !*/</font>
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='get_window_size'></a>get_window_size</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the size of the history buffer.  This is the number of points which
+                  are linearly combine to make the predictions returned by get_predicted_next_state().
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='update'></a>update</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - Propagates the prediction forward in time.
+                - In particular, the value in get_predicted_next_state() is inserted
+                  into the history buffer and then the next prediction is estimated 
+                  based on this updated history buffer.
+                - #get_predicted_next_state() == the prediction for the next point
+                  in the time series.
+        !*/</font>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> EXP<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='update'></a>update</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&lt;</font>EXP<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> z
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - is_col_vector(z) == true
+                - z.size() != 0
+                - if (get_predicted_next_state().size() != 0) then
+                    - z.size() == get_predicted_next_state().size()
+                      (i.e. z must be the same size as all the previous z values given
+                      to this function)
+            ensures
+                - Updates the state of this filter based on the current measurement in z. 
+                - In particular, the filter weights are updated and z is inserted into
+                  the history buffer.  Then the next prediction is estimated based on 
+                  these updated weights and history buffer.
+                - #get_predicted_next_state() == the prediction for the next point
+                  in the time series.
+                - #get_predicted_next_state().size() == z.size()
+        !*/</font>
+
+        <font color='#0000FF'>const</font> matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>0</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> <b><a name='get_predicted_next_state'></a>get_predicted_next_state</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the estimate of the next point we will observe in the
+                  time series data.
+        !*/</font>
+
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='serialize'></a>serialize</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> rls_filter<font color='#5555FF'>&amp;</font> item, 
+        std::ostream<font color='#5555FF'>&amp;</font> out 
+    <font face='Lucida Console'>)</font>;   
+    <font color='#009900'>/*!
+        provides serialization support 
+    !*/</font>
+
+    <font color='#0000FF'><u>void</u></font> <b><a name='deserialize'></a>deserialize</b> <font face='Lucida Console'>(</font>
+        rls_filter<font color='#5555FF'>&amp;</font> item, 
+        std::istream<font color='#5555FF'>&amp;</font> in
+    <font face='Lucida Console'>)</font>;   
+    <font color='#009900'>/*!
+        provides deserialization support 
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_RLS_FiLTER_ABSTRACT_Hh_
+</font>
+
+
+</pre></body></html>

@@ -1,0 +1,43 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - matrix_data_layout_abstract.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2008  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#undef</font> DLIB_MATRIx_DATA_LAYOUT_ABSTRACT_
+<font color='#0000FF'>#ifdef</font> DLIB_MATRIx_DATA_LAYOUT_ABSTRACT_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../algs.h.html'>../algs.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>struct</font> <b><a name='row_major_layout'></a>row_major_layout</b>
+    <b>{</b>
+        <font color='#009900'>/*!
+            This is the default matrix layout.  Any matrix object that uses this
+            layout will be laid out in memory in row major order.  Additionally,
+            all elements are contiguous (e.g. there isn't any padding at the ends of
+            rows or anything like that)
+        !*/</font>
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>struct</font> <b><a name='column_major_layout'></a>column_major_layout</b>
+    <b>{</b>
+        <font color='#009900'>/*!
+            Any matrix object that uses this layout will be laid out in memory in 
+            column major order.  Additionally, all elements are contiguous (e.g. 
+            there isn't any padding at the ends of rows or anything like that)
+        !*/</font>
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_MATRIx_DATA_LAYOUT_ABSTRACT_
+</font>
+
+
+</pre></body></html>

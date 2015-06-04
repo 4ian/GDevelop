@@ -1,0 +1,345 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - assignment_function_abstract.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2011  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#undef</font> DLIB_ASSIGNMENT_FuNCTION_ABSTRACT_Hh_
+<font color='#0000FF'>#ifdef</font> DLIB_ASSIGNMENT_FuNCTION_ABSTRACT_Hh_
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>vector<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../optimization/max_cost_assignment_abstract.h.html'>../optimization/max_cost_assignment_abstract.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>class</font> <b><a name='example_feature_extractor'></a>example_feature_extractor</b>
+    <b>{</b>
+        <font color='#009900'>/*!
+            WHAT THIS OBJECT REPRESENTS
+                This object defines the interface a feature extractor must implement
+                if it is to be used with the assignment_function defined at the bottom
+                of this file.  
+                
+                The model used by assignment_function objects is the following.  
+                Given two sets of objects, the Left Hand Set (LHS) and Right Hand Set (RHS),
+                find a one-to-one mapping M from LHS into RHS such that:
+                    M == argmax_m  sum_{l in LHS} match_score(l,m(l))
+                Where match_score() returns a scalar value indicating how good it is
+                to say l maps to the RHS element m(l).  Additionally, in this model, 
+                m() is allowed to indicate that l doesn't map to anything, and in this 
+                case it is excluded from the sum.    
+
+                Finally, match_score() is defined as: 
+                    match_score(l,r) == dot(w, PSI(l,r)) + bias
+                where l is an element of LHS, r is an element of RHS, w is a parameter
+                vector and bias is a scalar valued parameter.
+
+                Therefore, a feature extractor defines how the PSI() feature vector 
+                is calculated.  In particular, PSI() is defined by the get_features()
+                method of this class.
+
+            THREAD SAFETY
+                Instances of this object are required to be threadsafe, that is, it should
+                be safe for multiple threads to make concurrent calls to the member
+                functions of this object.
+
+        !*/</font>
+
+    <font color='#0000FF'>public</font>:
+
+        <font color='#009900'>// This type should be a dlib::matrix capable of storing column vectors
+</font>        <font color='#009900'>// or an unsorted sparse vector type as defined in dlib/svm/sparse_vector_abstract.h.
+</font>        <font color='#0000FF'>typedef</font> matrix_or_sparse_vector_type feature_vector_type;
+
+        <font color='#009900'>// These two typedefs define the types used to represent an element in 
+</font>        <font color='#009900'>// the left hand and right hand sets.  You can use any copyable types here.
+</font>        <font color='#0000FF'>typedef</font> user_defined_type_1 lhs_element;
+        <font color='#0000FF'>typedef</font> user_defined_type_2 rhs_element;
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='num_features'></a>num_features</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the dimensionality of the PSI() feature vector.  
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='get_features'></a>get_features</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> lhs_element<font color='#5555FF'>&amp;</font> left,
+            <font color='#0000FF'>const</font> rhs_element<font color='#5555FF'>&amp;</font> right,
+            feature_vector_type<font color='#5555FF'>&amp;</font> feats
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #feats == PSI(left,right)
+                  (i.e. This function computes a feature vector which, in some sense, 
+                  captures information useful for deciding if matching left to right 
+                  is "good").
+        !*/</font>
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='num_nonnegative_weights'></a>num_nonnegative_weights</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the number of elements of the w parameter vector which should be
+                  non-negative.  That is, this feature extractor is intended to be used
+                  with w vectors where the first num_nonnegative_weights() elements of w
+                  are &gt;= 0.  That is, it should be the case that w(i) &gt;= 0 for all i &lt;
+                  num_nonnegative_weights().
+                - Note that num_nonnegative_weights() is just an optional method to allow
+                  you to tell a tool like the structural_assignment_trainer that the
+                  learned w should have a certain number of non-negative elements.
+                  Therefore, if you do not provide a num_nonnegative_weights() method in
+                  your feature extractor then it will default to a value of 0, indicating
+                  that all elements of the w parameter vector may be any value.
+        !*/</font>
+
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='serialize'></a>serialize</b><font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> example_feature_extractor<font color='#5555FF'>&amp;</font> item,
+        std::ostream<font color='#5555FF'>&amp;</font> out
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        provides serialization support 
+    !*/</font>
+
+    <font color='#0000FF'><u>void</u></font> <b><a name='deserialize'></a>deserialize</b><font face='Lucida Console'>(</font>
+        example_feature_extractor<font color='#5555FF'>&amp;</font> item, 
+        std::istream<font color='#5555FF'>&amp;</font> in
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        provides deserialization support 
+    !*/</font>
+
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> feature_extractor 
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>class</font> <b><a name='assignment_function'></a>assignment_function</b>
+    <b>{</b>
+        <font color='#009900'>/*!
+            REQUIREMENTS ON feature_extractor
+                It must be an object that implements an interface compatible with 
+                the example_feature_extractor discussed above.
+
+            WHAT THIS OBJECT REPRESENTS
+                This object is a tool for solving the optimal assignment problem given a 
+                user defined method for computing the quality of any particular assignment. 
+
+                To define this precisely, suppose you have two sets of objects, a 
+                Left Hand Set (LHS) and a Right Hand Set (RHS) and you want to 
+                find a one-to-one mapping M from LHS into RHS such that:
+                    M == argmax_m  sum_{l in LHS} match_score(l,m(l))
+                Where match_score() returns a scalar value indicating how good it is
+                to say l maps to the RHS element m(l).  Additionally, in this model, 
+                m() is allowed to indicate that l doesn't map to anything, and in this 
+                case it is excluded from the sum.    
+
+                Finally, this object supports match_score() functions of the form: 
+                    match_score(l,r) == dot(w, PSI(l,r)) + bias
+                where l is an element of LHS, r is an element of RHS, w is a parameter
+                vector, bias is a scalar valued parameter, and PSI() is defined by the
+                feature_extractor template argument.  
+
+            THREAD SAFETY
+                It is always safe to use distinct instances of this object in different
+                threads.  However, when a single instance is shared between threads then
+                the following rules apply:
+                    It is safe to call the const members of this object from multiple
+                    threads so long as the feature_extractor is also threadsafe.  This is
+                    because the const members are purely read-only operations.  However,
+                    any operation that modifies an assignment_function is not threadsafe.
+        !*/</font>
+
+    <font color='#0000FF'>public</font>:
+
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> feature_extractor::lhs_element  lhs_element;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> feature_extractor::rhs_element  rhs_element;
+        <font color='#0000FF'>typedef</font>          std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font>               label_type;
+        <font color='#0000FF'>typedef</font>          label_type                      result_type;
+        <font color='#0000FF'>typedef</font> std::pair<font color='#5555FF'>&lt;</font>std::vector<font color='#5555FF'>&lt;</font>lhs_element<font color='#5555FF'>&gt;</font>, std::vector<font color='#5555FF'>&lt;</font>rhs_element<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> sample_type;
+
+        <b><a name='assignment_function'></a>assignment_function</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #get_feature_extractor() == feature_extractor() 
+                  (i.e. it will have its default value)
+                - #get_weights().size() == #get_feature_extractor().num_features()
+                - #get_weights() == 0
+                - #get_bias() == 0
+                - #forces_assignment() == false 
+        !*/</font>
+
+        <font color='#0000FF'>explicit</font> <b><a name='assignment_function'></a>assignment_function</b><font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>0</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> weights,
+            <font color='#0000FF'><u>double</u></font> bias
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - feature_extractor().num_features() == weights.size()
+            ensures
+                - #get_feature_extractor() == feature_extractor() 
+                  (i.e. it will have its default value)
+                - #get_weights() == weights
+                - #get_bias() == bias
+                - #forces_assignment() == false 
+        !*/</font>
+
+        <b><a name='assignment_function'></a>assignment_function</b><font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>0</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> weights,
+            <font color='#0000FF'><u>double</u></font> bias,
+            <font color='#0000FF'>const</font> feature_extractor<font color='#5555FF'>&amp;</font> fe
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - fe.num_features() == weights.size()
+            ensures
+                - #get_feature_extractor() == fe
+                - #get_weights() == weights
+                - #get_bias() == bias
+                - #forces_assignment() == false 
+        !*/</font>
+
+        <b><a name='assignment_function'></a>assignment_function</b><font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>0</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> weights,
+            <font color='#0000FF'><u>double</u></font> bias,
+            <font color='#0000FF'>const</font> feature_extractor<font color='#5555FF'>&amp;</font> fe,
+            <font color='#0000FF'><u>bool</u></font> force_assignment
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - fe.num_features() == weights.size()
+            ensures
+                - #get_feature_extractor() == fe
+                - #get_weights() == weights
+                - #get_bias() == bias
+                - #forces_assignment() == force_assignment
+        !*/</font>
+
+        <font color='#0000FF'>const</font> feature_extractor<font color='#5555FF'>&amp;</font> <b><a name='get_feature_extractor'></a>get_feature_extractor</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the feature extractor used by this object
+        !*/</font>
+
+        <font color='#0000FF'>const</font> matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>0</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> <b><a name='get_weights'></a>get_weights</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the parameter vector (w) associated with this assignment function. 
+                  The length of the vector is get_feature_extractor().num_features().  
+        !*/</font>
+
+        <font color='#0000FF'><u>double</u></font> <b><a name='get_bias'></a>get_bias</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the bias parameter associated with this assignment function.
+        !*/</font>
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='forces_assignment'></a>forces_assignment</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>; 
+        <font color='#009900'>/*!
+            ensures
+                - returns true if this object is in the "forced assignment mode" and false
+                  otherwise.
+                - When deciding how to match LHS to RHS, this object can operate in one of 
+                  two modes.  In the default mode, this object will indicate that there is 
+                  no match for an element of LHS if the best matching element of RHS would 
+                  result in a negative match_score().  However, in the "forced assignment mode",
+                  this object will always make the assignment if there is an available 
+                  element in RHS, regardless of the match_score().
+
+                  Another way to understand this distinction is to consider an example.  
+                  Suppose LHS and RHS both contain 10 elements.  Then in the default mode, 
+                  it is possible for this object to indicate that there are anywhere between 
+                  0 to 10 matches between LHS and RHS.  However, in forced assignment mode 
+                  it will always indicate exactly 10 matches.   
+        !*/</font>
+
+        result_type <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>lhs_element<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> lhs,
+            <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>rhs_element<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> rhs 
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <font color='#009900'>/*!
+            ensures
+                - returns a vector ASSIGN such that:
+                    - ASSIGN.size() == lhs.size()
+                    - if (ASSIGN[i] != -1) then
+                        - lhs[i] is predicted to associate to rhs[ASSIGN[i]].
+                    - else
+                        - lhs[i] doesn't associate with anything in rhs.
+                    - All values in ASSIGN which are not equal to -1 are unique.  
+                      That is, ASSIGN will never indicate that more than one element
+                      of lhs is assigned to a particular element of rhs.
+        !*/</font>
+
+        result_type <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> sample_type<font color='#5555FF'>&amp;</font> item
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns (*this)(item.first, item.second);
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='predict_assignments'></a>predict_assignments</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> sample_type<font color='#5555FF'>&amp;</font> item,
+            result_type<font color='#5555FF'>&amp;</font> assignment
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #assignment == (*this)(item)
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='predict_assignments'></a>predict_assignments</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>lhs_element<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> lhs,
+            <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>rhs_element<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> rhs 
+            result_type<font color='#5555FF'>&amp;</font> assignment
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #assignment == (*this)(lhs,rhs)
+        !*/</font>
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> feature_extractor
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='serialize'></a>serialize</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> assignment_function<font color='#5555FF'>&lt;</font>feature_extractor<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> item,
+        std::ostream<font color='#5555FF'>&amp;</font> out
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        provides serialization support 
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> feature_extractor
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='deserialize'></a>deserialize</b> <font face='Lucida Console'>(</font>
+        assignment_function<font color='#5555FF'>&lt;</font>feature_extractor<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> item,
+        std::istream<font color='#5555FF'>&amp;</font> in 
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        provides deserialization support 
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_ASSIGNMENT_FuNCTION_ABSTRACT_Hh_
+</font>
+
+</pre></body></html>

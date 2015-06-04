@@ -1,0 +1,267 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - gees.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2010  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_LAPACk_ES_Hh_
+<font color='#0000FF'>#define</font> DLIB_LAPACk_ES_Hh_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='fortran_id.h.html'>fortran_id.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../matrix.h.html'>../matrix.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+    <font color='#0000FF'>namespace</font> lapack
+    <b>{</b>
+        <font color='#0000FF'>namespace</font> binding
+        <b>{</b>
+<font color='#0000FF'>#if</font> defined<font face='Lucida Console'>(</font>__alpha__<font face='Lucida Console'>)</font> <font color='#5555FF'>|</font><font color='#5555FF'>|</font> defined<font face='Lucida Console'>(</font>__sparc64__<font face='Lucida Console'>)</font> <font color='#5555FF'>|</font><font color='#5555FF'>|</font> defined<font face='Lucida Console'>(</font>__x86_64__<font face='Lucida Console'>)</font> <font color='#5555FF'>|</font><font color='#5555FF'>|</font> defined<font face='Lucida Console'>(</font>__ia64__<font face='Lucida Console'>)</font>
+            <font color='#0000FF'>typedef</font> <font color='#0000FF'><u>int</u></font> logical;
+<font color='#0000FF'>#else</font>
+            <font color='#0000FF'>typedef</font> <font color='#0000FF'><u>long</u></font> <font color='#0000FF'><u>int</u></font> logical;
+<font color='#0000FF'>#endif</font>
+            <font color='#0000FF'>typedef</font> <b><a name='logical'></a>logical</b> <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>L_fp<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>...<font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>extern</font> "<font color='#CC0000'>C</font>"
+            <b>{</b>
+                <font color='#0000FF'><u>void</u></font> <b><a name='DLIB_FORTRAN_ID'></a>DLIB_FORTRAN_ID</b><font face='Lucida Console'>(</font>dgees<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>char</u></font> <font color='#5555FF'>*</font>jobvs, <font color='#0000FF'><u>char</u></font> <font color='#5555FF'>*</font>sort, L_fp select, integer <font color='#5555FF'>*</font>n, 
+                                             <font color='#0000FF'><u>double</u></font> <font color='#5555FF'>*</font>a, integer <font color='#5555FF'>*</font>lda, integer <font color='#5555FF'>*</font>sdim, <font color='#0000FF'><u>double</u></font> <font color='#5555FF'>*</font>wr, 
+                                             <font color='#0000FF'><u>double</u></font> <font color='#5555FF'>*</font>wi, <font color='#0000FF'><u>double</u></font> <font color='#5555FF'>*</font>vs, integer <font color='#5555FF'>*</font>ldvs, <font color='#0000FF'><u>double</u></font> <font color='#5555FF'>*</font>work, 
+                                             integer <font color='#5555FF'>*</font>lwork, logical <font color='#5555FF'>*</font>bwork, integer <font color='#5555FF'>*</font>info<font face='Lucida Console'>)</font>;
+
+                <font color='#0000FF'><u>void</u></font> <b><a name='DLIB_FORTRAN_ID'></a>DLIB_FORTRAN_ID</b><font face='Lucida Console'>(</font>sgees<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>char</u></font> <font color='#5555FF'>*</font>jobvs, <font color='#0000FF'><u>char</u></font> <font color='#5555FF'>*</font>sort, L_fp select, integer <font color='#5555FF'>*</font>n, 
+                                             <font color='#0000FF'><u>float</u></font> <font color='#5555FF'>*</font>a, integer <font color='#5555FF'>*</font>lda, integer <font color='#5555FF'>*</font>sdim, <font color='#0000FF'><u>float</u></font> <font color='#5555FF'>*</font>wr, 
+                                             <font color='#0000FF'><u>float</u></font> <font color='#5555FF'>*</font>wi, <font color='#0000FF'><u>float</u></font> <font color='#5555FF'>*</font>vs, integer <font color='#5555FF'>*</font>ldvs, <font color='#0000FF'><u>float</u></font> <font color='#5555FF'>*</font>work, 
+                                             integer <font color='#5555FF'>*</font>lwork, logical <font color='#5555FF'>*</font>bwork, integer <font color='#5555FF'>*</font>info<font face='Lucida Console'>)</font>;
+
+            <b>}</b>
+
+            <font color='#0000FF'>inline</font> <font color='#0000FF'><u>int</u></font> <b><a name='gees'></a>gees</b> <font face='Lucida Console'>(</font><font color='#0000FF'><u>char</u></font> jobvs, integer n, 
+                             <font color='#0000FF'><u>double</u></font> <font color='#5555FF'>*</font>a, integer lda, <font color='#0000FF'><u>double</u></font> <font color='#5555FF'>*</font>wr, 
+                             <font color='#0000FF'><u>double</u></font> <font color='#5555FF'>*</font>wi, <font color='#0000FF'><u>double</u></font> <font color='#5555FF'>*</font>vs, integer ldvs, <font color='#0000FF'><u>double</u></font> <font color='#5555FF'>*</font>work, 
+                             integer lwork<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#009900'>// No sorting allowed
+</font>                integer info <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                <font color='#0000FF'><u>char</u></font> sort <font color='#5555FF'>=</font> '<font color='#FF0000'>N</font>';
+                L_fp fnil <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                logical nil <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                integer sdim <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                <font color='#BB00BB'>DLIB_FORTRAN_ID</font><font face='Lucida Console'>(</font>dgees<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>jobvs, <font color='#5555FF'>&amp;</font>sort, fnil, <font color='#5555FF'>&amp;</font>n,
+                                       a, <font color='#5555FF'>&amp;</font>lda, <font color='#5555FF'>&amp;</font>sdim, wr,
+                                       wi, vs, <font color='#5555FF'>&amp;</font>ldvs, work,
+                                       <font color='#5555FF'>&amp;</font>lwork, <font color='#5555FF'>&amp;</font>nil, <font color='#5555FF'>&amp;</font>info<font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>return</font> info;
+            <b>}</b>
+
+
+            <font color='#0000FF'>inline</font> <font color='#0000FF'><u>int</u></font> <b><a name='gees'></a>gees</b> <font face='Lucida Console'>(</font><font color='#0000FF'><u>char</u></font> jobvs, integer n, 
+                             <font color='#0000FF'><u>float</u></font> <font color='#5555FF'>*</font>a, integer lda, <font color='#0000FF'><u>float</u></font> <font color='#5555FF'>*</font>wr, 
+                             <font color='#0000FF'><u>float</u></font> <font color='#5555FF'>*</font>wi, <font color='#0000FF'><u>float</u></font> <font color='#5555FF'>*</font>vs, integer ldvs, <font color='#0000FF'><u>float</u></font> <font color='#5555FF'>*</font>work, 
+                             integer lwork<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#009900'>// No sorting allowed
+</font>                integer info <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                <font color='#0000FF'><u>char</u></font> sort <font color='#5555FF'>=</font> '<font color='#FF0000'>N</font>';
+                L_fp fnil <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                logical nil <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                integer sdim <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                <font color='#BB00BB'>DLIB_FORTRAN_ID</font><font face='Lucida Console'>(</font>sgees<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>jobvs, <font color='#5555FF'>&amp;</font>sort, fnil, <font color='#5555FF'>&amp;</font>n,
+                                       a, <font color='#5555FF'>&amp;</font>lda, <font color='#5555FF'>&amp;</font>sdim, wr,
+                                       wi, vs, <font color='#5555FF'>&amp;</font>ldvs, work,
+                                       <font color='#5555FF'>&amp;</font>lwork, <font color='#5555FF'>&amp;</font>nil, <font color='#5555FF'>&amp;</font>info<font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>return</font> info;
+            <b>}</b>
+
+
+        <b>}</b>
+
+    <font color='#009900'>// ------------------------------------------------------------------------------------
+</font>
+<font color='#009900'>/*  -- LAPACK driver routine (version 3.1) -- */</font>
+<font color='#009900'>/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */</font>
+<font color='#009900'>/*     November 2006 */</font>
+
+<font color='#009900'>/*     .. Scalar Arguments .. */</font>
+<font color='#009900'>/*     .. */</font>
+<font color='#009900'>/*     .. Array Arguments .. */</font>
+<font color='#009900'>/*     .. */</font>
+<font color='#009900'>/*     .. Function Arguments .. */</font>
+<font color='#009900'>/*     .. */</font>
+
+<font color='#009900'>/*  Purpose */</font>
+<font color='#009900'>/*  ======= */</font>
+
+<font color='#009900'>/*  DGEES computes for an N-by-N real nonsymmetric matrix A, the */</font>
+<font color='#009900'>/*  eigenvalues, the real Schur form T, and, optionally, the matrix of */</font>
+<font color='#009900'>/*  Schur vectors Z.  This gives the Schur factorization A = Z*T*(Z**T). */</font>
+
+<font color='#009900'>/*  Optionally, it also orders the eigenvalues on the diagonal of the */</font>
+<font color='#009900'>/*  real Schur form so that selected eigenvalues are at the top left. */</font>
+<font color='#009900'>/*  The leading columns of Z then form an orthonormal basis for the */</font>
+<font color='#009900'>/*  invariant subspace corresponding to the selected eigenvalues. */</font>
+
+<font color='#009900'>/*  A matrix is in real Schur form if it is upper quasi-triangular with */</font>
+<font color='#009900'>/*  1-by-1 and 2-by-2 blocks. 2-by-2 blocks will be standardized in the */</font>
+<font color='#009900'>/*  form */</font>
+<font color='#009900'>/*          [  a  b  ] */</font>
+<font color='#009900'>/*          [  c  a  ] */</font>
+
+<font color='#009900'>/*  where b*c &lt; 0. The eigenvalues of such a block are a +- sqrt(bc). */</font>
+
+<font color='#009900'>/*  Arguments */</font>
+<font color='#009900'>/*  ========= */</font>
+
+<font color='#009900'>/*  JOBVS   (input) CHARACTER*1 */</font>
+<font color='#009900'>/*          = 'N': Schur vectors are not computed; */</font>
+<font color='#009900'>/*          = 'V': Schur vectors are computed. */</font>
+
+<font color='#009900'>/*  SORT    (input) CHARACTER*1 */</font>
+<font color='#009900'>/*          Specifies whether or not to order the eigenvalues on the */</font>
+<font color='#009900'>/*          diagonal of the Schur form. */</font>
+<font color='#009900'>/*          = 'N': Eigenvalues are not ordered; */</font>
+<font color='#009900'>/*          = 'S': Eigenvalues are ordered (see SELECT). */</font>
+
+<font color='#009900'>/*  SELECT  (external procedure) LOGICAL FUNCTION of two DOUBLE PRECISION arguments */</font>
+<font color='#009900'>/*          SELECT must be declared EXTERNAL in the calling subroutine. */</font>
+<font color='#009900'>/*          If SORT = 'S', SELECT is used to select eigenvalues to sort */</font>
+<font color='#009900'>/*          to the top left of the Schur form. */</font>
+<font color='#009900'>/*          If SORT = 'N', SELECT is not referenced. */</font>
+<font color='#009900'>/*          An eigenvalue WR(j)+sqrt(-1)*WI(j) is selected if */</font>
+<font color='#009900'>/*          SELECT(WR(j),WI(j)) is true; i.e., if either one of a complex */</font>
+<font color='#009900'>/*          conjugate pair of eigenvalues is selected, then both complex */</font>
+<font color='#009900'>/*          eigenvalues are selected. */</font>
+<font color='#009900'>/*          Note that a selected complex eigenvalue may no longer */</font>
+<font color='#009900'>/*          satisfy SELECT(WR(j),WI(j)) = .TRUE. after ordering, since */</font>
+<font color='#009900'>/*          ordering may change the value of complex eigenvalues */</font>
+<font color='#009900'>/*          (especially if the eigenvalue is ill-conditioned); in this */</font>
+<font color='#009900'>/*          case INFO is set to N+2 (see INFO below). */</font>
+
+<font color='#009900'>/*  N       (input) INTEGER */</font>
+<font color='#009900'>/*          The order of the matrix A. N &gt;= 0. */</font>
+
+<font color='#009900'>/*  A       (input/output) DOUBLE PRECISION array, dimension (LDA,N) */</font>
+<font color='#009900'>/*          On entry, the N-by-N matrix A. */</font>
+<font color='#009900'>/*          On exit, A has been overwritten by its real Schur form T. */</font>
+
+<font color='#009900'>/*  LDA     (input) INTEGER */</font>
+<font color='#009900'>/*          The leading dimension of the array A.  LDA &gt;= max(1,N). */</font>
+
+<font color='#009900'>/*  SDIM    (output) INTEGER */</font>
+<font color='#009900'>/*          If SORT = 'N', SDIM = 0. */</font>
+<font color='#009900'>/*          If SORT = 'S', SDIM = number of eigenvalues (after sorting) */</font>
+<font color='#009900'>/*                         for which SELECT is true. (Complex conjugate */</font>
+<font color='#009900'>/*                         pairs for which SELECT is true for either */</font>
+<font color='#009900'>/*                         eigenvalue count as 2.) */</font>
+
+<font color='#009900'>/*  WR      (output) DOUBLE PRECISION array, dimension (N) */</font>
+<font color='#009900'>/*  WI      (output) DOUBLE PRECISION array, dimension (N) */</font>
+<font color='#009900'>/*          WR and WI contain the real and imaginary parts, */</font>
+<font color='#009900'>/*          respectively, of the computed eigenvalues in the same order */</font>
+<font color='#009900'>/*          that they appear on the diagonal of the output Schur form T. */</font>
+<font color='#009900'>/*          Complex conjugate pairs of eigenvalues will appear */</font>
+<font color='#009900'>/*          consecutively with the eigenvalue having the positive */</font>
+<font color='#009900'>/*          imaginary part first. */</font>
+
+<font color='#009900'>/*  VS      (output) DOUBLE PRECISION array, dimension (LDVS,N) */</font>
+<font color='#009900'>/*          If JOBVS = 'V', VS contains the orthogonal matrix Z of Schur */</font>
+<font color='#009900'>/*          vectors. */</font>
+<font color='#009900'>/*          If JOBVS = 'N', VS is not referenced. */</font>
+
+<font color='#009900'>/*  LDVS    (input) INTEGER */</font>
+<font color='#009900'>/*          The leading dimension of the array VS.  LDVS &gt;= 1; if */</font>
+<font color='#009900'>/*          JOBVS = 'V', LDVS &gt;= N. */</font>
+
+<font color='#009900'>/*  WORK    (workspace/output) DOUBLE PRECISION array, dimension (MAX(1,LWORK)) */</font>
+<font color='#009900'>/*          On exit, if INFO = 0, WORK(1) contains the optimal LWORK. */</font>
+
+<font color='#009900'>/*  LWORK   (input) INTEGER */</font>
+<font color='#009900'>/*          The dimension of the array WORK.  LWORK &gt;= max(1,3*N). */</font>
+<font color='#009900'>/*          For good performance, LWORK must generally be larger. */</font>
+
+<font color='#009900'>/*          If LWORK = -1, then a workspace query is assumed; the routine */</font>
+<font color='#009900'>/*          only calculates the optimal size of the WORK array, returns */</font>
+<font color='#009900'>/*          this value as the first entry of the WORK array, and no error */</font>
+<font color='#009900'>/*          message related to LWORK is issued by XERBLA. */</font>
+
+<font color='#009900'>/*  BWORK   (workspace) LOGICAL array, dimension (N) */</font>
+<font color='#009900'>/*          Not referenced if SORT = 'N'. */</font>
+
+<font color='#009900'>/*  INFO    (output) INTEGER */</font>
+<font color='#009900'>/*          = 0: successful exit */</font>
+<font color='#009900'>/*          &lt; 0: if INFO = -i, the i-th argument had an illegal value. */</font>
+<font color='#009900'>/*          &gt; 0: if INFO = i, and i is */</font>
+<font color='#009900'>/*             &lt;= N: the QR algorithm failed to compute all the */</font>
+<font color='#009900'>/*                   eigenvalues; elements 1:ILO-1 and i+1:N of WR and WI */</font>
+<font color='#009900'>/*                   contain those eigenvalues which have converged; if */</font>
+<font color='#009900'>/*                   JOBVS = 'V', VS contains the matrix which reduces A */</font>
+<font color='#009900'>/*                   to its partially converged Schur form. */</font>
+<font color='#009900'>/*             = N+1: the eigenvalues could not be reordered because some */</font>
+<font color='#009900'>/*                   eigenvalues were too close to separate (the problem */</font>
+<font color='#009900'>/*                   is very ill-conditioned); */</font>
+<font color='#009900'>/*             = N+2: after reordering, roundoff changed values of some */</font>
+<font color='#009900'>/*                   complex eigenvalues so that leading eigenvalues in */</font>
+<font color='#009900'>/*                   the Schur form no longer satisfy SELECT=.TRUE.  This */</font>
+<font color='#009900'>/*                   could also be caused by underflow due to scaling. */</font>
+
+    <font color='#009900'>// ------------------------------------------------------------------------------------
+</font>
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'>typename</font> T, 
+            <font color='#0000FF'><u>long</u></font> NR1, <font color='#0000FF'><u>long</u></font> NR2, <font color='#0000FF'><u>long</u></font> NR3, <font color='#0000FF'><u>long</u></font> NR4,
+            <font color='#0000FF'><u>long</u></font> NC1, <font color='#0000FF'><u>long</u></font> NC2, <font color='#0000FF'><u>long</u></font> NC3, <font color='#0000FF'><u>long</u></font> NC4,
+            <font color='#0000FF'>typename</font> MM,
+            <font color='#0000FF'>typename</font> layout
+            <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>int</u></font> <b><a name='gees'></a>gees</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>char</u></font> jobz,
+            matrix<font color='#5555FF'>&lt;</font>T,NR1,NC1,MM,column_major_layout<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> a,
+            matrix<font color='#5555FF'>&lt;</font>T,NR2,NC2,MM,layout<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> wr,
+            matrix<font color='#5555FF'>&lt;</font>T,NR3,NC3,MM,layout<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> wi,
+            matrix<font color='#5555FF'>&lt;</font>T,NR4,NC4,MM,column_major_layout<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> vs
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            matrix<font color='#5555FF'>&lt;</font>T,<font color='#979000'>0</font>,<font color='#979000'>1</font>,MM,column_major_layout<font color='#5555FF'>&gt;</font> work;
+
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> n <font color='#5555FF'>=</font> a.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+            wr.<font color='#BB00BB'>set_size</font><font face='Lucida Console'>(</font>n,<font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+            wi.<font color='#BB00BB'>set_size</font><font face='Lucida Console'>(</font>n,<font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>jobz <font color='#5555FF'>=</font><font color='#5555FF'>=</font> '<font color='#FF0000'>V</font>'<font face='Lucida Console'>)</font>
+                vs.<font color='#BB00BB'>set_size</font><font face='Lucida Console'>(</font>n,n<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>else</font>
+                vs.<font color='#BB00BB'>set_size</font><font face='Lucida Console'>(</font>NR4?NR4:<font color='#979000'>1</font>, NC4?NC4:<font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// figure out how big the workspace needs to be.
+</font>            T work_size <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+            <font color='#0000FF'><u>int</u></font> info <font color='#5555FF'>=</font> binding::<font color='#BB00BB'>gees</font><font face='Lucida Console'>(</font>jobz, n, 
+                                     <font color='#5555FF'>&amp;</font><font color='#BB00BB'>a</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font>, a.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, <font color='#5555FF'>&amp;</font><font color='#BB00BB'>wr</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font>, 
+                                     <font color='#5555FF'>&amp;</font><font color='#BB00BB'>wi</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font>, <font color='#5555FF'>&amp;</font><font color='#BB00BB'>vs</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font>, vs.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, <font color='#5555FF'>&amp;</font>work_size, 
+                                     <font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>info <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                <font color='#0000FF'>return</font> info;
+
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>work.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> work_size<font face='Lucida Console'>)</font>
+                work.<font color='#BB00BB'>set_size</font><font face='Lucida Console'>(</font><font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>work_size<font face='Lucida Console'>)</font>, <font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// compute the actual decomposition 
+</font>            info <font color='#5555FF'>=</font> binding::<font color='#BB00BB'>gees</font><font face='Lucida Console'>(</font>jobz, n, 
+                                 <font color='#5555FF'>&amp;</font><font color='#BB00BB'>a</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font>, a.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, <font color='#5555FF'>&amp;</font><font color='#BB00BB'>wr</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font>, 
+                                 <font color='#5555FF'>&amp;</font><font color='#BB00BB'>wi</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font>, <font color='#5555FF'>&amp;</font><font color='#BB00BB'>vs</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font>, vs.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, <font color='#5555FF'>&amp;</font><font color='#BB00BB'>work</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font>, 
+                                 work.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>return</font> info;
+        <b>}</b>
+
+    <font color='#009900'>// ------------------------------------------------------------------------------------
+</font>
+    <b>}</b>
+
+<b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_LAPACk_ES_Hh_
+</font>
+
+</pre></body></html>

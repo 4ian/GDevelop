@@ -1,0 +1,1193 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - fhog.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2013  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_fHOG_Hh_
+<font color='#0000FF'>#define</font> DLIB_fHOG_Hh_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='fhog_abstract.h.html'>fhog_abstract.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../matrix.h.html'>../matrix.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../array2d.h.html'>../array2d.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../array.h.html'>../array.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../geometry.h.html'>../geometry.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='assign_image.h.html'>assign_image.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='draw.h.html'>draw.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='interpolation.h.html'>interpolation.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../simd/simd4i.h.html'>../simd/simd4i.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../simd/simd4f.h.html'>../simd/simd4f.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>namespace</font> impl_fhog
+    <b>{</b>
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> image_type<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>inline</font> <font color='#0000FF'>typename</font> dlib::enable_if_c<font color='#5555FF'>&lt;</font>pixel_traits<font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> image_type::pixel_type<font color='#5555FF'>&gt;</font>::rgb<font color='#5555FF'>&gt;</font>::type <b><a name='get_gradient'></a>get_gradient</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>int</u></font> r,
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>int</u></font> c,
+            <font color='#0000FF'>const</font> image_type<font color='#5555FF'>&amp;</font> img,
+            matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>2</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> grad,
+            <font color='#0000FF'><u>double</u></font><font color='#5555FF'>&amp;</font> len
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>2</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> grad2, grad3;
+            <font color='#009900'>// get the red gradient
+</font>            <font color='#BB00BB'>grad</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font>img[r][c<font color='#5555FF'>+</font><font color='#979000'>1</font>].red<font color='#5555FF'>-</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font>img[r][c<font color='#5555FF'>-</font><font color='#979000'>1</font>].red; 
+            <font color='#BB00BB'>grad</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font>img[r<font color='#5555FF'>+</font><font color='#979000'>1</font>][c].red<font color='#5555FF'>-</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font>img[r<font color='#5555FF'>-</font><font color='#979000'>1</font>][c].red;
+            len <font color='#5555FF'>=</font> <font color='#BB00BB'>length_squared</font><font face='Lucida Console'>(</font>grad<font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// get the green gradient
+</font>            <font color='#BB00BB'>grad2</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font>img[r][c<font color='#5555FF'>+</font><font color='#979000'>1</font>].green<font color='#5555FF'>-</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font>img[r][c<font color='#5555FF'>-</font><font color='#979000'>1</font>].green; 
+            <font color='#BB00BB'>grad2</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font>img[r<font color='#5555FF'>+</font><font color='#979000'>1</font>][c].green<font color='#5555FF'>-</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font>img[r<font color='#5555FF'>-</font><font color='#979000'>1</font>][c].green;
+            <font color='#0000FF'><u>double</u></font> v2 <font color='#5555FF'>=</font> <font color='#BB00BB'>length_squared</font><font face='Lucida Console'>(</font>grad2<font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// get the blue gradient
+</font>            <font color='#BB00BB'>grad3</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font>img[r][c<font color='#5555FF'>+</font><font color='#979000'>1</font>].blue<font color='#5555FF'>-</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font>img[r][c<font color='#5555FF'>-</font><font color='#979000'>1</font>].blue; 
+            <font color='#BB00BB'>grad3</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font>img[r<font color='#5555FF'>+</font><font color='#979000'>1</font>][c].blue<font color='#5555FF'>-</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font>img[r<font color='#5555FF'>-</font><font color='#979000'>1</font>][c].blue;
+            <font color='#0000FF'><u>double</u></font> v3 <font color='#5555FF'>=</font> <font color='#BB00BB'>length_squared</font><font face='Lucida Console'>(</font>grad3<font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// pick color with strongest gradient
+</font>            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>v2 <font color='#5555FF'>&gt;</font> len<font face='Lucida Console'>)</font> 
+            <b>{</b>
+                len <font color='#5555FF'>=</font> v2;
+                grad <font color='#5555FF'>=</font> grad2;
+            <b>}</b> 
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>v3 <font color='#5555FF'>&gt;</font> len<font face='Lucida Console'>)</font> 
+            <b>{</b>
+                len <font color='#5555FF'>=</font> v3;
+                grad <font color='#5555FF'>=</font> grad3;
+            <b>}</b>
+        <b>}</b>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> image_type<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>inline</font> <font color='#0000FF'>typename</font> dlib::enable_if_c<font color='#5555FF'>&lt;</font>pixel_traits<font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> image_type::pixel_type<font color='#5555FF'>&gt;</font>::rgb<font color='#5555FF'>&gt;</font>::type <b><a name='get_gradient'></a>get_gradient</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>int</u></font> r,
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>int</u></font> c,
+            <font color='#0000FF'>const</font> image_type<font color='#5555FF'>&amp;</font> img,
+            simd4f<font color='#5555FF'>&amp;</font> grad_x,
+            simd4f<font color='#5555FF'>&amp;</font> grad_y,
+            simd4f<font color='#5555FF'>&amp;</font> len
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            simd4i <font color='#BB00BB'>rleft</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font>img[r][c<font color='#5555FF'>-</font><font color='#979000'>1</font>].red, 
+                        <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font>img[r][c].red,
+                        <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font>img[r][c<font color='#5555FF'>+</font><font color='#979000'>1</font>].red,
+                        <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font>img[r][c<font color='#5555FF'>+</font><font color='#979000'>2</font>].red<font face='Lucida Console'>)</font>;
+            simd4i <font color='#BB00BB'>rright</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font>img[r][c<font color='#5555FF'>+</font><font color='#979000'>1</font>].red, 
+                         <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font>img[r][c<font color='#5555FF'>+</font><font color='#979000'>2</font>].red,
+                         <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font>img[r][c<font color='#5555FF'>+</font><font color='#979000'>3</font>].red,
+                         <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font>img[r][c<font color='#5555FF'>+</font><font color='#979000'>4</font>].red<font face='Lucida Console'>)</font>;
+            simd4i <font color='#BB00BB'>rtop</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font>img[r<font color='#5555FF'>-</font><font color='#979000'>1</font>][c].red,
+                       <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font>img[r<font color='#5555FF'>-</font><font color='#979000'>1</font>][c<font color='#5555FF'>+</font><font color='#979000'>1</font>].red,
+                       <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font>img[r<font color='#5555FF'>-</font><font color='#979000'>1</font>][c<font color='#5555FF'>+</font><font color='#979000'>2</font>].red,
+                       <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font>img[r<font color='#5555FF'>-</font><font color='#979000'>1</font>][c<font color='#5555FF'>+</font><font color='#979000'>3</font>].red<font face='Lucida Console'>)</font>;
+            simd4i <font color='#BB00BB'>rbottom</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font>img[r<font color='#5555FF'>+</font><font color='#979000'>1</font>][c].red,
+                          <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font>img[r<font color='#5555FF'>+</font><font color='#979000'>1</font>][c<font color='#5555FF'>+</font><font color='#979000'>1</font>].red,
+                          <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font>img[r<font color='#5555FF'>+</font><font color='#979000'>1</font>][c<font color='#5555FF'>+</font><font color='#979000'>2</font>].red,
+                          <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font>img[r<font color='#5555FF'>+</font><font color='#979000'>1</font>][c<font color='#5555FF'>+</font><font color='#979000'>3</font>].red<font face='Lucida Console'>)</font>;
+
+            simd4i <font color='#BB00BB'>gleft</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font>img[r][c<font color='#5555FF'>-</font><font color='#979000'>1</font>].green, 
+                        <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font>img[r][c].green,
+                        <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font>img[r][c<font color='#5555FF'>+</font><font color='#979000'>1</font>].green,
+                        <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font>img[r][c<font color='#5555FF'>+</font><font color='#979000'>2</font>].green<font face='Lucida Console'>)</font>;
+            simd4i <font color='#BB00BB'>gright</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font>img[r][c<font color='#5555FF'>+</font><font color='#979000'>1</font>].green, 
+                         <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font>img[r][c<font color='#5555FF'>+</font><font color='#979000'>2</font>].green,
+                         <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font>img[r][c<font color='#5555FF'>+</font><font color='#979000'>3</font>].green,
+                         <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font>img[r][c<font color='#5555FF'>+</font><font color='#979000'>4</font>].green<font face='Lucida Console'>)</font>;
+            simd4i <font color='#BB00BB'>gtop</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font>img[r<font color='#5555FF'>-</font><font color='#979000'>1</font>][c].green,
+                       <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font>img[r<font color='#5555FF'>-</font><font color='#979000'>1</font>][c<font color='#5555FF'>+</font><font color='#979000'>1</font>].green,
+                       <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font>img[r<font color='#5555FF'>-</font><font color='#979000'>1</font>][c<font color='#5555FF'>+</font><font color='#979000'>2</font>].green,
+                       <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font>img[r<font color='#5555FF'>-</font><font color='#979000'>1</font>][c<font color='#5555FF'>+</font><font color='#979000'>3</font>].green<font face='Lucida Console'>)</font>;
+            simd4i <font color='#BB00BB'>gbottom</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font>img[r<font color='#5555FF'>+</font><font color='#979000'>1</font>][c].green,
+                          <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font>img[r<font color='#5555FF'>+</font><font color='#979000'>1</font>][c<font color='#5555FF'>+</font><font color='#979000'>1</font>].green,
+                          <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font>img[r<font color='#5555FF'>+</font><font color='#979000'>1</font>][c<font color='#5555FF'>+</font><font color='#979000'>2</font>].green,
+                          <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font>img[r<font color='#5555FF'>+</font><font color='#979000'>1</font>][c<font color='#5555FF'>+</font><font color='#979000'>3</font>].green<font face='Lucida Console'>)</font>;
+
+            simd4i <font color='#BB00BB'>bleft</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font>img[r][c<font color='#5555FF'>-</font><font color='#979000'>1</font>].blue, 
+                        <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font>img[r][c].blue,
+                        <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font>img[r][c<font color='#5555FF'>+</font><font color='#979000'>1</font>].blue,
+                        <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font>img[r][c<font color='#5555FF'>+</font><font color='#979000'>2</font>].blue<font face='Lucida Console'>)</font>;
+            simd4i <font color='#BB00BB'>bright</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font>img[r][c<font color='#5555FF'>+</font><font color='#979000'>1</font>].blue, 
+                         <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font>img[r][c<font color='#5555FF'>+</font><font color='#979000'>2</font>].blue,
+                         <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font>img[r][c<font color='#5555FF'>+</font><font color='#979000'>3</font>].blue,
+                         <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font>img[r][c<font color='#5555FF'>+</font><font color='#979000'>4</font>].blue<font face='Lucida Console'>)</font>;
+            simd4i <font color='#BB00BB'>btop</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font>img[r<font color='#5555FF'>-</font><font color='#979000'>1</font>][c].blue,
+                       <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font>img[r<font color='#5555FF'>-</font><font color='#979000'>1</font>][c<font color='#5555FF'>+</font><font color='#979000'>1</font>].blue,
+                       <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font>img[r<font color='#5555FF'>-</font><font color='#979000'>1</font>][c<font color='#5555FF'>+</font><font color='#979000'>2</font>].blue,
+                       <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font>img[r<font color='#5555FF'>-</font><font color='#979000'>1</font>][c<font color='#5555FF'>+</font><font color='#979000'>3</font>].blue<font face='Lucida Console'>)</font>;
+            simd4i <font color='#BB00BB'>bbottom</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font>img[r<font color='#5555FF'>+</font><font color='#979000'>1</font>][c].blue,
+                          <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font>img[r<font color='#5555FF'>+</font><font color='#979000'>1</font>][c<font color='#5555FF'>+</font><font color='#979000'>1</font>].blue,
+                          <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font>img[r<font color='#5555FF'>+</font><font color='#979000'>1</font>][c<font color='#5555FF'>+</font><font color='#979000'>2</font>].blue,
+                          <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font>img[r<font color='#5555FF'>+</font><font color='#979000'>1</font>][c<font color='#5555FF'>+</font><font color='#979000'>3</font>].blue<font face='Lucida Console'>)</font>;
+
+            simd4i grad_x_red   <font color='#5555FF'>=</font> rright<font color='#5555FF'>-</font>rleft;
+            simd4i grad_y_red   <font color='#5555FF'>=</font> rbottom<font color='#5555FF'>-</font>rtop;
+            simd4i grad_x_green <font color='#5555FF'>=</font> gright<font color='#5555FF'>-</font>gleft;
+            simd4i grad_y_green <font color='#5555FF'>=</font> gbottom<font color='#5555FF'>-</font>gtop;
+            simd4i grad_x_blue  <font color='#5555FF'>=</font> bright<font color='#5555FF'>-</font>bleft;
+            simd4i grad_y_blue  <font color='#5555FF'>=</font> bbottom<font color='#5555FF'>-</font>btop;
+
+            simd4i rlen <font color='#5555FF'>=</font> grad_x_red<font color='#5555FF'>*</font>grad_x_red <font color='#5555FF'>+</font> grad_y_red<font color='#5555FF'>*</font>grad_y_red;
+            simd4i glen <font color='#5555FF'>=</font> grad_x_green<font color='#5555FF'>*</font>grad_x_green <font color='#5555FF'>+</font> grad_y_green<font color='#5555FF'>*</font>grad_y_green;
+            simd4i blen <font color='#5555FF'>=</font> grad_x_blue<font color='#5555FF'>*</font>grad_x_blue <font color='#5555FF'>+</font> grad_y_blue<font color='#5555FF'>*</font>grad_y_blue;
+
+            simd4i cmp <font color='#5555FF'>=</font> rlen<font color='#5555FF'>&gt;</font>glen;
+            simd4i tgrad_x <font color='#5555FF'>=</font> <font color='#BB00BB'>select</font><font face='Lucida Console'>(</font>cmp,grad_x_red,grad_x_green<font face='Lucida Console'>)</font>;
+            simd4i tgrad_y <font color='#5555FF'>=</font> <font color='#BB00BB'>select</font><font face='Lucida Console'>(</font>cmp,grad_y_red,grad_y_green<font face='Lucida Console'>)</font>;
+            simd4i tlen <font color='#5555FF'>=</font> <font color='#BB00BB'>select</font><font face='Lucida Console'>(</font>cmp,rlen,glen<font face='Lucida Console'>)</font>;
+
+            cmp <font color='#5555FF'>=</font> tlen<font color='#5555FF'>&gt;</font>blen;
+            grad_x <font color='#5555FF'>=</font> <font color='#BB00BB'>select</font><font face='Lucida Console'>(</font>cmp,tgrad_x,grad_x_blue<font face='Lucida Console'>)</font>;
+            grad_y <font color='#5555FF'>=</font> <font color='#BB00BB'>select</font><font face='Lucida Console'>(</font>cmp,tgrad_y,grad_y_blue<font face='Lucida Console'>)</font>;
+            len <font color='#5555FF'>=</font> <font color='#BB00BB'>select</font><font face='Lucida Console'>(</font>cmp,tlen,blen<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+    <font color='#009900'>// ------------------------------------------------------------------------------------
+</font>
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> image_type<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>inline</font> <font color='#0000FF'>typename</font> dlib::disable_if_c<font color='#5555FF'>&lt;</font>pixel_traits<font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> image_type::pixel_type<font color='#5555FF'>&gt;</font>::rgb<font color='#5555FF'>&gt;</font>::type <b><a name='get_gradient'></a>get_gradient</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>int</u></font> r,
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>int</u></font> c,
+            <font color='#0000FF'>const</font> image_type<font color='#5555FF'>&amp;</font> img,
+            matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>2</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> grad,
+            <font color='#0000FF'><u>double</u></font><font color='#5555FF'>&amp;</font> len
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#BB00BB'>grad</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font><font color='#BB00BB'>get_pixel_intensity</font><font face='Lucida Console'>(</font>img[r][c<font color='#5555FF'>+</font><font color='#979000'>1</font>]<font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font><font color='#BB00BB'>get_pixel_intensity</font><font face='Lucida Console'>(</font>img[r][c<font color='#5555FF'>-</font><font color='#979000'>1</font>]<font face='Lucida Console'>)</font>; 
+            <font color='#BB00BB'>grad</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font><font color='#BB00BB'>get_pixel_intensity</font><font face='Lucida Console'>(</font>img[r<font color='#5555FF'>+</font><font color='#979000'>1</font>][c]<font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font><font color='#BB00BB'>get_pixel_intensity</font><font face='Lucida Console'>(</font>img[r<font color='#5555FF'>-</font><font color='#979000'>1</font>][c]<font face='Lucida Console'>)</font>;
+            len <font color='#5555FF'>=</font> <font color='#BB00BB'>length_squared</font><font face='Lucida Console'>(</font>grad<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> image_type<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>inline</font> <font color='#0000FF'>typename</font> dlib::disable_if_c<font color='#5555FF'>&lt;</font>pixel_traits<font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> image_type::pixel_type<font color='#5555FF'>&gt;</font>::rgb<font color='#5555FF'>&gt;</font>::type <b><a name='get_gradient'></a>get_gradient</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>int</u></font> r,
+            <font color='#0000FF'><u>int</u></font> c,
+            <font color='#0000FF'>const</font> image_type<font color='#5555FF'>&amp;</font> img,
+            simd4f<font color='#5555FF'>&amp;</font> grad_x,
+            simd4f<font color='#5555FF'>&amp;</font> grad_y,
+            simd4f<font color='#5555FF'>&amp;</font> len
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            simd4i <font color='#BB00BB'>left</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font><font color='#BB00BB'>get_pixel_intensity</font><font face='Lucida Console'>(</font>img[r][c<font color='#5555FF'>-</font><font color='#979000'>1</font>]<font face='Lucida Console'>)</font>, 
+                        <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font><font color='#BB00BB'>get_pixel_intensity</font><font face='Lucida Console'>(</font>img[r][c]<font face='Lucida Console'>)</font>,
+                        <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font><font color='#BB00BB'>get_pixel_intensity</font><font face='Lucida Console'>(</font>img[r][c<font color='#5555FF'>+</font><font color='#979000'>1</font>]<font face='Lucida Console'>)</font>,
+                        <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font><font color='#BB00BB'>get_pixel_intensity</font><font face='Lucida Console'>(</font>img[r][c<font color='#5555FF'>+</font><font color='#979000'>2</font>]<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            simd4i <font color='#BB00BB'>right</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font><font color='#BB00BB'>get_pixel_intensity</font><font face='Lucida Console'>(</font>img[r][c<font color='#5555FF'>+</font><font color='#979000'>1</font>]<font face='Lucida Console'>)</font>, 
+                         <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font><font color='#BB00BB'>get_pixel_intensity</font><font face='Lucida Console'>(</font>img[r][c<font color='#5555FF'>+</font><font color='#979000'>2</font>]<font face='Lucida Console'>)</font>,
+                         <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font><font color='#BB00BB'>get_pixel_intensity</font><font face='Lucida Console'>(</font>img[r][c<font color='#5555FF'>+</font><font color='#979000'>3</font>]<font face='Lucida Console'>)</font>,
+                         <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font><font color='#BB00BB'>get_pixel_intensity</font><font face='Lucida Console'>(</font>img[r][c<font color='#5555FF'>+</font><font color='#979000'>4</font>]<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+            simd4i <font color='#BB00BB'>top</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font><font color='#BB00BB'>get_pixel_intensity</font><font face='Lucida Console'>(</font>img[r<font color='#5555FF'>-</font><font color='#979000'>1</font>][c]<font face='Lucida Console'>)</font>,
+                       <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font><font color='#BB00BB'>get_pixel_intensity</font><font face='Lucida Console'>(</font>img[r<font color='#5555FF'>-</font><font color='#979000'>1</font>][c<font color='#5555FF'>+</font><font color='#979000'>1</font>]<font face='Lucida Console'>)</font>,
+                       <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font><font color='#BB00BB'>get_pixel_intensity</font><font face='Lucida Console'>(</font>img[r<font color='#5555FF'>-</font><font color='#979000'>1</font>][c<font color='#5555FF'>+</font><font color='#979000'>2</font>]<font face='Lucida Console'>)</font>,
+                       <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font><font color='#BB00BB'>get_pixel_intensity</font><font face='Lucida Console'>(</font>img[r<font color='#5555FF'>-</font><font color='#979000'>1</font>][c<font color='#5555FF'>+</font><font color='#979000'>3</font>]<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            simd4i <font color='#BB00BB'>bottom</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font><font color='#BB00BB'>get_pixel_intensity</font><font face='Lucida Console'>(</font>img[r<font color='#5555FF'>+</font><font color='#979000'>1</font>][c]<font face='Lucida Console'>)</font>,
+                          <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font><font color='#BB00BB'>get_pixel_intensity</font><font face='Lucida Console'>(</font>img[r<font color='#5555FF'>+</font><font color='#979000'>1</font>][c<font color='#5555FF'>+</font><font color='#979000'>1</font>]<font face='Lucida Console'>)</font>,
+                          <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font><font color='#BB00BB'>get_pixel_intensity</font><font face='Lucida Console'>(</font>img[r<font color='#5555FF'>+</font><font color='#979000'>1</font>][c<font color='#5555FF'>+</font><font color='#979000'>2</font>]<font face='Lucida Console'>)</font>,
+                          <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font><font color='#BB00BB'>get_pixel_intensity</font><font face='Lucida Console'>(</font>img[r<font color='#5555FF'>+</font><font color='#979000'>1</font>][c<font color='#5555FF'>+</font><font color='#979000'>3</font>]<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+            grad_x <font color='#5555FF'>=</font> right<font color='#5555FF'>-</font>left;
+            grad_y <font color='#5555FF'>=</font> bottom<font color='#5555FF'>-</font>top;
+
+            len <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>grad_x<font color='#5555FF'>*</font>grad_x <font color='#5555FF'>+</font> grad_y<font color='#5555FF'>*</font>grad_y<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+    <font color='#009900'>// ------------------------------------------------------------------------------------
+</font>
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> mm1, <font color='#0000FF'>typename</font> mm2<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='set_hog'></a>set_hog</b> <font face='Lucida Console'>(</font>
+            dlib::array<font color='#5555FF'>&lt;</font>array2d<font color='#5555FF'>&lt;</font>T,mm1<font color='#5555FF'>&gt;</font>,mm2<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> hog,
+            <font color='#0000FF'><u>int</u></font> o,
+            <font color='#0000FF'><u>int</u></font> x, 
+            <font color='#0000FF'><u>int</u></font> y,
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font><font color='#5555FF'>&amp;</font> value
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            hog[o][y][x] <font color='#5555FF'>=</font> value;
+        <b>}</b>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> mm1, <font color='#0000FF'>typename</font> mm2<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='init_hog'></a>init_hog</b> <font face='Lucida Console'>(</font>
+            dlib::array<font color='#5555FF'>&lt;</font>array2d<font color='#5555FF'>&lt;</font>T,mm1<font color='#5555FF'>&gt;</font>,mm2<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> hog,
+            <font color='#0000FF'><u>int</u></font> hog_nr,
+            <font color='#0000FF'><u>int</u></font> hog_nc,
+            <font color='#0000FF'><u>int</u></font> filter_rows_padding,
+            <font color='#0000FF'><u>int</u></font> filter_cols_padding
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>int</u></font> num_hog_bands <font color='#5555FF'>=</font> <font color='#979000'>27</font><font color='#5555FF'>+</font><font color='#979000'>4</font>;
+            hog.<font color='#BB00BB'>resize</font><font face='Lucida Console'>(</font>num_hog_bands<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> num_hog_bands; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                hog[i].<font color='#BB00BB'>set_size</font><font face='Lucida Console'>(</font>hog_nr<font color='#5555FF'>+</font>filter_rows_padding<font color='#5555FF'>-</font><font color='#979000'>1</font>, hog_nc<font color='#5555FF'>+</font>filter_cols_padding<font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+                rectangle rect <font color='#5555FF'>=</font> <font color='#BB00BB'>get_rect</font><font face='Lucida Console'>(</font>hog[i]<font face='Lucida Console'>)</font>;
+                rect.<font color='#BB00BB'>top</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font><font color='#5555FF'>=</font>   <font face='Lucida Console'>(</font>filter_rows_padding<font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font><font color='#5555FF'>/</font><font color='#979000'>2</font>;
+                rect.<font color='#BB00BB'>left</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font><font color='#5555FF'>=</font>  <font face='Lucida Console'>(</font>filter_cols_padding<font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font><font color='#5555FF'>/</font><font color='#979000'>2</font>;
+                rect.<font color='#BB00BB'>right</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>-</font><font color='#5555FF'>=</font> filter_cols_padding<font color='#5555FF'>/</font><font color='#979000'>2</font>;
+                rect.<font color='#BB00BB'>bottom</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>-</font><font color='#5555FF'>=</font> filter_rows_padding<font color='#5555FF'>/</font><font color='#979000'>2</font>;
+                <font color='#BB00BB'>zero_border_pixels</font><font face='Lucida Console'>(</font>hog[i],rect<font face='Lucida Console'>)</font>;
+            <b>}</b>
+        <b>}</b>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> mm1, <font color='#0000FF'>typename</font> mm2<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='init_hog_zero_everything'></a>init_hog_zero_everything</b> <font face='Lucida Console'>(</font>
+            dlib::array<font color='#5555FF'>&lt;</font>array2d<font color='#5555FF'>&lt;</font>T,mm1<font color='#5555FF'>&gt;</font>,mm2<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> hog,
+            <font color='#0000FF'><u>int</u></font> hog_nr,
+            <font color='#0000FF'><u>int</u></font> hog_nc,
+            <font color='#0000FF'><u>int</u></font> filter_rows_padding,
+            <font color='#0000FF'><u>int</u></font> filter_cols_padding
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>int</u></font> num_hog_bands <font color='#5555FF'>=</font> <font color='#979000'>27</font><font color='#5555FF'>+</font><font color='#979000'>4</font>;
+            hog.<font color='#BB00BB'>resize</font><font face='Lucida Console'>(</font>num_hog_bands<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> num_hog_bands; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                hog[i].<font color='#BB00BB'>set_size</font><font face='Lucida Console'>(</font>hog_nr<font color='#5555FF'>+</font>filter_rows_padding<font color='#5555FF'>-</font><font color='#979000'>1</font>, hog_nc<font color='#5555FF'>+</font>filter_cols_padding<font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+                <font color='#BB00BB'>assign_all_pixels</font><font face='Lucida Console'>(</font>hog[i], <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+        <b>}</b>
+
+    <font color='#009900'>// ------------------------------------------------------------------------------------
+</font>
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> mm<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='set_hog'></a>set_hog</b> <font face='Lucida Console'>(</font>
+            array2d<font color='#5555FF'>&lt;</font>matrix<font color='#5555FF'>&lt;</font>T,<font color='#979000'>31</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font>,mm<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> hog,
+            <font color='#0000FF'><u>int</u></font> o,
+            <font color='#0000FF'><u>int</u></font> x, 
+            <font color='#0000FF'><u>int</u></font> y,
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font><font color='#5555FF'>&amp;</font> value
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            hog[y][x]<font face='Lucida Console'>(</font>o<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> value;
+        <b>}</b>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> mm<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='init_hog'></a>init_hog</b> <font face='Lucida Console'>(</font>
+            array2d<font color='#5555FF'>&lt;</font>matrix<font color='#5555FF'>&lt;</font>T,<font color='#979000'>31</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font>,mm<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> hog,
+            <font color='#0000FF'><u>int</u></font> hog_nr,
+            <font color='#0000FF'><u>int</u></font> hog_nc,
+            <font color='#0000FF'><u>int</u></font> filter_rows_padding,
+            <font color='#0000FF'><u>int</u></font> filter_cols_padding
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            hog.<font color='#BB00BB'>set_size</font><font face='Lucida Console'>(</font>hog_nr<font color='#5555FF'>+</font>filter_rows_padding<font color='#5555FF'>-</font><font color='#979000'>1</font>, hog_nc<font color='#5555FF'>+</font>filter_cols_padding<font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// now zero out the border region
+</font>            rectangle rect <font color='#5555FF'>=</font> <font color='#BB00BB'>get_rect</font><font face='Lucida Console'>(</font>hog<font face='Lucida Console'>)</font>;
+            rect.<font color='#BB00BB'>top</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font><font color='#5555FF'>=</font>   <font face='Lucida Console'>(</font>filter_rows_padding<font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font><font color='#5555FF'>/</font><font color='#979000'>2</font>;
+            rect.<font color='#BB00BB'>left</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font><font color='#5555FF'>=</font>  <font face='Lucida Console'>(</font>filter_cols_padding<font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font><font color='#5555FF'>/</font><font color='#979000'>2</font>;
+            rect.<font color='#BB00BB'>right</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>-</font><font color='#5555FF'>=</font> filter_cols_padding<font color='#5555FF'>/</font><font color='#979000'>2</font>;
+            rect.<font color='#BB00BB'>bottom</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>-</font><font color='#5555FF'>=</font> filter_rows_padding<font color='#5555FF'>/</font><font color='#979000'>2</font>;
+            border_enumerator <font color='#BB00BB'>be</font><font face='Lucida Console'>(</font><font color='#BB00BB'>get_rect</font><font face='Lucida Console'>(</font>hog<font face='Lucida Console'>)</font>,rect<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>be.<font color='#BB00BB'>move_next</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>const</font> point p <font color='#5555FF'>=</font> be.<font color='#BB00BB'>element</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                <font color='#BB00BB'>set_all_elements</font><font face='Lucida Console'>(</font>hog[p.<font color='#BB00BB'>y</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>][p.<font color='#BB00BB'>x</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>], <font color='#979000'>0</font><font face='Lucida Console'>)</font>; 
+            <b>}</b>
+        <b>}</b>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> mm<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='init_hog_zero_everything'></a>init_hog_zero_everything</b> <font face='Lucida Console'>(</font>
+            array2d<font color='#5555FF'>&lt;</font>matrix<font color='#5555FF'>&lt;</font>T,<font color='#979000'>31</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font>,mm<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> hog,
+            <font color='#0000FF'><u>int</u></font> hog_nr,
+            <font color='#0000FF'><u>int</u></font> hog_nc,
+            <font color='#0000FF'><u>int</u></font> filter_rows_padding,
+            <font color='#0000FF'><u>int</u></font> filter_cols_padding
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            hog.<font color='#BB00BB'>set_size</font><font face='Lucida Console'>(</font>hog_nr<font color='#5555FF'>+</font>filter_rows_padding<font color='#5555FF'>-</font><font color='#979000'>1</font>, hog_nc<font color='#5555FF'>+</font>filter_cols_padding<font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> r <font color='#5555FF'>=</font> <font color='#979000'>0</font>; r <font color='#5555FF'>&lt;</font> hog.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>r<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> c <font color='#5555FF'>=</font> <font color='#979000'>0</font>; c <font color='#5555FF'>&lt;</font> hog.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>c<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#BB00BB'>set_all_elements</font><font face='Lucida Console'>(</font>hog[r][c], <font color='#979000'>0</font><font face='Lucida Console'>)</font>; 
+                <b>}</b>
+            <b>}</b>
+        <b>}</b>
+
+    <font color='#009900'>// ------------------------------------------------------------------------------------
+</font>
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'>typename</font> image_type, 
+            <font color='#0000FF'>typename</font> out_type
+            <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='impl_extract_fhog_features_cell_size_1'></a>impl_extract_fhog_features_cell_size_1</b><font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> image_type<font color='#5555FF'>&amp;</font> img_, 
+            out_type<font color='#5555FF'>&amp;</font> hog, 
+            <font color='#0000FF'><u>int</u></font> filter_rows_padding,
+            <font color='#0000FF'><u>int</u></font> filter_cols_padding
+        <font face='Lucida Console'>)</font> 
+        <b>{</b>
+            const_image_view<font color='#5555FF'>&lt;</font>image_type<font color='#5555FF'>&gt;</font> <font color='#BB00BB'>img</font><font face='Lucida Console'>(</font>img_<font face='Lucida Console'>)</font>;
+            <font color='#009900'>// make sure requires clause is not broken
+</font>            <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font> filter_rows_padding <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font>
+                         filter_cols_padding <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font> ,
+                "<font color='#CC0000'>\t void extract_fhog_features()</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t Invalid inputs were given to this function. </font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t filter_rows_padding: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> filter_rows_padding 
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t filter_cols_padding: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> filter_cols_padding 
+                <font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>/*
+                This function is an optimized version of impl_extract_fhog_features() for
+                the case where cell_size == 1.
+            */</font>
+
+
+            <font color='#009900'>// unit vectors used to compute gradient orientation
+</font>            matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>2</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> directions[<font color='#979000'>9</font>];
+            directions[<font color='#979000'>0</font>] <font color='#5555FF'>=</font>  <font color='#979000'>1.0000</font>, <font color='#979000'>0.0000</font>; 
+            directions[<font color='#979000'>1</font>] <font color='#5555FF'>=</font>  <font color='#979000'>0.9397</font>, <font color='#979000'>0.3420</font>;
+            directions[<font color='#979000'>2</font>] <font color='#5555FF'>=</font>  <font color='#979000'>0.7660</font>, <font color='#979000'>0.6428</font>;
+            directions[<font color='#979000'>3</font>] <font color='#5555FF'>=</font>  <font color='#979000'>0.500</font>,  <font color='#979000'>0.8660</font>;
+            directions[<font color='#979000'>4</font>] <font color='#5555FF'>=</font>  <font color='#979000'>0.1736</font>, <font color='#979000'>0.9848</font>;
+            directions[<font color='#979000'>5</font>] <font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>0.1736</font>, <font color='#979000'>0.9848</font>;
+            directions[<font color='#979000'>6</font>] <font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>0.5000</font>, <font color='#979000'>0.8660</font>;
+            directions[<font color='#979000'>7</font>] <font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>0.7660</font>, <font color='#979000'>0.6428</font>;
+            directions[<font color='#979000'>8</font>] <font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>0.9397</font>, <font color='#979000'>0.3420</font>;
+
+
+
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>img.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#979000'>2</font> <font color='#5555FF'>|</font><font color='#5555FF'>|</font> img.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#979000'>2</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                hog.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>return</font>;
+            <b>}</b>
+
+            array2d<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font> <font color='#BB00BB'>angle</font><font face='Lucida Console'>(</font>img.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, img.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+            array2d<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>float</u></font><font color='#5555FF'>&gt;</font> <font color='#BB00BB'>norm</font><font face='Lucida Console'>(</font>img.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, img.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>zero_border_pixels</font><font face='Lucida Console'>(</font>norm,<font color='#979000'>1</font>,<font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// memory for HOG features
+</font>            <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> hog_nr <font color='#5555FF'>=</font> img.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#979000'>2</font>;
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> hog_nc <font color='#5555FF'>=</font> img.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#979000'>2</font>;
+
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>int</u></font> padding_rows_offset <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>filter_rows_padding<font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font><font color='#5555FF'>/</font><font color='#979000'>2</font>;
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>int</u></font> padding_cols_offset <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>filter_cols_padding<font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font><font color='#5555FF'>/</font><font color='#979000'>2</font>;
+            <font color='#BB00BB'>init_hog_zero_everything</font><font face='Lucida Console'>(</font>hog, hog_nr, hog_nc, filter_rows_padding, filter_cols_padding<font face='Lucida Console'>)</font>;
+
+
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>int</u></font> visible_nr <font color='#5555FF'>=</font> img.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#979000'>1</font>;
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>int</u></font> visible_nc <font color='#5555FF'>=</font> img.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#979000'>1</font>;
+
+            <font color='#009900'>// First populate the gradient histograms
+</font>            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> y <font color='#5555FF'>=</font> <font color='#979000'>1</font>; y <font color='#5555FF'>&lt;</font> visible_nr; y<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> 
+            <b>{</b>
+                <font color='#0000FF'><u>int</u></font> x;
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>x <font color='#5555FF'>=</font> <font color='#979000'>1</font>; x <font color='#5555FF'>&lt;</font> visible_nc<font color='#5555FF'>-</font><font color='#979000'>3</font>; x<font color='#5555FF'>+</font><font color='#5555FF'>=</font><font color='#979000'>4</font><font face='Lucida Console'>)</font> 
+                <b>{</b>
+                    <font color='#009900'>// v will be the length of the gradient vectors.
+</font>                    simd4f grad_x, grad_y, v;
+                    <font color='#BB00BB'>get_gradient</font><font face='Lucida Console'>(</font>y,x,img,grad_x,grad_y,v<font face='Lucida Console'>)</font>;
+
+                    <font color='#0000FF'><u>float</u></font> _vv[<font color='#979000'>4</font>];
+                    v.<font color='#BB00BB'>store</font><font face='Lucida Console'>(</font>_vv<font face='Lucida Console'>)</font>;
+
+                    <font color='#009900'>// Now snap the gradient to one of 18 orientations
+</font>                    simd4f best_dot <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                    simd4f best_o <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> o <font color='#5555FF'>=</font> <font color='#979000'>0</font>; o <font color='#5555FF'>&lt;</font> <font color='#979000'>9</font>; o<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> 
+                    <b>{</b>
+                        simd4f dot <font color='#5555FF'>=</font> grad_x<font color='#5555FF'>*</font>directions[o]<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> grad_y<font color='#5555FF'>*</font>directions[o]<font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+                        simd4f_bool cmp <font color='#5555FF'>=</font> dot<font color='#5555FF'>&gt;</font>best_dot;
+                        best_dot <font color='#5555FF'>=</font> <font color='#BB00BB'>select</font><font face='Lucida Console'>(</font>cmp,dot,best_dot<font face='Lucida Console'>)</font>; 
+                        dot <font color='#5555FF'>*</font><font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>1</font>;
+                        best_o <font color='#5555FF'>=</font> <font color='#BB00BB'>select</font><font face='Lucida Console'>(</font>cmp,o,best_o<font face='Lucida Console'>)</font>;
+
+                        cmp <font color='#5555FF'>=</font> dot<font color='#5555FF'>&gt;</font>best_dot;
+                        best_dot <font color='#5555FF'>=</font> <font color='#BB00BB'>select</font><font face='Lucida Console'>(</font>cmp,dot,best_dot<font face='Lucida Console'>)</font>;
+                        best_o <font color='#5555FF'>=</font> <font color='#BB00BB'>select</font><font face='Lucida Console'>(</font>cmp,o<font color='#5555FF'>+</font><font color='#979000'>9</font>,best_o<font face='Lucida Console'>)</font>;
+                    <b>}</b>
+
+                    int32 _best_o[<font color='#979000'>4</font>]; <font color='#BB00BB'>simd4i</font><font face='Lucida Console'>(</font>best_o<font face='Lucida Console'>)</font>.<font color='#BB00BB'>store</font><font face='Lucida Console'>(</font>_best_o<font face='Lucida Console'>)</font>;
+
+                    norm[y][x<font color='#5555FF'>+</font><font color='#979000'>0</font>] <font color='#5555FF'>=</font> _vv[<font color='#979000'>0</font>];
+                    norm[y][x<font color='#5555FF'>+</font><font color='#979000'>1</font>] <font color='#5555FF'>=</font> _vv[<font color='#979000'>1</font>];
+                    norm[y][x<font color='#5555FF'>+</font><font color='#979000'>2</font>] <font color='#5555FF'>=</font> _vv[<font color='#979000'>2</font>];
+                    norm[y][x<font color='#5555FF'>+</font><font color='#979000'>3</font>] <font color='#5555FF'>=</font> _vv[<font color='#979000'>3</font>];
+
+                    angle[y][x<font color='#5555FF'>+</font><font color='#979000'>0</font>] <font color='#5555FF'>=</font> _best_o[<font color='#979000'>0</font>];
+                    angle[y][x<font color='#5555FF'>+</font><font color='#979000'>1</font>] <font color='#5555FF'>=</font> _best_o[<font color='#979000'>1</font>];
+                    angle[y][x<font color='#5555FF'>+</font><font color='#979000'>2</font>] <font color='#5555FF'>=</font> _best_o[<font color='#979000'>2</font>];
+                    angle[y][x<font color='#5555FF'>+</font><font color='#979000'>3</font>] <font color='#5555FF'>=</font> _best_o[<font color='#979000'>3</font>];
+
+                <b>}</b>
+                <font color='#009900'>// Now process the right columns that don't fit into simd registers.
+</font>                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>; x <font color='#5555FF'>&lt;</font> visible_nc; x<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> 
+                <b>{</b>
+                    matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>2</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> grad;
+                    <font color='#0000FF'><u>double</u></font> v;
+                    <font color='#BB00BB'>get_gradient</font><font face='Lucida Console'>(</font>y,x,img,grad,v<font face='Lucida Console'>)</font>;
+
+                    <font color='#009900'>// snap to one of 18 orientations
+</font>                    <font color='#0000FF'><u>double</u></font> best_dot <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                    <font color='#0000FF'><u>int</u></font> best_o <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> o <font color='#5555FF'>=</font> <font color='#979000'>0</font>; o <font color='#5555FF'>&lt;</font> <font color='#979000'>9</font>; o<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> 
+                    <b>{</b>
+                        <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> dot <font color='#5555FF'>=</font> dlib::<font color='#BB00BB'>dot</font><font face='Lucida Console'>(</font>directions[o], grad<font face='Lucida Console'>)</font>; 
+                        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>dot <font color='#5555FF'>&gt;</font> best_dot<font face='Lucida Console'>)</font> 
+                        <b>{</b>
+                            best_dot <font color='#5555FF'>=</font> dot;
+                            best_o <font color='#5555FF'>=</font> o;
+                        <b>}</b> 
+                        <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>-</font>dot <font color='#5555FF'>&gt;</font> best_dot<font face='Lucida Console'>)</font> 
+                        <b>{</b>
+                            best_dot <font color='#5555FF'>=</font> <font color='#5555FF'>-</font>dot;
+                            best_o <font color='#5555FF'>=</font> o<font color='#5555FF'>+</font><font color='#979000'>9</font>;
+                        <b>}</b>
+                    <b>}</b>
+
+                    norm[y][x] <font color='#5555FF'>=</font> v;
+                    angle[y][x] <font color='#5555FF'>=</font> best_o;
+                <b>}</b>
+            <b>}</b>
+
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> eps <font color='#5555FF'>=</font> <font color='#979000'>0.0001</font>;
+            <font color='#009900'>// compute features
+</font>            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> y <font color='#5555FF'>=</font> <font color='#979000'>0</font>; y <font color='#5555FF'>&lt;</font> hog_nr; y<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> 
+            <b>{</b>
+                <font color='#0000FF'>const</font> <font color='#0000FF'><u>int</u></font> yy <font color='#5555FF'>=</font> y<font color='#5555FF'>+</font>padding_rows_offset; 
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> x <font color='#5555FF'>=</font> <font color='#979000'>0</font>; x <font color='#5555FF'>&lt;</font> hog_nc; x<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> 
+                <b>{</b>
+                    <font color='#0000FF'>const</font> simd4f <font color='#BB00BB'>z1</font><font face='Lucida Console'>(</font>norm[y<font color='#5555FF'>+</font><font color='#979000'>1</font>][x<font color='#5555FF'>+</font><font color='#979000'>1</font>],
+                                    norm[y][x<font color='#5555FF'>+</font><font color='#979000'>1</font>], 
+                                    norm[y<font color='#5555FF'>+</font><font color='#979000'>1</font>][x],  
+                                    norm[y][x]<font face='Lucida Console'>)</font>;
+
+                    <font color='#0000FF'>const</font> simd4f <font color='#BB00BB'>z2</font><font face='Lucida Console'>(</font>norm[y<font color='#5555FF'>+</font><font color='#979000'>1</font>][x<font color='#5555FF'>+</font><font color='#979000'>2</font>],
+                                    norm[y][x<font color='#5555FF'>+</font><font color='#979000'>2</font>],
+                                    norm[y<font color='#5555FF'>+</font><font color='#979000'>1</font>][x<font color='#5555FF'>+</font><font color='#979000'>1</font>],
+                                    norm[y][x<font color='#5555FF'>+</font><font color='#979000'>1</font>]<font face='Lucida Console'>)</font>;
+
+                    <font color='#0000FF'>const</font> simd4f <font color='#BB00BB'>z3</font><font face='Lucida Console'>(</font>norm[y<font color='#5555FF'>+</font><font color='#979000'>2</font>][x<font color='#5555FF'>+</font><font color='#979000'>1</font>],
+                                    norm[y<font color='#5555FF'>+</font><font color='#979000'>1</font>][x<font color='#5555FF'>+</font><font color='#979000'>1</font>],
+                                    norm[y<font color='#5555FF'>+</font><font color='#979000'>2</font>][x],
+                                    norm[y<font color='#5555FF'>+</font><font color='#979000'>1</font>][x]<font face='Lucida Console'>)</font>;
+
+                    <font color='#0000FF'>const</font> simd4f <font color='#BB00BB'>z4</font><font face='Lucida Console'>(</font>norm[y<font color='#5555FF'>+</font><font color='#979000'>2</font>][x<font color='#5555FF'>+</font><font color='#979000'>2</font>],
+                                    norm[y<font color='#5555FF'>+</font><font color='#979000'>1</font>][x<font color='#5555FF'>+</font><font color='#979000'>2</font>],
+                                    norm[y<font color='#5555FF'>+</font><font color='#979000'>2</font>][x<font color='#5555FF'>+</font><font color='#979000'>1</font>],
+                                    norm[y<font color='#5555FF'>+</font><font color='#979000'>1</font>][x<font color='#5555FF'>+</font><font color='#979000'>1</font>]<font face='Lucida Console'>)</font>;
+
+                    <font color='#0000FF'>const</font> simd4f temp0 <font color='#5555FF'>=</font> std::<font color='#BB00BB'>sqrt</font><font face='Lucida Console'>(</font>norm[y<font color='#5555FF'>+</font><font color='#979000'>1</font>][x<font color='#5555FF'>+</font><font color='#979000'>1</font>]<font face='Lucida Console'>)</font>;
+                    <font color='#0000FF'>const</font> simd4f nn <font color='#5555FF'>=</font> <font color='#979000'>0.2</font><font color='#5555FF'>*</font><font color='#BB00BB'>sqrt</font><font face='Lucida Console'>(</font>z1<font color='#5555FF'>+</font>z2<font color='#5555FF'>+</font>z3<font color='#5555FF'>+</font>z4<font color='#5555FF'>+</font>eps<font face='Lucida Console'>)</font>;
+                    <font color='#0000FF'>const</font> simd4f n <font color='#5555FF'>=</font> <font color='#979000'>0.1</font><font color='#5555FF'>/</font>nn;
+
+                    simd4f t <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+
+                    <font color='#0000FF'>const</font> <font color='#0000FF'><u>int</u></font> xx <font color='#5555FF'>=</font> x<font color='#5555FF'>+</font>padding_cols_offset; 
+
+                    simd4f h0 <font color='#5555FF'>=</font> <font color='#BB00BB'>min</font><font face='Lucida Console'>(</font>temp0,nn<font face='Lucida Console'>)</font><font color='#5555FF'>*</font>n;
+                    <font color='#0000FF'>const</font> <font color='#0000FF'><u>float</u></font> vv <font color='#5555FF'>=</font> <font color='#BB00BB'>sum</font><font face='Lucida Console'>(</font>h0<font face='Lucida Console'>)</font>;
+                    <font color='#BB00BB'>set_hog</font><font face='Lucida Console'>(</font>hog,angle[y<font color='#5555FF'>+</font><font color='#979000'>1</font>][x<font color='#5555FF'>+</font><font color='#979000'>1</font>],xx,yy,   vv<font face='Lucida Console'>)</font>;
+                    t <font color='#5555FF'>+</font><font color='#5555FF'>=</font> h0;
+
+                    t <font color='#5555FF'>*</font><font color='#5555FF'>=</font> <font color='#979000'>2</font><font color='#5555FF'>*</font><font color='#979000'>0.2357</font>;
+
+                    <font color='#009900'>// contrast-insensitive features
+</font>                    <font color='#BB00BB'>set_hog</font><font face='Lucida Console'>(</font>hog,angle[y<font color='#5555FF'>+</font><font color='#979000'>1</font>][x<font color='#5555FF'>+</font><font color='#979000'>1</font>]<font color='#5555FF'>%</font><font color='#979000'>9</font><font color='#5555FF'>+</font><font color='#979000'>18</font>,xx,yy, vv<font face='Lucida Console'>)</font>;
+
+
+                    <font color='#0000FF'><u>float</u></font> temp[<font color='#979000'>4</font>];
+                    t.<font color='#BB00BB'>store</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font>;
+
+                    <font color='#009900'>// texture features
+</font>                    <font color='#BB00BB'>set_hog</font><font face='Lucida Console'>(</font>hog,<font color='#979000'>27</font>,xx,yy, temp[<font color='#979000'>0</font>]<font face='Lucida Console'>)</font>;
+                    <font color='#BB00BB'>set_hog</font><font face='Lucida Console'>(</font>hog,<font color='#979000'>28</font>,xx,yy, temp[<font color='#979000'>1</font>]<font face='Lucida Console'>)</font>;
+                    <font color='#BB00BB'>set_hog</font><font face='Lucida Console'>(</font>hog,<font color='#979000'>29</font>,xx,yy, temp[<font color='#979000'>2</font>]<font face='Lucida Console'>)</font>;
+                    <font color='#BB00BB'>set_hog</font><font face='Lucida Console'>(</font>hog,<font color='#979000'>30</font>,xx,yy, temp[<font color='#979000'>3</font>]<font face='Lucida Console'>)</font>;
+                <b>}</b>
+            <b>}</b>
+        <b>}</b>
+
+    <font color='#009900'>// ------------------------------------------------------------------------------------
+</font>
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'>typename</font> image_type, 
+            <font color='#0000FF'>typename</font> out_type
+            <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='impl_extract_fhog_features'></a>impl_extract_fhog_features</b><font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> image_type<font color='#5555FF'>&amp;</font> img_, 
+            out_type<font color='#5555FF'>&amp;</font> hog, 
+            <font color='#0000FF'><u>int</u></font> cell_size,
+            <font color='#0000FF'><u>int</u></font> filter_rows_padding,
+            <font color='#0000FF'><u>int</u></font> filter_cols_padding
+        <font face='Lucida Console'>)</font> 
+        <b>{</b>
+            const_image_view<font color='#5555FF'>&lt;</font>image_type<font color='#5555FF'>&gt;</font> <font color='#BB00BB'>img</font><font face='Lucida Console'>(</font>img_<font face='Lucida Console'>)</font>;
+            <font color='#009900'>// make sure requires clause is not broken
+</font>            <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font> cell_size <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font>
+                         filter_rows_padding <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font>
+                         filter_cols_padding <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font> ,
+                "<font color='#CC0000'>\t void extract_fhog_features()</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t Invalid inputs were given to this function. </font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t cell_size: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> cell_size 
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t filter_rows_padding: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> filter_rows_padding 
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t filter_cols_padding: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> filter_cols_padding 
+                <font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>/*
+                This function implements the HOG feature extraction method described in 
+                the paper:
+                    P. Felzenszwalb, R. Girshick, D. McAllester, D. Ramanan
+                    Object Detection with Discriminatively Trained Part Based Models
+                    IEEE Transactions on Pattern Analysis and Machine Intelligence, Vol. 32, No. 9, Sep. 2010
+
+                Moreover, this function is derived from the HOG feature extraction code
+                from the features.cc file in the voc-releaseX code (see
+                http://people.cs.uchicago.edu/~rbg/latent/) which is has the following
+                license (note that the code has been modified to work with grayscale and
+                color as well as planar and interlaced input and output formats):
+
+                Copyright (C) 2011, 2012 Ross Girshick, Pedro Felzenszwalb
+                Copyright (C) 2008, 2009, 2010 Pedro Felzenszwalb, Ross Girshick
+                Copyright (C) 2007 Pedro Felzenszwalb, Deva Ramanan
+
+                Permission is hereby granted, free of charge, to any person obtaining
+                a copy of this software and associated documentation files (the
+                "Software"), to deal in the Software without restriction, including
+                without limitation the rights to use, copy, modify, merge, publish,
+                distribute, sublicense, and/or sell copies of the Software, and to
+                permit persons to whom the Software is furnished to do so, subject to
+                the following conditions:
+
+                The above copyright notice and this permission notice shall be
+                included in all copies or substantial portions of the Software.
+
+                THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+                EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+                MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+                NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+                LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+                OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+                WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+            */</font>
+
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>cell_size <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#BB00BB'>impl_extract_fhog_features_cell_size_1</font><font face='Lucida Console'>(</font>img_,hog,filter_rows_padding,filter_cols_padding<font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>return</font>;
+            <b>}</b>
+
+            <font color='#009900'>// unit vectors used to compute gradient orientation
+</font>            matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>2</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> directions[<font color='#979000'>9</font>];
+            directions[<font color='#979000'>0</font>] <font color='#5555FF'>=</font>  <font color='#979000'>1.0000</font>, <font color='#979000'>0.0000</font>; 
+            directions[<font color='#979000'>1</font>] <font color='#5555FF'>=</font>  <font color='#979000'>0.9397</font>, <font color='#979000'>0.3420</font>;
+            directions[<font color='#979000'>2</font>] <font color='#5555FF'>=</font>  <font color='#979000'>0.7660</font>, <font color='#979000'>0.6428</font>;
+            directions[<font color='#979000'>3</font>] <font color='#5555FF'>=</font>  <font color='#979000'>0.500</font>,  <font color='#979000'>0.8660</font>;
+            directions[<font color='#979000'>4</font>] <font color='#5555FF'>=</font>  <font color='#979000'>0.1736</font>, <font color='#979000'>0.9848</font>;
+            directions[<font color='#979000'>5</font>] <font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>0.1736</font>, <font color='#979000'>0.9848</font>;
+            directions[<font color='#979000'>6</font>] <font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>0.5000</font>, <font color='#979000'>0.8660</font>;
+            directions[<font color='#979000'>7</font>] <font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>0.7660</font>, <font color='#979000'>0.6428</font>;
+            directions[<font color='#979000'>8</font>] <font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>0.9397</font>, <font color='#979000'>0.3420</font>;
+
+
+
+            <font color='#009900'>// First we allocate memory for caching orientation histograms &amp; their norms.
+</font>            <font color='#0000FF'>const</font> <font color='#0000FF'><u>int</u></font> cells_nr <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>double</u></font><font face='Lucida Console'>)</font>img.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>/</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>double</u></font><font face='Lucida Console'>)</font>cell_size <font color='#5555FF'>+</font> <font color='#979000'>0.5</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>int</u></font> cells_nc <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>double</u></font><font face='Lucida Console'>)</font>img.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>/</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>double</u></font><font face='Lucida Console'>)</font>cell_size <font color='#5555FF'>+</font> <font color='#979000'>0.5</font><font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>cells_nr <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font> <font color='#5555FF'>|</font><font color='#5555FF'>|</font> cells_nc <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                hog.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>return</font>;
+            <b>}</b>
+
+            <font color='#009900'>// We give hist extra padding around the edges (1 cell all the way around the
+</font>            <font color='#009900'>// edge) so we can avoid needing to do boundary checks when indexing into it
+</font>            <font color='#009900'>// later on.  So some statements assign to the boundary but those values are
+</font>            <font color='#009900'>// never used.
+</font>            array2d<font color='#5555FF'>&lt;</font>matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>float</u></font>,<font color='#979000'>18</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> <font color='#BB00BB'>hist</font><font face='Lucida Console'>(</font>cells_nr<font color='#5555FF'>+</font><font color='#979000'>2</font>, cells_nc<font color='#5555FF'>+</font><font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> r <font color='#5555FF'>=</font> <font color='#979000'>0</font>; r <font color='#5555FF'>&lt;</font> hist.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>r<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> c <font color='#5555FF'>=</font> <font color='#979000'>0</font>; c <font color='#5555FF'>&lt;</font> hist.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>c<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    hist[r][c] <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                <b>}</b>
+            <b>}</b>
+
+            array2d<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>float</u></font><font color='#5555FF'>&gt;</font> <font color='#BB00BB'>norm</font><font face='Lucida Console'>(</font>cells_nr, cells_nc<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>assign_all_pixels</font><font face='Lucida Console'>(</font>norm, <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// memory for HOG features
+</font>            <font color='#0000FF'>const</font> <font color='#0000FF'><u>int</u></font> hog_nr <font color='#5555FF'>=</font> std::<font color='#BB00BB'>max</font><font face='Lucida Console'>(</font>cells_nr<font color='#5555FF'>-</font><font color='#979000'>2</font>, <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>int</u></font> hog_nc <font color='#5555FF'>=</font> std::<font color='#BB00BB'>max</font><font face='Lucida Console'>(</font>cells_nc<font color='#5555FF'>-</font><font color='#979000'>2</font>, <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>hog_nr <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font> <font color='#5555FF'>|</font><font color='#5555FF'>|</font> hog_nc <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                hog.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>return</font>;
+            <b>}</b>
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>int</u></font> padding_rows_offset <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>filter_rows_padding<font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font><font color='#5555FF'>/</font><font color='#979000'>2</font>;
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>int</u></font> padding_cols_offset <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>filter_cols_padding<font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font><font color='#5555FF'>/</font><font color='#979000'>2</font>;
+            <font color='#BB00BB'>init_hog</font><font face='Lucida Console'>(</font>hog, hog_nr, hog_nc, filter_rows_padding, filter_cols_padding<font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>int</u></font> visible_nr <font color='#5555FF'>=</font> std::<font color='#BB00BB'>min</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font>cells_nr<font color='#5555FF'>*</font>cell_size,img.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#979000'>1</font>;
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>int</u></font> visible_nc <font color='#5555FF'>=</font> std::<font color='#BB00BB'>min</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font>cells_nc<font color='#5555FF'>*</font>cell_size,img.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#979000'>1</font>;
+
+            <font color='#009900'>// First populate the gradient histograms
+</font>            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> y <font color='#5555FF'>=</font> <font color='#979000'>1</font>; y <font color='#5555FF'>&lt;</font> visible_nr; y<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> 
+            <b>{</b>
+                <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> yp <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>double</u></font><font face='Lucida Console'>)</font>y<font color='#5555FF'>+</font><font color='#979000'>0.5</font><font face='Lucida Console'>)</font><font color='#5555FF'>/</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>double</u></font><font face='Lucida Console'>)</font>cell_size <font color='#5555FF'>-</font> <font color='#979000'>0.5</font>;
+                <font color='#0000FF'>const</font> <font color='#0000FF'><u>int</u></font> iyp <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font>std::<font color='#BB00BB'>floor</font><font face='Lucida Console'>(</font>yp<font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> vy0 <font color='#5555FF'>=</font> yp<font color='#5555FF'>-</font>iyp;
+                <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> vy1 <font color='#5555FF'>=</font> <font color='#979000'>1.0</font><font color='#5555FF'>-</font>vy0;
+                <font color='#0000FF'><u>int</u></font> x;
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>x <font color='#5555FF'>=</font> <font color='#979000'>1</font>; x <font color='#5555FF'>&lt;</font> visible_nc<font color='#5555FF'>-</font><font color='#979000'>3</font>; x<font color='#5555FF'>+</font><font color='#5555FF'>=</font><font color='#979000'>4</font><font face='Lucida Console'>)</font> 
+                <b>{</b>
+                    simd4f <font color='#BB00BB'>xx</font><font face='Lucida Console'>(</font>x,x<font color='#5555FF'>+</font><font color='#979000'>1</font>,x<font color='#5555FF'>+</font><font color='#979000'>2</font>,x<font color='#5555FF'>+</font><font color='#979000'>3</font><font face='Lucida Console'>)</font>;
+                    <font color='#009900'>// v will be the length of the gradient vectors.
+</font>                    simd4f grad_x, grad_y, v;
+                    <font color='#BB00BB'>get_gradient</font><font face='Lucida Console'>(</font>y,x,img,grad_x,grad_y,v<font face='Lucida Console'>)</font>;
+
+                    <font color='#009900'>// We will use bilinear interpolation to add into the histogram bins.
+</font>                    <font color='#009900'>// So first we precompute the values needed to determine how much each
+</font>                    <font color='#009900'>// pixel votes into each bin.
+</font>                    simd4f xp <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>xx<font color='#5555FF'>+</font><font color='#979000'>0.5</font><font face='Lucida Console'>)</font><font color='#5555FF'>/</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>float</u></font><font face='Lucida Console'>)</font>cell_size <font color='#5555FF'>+</font> <font color='#979000'>0.5</font>;
+                    simd4i ixp <font color='#5555FF'>=</font> <font color='#BB00BB'>simd4i</font><font face='Lucida Console'>(</font>xp<font face='Lucida Console'>)</font>;
+                    simd4f vx0 <font color='#5555FF'>=</font> xp<font color='#5555FF'>-</font>ixp;
+                    simd4f vx1 <font color='#5555FF'>=</font> <font color='#979000'>1.0f</font><font color='#5555FF'>-</font>vx0;
+
+                    v <font color='#5555FF'>=</font> <font color='#BB00BB'>sqrt</font><font face='Lucida Console'>(</font>v<font face='Lucida Console'>)</font>;
+
+                    <font color='#009900'>// Now snap the gradient to one of 18 orientations
+</font>                    simd4f best_dot <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                    simd4f best_o <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> o <font color='#5555FF'>=</font> <font color='#979000'>0</font>; o <font color='#5555FF'>&lt;</font> <font color='#979000'>9</font>; o<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> 
+                    <b>{</b>
+                        simd4f dot <font color='#5555FF'>=</font> grad_x<font color='#5555FF'>*</font>directions[o]<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> grad_y<font color='#5555FF'>*</font>directions[o]<font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+                        simd4f_bool cmp <font color='#5555FF'>=</font> dot<font color='#5555FF'>&gt;</font>best_dot;
+                        best_dot <font color='#5555FF'>=</font> <font color='#BB00BB'>select</font><font face='Lucida Console'>(</font>cmp,dot,best_dot<font face='Lucida Console'>)</font>; 
+                        dot <font color='#5555FF'>*</font><font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>1</font>;
+                        best_o <font color='#5555FF'>=</font> <font color='#BB00BB'>select</font><font face='Lucida Console'>(</font>cmp,o,best_o<font face='Lucida Console'>)</font>;
+
+                        cmp <font color='#5555FF'>=</font> dot<font color='#5555FF'>&gt;</font>best_dot;
+                        best_dot <font color='#5555FF'>=</font> <font color='#BB00BB'>select</font><font face='Lucida Console'>(</font>cmp,dot,best_dot<font face='Lucida Console'>)</font>;
+                        best_o <font color='#5555FF'>=</font> <font color='#BB00BB'>select</font><font face='Lucida Console'>(</font>cmp,o<font color='#5555FF'>+</font><font color='#979000'>9</font>,best_o<font face='Lucida Console'>)</font>;
+                    <b>}</b>
+
+
+                    <font color='#009900'>// Add the gradient magnitude, v, to 4 histograms around pixel using
+</font>                    <font color='#009900'>// bilinear interpolation.
+</font>                    vx1 <font color='#5555FF'>*</font><font color='#5555FF'>=</font> v;
+                    vx0 <font color='#5555FF'>*</font><font color='#5555FF'>=</font> v;
+                    <font color='#009900'>// The amounts for each bin
+</font>                    simd4f v11 <font color='#5555FF'>=</font> vy1<font color='#5555FF'>*</font>vx1;
+                    simd4f v01 <font color='#5555FF'>=</font> vy0<font color='#5555FF'>*</font>vx1;
+                    simd4f v10 <font color='#5555FF'>=</font> vy1<font color='#5555FF'>*</font>vx0;
+                    simd4f v00 <font color='#5555FF'>=</font> vy0<font color='#5555FF'>*</font>vx0;
+
+                    int32 _best_o[<font color='#979000'>4</font>]; <font color='#BB00BB'>simd4i</font><font face='Lucida Console'>(</font>best_o<font face='Lucida Console'>)</font>.<font color='#BB00BB'>store</font><font face='Lucida Console'>(</font>_best_o<font face='Lucida Console'>)</font>;
+                    int32 _ixp[<font color='#979000'>4</font>];    ixp.<font color='#BB00BB'>store</font><font face='Lucida Console'>(</font>_ixp<font face='Lucida Console'>)</font>;
+                    <font color='#0000FF'><u>float</u></font> _v11[<font color='#979000'>4</font>];    v11.<font color='#BB00BB'>store</font><font face='Lucida Console'>(</font>_v11<font face='Lucida Console'>)</font>;
+                    <font color='#0000FF'><u>float</u></font> _v01[<font color='#979000'>4</font>];    v01.<font color='#BB00BB'>store</font><font face='Lucida Console'>(</font>_v01<font face='Lucida Console'>)</font>;
+                    <font color='#0000FF'><u>float</u></font> _v10[<font color='#979000'>4</font>];    v10.<font color='#BB00BB'>store</font><font face='Lucida Console'>(</font>_v10<font face='Lucida Console'>)</font>;
+                    <font color='#0000FF'><u>float</u></font> _v00[<font color='#979000'>4</font>];    v00.<font color='#BB00BB'>store</font><font face='Lucida Console'>(</font>_v00<font face='Lucida Console'>)</font>;
+
+                    hist[iyp<font color='#5555FF'>+</font><font color='#979000'>1</font>]  [_ixp[<font color='#979000'>0</font>]  ]<font face='Lucida Console'>(</font>_best_o[<font color='#979000'>0</font>]<font face='Lucida Console'>)</font> <font color='#5555FF'>+</font><font color='#5555FF'>=</font> _v11[<font color='#979000'>0</font>];
+                    hist[iyp<font color='#5555FF'>+</font><font color='#979000'>1</font><font color='#5555FF'>+</font><font color='#979000'>1</font>][_ixp[<font color='#979000'>0</font>]  ]<font face='Lucida Console'>(</font>_best_o[<font color='#979000'>0</font>]<font face='Lucida Console'>)</font> <font color='#5555FF'>+</font><font color='#5555FF'>=</font> _v01[<font color='#979000'>0</font>];
+                    hist[iyp<font color='#5555FF'>+</font><font color='#979000'>1</font>]  [_ixp[<font color='#979000'>0</font>]<font color='#5555FF'>+</font><font color='#979000'>1</font>]<font face='Lucida Console'>(</font>_best_o[<font color='#979000'>0</font>]<font face='Lucida Console'>)</font> <font color='#5555FF'>+</font><font color='#5555FF'>=</font> _v10[<font color='#979000'>0</font>];
+                    hist[iyp<font color='#5555FF'>+</font><font color='#979000'>1</font><font color='#5555FF'>+</font><font color='#979000'>1</font>][_ixp[<font color='#979000'>0</font>]<font color='#5555FF'>+</font><font color='#979000'>1</font>]<font face='Lucida Console'>(</font>_best_o[<font color='#979000'>0</font>]<font face='Lucida Console'>)</font> <font color='#5555FF'>+</font><font color='#5555FF'>=</font> _v00[<font color='#979000'>0</font>];
+
+                    hist[iyp<font color='#5555FF'>+</font><font color='#979000'>1</font>]  [_ixp[<font color='#979000'>1</font>]  ]<font face='Lucida Console'>(</font>_best_o[<font color='#979000'>1</font>]<font face='Lucida Console'>)</font> <font color='#5555FF'>+</font><font color='#5555FF'>=</font> _v11[<font color='#979000'>1</font>];
+                    hist[iyp<font color='#5555FF'>+</font><font color='#979000'>1</font><font color='#5555FF'>+</font><font color='#979000'>1</font>][_ixp[<font color='#979000'>1</font>]  ]<font face='Lucida Console'>(</font>_best_o[<font color='#979000'>1</font>]<font face='Lucida Console'>)</font> <font color='#5555FF'>+</font><font color='#5555FF'>=</font> _v01[<font color='#979000'>1</font>];
+                    hist[iyp<font color='#5555FF'>+</font><font color='#979000'>1</font>]  [_ixp[<font color='#979000'>1</font>]<font color='#5555FF'>+</font><font color='#979000'>1</font>]<font face='Lucida Console'>(</font>_best_o[<font color='#979000'>1</font>]<font face='Lucida Console'>)</font> <font color='#5555FF'>+</font><font color='#5555FF'>=</font> _v10[<font color='#979000'>1</font>];
+                    hist[iyp<font color='#5555FF'>+</font><font color='#979000'>1</font><font color='#5555FF'>+</font><font color='#979000'>1</font>][_ixp[<font color='#979000'>1</font>]<font color='#5555FF'>+</font><font color='#979000'>1</font>]<font face='Lucida Console'>(</font>_best_o[<font color='#979000'>1</font>]<font face='Lucida Console'>)</font> <font color='#5555FF'>+</font><font color='#5555FF'>=</font> _v00[<font color='#979000'>1</font>];
+
+                    hist[iyp<font color='#5555FF'>+</font><font color='#979000'>1</font>]  [_ixp[<font color='#979000'>2</font>]  ]<font face='Lucida Console'>(</font>_best_o[<font color='#979000'>2</font>]<font face='Lucida Console'>)</font> <font color='#5555FF'>+</font><font color='#5555FF'>=</font> _v11[<font color='#979000'>2</font>];
+                    hist[iyp<font color='#5555FF'>+</font><font color='#979000'>1</font><font color='#5555FF'>+</font><font color='#979000'>1</font>][_ixp[<font color='#979000'>2</font>]  ]<font face='Lucida Console'>(</font>_best_o[<font color='#979000'>2</font>]<font face='Lucida Console'>)</font> <font color='#5555FF'>+</font><font color='#5555FF'>=</font> _v01[<font color='#979000'>2</font>];
+                    hist[iyp<font color='#5555FF'>+</font><font color='#979000'>1</font>]  [_ixp[<font color='#979000'>2</font>]<font color='#5555FF'>+</font><font color='#979000'>1</font>]<font face='Lucida Console'>(</font>_best_o[<font color='#979000'>2</font>]<font face='Lucida Console'>)</font> <font color='#5555FF'>+</font><font color='#5555FF'>=</font> _v10[<font color='#979000'>2</font>];
+                    hist[iyp<font color='#5555FF'>+</font><font color='#979000'>1</font><font color='#5555FF'>+</font><font color='#979000'>1</font>][_ixp[<font color='#979000'>2</font>]<font color='#5555FF'>+</font><font color='#979000'>1</font>]<font face='Lucida Console'>(</font>_best_o[<font color='#979000'>2</font>]<font face='Lucida Console'>)</font> <font color='#5555FF'>+</font><font color='#5555FF'>=</font> _v00[<font color='#979000'>2</font>];
+
+                    hist[iyp<font color='#5555FF'>+</font><font color='#979000'>1</font>]  [_ixp[<font color='#979000'>3</font>]  ]<font face='Lucida Console'>(</font>_best_o[<font color='#979000'>3</font>]<font face='Lucida Console'>)</font> <font color='#5555FF'>+</font><font color='#5555FF'>=</font> _v11[<font color='#979000'>3</font>];
+                    hist[iyp<font color='#5555FF'>+</font><font color='#979000'>1</font><font color='#5555FF'>+</font><font color='#979000'>1</font>][_ixp[<font color='#979000'>3</font>]  ]<font face='Lucida Console'>(</font>_best_o[<font color='#979000'>3</font>]<font face='Lucida Console'>)</font> <font color='#5555FF'>+</font><font color='#5555FF'>=</font> _v01[<font color='#979000'>3</font>];
+                    hist[iyp<font color='#5555FF'>+</font><font color='#979000'>1</font>]  [_ixp[<font color='#979000'>3</font>]<font color='#5555FF'>+</font><font color='#979000'>1</font>]<font face='Lucida Console'>(</font>_best_o[<font color='#979000'>3</font>]<font face='Lucida Console'>)</font> <font color='#5555FF'>+</font><font color='#5555FF'>=</font> _v10[<font color='#979000'>3</font>];
+                    hist[iyp<font color='#5555FF'>+</font><font color='#979000'>1</font><font color='#5555FF'>+</font><font color='#979000'>1</font>][_ixp[<font color='#979000'>3</font>]<font color='#5555FF'>+</font><font color='#979000'>1</font>]<font face='Lucida Console'>(</font>_best_o[<font color='#979000'>3</font>]<font face='Lucida Console'>)</font> <font color='#5555FF'>+</font><font color='#5555FF'>=</font> _v00[<font color='#979000'>3</font>];
+                <b>}</b>
+                <font color='#009900'>// Now process the right columns that don't fit into simd registers.
+</font>                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>; x <font color='#5555FF'>&lt;</font> visible_nc; x<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> 
+                <b>{</b>
+                    matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>2</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> grad;
+                    <font color='#0000FF'><u>double</u></font> v;
+                    <font color='#BB00BB'>get_gradient</font><font face='Lucida Console'>(</font>y,x,img,grad,v<font face='Lucida Console'>)</font>;
+
+                    <font color='#009900'>// snap to one of 18 orientations
+</font>                    <font color='#0000FF'><u>double</u></font> best_dot <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                    <font color='#0000FF'><u>int</u></font> best_o <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> o <font color='#5555FF'>=</font> <font color='#979000'>0</font>; o <font color='#5555FF'>&lt;</font> <font color='#979000'>9</font>; o<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> 
+                    <b>{</b>
+                        <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> dot <font color='#5555FF'>=</font> dlib::<font color='#BB00BB'>dot</font><font face='Lucida Console'>(</font>directions[o], grad<font face='Lucida Console'>)</font>; 
+                        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>dot <font color='#5555FF'>&gt;</font> best_dot<font face='Lucida Console'>)</font> 
+                        <b>{</b>
+                            best_dot <font color='#5555FF'>=</font> dot;
+                            best_o <font color='#5555FF'>=</font> o;
+                        <b>}</b> 
+                        <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>-</font>dot <font color='#5555FF'>&gt;</font> best_dot<font face='Lucida Console'>)</font> 
+                        <b>{</b>
+                            best_dot <font color='#5555FF'>=</font> <font color='#5555FF'>-</font>dot;
+                            best_o <font color='#5555FF'>=</font> o<font color='#5555FF'>+</font><font color='#979000'>9</font>;
+                        <b>}</b>
+                    <b>}</b>
+
+                    v <font color='#5555FF'>=</font> std::<font color='#BB00BB'>sqrt</font><font face='Lucida Console'>(</font>v<font face='Lucida Console'>)</font>;
+                    <font color='#009900'>// add to 4 histograms around pixel using bilinear interpolation
+</font>                    <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> xp <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>double</u></font><font face='Lucida Console'>)</font>x<font color='#5555FF'>+</font><font color='#979000'>0.5</font><font face='Lucida Console'>)</font><font color='#5555FF'>/</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>double</u></font><font face='Lucida Console'>)</font>cell_size <font color='#5555FF'>-</font> <font color='#979000'>0.5</font>;
+                    <font color='#0000FF'>const</font> <font color='#0000FF'><u>int</u></font> ixp <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font>std::<font color='#BB00BB'>floor</font><font face='Lucida Console'>(</font>xp<font face='Lucida Console'>)</font>;
+                    <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> vx0 <font color='#5555FF'>=</font> xp<font color='#5555FF'>-</font>ixp;
+                    <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> vx1 <font color='#5555FF'>=</font> <font color='#979000'>1.0</font><font color='#5555FF'>-</font>vx0;
+
+                    hist[iyp<font color='#5555FF'>+</font><font color='#979000'>1</font>][ixp<font color='#5555FF'>+</font><font color='#979000'>1</font>]<font face='Lucida Console'>(</font>best_o<font face='Lucida Console'>)</font> <font color='#5555FF'>+</font><font color='#5555FF'>=</font> vy1<font color='#5555FF'>*</font>vx1<font color='#5555FF'>*</font>v;
+                    hist[iyp<font color='#5555FF'>+</font><font color='#979000'>1</font><font color='#5555FF'>+</font><font color='#979000'>1</font>][ixp<font color='#5555FF'>+</font><font color='#979000'>1</font>]<font face='Lucida Console'>(</font>best_o<font face='Lucida Console'>)</font> <font color='#5555FF'>+</font><font color='#5555FF'>=</font> vy0<font color='#5555FF'>*</font>vx1<font color='#5555FF'>*</font>v;
+                    hist[iyp<font color='#5555FF'>+</font><font color='#979000'>1</font>][ixp<font color='#5555FF'>+</font><font color='#979000'>1</font><font color='#5555FF'>+</font><font color='#979000'>1</font>]<font face='Lucida Console'>(</font>best_o<font face='Lucida Console'>)</font> <font color='#5555FF'>+</font><font color='#5555FF'>=</font> vy1<font color='#5555FF'>*</font>vx0<font color='#5555FF'>*</font>v;
+                    hist[iyp<font color='#5555FF'>+</font><font color='#979000'>1</font><font color='#5555FF'>+</font><font color='#979000'>1</font>][ixp<font color='#5555FF'>+</font><font color='#979000'>1</font><font color='#5555FF'>+</font><font color='#979000'>1</font>]<font face='Lucida Console'>(</font>best_o<font face='Lucida Console'>)</font> <font color='#5555FF'>+</font><font color='#5555FF'>=</font> vy0<font color='#5555FF'>*</font>vx0<font color='#5555FF'>*</font>v;
+                <b>}</b>
+            <b>}</b>
+
+            <font color='#009900'>// compute energy in each block by summing over orientations
+</font>            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> r <font color='#5555FF'>=</font> <font color='#979000'>0</font>; r <font color='#5555FF'>&lt;</font> cells_nr; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>r<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> c <font color='#5555FF'>=</font> <font color='#979000'>0</font>; c <font color='#5555FF'>&lt;</font> cells_nc; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>c<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> o <font color='#5555FF'>=</font> <font color='#979000'>0</font>; o <font color='#5555FF'>&lt;</font> <font color='#979000'>9</font>; o<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> 
+                    <b>{</b>
+                        norm[r][c] <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>hist[r<font color='#5555FF'>+</font><font color='#979000'>1</font>][c<font color='#5555FF'>+</font><font color='#979000'>1</font>]<font face='Lucida Console'>(</font>o<font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> hist[r<font color='#5555FF'>+</font><font color='#979000'>1</font>][c<font color='#5555FF'>+</font><font color='#979000'>1</font>]<font face='Lucida Console'>(</font>o<font color='#5555FF'>+</font><font color='#979000'>9</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>*</font> <font face='Lucida Console'>(</font>hist[r<font color='#5555FF'>+</font><font color='#979000'>1</font>][c<font color='#5555FF'>+</font><font color='#979000'>1</font>]<font face='Lucida Console'>(</font>o<font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> hist[r<font color='#5555FF'>+</font><font color='#979000'>1</font>][c<font color='#5555FF'>+</font><font color='#979000'>1</font>]<font face='Lucida Console'>(</font>o<font color='#5555FF'>+</font><font color='#979000'>9</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                    <b>}</b>
+                <b>}</b>
+            <b>}</b>
+
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> eps <font color='#5555FF'>=</font> <font color='#979000'>0.0001</font>;
+            <font color='#009900'>// compute features
+</font>            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> y <font color='#5555FF'>=</font> <font color='#979000'>0</font>; y <font color='#5555FF'>&lt;</font> hog_nr; y<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> 
+            <b>{</b>
+                <font color='#0000FF'>const</font> <font color='#0000FF'><u>int</u></font> yy <font color='#5555FF'>=</font> y<font color='#5555FF'>+</font>padding_rows_offset; 
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> x <font color='#5555FF'>=</font> <font color='#979000'>0</font>; x <font color='#5555FF'>&lt;</font> hog_nc; x<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> 
+                <b>{</b>
+                    <font color='#0000FF'>const</font> simd4f <font color='#BB00BB'>z1</font><font face='Lucida Console'>(</font>norm[y<font color='#5555FF'>+</font><font color='#979000'>1</font>][x<font color='#5555FF'>+</font><font color='#979000'>1</font>],
+                                    norm[y][x<font color='#5555FF'>+</font><font color='#979000'>1</font>], 
+                                    norm[y<font color='#5555FF'>+</font><font color='#979000'>1</font>][x],  
+                                    norm[y][x]<font face='Lucida Console'>)</font>;
+
+                    <font color='#0000FF'>const</font> simd4f <font color='#BB00BB'>z2</font><font face='Lucida Console'>(</font>norm[y<font color='#5555FF'>+</font><font color='#979000'>1</font>][x<font color='#5555FF'>+</font><font color='#979000'>2</font>],
+                                    norm[y][x<font color='#5555FF'>+</font><font color='#979000'>2</font>],
+                                    norm[y<font color='#5555FF'>+</font><font color='#979000'>1</font>][x<font color='#5555FF'>+</font><font color='#979000'>1</font>],
+                                    norm[y][x<font color='#5555FF'>+</font><font color='#979000'>1</font>]<font face='Lucida Console'>)</font>;
+
+                    <font color='#0000FF'>const</font> simd4f <font color='#BB00BB'>z3</font><font face='Lucida Console'>(</font>norm[y<font color='#5555FF'>+</font><font color='#979000'>2</font>][x<font color='#5555FF'>+</font><font color='#979000'>1</font>],
+                                    norm[y<font color='#5555FF'>+</font><font color='#979000'>1</font>][x<font color='#5555FF'>+</font><font color='#979000'>1</font>],
+                                    norm[y<font color='#5555FF'>+</font><font color='#979000'>2</font>][x],
+                                    norm[y<font color='#5555FF'>+</font><font color='#979000'>1</font>][x]<font face='Lucida Console'>)</font>;
+
+                    <font color='#0000FF'>const</font> simd4f <font color='#BB00BB'>z4</font><font face='Lucida Console'>(</font>norm[y<font color='#5555FF'>+</font><font color='#979000'>2</font>][x<font color='#5555FF'>+</font><font color='#979000'>2</font>],
+                                    norm[y<font color='#5555FF'>+</font><font color='#979000'>1</font>][x<font color='#5555FF'>+</font><font color='#979000'>2</font>],
+                                    norm[y<font color='#5555FF'>+</font><font color='#979000'>2</font>][x<font color='#5555FF'>+</font><font color='#979000'>1</font>],
+                                    norm[y<font color='#5555FF'>+</font><font color='#979000'>1</font>][x<font color='#5555FF'>+</font><font color='#979000'>1</font>]<font face='Lucida Console'>)</font>;
+
+                    <font color='#0000FF'>const</font> simd4f nn <font color='#5555FF'>=</font> <font color='#979000'>0.2</font><font color='#5555FF'>*</font><font color='#BB00BB'>sqrt</font><font face='Lucida Console'>(</font>z1<font color='#5555FF'>+</font>z2<font color='#5555FF'>+</font>z3<font color='#5555FF'>+</font>z4<font color='#5555FF'>+</font>eps<font face='Lucida Console'>)</font>;
+                    <font color='#0000FF'>const</font> simd4f n <font color='#5555FF'>=</font> <font color='#979000'>0.1</font><font color='#5555FF'>/</font>nn;
+
+                    simd4f t <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+
+                    <font color='#0000FF'>const</font> <font color='#0000FF'><u>int</u></font> xx <font color='#5555FF'>=</font> x<font color='#5555FF'>+</font>padding_cols_offset; 
+
+                    <font color='#009900'>// contrast-sensitive features
+</font>                    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> o <font color='#5555FF'>=</font> <font color='#979000'>0</font>; o <font color='#5555FF'>&lt;</font> <font color='#979000'>18</font>; o<font color='#5555FF'>+</font><font color='#5555FF'>=</font><font color='#979000'>3</font><font face='Lucida Console'>)</font> 
+                    <b>{</b>
+                        simd4f <font color='#BB00BB'>temp0</font><font face='Lucida Console'>(</font>hist[y<font color='#5555FF'>+</font><font color='#979000'>1</font><font color='#5555FF'>+</font><font color='#979000'>1</font>][x<font color='#5555FF'>+</font><font color='#979000'>1</font><font color='#5555FF'>+</font><font color='#979000'>1</font>]<font face='Lucida Console'>(</font>o<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                        simd4f <font color='#BB00BB'>temp1</font><font face='Lucida Console'>(</font>hist[y<font color='#5555FF'>+</font><font color='#979000'>1</font><font color='#5555FF'>+</font><font color='#979000'>1</font>][x<font color='#5555FF'>+</font><font color='#979000'>1</font><font color='#5555FF'>+</font><font color='#979000'>1</font>]<font face='Lucida Console'>(</font>o<font color='#5555FF'>+</font><font color='#979000'>1</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                        simd4f <font color='#BB00BB'>temp2</font><font face='Lucida Console'>(</font>hist[y<font color='#5555FF'>+</font><font color='#979000'>1</font><font color='#5555FF'>+</font><font color='#979000'>1</font>][x<font color='#5555FF'>+</font><font color='#979000'>1</font><font color='#5555FF'>+</font><font color='#979000'>1</font>]<font face='Lucida Console'>(</font>o<font color='#5555FF'>+</font><font color='#979000'>2</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                        simd4f h0 <font color='#5555FF'>=</font> <font color='#BB00BB'>min</font><font face='Lucida Console'>(</font>temp0,nn<font face='Lucida Console'>)</font><font color='#5555FF'>*</font>n;
+                        simd4f h1 <font color='#5555FF'>=</font> <font color='#BB00BB'>min</font><font face='Lucida Console'>(</font>temp1,nn<font face='Lucida Console'>)</font><font color='#5555FF'>*</font>n;
+                        simd4f h2 <font color='#5555FF'>=</font> <font color='#BB00BB'>min</font><font face='Lucida Console'>(</font>temp2,nn<font face='Lucida Console'>)</font><font color='#5555FF'>*</font>n;
+                        <font color='#BB00BB'>set_hog</font><font face='Lucida Console'>(</font>hog,o,xx,yy,   <font color='#BB00BB'>sum</font><font face='Lucida Console'>(</font>h0<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                        <font color='#BB00BB'>set_hog</font><font face='Lucida Console'>(</font>hog,o<font color='#5555FF'>+</font><font color='#979000'>1</font>,xx,yy, <font color='#BB00BB'>sum</font><font face='Lucida Console'>(</font>h1<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                        <font color='#BB00BB'>set_hog</font><font face='Lucida Console'>(</font>hog,o<font color='#5555FF'>+</font><font color='#979000'>2</font>,xx,yy, <font color='#BB00BB'>sum</font><font face='Lucida Console'>(</font>h2<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                        t <font color='#5555FF'>+</font><font color='#5555FF'>=</font> h0<font color='#5555FF'>+</font>h1<font color='#5555FF'>+</font>h2;
+                    <b>}</b>
+
+                    t <font color='#5555FF'>*</font><font color='#5555FF'>=</font> <font color='#979000'>2</font><font color='#5555FF'>*</font><font color='#979000'>0.2357</font>;
+
+                    <font color='#009900'>// contrast-insensitive features
+</font>                    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> o <font color='#5555FF'>=</font> <font color='#979000'>0</font>; o <font color='#5555FF'>&lt;</font> <font color='#979000'>9</font>; o<font color='#5555FF'>+</font><font color='#5555FF'>=</font><font color='#979000'>3</font><font face='Lucida Console'>)</font> 
+                    <b>{</b>
+                        simd4f temp0 <font color='#5555FF'>=</font> hist[y<font color='#5555FF'>+</font><font color='#979000'>1</font><font color='#5555FF'>+</font><font color='#979000'>1</font>][x<font color='#5555FF'>+</font><font color='#979000'>1</font><font color='#5555FF'>+</font><font color='#979000'>1</font>]<font face='Lucida Console'>(</font>o<font face='Lucida Console'>)</font>   <font color='#5555FF'>+</font> hist[y<font color='#5555FF'>+</font><font color='#979000'>1</font><font color='#5555FF'>+</font><font color='#979000'>1</font>][x<font color='#5555FF'>+</font><font color='#979000'>1</font><font color='#5555FF'>+</font><font color='#979000'>1</font>]<font face='Lucida Console'>(</font>o<font color='#5555FF'>+</font><font color='#979000'>9</font><font face='Lucida Console'>)</font>;
+                        simd4f temp1 <font color='#5555FF'>=</font> hist[y<font color='#5555FF'>+</font><font color='#979000'>1</font><font color='#5555FF'>+</font><font color='#979000'>1</font>][x<font color='#5555FF'>+</font><font color='#979000'>1</font><font color='#5555FF'>+</font><font color='#979000'>1</font>]<font face='Lucida Console'>(</font>o<font color='#5555FF'>+</font><font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> hist[y<font color='#5555FF'>+</font><font color='#979000'>1</font><font color='#5555FF'>+</font><font color='#979000'>1</font>][x<font color='#5555FF'>+</font><font color='#979000'>1</font><font color='#5555FF'>+</font><font color='#979000'>1</font>]<font face='Lucida Console'>(</font>o<font color='#5555FF'>+</font><font color='#979000'>9</font><font color='#5555FF'>+</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+                        simd4f temp2 <font color='#5555FF'>=</font> hist[y<font color='#5555FF'>+</font><font color='#979000'>1</font><font color='#5555FF'>+</font><font color='#979000'>1</font>][x<font color='#5555FF'>+</font><font color='#979000'>1</font><font color='#5555FF'>+</font><font color='#979000'>1</font>]<font face='Lucida Console'>(</font>o<font color='#5555FF'>+</font><font color='#979000'>2</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> hist[y<font color='#5555FF'>+</font><font color='#979000'>1</font><font color='#5555FF'>+</font><font color='#979000'>1</font>][x<font color='#5555FF'>+</font><font color='#979000'>1</font><font color='#5555FF'>+</font><font color='#979000'>1</font>]<font face='Lucida Console'>(</font>o<font color='#5555FF'>+</font><font color='#979000'>9</font><font color='#5555FF'>+</font><font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+                        simd4f h0 <font color='#5555FF'>=</font> <font color='#BB00BB'>min</font><font face='Lucida Console'>(</font>temp0,nn<font face='Lucida Console'>)</font><font color='#5555FF'>*</font>n;
+                        simd4f h1 <font color='#5555FF'>=</font> <font color='#BB00BB'>min</font><font face='Lucida Console'>(</font>temp1,nn<font face='Lucida Console'>)</font><font color='#5555FF'>*</font>n;
+                        simd4f h2 <font color='#5555FF'>=</font> <font color='#BB00BB'>min</font><font face='Lucida Console'>(</font>temp2,nn<font face='Lucida Console'>)</font><font color='#5555FF'>*</font>n;
+                        <font color='#BB00BB'>set_hog</font><font face='Lucida Console'>(</font>hog,o<font color='#5555FF'>+</font><font color='#979000'>18</font>,xx,yy, <font color='#BB00BB'>sum</font><font face='Lucida Console'>(</font>h0<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                        <font color='#BB00BB'>set_hog</font><font face='Lucida Console'>(</font>hog,o<font color='#5555FF'>+</font><font color='#979000'>18</font><font color='#5555FF'>+</font><font color='#979000'>1</font>,xx,yy, <font color='#BB00BB'>sum</font><font face='Lucida Console'>(</font>h1<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                        <font color='#BB00BB'>set_hog</font><font face='Lucida Console'>(</font>hog,o<font color='#5555FF'>+</font><font color='#979000'>18</font><font color='#5555FF'>+</font><font color='#979000'>2</font>,xx,yy, <font color='#BB00BB'>sum</font><font face='Lucida Console'>(</font>h2<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                    <b>}</b>
+
+
+                    <font color='#0000FF'><u>float</u></font> temp[<font color='#979000'>4</font>];
+                    t.<font color='#BB00BB'>store</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font>;
+
+                    <font color='#009900'>// texture features
+</font>                    <font color='#BB00BB'>set_hog</font><font face='Lucida Console'>(</font>hog,<font color='#979000'>27</font>,xx,yy, temp[<font color='#979000'>0</font>]<font face='Lucida Console'>)</font>;
+                    <font color='#BB00BB'>set_hog</font><font face='Lucida Console'>(</font>hog,<font color='#979000'>28</font>,xx,yy, temp[<font color='#979000'>1</font>]<font face='Lucida Console'>)</font>;
+                    <font color='#BB00BB'>set_hog</font><font face='Lucida Console'>(</font>hog,<font color='#979000'>29</font>,xx,yy, temp[<font color='#979000'>2</font>]<font face='Lucida Console'>)</font>;
+                    <font color='#BB00BB'>set_hog</font><font face='Lucida Console'>(</font>hog,<font color='#979000'>30</font>,xx,yy, temp[<font color='#979000'>3</font>]<font face='Lucida Console'>)</font>;
+                <b>}</b>
+            <b>}</b>
+        <b>}</b>
+
+    <font color='#009900'>// ------------------------------------------------------------------------------------
+</font>
+        <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='create_fhog_bar_images'></a>create_fhog_bar_images</b> <font face='Lucida Console'>(</font>
+            dlib::array<font color='#5555FF'>&lt;</font>matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>float</u></font><font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> mbars,
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> w
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> bdims <font color='#5555FF'>=</font> <font color='#979000'>9</font>;
+            <font color='#009900'>// Make the oriented lines we use to draw on each HOG cell.
+</font>            mbars.<font color='#BB00BB'>resize</font><font face='Lucida Console'>(</font>bdims<font face='Lucida Console'>)</font>;
+            dlib::array<font color='#5555FF'>&lt;</font>array2d<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> <font color='#BB00BB'>bars</font><font face='Lucida Console'>(</font>bdims<font face='Lucida Console'>)</font>;
+            array2d<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font> <font color='#BB00BB'>temp</font><font face='Lucida Console'>(</font>w,w<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> bars.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#BB00BB'>assign_all_pixels</font><font face='Lucida Console'>(</font>temp, <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+                <font color='#BB00BB'>draw_line</font><font face='Lucida Console'>(</font>temp, <font color='#BB00BB'>point</font><font face='Lucida Console'>(</font>w<font color='#5555FF'>/</font><font color='#979000'>2</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font>, <font color='#BB00BB'>point</font><font face='Lucida Console'>(</font>w<font color='#5555FF'>/</font><font color='#979000'>2</font>,w<font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>, <font color='#979000'>255</font><font face='Lucida Console'>)</font>;
+                <font color='#BB00BB'>rotate_image</font><font face='Lucida Console'>(</font>temp, bars[i], i<font color='#5555FF'>*</font><font color='#5555FF'>-</font>pi<font color='#5555FF'>/</font>bars.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+                mbars[i] <font color='#5555FF'>=</font> <font color='#BB00BB'>subm</font><font face='Lucida Console'>(</font>matrix_cast<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>float</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#BB00BB'>mat</font><font face='Lucida Console'>(</font>bars[i]<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>, <font color='#BB00BB'>centered_rect</font><font face='Lucida Console'>(</font><font color='#BB00BB'>get_rect</font><font face='Lucida Console'>(</font>bars[i]<font face='Lucida Console'>)</font>,w,w<font face='Lucida Console'>)</font> <font face='Lucida Console'>)</font>;
+            <b>}</b>
+        <b>}</b>
+
+    <b>}</b> <font color='#009900'>// end namespace impl_fhog
+</font>
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> image_type, 
+        <font color='#0000FF'>typename</font> T, 
+        <font color='#0000FF'>typename</font> mm1, 
+        <font color='#0000FF'>typename</font> mm2
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='extract_fhog_features'></a>extract_fhog_features</b><font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> image_type<font color='#5555FF'>&amp;</font> img, 
+        dlib::array<font color='#5555FF'>&lt;</font>array2d<font color='#5555FF'>&lt;</font>T,mm1<font color='#5555FF'>&gt;</font>,mm2<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> hog, 
+        <font color='#0000FF'><u>int</u></font> cell_size <font color='#5555FF'>=</font> <font color='#979000'>8</font>,
+        <font color='#0000FF'><u>int</u></font> filter_rows_padding <font color='#5555FF'>=</font> <font color='#979000'>1</font>,
+        <font color='#0000FF'><u>int</u></font> filter_cols_padding <font color='#5555FF'>=</font> <font color='#979000'>1</font>
+    <font face='Lucida Console'>)</font> 
+    <b>{</b>
+        impl_fhog::<font color='#BB00BB'>impl_extract_fhog_features</font><font face='Lucida Console'>(</font>img, hog, cell_size, filter_rows_padding, filter_cols_padding<font face='Lucida Console'>)</font>;
+        <font color='#009900'>// If the image is too small then the above function outputs an empty feature map.
+</font>        <font color='#009900'>// But to make things very uniform in usage we require the output to still have the
+</font>        <font color='#009900'>// 31 planes (but they are just empty).
+</font>        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>hog.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+            hog.<font color='#BB00BB'>resize</font><font face='Lucida Console'>(</font><font color='#979000'>31</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> image_type, 
+        <font color='#0000FF'>typename</font> T, 
+        <font color='#0000FF'>typename</font> mm
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='extract_fhog_features'></a>extract_fhog_features</b><font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> image_type<font color='#5555FF'>&amp;</font> img, 
+        array2d<font color='#5555FF'>&lt;</font>matrix<font color='#5555FF'>&lt;</font>T,<font color='#979000'>31</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font>,mm<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> hog, 
+        <font color='#0000FF'><u>int</u></font> cell_size <font color='#5555FF'>=</font> <font color='#979000'>8</font>,
+        <font color='#0000FF'><u>int</u></font> filter_rows_padding <font color='#5555FF'>=</font> <font color='#979000'>1</font>,
+        <font color='#0000FF'><u>int</u></font> filter_cols_padding <font color='#5555FF'>=</font> <font color='#979000'>1</font>
+    <font face='Lucida Console'>)</font> 
+    <b>{</b>
+        impl_fhog::<font color='#BB00BB'>impl_extract_fhog_features</font><font face='Lucida Console'>(</font>img, hog, cell_size, filter_rows_padding, filter_cols_padding<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> image_type,
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='extract_fhog_features'></a>extract_fhog_features</b><font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> image_type<font color='#5555FF'>&amp;</font> img, 
+        matrix<font color='#5555FF'>&lt;</font>T,<font color='#979000'>0</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> feats,
+        <font color='#0000FF'><u>int</u></font> cell_size <font color='#5555FF'>=</font> <font color='#979000'>8</font>,
+        <font color='#0000FF'><u>int</u></font> filter_rows_padding <font color='#5555FF'>=</font> <font color='#979000'>1</font>,
+        <font color='#0000FF'><u>int</u></font> filter_cols_padding <font color='#5555FF'>=</font> <font color='#979000'>1</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        dlib::array<font color='#5555FF'>&lt;</font>array2d<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> hog;
+        <font color='#BB00BB'>extract_fhog_features</font><font face='Lucida Console'>(</font>img, hog, cell_size, filter_rows_padding, filter_cols_padding<font face='Lucida Console'>)</font>;
+        feats.<font color='#BB00BB'>set_size</font><font face='Lucida Console'>(</font>hog.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>*</font>hog[<font color='#979000'>0</font>].<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> hog.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> size <font color='#5555FF'>=</font> hog[i].<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>set_rowm</font><font face='Lucida Console'>(</font>feats, <font color='#BB00BB'>range</font><font face='Lucida Console'>(</font>i<font color='#5555FF'>*</font>size, <font face='Lucida Console'>(</font>i<font color='#5555FF'>+</font><font color='#979000'>1</font><font face='Lucida Console'>)</font><font color='#5555FF'>*</font>size<font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#BB00BB'>reshape_to_column_vector</font><font face='Lucida Console'>(</font><font color='#BB00BB'>mat</font><font face='Lucida Console'>(</font>hog[i]<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> image_type
+        <font color='#5555FF'>&gt;</font>
+    matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>0</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> <b><a name='extract_fhog_features'></a>extract_fhog_features</b><font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> image_type<font color='#5555FF'>&amp;</font> img, 
+        <font color='#0000FF'><u>int</u></font> cell_size <font color='#5555FF'>=</font> <font color='#979000'>8</font>,
+        <font color='#0000FF'><u>int</u></font> filter_rows_padding <font color='#5555FF'>=</font> <font color='#979000'>1</font>,
+        <font color='#0000FF'><u>int</u></font> filter_cols_padding <font color='#5555FF'>=</font> <font color='#979000'>1</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>0</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> feats;
+        <font color='#BB00BB'>extract_fhog_features</font><font face='Lucida Console'>(</font>img, feats, cell_size, filter_rows_padding, filter_cols_padding<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>return</font> feats;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>inline</font> point <b><a name='image_to_fhog'></a>image_to_fhog</b> <font face='Lucida Console'>(</font>
+        point p,
+        <font color='#0000FF'><u>int</u></font> cell_size <font color='#5555FF'>=</font> <font color='#979000'>8</font>,
+        <font color='#0000FF'><u>int</u></font> filter_rows_padding <font color='#5555FF'>=</font> <font color='#979000'>1</font>,
+        <font color='#0000FF'><u>int</u></font> filter_cols_padding <font color='#5555FF'>=</font> <font color='#979000'>1</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#009900'>// make sure requires clause is not broken
+</font>        <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font> cell_size <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font>
+            filter_rows_padding <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font>
+            filter_cols_padding <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font> ,
+            "<font color='#CC0000'>\t point image_to_fhog()</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t Invalid inputs were given to this function. </font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t cell_size: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> cell_size 
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t filter_rows_padding: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> filter_rows_padding 
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t filter_cols_padding: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> filter_cols_padding 
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// There is a one pixel border around the image.
+</font>        p <font color='#5555FF'>-</font><font color='#5555FF'>=</font> <font color='#BB00BB'>point</font><font face='Lucida Console'>(</font><font color='#979000'>1</font>,<font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+        <font color='#009900'>// There is also a 1 "cell" border around the HOG image formation.
+</font>        <font color='#0000FF'>return</font> p<font color='#5555FF'>/</font>cell_size <font color='#5555FF'>-</font> <font color='#BB00BB'>point</font><font face='Lucida Console'>(</font><font color='#979000'>1</font>,<font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> <font color='#BB00BB'>point</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>filter_cols_padding<font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font><font color='#5555FF'>/</font><font color='#979000'>2</font>,<font face='Lucida Console'>(</font>filter_rows_padding<font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font><font color='#5555FF'>/</font><font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>inline</font> rectangle <b><a name='image_to_fhog'></a>image_to_fhog</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> rectangle<font color='#5555FF'>&amp;</font> rect,
+        <font color='#0000FF'><u>int</u></font> cell_size <font color='#5555FF'>=</font> <font color='#979000'>8</font>,
+        <font color='#0000FF'><u>int</u></font> filter_rows_padding <font color='#5555FF'>=</font> <font color='#979000'>1</font>,
+        <font color='#0000FF'><u>int</u></font> filter_cols_padding <font color='#5555FF'>=</font> <font color='#979000'>1</font>
+    <font face='Lucida Console'>)</font> 
+    <b>{</b>
+        <font color='#009900'>// make sure requires clause is not broken
+</font>        <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font> cell_size <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font>
+            filter_rows_padding <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font>
+            filter_cols_padding <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font> ,
+            "<font color='#CC0000'>\t rectangle image_to_fhog()</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t Invalid inputs were given to this function. </font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t cell_size: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> cell_size 
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t filter_rows_padding: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> filter_rows_padding 
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t filter_cols_padding: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> filter_cols_padding 
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>return</font> <font color='#BB00BB'>rectangle</font><font face='Lucida Console'>(</font><font color='#BB00BB'>image_to_fhog</font><font face='Lucida Console'>(</font>rect.<font color='#BB00BB'>tl_corner</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,cell_size,filter_rows_padding,filter_cols_padding<font face='Lucida Console'>)</font>,
+                         <font color='#BB00BB'>image_to_fhog</font><font face='Lucida Console'>(</font>rect.<font color='#BB00BB'>br_corner</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,cell_size,filter_rows_padding,filter_cols_padding<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>inline</font> point <b><a name='fhog_to_image'></a>fhog_to_image</b> <font face='Lucida Console'>(</font>
+        point p,
+        <font color='#0000FF'><u>int</u></font> cell_size <font color='#5555FF'>=</font> <font color='#979000'>8</font>,
+        <font color='#0000FF'><u>int</u></font> filter_rows_padding <font color='#5555FF'>=</font> <font color='#979000'>1</font>,
+        <font color='#0000FF'><u>int</u></font> filter_cols_padding <font color='#5555FF'>=</font> <font color='#979000'>1</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#009900'>// make sure requires clause is not broken
+</font>        <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font> cell_size <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font>
+            filter_rows_padding <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font>
+            filter_cols_padding <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font> ,
+            "<font color='#CC0000'>\t point fhog_to_image()</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t Invalid inputs were given to this function. </font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t cell_size: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> cell_size 
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t filter_rows_padding: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> filter_rows_padding 
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t filter_cols_padding: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> filter_cols_padding 
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// Convert to image space and then set to the center of the cell.
+</font>        point offset;
+        
+        p <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>p<font color='#5555FF'>+</font><font color='#BB00BB'>point</font><font face='Lucida Console'>(</font><font color='#979000'>1</font>,<font color='#979000'>1</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#BB00BB'>point</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>filter_cols_padding<font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font><font color='#5555FF'>/</font><font color='#979000'>2</font>,<font face='Lucida Console'>(</font>filter_rows_padding<font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font><font color='#5555FF'>/</font><font color='#979000'>2</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font color='#5555FF'>*</font>cell_size <font color='#5555FF'>+</font> <font color='#BB00BB'>point</font><font face='Lucida Console'>(</font><font color='#979000'>1</font>,<font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>p.<font color='#BB00BB'>x</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#979000'>0</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> p.<font color='#BB00BB'>y</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font> offset <font color='#5555FF'>=</font> <font color='#BB00BB'>point</font><font face='Lucida Console'>(</font>cell_size<font color='#5555FF'>/</font><font color='#979000'>2</font>,cell_size<font color='#5555FF'>/</font><font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>p.<font color='#BB00BB'>x</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font>  <font color='#979000'>0</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> p.<font color='#BB00BB'>y</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font> offset <font color='#5555FF'>=</font> <font color='#BB00BB'>point</font><font face='Lucida Console'>(</font><font color='#5555FF'>-</font>cell_size<font color='#5555FF'>/</font><font color='#979000'>2</font>,cell_size<font color='#5555FF'>/</font><font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>p.<font color='#BB00BB'>x</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#979000'>0</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> p.<font color='#BB00BB'>y</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font>  <font color='#979000'>0</font><font face='Lucida Console'>)</font> offset <font color='#5555FF'>=</font> <font color='#BB00BB'>point</font><font face='Lucida Console'>(</font>cell_size<font color='#5555FF'>/</font><font color='#979000'>2</font>,<font color='#5555FF'>-</font>cell_size<font color='#5555FF'>/</font><font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>p.<font color='#BB00BB'>x</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font>  <font color='#979000'>0</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> p.<font color='#BB00BB'>y</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font>  <font color='#979000'>0</font><font face='Lucida Console'>)</font> offset <font color='#5555FF'>=</font> <font color='#BB00BB'>point</font><font face='Lucida Console'>(</font><font color='#5555FF'>-</font>cell_size<font color='#5555FF'>/</font><font color='#979000'>2</font>,<font color='#5555FF'>-</font>cell_size<font color='#5555FF'>/</font><font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>return</font> p <font color='#5555FF'>+</font> offset;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>inline</font> rectangle <b><a name='fhog_to_image'></a>fhog_to_image</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> rectangle<font color='#5555FF'>&amp;</font> rect,
+        <font color='#0000FF'><u>int</u></font> cell_size <font color='#5555FF'>=</font> <font color='#979000'>8</font>,
+        <font color='#0000FF'><u>int</u></font> filter_rows_padding <font color='#5555FF'>=</font> <font color='#979000'>1</font>,
+        <font color='#0000FF'><u>int</u></font> filter_cols_padding <font color='#5555FF'>=</font> <font color='#979000'>1</font>
+    <font face='Lucida Console'>)</font> 
+    <b>{</b>
+        <font color='#009900'>// make sure requires clause is not broken
+</font>        <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font> cell_size <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font>
+            filter_rows_padding <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font>
+            filter_cols_padding <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font> ,
+            "<font color='#CC0000'>\t rectangle fhog_to_image()</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t Invalid inputs were given to this function. </font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t cell_size: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> cell_size 
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t filter_rows_padding: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> filter_rows_padding 
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t filter_cols_padding: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> filter_cols_padding 
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>return</font> <font color='#BB00BB'>rectangle</font><font face='Lucida Console'>(</font><font color='#BB00BB'>fhog_to_image</font><font face='Lucida Console'>(</font>rect.<font color='#BB00BB'>tl_corner</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,cell_size,filter_rows_padding,filter_cols_padding<font face='Lucida Console'>)</font>,
+                         <font color='#BB00BB'>fhog_to_image</font><font face='Lucida Console'>(</font>rect.<font color='#BB00BB'>br_corner</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,cell_size,filter_rows_padding,filter_cols_padding<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T, 
+        <font color='#0000FF'>typename</font> mm1, 
+        <font color='#0000FF'>typename</font> mm2
+        <font color='#5555FF'>&gt;</font>
+    matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font> <b><a name='draw_fhog'></a>draw_fhog</b><font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> dlib::array<font color='#5555FF'>&lt;</font>array2d<font color='#5555FF'>&lt;</font>T,mm1<font color='#5555FF'>&gt;</font>,mm2<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> hog,
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> cell_draw_size <font color='#5555FF'>=</font> <font color='#979000'>15</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#009900'>// make sure requires clause is not broken
+</font>        <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font> cell_draw_size <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> hog.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>=</font><font color='#5555FF'>=</font><font color='#979000'>31</font>,
+            "<font color='#CC0000'>\t matrix&lt;unsigned char&gt; draw_fhog()</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t Invalid inputs were given to this function. </font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t cell_draw_size: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> cell_draw_size 
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t hog.size(): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> hog.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> 
+        <font face='Lucida Console'>)</font>;
+
+        dlib::array<font color='#5555FF'>&lt;</font>matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>float</u></font><font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> mbars;
+        impl_fhog::<font color='#BB00BB'>create_fhog_bar_images</font><font face='Lucida Console'>(</font>mbars,cell_draw_size<font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// now draw the bars onto the HOG cells
+</font>        matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>float</u></font><font color='#5555FF'>&gt;</font> <font color='#BB00BB'>himg</font><font face='Lucida Console'>(</font>hog[<font color='#979000'>0</font>].<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>*</font>cell_draw_size, hog[<font color='#979000'>0</font>].<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>*</font>cell_draw_size<font face='Lucida Console'>)</font>;
+        himg <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> d <font color='#5555FF'>=</font> <font color='#979000'>0</font>; d <font color='#5555FF'>&lt;</font> mbars.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>d<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> r <font color='#5555FF'>=</font> <font color='#979000'>0</font>; r <font color='#5555FF'>&lt;</font> himg.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; r<font color='#5555FF'>+</font><font color='#5555FF'>=</font>cell_draw_size<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> c <font color='#5555FF'>=</font> <font color='#979000'>0</font>; c <font color='#5555FF'>&lt;</font> himg.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; c<font color='#5555FF'>+</font><font color='#5555FF'>=</font>cell_draw_size<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#0000FF'>const</font> <font color='#0000FF'><u>float</u></font> val <font color='#5555FF'>=</font> hog[d][r<font color='#5555FF'>/</font>cell_draw_size][c<font color='#5555FF'>/</font>cell_draw_size] <font color='#5555FF'>+</font>
+                        hog[d<font color='#5555FF'>+</font>mbars.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>][r<font color='#5555FF'>/</font>cell_draw_size][c<font color='#5555FF'>/</font>cell_draw_size] <font color='#5555FF'>+</font>
+                        hog[d<font color='#5555FF'>+</font>mbars.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>*</font><font color='#979000'>2</font>][r<font color='#5555FF'>/</font>cell_draw_size][c<font color='#5555FF'>/</font>cell_draw_size];
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>val <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        <font color='#BB00BB'>set_subm</font><font face='Lucida Console'>(</font>himg, r, c, cell_draw_size, cell_draw_size<font face='Lucida Console'>)</font> <font color='#5555FF'>+</font><font color='#5555FF'>=</font> val<font color='#5555FF'>*</font>mbars[d<font color='#5555FF'>%</font>mbars.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>];
+                    <b>}</b>
+                <b>}</b>
+            <b>}</b>
+        <b>}</b>
+
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> thresh <font color='#5555FF'>=</font> <font color='#BB00BB'>mean</font><font face='Lucida Console'>(</font>himg<font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> <font color='#979000'>4</font><font color='#5555FF'>*</font><font color='#BB00BB'>stddev</font><font face='Lucida Console'>(</font>himg<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>thresh <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+            <font color='#0000FF'>return</font> matrix_cast<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#BB00BB'>upperbound</font><font face='Lucida Console'>(</font><font color='#BB00BB'>round</font><font face='Lucida Console'>(</font>himg<font color='#5555FF'>*</font><font color='#979000'>255</font><font color='#5555FF'>/</font>thresh<font face='Lucida Console'>)</font>,<font color='#979000'>255</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>else</font>
+            <font color='#0000FF'>return</font> matrix_cast<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>himg<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font> <b><a name='draw_fhog'></a>draw_fhog</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>matrix<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> hog,
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> cell_draw_size <font color='#5555FF'>=</font> <font color='#979000'>15</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#009900'>// make sure requires clause is not broken
+</font>        <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font> cell_draw_size <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> hog.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>=</font><font color='#5555FF'>=</font><font color='#979000'>31</font>,
+            "<font color='#CC0000'>\t matrix&lt;unsigned char&gt; draw_fhog()</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t Invalid inputs were given to this function. </font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t cell_draw_size: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> cell_draw_size 
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t hog.size(): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> hog.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> 
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// Just convert the input into the right object and then call the above draw_fhog()
+</font>        <font color='#009900'>// function on it.
+</font>        dlib::array<font color='#5555FF'>&lt;</font>array2d<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> <font color='#BB00BB'>temp</font><font face='Lucida Console'>(</font>hog.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> temp.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+        <b>{</b>
+            temp[i].<font color='#BB00BB'>set_size</font><font face='Lucida Console'>(</font>hog[i].<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, hog[i].<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> r <font color='#5555FF'>=</font> <font color='#979000'>0</font>; r <font color='#5555FF'>&lt;</font> hog[i].<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>r<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> c <font color='#5555FF'>=</font> <font color='#979000'>0</font>; c <font color='#5555FF'>&lt;</font> hog[i].<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>c<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    temp[i][r][c] <font color='#5555FF'>=</font> hog[i]<font face='Lucida Console'>(</font>r,c<font face='Lucida Console'>)</font>;
+                <b>}</b>
+            <b>}</b>
+        <b>}</b>
+        <font color='#0000FF'>return</font> <font color='#BB00BB'>draw_fhog</font><font face='Lucida Console'>(</font>temp,cell_draw_size<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T, 
+        <font color='#0000FF'>typename</font> mm
+        <font color='#5555FF'>&gt;</font>
+    matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font> <b><a name='draw_fhog'></a>draw_fhog</b><font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> array2d<font color='#5555FF'>&lt;</font>matrix<font color='#5555FF'>&lt;</font>T,<font color='#979000'>31</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font>,mm<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> hog,
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> cell_draw_size <font color='#5555FF'>=</font> <font color='#979000'>15</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#009900'>// make sure requires clause is not broken
+</font>        <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font> cell_draw_size <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font>,
+            "<font color='#CC0000'>\t matrix&lt;unsigned char&gt; draw_fhog()</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t Invalid inputs were given to this function. </font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t cell_draw_size: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> cell_draw_size 
+        <font face='Lucida Console'>)</font>;
+
+        dlib::array<font color='#5555FF'>&lt;</font>matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>float</u></font><font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> mbars;
+        impl_fhog::<font color='#BB00BB'>create_fhog_bar_images</font><font face='Lucida Console'>(</font>mbars,cell_draw_size<font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// now draw the bars onto the HOG cells
+</font>        matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>float</u></font><font color='#5555FF'>&gt;</font> <font color='#BB00BB'>himg</font><font face='Lucida Console'>(</font>hog.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>*</font>cell_draw_size, hog.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>*</font>cell_draw_size<font face='Lucida Console'>)</font>;
+        himg <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> d <font color='#5555FF'>=</font> <font color='#979000'>0</font>; d <font color='#5555FF'>&lt;</font> mbars.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>d<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> r <font color='#5555FF'>=</font> <font color='#979000'>0</font>; r <font color='#5555FF'>&lt;</font> himg.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; r<font color='#5555FF'>+</font><font color='#5555FF'>=</font>cell_draw_size<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> c <font color='#5555FF'>=</font> <font color='#979000'>0</font>; c <font color='#5555FF'>&lt;</font> himg.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; c<font color='#5555FF'>+</font><font color='#5555FF'>=</font>cell_draw_size<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#0000FF'>const</font> <font color='#0000FF'><u>float</u></font> val <font color='#5555FF'>=</font> hog[r<font color='#5555FF'>/</font>cell_draw_size][c<font color='#5555FF'>/</font>cell_draw_size]<font face='Lucida Console'>(</font>d<font face='Lucida Console'>)</font> <font color='#5555FF'>+</font>
+                        hog[r<font color='#5555FF'>/</font>cell_draw_size][c<font color='#5555FF'>/</font>cell_draw_size]<font face='Lucida Console'>(</font>d<font color='#5555FF'>+</font>mbars.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font>
+                        hog[r<font color='#5555FF'>/</font>cell_draw_size][c<font color='#5555FF'>/</font>cell_draw_size]<font face='Lucida Console'>(</font>d<font color='#5555FF'>+</font>mbars.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>*</font><font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>val <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        <font color='#BB00BB'>set_subm</font><font face='Lucida Console'>(</font>himg, r, c, cell_draw_size, cell_draw_size<font face='Lucida Console'>)</font> <font color='#5555FF'>+</font><font color='#5555FF'>=</font> val<font color='#5555FF'>*</font>mbars[d<font color='#5555FF'>%</font>mbars.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>];
+                    <b>}</b>
+                <b>}</b>
+            <b>}</b>
+        <b>}</b>
+
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> thresh <font color='#5555FF'>=</font> <font color='#BB00BB'>mean</font><font face='Lucida Console'>(</font>himg<font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> <font color='#979000'>4</font><font color='#5555FF'>*</font><font color='#BB00BB'>stddev</font><font face='Lucida Console'>(</font>himg<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>thresh <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+            <font color='#0000FF'>return</font> matrix_cast<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#BB00BB'>upperbound</font><font face='Lucida Console'>(</font><font color='#BB00BB'>round</font><font face='Lucida Console'>(</font>himg<font color='#5555FF'>*</font><font color='#979000'>255</font><font color='#5555FF'>/</font>thresh<font face='Lucida Console'>)</font>,<font color='#979000'>255</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>else</font>
+            <font color='#0000FF'>return</font> matrix_cast<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>himg<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_fHOG_Hh_
+</font>
+
+</pre></body></html>

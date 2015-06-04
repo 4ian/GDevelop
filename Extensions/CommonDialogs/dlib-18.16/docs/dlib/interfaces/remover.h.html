@@ -1,0 +1,223 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - remover.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2005  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_REMOVER_KERNEl_INTERFACE_
+<font color='#0000FF'>#define</font> DLIB_REMOVER_KERNEl_INTERFACE_
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>functional<font color='#5555FF'>&gt;</font>
+
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>class</font> <b><a name='remover'></a>remover</b> 
+    <b>{</b>
+
+        <font color='#009900'>/*!
+            REQUIREMENTS ON T
+                T is swappable by a global swap() and                
+                T must have a default constructor
+
+            POINTERS AND REFERENCES TO INTERNAL DATA
+                The size() function does not invalidate pointers or 
+                references to internal data.  All other functions have no such 
+                guarantee.
+
+            WHAT THIS OBJECT REPRESENTS
+                This object represents some generalized interface for removing
+                single items from container classes.                  
+        !*/</font>
+        
+
+        <font color='#0000FF'>public</font>:
+            <font color='#0000FF'>typedef</font> T type;
+
+            <font color='#0000FF'>virtual</font> ~<b><a name='remover'></a>remover</b><font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font>; 
+            <font color='#009900'>/*!
+                ensures
+                    - all resources associated with *this have been released.
+            !*/</font>
+
+            <font color='#0000FF'>virtual</font> <font color='#0000FF'><u>void</u></font> <b><a name='remove_any'></a>remove_any</b> <font face='Lucida Console'>(</font>
+                T<font color='#5555FF'>&amp;</font> item
+            <font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            <font color='#009900'>/*!
+                requires 
+                    - size() != 0
+                ensures
+                    - #size() == size() - 1
+                    - removes an element from *this and swaps it into item.  
+                    - if (*this implements the enumerable interface) then
+                        - #at_start() == true
+            !*/</font>
+
+            <font color='#0000FF'>virtual</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='size'></a>size</b> <font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            <font color='#009900'>/*!
+                ensures
+                    - returns the number of elements in *this
+            !*/</font>
+
+        <font color='#0000FF'>protected</font>:
+
+            <font color='#009900'>// restricted functions
+</font>            remover<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>=</font><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> remover<font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font> <b>{</b><font color='#0000FF'>return</font> <font color='#5555FF'>*</font><font color='#0000FF'>this</font>;<b>}</b>    <font color='#009900'>// assignment operator
+</font>    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T,
+        <font color='#0000FF'>typename</font> compare
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>class</font> <b><a name='asc_remover'></a>asc_remover</b> : <font color='#0000FF'>public</font> remover<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font>
+    <b>{</b>
+        <font color='#009900'>/*!
+            REQUIREMENTS ON T
+                T is swappable by a global swap() and                
+                T must have a default constructor and
+                T must be comparable by compare where compare is a functor compatible with std::less 
+
+            WHAT THIS OBJECT REPRESENTS
+                This object represents the same thing as remover except
+                that remove_any() will remove elements in ascending order
+                according to the compare functor.  
+        !*/</font>
+    <font color='#0000FF'>public</font>:
+        <font color='#0000FF'>typedef</font> compare compare_type;
+
+    <font color='#0000FF'>protected</font>:
+        <font color='#009900'>// restricted functions
+</font>        asc_remover<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>=</font><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> asc_remover<font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font> <b>{</b><font color='#0000FF'>return</font> <font color='#5555FF'>*</font><font color='#0000FF'>this</font>;<b>}</b>    <font color='#009900'>// assignment operator
+</font>    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> domain,
+        <font color='#0000FF'>typename</font> range
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>class</font> <b><a name='pair_remover'></a>pair_remover</b> 
+    <b>{</b>
+
+        <font color='#009900'>/*!
+            REQUIREMENTS ON domain
+                domain is swappable by a global swap() and                
+                domain must have a default constructor
+
+            REQUIREMENTS ON range
+                range is swappable by a global swap() and
+                range must have a default constructor
+
+            POINTERS AND REFERENCES TO INTERNAL DATA
+                The size() function does not invalidate pointers or 
+                references to internal data.  All other functions have no such 
+                guarantee.
+
+            WHAT THIS OBJECT REPRESENTS
+                This object represents some generalized interface for removing
+                pairs from container classes which enforce some kind of pairing on
+                the elements that they contain.  
+        !*/</font>
+        
+        <font color='#0000FF'>public</font>:
+            <font color='#0000FF'>typedef</font> domain domain_type;
+            <font color='#0000FF'>typedef</font> range range_type;
+
+            <font color='#0000FF'>virtual</font> ~<b><a name='pair_remover'></a>pair_remover</b><font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font>; 
+            <font color='#009900'>/*!
+                ensures
+                    - all resources associated with *this have been released.
+            !*/</font>
+
+            <font color='#0000FF'>virtual</font> <font color='#0000FF'><u>void</u></font> <b><a name='remove_any'></a>remove_any</b> <font face='Lucida Console'>(</font>
+                domain<font color='#5555FF'>&amp;</font> d,
+                range<font color='#5555FF'>&amp;</font> r
+            <font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            <font color='#009900'>/*!
+                requires                     
+                    - &amp;d != &amp;r (i.e. d and r cannot be the same variable) 
+                    - size() != 0
+                ensures
+                    - #size() == size() - 1
+                    - removes an element from the domain of *this and swaps it
+                      into d.  
+                    - removes the element in *this's range that is associated 
+                      with #d and swaps it into r.
+                    - if (*this implements the enumerable interface) then
+                        - #at_start() == true
+            !*/</font>
+
+            <font color='#0000FF'>virtual</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='size'></a>size</b> <font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            <font color='#009900'>/*!
+                ensures
+                    - returns the number of elements in *this 
+            !*/</font>
+
+
+        <font color='#0000FF'>protected</font>:
+
+            <font color='#009900'>// restricted functions
+</font>            pair_remover<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>=</font><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> pair_remover<font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font> <b>{</b><font color='#0000FF'>return</font> <font color='#5555FF'>*</font><font color='#0000FF'>this</font>;<b>}</b>    <font color='#009900'>// assignment operator
+</font>
+
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> domain,
+        <font color='#0000FF'>typename</font> range,
+        <font color='#0000FF'>typename</font> compare
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>class</font> <b><a name='asc_pair_remover'></a>asc_pair_remover</b> : <font color='#0000FF'>public</font> pair_remover<font color='#5555FF'>&lt;</font>domain,range<font color='#5555FF'>&gt;</font>
+    <b>{</b>
+        <font color='#009900'>/*!
+            REQUIREMENTS ON domain
+                domain is swappable by a global swap() and                
+                domain must have a default constructor and
+                domain must be comparable by compare where compare is a functor compatible with std::less 
+
+            REQUIREMENTS ON range
+                range is swappable by a global swap() and
+                range must have a default constructor
+
+            WHAT THIS OBJECT REPRESENTS
+                This object represents the same thing as pair_remover except
+                that remove_any() will remove domain elements in ascending 
+                order according to the compare functor.  
+        !*/</font>
+    <font color='#0000FF'>public</font>:
+        <font color='#0000FF'>typedef</font> compare compare_type;
+
+    <font color='#0000FF'>protected</font>:
+        <font color='#009900'>// restricted functions
+</font>        asc_pair_remover<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>=</font><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> asc_pair_remover<font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font> <b>{</b><font color='#0000FF'>return</font> <font color='#5555FF'>*</font><font color='#0000FF'>this</font>;<b>}</b>    <font color='#009900'>// assignment operator
+</font>    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#009900'>// destructor does nothing
+</font>    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+    remover<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font>::~<b><a name='remover'></a>remover</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+
+    <font color='#009900'>// destructor does nothing
+</font>    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> domain, <font color='#0000FF'>typename</font> range<font color='#5555FF'>&gt;</font>
+    pair_remover<font color='#5555FF'>&lt;</font>domain,range<font color='#5555FF'>&gt;</font>::~<b><a name='pair_remover'></a>pair_remover</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_REMOVER_KERNEl_INTERFACE_
+</font>
+
+</pre></body></html>

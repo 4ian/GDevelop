@@ -1,0 +1,121 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - numpy.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2014  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_PYTHON_NuMPY_Hh_
+<font color='#0000FF'>#define</font> DLIB_PYTHON_NuMPY_Hh_
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>boost<font color='#5555FF'>/</font>python.hpp<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>error.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>algs.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>string.h<font color='#5555FF'>&gt;</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'><u>void</u></font> <b><a name='validate_numpy_array_type'></a>validate_numpy_array_type</b> <font face='Lucida Console'>(</font>
+    boost::python::object<font color='#5555FF'>&amp;</font> obj
+<font face='Lucida Console'>)</font>
+<b>{</b>
+    <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> boost::python;
+    <font color='#0000FF'>const</font> <font color='#0000FF'><u>char</u></font> ch <font color='#5555FF'>=</font> extract<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>obj.<font color='#BB00BB'>attr</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>dtype</font>"<font face='Lucida Console'>)</font>.<font color='#BB00BB'>attr</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>char</font>"<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>dlib::is_same_type<font color='#5555FF'>&lt;</font>T,<font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font>::value <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> ch <font color='#5555FF'>!</font><font color='#5555FF'>=</font> '<font color='#FF0000'>d</font>'<font face='Lucida Console'>)</font>
+        <font color='#0000FF'>throw</font> dlib::<font color='#BB00BB'>error</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>Expected numpy.ndarray of float64</font>"<font face='Lucida Console'>)</font>;
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>dlib::is_same_type<font color='#5555FF'>&lt;</font>T,<font color='#0000FF'><u>float</u></font><font color='#5555FF'>&gt;</font>::value <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> ch <font color='#5555FF'>!</font><font color='#5555FF'>=</font> '<font color='#FF0000'>f</font>'<font face='Lucida Console'>)</font>
+        <font color='#0000FF'>throw</font> dlib::<font color='#BB00BB'>error</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>Expected numpy.ndarray of float32</font>"<font face='Lucida Console'>)</font>;
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>dlib::is_same_type<font color='#5555FF'>&lt;</font>T,dlib::int32<font color='#5555FF'>&gt;</font>::value <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> ch <font color='#5555FF'>!</font><font color='#5555FF'>=</font> '<font color='#FF0000'>i</font>'<font face='Lucida Console'>)</font>
+        <font color='#0000FF'>throw</font> dlib::<font color='#BB00BB'>error</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>Expected numpy.ndarray of int32</font>"<font face='Lucida Console'>)</font>;
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>dlib::is_same_type<font color='#5555FF'>&lt;</font>T,<font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font>::value <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> ch <font color='#5555FF'>!</font><font color='#5555FF'>=</font> '<font color='#FF0000'>B</font>'<font face='Lucida Console'>)</font>
+        <font color='#0000FF'>throw</font> dlib::<font color='#BB00BB'>error</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>Expected numpy.ndarray of uint8</font>"<font face='Lucida Console'>)</font>;
+<b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T, <font color='#0000FF'><u>int</u></font> dims<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'><u>void</u></font> <b><a name='get_numpy_ndarray_parts'></a>get_numpy_ndarray_parts</b> <font face='Lucida Console'>(</font>
+    boost::python::object<font color='#5555FF'>&amp;</font> obj,
+    T<font color='#5555FF'>*</font><font color='#5555FF'>&amp;</font> data,
+    <font color='#0000FF'><u>long</u></font> <font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>shape<font face='Lucida Console'>)</font>[dims]
+<font face='Lucida Console'>)</font>
+<font color='#009900'>/*!
+    ensures
+        - extracts the pointer to the data from the given numpy ndarray.  Stores the shape
+          of the array into #shape.
+!*/</font>
+<b>{</b>
+    Py_buffer pybuf;
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>PyObject_GetBuffer</font><font face='Lucida Console'>(</font>obj.<font color='#BB00BB'>ptr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, <font color='#5555FF'>&amp;</font>pybuf, PyBUF_ND <font color='#5555FF'>|</font> PyBUF_WRITABLE <font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+        <font color='#0000FF'>throw</font> dlib::<font color='#BB00BB'>error</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>Expected contiguous and writable numpy.ndarray.</font>"<font face='Lucida Console'>)</font>;
+
+    <font color='#0000FF'>try</font>
+    <b>{</b>
+        validate_numpy_array_type<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>obj<font face='Lucida Console'>)</font>;
+        data <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>T<font color='#5555FF'>*</font><font face='Lucida Console'>)</font>pybuf.buf;
+
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>pybuf.ndim <font color='#5555FF'>&gt;</font> dims<font face='Lucida Console'>)</font>
+            <font color='#0000FF'>throw</font> dlib::<font color='#BB00BB'>error</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>Expected array with </font>" <font color='#5555FF'>+</font> dlib::<font color='#BB00BB'>cast_to_string</font><font face='Lucida Console'>(</font>dims<font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> "<font color='#CC0000'> dimensions.</font>"<font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> dims; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>i <font color='#5555FF'>&lt;</font> pybuf.ndim<font face='Lucida Console'>)</font>
+                shape[i] <font color='#5555FF'>=</font> pybuf.shape[i];
+            <font color='#0000FF'>else</font>
+                shape[i] <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+        <b>}</b>
+    <b>}</b>
+    <font color='#0000FF'>catch</font><font face='Lucida Console'>(</font>...<font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#BB00BB'>PyBuffer_Release</font><font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>pybuf<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>throw</font>;
+    <b>}</b>
+    <font color='#BB00BB'>PyBuffer_Release</font><font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>pybuf<font face='Lucida Console'>)</font>;
+<b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T, <font color='#0000FF'><u>int</u></font> dims<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'><u>void</u></font> <b><a name='get_numpy_ndarray_parts'></a>get_numpy_ndarray_parts</b> <font face='Lucida Console'>(</font>
+    <font color='#0000FF'>const</font> boost::python::object<font color='#5555FF'>&amp;</font> obj,
+    <font color='#0000FF'>const</font> T<font color='#5555FF'>*</font><font color='#5555FF'>&amp;</font> data,
+    <font color='#0000FF'><u>long</u></font> <font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>shape<font face='Lucida Console'>)</font>[dims]
+<font face='Lucida Console'>)</font>
+<font color='#009900'>/*!
+    ensures
+        - extracts the pointer to the data from the given numpy ndarray.  Stores the shape
+          of the array into #shape.
+!*/</font>
+<b>{</b>
+    Py_buffer pybuf;
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>PyObject_GetBuffer</font><font face='Lucida Console'>(</font>obj.<font color='#BB00BB'>ptr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, <font color='#5555FF'>&amp;</font>pybuf, PyBUF_ND <font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+        <font color='#0000FF'>throw</font> dlib::<font color='#BB00BB'>error</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>Expected contiguous numpy.ndarray.</font>"<font face='Lucida Console'>)</font>;
+
+    <font color='#0000FF'>try</font>
+    <b>{</b>
+        validate_numpy_array_type<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>obj<font face='Lucida Console'>)</font>;
+        data <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'>const</font> T<font color='#5555FF'>*</font><font face='Lucida Console'>)</font>pybuf.buf;
+
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>pybuf.ndim <font color='#5555FF'>&gt;</font> dims<font face='Lucida Console'>)</font>
+            <font color='#0000FF'>throw</font> dlib::<font color='#BB00BB'>error</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>Expected array with </font>" <font color='#5555FF'>+</font> dlib::<font color='#BB00BB'>cast_to_string</font><font face='Lucida Console'>(</font>dims<font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> "<font color='#CC0000'> dimensions.</font>"<font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> dims; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>i <font color='#5555FF'>&lt;</font> pybuf.ndim<font face='Lucida Console'>)</font>
+                shape[i] <font color='#5555FF'>=</font> pybuf.shape[i];
+            <font color='#0000FF'>else</font>
+                shape[i] <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+        <b>}</b>
+    <b>}</b>
+    <font color='#0000FF'>catch</font><font face='Lucida Console'>(</font>...<font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#BB00BB'>PyBuffer_Release</font><font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>pybuf<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>throw</font>;
+    <b>}</b>
+    <font color='#BB00BB'>PyBuffer_Release</font><font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>pybuf<font face='Lucida Console'>)</font>;
+<b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_PYTHON_NuMPY_Hh_
+</font>
+
+</pre></body></html>

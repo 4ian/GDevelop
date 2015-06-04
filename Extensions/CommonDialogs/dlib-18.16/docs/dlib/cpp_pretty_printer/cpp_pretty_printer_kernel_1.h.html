@@ -1,0 +1,586 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - cpp_pretty_printer_kernel_1.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2005  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_CPP_PRETTY_PRINTER_KERNEl_1_
+<font color='#0000FF'>#define</font> DLIB_CPP_PRETTY_PRINTER_KERNEl_1_
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>string<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>iostream<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>sstream<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='cpp_pretty_printer_kernel_abstract.h.html'>cpp_pretty_printer_kernel_abstract.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../algs.h.html'>../algs.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> stack,
+        <font color='#0000FF'>typename</font> tok
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>class</font> <b><a name='cpp_pretty_printer_kernel_1'></a>cpp_pretty_printer_kernel_1</b> 
+    <b>{</b>
+        <font color='#009900'>/*!
+            REQUIREMENTS ON stack
+                must be an implementation of stack/stack_kernel_abstract.h and
+                stack::type == unsigned long
+
+            REQUIREMENTS ON tok
+                must be an implementation of tokenizer/tokenizer_kernel_abstract.h
+
+            INFO
+                This implementation applies a color scheme, turns include directives 
+                such as #include "file.h" into links to file.h.html, and it also puts 
+                HTML anchor points on function and class declarations.
+        !*/</font>
+
+    <font color='#0000FF'>public</font>:
+
+        <b><a name='cpp_pretty_printer_kernel_1'></a>cpp_pretty_printer_kernel_1</b> <font face='Lucida Console'>(</font>        
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>virtual</font> ~<b><a name='cpp_pretty_printer_kernel_1'></a>cpp_pretty_printer_kernel_1</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='print'></a>print</b> <font face='Lucida Console'>(</font>
+            std::istream<font color='#5555FF'>&amp;</font> in,
+            std::ostream<font color='#5555FF'>&amp;</font> out,
+            <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> title
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='print_and_number'></a>print_and_number</b> <font face='Lucida Console'>(</font>
+            std::istream<font color='#5555FF'>&amp;</font> in,
+            std::ostream<font color='#5555FF'>&amp;</font> out,
+            <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> title
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+    <font color='#0000FF'>private</font>:
+
+        <font color='#0000FF'>const</font> std::string <b><a name='htmlify'></a>htmlify</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> str
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - str == str but with any '&lt;' replaced with '&amp;lt;', any '&gt;' replaced
+                  with '&amp;gt;', and any '&amp;' replaced with '&amp;amp;'
+        !*/</font>
+
+        <font color='#009900'>// data members
+</font>        <font color='#0000FF'>mutable</font> tok t;
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='number'></a>number</b> <font face='Lucida Console'>(</font>
+            std::istream<font color='#5555FF'>&amp;</font> in,
+            std::ostream<font color='#5555FF'>&amp;</font> out
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - prints in to out and adds line numbers
+        !*/</font>
+
+        <font color='#009900'>// restricted functions
+</font>        <b><a name='cpp_pretty_printer_kernel_1'></a>cpp_pretty_printer_kernel_1</b><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> cpp_pretty_printer_kernel_1<font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font>;        <font color='#009900'>// copy constructor
+</font>        cpp_pretty_printer_kernel_1<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>=</font><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> cpp_pretty_printer_kernel_1<font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font>;    <font color='#009900'>// assignment operator
+</font>
+    <b>}</b>;    
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>    <font color='#009900'>// member function definitions
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> stack,
+        <font color='#0000FF'>typename</font> tok
+        <font color='#5555FF'>&gt;</font>
+    cpp_pretty_printer_kernel_1<font color='#5555FF'>&lt;</font>stack,tok<font color='#5555FF'>&gt;</font>::
+    <b><a name='cpp_pretty_printer_kernel_1'></a>cpp_pretty_printer_kernel_1</b> <font face='Lucida Console'>(</font>        
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> stack,
+        <font color='#0000FF'>typename</font> tok
+        <font color='#5555FF'>&gt;</font>
+    cpp_pretty_printer_kernel_1<font color='#5555FF'>&lt;</font>stack,tok<font color='#5555FF'>&gt;</font>::
+    ~<b><a name='cpp_pretty_printer_kernel_1'></a>cpp_pretty_printer_kernel_1</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> stack,
+        <font color='#0000FF'>typename</font> tok
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> cpp_pretty_printer_kernel_1<font color='#5555FF'>&lt;</font>stack,tok<font color='#5555FF'>&gt;</font>::
+    <b><a name='print'></a>print</b> <font face='Lucida Console'>(</font>
+        std::istream<font color='#5555FF'>&amp;</font> in,
+        std::ostream<font color='#5555FF'>&amp;</font> out,
+        <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> title
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> std;
+
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font>out<font face='Lucida Console'>)</font>
+            <font color='#0000FF'>throw</font> std::ios::<font color='#BB00BB'>failure</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>error occurred in cpp_pretty_printer_kernel_1::print</font>"<font face='Lucida Console'>)</font>;
+
+        t.<font color='#BB00BB'>set_stream</font><font face='Lucida Console'>(</font>in<font face='Lucida Console'>)</font>;
+
+        out <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>&lt;html&gt;&lt;!-- </font>" 
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates.</font>" 
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'> --&gt;&lt;head&gt;&lt;title&gt;</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> title <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>&lt;/title&gt;&lt;/head&gt;&lt;body bgcolor='white'&gt;&lt;pre&gt;\n</font>";
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font>out<font face='Lucida Console'>)</font>
+            <font color='#0000FF'>throw</font> std::ios::<font color='#BB00BB'>failure</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>error occurred in cpp_pretty_printer_kernel_1::print</font>"<font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> scope <font color='#5555FF'>=</font> <font color='#979000'>0</font>; <font color='#009900'>// counts the number of new scopes we have entered 
+</font>                        <font color='#009900'>// since we were at a scope where functions can be declared
+</font>
+        <font color='#0000FF'><u>bool</u></font> recently_seen_class_keyword <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+            <font color='#009900'>// true if we have seen the keywords class, struct, or enum and
+</font>            <font color='#009900'>// we have not seen any identifiers or { characters
+</font>
+        <font color='#0000FF'><u>bool</u></font> recently_seen_include <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+            <font color='#009900'>// true if we have seen the #include keyword and have not seen double
+</font>            <font color='#009900'>// quoted text or &gt;
+</font>
+        <font color='#0000FF'><u>bool</u></font> recently_seen_new_scope <font color='#5555FF'>=</font> <font color='#979000'>false</font>;  
+            <font color='#009900'>// true if we have seen the keywords class, namespace, or struct and
+</font>            <font color='#009900'>// we have not seen the characters {, ), or ; since then
+</font>
+        <font color='#0000FF'><u>bool</u></font> recently_seen_paren <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+            <font color='#009900'>// true if we have seen a ) and we have only seen white_space or comments since
+</font>
+        <font color='#0000FF'><u>bool</u></font> in_initialization_list <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+            <font color='#009900'>// true if we have seen a ) followed by any white space or comments and then
+</font>            <font color='#009900'>// followed by a : (in scope==0 with recently_seen_preprocessor==false) and we 
+</font>            <font color='#009900'>// have not yet seen the character { or ;
+</font>
+        <font color='#0000FF'><u>bool</u></font> recently_seen_preprocessor <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+            <font color='#009900'>// true if we have seen the #pragma or #if or #define or #elif keywords and have 
+</font>            <font color='#009900'>// not seen an end of line.
+</font>
+        <font color='#0000FF'><u>bool</u></font> recently_seen_extern <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+            <font color='#009900'>// true if we have seen the extern keyword and haven't seen a ; or { yet.
+</font>
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> paren_count <font color='#5555FF'>=</font> <font color='#979000'>0</font>; 
+            <font color='#009900'>// this is the number of ( we have seen minus the number of ) we have
+</font>            <font color='#009900'>// seen.
+</font>            
+
+        <font color='#0000FF'><u>int</u></font> type;
+        stack scopes; <font color='#009900'>// a stack to hold old scopes
+</font>        string token, temp;
+        t.<font color='#BB00BB'>get_token</font><font face='Lucida Console'>(</font>type,token<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>type <font color='#5555FF'>!</font><font color='#5555FF'>=</font> tok::END_OF_FILE<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>switch</font> <font face='Lucida Console'>(</font>type<font face='Lucida Console'>)</font>
+            <b>{</b>
+            <font color='#0000FF'>case</font> tok::IDENTIFIER: <font color='#009900'>// ------------------------------------------
+</font>                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> recently_seen_class_keyword<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#009900'>// this might be a class name so check if there is a 
+</font>                    <font color='#009900'>// ; or identifier or * or &amp; coming up.
+</font>                    type <font color='#5555FF'>=</font> t.<font color='#BB00BB'>peek_type</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                    temp.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>type <font color='#5555FF'>=</font><font color='#5555FF'>=</font> tok::WHITE_SPACE<font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        t.<font color='#BB00BB'>get_token</font><font face='Lucida Console'>(</font>type,temp<font face='Lucida Console'>)</font>;
+                        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>temp.<font color='#BB00BB'>find_first_of</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>\n\r</font>"<font face='Lucida Console'>)</font> <font color='#5555FF'>!</font><font color='#5555FF'>=</font> string::npos<font face='Lucida Console'>)</font>
+                            recently_seen_preprocessor <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+                    <b>}</b>
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>t.<font color='#BB00BB'>peek_token</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>!</font><font color='#5555FF'>=</font> "<font color='#CC0000'>;</font>" <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> t.<font color='#BB00BB'>peek_type</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>!</font><font color='#5555FF'>=</font> tok::IDENTIFIER <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font>
+                        t.<font color='#BB00BB'>peek_token</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>!</font><font color='#5555FF'>=</font> "<font color='#CC0000'>*</font>" <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> t.<font color='#BB00BB'>peek_token</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>!</font><font color='#5555FF'>=</font> "<font color='#CC0000'>&amp;</font>"<font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        <font color='#009900'>// this is the name of a class or struct in a class or
+</font>                        <font color='#009900'>// struct declaration.
+</font>                        out <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>&lt;b&gt;&lt;a name='</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> token <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>'&gt;&lt;/a&gt;</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> token <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>&lt;/b&gt;</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> temp;
+                    <b>}</b>
+                    <font color='#0000FF'>else</font>
+                    <b>{</b>
+                        out <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> token <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> temp;
+                    <b>}</b>
+                <b>}</b>
+                <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> <font color='#5555FF'>!</font>in_initialization_list <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font>
+                     <font color='#5555FF'>!</font>recently_seen_preprocessor <font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#009900'>// this might be a function name so check if there is a 
+</font>                    <font color='#009900'>// ( coming up.
+</font>                    type <font color='#5555FF'>=</font> t.<font color='#BB00BB'>peek_type</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                    temp.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>type <font color='#5555FF'>=</font><font color='#5555FF'>=</font> tok::WHITE_SPACE<font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        t.<font color='#BB00BB'>get_token</font><font face='Lucida Console'>(</font>type,temp<font face='Lucida Console'>)</font>;
+                        type <font color='#5555FF'>=</font> t.<font color='#BB00BB'>peek_type</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                    <b>}</b>
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>type <font color='#5555FF'>=</font><font color='#5555FF'>=</font> tok::OTHER <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> t.<font color='#BB00BB'>peek_token</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'>(</font>"<font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>scope <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> paren_count <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                        <b>{</b>
+                            <font color='#009900'>// this is a function definition or prototype
+</font>                            out <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>&lt;b&gt;&lt;a name='</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> token <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>'&gt;&lt;/a&gt;</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> token <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>&lt;/b&gt;</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> temp;
+                        <b>}</b>
+                        <font color='#0000FF'>else</font>
+                        <b>{</b>
+                            <font color='#009900'>// this is a function call (probably) 
+</font>                            out <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>&lt;font color='#BB00BB'&gt;</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> token <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>&lt;/font&gt;</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> temp;
+                        <b>}</b>
+                    <b>}</b>
+                    <font color='#0000FF'>else</font>
+                    <b>{</b>
+                        out <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> token <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> temp;
+                    <b>}</b>
+                <b>}</b>
+                <font color='#0000FF'>else</font>
+                <b>{</b>
+                    out <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> token;
+                <b>}</b>
+                
+
+
+                recently_seen_class_keyword <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+                recently_seen_paren <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+                <font color='#0000FF'>break</font>;
+
+            <font color='#0000FF'>case</font> tok::KEYWORD: <font color='#009900'>// ---------------------------------------------
+</font>                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>scope <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> token <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'>operator</font>"<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#009900'>// Doing this is sort of weird since operator is really a keyword
+</font>                    <font color='#009900'>// but I just like how this looks.
+</font>                    out <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>&lt;b&gt;&lt;a name='</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> token <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>'&gt;&lt;/a&gt;</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> token <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>&lt;/b&gt;</font>";
+                <b>}</b>
+                <font color='#009900'>// this isn't a keyword if it is something like #include &lt;new&gt;
+</font>                <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> token <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'>true</font>" <font color='#5555FF'>|</font><font color='#5555FF'>|</font> token <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'>false</font>"<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#009900'>// color 'true' and 'false' the same way we color numbers
+</font>                    out <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>&lt;font color='#979000'&gt;</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> token <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>&lt;/font&gt;</font>";
+                <b>}</b>
+                <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font>recently_seen_include<font face='Lucida Console'>)</font> 
+                <b>{</b>
+                    <font color='#009900'>// This is a normal keyword
+</font>                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>token <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'>char</font>" <font color='#5555FF'>|</font><font color='#5555FF'>|</font> token <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'>unsigned</font>" <font color='#5555FF'>|</font><font color='#5555FF'>|</font> token <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'>signed</font>" <font color='#5555FF'>|</font><font color='#5555FF'>|</font>
+                        token <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'>short</font>" <font color='#5555FF'>|</font><font color='#5555FF'>|</font> token <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'>int</font>" <font color='#5555FF'>|</font><font color='#5555FF'>|</font> token <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'>long</font>" <font color='#5555FF'>|</font><font color='#5555FF'>|</font> 
+                        token <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'>float</font>" <font color='#5555FF'>|</font><font color='#5555FF'>|</font> token <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'>double</font>" <font color='#5555FF'>|</font><font color='#5555FF'>|</font> token <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'>bool</font>" <font color='#5555FF'>|</font><font color='#5555FF'>|</font>
+                        token <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'>void</font>" <font color='#5555FF'>|</font><font color='#5555FF'>|</font> token <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'>size_t</font>" <font color='#5555FF'>|</font><font color='#5555FF'>|</font> token <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'>wchar_t</font>"<font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        out <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>&lt;font color='#0000FF'&gt;&lt;u&gt;</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> token <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>&lt;/u&gt;&lt;/font&gt;</font>";
+                    <b>}</b>
+                    <font color='#0000FF'>else</font>
+                    <b>{</b>
+                        out <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>&lt;font color='#0000FF'&gt;</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> token <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>&lt;/font&gt;</font>";
+                    <b>}</b>
+                <b>}</b>
+                <font color='#0000FF'>else</font>
+                <b>{</b>
+                    out <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> token;
+                <b>}</b>
+
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>token <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'>#include</font>"<font face='Lucida Console'>)</font> 
+                <b>{</b>
+                    recently_seen_include <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+                <b>}</b>
+                <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>token <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'>class</font>"<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    recently_seen_new_scope <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+                    recently_seen_class_keyword <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+                <b>}</b>
+                <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>token <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'>namespace</font>"<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    recently_seen_new_scope <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+                <b>}</b>
+                <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>token <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'>enum</font>"<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    recently_seen_class_keyword <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+                <b>}</b>
+                <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>token <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'>struct</font>"<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    recently_seen_new_scope <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+                    recently_seen_class_keyword <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+                <b>}</b>
+                <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>token <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'>#pragma</font>" <font color='#5555FF'>|</font><font color='#5555FF'>|</font> token <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'>#if</font>" <font color='#5555FF'>|</font><font color='#5555FF'>|</font> token <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'>#define</font>" <font color='#5555FF'>|</font><font color='#5555FF'>|</font> token <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'>#elif</font>"<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    recently_seen_preprocessor <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+                <b>}</b>
+                <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>token <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'>extern</font>"<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    recently_seen_extern <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+                <b>}</b>
+                recently_seen_paren <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+                <font color='#0000FF'>break</font>;
+
+            <font color='#0000FF'>case</font> tok::COMMENT: <font color='#009900'>// ---------------------------------------------
+</font>                <b>{</b>
+                    <font color='#009900'>// if this is a special anchor comment
+</font>                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>token.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> <font color='#979000'>4</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font>
+                        token[<font color='#979000'>0</font>] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> '<font color='#FF0000'>/</font>' <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font>
+                        token[<font color='#979000'>1</font>] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> '<font color='#FF0000'>*</font>' <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font>
+                        token[<font color='#979000'>2</font>] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> '<font color='#FF0000'>!</font>' <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font>
+                        token[<font color='#979000'>3</font>] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> '<font color='#FF0000'>A</font>' <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font>
+                        token[<font color='#979000'>4</font>] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> '<font color='#FF0000'> </font>'
+                    <font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        temp <font color='#5555FF'>=</font> token;
+                        istringstream <font color='#BB00BB'>sin</font><font face='Lucida Console'>(</font>token<font face='Lucida Console'>)</font>;
+                        sin <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font> temp;
+                        sin <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font> temp;
+                        sin.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                        <font color='#009900'>// if there was still more stuff in the token then we are ok.
+</font>                        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>sin<font face='Lucida Console'>)</font>
+                            out <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>&lt;a name='</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> temp <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>'/&gt;</font>";
+                    <b>}</b>
+                    out <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>&lt;font color='#009900'&gt;</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>htmlify</font><font face='Lucida Console'>(</font>token<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>&lt;/font&gt;</font>";
+                <b>}</b>
+                <font color='#0000FF'>break</font>;
+
+            <font color='#0000FF'>case</font> tok::SINGLE_QUOTED_TEXT: <font color='#009900'>// ----------------------------------
+</font>                <b>{</b>
+                    out <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>&lt;font color='#FF0000'&gt;</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>htmlify</font><font face='Lucida Console'>(</font>token<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>&lt;/font&gt;</font>";
+                    recently_seen_paren <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+                <b>}</b>
+                <font color='#0000FF'>break</font>;
+
+            <font color='#0000FF'>case</font> tok::NUMBER: <font color='#009900'>// -----------------------------------------
+</font>                <b>{</b>
+                    out <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>&lt;font color='#979000'&gt;</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> token <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>&lt;/font&gt;</font>";
+                    recently_seen_include <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+                <b>}</b>
+                <font color='#0000FF'>break</font>;
+
+            <font color='#0000FF'>case</font> tok::WHITE_SPACE: <font color='#009900'>// -----------------------------------------
+</font>                <b>{</b>
+                    out <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> token;
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>token.<font color='#BB00BB'>find_first_of</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>\n\r</font>"<font face='Lucida Console'>)</font> <font color='#5555FF'>!</font><font color='#5555FF'>=</font> string::npos<font face='Lucida Console'>)</font>
+                        recently_seen_preprocessor <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+                <b>}</b>
+                <font color='#0000FF'>break</font>;
+
+            <font color='#0000FF'>case</font> tok::DOUBLE_QUOTED_TEXT: <font color='#009900'>// ----------------------------------
+</font>                <b>{</b>
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>recently_seen_include<font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        <font color='#009900'>// this is the name of an included file
+</font>                        recently_seen_include <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+                        out <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>&lt;a style='text-decoration:none' href='</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>htmlify</font><font face='Lucida Console'>(</font>token<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>.html'&gt;</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>htmlify</font><font face='Lucida Console'>(</font>token<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>&lt;/a&gt;</font>";                
+                    <b>}</b>
+                    <font color='#0000FF'>else</font>
+                    <b>{</b>
+                        <font color='#009900'>// this is just a normal quoted string
+</font>                        out <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>&lt;font color='#CC0000'&gt;</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>htmlify</font><font face='Lucida Console'>(</font>token<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>&lt;/font&gt;</font>";
+                    <b>}</b>
+                    recently_seen_paren <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+                <b>}</b>
+                <font color='#0000FF'>break</font>;
+
+            <font color='#0000FF'>case</font> tok::OTHER: <font color='#009900'>// -----------------------------------------------               
+</font>                <font color='#0000FF'>switch</font> <font face='Lucida Console'>(</font>token[<font color='#979000'>0</font>]<font face='Lucida Console'>)</font>
+                <b>{</b>
+                <font color='#0000FF'>case</font> '<font color='#FF0000'>{</font>':
+                    out <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>&lt;b&gt;{&lt;/b&gt;</font>";  
+                    <font color='#009900'>// if we are entering a new scope
+</font>                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>recently_seen_new_scope <font color='#5555FF'>|</font><font color='#5555FF'>|</font> recently_seen_extern<font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        recently_seen_new_scope <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+                        scopes.<font color='#BB00BB'>push</font><font face='Lucida Console'>(</font>scope<font face='Lucida Console'>)</font>;
+                        scope <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                    <b>}</b>
+                    <font color='#0000FF'>else</font>
+                    <b>{</b>
+                        <font color='#5555FF'>+</font><font color='#5555FF'>+</font>scope;
+                    <b>}</b>
+                    in_initialization_list <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+                    recently_seen_paren <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+                    recently_seen_class_keyword <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+                    recently_seen_extern <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+                    <font color='#0000FF'>break</font>;
+                <font color='#0000FF'>case</font> '<font color='#FF0000'>}</font>':
+                    out <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>&lt;b&gt;}&lt;/b&gt;</font>";
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>scope <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        <font color='#5555FF'>-</font><font color='#5555FF'>-</font>scope;
+                    <b>}</b>
+                    <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>scopes.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        scopes.<font color='#BB00BB'>pop</font><font face='Lucida Console'>(</font>scope<font face='Lucida Console'>)</font>;
+                    <b>}</b>
+                    recently_seen_paren <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+                    <font color='#0000FF'>break</font>;
+
+                <font color='#0000FF'>case</font> '<font color='#FF0000'>:</font>':
+                    out <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> '<font color='#FF0000'>:</font>';
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>recently_seen_paren <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> scope <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> 
+                        recently_seen_preprocessor <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font><font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        in_initialization_list <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+                    <b>}</b>
+                    recently_seen_paren <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+                    <font color='#0000FF'>break</font>;
+
+                <font color='#0000FF'>case</font> '<font color='#FF0000'>;</font>': 
+                    out <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> '<font color='#FF0000'>;</font>';
+                    recently_seen_new_scope <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+                    recently_seen_paren <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+                    recently_seen_extern <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+                    <font color='#0000FF'>break</font>;
+
+                <font color='#0000FF'>case</font> '<font color='#FF0000'>)</font>':
+                    out <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>&lt;font face='Lucida Console'&gt;)&lt;/font&gt;</font>";
+                    recently_seen_paren <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+                    recently_seen_new_scope <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+                    <font color='#5555FF'>-</font><font color='#5555FF'>-</font>paren_count;
+                    <font color='#0000FF'>break</font>;
+
+                <font color='#0000FF'>case</font> '<font color='#FF0000'>(</font>':
+                    out <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>&lt;font face='Lucida Console'&gt;(&lt;/font&gt;</font>";
+                    recently_seen_paren <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+                    <font color='#5555FF'>+</font><font color='#5555FF'>+</font>paren_count;
+                    <font color='#0000FF'>break</font>;
+
+                <font color='#0000FF'>case</font> '<font color='#FF0000'>&gt;</font>':
+                    recently_seen_include <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+                    out <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>&lt;font color='#5555FF'&gt;&amp;gt;&lt;/font&gt;</font>";
+                    recently_seen_paren <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+                    <font color='#0000FF'>break</font>;
+
+                <font color='#0000FF'>case</font> '<font color='#FF0000'>&lt;</font>':
+                    out <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>&lt;font color='#5555FF'&gt;&amp;lt;&lt;/font&gt;</font>";
+                    recently_seen_paren <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+                    <font color='#0000FF'>break</font>;
+
+                <font color='#0000FF'>case</font> '<font color='#FF0000'>&amp;</font>':
+                    out <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>&lt;font color='#5555FF'&gt;&amp;amp;&lt;/font&gt;</font>";
+                    recently_seen_paren <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+                    <font color='#0000FF'>break</font>;
+
+                <font color='#0000FF'>case</font> '<font color='#FF0000'>=</font>':
+                <font color='#0000FF'>case</font> '<font color='#FF0000'>+</font>':
+                <font color='#0000FF'>case</font> '<font color='#FF0000'>-</font>':
+                <font color='#0000FF'>case</font> '<font color='#FF0000'>/</font>':
+                <font color='#0000FF'>case</font> '<font color='#FF0000'>*</font>':
+                <font color='#0000FF'>case</font> '<font color='#FF0000'>!</font>':
+                <font color='#0000FF'>case</font> '<font color='#FF0000'>|</font>':
+                <font color='#0000FF'>case</font> '<font color='#FF0000'>%</font>':
+                    out <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>&lt;font color='#5555FF'&gt;</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> token <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>&lt;/font&gt;</font>";
+                    recently_seen_paren <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+                    <font color='#0000FF'>break</font>;
+
+                <font color='#0000FF'>default</font>:
+                    out <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> token;
+                    recently_seen_paren <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+                    <font color='#0000FF'>break</font>;
+
+                <b>}</b> <font color='#009900'>// switch (token[0])
+</font>                <font color='#0000FF'>break</font>;
+
+            <b>}</b> <font color='#009900'>// switch (type)
+</font>
+            t.<font color='#BB00BB'>get_token</font><font face='Lucida Console'>(</font>type,token<font face='Lucida Console'>)</font>;
+        <b>}</b> <font color='#009900'>// while (type != tok::END_OF_FILE)
+</font>
+
+        out <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n&lt;/pre&gt;&lt;/body&gt;&lt;/html&gt;</font>";
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font>out<font face='Lucida Console'>)</font>
+            <font color='#0000FF'>throw</font> std::ios::<font color='#BB00BB'>failure</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>error occurred in cpp_pretty_printer_kernel_1::print</font>"<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> stack,
+        <font color='#0000FF'>typename</font> tok
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> cpp_pretty_printer_kernel_1<font color='#5555FF'>&lt;</font>stack,tok<font color='#5555FF'>&gt;</font>::
+    <b><a name='print_and_number'></a>print_and_number</b> <font face='Lucida Console'>(</font>
+        std::istream<font color='#5555FF'>&amp;</font> in,
+        std::ostream<font color='#5555FF'>&amp;</font> out,
+        <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> title
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> std;
+        ostringstream sout;
+        <font color='#BB00BB'>print</font><font face='Lucida Console'>(</font>in,sout,title<font face='Lucida Console'>)</font>;
+        istringstream <font color='#BB00BB'>sin</font><font face='Lucida Console'>(</font>sout.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>number</font><font face='Lucida Console'>(</font>sin,out<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>    <font color='#009900'>// private member function definitions
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> stack,
+        <font color='#0000FF'>typename</font> tok
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> cpp_pretty_printer_kernel_1<font color='#5555FF'>&lt;</font>stack,tok<font color='#5555FF'>&gt;</font>::
+    <b><a name='number'></a>number</b> <font face='Lucida Console'>(</font>
+        std::istream<font color='#5555FF'>&amp;</font> in,
+        std::ostream<font color='#5555FF'>&amp;</font> out
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font>out<font face='Lucida Console'>)</font>
+            <font color='#0000FF'>throw</font> std::ios::<font color='#BB00BB'>failure</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>error occurred in cpp_pretty_printer_kernel_1::number</font>"<font face='Lucida Console'>)</font>;
+
+        std::string space <font color='#5555FF'>=</font> "<font color='#CC0000'>&amp;nbsp;&amp;nbsp;&amp;nbsp;</font>";
+        std::ios::int_type ch;
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> count <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+        <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>ch<font color='#5555FF'>=</font>in.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>!</font><font color='#5555FF'>=</font> EOF<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>ch <font color='#5555FF'>!</font><font color='#5555FF'>=</font> '<font color='#FF0000'>\n</font>'<font face='Lucida Console'>)</font>
+            <b>{</b>
+                out <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>char</u></font><font face='Lucida Console'>)</font>ch;    
+            <b>}</b>
+            <font color='#0000FF'>else</font>
+            <b>{</b>
+                out <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n&lt;font color='555555'&gt;</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> count <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'> &lt;/font&gt; </font>" <font color='#5555FF'>+</font> space;
+                <font color='#5555FF'>+</font><font color='#5555FF'>+</font>count;
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>count <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>10</font><font face='Lucida Console'>)</font>
+                    space <font color='#5555FF'>=</font> "<font color='#CC0000'>&amp;nbsp;&amp;nbsp;</font>";
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>count <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>100</font><font face='Lucida Console'>)</font>
+                    space <font color='#5555FF'>=</font> "<font color='#CC0000'>&amp;nbsp;</font>";
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>count <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>1000</font><font face='Lucida Console'>)</font>
+                    space <font color='#5555FF'>=</font> "<font color='#CC0000'></font>";            
+            <b>}</b>
+        <b>}</b>
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font>out<font face='Lucida Console'>)</font>
+            <font color='#0000FF'>throw</font> std::ios::<font color='#BB00BB'>failure</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>error occurred in cpp_pretty_printer_kernel_1::number</font>"<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> stack,
+        <font color='#0000FF'>typename</font> tok
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>const</font> std::string cpp_pretty_printer_kernel_1<font color='#5555FF'>&lt;</font>stack,tok<font color='#5555FF'>&gt;</font>::
+    <b><a name='htmlify'></a>htmlify</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> str
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        std::string::size_type i;
+        std::string temp;
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> str.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>str[i] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> '<font color='#FF0000'>&lt;</font>'<font face='Lucida Console'>)</font>
+                temp <font color='#5555FF'>+</font><font color='#5555FF'>=</font> "<font color='#CC0000'>&amp;lt;</font>";
+            <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>str[i] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> '<font color='#FF0000'>&gt;</font>'<font face='Lucida Console'>)</font>
+                temp <font color='#5555FF'>+</font><font color='#5555FF'>=</font> "<font color='#CC0000'>&amp;gt;</font>";
+            <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>str[i] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> '<font color='#FF0000'>&amp;</font>'<font face='Lucida Console'>)</font>
+                temp <font color='#5555FF'>+</font><font color='#5555FF'>=</font> "<font color='#CC0000'>&amp;amp;</font>";
+            <font color='#0000FF'>else</font>
+                temp <font color='#5555FF'>+</font><font color='#5555FF'>=</font> str[i];
+        <b>}</b>
+        <font color='#0000FF'>return</font> temp;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_CPP_PRETTY_PRINTER_KERNEl_1_
+</font>
+
+</pre></body></html>

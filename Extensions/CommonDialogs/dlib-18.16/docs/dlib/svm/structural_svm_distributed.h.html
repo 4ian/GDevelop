@@ -1,0 +1,704 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - structural_svm_distributed.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2011  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_STRUCTURAL_SVM_DISTRIBUTeD_Hh_
+<font color='#0000FF'>#define</font> DLIB_STRUCTURAL_SVM_DISTRIBUTeD_Hh_
+
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='structural_svm_distributed_abstract.h.html'>structural_svm_distributed_abstract.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='structural_svm_problem.h.html'>structural_svm_problem.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../bridge.h.html'>../bridge.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../smart_pointers.h.html'>../smart_pointers.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../misc_api.h.html'>../misc_api.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../statistics.h.html'>../statistics.h</a>"
+
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../threads.h.html'>../threads.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../pipe.h.html'>../pipe.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../type_safe_union.h.html'>../type_safe_union.h</a>"
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>iostream<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>vector<font color='#5555FF'>&gt;</font>
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>namespace</font> impl
+    <b>{</b>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> matrix_type<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>struct</font> <b><a name='oracle_response'></a>oracle_response</b>
+        <b>{</b>
+            <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> matrix_type::type scalar_type;
+
+            matrix_type subgradient;
+            scalar_type loss;
+            <font color='#0000FF'><u>long</u></font> num;
+
+            <font color='#0000FF'>friend</font> <font color='#0000FF'><u>void</u></font> <b><a name='swap'></a>swap</b> <font face='Lucida Console'>(</font>oracle_response<font color='#5555FF'>&amp;</font> a, oracle_response<font color='#5555FF'>&amp;</font> b<font face='Lucida Console'>)</font>
+            <b>{</b>
+                a.subgradient.<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>b.subgradient<font face='Lucida Console'>)</font>;
+                std::<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>a.loss, b.loss<font face='Lucida Console'>)</font>;
+                std::<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>a.num, b.num<font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+            <font color='#0000FF'>friend</font> <font color='#0000FF'><u>void</u></font> <b><a name='serialize'></a>serialize</b> <font face='Lucida Console'>(</font><font color='#0000FF'>const</font> oracle_response<font color='#5555FF'>&amp;</font> item, std::ostream<font color='#5555FF'>&amp;</font> out<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item.subgradient, out<font face='Lucida Console'>)</font>;
+                dlib::<font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item.loss, out<font face='Lucida Console'>)</font>;
+                dlib::<font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item.num, out<font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+            <font color='#0000FF'>friend</font> <font color='#0000FF'><u>void</u></font> <b><a name='deserialize'></a>deserialize</b> <font face='Lucida Console'>(</font>oracle_response<font color='#5555FF'>&amp;</font> item, std::istream<font color='#5555FF'>&amp;</font> in<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item.subgradient, in<font face='Lucida Console'>)</font>;
+                dlib::<font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item.loss, in<font face='Lucida Console'>)</font>;
+                dlib::<font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item.num, in<font face='Lucida Console'>)</font>;
+            <b>}</b>
+        <b>}</b>;
+
+    <font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> matrix_type<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>struct</font> <b><a name='oracle_request'></a>oracle_request</b>
+        <b>{</b>
+            <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> matrix_type::type scalar_type;
+
+            matrix_type current_solution;
+            scalar_type saved_current_risk_gap;
+            <font color='#0000FF'><u>bool</u></font> skip_cache;
+            <font color='#0000FF'><u>bool</u></font> converged;
+
+            <font color='#0000FF'>friend</font> <font color='#0000FF'><u>void</u></font> <b><a name='swap'></a>swap</b> <font face='Lucida Console'>(</font>oracle_request<font color='#5555FF'>&amp;</font> a, oracle_request<font color='#5555FF'>&amp;</font> b<font face='Lucida Console'>)</font>
+            <b>{</b>
+                a.current_solution.<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>b.current_solution<font face='Lucida Console'>)</font>;
+                std::<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>a.saved_current_risk_gap, b.saved_current_risk_gap<font face='Lucida Console'>)</font>;
+                std::<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>a.skip_cache, b.skip_cache<font face='Lucida Console'>)</font>;
+                std::<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>a.converged, b.converged<font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+            <font color='#0000FF'>friend</font> <font color='#0000FF'><u>void</u></font> <b><a name='serialize'></a>serialize</b> <font face='Lucida Console'>(</font><font color='#0000FF'>const</font> oracle_request<font color='#5555FF'>&amp;</font> item, std::ostream<font color='#5555FF'>&amp;</font> out<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item.current_solution, out<font face='Lucida Console'>)</font>;
+                dlib::<font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item.saved_current_risk_gap, out<font face='Lucida Console'>)</font>;
+                dlib::<font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item.skip_cache, out<font face='Lucida Console'>)</font>;
+                dlib::<font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item.converged, out<font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+            <font color='#0000FF'>friend</font> <font color='#0000FF'><u>void</u></font> <b><a name='deserialize'></a>deserialize</b> <font face='Lucida Console'>(</font>oracle_request<font color='#5555FF'>&amp;</font> item, std::istream<font color='#5555FF'>&amp;</font> in<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item.current_solution, in<font face='Lucida Console'>)</font>;
+                dlib::<font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item.saved_current_risk_gap, in<font face='Lucida Console'>)</font>;
+                dlib::<font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item.skip_cache, in<font face='Lucida Console'>)</font>;
+                dlib::<font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item.converged, in<font face='Lucida Console'>)</font>;
+            <b>}</b>
+        <b>}</b>;
+
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>class</font> <b><a name='svm_struct_processing_node'></a>svm_struct_processing_node</b> : noncopyable
+    <b>{</b>
+    <font color='#0000FF'>public</font>:
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'>typename</font> T,
+            <font color='#0000FF'>typename</font> U 
+            <font color='#5555FF'>&gt;</font>
+        <b><a name='svm_struct_processing_node'></a>svm_struct_processing_node</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> structural_svm_problem<font color='#5555FF'>&lt;</font>T,U<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> problem,
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>short</u></font> port,
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>short</u></font> num_threads
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#009900'>// make sure requires clause is not broken
+</font>            <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font>port <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> problem.<font color='#BB00BB'>get_num_samples</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font>
+                        problem.<font color='#BB00BB'>get_num_dimensions</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font>,
+                "<font color='#CC0000'>\t svm_struct_processing_node()</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t Invalid arguments were given to this function</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t port: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> port 
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t problem.get_num_samples():    </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> problem.<font color='#BB00BB'>get_num_samples</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> 
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t problem.get_num_dimensions(): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> problem.<font color='#BB00BB'>get_num_dimensions</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> 
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t this: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font>
+                <font face='Lucida Console'>)</font>;
+
+            the_problem.<font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font><font color='#0000FF'>new</font> node_type<font color='#5555FF'>&lt;</font>T,U<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>problem, port, num_threads<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+    <font color='#0000FF'>private</font>:
+
+        <font color='#0000FF'>struct</font> <b><a name='base'></a>base</b>
+        <b>{</b>
+            <font color='#0000FF'>virtual</font> ~<b><a name='base'></a>base</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><b>{</b><b>}</b>
+        <b>}</b>;
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'>typename</font> matrix_type,
+            <font color='#0000FF'>typename</font> feature_vector_type 
+            <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>class</font> <b><a name='node_type'></a>node_type</b> : <font color='#0000FF'>public</font> base, threaded_object
+        <b>{</b>
+        <font color='#0000FF'>public</font>:
+            <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> matrix_type::type scalar_type;
+
+            <b><a name='node_type'></a>node_type</b><font face='Lucida Console'>(</font>
+                <font color='#0000FF'>const</font> structural_svm_problem<font color='#5555FF'>&lt;</font>matrix_type,feature_vector_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> prob,
+                <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>short</u></font> port,
+                <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> num_threads
+            <font face='Lucida Console'>)</font> : in<font face='Lucida Console'>(</font><font color='#979000'>3</font><font face='Lucida Console'>)</font>,out<font face='Lucida Console'>(</font><font color='#979000'>3</font><font face='Lucida Console'>)</font>, problem<font face='Lucida Console'>(</font>prob<font face='Lucida Console'>)</font>, tp<font face='Lucida Console'>(</font>num_threads<font face='Lucida Console'>)</font>
+            <b>{</b>
+                b.<font color='#BB00BB'>reconfigure</font><font face='Lucida Console'>(</font><font color='#BB00BB'>listen_on_port</font><font face='Lucida Console'>(</font>port<font face='Lucida Console'>)</font>, <font color='#BB00BB'>receive</font><font face='Lucida Console'>(</font>in<font face='Lucida Console'>)</font>, <font color='#BB00BB'>transmit</font><font face='Lucida Console'>(</font>out<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+                <font color='#BB00BB'>start</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+            ~<b><a name='node_type'></a>node_type</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                in.<font color='#BB00BB'>disable</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                out.<font color='#BB00BB'>disable</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                <font color='#BB00BB'>wait</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+        <font color='#0000FF'>private</font>:
+
+            <font color='#0000FF'><u>void</u></font> <b><a name='thread'></a>thread</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> impl;
+                tsu_in msg; 
+                tsu_out temp;
+
+                timestamper ts;
+                running_stats<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font> with_buffer_time;
+                running_stats<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font> without_buffer_time;
+                <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> num_iterations_executed <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+
+                <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>in.<font color='#BB00BB'>dequeue</font><font face='Lucida Console'>(</font>msg<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#009900'>// initialize the cache and compute psi_true.
+</font>                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>cache.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        cache.<font color='#BB00BB'>resize</font><font face='Lucida Console'>(</font>problem.<font color='#BB00BB'>get_num_samples</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> cache.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                            cache[i].<font color='#BB00BB'>init</font><font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>problem,i<font face='Lucida Console'>)</font>;
+
+                        psi_true.<font color='#BB00BB'>set_size</font><font face='Lucida Console'>(</font>problem.<font color='#BB00BB'>get_num_dimensions</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,<font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+                        psi_true <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+
+                        <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> num <font color='#5555FF'>=</font> problem.<font color='#BB00BB'>get_num_samples</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                        feature_vector_type ftemp;
+                        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> num; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                        <b>{</b>
+                            cache[i].<font color='#BB00BB'>get_truth_joint_feature_vector_cached</font><font face='Lucida Console'>(</font>ftemp<font face='Lucida Console'>)</font>;
+
+                            <font color='#BB00BB'>subtract_from</font><font face='Lucida Console'>(</font>psi_true, ftemp<font face='Lucida Console'>)</font>;
+                        <b>}</b>
+                    <b>}</b>
+
+
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>msg.<font color='#0000FF'>template</font> contains<font color='#5555FF'>&lt;</font>bridge_status<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> 
+                        msg.<font color='#0000FF'>template</font> get<font color='#5555FF'>&lt;</font>bridge_status<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.is_connected<font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        temp <font color='#5555FF'>=</font> problem.<font color='#BB00BB'>get_num_dimensions</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                        out.<font color='#BB00BB'>enqueue</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font>;
+
+                    <b>}</b>
+                    <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>msg.<font color='#0000FF'>template</font> contains<font color='#5555FF'>&lt;</font>oracle_request<font color='#5555FF'>&lt;</font>matrix_type<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        <font color='#5555FF'>+</font><font color='#5555FF'>+</font>num_iterations_executed;
+
+                        <font color='#0000FF'>const</font> oracle_request<font color='#5555FF'>&lt;</font>matrix_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> req <font color='#5555FF'>=</font> msg.<font color='#0000FF'>template</font> get<font color='#5555FF'>&lt;</font>oracle_request<font color='#5555FF'>&lt;</font>matrix_type<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+                        oracle_response<font color='#5555FF'>&lt;</font>matrix_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> data <font color='#5555FF'>=</font> temp.<font color='#0000FF'>template</font> get<font color='#5555FF'>&lt;</font>oracle_response<font color='#5555FF'>&lt;</font>matrix_type<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+                        data.subgradient <font color='#5555FF'>=</font> psi_true;
+                        data.loss <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+
+                        data.num <font color='#5555FF'>=</font> problem.<font color='#BB00BB'>get_num_samples</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+                        <font color='#0000FF'>const</font> uint64 start_time <font color='#5555FF'>=</font> ts.<font color='#BB00BB'>get_timestamp</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+                        <font color='#009900'>// pick fastest buffering strategy
+</font>                        <font color='#0000FF'><u>bool</u></font> buffer_subgradients_locally <font color='#5555FF'>=</font> with_buffer_time.<font color='#BB00BB'>mean</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> without_buffer_time.<font color='#BB00BB'>mean</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+                        <font color='#009900'>// every 50 iterations we should try to flip the buffering scheme to see if
+</font>                        <font color='#009900'>// doing it the other way might be better.  
+</font>                        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>num_iterations_executed<font color='#5555FF'>%</font><font color='#979000'>50</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                        <b>{</b>
+                            buffer_subgradients_locally <font color='#5555FF'>=</font> <font color='#5555FF'>!</font>buffer_subgradients_locally;
+                        <b>}</b>
+
+                        binder <font color='#BB00BB'>b</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font>, req, data, buffer_subgradients_locally<font face='Lucida Console'>)</font>;
+                        <font color='#BB00BB'>parallel_for_blocked</font><font face='Lucida Console'>(</font>tp, <font color='#979000'>0</font>, data.num, b, <font color='#5555FF'>&amp;</font>binder::call_oracle<font face='Lucida Console'>)</font>;
+
+                        <font color='#0000FF'>const</font> uint64 stop_time <font color='#5555FF'>=</font> ts.<font color='#BB00BB'>get_timestamp</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>buffer_subgradients_locally<font face='Lucida Console'>)</font>
+                            with_buffer_time.<font color='#BB00BB'>add</font><font face='Lucida Console'>(</font>stop_time<font color='#5555FF'>-</font>start_time<font face='Lucida Console'>)</font>;
+                        <font color='#0000FF'>else</font>
+                            without_buffer_time.<font color='#BB00BB'>add</font><font face='Lucida Console'>(</font>stop_time<font color='#5555FF'>-</font>start_time<font face='Lucida Console'>)</font>;
+
+                        out.<font color='#BB00BB'>enqueue</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font>;
+                    <b>}</b>
+                <b>}</b>
+            <b>}</b>
+
+            <font color='#0000FF'>struct</font> <b><a name='binder'></a>binder</b>
+            <b>{</b>
+                <b><a name='binder'></a>binder</b> <font face='Lucida Console'>(</font>
+                    <font color='#0000FF'>const</font> node_type<font color='#5555FF'>&amp;</font> self_,
+                    <font color='#0000FF'>const</font> impl::oracle_request<font color='#5555FF'>&lt;</font>matrix_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> req_,
+                    impl::oracle_response<font color='#5555FF'>&lt;</font>matrix_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> data_,
+                    <font color='#0000FF'><u>bool</u></font> buffer_subgradients_locally_
+                <font face='Lucida Console'>)</font> : self<font face='Lucida Console'>(</font>self_<font face='Lucida Console'>)</font>, req<font face='Lucida Console'>(</font>req_<font face='Lucida Console'>)</font>, data<font face='Lucida Console'>(</font>data_<font face='Lucida Console'>)</font>,
+                    buffer_subgradients_locally<font face='Lucida Console'>(</font>buffer_subgradients_locally_<font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+
+                <font color='#0000FF'><u>void</u></font> <b><a name='call_oracle'></a>call_oracle</b> <font face='Lucida Console'>(</font>
+                    <font color='#0000FF'><u>long</u></font> begin,
+                    <font color='#0000FF'><u>long</u></font> end
+                <font face='Lucida Console'>)</font> 
+                <b>{</b>
+                    <font color='#009900'>// If we are only going to call the separation oracle once then don't
+</font>                    <font color='#009900'>// run the slightly more complex for loop version of this code.  Or if
+</font>                    <font color='#009900'>// we just don't want to run the complex buffering one.  The code later
+</font>                    <font color='#009900'>// on decides if we should do the buffering based on how long it takes
+</font>                    <font color='#009900'>// to execute.  We do this because, when the subgradient is really high
+</font>                    <font color='#009900'>// dimensional it can take a lot of time to add them together.  So we
+</font>                    <font color='#009900'>// might want to avoid doing that.
+</font>                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>end<font color='#5555FF'>-</font>begin <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#979000'>1</font> <font color='#5555FF'>|</font><font color='#5555FF'>|</font> <font color='#5555FF'>!</font>buffer_subgradients_locally<font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        scalar_type loss;
+                        feature_vector_type ftemp;
+                        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> begin; i <font color='#5555FF'>&lt;</font> end; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                        <b>{</b>
+                            self.cache[i].<font color='#BB00BB'>separation_oracle_cached</font><font face='Lucida Console'>(</font>req.converged, 
+                                                                   req.skip_cache, 
+                                                                   req.saved_current_risk_gap,
+                                                                   req.current_solution,
+                                                                   loss,
+                                                                   ftemp<font face='Lucida Console'>)</font>;
+
+                            auto_mutex <font color='#BB00BB'>lock</font><font face='Lucida Console'>(</font>self.accum_mutex<font face='Lucida Console'>)</font>;
+                            data.loss <font color='#5555FF'>+</font><font color='#5555FF'>=</font> loss;
+                            <font color='#BB00BB'>add_to</font><font face='Lucida Console'>(</font>data.subgradient, ftemp<font face='Lucida Console'>)</font>;
+                        <b>}</b>
+                    <b>}</b>
+                    <font color='#0000FF'>else</font>
+                    <b>{</b>
+                        scalar_type loss <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                        matrix_type <font color='#BB00BB'>faccum</font><font face='Lucida Console'>(</font>data.subgradient.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,<font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+                        faccum <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+
+                        feature_vector_type ftemp;
+
+                        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> begin; i <font color='#5555FF'>&lt;</font> end; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                        <b>{</b>
+                            scalar_type loss_temp;
+                            self.cache[i].<font color='#BB00BB'>separation_oracle_cached</font><font face='Lucida Console'>(</font>req.converged,
+                                                                   req.skip_cache, 
+                                                                   req.saved_current_risk_gap,
+                                                                   req.current_solution,
+                                                                   loss_temp,
+                                                                   ftemp<font face='Lucida Console'>)</font>;
+                            loss <font color='#5555FF'>+</font><font color='#5555FF'>=</font> loss_temp;
+                            <font color='#BB00BB'>add_to</font><font face='Lucida Console'>(</font>faccum, ftemp<font face='Lucida Console'>)</font>;
+                        <b>}</b>
+
+                        auto_mutex <font color='#BB00BB'>lock</font><font face='Lucida Console'>(</font>self.accum_mutex<font face='Lucida Console'>)</font>;
+                        data.loss <font color='#5555FF'>+</font><font color='#5555FF'>=</font> loss;
+                        <font color='#BB00BB'>add_to</font><font face='Lucida Console'>(</font>data.subgradient, faccum<font face='Lucida Console'>)</font>;
+                    <b>}</b>
+                <b>}</b>
+
+                <font color='#0000FF'>const</font> node_type<font color='#5555FF'>&amp;</font> self;
+                <font color='#0000FF'>const</font> impl::oracle_request<font color='#5555FF'>&lt;</font>matrix_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> req;
+                impl::oracle_response<font color='#5555FF'>&lt;</font>matrix_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> data;
+                <font color='#0000FF'><u>bool</u></font> buffer_subgradients_locally;
+            <b>}</b>;
+
+
+
+            <font color='#0000FF'>typedef</font> type_safe_union<font color='#5555FF'>&lt;</font>impl::oracle_request<font color='#5555FF'>&lt;</font>matrix_type<font color='#5555FF'>&gt;</font>, bridge_status<font color='#5555FF'>&gt;</font> tsu_in;
+            <font color='#0000FF'>typedef</font> type_safe_union<font color='#5555FF'>&lt;</font>impl::oracle_response<font color='#5555FF'>&lt;</font>matrix_type<font color='#5555FF'>&gt;</font> , <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font> tsu_out;
+
+            pipe<font color='#5555FF'>&lt;</font>tsu_in<font color='#5555FF'>&gt;</font> in;
+            pipe<font color='#5555FF'>&lt;</font>tsu_out<font color='#5555FF'>&gt;</font> out;
+            bridge b;
+
+            <font color='#0000FF'>mutable</font> matrix_type psi_true;
+            <font color='#0000FF'>const</font> structural_svm_problem<font color='#5555FF'>&lt;</font>matrix_type,feature_vector_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> problem;
+            <font color='#0000FF'>mutable</font> std::vector<font color='#5555FF'>&lt;</font>cache_element_structural_svm<font color='#5555FF'>&lt;</font>structural_svm_problem<font color='#5555FF'>&lt;</font>matrix_type,feature_vector_type<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> cache;
+
+            <font color='#0000FF'>mutable</font> thread_pool tp;
+            mutex accum_mutex;
+        <b>}</b>;
+
+
+        scoped_ptr<font color='#5555FF'>&lt;</font>base<font color='#5555FF'>&gt;</font> the_problem;
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>class</font> <b><a name='svm_struct_controller_node'></a>svm_struct_controller_node</b> : noncopyable
+    <b>{</b>
+    <font color='#0000FF'>public</font>:
+
+        <b><a name='svm_struct_controller_node'></a>svm_struct_controller_node</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> :
+            eps<font face='Lucida Console'>(</font><font color='#979000'>0.001</font><font face='Lucida Console'>)</font>,
+            max_iterations<font face='Lucida Console'>(</font><font color='#979000'>10000</font><font face='Lucida Console'>)</font>,
+            cache_based_eps<font face='Lucida Console'>(</font>std::numeric_limits<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font>::infinity<font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>,
+            verbose<font face='Lucida Console'>(</font><font color='#979000'>false</font><font face='Lucida Console'>)</font>,
+            C<font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>
+        <b>{</b><b>}</b>
+
+        <font color='#0000FF'><u>double</u></font> <b><a name='get_cache_based_epsilon'></a>get_cache_based_epsilon</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#0000FF'>return</font> cache_based_eps;
+        <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_cache_based_epsilon'></a>set_cache_based_epsilon</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>double</u></font> eps_
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#009900'>// make sure requires clause is not broken
+</font>            <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font>eps_ <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font>,
+                "<font color='#CC0000'>\t void svm_struct_controller_node::set_cache_based_epsilon()</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t eps_ must be greater than 0</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t eps_: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> eps_ 
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t this: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font>
+                <font face='Lucida Console'>)</font>;
+
+            cache_based_eps <font color='#5555FF'>=</font> eps_;
+        <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_epsilon'></a>set_epsilon</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>double</u></font> eps_
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#009900'>// make sure requires clause is not broken
+</font>            <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font>eps_ <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font>,
+                "<font color='#CC0000'>\t void svm_struct_controller_node::set_epsilon()</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t eps_ must be greater than 0</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t eps_: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> eps_ 
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t this: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font>
+                <font face='Lucida Console'>)</font>;
+
+            eps <font color='#5555FF'>=</font> eps_;
+        <b>}</b>
+
+        <font color='#0000FF'><u>double</u></font> <b><a name='get_epsilon'></a>get_epsilon</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> eps; <b>}</b>
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='get_max_iterations'></a>get_max_iterations</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> max_iterations; <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_max_iterations'></a>set_max_iterations</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> max_iter
+        <font face='Lucida Console'>)</font> 
+        <b>{</b>
+            max_iterations <font color='#5555FF'>=</font> max_iter;
+        <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='be_verbose'></a>be_verbose</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> 
+        <b>{</b>
+            verbose <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+        <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='be_quiet'></a>be_quiet</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            verbose <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+        <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='add_nuclear_norm_regularizer'></a>add_nuclear_norm_regularizer</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>long</u></font> first_dimension,
+            <font color='#0000FF'><u>long</u></font> rows,
+            <font color='#0000FF'><u>long</u></font> cols,
+            <font color='#0000FF'><u>double</u></font> regularization_strength
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#009900'>// make sure requires clause is not broken
+</font>            <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font><font color='#979000'>0</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> first_dimension  <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font>
+                <font color='#979000'>0</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> rows <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> <font color='#979000'>0</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> cols <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> 
+                <font color='#979000'>0</font> <font color='#5555FF'>&lt;</font> regularization_strength,
+                "<font color='#CC0000'>\t void svm_struct_controller_node::add_nuclear_norm_regularizer()</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t Invalid arguments were given to this function.</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t first_dimension:         </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> first_dimension 
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t rows:                    </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> rows 
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t cols:                    </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> cols 
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t regularization_strength: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> regularization_strength 
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t this: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font>
+                <font face='Lucida Console'>)</font>;
+
+            impl::nuclear_norm_regularizer temp;
+            temp.first_dimension <font color='#5555FF'>=</font> first_dimension;
+            temp.nr <font color='#5555FF'>=</font> rows;
+            temp.nc <font color='#5555FF'>=</font> cols;
+            temp.regularization_strength <font color='#5555FF'>=</font> regularization_strength;
+            nuclear_norm_regularizers.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='num_nuclear_norm_regularizers'></a>num_nuclear_norm_regularizers</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> nuclear_norm_regularizers.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='clear_nuclear_norm_regularizers'></a>clear_nuclear_norm_regularizers</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <b>{</b> nuclear_norm_regularizers.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <b>}</b>
+
+
+        <font color='#0000FF'><u>double</u></font> <b><a name='get_c'></a>get_c</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> C; <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_c'></a>set_c</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>double</u></font> C_
+        <font face='Lucida Console'>)</font> 
+        <b>{</b> 
+            <font color='#009900'>// make sure requires clause is not broken
+</font>            <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font>C_ <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font>,
+                "<font color='#CC0000'>\t void svm_struct_controller_node::set_c()</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t C_ must be greater than 0</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t C_:    </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> C_ 
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t this: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font>
+                <font face='Lucida Console'>)</font>;
+
+            C <font color='#5555FF'>=</font> C_; 
+        <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='add_processing_node'></a>add_processing_node</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> network_address<font color='#5555FF'>&amp;</font> addr
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#009900'>// make sure requires clause is not broken
+</font>            <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font>addr.port <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font>,
+                "<font color='#CC0000'>\t void svm_struct_controller_node::add_processing_node()</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t Invalid inputs were given to this function</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t addr.host_address:   </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> addr.host_address 
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t addr.port: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> addr.port
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t this: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font>
+                <font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// check if this address is already registered
+</font>            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> nodes.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>nodes[i] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> addr<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#0000FF'>return</font>;
+                <b>}</b>
+            <b>}</b>
+            
+            nodes.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>addr<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='add_processing_node'></a>add_processing_node</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> ip_or_hostname,
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>short</u></font> port
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#BB00BB'>add_processing_node</font><font face='Lucida Console'>(</font><font color='#BB00BB'>network_address</font><font face='Lucida Console'>(</font>ip_or_hostname,port<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='get_num_processing_nodes'></a>get_num_processing_nodes</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#0000FF'>return</font> nodes.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='remove_processing_nodes'></a>remove_processing_nodes</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> 
+        <b>{</b>
+            nodes.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> matrix_type<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>double</u></font> <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> oca<font color='#5555FF'>&amp;</font> solver,
+            matrix_type<font color='#5555FF'>&amp;</font> w
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#009900'>// make sure requires clause is not broken
+</font>            <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font><font color='#BB00BB'>get_num_processing_nodes</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font>,
+                        "<font color='#CC0000'>\t double svm_struct_controller_node::operator()</font>"
+                        <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t You must add some processing nodes before calling this function.</font>"
+                        <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t this: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font>
+            <font face='Lucida Console'>)</font>;
+
+            problem_type<font color='#5555FF'>&lt;</font>matrix_type<font color='#5555FF'>&gt;</font> <font color='#BB00BB'>problem</font><font face='Lucida Console'>(</font>nodes<font face='Lucida Console'>)</font>;
+            problem.<font color='#BB00BB'>set_cache_based_epsilon</font><font face='Lucida Console'>(</font>cache_based_eps<font face='Lucida Console'>)</font>;
+            problem.<font color='#BB00BB'>set_epsilon</font><font face='Lucida Console'>(</font>eps<font face='Lucida Console'>)</font>;
+            problem.<font color='#BB00BB'>set_max_iterations</font><font face='Lucida Console'>(</font>max_iterations<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>verbose<font face='Lucida Console'>)</font>
+                problem.<font color='#BB00BB'>be_verbose</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            problem.<font color='#BB00BB'>set_c</font><font face='Lucida Console'>(</font>C<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> nuclear_norm_regularizers.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                problem.<font color='#BB00BB'>add_nuclear_norm_regularizer</font><font face='Lucida Console'>(</font>
+                    nuclear_norm_regularizers[i].first_dimension,
+                    nuclear_norm_regularizers[i].nr,
+                    nuclear_norm_regularizers[i].nc,
+                    nuclear_norm_regularizers[i].regularization_strength<font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+            <font color='#0000FF'>return</font> <font color='#BB00BB'>solver</font><font face='Lucida Console'>(</font>problem, w<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>class</font> <b><a name='invalid_problem'></a>invalid_problem</b> : <font color='#0000FF'>public</font> error
+        <b>{</b>
+        <font color='#0000FF'>public</font>:
+            <b><a name='invalid_problem'></a>invalid_problem</b><font face='Lucida Console'>(</font>
+                <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> a
+            <font face='Lucida Console'>)</font>: error<font face='Lucida Console'>(</font>a<font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+        <b>}</b>;
+
+
+    <font color='#0000FF'>private</font>:
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> matrix_type_<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>class</font> <b><a name='problem_type'></a>problem_type</b> : <font color='#0000FF'>public</font> structural_svm_problem<font color='#5555FF'>&lt;</font>matrix_type_<font color='#5555FF'>&gt;</font>
+        <b>{</b>
+        <font color='#0000FF'>public</font>:
+            <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> matrix_type_::type scalar_type;
+            <font color='#0000FF'>typedef</font> matrix_type_ matrix_type;
+
+            <b><a name='problem_type'></a>problem_type</b> <font face='Lucida Console'>(</font>
+                <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>network_address<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> nodes_
+            <font face='Lucida Console'>)</font> :
+                nodes<font face='Lucida Console'>(</font>nodes_<font face='Lucida Console'>)</font>,
+                in<font face='Lucida Console'>(</font><font color='#979000'>3</font><font face='Lucida Console'>)</font>,
+                num_dims<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+
+                <font color='#009900'>// initialize all the transmit pipes
+</font>                out_pipes.<font color='#BB00BB'>resize</font><font face='Lucida Console'>(</font>nodes.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> out_pipes.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    out_pipes[i].<font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font><font color='#0000FF'>new</font> pipe<font color='#5555FF'>&lt;</font>tsu_out<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#979000'>3</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                <b>}</b>
+
+                <font color='#009900'>// make bridges that connect to all our remote processing nodes
+</font>                bridges.<font color='#BB00BB'>resize</font><font face='Lucida Console'>(</font>nodes.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i<font color='#5555FF'>&lt;</font> bridges.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    bridges[i].<font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font><font color='#0000FF'>new</font> <font color='#BB00BB'>bridge</font><font face='Lucida Console'>(</font><font color='#BB00BB'>connect_to</font><font face='Lucida Console'>(</font>nodes[i]<font face='Lucida Console'>)</font>, 
+                                                <font color='#BB00BB'>receive</font><font face='Lucida Console'>(</font>in<font face='Lucida Console'>)</font>, <font color='#BB00BB'>transmit</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font>out_pipes[i]<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                <b>}</b>
+
+
+
+                <font color='#009900'>// The remote processing nodes are supposed to all send the problem dimensionality
+</font>                <font color='#009900'>// upon connection. So get that and make sure everyone agrees on what it's supposed to be.
+</font>                tsu_in temp;
+                <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> responses <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                <font color='#0000FF'><u>bool</u></font> seen_dim <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+                <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>responses <font color='#5555FF'>&lt;</font> nodes.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                <b>{</b>
+                    in.<font color='#BB00BB'>dequeue</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font>;
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>temp.<font color='#0000FF'>template</font> contains<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        <font color='#5555FF'>+</font><font color='#5555FF'>+</font>responses;
+                        <font color='#009900'>// if this new dimension doesn't match what we have seen previously
+</font>                        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>seen_dim <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> num_dims <font color='#5555FF'>!</font><font color='#5555FF'>=</font> temp.<font color='#0000FF'>template</font> get<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                        <b>{</b>
+                            <font color='#0000FF'>throw</font> <font color='#BB00BB'>invalid_problem</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>remote hosts disagree on the number of dimensions!</font>"<font face='Lucida Console'>)</font>;
+                        <b>}</b>
+                        seen_dim <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+                        num_dims <font color='#5555FF'>=</font> temp.<font color='#0000FF'>template</font> get<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                    <b>}</b>
+                <b>}</b>
+            <b>}</b>
+
+            <font color='#009900'>// These functions are just here because the structural_svm_problem requires
+</font>            <font color='#009900'>// them, but since we are overloading get_risk() they are never called so they
+</font>            <font color='#009900'>// don't matter.
+</font>            <font color='#0000FF'>virtual</font> <font color='#0000FF'><u>long</u></font> <b><a name='get_num_samples'></a>get_num_samples</b> <font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b><font color='#0000FF'>return</font> <font color='#979000'>0</font>;<b>}</b>
+            <font color='#0000FF'>virtual</font> <font color='#0000FF'><u>void</u></font> <b><a name='get_truth_joint_feature_vector'></a>get_truth_joint_feature_vector</b> <font face='Lucida Console'>(</font> <font color='#0000FF'><u>long</u></font> , matrix_type<font color='#5555FF'>&amp;</font>  <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b><b>}</b>
+            <font color='#0000FF'>virtual</font> <font color='#0000FF'><u>void</u></font> <b><a name='separation_oracle'></a>separation_oracle</b> <font face='Lucida Console'>(</font> <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> , <font color='#0000FF'>const</font> matrix_type<font color='#5555FF'>&amp;</font> , scalar_type<font color='#5555FF'>&amp;</font> , matrix_type<font color='#5555FF'>&amp;</font> <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b><b>}</b>
+
+            <font color='#0000FF'>virtual</font> <font color='#0000FF'><u>long</u></font> <b><a name='get_num_dimensions'></a>get_num_dimensions</b> <font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+            <b>{</b>
+                <font color='#0000FF'>return</font> num_dims;
+            <b>}</b>
+
+            <font color='#0000FF'>virtual</font> <font color='#0000FF'><u>void</u></font> <b><a name='get_risk'></a>get_risk</b> <font face='Lucida Console'>(</font>
+                matrix_type<font color='#5555FF'>&amp;</font> w,
+                scalar_type<font color='#5555FF'>&amp;</font> risk,
+                matrix_type<font color='#5555FF'>&amp;</font> subgradient
+            <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> 
+            <b>{</b>
+                <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> impl;
+                subgradient.<font color='#BB00BB'>set_size</font><font face='Lucida Console'>(</font>w.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,<font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+                subgradient <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+
+                <font color='#009900'>// send out all the oracle requests
+</font>                tsu_out temp_out;
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> out_pipes.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    temp_out.<font color='#0000FF'>template</font> get<font color='#5555FF'>&lt;</font>oracle_request<font color='#5555FF'>&lt;</font>matrix_type<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.current_solution <font color='#5555FF'>=</font> w;
+                    temp_out.<font color='#0000FF'>template</font> get<font color='#5555FF'>&lt;</font>oracle_request<font color='#5555FF'>&lt;</font>matrix_type<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.saved_current_risk_gap <font color='#5555FF'>=</font> <font color='#0000FF'>this</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>saved_current_risk_gap;
+                    temp_out.<font color='#0000FF'>template</font> get<font color='#5555FF'>&lt;</font>oracle_request<font color='#5555FF'>&lt;</font>matrix_type<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.skip_cache <font color='#5555FF'>=</font> <font color='#0000FF'>this</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>skip_cache;
+                    temp_out.<font color='#0000FF'>template</font> get<font color='#5555FF'>&lt;</font>oracle_request<font color='#5555FF'>&lt;</font>matrix_type<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.converged <font color='#5555FF'>=</font> <font color='#0000FF'>this</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>converged;
+                    out_pipes[i]<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>enqueue</font><font face='Lucida Console'>(</font>temp_out<font face='Lucida Console'>)</font>;
+                <b>}</b>
+
+                <font color='#009900'>// collect all the oracle responses  
+</font>                <font color='#0000FF'><u>long</u></font> num <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                scalar_type total_loss <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                tsu_in temp_in;
+                <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> responses <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>responses <font color='#5555FF'>&lt;</font> out_pipes.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                <b>{</b>
+                    in.<font color='#BB00BB'>dequeue</font><font face='Lucida Console'>(</font>temp_in<font face='Lucida Console'>)</font>;
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>temp_in.<font color='#0000FF'>template</font> contains<font color='#5555FF'>&lt;</font>oracle_response<font color='#5555FF'>&lt;</font>matrix_type<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        <font color='#5555FF'>+</font><font color='#5555FF'>+</font>responses;
+                        <font color='#0000FF'>const</font> oracle_response<font color='#5555FF'>&lt;</font>matrix_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> data <font color='#5555FF'>=</font> temp_in.<font color='#0000FF'>template</font> get<font color='#5555FF'>&lt;</font>oracle_response<font color='#5555FF'>&lt;</font>matrix_type<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                        subgradient <font color='#5555FF'>+</font><font color='#5555FF'>=</font> data.subgradient; 
+                        total_loss <font color='#5555FF'>+</font><font color='#5555FF'>=</font> data.loss;
+                        num <font color='#5555FF'>+</font><font color='#5555FF'>=</font> data.num;
+                    <b>}</b>
+                <b>}</b>
+
+                subgradient <font color='#5555FF'>/</font><font color='#5555FF'>=</font> num;
+                total_loss <font color='#5555FF'>/</font><font color='#5555FF'>=</font> num;
+                risk <font color='#5555FF'>=</font> total_loss <font color='#5555FF'>+</font> <font color='#BB00BB'>dot</font><font face='Lucida Console'>(</font>subgradient,w<font face='Lucida Console'>)</font>;
+
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#0000FF'>this</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>nuclear_norm_regularizers.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                <b>{</b>
+                    matrix_type grad; 
+                    <font color='#0000FF'><u>double</u></font> obj;
+                    <font color='#0000FF'>this</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>compute_nuclear_norm_parts</font><font face='Lucida Console'>(</font>w, grad, obj<font face='Lucida Console'>)</font>;
+                    risk <font color='#5555FF'>+</font><font color='#5555FF'>=</font> obj;
+                    subgradient <font color='#5555FF'>+</font><font color='#5555FF'>=</font> grad;
+                <b>}</b>
+            <b>}</b>
+
+            std::vector<font color='#5555FF'>&lt;</font>network_address<font color='#5555FF'>&gt;</font> nodes;
+
+            <font color='#0000FF'>typedef</font> type_safe_union<font color='#5555FF'>&lt;</font>impl::oracle_request<font color='#5555FF'>&lt;</font>matrix_type<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> tsu_out;
+            <font color='#0000FF'>typedef</font> type_safe_union<font color='#5555FF'>&lt;</font>impl::oracle_response<font color='#5555FF'>&lt;</font>matrix_type<font color='#5555FF'>&gt;</font>, <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font> tsu_in;
+
+            std::vector<font color='#5555FF'>&lt;</font>shared_ptr<font color='#5555FF'>&lt;</font>pipe<font color='#5555FF'>&lt;</font>tsu_out<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> out_pipes;
+            <font color='#0000FF'>mutable</font> pipe<font color='#5555FF'>&lt;</font>tsu_in<font color='#5555FF'>&gt;</font> in;
+            std::vector<font color='#5555FF'>&lt;</font>shared_ptr<font color='#5555FF'>&lt;</font>bridge<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> bridges;
+            <font color='#0000FF'><u>long</u></font> num_dims;
+        <b>}</b>;
+
+        std::vector<font color='#5555FF'>&lt;</font>network_address<font color='#5555FF'>&gt;</font> nodes;
+        <font color='#0000FF'><u>double</u></font> eps;
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> max_iterations;
+        <font color='#0000FF'><u>double</u></font> cache_based_eps;
+        <font color='#0000FF'><u>bool</u></font> verbose;
+        <font color='#0000FF'><u>double</u></font> C;
+        std::vector<font color='#5555FF'>&lt;</font>impl::nuclear_norm_regularizer<font color='#5555FF'>&gt;</font> nuclear_norm_regularizers;
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_STRUCTURAL_SVM_DISTRIBUTeD_Hh_
+</font>
+
+</pre></body></html>

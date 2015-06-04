@@ -1,0 +1,391 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - pyramid_down.cpp</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2011  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>sstream<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>string<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>cstdlib<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>ctime<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>image_transforms.h<font color='#5555FF'>&gt;</font>
+<font color='#009900'>//#include &lt;dlib/gui_widgets.h&gt;
+</font><font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>rand.h<font color='#5555FF'>&gt;</font>
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='tester.h.html'>tester.h</a>"
+
+<font color='#0000FF'>namespace</font>  
+<b>{</b>
+    <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> test;
+    <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> dlib;
+    <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> std;
+
+    logger <b><a name='dlog'></a>dlog</b><font face='Lucida Console'>(</font>"<font color='#CC0000'>test.pyramid_down</font>"<font face='Lucida Console'>)</font>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<font color='#0000FF'><u>void</u></font> <b><a name='test_pyramid_down_grayscale'></a>test_pyramid_down_grayscale</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+<b>{</b>
+    array2d<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font> img, down;
+    pyramid_down<font color='#5555FF'>&lt;</font><font color='#979000'>2</font><font color='#5555FF'>&gt;</font> pyr;
+
+    img.<font color='#BB00BB'>set_size</font><font face='Lucida Console'>(</font><font color='#979000'>300</font>,<font color='#979000'>264</font><font face='Lucida Console'>)</font>;
+
+    <font color='#BB00BB'>assign_all_pixels</font><font face='Lucida Console'>(</font>img, <font color='#979000'>10</font><font face='Lucida Console'>)</font>;
+
+    <font color='#BB00BB'>pyr</font><font face='Lucida Console'>(</font>img, down<font face='Lucida Console'>)</font>;
+
+    <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>std::<font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font>down.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>*</font><font color='#979000'>2</font> <font color='#5555FF'>-</font> img.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> <font color='#979000'>5</font><font face='Lucida Console'>)</font>;
+    <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>std::<font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font>down.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>*</font><font color='#979000'>2</font> <font color='#5555FF'>-</font> img.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> <font color='#979000'>5</font><font face='Lucida Console'>)</font>;
+
+    rectangle rect1 <font color='#5555FF'>=</font> <font color='#BB00BB'>get_rect</font><font face='Lucida Console'>(</font>img<font face='Lucida Console'>)</font>;
+    rectangle rect2 <font color='#5555FF'>=</font> pyr.<font color='#BB00BB'>rect_up</font><font face='Lucida Console'>(</font><font color='#BB00BB'>get_rect</font><font face='Lucida Console'>(</font>down<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+    <font color='#0000FF'><u>double</u></font> overlap <font color='#5555FF'>=</font> rect1.<font color='#BB00BB'>intersect</font><font face='Lucida Console'>(</font>rect2<font face='Lucida Console'>)</font>.<font color='#BB00BB'>area</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>/</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>double</u></font><font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>rect1 <font color='#5555FF'>+</font> rect2<font face='Lucida Console'>)</font>.<font color='#BB00BB'>area</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>overlap <font color='#5555FF'>&gt;</font> <font color='#979000'>0.95</font><font face='Lucida Console'>)</font>;
+
+    rect1 <font color='#5555FF'>=</font> <font color='#BB00BB'>get_rect</font><font face='Lucida Console'>(</font>down<font face='Lucida Console'>)</font>;
+    rect2 <font color='#5555FF'>=</font> pyr.<font color='#BB00BB'>rect_down</font><font face='Lucida Console'>(</font><font color='#BB00BB'>get_rect</font><font face='Lucida Console'>(</font>img<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+    overlap <font color='#5555FF'>=</font> rect1.<font color='#BB00BB'>intersect</font><font face='Lucida Console'>(</font>rect2<font face='Lucida Console'>)</font>.<font color='#BB00BB'>area</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>/</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>double</u></font><font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>rect1 <font color='#5555FF'>+</font> rect2<font face='Lucida Console'>)</font>.<font color='#BB00BB'>area</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>overlap <font color='#5555FF'>&gt;</font> <font color='#979000'>0.95</font><font face='Lucida Console'>)</font>;
+
+    <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>min</font><font face='Lucida Console'>(</font><font color='#BB00BB'>mat</font><font face='Lucida Console'>(</font>down<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>10</font><font face='Lucida Console'>)</font>;
+    <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>max</font><font face='Lucida Console'>(</font><font color='#BB00BB'>mat</font><font face='Lucida Console'>(</font>down<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>10</font><font face='Lucida Console'>)</font>;
+<b>}</b>
+
+<font color='#0000FF'><u>void</u></font> <b><a name='test_pyramid_down_rgb'></a>test_pyramid_down_rgb</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+<b>{</b>
+    array2d<font color='#5555FF'>&lt;</font>rgb_pixel<font color='#5555FF'>&gt;</font> img;
+    array2d<font color='#5555FF'>&lt;</font>bgr_pixel<font color='#5555FF'>&gt;</font> down;
+    pyramid_down<font color='#5555FF'>&lt;</font><font color='#979000'>2</font><font color='#5555FF'>&gt;</font> pyr;
+
+    img.<font color='#BB00BB'>set_size</font><font face='Lucida Console'>(</font><font color='#979000'>231</font>, <font color='#979000'>351</font><font face='Lucida Console'>)</font>;
+
+    <font color='#BB00BB'>assign_all_pixels</font><font face='Lucida Console'>(</font>img, <font color='#BB00BB'>rgb_pixel</font><font face='Lucida Console'>(</font><font color='#979000'>1</font>,<font color='#979000'>2</font>,<font color='#979000'>3</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+    <font color='#BB00BB'>pyr</font><font face='Lucida Console'>(</font>img, down<font face='Lucida Console'>)</font>;
+
+    <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>std::<font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font>down.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>*</font><font color='#979000'>2</font> <font color='#5555FF'>-</font> img.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> <font color='#979000'>5</font><font face='Lucida Console'>)</font>;
+    <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>std::<font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font>down.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>*</font><font color='#979000'>2</font> <font color='#5555FF'>-</font> img.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> <font color='#979000'>5</font><font face='Lucida Console'>)</font>;
+
+    rectangle rect1 <font color='#5555FF'>=</font> <font color='#BB00BB'>get_rect</font><font face='Lucida Console'>(</font>img<font face='Lucida Console'>)</font>;
+    rectangle rect2 <font color='#5555FF'>=</font> pyr.<font color='#BB00BB'>rect_up</font><font face='Lucida Console'>(</font><font color='#BB00BB'>get_rect</font><font face='Lucida Console'>(</font>down<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+    <font color='#0000FF'><u>double</u></font> overlap <font color='#5555FF'>=</font> rect1.<font color='#BB00BB'>intersect</font><font face='Lucida Console'>(</font>rect2<font face='Lucida Console'>)</font>.<font color='#BB00BB'>area</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>/</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>double</u></font><font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>rect1 <font color='#5555FF'>+</font> rect2<font face='Lucida Console'>)</font>.<font color='#BB00BB'>area</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>overlap <font color='#5555FF'>&gt;</font> <font color='#979000'>0.95</font><font face='Lucida Console'>)</font>;
+
+    rect1 <font color='#5555FF'>=</font> <font color='#BB00BB'>get_rect</font><font face='Lucida Console'>(</font>down<font face='Lucida Console'>)</font>;
+    rect2 <font color='#5555FF'>=</font> pyr.<font color='#BB00BB'>rect_down</font><font face='Lucida Console'>(</font><font color='#BB00BB'>get_rect</font><font face='Lucida Console'>(</font>img<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+    overlap <font color='#5555FF'>=</font> rect1.<font color='#BB00BB'>intersect</font><font face='Lucida Console'>(</font>rect2<font face='Lucida Console'>)</font>.<font color='#BB00BB'>area</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>/</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>double</u></font><font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>rect1 <font color='#5555FF'>+</font> rect2<font face='Lucida Console'>)</font>.<font color='#BB00BB'>area</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>overlap <font color='#5555FF'>&gt;</font> <font color='#979000'>0.95</font><font face='Lucida Console'>)</font>;
+
+    <font color='#0000FF'><u>bool</u></font> pixels_match <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> r <font color='#5555FF'>=</font> <font color='#979000'>0</font>; r <font color='#5555FF'>&lt;</font> down.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>r<font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> c <font color='#5555FF'>=</font> <font color='#979000'>0</font>; c <font color='#5555FF'>&lt;</font> down.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>c<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>down[r][c].red <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>1</font> <font color='#5555FF'>|</font><font color='#5555FF'>|</font>
+                down[r][c].green <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>2</font> <font color='#5555FF'>|</font><font color='#5555FF'>|</font>
+                down[r][c].blue <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>3</font> <font face='Lucida Console'>)</font>
+            <b>{</b>
+                pixels_match <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+            <b>}</b>
+        <b>}</b>
+    <b>}</b>
+    <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>pixels_match<font face='Lucida Console'>)</font>;
+<b>}</b>
+
+<font color='#009900'>//  ----------------------------------------------------------------------------
+</font>
+<font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> image_type<font color='#5555FF'>&gt;</font>
+rgb_pixel <b><a name='mean_pixel'></a>mean_pixel</b> <font face='Lucida Console'>(</font>
+    <font color='#0000FF'>const</font> image_type<font color='#5555FF'>&amp;</font> img,
+    <font color='#0000FF'>const</font> rectangle<font color='#5555FF'>&amp;</font> rect
+<font face='Lucida Console'>)</font>
+<b>{</b>
+    <font color='#0000FF'><u>long</u></font> red <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+    <font color='#0000FF'><u>long</u></font> green <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+    <font color='#0000FF'><u>long</u></font> blue <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> r <font color='#5555FF'>=</font> rect.<font color='#BB00BB'>top</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; r <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> rect.<font color='#BB00BB'>bottom</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>r<font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> c <font color='#5555FF'>=</font> rect.<font color='#BB00BB'>left</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; c <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> rect.<font color='#BB00BB'>right</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>c<font face='Lucida Console'>)</font>
+        <b>{</b>
+            red <font color='#5555FF'>+</font><font color='#5555FF'>=</font> img[r][c].red;
+            green <font color='#5555FF'>+</font><font color='#5555FF'>=</font> img[r][c].green;
+            blue <font color='#5555FF'>+</font><font color='#5555FF'>=</font> img[r][c].blue;
+        <b>}</b>
+    <b>}</b>
+
+    <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> n <font color='#5555FF'>=</font> rect.<font color='#BB00BB'>area</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    <font color='#0000FF'>return</font> <font color='#BB00BB'>rgb_pixel</font><font face='Lucida Console'>(</font>red<font color='#5555FF'>/</font>n, green<font color='#5555FF'>/</font>n, blue<font color='#5555FF'>/</font>n<font face='Lucida Console'>)</font>;
+<b>}</b>
+
+<font color='#009900'>//  ----------------------------------------------------------------------------
+</font>
+<font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> pyramid_down_type<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'><u>void</u></font> <b><a name='test_pyramid_down_rgb2'></a>test_pyramid_down_rgb2</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+<b>{</b>
+    array2d<font color='#5555FF'>&lt;</font>rgb_pixel<font color='#5555FF'>&gt;</font> img, img3;
+    array2d<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font> img2, img4;
+
+
+    img.<font color='#BB00BB'>set_size</font><font face='Lucida Console'>(</font><font color='#979000'>300</font>,<font color='#979000'>400</font><font face='Lucida Console'>)</font>;
+    <font color='#BB00BB'>assign_all_pixels</font><font face='Lucida Console'>(</font>img, <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+    rectangle rect1 <font color='#5555FF'>=</font> <font color='#BB00BB'>centered_rect</font><font face='Lucida Console'>(</font> <font color='#979000'>10</font>,<font color='#979000'>10</font>, <font color='#979000'>14</font>, <font color='#979000'>14</font><font face='Lucida Console'>)</font>;
+    rectangle rect2 <font color='#5555FF'>=</font> <font color='#BB00BB'>centered_rect</font><font face='Lucida Console'>(</font> <font color='#979000'>100</font>,<font color='#979000'>100</font>, <font color='#979000'>34</font>, <font color='#979000'>42</font><font face='Lucida Console'>)</font>;
+    rectangle rect3 <font color='#5555FF'>=</font> <font color='#BB00BB'>centered_rect</font><font face='Lucida Console'>(</font> <font color='#979000'>310</font>,<font color='#979000'>215</font>, <font color='#979000'>65</font>, <font color='#979000'>21</font><font face='Lucida Console'>)</font>;
+
+    <font color='#BB00BB'>fill_rect</font><font face='Lucida Console'>(</font>img, rect1, <font color='#BB00BB'>rgb_pixel</font><font face='Lucida Console'>(</font><font color='#979000'>255</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+    <font color='#BB00BB'>fill_rect</font><font face='Lucida Console'>(</font>img, rect2, <font color='#BB00BB'>rgb_pixel</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>,<font color='#979000'>255</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+    <font color='#BB00BB'>fill_rect</font><font face='Lucida Console'>(</font>img, rect3, <font color='#BB00BB'>rgb_pixel</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>255</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+
+
+    pyramid_down_type pyr;
+
+    <font color='#BB00BB'>pyr</font><font face='Lucida Console'>(</font>img, img2<font face='Lucida Console'>)</font>;
+    <font color='#BB00BB'>pyr</font><font face='Lucida Console'>(</font>img, img3<font face='Lucida Console'>)</font>;
+
+
+    <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>rect1.<font color='#BB00BB'>tl_corner</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> pyr.<font color='#BB00BB'>rect_down</font><font face='Lucida Console'>(</font>pyr.<font color='#BB00BB'>rect_up</font><font face='Lucida Console'>(</font>rect1,<font color='#979000'>2</font><font face='Lucida Console'>)</font>,<font color='#979000'>2</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>tl_corner</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>length</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+    <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>rect1.<font color='#BB00BB'>br_corner</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> pyr.<font color='#BB00BB'>rect_down</font><font face='Lucida Console'>(</font>pyr.<font color='#BB00BB'>rect_up</font><font face='Lucida Console'>(</font>rect1,<font color='#979000'>2</font><font face='Lucida Console'>)</font>,<font color='#979000'>2</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>br_corner</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>length</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+    <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>rect2.<font color='#BB00BB'>tl_corner</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> pyr.<font color='#BB00BB'>rect_down</font><font face='Lucida Console'>(</font>pyr.<font color='#BB00BB'>rect_up</font><font face='Lucida Console'>(</font>rect2,<font color='#979000'>2</font><font face='Lucida Console'>)</font>,<font color='#979000'>2</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>tl_corner</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>length</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+    <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>rect2.<font color='#BB00BB'>br_corner</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> pyr.<font color='#BB00BB'>rect_down</font><font face='Lucida Console'>(</font>pyr.<font color='#BB00BB'>rect_up</font><font face='Lucida Console'>(</font>rect2,<font color='#979000'>2</font><font face='Lucida Console'>)</font>,<font color='#979000'>2</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>br_corner</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>length</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+    <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>rect3.<font color='#BB00BB'>tl_corner</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> pyr.<font color='#BB00BB'>rect_down</font><font face='Lucida Console'>(</font>pyr.<font color='#BB00BB'>rect_up</font><font face='Lucida Console'>(</font>rect3,<font color='#979000'>2</font><font face='Lucida Console'>)</font>,<font color='#979000'>2</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>tl_corner</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>length</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+    <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>rect3.<font color='#BB00BB'>br_corner</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> pyr.<font color='#BB00BB'>rect_down</font><font face='Lucida Console'>(</font>pyr.<font color='#BB00BB'>rect_up</font><font face='Lucida Console'>(</font>rect3,<font color='#979000'>2</font><font face='Lucida Console'>)</font>,<font color='#979000'>2</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>br_corner</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>length</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+
+    rect1 <font color='#5555FF'>=</font> <font color='#BB00BB'>shrink_rect</font><font face='Lucida Console'>(</font>pyr.<font color='#BB00BB'>rect_down</font><font face='Lucida Console'>(</font>rect1<font face='Lucida Console'>)</font>,<font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+    rect2 <font color='#5555FF'>=</font> <font color='#BB00BB'>shrink_rect</font><font face='Lucida Console'>(</font>pyr.<font color='#BB00BB'>rect_down</font><font face='Lucida Console'>(</font>rect2<font face='Lucida Console'>)</font>,<font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+    rect3 <font color='#5555FF'>=</font> <font color='#BB00BB'>shrink_rect</font><font face='Lucida Console'>(</font>pyr.<font color='#BB00BB'>rect_down</font><font face='Lucida Console'>(</font>rect3<font face='Lucida Console'>)</font>,<font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+
+    <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>rect1.<font color='#BB00BB'>area</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> <font color='#979000'>10</font><font face='Lucida Console'>)</font>;
+    <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>rect2.<font color='#BB00BB'>area</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> <font color='#979000'>10</font><font face='Lucida Console'>)</font>;
+    <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>rect3.<font color='#BB00BB'>area</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> <font color='#979000'>10</font><font face='Lucida Console'>)</font>;
+
+    <font color='#009900'>/*
+    image_window my_window(img);
+    image_window win2(img2);
+    image_window win3(img3);
+    win2.add_overlay(image_window::overlay_rect(rect1, rgb_pixel(255,0,0)));
+    win2.add_overlay(image_window::overlay_rect(rect2, rgb_pixel(255,0,0)));
+    win2.add_overlay(image_window::overlay_rect(rect3, rgb_pixel(255,0,0)));
+    win3.add_overlay(image_window::overlay_rect(rect1, rgb_pixel(255,0,0)));
+    win3.add_overlay(image_window::overlay_rect(rect2, rgb_pixel(255,0,0)));
+    win3.add_overlay(image_window::overlay_rect(rect3, rgb_pixel(255,0,0)));
+    */</font>
+
+
+    <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>std::<font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font><font color='#BB00BB'>mean</font><font face='Lucida Console'>(</font><font color='#BB00BB'>subm</font><font face='Lucida Console'>(</font>matrix_cast<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#BB00BB'>mat</font><font face='Lucida Console'>(</font>img2<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>,rect1<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> <font color='#979000'>255</font><font color='#5555FF'>/</font><font color='#979000'>3</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> <font color='#979000'>3</font><font face='Lucida Console'>)</font>;
+    <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>std::<font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font><font color='#BB00BB'>mean</font><font face='Lucida Console'>(</font><font color='#BB00BB'>subm</font><font face='Lucida Console'>(</font>matrix_cast<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#BB00BB'>mat</font><font face='Lucida Console'>(</font>img2<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>,rect2<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> <font color='#979000'>255</font><font color='#5555FF'>/</font><font color='#979000'>3</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> <font color='#979000'>3</font><font face='Lucida Console'>)</font>;
+    <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>std::<font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font><font color='#BB00BB'>mean</font><font face='Lucida Console'>(</font><font color='#BB00BB'>subm</font><font face='Lucida Console'>(</font>matrix_cast<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#BB00BB'>mat</font><font face='Lucida Console'>(</font>img2<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>,rect3<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> <font color='#979000'>255</font><font color='#5555FF'>/</font><font color='#979000'>3</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> <font color='#979000'>3</font><font face='Lucida Console'>)</font>;
+    <font color='#BB00BB'>assign_image</font><font face='Lucida Console'>(</font>img4, img<font face='Lucida Console'>)</font>;
+    <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>std::<font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font><font color='#BB00BB'>mean</font><font face='Lucida Console'>(</font><font color='#BB00BB'>mat</font><font face='Lucida Console'>(</font>img4<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> <font color='#BB00BB'>mean</font><font face='Lucida Console'>(</font><font color='#BB00BB'>mat</font><font face='Lucida Console'>(</font>img2<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> <font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+
+
+    rgb_pixel mean1 <font color='#5555FF'>=</font> <font color='#BB00BB'>mean_pixel</font><font face='Lucida Console'>(</font>img3, rect1<font face='Lucida Console'>)</font>;
+    rgb_pixel mean2 <font color='#5555FF'>=</font> <font color='#BB00BB'>mean_pixel</font><font face='Lucida Console'>(</font>img3, rect2<font face='Lucida Console'>)</font>;
+    rgb_pixel mean3 <font color='#5555FF'>=</font> <font color='#BB00BB'>mean_pixel</font><font face='Lucida Console'>(</font>img3, rect3<font face='Lucida Console'>)</font>;
+    rgb_pixel mean_all_true <font color='#5555FF'>=</font> <font color='#BB00BB'>mean_pixel</font><font face='Lucida Console'>(</font>img, <font color='#BB00BB'>get_rect</font><font face='Lucida Console'>(</font>img<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+    rgb_pixel mean_all <font color='#5555FF'>=</font> <font color='#BB00BB'>mean_pixel</font><font face='Lucida Console'>(</font>img3, <font color='#BB00BB'>get_rect</font><font face='Lucida Console'>(</font>img3<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+    <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>mean1.red <font color='#5555FF'>&gt;</font> <font color='#979000'>250</font><font face='Lucida Console'>)</font>;
+    <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>mean1.green <font color='#5555FF'>&lt;</font> <font color='#979000'>3</font><font face='Lucida Console'>)</font>;
+    <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>mean1.blue <font color='#5555FF'>&lt;</font> <font color='#979000'>3</font><font face='Lucida Console'>)</font>;
+
+    <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>mean2.red <font color='#5555FF'>&lt;</font> <font color='#979000'>3</font><font face='Lucida Console'>)</font>;
+    <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>mean2.green <font color='#5555FF'>&gt;</font> <font color='#979000'>250</font><font face='Lucida Console'>)</font>;
+    <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>mean2.blue <font color='#5555FF'>&lt;</font> <font color='#979000'>3</font><font face='Lucida Console'>)</font>;
+
+    <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>mean3.red <font color='#5555FF'>&lt;</font> <font color='#979000'>3</font><font face='Lucida Console'>)</font>;
+    <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>mean3.green <font color='#5555FF'>&lt;</font> <font color='#979000'>3</font><font face='Lucida Console'>)</font>;
+    <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>mean3.blue <font color='#5555FF'>&gt;</font> <font color='#979000'>250</font><font face='Lucida Console'>)</font>;
+
+    <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>std::<font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font>mean_all_true.red <font color='#5555FF'>-</font> mean_all.red<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+    <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>std::<font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font>mean_all_true.green <font color='#5555FF'>-</font> mean_all.green<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+    <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>std::<font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font>mean_all_true.blue <font color='#5555FF'>-</font> mean_all.blue<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+
+    <font color='#009900'>//my_window.wait_until_closed();
+</font><b>}</b>
+
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> pyramid_down_type<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'><u>void</u></font> <b><a name='test_pyramid_down_grayscale2'></a>test_pyramid_down_grayscale2</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+<b>{</b>
+    array2d<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font> img;
+    array2d<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font> img2, img4;
+
+
+    img.<font color='#BB00BB'>set_size</font><font face='Lucida Console'>(</font><font color='#979000'>300</font>,<font color='#979000'>400</font><font face='Lucida Console'>)</font>;
+    <font color='#BB00BB'>assign_all_pixels</font><font face='Lucida Console'>(</font>img, <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+    rectangle rect1 <font color='#5555FF'>=</font> <font color='#BB00BB'>centered_rect</font><font face='Lucida Console'>(</font> <font color='#979000'>10</font>,<font color='#979000'>10</font>, <font color='#979000'>14</font>, <font color='#979000'>14</font><font face='Lucida Console'>)</font>;
+    rectangle rect2 <font color='#5555FF'>=</font> <font color='#BB00BB'>centered_rect</font><font face='Lucida Console'>(</font> <font color='#979000'>100</font>,<font color='#979000'>100</font>, <font color='#979000'>34</font>, <font color='#979000'>42</font><font face='Lucida Console'>)</font>;
+    rectangle rect3 <font color='#5555FF'>=</font> <font color='#BB00BB'>centered_rect</font><font face='Lucida Console'>(</font> <font color='#979000'>310</font>,<font color='#979000'>215</font>, <font color='#979000'>65</font>, <font color='#979000'>21</font><font face='Lucida Console'>)</font>;
+
+    <font color='#BB00BB'>fill_rect</font><font face='Lucida Console'>(</font>img, rect1, <font color='#979000'>255</font><font face='Lucida Console'>)</font>;
+    <font color='#BB00BB'>fill_rect</font><font face='Lucida Console'>(</font>img, rect2, <font color='#979000'>170</font><font face='Lucida Console'>)</font>;
+    <font color='#BB00BB'>fill_rect</font><font face='Lucida Console'>(</font>img, rect3, <font color='#979000'>100</font><font face='Lucida Console'>)</font>;
+
+
+
+    pyramid_down_type pyr;
+
+    <font color='#BB00BB'>pyr</font><font face='Lucida Console'>(</font>img, img2<font face='Lucida Console'>)</font>;
+
+
+    <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>rect1.<font color='#BB00BB'>tl_corner</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> pyr.<font color='#BB00BB'>rect_down</font><font face='Lucida Console'>(</font>pyr.<font color='#BB00BB'>rect_up</font><font face='Lucida Console'>(</font>rect1,<font color='#979000'>2</font><font face='Lucida Console'>)</font>,<font color='#979000'>2</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>tl_corner</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>length</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+    <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>rect1.<font color='#BB00BB'>br_corner</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> pyr.<font color='#BB00BB'>rect_down</font><font face='Lucida Console'>(</font>pyr.<font color='#BB00BB'>rect_up</font><font face='Lucida Console'>(</font>rect1,<font color='#979000'>2</font><font face='Lucida Console'>)</font>,<font color='#979000'>2</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>br_corner</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>length</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+    <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>rect2.<font color='#BB00BB'>tl_corner</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> pyr.<font color='#BB00BB'>rect_down</font><font face='Lucida Console'>(</font>pyr.<font color='#BB00BB'>rect_up</font><font face='Lucida Console'>(</font>rect2,<font color='#979000'>2</font><font face='Lucida Console'>)</font>,<font color='#979000'>2</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>tl_corner</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>length</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+    <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>rect2.<font color='#BB00BB'>br_corner</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> pyr.<font color='#BB00BB'>rect_down</font><font face='Lucida Console'>(</font>pyr.<font color='#BB00BB'>rect_up</font><font face='Lucida Console'>(</font>rect2,<font color='#979000'>2</font><font face='Lucida Console'>)</font>,<font color='#979000'>2</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>br_corner</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>length</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+    <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>rect3.<font color='#BB00BB'>tl_corner</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> pyr.<font color='#BB00BB'>rect_down</font><font face='Lucida Console'>(</font>pyr.<font color='#BB00BB'>rect_up</font><font face='Lucida Console'>(</font>rect3,<font color='#979000'>2</font><font face='Lucida Console'>)</font>,<font color='#979000'>2</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>tl_corner</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>length</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+    <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>rect3.<font color='#BB00BB'>br_corner</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> pyr.<font color='#BB00BB'>rect_down</font><font face='Lucida Console'>(</font>pyr.<font color='#BB00BB'>rect_up</font><font face='Lucida Console'>(</font>rect3,<font color='#979000'>2</font><font face='Lucida Console'>)</font>,<font color='#979000'>2</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>br_corner</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>length</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+
+    rect1 <font color='#5555FF'>=</font> <font color='#BB00BB'>shrink_rect</font><font face='Lucida Console'>(</font>pyr.<font color='#BB00BB'>rect_down</font><font face='Lucida Console'>(</font>rect1<font face='Lucida Console'>)</font>,<font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+    rect2 <font color='#5555FF'>=</font> <font color='#BB00BB'>shrink_rect</font><font face='Lucida Console'>(</font>pyr.<font color='#BB00BB'>rect_down</font><font face='Lucida Console'>(</font>rect2<font face='Lucida Console'>)</font>,<font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+    rect3 <font color='#5555FF'>=</font> <font color='#BB00BB'>shrink_rect</font><font face='Lucida Console'>(</font>pyr.<font color='#BB00BB'>rect_down</font><font face='Lucida Console'>(</font>rect3<font face='Lucida Console'>)</font>,<font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+
+    <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>rect1.<font color='#BB00BB'>area</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> <font color='#979000'>10</font><font face='Lucida Console'>)</font>;
+    <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>rect2.<font color='#BB00BB'>area</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> <font color='#979000'>10</font><font face='Lucida Console'>)</font>;
+    <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>rect3.<font color='#BB00BB'>area</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> <font color='#979000'>10</font><font face='Lucida Console'>)</font>;
+
+    <font color='#009900'>/*
+    image_window my_window(img);
+    image_window win2(img2);
+    win2.add_overlay(image_window::overlay_rect(rect1, rgb_pixel(255,0,0)));
+    win2.add_overlay(image_window::overlay_rect(rect2, rgb_pixel(255,0,0)));
+    win2.add_overlay(image_window::overlay_rect(rect3, rgb_pixel(255,0,0)));
+    */</font>
+
+
+    <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>std::<font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font><font color='#BB00BB'>mean</font><font face='Lucida Console'>(</font><font color='#BB00BB'>subm</font><font face='Lucida Console'>(</font>matrix_cast<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#BB00BB'>mat</font><font face='Lucida Console'>(</font>img2<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>,rect1<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> <font color='#979000'>255</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#979000'>3</font><font face='Lucida Console'>)</font>;
+    <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>std::<font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font><font color='#BB00BB'>mean</font><font face='Lucida Console'>(</font><font color='#BB00BB'>subm</font><font face='Lucida Console'>(</font>matrix_cast<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#BB00BB'>mat</font><font face='Lucida Console'>(</font>img2<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>,rect2<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> <font color='#979000'>170</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> <font color='#979000'>3</font><font face='Lucida Console'>)</font>;
+    <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>std::<font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font><font color='#BB00BB'>mean</font><font face='Lucida Console'>(</font><font color='#BB00BB'>subm</font><font face='Lucida Console'>(</font>matrix_cast<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#BB00BB'>mat</font><font face='Lucida Console'>(</font>img2<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>,rect3<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> <font color='#979000'>100</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> <font color='#979000'>3</font><font face='Lucida Console'>)</font>;
+    <font color='#BB00BB'>assign_image</font><font face='Lucida Console'>(</font>img4, img<font face='Lucida Console'>)</font>;
+    <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>std::<font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font><font color='#BB00BB'>mean</font><font face='Lucida Console'>(</font><font color='#BB00BB'>mat</font><font face='Lucida Console'>(</font>img4<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> <font color='#BB00BB'>mean</font><font face='Lucida Console'>(</font><font color='#BB00BB'>mat</font><font face='Lucida Console'>(</font>img2<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> <font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+
+
+    <font color='#009900'>//my_window.wait_until_closed();
+</font>
+
+
+    <font color='#009900'>// make sure the coordinate mapping is invertible when it should be
+</font>    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> l <font color='#5555FF'>=</font> <font color='#979000'>0</font>; l <font color='#5555FF'>&lt;</font> <font color='#979000'>4</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>l<font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> x <font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>10</font>; x <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#979000'>10</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>x<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> y <font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>10</font>; y <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#979000'>10</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>y<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#BB00BB'>DLIB_TEST_MSG</font><font face='Lucida Console'>(</font><font color='#BB00BB'>point</font><font face='Lucida Console'>(</font>pyr.<font color='#BB00BB'>point_down</font><font face='Lucida Console'>(</font>pyr.<font color='#BB00BB'>point_up</font><font face='Lucida Console'>(</font><font color='#BB00BB'>point</font><font face='Lucida Console'>(</font>x,y<font face='Lucida Console'>)</font>,l<font face='Lucida Console'>)</font>,l<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#BB00BB'>point</font><font face='Lucida Console'>(</font>x,y<font face='Lucida Console'>)</font>, 
+                    <font color='#BB00BB'>point</font><font face='Lucida Console'>(</font>x,y<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>  </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> pyr.<font color='#BB00BB'>point_up</font><font face='Lucida Console'>(</font><font color='#BB00BB'>point</font><font face='Lucida Console'>(</font>x,y<font face='Lucida Console'>)</font>,l<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>   </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> pyr.<font color='#BB00BB'>point_down</font><font face='Lucida Console'>(</font>pyr.<font color='#BB00BB'>point_up</font><font face='Lucida Console'>(</font><font color='#BB00BB'>point</font><font face='Lucida Console'>(</font>x,y<font face='Lucida Console'>)</font>,l<font face='Lucida Console'>)</font>,l<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                <font color='#BB00BB'>DLIB_TEST_MSG</font><font face='Lucida Console'>(</font><font color='#BB00BB'>point</font><font face='Lucida Console'>(</font>pyr.<font color='#BB00BB'>point_down</font><font face='Lucida Console'>(</font><font color='#BB00BB'>point</font><font face='Lucida Console'>(</font>pyr.<font color='#BB00BB'>point_up</font><font face='Lucida Console'>(</font><font color='#BB00BB'>point</font><font face='Lucida Console'>(</font>x,y<font face='Lucida Console'>)</font>,l<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>,l<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#BB00BB'>point</font><font face='Lucida Console'>(</font>x,y<font face='Lucida Console'>)</font>, 
+                    <font color='#BB00BB'>point</font><font face='Lucida Console'>(</font>x,y<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>  </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> pyr.<font color='#BB00BB'>point_up</font><font face='Lucida Console'>(</font><font color='#BB00BB'>point</font><font face='Lucida Console'>(</font>x,y<font face='Lucida Console'>)</font>,l<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>   </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> pyr.<font color='#BB00BB'>point_down</font><font face='Lucida Console'>(</font><font color='#BB00BB'>point</font><font face='Lucida Console'>(</font>pyr.<font color='#BB00BB'>point_up</font><font face='Lucida Console'>(</font><font color='#BB00BB'>point</font><font face='Lucida Console'>(</font>x,y<font face='Lucida Console'>)</font>,l<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>,l<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+        <b>}</b>
+    <b>}</b>
+<b>}</b>
+
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> pyramid_down_type<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'><u>void</u></font> <b><a name='test_pyramid_down_small_sizes'></a>test_pyramid_down_small_sizes</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+<b>{</b>
+    <font color='#009900'>// just make sure it doesn't get messed up with small images.  This test
+</font>    <font color='#009900'>// is only really useful if asserts are enabled.
+</font>    pyramid_down_type pyr;
+
+    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> size <font color='#5555FF'>=</font> <font color='#979000'>0</font>; size <font color='#5555FF'>&lt;</font> <font color='#979000'>20</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>size<font face='Lucida Console'>)</font>
+    <b>{</b>
+        array2d<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font> <font color='#BB00BB'>img1</font><font face='Lucida Console'>(</font>size,size<font face='Lucida Console'>)</font>;
+        array2d<font color='#5555FF'>&lt;</font>rgb_pixel<font color='#5555FF'>&gt;</font> <font color='#BB00BB'>img2</font><font face='Lucida Console'>(</font>size,size<font face='Lucida Console'>)</font>;
+
+        array2d<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font> out1;
+        array2d<font color='#5555FF'>&lt;</font>rgb_pixel<font color='#5555FF'>&gt;</font> out2;
+
+        <font color='#BB00BB'>assign_all_pixels</font><font face='Lucida Console'>(</font>img1, <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>assign_all_pixels</font><font face='Lucida Console'>(</font>img2, <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+
+        <font color='#BB00BB'>pyr</font><font face='Lucida Console'>(</font>img1, out1<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>pyr</font><font face='Lucida Console'>(</font>img2, out2<font face='Lucida Console'>)</font>;
+    <b>}</b>
+<b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+
+    <font color='#0000FF'>class</font> <b><a name='test_pyramid_down'></a>test_pyramid_down</b> : <font color='#0000FF'>public</font> tester
+    <b>{</b>
+    <font color='#0000FF'>public</font>:
+        <b><a name='test_pyramid_down'></a>test_pyramid_down</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> :
+            tester <font face='Lucida Console'>(</font>"<font color='#CC0000'>test_pyramid_down</font>",
+                    "<font color='#CC0000'>Runs tests on the pyramid_down() function.</font>"<font face='Lucida Console'>)</font>
+        <b>{</b><b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='perform_test'></a>perform_test</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#BB00BB'>print_spinner</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>test_pyramid_down_grayscale</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>print_spinner</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>test_pyramid_down_rgb</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+            <font color='#BB00BB'>print_spinner</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>call test_pyramid_down_small_sizes&lt;pyramid_down&lt;2&gt; &gt;();</font>";
+            test_pyramid_down_small_sizes<font color='#5555FF'>&lt;</font>pyramid_down<font color='#5555FF'>&lt;</font><font color='#979000'>2</font><font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>call test_pyramid_down_small_sizes&lt;pyramid_down&lt;3&gt; &gt;();</font>";
+            test_pyramid_down_small_sizes<font color='#5555FF'>&lt;</font>pyramid_down<font color='#5555FF'>&lt;</font><font color='#979000'>3</font><font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>call test_pyramid_down_small_sizes&lt;pyramid_down&lt;4&gt; &gt;();</font>";
+            test_pyramid_down_small_sizes<font color='#5555FF'>&lt;</font>pyramid_down<font color='#5555FF'>&lt;</font><font color='#979000'>4</font><font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>call test_pyramid_down_small_sizes&lt;pyramid_down&lt;5&gt; &gt;();</font>";
+            test_pyramid_down_small_sizes<font color='#5555FF'>&lt;</font>pyramid_down<font color='#5555FF'>&lt;</font><font color='#979000'>5</font><font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>call test_pyramid_down_small_sizes&lt;pyramid_disable&gt;();</font>";
+            test_pyramid_down_small_sizes<font color='#5555FF'>&lt;</font>pyramid_disable<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>call test_pyramid_down_small_sizes&lt;pyramid_down&lt;9&gt; &gt;();</font>";
+            test_pyramid_down_small_sizes<font color='#5555FF'>&lt;</font>pyramid_down<font color='#5555FF'>&lt;</font><font color='#979000'>9</font><font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+            <font color='#BB00BB'>print_spinner</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>call test_pyramid_down_rgb2&lt;pyramid_down&lt;2&gt; &gt;();</font>";
+            test_pyramid_down_rgb2<font color='#5555FF'>&lt;</font>pyramid_down<font color='#5555FF'>&lt;</font><font color='#979000'>2</font><font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+            <font color='#BB00BB'>print_spinner</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>call test_pyramid_down_rgb2&lt;pyramid_down&lt;3&gt; &gt;();</font>";
+            test_pyramid_down_rgb2<font color='#5555FF'>&lt;</font>pyramid_down<font color='#5555FF'>&lt;</font><font color='#979000'>3</font><font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+            <font color='#BB00BB'>print_spinner</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>call test_pyramid_down_rgb2&lt;pyramid_down&lt;4&gt; &gt;();</font>";
+            test_pyramid_down_rgb2<font color='#5555FF'>&lt;</font>pyramid_down<font color='#5555FF'>&lt;</font><font color='#979000'>4</font><font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+            <font color='#BB00BB'>print_spinner</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>call test_pyramid_down_rgb2&lt;pyramid_down&lt;5&gt; &gt;();</font>";
+            test_pyramid_down_rgb2<font color='#5555FF'>&lt;</font>pyramid_down<font color='#5555FF'>&lt;</font><font color='#979000'>5</font><font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+            <font color='#BB00BB'>print_spinner</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>call test_pyramid_down_rgb2&lt;pyramid_down&lt;8&gt; &gt;();</font>";
+            test_pyramid_down_rgb2<font color='#5555FF'>&lt;</font>pyramid_down<font color='#5555FF'>&lt;</font><font color='#979000'>8</font><font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+
+            <font color='#BB00BB'>print_spinner</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>call test_pyramid_down_grayscale2&lt;pyramid_down&lt;2&gt; &gt;();</font>";
+            test_pyramid_down_grayscale2<font color='#5555FF'>&lt;</font>pyramid_down<font color='#5555FF'>&lt;</font><font color='#979000'>2</font><font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+            <font color='#BB00BB'>print_spinner</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>call test_pyramid_down_grayscale2&lt;pyramid_down&lt;3&gt; &gt;();</font>";
+            test_pyramid_down_grayscale2<font color='#5555FF'>&lt;</font>pyramid_down<font color='#5555FF'>&lt;</font><font color='#979000'>3</font><font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+            <font color='#BB00BB'>print_spinner</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>call test_pyramid_down_grayscale2&lt;pyramid_down&lt;4&gt; &gt;();</font>";
+            test_pyramid_down_grayscale2<font color='#5555FF'>&lt;</font>pyramid_down<font color='#5555FF'>&lt;</font><font color='#979000'>4</font><font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+            <font color='#BB00BB'>print_spinner</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>call test_pyramid_down_grayscale2&lt;pyramid_down&lt;5&gt; &gt;();</font>";
+            test_pyramid_down_grayscale2<font color='#5555FF'>&lt;</font>pyramid_down<font color='#5555FF'>&lt;</font><font color='#979000'>5</font><font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+            <font color='#BB00BB'>print_spinner</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>call test_pyramid_down_grayscale2&lt;pyramid_down&lt;6&gt; &gt;();</font>";
+            test_pyramid_down_grayscale2<font color='#5555FF'>&lt;</font>pyramid_down<font color='#5555FF'>&lt;</font><font color='#979000'>6</font><font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+    <b>}</b> a;
+
+<b>}</b>
+
+
+
+
+
+</pre></body></html>

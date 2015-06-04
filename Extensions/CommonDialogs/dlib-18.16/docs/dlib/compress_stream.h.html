@@ -1,0 +1,136 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - compress_stream.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2003  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_COMPRESS_STREAm_
+<font color='#0000FF'>#define</font> DLIB_COMPRESS_STREAm_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='compress_stream/compress_stream_kernel_1.h.html'>compress_stream/compress_stream_kernel_1.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='compress_stream/compress_stream_kernel_2.h.html'>compress_stream/compress_stream_kernel_2.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='compress_stream/compress_stream_kernel_3.h.html'>compress_stream/compress_stream_kernel_3.h</a>"
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='conditioning_class.h.html'>conditioning_class.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='entropy_encoder.h.html'>entropy_encoder.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='entropy_decoder.h.html'>entropy_decoder.h</a>"
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='entropy_encoder_model.h.html'>entropy_encoder_model.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='entropy_decoder_model.h.html'>entropy_decoder_model.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='lz77_buffer.h.html'>lz77_buffer.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='sliding_buffer.h.html'>sliding_buffer.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='lzp_buffer.h.html'>lzp_buffer.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='crc32.h.html'>crc32.h</a>"
+
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+    <font color='#0000FF'>class</font> <b><a name='compress_stream'></a>compress_stream</b>
+    <b>{</b>
+        <b><a name='compress_stream'></a>compress_stream</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+
+        <font color='#0000FF'>typedef</font> entropy_encoder_model<font color='#5555FF'>&lt;</font><font color='#979000'>257</font>,entropy_encoder::kernel_2a<font color='#5555FF'>&gt;</font>::kernel_1b fce1;
+        <font color='#0000FF'>typedef</font> entropy_decoder_model<font color='#5555FF'>&lt;</font><font color='#979000'>257</font>,entropy_decoder::kernel_2a<font color='#5555FF'>&gt;</font>::kernel_1b fcd1;
+
+        <font color='#0000FF'>typedef</font> entropy_encoder_model<font color='#5555FF'>&lt;</font><font color='#979000'>257</font>,entropy_encoder::kernel_2a<font color='#5555FF'>&gt;</font>::kernel_2b fce2;
+        <font color='#0000FF'>typedef</font> entropy_decoder_model<font color='#5555FF'>&lt;</font><font color='#979000'>257</font>,entropy_decoder::kernel_2a<font color='#5555FF'>&gt;</font>::kernel_2b fcd2;
+
+        <font color='#0000FF'>typedef</font> entropy_encoder_model<font color='#5555FF'>&lt;</font><font color='#979000'>257</font>,entropy_encoder::kernel_2a<font color='#5555FF'>&gt;</font>::kernel_3b fce3;
+        <font color='#0000FF'>typedef</font> entropy_decoder_model<font color='#5555FF'>&lt;</font><font color='#979000'>257</font>,entropy_decoder::kernel_2a<font color='#5555FF'>&gt;</font>::kernel_3b fcd3;
+
+        <font color='#0000FF'>typedef</font> entropy_encoder_model<font color='#5555FF'>&lt;</font><font color='#979000'>257</font>,entropy_encoder::kernel_2a<font color='#5555FF'>&gt;</font>::kernel_4a fce4a;
+        <font color='#0000FF'>typedef</font> entropy_decoder_model<font color='#5555FF'>&lt;</font><font color='#979000'>257</font>,entropy_decoder::kernel_2a<font color='#5555FF'>&gt;</font>::kernel_4a fcd4a;
+        <font color='#0000FF'>typedef</font> entropy_encoder_model<font color='#5555FF'>&lt;</font><font color='#979000'>257</font>,entropy_encoder::kernel_2a<font color='#5555FF'>&gt;</font>::kernel_4b fce4b;
+        <font color='#0000FF'>typedef</font> entropy_decoder_model<font color='#5555FF'>&lt;</font><font color='#979000'>257</font>,entropy_decoder::kernel_2a<font color='#5555FF'>&gt;</font>::kernel_4b fcd4b;
+
+        <font color='#0000FF'>typedef</font> entropy_encoder_model<font color='#5555FF'>&lt;</font><font color='#979000'>257</font>,entropy_encoder::kernel_2a<font color='#5555FF'>&gt;</font>::kernel_5a fce5a;
+        <font color='#0000FF'>typedef</font> entropy_decoder_model<font color='#5555FF'>&lt;</font><font color='#979000'>257</font>,entropy_decoder::kernel_2a<font color='#5555FF'>&gt;</font>::kernel_5a fcd5a;
+        <font color='#0000FF'>typedef</font> entropy_encoder_model<font color='#5555FF'>&lt;</font><font color='#979000'>257</font>,entropy_encoder::kernel_2a<font color='#5555FF'>&gt;</font>::kernel_5b fce5b;
+        <font color='#0000FF'>typedef</font> entropy_decoder_model<font color='#5555FF'>&lt;</font><font color='#979000'>257</font>,entropy_decoder::kernel_2a<font color='#5555FF'>&gt;</font>::kernel_5b fcd5b;
+        <font color='#0000FF'>typedef</font> entropy_encoder_model<font color='#5555FF'>&lt;</font><font color='#979000'>257</font>,entropy_encoder::kernel_2a<font color='#5555FF'>&gt;</font>::kernel_5c fce5c;
+        <font color='#0000FF'>typedef</font> entropy_decoder_model<font color='#5555FF'>&lt;</font><font color='#979000'>257</font>,entropy_decoder::kernel_2a<font color='#5555FF'>&gt;</font>::kernel_5c fcd5c;
+
+        <font color='#0000FF'>typedef</font> entropy_encoder_model<font color='#5555FF'>&lt;</font><font color='#979000'>257</font>,entropy_encoder::kernel_2a<font color='#5555FF'>&gt;</font>::kernel_6a fce6;
+        <font color='#0000FF'>typedef</font> entropy_decoder_model<font color='#5555FF'>&lt;</font><font color='#979000'>257</font>,entropy_decoder::kernel_2a<font color='#5555FF'>&gt;</font>::kernel_6a fcd6;
+
+
+        <font color='#0000FF'>typedef</font> entropy_encoder_model<font color='#5555FF'>&lt;</font><font color='#979000'>257</font>,entropy_encoder::kernel_2a<font color='#5555FF'>&gt;</font>::kernel_2d fce2d;
+        <font color='#0000FF'>typedef</font> entropy_decoder_model<font color='#5555FF'>&lt;</font><font color='#979000'>257</font>,entropy_decoder::kernel_2a<font color='#5555FF'>&gt;</font>::kernel_2d fcd2d;
+
+        <font color='#0000FF'>typedef</font> sliding_buffer<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font>::kernel_1a sliding_buffer1;
+        <font color='#0000FF'>typedef</font> lz77_buffer::kernel_2a lz77_buffer2a;
+
+
+        <font color='#0000FF'>typedef</font> lzp_buffer::kernel_1a lzp_buf_1;
+        <font color='#0000FF'>typedef</font> lzp_buffer::kernel_2a lzp_buf_2;
+
+
+        <font color='#0000FF'>typedef</font> entropy_encoder_model<font color='#5555FF'>&lt;</font><font color='#979000'>513</font>,entropy_encoder::kernel_2a<font color='#5555FF'>&gt;</font>::kernel_1b fce_length;
+        <font color='#0000FF'>typedef</font> entropy_decoder_model<font color='#5555FF'>&lt;</font><font color='#979000'>513</font>,entropy_decoder::kernel_2a<font color='#5555FF'>&gt;</font>::kernel_1b fcd_length;
+
+        <font color='#0000FF'>typedef</font> entropy_encoder_model<font color='#5555FF'>&lt;</font><font color='#979000'>65534</font>,entropy_encoder::kernel_2a<font color='#5555FF'>&gt;</font>::kernel_1b fce_length_2;
+        <font color='#0000FF'>typedef</font> entropy_decoder_model<font color='#5555FF'>&lt;</font><font color='#979000'>65534</font>,entropy_decoder::kernel_2a<font color='#5555FF'>&gt;</font>::kernel_1b fcd_length_2;
+
+
+        <font color='#0000FF'>typedef</font> entropy_encoder_model<font color='#5555FF'>&lt;</font><font color='#979000'>32257</font>,entropy_encoder::kernel_2a<font color='#5555FF'>&gt;</font>::kernel_1b fce_index;
+        <font color='#0000FF'>typedef</font> entropy_decoder_model<font color='#5555FF'>&lt;</font><font color='#979000'>32257</font>,entropy_decoder::kernel_2a<font color='#5555FF'>&gt;</font>::kernel_1b fcd_index;
+
+    <font color='#0000FF'>public</font>:
+        
+        <font color='#009900'>//----------- kernels ---------------
+</font>
+        <font color='#009900'>// kernel_1a        
+</font>        <font color='#0000FF'>typedef</font>      compress_stream_kernel_1 <font color='#5555FF'>&lt;</font>fce1,fcd1,crc32::kernel_1a<font color='#5555FF'>&gt;</font>
+                     kernel_1a;
+   
+        <font color='#009900'>// kernel_1b        
+</font>        <font color='#0000FF'>typedef</font>      compress_stream_kernel_1 <font color='#5555FF'>&lt;</font>fce2,fcd2,crc32::kernel_1a<font color='#5555FF'>&gt;</font>
+                     kernel_1b;
+
+        <font color='#009900'>// kernel_1c        
+</font>        <font color='#0000FF'>typedef</font>      compress_stream_kernel_1 <font color='#5555FF'>&lt;</font>fce3,fcd3,crc32::kernel_1a<font color='#5555FF'>&gt;</font>
+                     kernel_1c;
+
+        <font color='#009900'>// kernel_1da        
+</font>        <font color='#0000FF'>typedef</font>      compress_stream_kernel_1 <font color='#5555FF'>&lt;</font>fce4a,fcd4a,crc32::kernel_1a<font color='#5555FF'>&gt;</font>
+                     kernel_1da;
+
+        <font color='#009900'>// kernel_1ea        
+</font>        <font color='#0000FF'>typedef</font>      compress_stream_kernel_1 <font color='#5555FF'>&lt;</font>fce5a,fcd5a,crc32::kernel_1a<font color='#5555FF'>&gt;</font>
+                     kernel_1ea;
+
+        <font color='#009900'>// kernel_1db        
+</font>        <font color='#0000FF'>typedef</font>      compress_stream_kernel_1 <font color='#5555FF'>&lt;</font>fce4b,fcd4b,crc32::kernel_1a<font color='#5555FF'>&gt;</font>
+                     kernel_1db;
+
+        <font color='#009900'>// kernel_1eb        
+</font>        <font color='#0000FF'>typedef</font>      compress_stream_kernel_1 <font color='#5555FF'>&lt;</font>fce5b,fcd5b,crc32::kernel_1a<font color='#5555FF'>&gt;</font>
+                     kernel_1eb;
+
+        <font color='#009900'>// kernel_1ec        
+</font>        <font color='#0000FF'>typedef</font>      compress_stream_kernel_1 <font color='#5555FF'>&lt;</font>fce5c,fcd5c,crc32::kernel_1a<font color='#5555FF'>&gt;</font>
+                     kernel_1ec;
+
+
+
+
+        <font color='#009900'>// kernel_2a        
+</font>        <font color='#0000FF'>typedef</font>      compress_stream_kernel_2 <font color='#5555FF'>&lt;</font>fce2,fcd2,lz77_buffer2a,sliding_buffer1,fce_length,fcd_length,fce_index,fcd_index,crc32::kernel_1a<font color='#5555FF'>&gt;</font>
+                     kernel_2a;
+
+
+
+
+        <font color='#009900'>// kernel_3a        
+</font>        <font color='#0000FF'>typedef</font>      compress_stream_kernel_3 <font color='#5555FF'>&lt;</font>lzp_buf_1,crc32::kernel_1a,<font color='#979000'>16</font><font color='#5555FF'>&gt;</font>
+                     kernel_3a;
+        <font color='#009900'>// kernel_3b        
+</font>        <font color='#0000FF'>typedef</font>      compress_stream_kernel_3 <font color='#5555FF'>&lt;</font>lzp_buf_2,crc32::kernel_1a,<font color='#979000'>16</font><font color='#5555FF'>&gt;</font>
+                     kernel_3b;
+   
+
+    <b>}</b>;
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_COMPRESS_STREAm_
+</font>
+
+</pre></body></html>

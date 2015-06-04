@@ -1,0 +1,49 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - lzp_buffer.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2005  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_LZP_BUFFEr_
+<font color='#0000FF'>#define</font> DLIB_LZP_BUFFEr_
+
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='lzp_buffer/lzp_buffer_kernel_1.h.html'>lzp_buffer/lzp_buffer_kernel_1.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='lzp_buffer/lzp_buffer_kernel_2.h.html'>lzp_buffer/lzp_buffer_kernel_2.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='lzp_buffer/lzp_buffer_kernel_c.h.html'>lzp_buffer/lzp_buffer_kernel_c.h</a>"
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='sliding_buffer.h.html'>sliding_buffer.h</a>"
+
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+
+    <font color='#0000FF'>class</font> <b><a name='lzp_buffer'></a>lzp_buffer</b>
+    <b>{</b>
+
+        <b><a name='lzp_buffer'></a>lzp_buffer</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+
+        <font color='#0000FF'>typedef</font> sliding_buffer<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font>::kernel_1a sb1;
+
+    <font color='#0000FF'>public</font>:
+        
+        <font color='#009900'>//----------- kernels ---------------
+</font>
+        <font color='#009900'>// kernel_1a        
+</font>        <font color='#0000FF'>typedef</font>     lzp_buffer_kernel_1<font color='#5555FF'>&lt;</font>sb1<font color='#5555FF'>&gt;</font>   
+                    kernel_1a;
+        <font color='#0000FF'>typedef</font>     lzp_buffer_kernel_c<font color='#5555FF'>&lt;</font>kernel_1a<font color='#5555FF'>&gt;</font>
+                    kernel_1a_c;
+
+        <font color='#009900'>// kernel_2a        
+</font>        <font color='#0000FF'>typedef</font>     lzp_buffer_kernel_2<font color='#5555FF'>&lt;</font>sb1<font color='#5555FF'>&gt;</font>   
+                    kernel_2a;
+        <font color='#0000FF'>typedef</font>     lzp_buffer_kernel_c<font color='#5555FF'>&lt;</font>kernel_2a<font color='#5555FF'>&gt;</font>
+                    kernel_2a_c;
+  
+
+    <b>}</b>;
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_LZP_BUFFEr_
+</font>
+
+</pre></body></html>

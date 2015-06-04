@@ -1,0 +1,309 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - ekm_and_lisf.cpp</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2009  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font>
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='tester.h.html'>tester.h</a>"
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>svm.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>rand.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>string.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>vector<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>sstream<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>ctime<font color='#5555FF'>&gt;</font>
+
+<font color='#0000FF'>namespace</font>  
+<b>{</b>
+    <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> test;
+    <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> dlib;
+    <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> std;
+    dlib::logger <b><a name='dlog'></a>dlog</b><font face='Lucida Console'>(</font>"<font color='#CC0000'>test.ekm_and_lisf</font>"<font face='Lucida Console'>)</font>;
+
+
+    <font color='#0000FF'>class</font> <b><a name='empirical_kernel_map_tester'></a>empirical_kernel_map_tester</b> : <font color='#0000FF'>public</font> tester
+    <b>{</b>
+        <font color='#009900'>/*!
+            WHAT THIS OBJECT REPRESENTS
+                This object represents a unit test.  When it is constructed
+                it adds itself into the testing framework.
+        !*/</font>
+    <font color='#0000FF'>public</font>:
+        <b><a name='empirical_kernel_map_tester'></a>empirical_kernel_map_tester</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> :
+            tester <font face='Lucida Console'>(</font>
+                "<font color='#CC0000'>test_ekm_and_lisf</font>",       <font color='#009900'>// the command line argument name for this test
+</font>                "<font color='#CC0000'>Run tests on the empirical_kernel_map and linearly_independent_subset_finder objects.</font>", <font color='#009900'>// the command line argument description
+</font>                <font color='#979000'>0</font>                     <font color='#009900'>// the number of command line arguments for this test
+</font>            <font face='Lucida Console'>)</font>
+        <b>{</b>
+            thetime <font color='#5555FF'>=</font> <font color='#BB00BB'>time</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        time_t thetime;
+        dlib::rand rnd;
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='validate'></a>validate</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> ekm_small,
+            <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> ekm_big
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font> tmat;
+            projection_function<font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T::kernel_type<font color='#5555FF'>&gt;</font> proj;
+
+            ekm_small.<font color='#BB00BB'>get_transformation_to</font><font face='Lucida Console'>(</font>ekm_big, tmat, proj<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>tmat.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> ekm_big.<font color='#BB00BB'>out_vector_size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>tmat.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> ekm_small.<font color='#BB00BB'>out_vector_size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font>proj.basis_vectors.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> ekm_big.<font color='#BB00BB'>basis_size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> ekm_small.<font color='#BB00BB'>basis_size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> <font color='#979000'>6</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>const</font> <font color='#0000FF'>typename</font> T::sample_type temp <font color='#5555FF'>=</font> <font color='#BB00BB'>randm</font><font face='Lucida Console'>(</font><font color='#979000'>4</font>,<font color='#979000'>1</font>,rnd<font face='Lucida Console'>)</font>;
+                <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>length</font><font face='Lucida Console'>(</font>ekm_big.<font color='#BB00BB'>project</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> <font face='Lucida Console'>(</font>tmat<font color='#5555FF'>*</font>ekm_small.<font color='#BB00BB'>project</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> <font color='#BB00BB'>proj</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> <font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>10</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+        <b>}</b>
+
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='test_transformation_stuff'></a>test_transformation_stuff</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>typedef</font> matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>0</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> sample_type;
+            <font color='#0000FF'>typedef</font> radial_basis_kernel<font color='#5555FF'>&lt;</font>sample_type<font color='#5555FF'>&gt;</font> kernel_type;
+            <font color='#0000FF'>const</font> kernel_type <font color='#BB00BB'>kern</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+
+
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> n <font color='#5555FF'>=</font> <font color='#979000'>1</font>; n <font color='#5555FF'>&lt;</font> <font color='#979000'>6</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>n<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#BB00BB'>print_spinner</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> extra <font color='#5555FF'>=</font> <font color='#979000'>1</font>; extra <font color='#5555FF'>&lt;</font> <font color='#979000'>10</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>extra<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    std::vector<font color='#5555FF'>&lt;</font>sample_type<font color='#5555FF'>&gt;</font> samps_small, samps_big;
+                    linearly_independent_subset_finder<font color='#5555FF'>&lt;</font>kernel_type<font color='#5555FF'>&gt;</font> <font color='#BB00BB'>lisf_small</font><font face='Lucida Console'>(</font>kern, <font color='#979000'>1000</font><font face='Lucida Console'>)</font>;
+                    linearly_independent_subset_finder<font color='#5555FF'>&lt;</font>kernel_type<font color='#5555FF'>&gt;</font> <font color='#BB00BB'>lisf_big</font><font face='Lucida Console'>(</font>kern, <font color='#979000'>1000</font><font face='Lucida Console'>)</font>;
+                    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> n; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        samps_small.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font><font color='#BB00BB'>randm</font><font face='Lucida Console'>(</font><font color='#979000'>4</font>,<font color='#979000'>1</font>,rnd<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                        samps_big.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>samps_small.<font color='#BB00BB'>back</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                        lisf_big.<font color='#BB00BB'>add</font><font face='Lucida Console'>(</font>samps_small.<font color='#BB00BB'>back</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                        lisf_small.<font color='#BB00BB'>add</font><font face='Lucida Console'>(</font>samps_small.<font color='#BB00BB'>back</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                    <b>}</b>
+                    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> extra; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        samps_big.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font><font color='#BB00BB'>randm</font><font face='Lucida Console'>(</font><font color='#979000'>4</font>,<font color='#979000'>1</font>,rnd<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                        lisf_big.<font color='#BB00BB'>add</font><font face='Lucida Console'>(</font>samps_big.<font color='#BB00BB'>back</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                    <b>}</b>
+
+
+                    <font color='#009900'>// test no lisf
+</font>                    <b>{</b>
+                        empirical_kernel_map<font color='#5555FF'>&lt;</font>kernel_type<font color='#5555FF'>&gt;</font> ekm_small, ekm_big;
+                        ekm_small.<font color='#BB00BB'>load</font><font face='Lucida Console'>(</font>kern, samps_small<font face='Lucida Console'>)</font>;
+                        ekm_big.<font color='#BB00BB'>load</font><font face='Lucida Console'>(</font>kern, samps_big<font face='Lucida Console'>)</font>;
+
+                        <font color='#BB00BB'>validate</font><font face='Lucida Console'>(</font>ekm_small, ekm_big<font face='Lucida Console'>)</font>;
+                    <b>}</b>
+
+                    <font color='#009900'>// test with lisf
+</font>                    <b>{</b>
+                        empirical_kernel_map<font color='#5555FF'>&lt;</font>kernel_type<font color='#5555FF'>&gt;</font> ekm_small, ekm_big;
+                        ekm_small.<font color='#BB00BB'>load</font><font face='Lucida Console'>(</font>lisf_small<font face='Lucida Console'>)</font>;
+                        ekm_big.<font color='#BB00BB'>load</font><font face='Lucida Console'>(</font>lisf_big<font face='Lucida Console'>)</font>;
+
+                        <font color='#BB00BB'>validate</font><font face='Lucida Console'>(</font>ekm_small, ekm_big<font face='Lucida Console'>)</font>;
+                    <b>}</b>
+
+                    <font color='#009900'>// test with partly lisf
+</font>                    <b>{</b>
+                        empirical_kernel_map<font color='#5555FF'>&lt;</font>kernel_type<font color='#5555FF'>&gt;</font> ekm_small, ekm_big;
+                        ekm_small.<font color='#BB00BB'>load</font><font face='Lucida Console'>(</font>kern, samps_small<font face='Lucida Console'>)</font>;
+                        ekm_big.<font color='#BB00BB'>load</font><font face='Lucida Console'>(</font>lisf_big<font face='Lucida Console'>)</font>;
+
+                        <font color='#BB00BB'>validate</font><font face='Lucida Console'>(</font>ekm_small, ekm_big<font face='Lucida Console'>)</font>;
+                    <b>}</b>
+
+                    <font color='#009900'>// test with partly lisf
+</font>                    <b>{</b>
+                        empirical_kernel_map<font color='#5555FF'>&lt;</font>kernel_type<font color='#5555FF'>&gt;</font> ekm_small, ekm_big;
+                        ekm_small.<font color='#BB00BB'>load</font><font face='Lucida Console'>(</font>lisf_small<font face='Lucida Console'>)</font>;
+                        ekm_big.<font color='#BB00BB'>load</font><font face='Lucida Console'>(</font>kern, samps_big<font face='Lucida Console'>)</font>;
+
+                        <font color='#BB00BB'>validate</font><font face='Lucida Console'>(</font>ekm_small, ekm_big<font face='Lucida Console'>)</font>;
+                    <b>}</b>
+
+                <b>}</b>
+            <b>}</b>
+
+
+            <font color='#009900'>// test what happens if the bigger ekm only has repeated basis vectors
+</font>            <b>{</b>
+                empirical_kernel_map<font color='#5555FF'>&lt;</font>kernel_type<font color='#5555FF'>&gt;</font> ekm_big, ekm_small;
+                std::vector<font color='#5555FF'>&lt;</font>sample_type<font color='#5555FF'>&gt;</font> samps_big, samps_small;
+
+                sample_type temp <font color='#5555FF'>=</font> <font color='#BB00BB'>randm</font><font face='Lucida Console'>(</font><font color='#979000'>4</font>,<font color='#979000'>1</font>,rnd<font face='Lucida Console'>)</font>;
+
+                samps_small.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font>;
+                samps_big.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font>;
+                samps_big.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font>;
+
+                ekm_big.<font color='#BB00BB'>load</font><font face='Lucida Console'>(</font>kern, samps_big<font face='Lucida Console'>)</font>;
+                ekm_small.<font color='#BB00BB'>load</font><font face='Lucida Console'>(</font>kern, samps_small<font face='Lucida Console'>)</font>;
+
+                <font color='#BB00BB'>validate</font><font face='Lucida Console'>(</font>ekm_small, ekm_big<font face='Lucida Console'>)</font>;
+
+            <b>}</b>
+            <b>{</b>
+                empirical_kernel_map<font color='#5555FF'>&lt;</font>kernel_type<font color='#5555FF'>&gt;</font> ekm_big, ekm_small;
+                linearly_independent_subset_finder<font color='#5555FF'>&lt;</font>kernel_type<font color='#5555FF'>&gt;</font> <font color='#BB00BB'>lisf_small</font><font face='Lucida Console'>(</font>kern, <font color='#979000'>1000</font><font face='Lucida Console'>)</font>;
+                std::vector<font color='#5555FF'>&lt;</font>sample_type<font color='#5555FF'>&gt;</font> samps_big;
+
+                sample_type temp <font color='#5555FF'>=</font> <font color='#BB00BB'>randm</font><font face='Lucida Console'>(</font><font color='#979000'>4</font>,<font color='#979000'>1</font>,rnd<font face='Lucida Console'>)</font>;
+
+                lisf_small.<font color='#BB00BB'>add</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font>;
+                samps_big.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font>;
+                samps_big.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font>;
+
+                ekm_big.<font color='#BB00BB'>load</font><font face='Lucida Console'>(</font>kern, samps_big<font face='Lucida Console'>)</font>;
+                ekm_small.<font color='#BB00BB'>load</font><font face='Lucida Console'>(</font>lisf_small<font face='Lucida Console'>)</font>;
+
+                <font color='#BB00BB'>validate</font><font face='Lucida Console'>(</font>ekm_small, ekm_big<font face='Lucida Console'>)</font>;
+
+            <b>}</b>
+            <b>{</b>
+                empirical_kernel_map<font color='#5555FF'>&lt;</font>kernel_type<font color='#5555FF'>&gt;</font> ekm_big, ekm_small;
+                std::vector<font color='#5555FF'>&lt;</font>sample_type<font color='#5555FF'>&gt;</font> samps_big, samps_small;
+
+                sample_type temp <font color='#5555FF'>=</font> <font color='#BB00BB'>randm</font><font face='Lucida Console'>(</font><font color='#979000'>4</font>,<font color='#979000'>1</font>,rnd<font face='Lucida Console'>)</font>;
+                sample_type temp2 <font color='#5555FF'>=</font> <font color='#BB00BB'>randm</font><font face='Lucida Console'>(</font><font color='#979000'>4</font>,<font color='#979000'>1</font>,rnd<font face='Lucida Console'>)</font>;
+
+                samps_small.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font>;
+                samps_small.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>temp2<font face='Lucida Console'>)</font>;
+                samps_big.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font>;
+                samps_big.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>temp2<font face='Lucida Console'>)</font>;
+                samps_big.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font><font color='#BB00BB'>randm</font><font face='Lucida Console'>(</font><font color='#979000'>4</font>,<font color='#979000'>1</font>,rnd<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+                ekm_big.<font color='#BB00BB'>load</font><font face='Lucida Console'>(</font>kern, samps_big<font face='Lucida Console'>)</font>;
+                ekm_small.<font color='#BB00BB'>load</font><font face='Lucida Console'>(</font>kern, samps_small<font face='Lucida Console'>)</font>;
+
+                <font color='#BB00BB'>validate</font><font face='Lucida Console'>(</font>ekm_small, ekm_big<font face='Lucida Console'>)</font>;
+
+            <b>}</b>
+            <b>{</b>
+                empirical_kernel_map<font color='#5555FF'>&lt;</font>kernel_type<font color='#5555FF'>&gt;</font> ekm_big, ekm_small;
+                linearly_independent_subset_finder<font color='#5555FF'>&lt;</font>kernel_type<font color='#5555FF'>&gt;</font> <font color='#BB00BB'>lisf_small</font><font face='Lucida Console'>(</font>kern, <font color='#979000'>1000</font><font face='Lucida Console'>)</font>;
+                std::vector<font color='#5555FF'>&lt;</font>sample_type<font color='#5555FF'>&gt;</font> samps_big;
+
+                sample_type temp <font color='#5555FF'>=</font> <font color='#BB00BB'>randm</font><font face='Lucida Console'>(</font><font color='#979000'>4</font>,<font color='#979000'>1</font>,rnd<font face='Lucida Console'>)</font>;
+                sample_type temp2 <font color='#5555FF'>=</font> <font color='#BB00BB'>randm</font><font face='Lucida Console'>(</font><font color='#979000'>4</font>,<font color='#979000'>1</font>,rnd<font face='Lucida Console'>)</font>;
+
+                lisf_small.<font color='#BB00BB'>add</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font>;
+                lisf_small.<font color='#BB00BB'>add</font><font face='Lucida Console'>(</font>temp2<font face='Lucida Console'>)</font>;
+                samps_big.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font>;
+                samps_big.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>temp2<font face='Lucida Console'>)</font>;
+                samps_big.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font>;
+
+                ekm_big.<font color='#BB00BB'>load</font><font face='Lucida Console'>(</font>kern, samps_big<font face='Lucida Console'>)</font>;
+                ekm_small.<font color='#BB00BB'>load</font><font face='Lucida Console'>(</font>lisf_small<font face='Lucida Console'>)</font>;
+
+                <font color='#BB00BB'>validate</font><font face='Lucida Console'>(</font>ekm_small, ekm_big<font face='Lucida Console'>)</font>;
+
+            <b>}</b>
+
+
+        <b>}</b>
+
+
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='perform_test'></a>perform_test</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#5555FF'>+</font><font color='#5555FF'>+</font>thetime;
+            <font color='#0000FF'>typedef</font> matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>0</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> sample_type;
+            <font color='#009900'>//dlog &lt;&lt; LINFO &lt;&lt; "time seed: " &lt;&lt; thetime;
+</font>            <font color='#009900'>//rnd.set_seed(cast_to_string(thetime));
+</font>
+
+            <font color='#0000FF'>typedef</font> radial_basis_kernel<font color='#5555FF'>&lt;</font>sample_type<font color='#5555FF'>&gt;</font> kernel_type;
+
+
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> n <font color='#5555FF'>=</font> <font color='#979000'>1</font>; n <font color='#5555FF'>&lt;</font> <font color='#979000'>10</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>n<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#BB00BB'>print_spinner</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>matrix size </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> n;
+
+                std::vector<font color='#5555FF'>&lt;</font>sample_type<font color='#5555FF'>&gt;</font> samples;
+                <font color='#009900'>// make some samples
+</font>                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> n; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    samples.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font><font color='#BB00BB'>randm</font><font face='Lucida Console'>(</font><font color='#979000'>4</font>,<font color='#979000'>1</font>,rnd<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                    <font color='#009900'>// double up the samples just to mess with the lisf
+</font>                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>n <font color='#5555FF'>&gt;</font> <font color='#979000'>5</font><font face='Lucida Console'>)</font>
+                        samples.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>samples.<font color='#BB00BB'>back</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                <b>}</b>
+
+                dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>samples.size(): </font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> samples.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+                <font color='#0000FF'>const</font> kernel_type <font color='#BB00BB'>kern</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+
+                linearly_independent_subset_finder<font color='#5555FF'>&lt;</font>kernel_type<font color='#5555FF'>&gt;</font> <font color='#BB00BB'>lisf</font><font face='Lucida Console'>(</font>kern, <font color='#979000'>100</font>, <font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>4</font><font face='Lucida Console'>)</font>;
+                <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> count <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> samples.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>lisf.<font color='#BB00BB'>add</font><font face='Lucida Console'>(</font>samples[i]<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>equal</font><font face='Lucida Console'>(</font>lisf[lisf.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#979000'>1</font>], samples[i]<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                        <font color='#5555FF'>+</font><font color='#5555FF'>+</font>count;
+                    <b>}</b>
+                <b>}</b>
+                <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>count <font color='#5555FF'>=</font><font color='#5555FF'>=</font> lisf.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+                <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>lisf.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font>n<font face='Lucida Console'>)</font>;
+
+
+                dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>lisf.size(): </font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> lisf.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+                <font color='#009900'>// make sure the kernel matrices coming out of the lisf are correct
+</font>                <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>dlib::<font color='#BB00BB'>equal</font><font face='Lucida Console'>(</font>lisf.<font color='#BB00BB'>get_kernel_matrix</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, <font color='#BB00BB'>kernel_matrix</font><font face='Lucida Console'>(</font>kern, lisf<font face='Lucida Console'>)</font>, <font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>8</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>dlib::<font color='#BB00BB'>equal</font><font face='Lucida Console'>(</font>lisf.<font color='#BB00BB'>get_inv_kernel_marix</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, <font color='#BB00BB'>inv</font><font face='Lucida Console'>(</font><font color='#BB00BB'>kernel_matrix</font><font face='Lucida Console'>(</font>kern, lisf.<font color='#BB00BB'>get_dictionary</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>, <font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>8</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+                empirical_kernel_map<font color='#5555FF'>&lt;</font>kernel_type<font color='#5555FF'>&gt;</font> ekm;
+                ekm.<font color='#BB00BB'>load</font><font face='Lucida Console'>(</font>lisf<font face='Lucida Console'>)</font>;
+                <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>ekm.<font color='#BB00BB'>basis_size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> lisf.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+                std::vector<font color='#5555FF'>&lt;</font>sample_type<font color='#5555FF'>&gt;</font> proj_samples;
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> samples.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#0000FF'><u>double</u></font> err;
+                    proj_samples.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>ekm.<font color='#BB00BB'>project</font><font face='Lucida Console'>(</font>samples[i], err<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                    <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>err <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>4</font><font face='Lucida Console'>)</font>;
+                    <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> error_agreement <font color='#5555FF'>=</font> std::<font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font>err <font color='#5555FF'>-</font> lisf.<font color='#BB00BB'>projection_error</font><font face='Lucida Console'>(</font>samples[i]<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                    dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LTRACE <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>err: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> err <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>    error_agreement: </font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> error_agreement;
+                    <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>error_agreement <font color='#5555FF'>&lt;</font> <font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>11</font><font face='Lucida Console'>)</font>;
+                <b>}</b>
+
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> <font color='#979000'>5</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    sample_type temp <font color='#5555FF'>=</font> <font color='#BB00BB'>randm</font><font face='Lucida Console'>(</font><font color='#979000'>4</font>,<font color='#979000'>1</font>,rnd<font face='Lucida Console'>)</font>;
+                    <font color='#0000FF'><u>double</u></font> err;
+                    ekm.<font color='#BB00BB'>project</font><font face='Lucida Console'>(</font>temp, err<font face='Lucida Console'>)</font>;
+                    <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> error_agreement <font color='#5555FF'>=</font> std::<font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font>err <font color='#5555FF'>-</font> lisf.<font color='#BB00BB'>projection_error</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                    dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LTRACE <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>err: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> err <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>    error_agreement: </font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> error_agreement;
+                    <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>error_agreement <font color='#5555FF'>&lt;</font> <font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>11</font><font face='Lucida Console'>)</font>;
+                <b>}</b>
+
+                <font color='#009900'>// make sure the EKM did the projection correctly
+</font>                <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>dlib::<font color='#BB00BB'>equal</font><font face='Lucida Console'>(</font><font color='#BB00BB'>kernel_matrix</font><font face='Lucida Console'>(</font>kern, samples<font face='Lucida Console'>)</font>, <font color='#BB00BB'>kernel_matrix</font><font face='Lucida Console'>(</font>linear_kernel<font color='#5555FF'>&lt;</font>sample_type<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, proj_samples<font face='Lucida Console'>)</font>, <font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>5</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+
+            <font color='#BB00BB'>test_transformation_stuff</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+        <b>}</b>
+    <b>}</b>;
+
+    <font color='#009900'>// Create an instance of this object.  Doing this causes this test
+</font>    <font color='#009900'>// to be automatically inserted into the testing framework whenever this cpp file
+</font>    <font color='#009900'>// is linked into the project.  Note that since we are inside an unnamed-namespace 
+</font>    <font color='#009900'>// we won't get any linker errors about the symbol a being defined multiple times. 
+</font>    empirical_kernel_map_tester a;
+
+<b>}</b>
+
+
+
+</pre></body></html>

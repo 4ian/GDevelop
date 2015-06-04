@@ -1,0 +1,411 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - parallel_for_extension_abstract.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2013  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#undef</font> DLIB_PARALLEL_FoR_ABSTRACT_Hh_
+<font color='#0000FF'>#ifdef</font> DLIB_PARALLEL_FoR_ABSTRACT_Hh_ 
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='thread_pool_extension_abstract.h.html'>thread_pool_extension_abstract.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='parallel_for_blocked'></a>parallel_for_blocked</b> <font face='Lucida Console'>(</font>
+        thread_pool<font color='#5555FF'>&amp;</font> tp,
+        <font color='#0000FF'><u>long</u></font> begin,
+        <font color='#0000FF'><u>long</u></font> end,
+        T<font color='#5555FF'>&amp;</font> obj,
+        <font color='#0000FF'><u>void</u></font> <font face='Lucida Console'>(</font>T::<font color='#5555FF'>*</font>funct<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font>, <font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font>,
+        <font color='#0000FF'><u>long</u></font> chunks_per_thread <font color='#5555FF'>=</font> <font color='#979000'>8</font>
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - begin &lt;= end
+            - chunks_per_thread &gt; 0
+            - funct does not throw any exceptions
+        ensures
+            - This is a convenience function for submitting a block of jobs to a thread_pool.  
+              In particular, given the half open range [begin, end), this function will
+              split the range into approximately tp.num_threads_in_pool()*chunks_per_thread
+              blocks, which it will then submit to the thread_pool.  The given thread_pool
+              will then call (obj.*funct)() on each of the subranges.
+            - To be precise, suppose we have broken the range [begin, end) into the
+              following subranges:
+                - [begin[0], end[0])
+                - [begin[1], end[1])
+                - [begin[2], end[2])
+                  ...
+                - [begin[n], end[n])
+              Then parallel_for_blocked() submits each of these subranges to tp for
+              processing such that (obj.*funct)(begin[i], end[i]) is invoked for all valid
+              values of i.  Moreover, the subranges are non-overlapping and completely
+              cover the total range of [begin, end).
+            - This function will not perform any memory allocations or create any system
+              resources such as mutex objects.
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='parallel_for_blocked'></a>parallel_for_blocked</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> num_threads,
+        <font color='#0000FF'><u>long</u></font> begin,
+        <font color='#0000FF'><u>long</u></font> end,
+        T<font color='#5555FF'>&amp;</font> obj,
+        <font color='#0000FF'><u>void</u></font> <font face='Lucida Console'>(</font>T::<font color='#5555FF'>*</font>funct<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font>, <font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font>,
+        <font color='#0000FF'><u>long</u></font> chunks_per_thread <font color='#5555FF'>=</font> <font color='#979000'>8</font>
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - begin &lt;= end
+            - chunks_per_thread &gt; 0
+            - funct does not throw any exceptions
+        ensures
+            - This function is equivalent to the following block of code:
+                thread_pool tp(num_threads);
+                parallel_for_blocked(tp, begin, end, obj, funct, chunks_per_thread);
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='parallel_for_blocked'></a>parallel_for_blocked</b> <font face='Lucida Console'>(</font>
+        thread_pool<font color='#5555FF'>&amp;</font> tp,
+        <font color='#0000FF'><u>long</u></font> begin,
+        <font color='#0000FF'><u>long</u></font> end,
+        <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> funct,
+        <font color='#0000FF'><u>long</u></font> chunks_per_thread <font color='#5555FF'>=</font> <font color='#979000'>8</font>
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - chunks_per_thread &gt; 0
+            - begin &lt;= end
+            - funct does not throw any exceptions
+        ensures
+            - This is a convenience function for submitting a block of jobs to a
+              thread_pool.  In particular, given the range [begin, end), this function will
+              split the range into approximately tp.num_threads_in_pool()*chunks_per_thread
+              blocks, which it will then submit to the thread_pool.  The given thread_pool
+              will then call funct() on each of the subranges.
+            - To be precise, suppose we have broken the range [begin, end) into the
+              following subranges:
+                - [begin[0], end[0])
+                - [begin[1], end[1])
+                - [begin[2], end[2])
+                  ...
+                - [begin[n], end[n])
+              Then parallel_for_blocked() submits each of these subranges to tp for
+              processing such that funct(begin[i], end[i]) is invoked for all valid values
+              of i.
+            - This function will not perform any memory allocations or create any system
+              resources such as mutex objects.
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='parallel_for_blocked'></a>parallel_for_blocked</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> num_threads,
+        <font color='#0000FF'><u>long</u></font> begin,
+        <font color='#0000FF'><u>long</u></font> end,
+        <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> funct,
+        <font color='#0000FF'><u>long</u></font> chunks_per_thread <font color='#5555FF'>=</font> <font color='#979000'>8</font>
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - begin &lt;= end
+            - chunks_per_thread &gt; 0
+            - funct does not throw any exceptions
+        ensures
+            - This function is equivalent to the following block of code:
+                thread_pool tp(num_threads);
+                parallel_for_blocked(tp, begin, end, funct, chunks_per_thread);
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='parallel_for'></a>parallel_for</b> <font face='Lucida Console'>(</font>
+        thread_pool<font color='#5555FF'>&amp;</font> tp,
+        <font color='#0000FF'><u>long</u></font> begin,
+        <font color='#0000FF'><u>long</u></font> end,
+        T<font color='#5555FF'>&amp;</font> obj,
+        <font color='#0000FF'><u>void</u></font> <font face='Lucida Console'>(</font>T::<font color='#5555FF'>*</font>funct<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font>,
+        <font color='#0000FF'><u>long</u></font> chunks_per_thread <font color='#5555FF'>=</font> <font color='#979000'>8</font>
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - begin &lt;= end
+            - chunks_per_thread &gt; 0
+            - funct does not throw any exceptions
+        ensures
+            - This function is equivalent to the following function call:
+              parallel_for_blocked(tp, begin, end, [&amp;](long begin_sub, long end_sub) 
+                {
+                  for (long i = begin_sub; i &lt; end_sub; ++i)
+                      (obj.*funct)(i);  
+                }, chunks_per_thread);
+            - Therefore, this routine invokes (obj.*funct)(i) for all i in the range
+              [begin, end).  However, it does so using tp.num_threads_in_pool() parallel
+              threads.
+            - This function will not perform any memory allocations or create any system
+              resources such as mutex objects.
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='parallel_for'></a>parallel_for</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> num_threads,
+        <font color='#0000FF'><u>long</u></font> begin,
+        <font color='#0000FF'><u>long</u></font> end,
+        T<font color='#5555FF'>&amp;</font> obj,
+        <font color='#0000FF'><u>void</u></font> <font face='Lucida Console'>(</font>T::<font color='#5555FF'>*</font>funct<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font>,
+        <font color='#0000FF'><u>long</u></font> chunks_per_thread <font color='#5555FF'>=</font> <font color='#979000'>8</font>
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - begin &lt;= end
+            - chunks_per_thread &gt; 0
+            - funct does not throw any exceptions
+        ensures
+            - This function is equivalent to the following block of code:
+                thread_pool tp(num_threads);
+                parallel_for(tp, begin, end, obj, funct, chunks_per_thread);
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='parallel_for'></a>parallel_for</b> <font face='Lucida Console'>(</font>
+        thread_pool<font color='#5555FF'>&amp;</font> tp,
+        <font color='#0000FF'><u>long</u></font> begin,
+        <font color='#0000FF'><u>long</u></font> end,
+        <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> funct,
+        <font color='#0000FF'><u>long</u></font> chunks_per_thread <font color='#5555FF'>=</font> <font color='#979000'>8</font>
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - begin &lt;= end
+            - chunks_per_thread &gt; 0
+            - funct does not throw any exceptions
+        ensures
+            - This function is equivalent to the following function call:
+              parallel_for_blocked(tp, begin, end, [&amp;](long begin_sub, long end_sub) 
+                {
+                  for (long i = begin_sub; i &lt; end_sub; ++i)
+                      funct(i);  
+                }, chunks_per_thread);
+            - Therefore, this routine invokes funct(i) for all i in the range [begin, end).
+              However, it does so using tp.num_threads_in_pool() parallel threads.
+            - This function will not perform any memory allocations or create any system
+              resources such as mutex objects.
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='parallel_for'></a>parallel_for</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> num_threads,
+        <font color='#0000FF'><u>long</u></font> begin,
+        <font color='#0000FF'><u>long</u></font> end,
+        <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> funct,
+        <font color='#0000FF'><u>long</u></font> chunks_per_thread <font color='#5555FF'>=</font> <font color='#979000'>8</font>
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - begin &lt;= end
+            - chunks_per_thread &gt; 0
+            - funct does not throw any exceptions
+        ensures
+            - This function is equivalent to the following block of code:
+                thread_pool tp(num_threads);
+                parallel_for(tp, begin, end, funct, chunks_per_thread);
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='parallel_for_verbose'></a>parallel_for_verbose</b> <font face='Lucida Console'>(</font>
+        thread_pool<font color='#5555FF'>&amp;</font> tp,
+        <font color='#0000FF'><u>long</u></font> begin,
+        <font color='#0000FF'><u>long</u></font> end,
+        T<font color='#5555FF'>&amp;</font> obj,
+        <font color='#0000FF'><u>void</u></font> <font face='Lucida Console'>(</font>T::<font color='#5555FF'>*</font>funct<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font>,
+        <font color='#0000FF'><u>long</u></font> chunks_per_thread <font color='#5555FF'>=</font> <font color='#979000'>8</font>
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - begin &lt;= end
+            - chunks_per_thread &gt; 0
+            - funct does not throw any exceptions
+        ensures
+            - This function is identical to the parallel_for() routine defined above except
+              that it will print messages to cout showing the progress in executing the
+              parallel for loop.
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='parallel_for_verbose'></a>parallel_for_verbose</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> num_threads,
+        <font color='#0000FF'><u>long</u></font> begin,
+        <font color='#0000FF'><u>long</u></font> end,
+        T<font color='#5555FF'>&amp;</font> obj,
+        <font color='#0000FF'><u>void</u></font> <font face='Lucida Console'>(</font>T::<font color='#5555FF'>*</font>funct<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font>,
+        <font color='#0000FF'><u>long</u></font> chunks_per_thread <font color='#5555FF'>=</font> <font color='#979000'>8</font>
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - begin &lt;= end
+            - chunks_per_thread &gt; 0
+            - funct does not throw any exceptions
+        ensures
+            - This function is identical to the parallel_for() routine defined above except
+              that it will print messages to cout showing the progress in executing the
+              parallel for loop.
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='parallel_for_verbose'></a>parallel_for_verbose</b> <font face='Lucida Console'>(</font>
+        thread_pool<font color='#5555FF'>&amp;</font> tp,
+        <font color='#0000FF'><u>long</u></font> begin,
+        <font color='#0000FF'><u>long</u></font> end,
+        <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> funct,
+        <font color='#0000FF'><u>long</u></font> chunks_per_thread <font color='#5555FF'>=</font> <font color='#979000'>8</font>
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - begin &lt;= end
+            - chunks_per_thread &gt; 0
+            - funct does not throw any exceptions
+        ensures
+            - This function is identical to the parallel_for() routine defined above except
+              that it will print messages to cout showing the progress in executing the
+              parallel for loop.
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='parallel_for_verbose'></a>parallel_for_verbose</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> num_threads,
+        <font color='#0000FF'><u>long</u></font> begin,
+        <font color='#0000FF'><u>long</u></font> end,
+        <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> funct,
+        <font color='#0000FF'><u>long</u></font> chunks_per_thread <font color='#5555FF'>=</font> <font color='#979000'>8</font>
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - begin &lt;= end
+            - chunks_per_thread &gt; 0
+            - funct does not throw any exceptions
+        ensures
+            - This function is identical to the parallel_for() routine defined above except
+              that it will print messages to cout showing the progress in executing the
+              parallel for loop.
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='parallel_for_blocked_verbose'></a>parallel_for_blocked_verbose</b> <font face='Lucida Console'>(</font>
+        thread_pool<font color='#5555FF'>&amp;</font> tp,
+        <font color='#0000FF'><u>long</u></font> begin,
+        <font color='#0000FF'><u>long</u></font> end,
+        T<font color='#5555FF'>&amp;</font> obj,
+        <font color='#0000FF'><u>void</u></font> <font face='Lucida Console'>(</font>T::<font color='#5555FF'>*</font>funct<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font>,<font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font>,
+        <font color='#0000FF'><u>long</u></font> chunks_per_thread <font color='#5555FF'>=</font> <font color='#979000'>8</font>
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - begin &lt;= end
+            - chunks_per_thread &gt; 0
+            - funct does not throw any exceptions
+        ensures
+            - This function is identical to the parallel_for_blocked() routine defined
+              above except that it will print messages to cout showing the progress in
+              executing the parallel for loop.
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='parallel_for_blocked_verbose'></a>parallel_for_blocked_verbose</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> num_threads,
+        <font color='#0000FF'><u>long</u></font> begin,
+        <font color='#0000FF'><u>long</u></font> end,
+        T<font color='#5555FF'>&amp;</font> obj,
+        <font color='#0000FF'><u>void</u></font> <font face='Lucida Console'>(</font>T::<font color='#5555FF'>*</font>funct<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font>,<font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font>,
+        <font color='#0000FF'><u>long</u></font> chunks_per_thread <font color='#5555FF'>=</font> <font color='#979000'>8</font>
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - begin &lt;= end
+            - chunks_per_thread &gt; 0
+            - funct does not throw any exceptions
+        ensures
+            - This function is identical to the parallel_for_blocked() routine defined
+              above except that it will print messages to cout showing the progress in
+              executing the parallel for loop.
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='parallel_for_blocked_verbose'></a>parallel_for_blocked_verbose</b> <font face='Lucida Console'>(</font>
+        thread_pool<font color='#5555FF'>&amp;</font> tp,
+        <font color='#0000FF'><u>long</u></font> begin,
+        <font color='#0000FF'><u>long</u></font> end,
+        <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> funct,
+        <font color='#0000FF'><u>long</u></font> chunks_per_thread <font color='#5555FF'>=</font> <font color='#979000'>8</font>
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - begin &lt;= end
+            - chunks_per_thread &gt; 0
+            - funct does not throw any exceptions
+        ensures
+            - This function is identical to the parallel_for_blocked() routine defined
+              above except that it will print messages to cout showing the progress in
+              executing the parallel for loop.
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='parallel_for_blocked_verbose'></a>parallel_for_blocked_verbose</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> num_threads,
+        <font color='#0000FF'><u>long</u></font> begin,
+        <font color='#0000FF'><u>long</u></font> end,
+        <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> funct,
+        <font color='#0000FF'><u>long</u></font> chunks_per_thread <font color='#5555FF'>=</font> <font color='#979000'>8</font>
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - begin &lt;= end
+            - chunks_per_thread &gt; 0
+            - funct does not throw any exceptions
+        ensures
+            - This function is identical to the parallel_for_blocked() routine defined
+              above except that it will print messages to cout showing the progress in
+              executing the parallel for loop.
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_PARALLEL_FoR_ABSTRACT_Hh_
+</font>
+
+
+</pre></body></html>

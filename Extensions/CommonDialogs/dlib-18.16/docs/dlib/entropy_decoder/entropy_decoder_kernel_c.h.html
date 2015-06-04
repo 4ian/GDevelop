@@ -1,0 +1,126 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - entropy_decoder_kernel_c.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2003  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_ENTROPY_DECODER_KERNEl_C_
+<font color='#0000FF'>#define</font> DLIB_ENTROPY_DECODER_KERNEl_C_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='entropy_decoder_kernel_abstract.h.html'>entropy_decoder_kernel_abstract.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../algs.h.html'>../algs.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../assert.h.html'>../assert.h</a>"
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>iostream<font color='#5555FF'>&gt;</font>
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> decoder
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>class</font> <b><a name='entropy_decoder_kernel_c'></a>entropy_decoder_kernel_c</b> : <font color='#0000FF'>public</font> decoder
+    <b>{</b>
+        
+        <font color='#0000FF'>public</font>:
+            std::istream<font color='#5555FF'>&amp;</font> <b><a name='get_stream'></a>get_stream</b> <font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+            <font color='#0000FF'><u>void</u></font> <b><a name='decode'></a>decode</b> <font face='Lucida Console'>(</font>
+                uint32 low_count,
+                uint32 high_count
+            <font face='Lucida Console'>)</font>;
+
+            uint32 <b><a name='get_target'></a>get_target</b> <font face='Lucida Console'>(</font>
+                uint32 total
+            <font face='Lucida Console'>)</font>;
+
+    <font color='#0000FF'>private</font>:
+        uint32 _get_target;
+        uint32 TOTAL;
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>    <font color='#009900'>// member function definitions
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> decoder
+        <font color='#5555FF'>&gt;</font>
+    std::istream<font color='#5555FF'>&amp;</font> entropy_decoder_kernel_c<font color='#5555FF'>&lt;</font>decoder<font color='#5555FF'>&gt;</font>::
+    <b><a name='get_stream'></a>get_stream</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        <font color='#009900'>// make sure requires clause is not broken
+</font>        <font color='#BB00BB'>DLIB_CASSERT</font><font face='Lucida Console'>(</font> <font color='#0000FF'>this</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>stream_is_set</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>true</font>,
+            "<font color='#CC0000'>\tstd::istream&amp; entropy_decoder::get_stream()</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tyou must set a stream for this object before you can get it</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tthis: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font>
+            <font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// call the real function
+</font>        <font color='#0000FF'>return</font> decoder::<font color='#BB00BB'>get_stream</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> decoder
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> entropy_decoder_kernel_c<font color='#5555FF'>&lt;</font>decoder<font color='#5555FF'>&gt;</font>::
+    <b><a name='decode'></a>decode</b> <font face='Lucida Console'>(</font>
+        uint32 low_count,
+        uint32 high_count
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#009900'>// make sure requires clause is not broken
+</font>        <font color='#BB00BB'>DLIB_CASSERT</font><font face='Lucida Console'>(</font> <font face='Lucida Console'>(</font>low_count <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> _get_target<font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> <font face='Lucida Console'>(</font>_get_target <font color='#5555FF'>&lt;</font> high_count<font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> 
+                <font face='Lucida Console'>(</font>high_count <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> TOTAL<font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font>
+                <font face='Lucida Console'>(</font><font color='#0000FF'>this</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>stream_is_set</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>true</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> <font face='Lucida Console'>(</font><font color='#0000FF'>this</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>get_target_called</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>true</font><font face='Lucida Console'>)</font>,
+            "<font color='#CC0000'>\tvoid entropy_decoder::decode()</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tRefer to the ensures clause for this function for further information.</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tNote that _get_target refers to get_target(TOTAL)</font>" 
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tthis:                </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font>
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tlow_count:           </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> low_count
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\thigh_count:          </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> high_count
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tTOTAL:               </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> TOTAL
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tget_target(TOTAL):   </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> _get_target
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tis_stream_set():     </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font face='Lucida Console'>(</font><font color='#0000FF'>this</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>stream_is_set</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> ? "<font color='#CC0000'>true</font>" : "<font color='#CC0000'>false</font>" <font face='Lucida Console'>)</font>
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tget_target_called(): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font face='Lucida Console'>(</font><font color='#0000FF'>this</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>get_target_called</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> ? "<font color='#CC0000'>true</font>" : "<font color='#CC0000'>false</font>" <font face='Lucida Console'>)</font>
+            <font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// call the real function
+</font>        decoder::<font color='#BB00BB'>decode</font><font face='Lucida Console'>(</font>low_count,high_count<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> decoder
+        <font color='#5555FF'>&gt;</font>
+    uint32 entropy_decoder_kernel_c<font color='#5555FF'>&lt;</font>decoder<font color='#5555FF'>&gt;</font>::
+    <b><a name='get_target'></a>get_target</b> <font face='Lucida Console'>(</font>
+        uint32 total
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#009900'>// make sure requires clause is not broken
+</font>        <font color='#BB00BB'>DLIB_CASSERT</font><font face='Lucida Console'>(</font> <font face='Lucida Console'>(</font>total <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> <font face='Lucida Console'>(</font>total <font color='#5555FF'>&lt;</font> <font color='#979000'>65536</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> <font face='Lucida Console'>(</font><font color='#0000FF'>this</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>stream_is_set</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>true</font><font face='Lucida Console'>)</font>,
+            "<font color='#CC0000'>\tvoid entropy_decoder::get_target()</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tyou must set a stream for this object before you can get the </font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\rnext target.</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tthis: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font>
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\ttotal: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> total
+            <font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// call the real function
+</font>        _get_target <font color='#5555FF'>=</font> decoder::<font color='#BB00BB'>get_target</font><font face='Lucida Console'>(</font>total<font face='Lucida Console'>)</font>;
+        TOTAL <font color='#5555FF'>=</font> total;
+        <font color='#0000FF'>return</font> _get_target;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_ENTROPY_ENCODER_KERNEl_C_
+</font>
+
+</pre></body></html>

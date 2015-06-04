@@ -1,0 +1,65 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - enable_if.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright 2003 (C) The Trustees of Indiana University.
+</font><font color='#009900'>// Use, modification, and distribution is subject to the Boost Software
+</font><font color='#009900'>// License, Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
+</font><font color='#009900'>// http://www.boost.org/LICENSE_1_0.txt)
+</font><font color='#009900'>//    Authors: Jaakko Jarvi (jajarvi at osl.iu.edu)
+</font><font color='#009900'>//             Jeremiah Willcock (jewillco at osl.iu.edu)
+</font><font color='#009900'>//             Andrew Lumsdaine (lums at osl.iu.edu)
+</font><font color='#0000FF'>#ifndef</font> DLIB_BOOST_UTILITY_ENABLE_IF_HPP
+<font color='#0000FF'>#define</font> DLIB_BOOST_UTILITY_ENABLE_IF_HPP
+
+<font color='#0000FF'>namespace</font> dlib 
+<b>{</b>
+ 
+  <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'><u>bool</u></font> B, <font color='#0000FF'>class</font> <b><a name='T'></a>T</b> <font color='#5555FF'>=</font> <font color='#0000FF'><u>void</u></font><font color='#5555FF'>&gt;</font>
+  <font color='#0000FF'>struct</font> <b><a name='enable_if_c'></a>enable_if_c</b> <b>{</b>
+    <font color='#0000FF'>typedef</font> T type;
+  <b>}</b>;
+
+  <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>class</font> <b><a name='T'></a>T</b><font color='#5555FF'>&gt;</font>
+  <font color='#0000FF'>struct</font> <b><a name='enable_if_c'></a>enable_if_c</b><font color='#5555FF'>&lt;</font><font color='#979000'>false</font>, T<font color='#5555FF'>&gt;</font> <b>{</b><b>}</b>;
+
+  <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>class</font> <b><a name='Cond'></a>Cond</b>, <font color='#0000FF'>class</font> <b><a name='T'></a>T</b> <font color='#5555FF'>=</font> <font color='#0000FF'><u>void</u></font><font color='#5555FF'>&gt;</font> 
+  <font color='#0000FF'>struct</font> <b><a name='enable_if'></a>enable_if</b> : <font color='#0000FF'>public</font> enable_if_c<font color='#5555FF'>&lt;</font>Cond::value, T<font color='#5555FF'>&gt;</font> <b>{</b><b>}</b>;
+
+  <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'><u>bool</u></font> B, <font color='#0000FF'>class</font> <b><a name='T'></a>T</b><font color='#5555FF'>&gt;</font>
+  <font color='#0000FF'>struct</font> <b><a name='lazy_enable_if_c'></a>lazy_enable_if_c</b> <b>{</b>
+    <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> T::type type;
+  <b>}</b>;
+
+  <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>class</font> <b><a name='T'></a>T</b><font color='#5555FF'>&gt;</font>
+  <font color='#0000FF'>struct</font> <b><a name='lazy_enable_if_c'></a>lazy_enable_if_c</b><font color='#5555FF'>&lt;</font><font color='#979000'>false</font>, T<font color='#5555FF'>&gt;</font> <b>{</b><b>}</b>;
+
+  <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>class</font> <b><a name='Cond'></a>Cond</b>, <font color='#0000FF'>class</font> <b><a name='T'></a>T</b><font color='#5555FF'>&gt;</font> 
+  <font color='#0000FF'>struct</font> <b><a name='lazy_enable_if'></a>lazy_enable_if</b> : <font color='#0000FF'>public</font> lazy_enable_if_c<font color='#5555FF'>&lt;</font>Cond::value, T<font color='#5555FF'>&gt;</font> <b>{</b><b>}</b>;
+
+
+  <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'><u>bool</u></font> B, <font color='#0000FF'>class</font> <b><a name='T'></a>T</b> <font color='#5555FF'>=</font> <font color='#0000FF'><u>void</u></font><font color='#5555FF'>&gt;</font>
+  <font color='#0000FF'>struct</font> <b><a name='disable_if_c'></a>disable_if_c</b> <b>{</b>
+    <font color='#0000FF'>typedef</font> T type;
+  <b>}</b>;
+
+  <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>class</font> <b><a name='T'></a>T</b><font color='#5555FF'>&gt;</font>
+  <font color='#0000FF'>struct</font> <b><a name='disable_if_c'></a>disable_if_c</b><font color='#5555FF'>&lt;</font><font color='#979000'>true</font>, T<font color='#5555FF'>&gt;</font> <b>{</b><b>}</b>;
+
+  <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>class</font> <b><a name='Cond'></a>Cond</b>, <font color='#0000FF'>class</font> <b><a name='T'></a>T</b> <font color='#5555FF'>=</font> <font color='#0000FF'><u>void</u></font><font color='#5555FF'>&gt;</font> 
+  <font color='#0000FF'>struct</font> <b><a name='disable_if'></a>disable_if</b> : <font color='#0000FF'>public</font> disable_if_c<font color='#5555FF'>&lt;</font>Cond::value, T<font color='#5555FF'>&gt;</font> <b>{</b><b>}</b>;
+
+  <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'><u>bool</u></font> B, <font color='#0000FF'>class</font> <b><a name='T'></a>T</b><font color='#5555FF'>&gt;</font>
+  <font color='#0000FF'>struct</font> <b><a name='lazy_disable_if_c'></a>lazy_disable_if_c</b> <b>{</b>
+    <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> T::type type;
+  <b>}</b>;
+
+  <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>class</font> <b><a name='T'></a>T</b><font color='#5555FF'>&gt;</font>
+  <font color='#0000FF'>struct</font> <b><a name='lazy_disable_if_c'></a>lazy_disable_if_c</b><font color='#5555FF'>&lt;</font><font color='#979000'>true</font>, T<font color='#5555FF'>&gt;</font> <b>{</b><b>}</b>;
+
+  <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>class</font> <b><a name='Cond'></a>Cond</b>, <font color='#0000FF'>class</font> <b><a name='T'></a>T</b><font color='#5555FF'>&gt;</font> 
+  <font color='#0000FF'>struct</font> <b><a name='lazy_disable_if'></a>lazy_disable_if</b> : <font color='#0000FF'>public</font> lazy_disable_if_c<font color='#5555FF'>&lt;</font>Cond::value, T<font color='#5555FF'>&gt;</font> <b>{</b><b>}</b>;
+
+<b>}</b> <font color='#009900'>// namespace dlib 
+</font>
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_BOOST_UTILITY_ENABLE_IF_HPP
+</font>
+
+</pre></body></html>

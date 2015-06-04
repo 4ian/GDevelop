@@ -1,0 +1,525 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - bigint.cpp</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2003  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font>
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>sstream<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>string<font color='#5555FF'>&gt;</font>
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>bigint.h<font color='#5555FF'>&gt;</font>
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='tester.h.html'>tester.h</a>"
+
+<font color='#0000FF'>namespace</font>  
+<b>{</b>
+    <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> test;
+    <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> dlib;
+    <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> std;
+
+    logger <b><a name='dlog'></a>dlog</b><font face='Lucida Console'>(</font>"<font color='#CC0000'>test.bigint</font>"<font face='Lucida Console'>)</font>;
+
+    <font color='#0000FF'>namespace</font> bigint_kernel_test_helpers 
+    <b>{</b>
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'>typename</font> bint
+            <font color='#5555FF'>&gt;</font>
+        bint <b><a name='short_fact'></a>short_fact</b> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>short</u></font> value<font face='Lucida Console'>)</font>
+        <font color='#009900'>/*!
+            ensures
+                - returns the factorial of value
+        !*/</font>
+        <b>{</b>
+            <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> relational_operators;
+
+            bint a <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>short</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>2</font>; i <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> value; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                a <font color='#5555FF'>*</font><font color='#5555FF'>=</font> i;
+
+            <font color='#0000FF'>return</font> a;
+        <b>}</b>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'>typename</font> bint
+            <font color='#5555FF'>&gt;</font>
+        bint <b><a name='short_fact_squared'></a>short_fact_squared</b> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>short</u></font> value<font face='Lucida Console'>)</font>
+        <font color='#009900'>/*!
+            ensures
+                - returns the square of the factorial of value
+        !*/</font>
+        <b>{</b>
+            <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> relational_operators;
+
+            bint a <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>short</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>2</font>; i <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> value; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                a <font color='#5555FF'>*</font><font color='#5555FF'>=</font> i;
+                a <font color='#5555FF'>*</font><font color='#5555FF'>=</font> i;
+            <b>}</b>
+
+            <font color='#0000FF'>return</font> a;
+        <b>}</b>
+
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'>typename</font> bint
+            <font color='#5555FF'>&gt;</font>
+        bint <b><a name='big_fact'></a>big_fact</b> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>short</u></font> value<font face='Lucida Console'>)</font>
+        <font color='#009900'>/*!
+            ensures
+                - returns the factorial of value
+        !*/</font>
+        <b>{</b>
+            <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> relational_operators;
+
+            bint a <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+            <font color='#0000FF'><u>int</u></font> k <font color='#5555FF'>=</font> <font color='#979000'>0</font>; 
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>bint i <font color='#5555FF'>=</font> <font color='#979000'>2</font>; i <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> value; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#5555FF'>+</font><font color='#5555FF'>+</font>k;
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>k<font color='#5555FF'>%</font><font color='#979000'>10</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                    <font color='#BB00BB'>print_spinner</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                a <font color='#5555FF'>*</font><font color='#5555FF'>=</font> i;
+            <b>}</b>
+
+            <font color='#0000FF'>return</font> a;
+        <b>}</b>        
+    <b>}</b>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> bint
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='bigint_kernel_test'></a>bigint_kernel_test</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font>
+    <font color='#009900'>/*!
+        requires
+            - bint is an implementation of bigint/bigint_kernel_abstract.h
+        ensures
+            - runs tests on bint for compliance with the specs 
+    !*/</font>
+    <b>{</b>        
+        <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> bigint_kernel_test_helpers;
+        <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> relational_operators;
+        istringstream sin;
+        ostringstream sout;
+
+        bint i <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        bint <font color='#BB00BB'>a</font><font face='Lucida Console'>(</font><font color='#979000'>5</font><font face='Lucida Console'>)</font>, b, <font color='#BB00BB'>c</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#979000'>5</font> <font color='#5555FF'>-</font> a <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>a <font color='#5555FF'>-</font> <font color='#979000'>5</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#979000'>0</font> <font color='#5555FF'>-</font> c <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>c <font color='#5555FF'>-</font> <font color='#979000'>0</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#979000'>0</font> <font color='#5555FF'>+</font> c <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>c <font color='#5555FF'>+</font> <font color='#979000'>0</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#979000'>0</font> <font color='#5555FF'>+</font> a <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>5</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>a <font color='#5555FF'>+</font> <font color='#979000'>0</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>5</font><font face='Lucida Console'>)</font>;
+
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#979000'>0</font> <font color='#5555FF'>-</font> b <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>b <font color='#5555FF'>-</font> <font color='#979000'>0</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#979000'>0</font> <font color='#5555FF'>+</font> b <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>b <font color='#5555FF'>+</font> <font color='#979000'>0</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>i <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>a <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>5</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>b <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>c <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+
+
+
+        a <font color='#5555FF'>-</font><font color='#5555FF'>=</font> <font color='#979000'>5</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>a <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+
+
+
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> k <font color='#5555FF'>=</font> <font color='#979000'>0</font>; k <font color='#5555FF'>&lt;</font> <font color='#979000'>100</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>k<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#009900'>// compute the factorial of k using the O(n) multiplication algorithm
+</font>            a <font color='#5555FF'>=</font> short_fact<font color='#5555FF'>&lt;</font>bint<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>k<font face='Lucida Console'>)</font>;
+            <font color='#009900'>// compute the factorial of k using the full blown big int 
+</font>            <font color='#009900'>// multiplication algorithm.
+</font>            b <font color='#5555FF'>=</font> big_fact<font color='#5555FF'>&lt;</font>bint<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>k<font face='Lucida Console'>)</font>;
+            <font color='#009900'>// compute the square of the factorial of k using the full blown
+</font>            <font color='#009900'>// big int multiplication algorithm.
+</font>            c <font color='#5555FF'>=</font> a<font color='#5555FF'>*</font>b;
+            <font color='#009900'>// make sure a and b ended up being the same number
+</font>            <font color='#BB00BB'>DLIB_TEST_MSG</font><font face='Lucida Console'>(</font>a <font color='#5555FF'>=</font><font color='#5555FF'>=</font> b,
+                         "<font color='#CC0000'>k: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> k <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n</font>"
+                         "<font color='#CC0000'>short_fact: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> a <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n</font>"
+                         "<font color='#CC0000'>big_fact: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> b 
+            <font face='Lucida Console'>)</font>;
+            <font color='#009900'>// make sure c really is the square of the factorial of k
+</font>            <font color='#BB00BB'>DLIB_TEST_MSG</font><font face='Lucida Console'>(</font>short_fact_squared<font color='#5555FF'>&lt;</font>bint<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>k<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> c,"<font color='#CC0000'>k: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> k<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>print_spinner</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#009900'>// do the same thing as the last loop but do it with way bigger numbers
+</font>        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> k <font color='#5555FF'>=</font> <font color='#979000'>1000</font>; k <font color='#5555FF'>&lt;</font> <font color='#979000'>10000</font>; k <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#979000'>2000</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            bint a <font color='#5555FF'>=</font> short_fact<font color='#5555FF'>&lt;</font>bint<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>k<font face='Lucida Console'>)</font>;
+            bint b <font color='#5555FF'>=</font> big_fact<font color='#5555FF'>&lt;</font>bint<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>k<font face='Lucida Console'>)</font>;
+            bint c <font color='#5555FF'>=</font> a<font color='#5555FF'>*</font>b;
+            <font color='#BB00BB'>DLIB_TEST_MSG</font><font face='Lucida Console'>(</font>a <font color='#5555FF'>=</font><font color='#5555FF'>=</font> b,
+                         "<font color='#CC0000'>k: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> k <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n</font>"
+                         "<font color='#CC0000'>short_fact: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> a <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n</font>"
+                         "<font color='#CC0000'>big_fact: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> b 
+            <font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST_MSG</font><font face='Lucida Console'>(</font>short_fact_squared<font color='#5555FF'>&lt;</font>bint<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>k<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> c,"<font color='#CC0000'>k: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> k<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>print_spinner</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+
+
+        <font color='#009900'>// test the &lt;&lt; and &gt;&gt; operators a little
+</font>        a <font color='#5555FF'>=</font> big_fact<font color='#5555FF'>&lt;</font>bint<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#979000'>20</font><font face='Lucida Console'>)</font>;
+        sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> a;
+        <font color='#BB00BB'>DLIB_TEST_MSG</font><font face='Lucida Console'>(</font> sout.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'>2432902008176640000</font>","<font color='#CC0000'>was: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> a<font face='Lucida Console'>)</font>;
+
+        sin.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>684626312793279327952039475203945</font>"<font face='Lucida Console'>)</font>;
+        sin <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font> a;
+        sout.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font>"<font color='#CC0000'></font>"<font face='Lucida Console'>)</font>;
+        sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> a;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>sout.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'>684626312793279327952039475203945</font>"<font face='Lucida Console'>)</font>;
+
+        <font color='#BB00BB'>print_spinner</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>a <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+
+
+        <font color='#009900'>// make sure that when you try to read something that isn't a number
+</font>        <font color='#009900'>// into a bigint you get an error
+</font>        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>sin.<font color='#BB00BB'>fail</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font><font face='Lucida Console'>)</font>;
+        sin.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>the cat ate some cheese</font>"<font face='Lucida Console'>)</font>;
+        sin <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font> a;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>sin.<font color='#BB00BB'>fail</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>true</font><font face='Lucida Console'>)</font>;
+        sin.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        sin.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font>"<font color='#CC0000'></font>"<font face='Lucida Console'>)</font>;
+
+
+
+        sin.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>3628913</font>"<font face='Lucida Console'>)</font>;
+        sin <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font> i;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>short_fact<font color='#5555FF'>&lt;</font>bint<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#979000'>10</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> short_fact<font color='#5555FF'>&lt;</font>bint<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#979000'>5</font><font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> <font color='#979000'>7</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> i<font face='Lucida Console'>)</font>;
+
+        sin.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>2432902008173011193</font>"<font face='Lucida Console'>)</font>;
+        sin <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font> i;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>short_fact<font color='#5555FF'>&lt;</font>bint<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#979000'>20</font><font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> short_fact<font color='#5555FF'>&lt;</font>bint<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#979000'>10</font><font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> <font color='#979000'>7</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> i<font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// test the serialization stuff
+</font>        sout.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font>"<font color='#CC0000'></font>"<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>i,sout<font face='Lucida Console'>)</font>;
+        i <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        sin.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font>sout.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>i,sin<font face='Lucida Console'>)</font>;
+
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>short_fact<font color='#5555FF'>&lt;</font>bint<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#979000'>20</font><font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> short_fact<font color='#5555FF'>&lt;</font>bint<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#979000'>10</font><font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> <font color='#979000'>7</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> i<font face='Lucida Console'>)</font>;
+
+
+
+
+        <font color='#BB00BB'>print_spinner</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+
+
+
+        sin.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>100000</font>"<font face='Lucida Console'>)</font>;
+        sin <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font> b;
+        a <font color='#5555FF'>=</font> b;
+        <font color='#5555FF'>+</font><font color='#5555FF'>+</font>b;
+        <font color='#BB00BB'>DLIB_TEST_MSG</font> <font face='Lucida Console'>(</font> a <font color='#5555FF'>+</font> <font color='#979000'>1</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> b,"<font color='#CC0000'>a==</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> a <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>b==</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> b <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl<font face='Lucida Console'>)</font>;
+
+
+
+
+
+        <font color='#009900'>// compute some stuff and see if you get the right value
+</font>        a <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        b <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        sin.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>1000000</font>"<font face='Lucida Console'>)</font>;
+        sin <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font> b;
+        <font color='#0000FF'><u>int</u></font> mel <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>i <font color='#5555FF'>=</font> a; i <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> b; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#009900'>// switch it up on em
+</font>            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>i<font color='#5555FF'>%</font><font color='#979000'>2</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                a <font color='#5555FF'>=</font> a <font color='#5555FF'>+</font> i;
+            <font color='#0000FF'>else</font>
+                a <font color='#5555FF'>+</font><font color='#5555FF'>=</font> i;          
+            <font color='#5555FF'>+</font><font color='#5555FF'>+</font>mel;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>mel<font color='#5555FF'>&amp;</font><font color='#979000'>0xFFF</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                <font color='#BB00BB'>print_spinner</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+        <font color='#BB00BB'>DLIB_TEST_MSG</font><font face='Lucida Console'>(</font>a <font color='#5555FF'>=</font><font color='#5555FF'>=</font> b<font color='#5555FF'>*</font><font face='Lucida Console'>(</font>b<font color='#5555FF'>+</font><font color='#979000'>1</font><font face='Lucida Console'>)</font><font color='#5555FF'>/</font><font color='#979000'>2</font>, "<font color='#CC0000'>a==</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> a <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>b*(b+1)/2==</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> b<font color='#5555FF'>*</font><font face='Lucida Console'>(</font>b<font color='#5555FF'>+</font><font color='#979000'>1</font><font face='Lucida Console'>)</font><font color='#5555FF'>/</font><font color='#979000'>2</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl<font face='Lucida Console'>)</font>;
+
+
+
+
+
+
+        <font color='#BB00BB'>print_spinner</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+
+        <font color='#009900'>// compute some stuff and see if you get the right value
+</font>        <font color='#009900'>// this time going the other way using operator--
+</font>        a <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        b <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        sin.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>100000</font>"<font face='Lucida Console'>)</font>;
+        sin <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font> b;
+        i <font color='#5555FF'>=</font> b;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>i <font color='#5555FF'>=</font><font color='#5555FF'>=</font> b<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST_MSG</font><font face='Lucida Console'>(</font>i <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font>,"<font color='#CC0000'>i==</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> i<font face='Lucida Console'>)</font>;
+        mel <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>i <font color='#5555FF'>=</font> b; i <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font>; <font color='#5555FF'>-</font><font color='#5555FF'>-</font>i<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#009900'>// switch it up on em
+</font>            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>i<font color='#5555FF'>%</font><font color='#979000'>2</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                a <font color='#5555FF'>=</font> a <font color='#5555FF'>+</font> i;
+            <font color='#0000FF'>else</font>
+                a <font color='#5555FF'>+</font><font color='#5555FF'>=</font> i;  
+            <font color='#5555FF'>+</font><font color='#5555FF'>+</font>mel;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>mel<font color='#5555FF'>&amp;</font><font color='#979000'>0xFF</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                <font color='#BB00BB'>print_spinner</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+        <font color='#BB00BB'>DLIB_TEST_MSG</font><font face='Lucida Console'>(</font>a <font color='#5555FF'>=</font><font color='#5555FF'>=</font> b<font color='#5555FF'>*</font><font face='Lucida Console'>(</font>b<font color='#5555FF'>+</font><font color='#979000'>1</font><font face='Lucida Console'>)</font><font color='#5555FF'>/</font><font color='#979000'>2</font>, "<font color='#CC0000'>a==</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> a <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>b*(b+1)/2==</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> b<font color='#5555FF'>*</font><font face='Lucida Console'>(</font>b<font color='#5555FF'>+</font><font color='#979000'>1</font><font face='Lucida Console'>)</font><font color='#5555FF'>/</font><font color='#979000'>2</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl<font face='Lucida Console'>)</font>;
+
+
+
+
+
+
+
+
+
+
+
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>short_fact<font color='#5555FF'>&lt;</font>bint<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#979000'>10</font><font face='Lucida Console'>)</font><font color='#5555FF'>/</font>short_fact<font color='#5555FF'>&lt;</font>bint<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#979000'>5</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>30240</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>short_fact<font color='#5555FF'>&lt;</font>bint<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#979000'>10</font><font face='Lucida Console'>)</font><font color='#5555FF'>/</font><font face='Lucida Console'>(</font>short_fact<font color='#5555FF'>&lt;</font>bint<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#979000'>5</font><font face='Lucida Console'>)</font><font color='#5555FF'>+</font><font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>29990</font><font face='Lucida Console'>)</font>;
+
+        sin.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>221172909834240000</font>"<font face='Lucida Console'>)</font>;
+        sin <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font> a;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>short_fact<font color='#5555FF'>&lt;</font>bint<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#979000'>20</font><font face='Lucida Console'>)</font><font color='#5555FF'>/</font><font face='Lucida Console'>(</font>short_fact<font color='#5555FF'>&lt;</font>bint<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#979000'>5</font><font face='Lucida Console'>)</font><font color='#5555FF'>+</font><font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> a<font color='#5555FF'>/</font><font color='#979000'>11</font><font face='Lucida Console'>)</font>;
+
+        sin.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>670442388044</font>"<font face='Lucida Console'>)</font>;
+        sin <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font> b;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>short_fact<font color='#5555FF'>&lt;</font>bint<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#979000'>20</font><font face='Lucida Console'>)</font><font color='#5555FF'>/</font><font face='Lucida Console'>(</font>short_fact<font color='#5555FF'>&lt;</font>bint<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#979000'>10</font><font face='Lucida Console'>)</font><font color='#5555FF'>+</font><font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> b<font face='Lucida Console'>)</font>;
+
+        <font color='#BB00BB'>print_spinner</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+        sin.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>1860479</font>"<font face='Lucida Console'>)</font>;
+        sin <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font> i;
+        <font color='#BB00BB'>DLIB_TEST_MSG</font><font face='Lucida Console'>(</font>short_fact<font color='#5555FF'>&lt;</font>bint<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#979000'>20</font><font face='Lucida Console'>)</font><font color='#5555FF'>/</font><font face='Lucida Console'>(</font>short_fact<font color='#5555FF'>&lt;</font>bint<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#979000'>15</font><font face='Lucida Console'>)</font><font color='#5555FF'>+</font><font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> i,short_fact<font color='#5555FF'>&lt;</font>bint<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#979000'>20</font><font face='Lucida Console'>)</font><font color='#5555FF'>/</font><font face='Lucida Console'>(</font>short_fact<font color='#5555FF'>&lt;</font>bint<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#979000'>15</font><font face='Lucida Console'>)</font><font color='#5555FF'>+</font><font color='#979000'>1</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// test the serialization stuff
+</font>        sout.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font>"<font color='#CC0000'></font>"<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>i,sout<font face='Lucida Console'>)</font>;
+        i <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        sin.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font>sout.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>i,sin<font face='Lucida Console'>)</font>;
+
+        <font color='#BB00BB'>DLIB_TEST_MSG</font><font face='Lucida Console'>(</font>short_fact<font color='#5555FF'>&lt;</font>bint<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#979000'>20</font><font face='Lucida Console'>)</font><font color='#5555FF'>/</font><font face='Lucida Console'>(</font>short_fact<font color='#5555FF'>&lt;</font>bint<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#979000'>15</font><font face='Lucida Console'>)</font><font color='#5555FF'>+</font><font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> i,short_fact<font color='#5555FF'>&lt;</font>bint<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#979000'>20</font><font face='Lucida Console'>)</font><font color='#5555FF'>/</font><font face='Lucida Console'>(</font>short_fact<font color='#5555FF'>&lt;</font>bint<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#979000'>15</font><font face='Lucida Console'>)</font><font color='#5555FF'>+</font><font color='#979000'>1</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+
+        <font color='#BB00BB'>print_spinner</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// test the serialization stuff
+</font>        sout.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font>"<font color='#CC0000'></font>"<font face='Lucida Console'>)</font>;
+        i <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>i,sout<font face='Lucida Console'>)</font>;
+        i <font color='#5555FF'>=</font> <font color='#979000'>1234</font>;
+        sin.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font>sout.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>i,sin<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>i <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+
+
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>short_fact<font color='#5555FF'>&lt;</font>bint<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#979000'>10000</font><font face='Lucida Console'>)</font><font color='#5555FF'>/</font>short_fact<font color='#5555FF'>&lt;</font>bint<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#979000'>9999</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>10000</font><font face='Lucida Console'>)</font>;
+
+
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>bint</font><font face='Lucida Console'>(</font><font color='#979000'>5</font><font face='Lucida Console'>)</font><font color='#5555FF'>%</font><font color='#BB00BB'>bint</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>bint</font><font face='Lucida Console'>(</font><font color='#979000'>5</font><font face='Lucida Console'>)</font><font color='#5555FF'>%</font><font color='#BB00BB'>bint</font><font face='Lucida Console'>(</font><font color='#979000'>6</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>5</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>bint</font><font face='Lucida Console'>(</font><font color='#979000'>25</font><font face='Lucida Console'>)</font><font color='#5555FF'>%</font><font color='#BB00BB'>bint</font><font face='Lucida Console'>(</font><font color='#979000'>6</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>print_spinner</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>bint</font><font face='Lucida Console'>(</font><font color='#979000'>354</font><font face='Lucida Console'>)</font><font color='#5555FF'>%</font><font color='#BB00BB'>bint</font><font face='Lucida Console'>(</font><font color='#979000'>123</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>108</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>bint</font><font face='Lucida Console'>(</font><font color='#979000'>20</font><font face='Lucida Console'>)</font><font color='#5555FF'>%</font><font face='Lucida Console'>(</font><font color='#BB00BB'>bint</font><font face='Lucida Console'>(</font><font color='#979000'>10</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>bint</font><font face='Lucida Console'>(</font><font color='#979000'>20</font><font face='Lucida Console'>)</font><font color='#5555FF'>%</font><font face='Lucida Console'>(</font><font color='#BB00BB'>bint</font><font face='Lucida Console'>(</font><font color='#979000'>10</font><font face='Lucida Console'>)</font><font color='#5555FF'>+</font><font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>9</font><font face='Lucida Console'>)</font>;
+
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>bint</font><font face='Lucida Console'>(</font><font color='#979000'>20</font><font face='Lucida Console'>)</font><font color='#5555FF'>%</font><font face='Lucida Console'>(</font><font color='#BB00BB'>bint</font><font face='Lucida Console'>(</font><font color='#979000'>15</font><font face='Lucida Console'>)</font><font color='#5555FF'>+</font><font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>4</font><font face='Lucida Console'>)</font>;
+
+
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>short_fact<font color='#5555FF'>&lt;</font>bint<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#979000'>10</font><font face='Lucida Console'>)</font><font color='#5555FF'>%</font><font face='Lucida Console'>(</font>short_fact<font color='#5555FF'>&lt;</font>bint<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#979000'>5</font><font face='Lucida Console'>)</font><font color='#5555FF'>+</font><font color='#979000'>2</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>32</font><font face='Lucida Console'>)</font>;
+
+        sin.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>2908082</font>"<font face='Lucida Console'>)</font>;
+        sin <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font> i;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>short_fact<font color='#5555FF'>&lt;</font>bint<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#979000'>15</font><font face='Lucida Console'>)</font><font color='#5555FF'>%</font><font face='Lucida Console'>(</font>short_fact<font color='#5555FF'>&lt;</font>bint<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#979000'>10</font><font face='Lucida Console'>)</font><font color='#5555FF'>+</font><font color='#979000'>2</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> i<font face='Lucida Console'>)</font>;
+
+
+
+
+
+
+        <font color='#009900'>// same as some of the above stuff but using big_fact
+</font>
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>big_fact<font color='#5555FF'>&lt;</font>bint<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#979000'>10</font><font face='Lucida Console'>)</font><font color='#5555FF'>%</font><font face='Lucida Console'>(</font>big_fact<font color='#5555FF'>&lt;</font>bint<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#979000'>5</font><font face='Lucida Console'>)</font><font color='#5555FF'>+</font><font color='#979000'>2</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>32</font><font face='Lucida Console'>)</font>;
+
+        sin.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>2908082</font>"<font face='Lucida Console'>)</font>;
+        sin <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font> i;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>big_fact<font color='#5555FF'>&lt;</font>bint<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#979000'>15</font><font face='Lucida Console'>)</font><font color='#5555FF'>%</font><font face='Lucida Console'>(</font>big_fact<font color='#5555FF'>&lt;</font>bint<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#979000'>10</font><font face='Lucida Console'>)</font><font color='#5555FF'>+</font><font color='#979000'>2</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> i<font face='Lucida Console'>)</font>;
+
+
+        <font color='#BB00BB'>print_spinner</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>big_fact<font color='#5555FF'>&lt;</font>bint<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#979000'>10</font><font face='Lucida Console'>)</font><font color='#5555FF'>/</font>big_fact<font color='#5555FF'>&lt;</font>bint<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#979000'>5</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>30240</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>big_fact<font color='#5555FF'>&lt;</font>bint<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#979000'>10</font><font face='Lucida Console'>)</font><font color='#5555FF'>/</font><font face='Lucida Console'>(</font>big_fact<font color='#5555FF'>&lt;</font>bint<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#979000'>5</font><font face='Lucida Console'>)</font><font color='#5555FF'>+</font><font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>29990</font><font face='Lucida Console'>)</font>;
+
+        sin.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>221172909834240000</font>"<font face='Lucida Console'>)</font>;
+        sin <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font> a;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>big_fact<font color='#5555FF'>&lt;</font>bint<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#979000'>20</font><font face='Lucida Console'>)</font><font color='#5555FF'>/</font><font face='Lucida Console'>(</font>big_fact<font color='#5555FF'>&lt;</font>bint<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#979000'>5</font><font face='Lucida Console'>)</font><font color='#5555FF'>+</font><font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> a<font color='#5555FF'>/</font><font color='#979000'>11</font><font face='Lucida Console'>)</font>;
+
+
+        sin.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>670442388044</font>"<font face='Lucida Console'>)</font>;
+        sin <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font> b;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>big_fact<font color='#5555FF'>&lt;</font>bint<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#979000'>20</font><font face='Lucida Console'>)</font><font color='#5555FF'>/</font><font face='Lucida Console'>(</font>big_fact<font color='#5555FF'>&lt;</font>bint<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#979000'>10</font><font face='Lucida Console'>)</font><font color='#5555FF'>+</font><font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> b<font face='Lucida Console'>)</font>;
+
+
+        sin.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>1860479</font>"<font face='Lucida Console'>)</font>;
+        sin <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font> i;
+        <font color='#BB00BB'>DLIB_TEST_MSG</font><font face='Lucida Console'>(</font>big_fact<font color='#5555FF'>&lt;</font>bint<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#979000'>20</font><font face='Lucida Console'>)</font><font color='#5555FF'>/</font><font face='Lucida Console'>(</font>big_fact<font color='#5555FF'>&lt;</font>bint<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#979000'>15</font><font face='Lucida Console'>)</font><font color='#5555FF'>+</font><font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> i,big_fact<font color='#5555FF'>&lt;</font>bint<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#979000'>20</font><font face='Lucida Console'>)</font><font color='#5555FF'>/</font><font face='Lucida Console'>(</font>big_fact<font color='#5555FF'>&lt;</font>bint<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#979000'>15</font><font face='Lucida Console'>)</font><font color='#5555FF'>+</font><font color='#979000'>1</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>big_fact<font color='#5555FF'>&lt;</font>bint<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#979000'>100</font><font face='Lucida Console'>)</font><font color='#5555FF'>/</font>big_fact<font color='#5555FF'>&lt;</font>bint<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#979000'>99</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>100</font><font face='Lucida Console'>)</font>;
+
+
+
+
+        sout.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font>"<font color='#CC0000'></font>"<font face='Lucida Console'>)</font>;
+        sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>148571596448176149730952273362082573788556996128468876694221686370498539309</font>";
+        sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>4065876545992131370884059645617234469978112000000000000000000000</font>";
+        sin.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font>sout.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        sin <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font> a;
+
+        sout.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font>"<font color='#CC0000'></font>"<font face='Lucida Console'>)</font>;
+        sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>933262154439441526816992388562667004907159682643816214685929638952175999932</font>";
+        sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>299156089414639761565182862536979208272237582511852109168640000000000000000</font>";
+        sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>000000</font>";
+        sin.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font>sout.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        sin <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font> b;
+
+
+        sout.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font>"<font color='#CC0000'></font>"<font face='Lucida Console'>)</font>;
+        sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>138656248189732152054159609718432247180282092567575172939636909224427929240</font>";
+        sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>834642263988043338170905744175653189424779336521852536242160190545537133916</font>";
+        sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>649622615351174407746524657461692702500613722228638559932561661493048332720</font>";
+        sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>6050692647868232055316807680000000000000000000000000000000000000000000</font>";
+        sin.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font>sout.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        sin <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font> c;
+
+        <font color='#BB00BB'>DLIB_TEST_MSG</font><font face='Lucida Console'>(</font>a<font color='#5555FF'>*</font>b <font color='#5555FF'>=</font><font color='#5555FF'>=</font> c,
+                     "<font color='#CC0000'>a*b: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> a<font color='#5555FF'>*</font>b <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font>
+                     "<font color='#CC0000'>\nc:   </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> c<font face='Lucida Console'>)</font>;
+
+
+        <font color='#BB00BB'>print_spinner</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+        i <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        mel <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> j;
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>j <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> <font color='#BB00BB'>bint</font><font face='Lucida Console'>(</font><font color='#979000'>100000</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>j<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>i<font color='#5555FF'>+</font><font color='#5555FF'>+</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#BB00BB'>bint</font><font face='Lucida Console'>(</font>j<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <font color='#5555FF'>+</font><font color='#5555FF'>+</font>mel;
+            <font color='#0000FF'>if</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>mel<font color='#5555FF'>&amp;</font><font color='#979000'>0xFF</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                <font color='#BB00BB'>print_spinner</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>j <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>100000</font><font face='Lucida Console'>)</font>;
+
+        i <font color='#5555FF'>=</font> <font color='#979000'>1234</font>;
+
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>i <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>1234</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>i <font color='#5555FF'>&lt;</font> <font color='#979000'>2345</font> <font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>i <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font>    <font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>i <font color='#5555FF'>&gt;</font> <font color='#979000'>123</font>  <font face='Lucida Console'>)</font>;
+
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>i <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>1334</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>i <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#979000'>2345</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>i <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#979000'>0</font>   <font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>i <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#979000'>123</font> <font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>i <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#979000'>1234</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>i <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#979000'>1234</font><font face='Lucida Console'>)</font>;
+
+
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#979000'>1234</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> i<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#979000'>2345</font> <font color='#5555FF'>&gt;</font> i<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>    <font color='#5555FF'>&lt;</font> i<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#979000'>123</font>  <font color='#5555FF'>&lt;</font> i<font face='Lucida Console'>)</font>;
+
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#979000'>1334</font> <font color='#5555FF'>!</font><font color='#5555FF'>=</font> i<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#979000'>2345</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> i<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>    <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> i<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#979000'>123</font>  <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> i<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#979000'>1234</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> i<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#979000'>1234</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> i<font face='Lucida Console'>)</font>;
+
+
+        a <font color='#5555FF'>=</font> big_fact<font color='#5555FF'>&lt;</font>bint<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#979000'>200</font><font face='Lucida Console'>)</font>;
+        b <font color='#5555FF'>=</font> big_fact<font color='#5555FF'>&lt;</font>bint<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#979000'>100</font><font face='Lucida Console'>)</font>;
+
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>a <font color='#5555FF'>&gt;</font> b<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>a <font color='#5555FF'>!</font><font color='#5555FF'>=</font> b<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>b <font color='#5555FF'>&lt;</font> a<font face='Lucida Console'>)</font>;            
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>b <font color='#5555FF'>!</font><font color='#5555FF'>=</font> a<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>b <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> a<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>a <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> b<font face='Lucida Console'>)</font>;
+
+
+
+        a <font color='#5555FF'>=</font> <font color='#979000'>10000</font>;
+        a <font color='#5555FF'>=</font> a<font color='#5555FF'>*</font>a<font color='#5555FF'>*</font>a<font color='#5555FF'>*</font>a; a <font color='#5555FF'>=</font> a<font color='#5555FF'>*</font>a; a <font color='#5555FF'>=</font> a<font color='#5555FF'>*</font>a;
+        b <font color='#5555FF'>=</font> <font color='#979000'>2</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>a<font color='#5555FF'>/</font>b<font face='Lucida Console'>)</font><font color='#5555FF'>*</font>b <font color='#5555FF'>=</font><font color='#5555FF'>=</font> a<font face='Lucida Console'>)</font>;
+
+        a <font color='#5555FF'>=</font> <font color='#979000'>10000</font><font color='#5555FF'>*</font><font color='#979000'>5</font>;
+        a <font color='#5555FF'>=</font> a<font color='#5555FF'>*</font>a<font color='#5555FF'>*</font>a<font color='#5555FF'>*</font>a; a <font color='#5555FF'>=</font> a<font color='#5555FF'>*</font>a; a <font color='#5555FF'>=</font> a<font color='#5555FF'>*</font>a;
+        b <font color='#5555FF'>=</font> <font color='#979000'>5</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>a<font color='#5555FF'>/</font>b<font face='Lucida Console'>)</font><font color='#5555FF'>*</font>b <font color='#5555FF'>=</font><font color='#5555FF'>=</font> a<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+
+
+
+    <font color='#0000FF'>class</font> <b><a name='bigint_tester'></a>bigint_tester</b> : <font color='#0000FF'>public</font> tester
+    <b>{</b>
+    <font color='#0000FF'>public</font>:
+        <b><a name='bigint_tester'></a>bigint_tester</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> :
+            tester <font face='Lucida Console'>(</font>"<font color='#CC0000'>test_bigint</font>",
+                    "<font color='#CC0000'>Runs tests on the bigint component.</font>"<font face='Lucida Console'>)</font>
+        <b>{</b><b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='perform_test'></a>perform_test</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>testing kernel_1a</font>";
+            bigint_kernel_test<font color='#5555FF'>&lt;</font>bigint::kernel_1a<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>print_spinner</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            
+            dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>testing kernel_1a_c</font>";
+            bigint_kernel_test<font color='#5555FF'>&lt;</font>bigint::kernel_1a_c<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>print_spinner</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+            dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>testing kernel_2a</font>";
+            bigint_kernel_test<font color='#5555FF'>&lt;</font>bigint::kernel_2a<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>print_spinner</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+            dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>testing kernel_2a_c</font>";
+            bigint_kernel_test<font color='#5555FF'>&lt;</font>bigint::kernel_2a_c<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>print_spinner</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+        <b>}</b>
+    <b>}</b> a;
+
+<b>}</b>
+
+
+</pre></body></html>

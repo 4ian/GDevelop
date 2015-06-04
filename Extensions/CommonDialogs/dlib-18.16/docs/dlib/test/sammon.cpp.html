@@ -1,0 +1,214 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - sammon.cpp</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2012  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font>
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>sstream<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>string<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>cstdlib<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>ctime<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>cmath<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>statistics.h<font color='#5555FF'>&gt;</font>
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='tester.h.html'>tester.h</a>"
+
+<font color='#0000FF'>namespace</font>  
+<b>{</b>
+
+    <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> test;
+    <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> dlib;
+    <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> std;
+
+    logger <b><a name='dlog'></a>dlog</b><font face='Lucida Console'>(</font>"<font color='#CC0000'>test.sammon</font>"<font face='Lucida Console'>)</font>;
+
+
+    std::vector<font color='#5555FF'>&lt;</font>matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>4</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> <b><a name='make_test_data4'></a>make_test_data4</b><font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        std::vector<font color='#5555FF'>&lt;</font>matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>4</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> data;
+
+        matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>4</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> m;
+
+        m <font color='#5555FF'>=</font> <font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>, <font color='#979000'>0</font>; data.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>m<font face='Lucida Console'>)</font>;
+        m <font color='#5555FF'>=</font> <font color='#979000'>1</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>, <font color='#979000'>0</font>; data.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>m<font face='Lucida Console'>)</font>;
+        m <font color='#5555FF'>=</font> <font color='#979000'>0</font>,<font color='#979000'>1</font>,<font color='#979000'>0</font>, <font color='#979000'>0</font>; data.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>m<font face='Lucida Console'>)</font>;
+        m <font color='#5555FF'>=</font> <font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>1</font>, <font color='#979000'>0</font>; data.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>m<font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>return</font> data;
+    <b>}</b>
+
+    std::vector<font color='#5555FF'>&lt;</font>matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>3</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> <b><a name='make_test_data3'></a>make_test_data3</b><font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        std::vector<font color='#5555FF'>&lt;</font>matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>3</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> data;
+
+        matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>3</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> m;
+
+        m <font color='#5555FF'>=</font> <font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>; data.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>m<font face='Lucida Console'>)</font>;
+        m <font color='#5555FF'>=</font> <font color='#979000'>1</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>; data.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>m<font face='Lucida Console'>)</font>;
+        m <font color='#5555FF'>=</font> <font color='#979000'>0</font>,<font color='#979000'>1</font>,<font color='#979000'>0</font>; data.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>m<font face='Lucida Console'>)</font>;
+        m <font color='#5555FF'>=</font> <font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>1</font>; data.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>m<font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>return</font> data;
+    <b>}</b>
+
+    std::vector<font color='#5555FF'>&lt;</font>matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> <b><a name='make_test_data3d'></a>make_test_data3d</b><font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        std::vector<font color='#5555FF'>&lt;</font>matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> data;
+
+        matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>3</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> m;
+
+        m <font color='#5555FF'>=</font> <font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>; data.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>m<font face='Lucida Console'>)</font>;
+        m <font color='#5555FF'>=</font> <font color='#979000'>1</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>; data.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>m<font face='Lucida Console'>)</font>;
+        m <font color='#5555FF'>=</font> <font color='#979000'>0</font>,<font color='#979000'>1</font>,<font color='#979000'>0</font>; data.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>m<font face='Lucida Console'>)</font>;
+        m <font color='#5555FF'>=</font> <font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>1</font>; data.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>m<font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>return</font> data;
+    <b>}</b>
+
+
+    <font color='#0000FF'><u>void</u></font> <b><a name='runtest'></a>runtest</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+    <b>{</b>
+        sammon_projection s;
+        std::vector<font color='#5555FF'>&lt;</font>matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>, <font color='#979000'>0</font>, <font color='#979000'>1</font><font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font>  projs <font color='#5555FF'>=</font> <font color='#BB00BB'>s</font><font face='Lucida Console'>(</font><font color='#BB00BB'>make_test_data3</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,<font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+        running_stats<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font> rs1, rs2;
+
+        rs1.<font color='#BB00BB'>add</font><font face='Lucida Console'>(</font><font color='#BB00BB'>length</font><font face='Lucida Console'>(</font>projs[<font color='#979000'>0</font>] <font color='#5555FF'>-</font> projs[<font color='#979000'>1</font>]<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        rs1.<font color='#BB00BB'>add</font><font face='Lucida Console'>(</font><font color='#BB00BB'>length</font><font face='Lucida Console'>(</font>projs[<font color='#979000'>0</font>] <font color='#5555FF'>-</font> projs[<font color='#979000'>2</font>]<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        rs1.<font color='#BB00BB'>add</font><font face='Lucida Console'>(</font><font color='#BB00BB'>length</font><font face='Lucida Console'>(</font>projs[<font color='#979000'>0</font>] <font color='#5555FF'>-</font> projs[<font color='#979000'>3</font>]<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+        rs2.<font color='#BB00BB'>add</font><font face='Lucida Console'>(</font><font color='#BB00BB'>length</font><font face='Lucida Console'>(</font>projs[<font color='#979000'>1</font>] <font color='#5555FF'>-</font> projs[<font color='#979000'>2</font>]<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        rs2.<font color='#BB00BB'>add</font><font face='Lucida Console'>(</font><font color='#BB00BB'>length</font><font face='Lucida Console'>(</font>projs[<font color='#979000'>2</font>] <font color='#5555FF'>-</font> projs[<font color='#979000'>3</font>]<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        rs2.<font color='#BB00BB'>add</font><font face='Lucida Console'>(</font><font color='#BB00BB'>length</font><font face='Lucida Console'>(</font>projs[<font color='#979000'>3</font>] <font color='#5555FF'>-</font> projs[<font color='#979000'>1</font>]<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>rs1.<font color='#BB00BB'>stddev</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>/</font>rs1.<font color='#BB00BB'>mean</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> <font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>4</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>rs2.<font color='#BB00BB'>stddev</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>/</font>rs2.<font color='#BB00BB'>mean</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> <font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>4</font><font face='Lucida Console'>)</font>;
+
+
+
+        projs <font color='#5555FF'>=</font> <font color='#BB00BB'>s</font><font face='Lucida Console'>(</font><font color='#BB00BB'>make_test_data4</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,<font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+        rs1.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        rs2.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+        rs1.<font color='#BB00BB'>add</font><font face='Lucida Console'>(</font><font color='#BB00BB'>length</font><font face='Lucida Console'>(</font>projs[<font color='#979000'>0</font>] <font color='#5555FF'>-</font> projs[<font color='#979000'>1</font>]<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        rs1.<font color='#BB00BB'>add</font><font face='Lucida Console'>(</font><font color='#BB00BB'>length</font><font face='Lucida Console'>(</font>projs[<font color='#979000'>0</font>] <font color='#5555FF'>-</font> projs[<font color='#979000'>2</font>]<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        rs1.<font color='#BB00BB'>add</font><font face='Lucida Console'>(</font><font color='#BB00BB'>length</font><font face='Lucida Console'>(</font>projs[<font color='#979000'>0</font>] <font color='#5555FF'>-</font> projs[<font color='#979000'>3</font>]<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+        rs2.<font color='#BB00BB'>add</font><font face='Lucida Console'>(</font><font color='#BB00BB'>length</font><font face='Lucida Console'>(</font>projs[<font color='#979000'>1</font>] <font color='#5555FF'>-</font> projs[<font color='#979000'>2</font>]<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        rs2.<font color='#BB00BB'>add</font><font face='Lucida Console'>(</font><font color='#BB00BB'>length</font><font face='Lucida Console'>(</font>projs[<font color='#979000'>2</font>] <font color='#5555FF'>-</font> projs[<font color='#979000'>3</font>]<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        rs2.<font color='#BB00BB'>add</font><font face='Lucida Console'>(</font><font color='#BB00BB'>length</font><font face='Lucida Console'>(</font>projs[<font color='#979000'>3</font>] <font color='#5555FF'>-</font> projs[<font color='#979000'>1</font>]<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>rs1.<font color='#BB00BB'>stddev</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>/</font>rs1.<font color='#BB00BB'>mean</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> <font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>4</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>rs2.<font color='#BB00BB'>stddev</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>/</font>rs2.<font color='#BB00BB'>mean</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> <font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>4</font><font face='Lucida Console'>)</font>;
+
+        projs <font color='#5555FF'>=</font> <font color='#BB00BB'>s</font><font face='Lucida Console'>(</font><font color='#BB00BB'>make_test_data3d</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,<font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+        rs1.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        rs2.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+        rs1.<font color='#BB00BB'>add</font><font face='Lucida Console'>(</font><font color='#BB00BB'>length</font><font face='Lucida Console'>(</font>projs[<font color='#979000'>0</font>] <font color='#5555FF'>-</font> projs[<font color='#979000'>1</font>]<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        rs1.<font color='#BB00BB'>add</font><font face='Lucida Console'>(</font><font color='#BB00BB'>length</font><font face='Lucida Console'>(</font>projs[<font color='#979000'>0</font>] <font color='#5555FF'>-</font> projs[<font color='#979000'>2</font>]<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        rs1.<font color='#BB00BB'>add</font><font face='Lucida Console'>(</font><font color='#BB00BB'>length</font><font face='Lucida Console'>(</font>projs[<font color='#979000'>0</font>] <font color='#5555FF'>-</font> projs[<font color='#979000'>3</font>]<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+        rs2.<font color='#BB00BB'>add</font><font face='Lucida Console'>(</font><font color='#BB00BB'>length</font><font face='Lucida Console'>(</font>projs[<font color='#979000'>1</font>] <font color='#5555FF'>-</font> projs[<font color='#979000'>2</font>]<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        rs2.<font color='#BB00BB'>add</font><font face='Lucida Console'>(</font><font color='#BB00BB'>length</font><font face='Lucida Console'>(</font>projs[<font color='#979000'>2</font>] <font color='#5555FF'>-</font> projs[<font color='#979000'>3</font>]<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        rs2.<font color='#BB00BB'>add</font><font face='Lucida Console'>(</font><font color='#BB00BB'>length</font><font face='Lucida Console'>(</font>projs[<font color='#979000'>3</font>] <font color='#5555FF'>-</font> projs[<font color='#979000'>1</font>]<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>rs1.<font color='#BB00BB'>stddev</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>/</font>rs1.<font color='#BB00BB'>mean</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> <font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>4</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>rs2.<font color='#BB00BB'>stddev</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>/</font>rs2.<font color='#BB00BB'>mean</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> <font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>4</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+    <font color='#0000FF'><u>void</u></font> <b><a name='runtest2'></a>runtest2</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+    <b>{</b>
+        sammon_projection s;
+        std::vector<font color='#5555FF'>&lt;</font>matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>, <font color='#979000'>0</font>, <font color='#979000'>1</font><font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font>  projs, temp;
+
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>s</font><font face='Lucida Console'>(</font>projs,<font color='#979000'>3</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+
+        matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>2</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> m;
+        m <font color='#5555FF'>=</font> <font color='#979000'>1</font>,<font color='#979000'>2</font>;
+        projs.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>m<font face='Lucida Console'>)</font>;
+        temp <font color='#5555FF'>=</font> <font color='#BB00BB'>s</font><font face='Lucida Console'>(</font>projs,<font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>temp.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>temp[<font color='#979000'>0</font>].<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+
+        projs.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>m<font face='Lucida Console'>)</font>;
+        temp <font color='#5555FF'>=</font> <font color='#BB00BB'>s</font><font face='Lucida Console'>(</font>projs,<font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>temp.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>temp[<font color='#979000'>0</font>].<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>temp[<font color='#979000'>1</font>].<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+    <font color='#0000FF'><u>void</u></font> <b><a name='runtest3'></a>runtest3</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> num_dims<font face='Lucida Console'>)</font>
+    <b>{</b>
+        sammon_projection s;
+        std::vector<font color='#5555FF'>&lt;</font>matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>, <font color='#979000'>0</font>, <font color='#979000'>1</font><font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font>  projs;
+        matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>3</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> m;
+        m <font color='#5555FF'>=</font> <font color='#979000'>1</font>, <font color='#979000'>1</font>, <font color='#979000'>1</font>;
+        projs.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>m<font face='Lucida Console'>)</font>;
+
+        m <font color='#5555FF'>=</font> <font color='#979000'>1</font>, <font color='#979000'>2</font>, <font color='#979000'>1</font>;
+        projs.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>m<font face='Lucida Console'>)</font>;
+
+        m <font color='#5555FF'>=</font> <font color='#979000'>1</font>, <font color='#979000'>3</font>, <font color='#979000'>1</font>;
+        projs.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>m<font face='Lucida Console'>)</font>;
+
+        projs <font color='#5555FF'>=</font> <font color='#BB00BB'>s</font><font face='Lucida Console'>(</font>projs,num_dims<font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> d1a <font color='#5555FF'>=</font> <font color='#BB00BB'>length</font><font face='Lucida Console'>(</font>projs[<font color='#979000'>0</font>] <font color='#5555FF'>-</font> projs[<font color='#979000'>1</font>]<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> d1b <font color='#5555FF'>=</font> <font color='#BB00BB'>length</font><font face='Lucida Console'>(</font>projs[<font color='#979000'>1</font>] <font color='#5555FF'>-</font> projs[<font color='#979000'>2</font>]<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> d2  <font color='#5555FF'>=</font> <font color='#BB00BB'>length</font><font face='Lucida Console'>(</font>projs[<font color='#979000'>0</font>] <font color='#5555FF'>-</font> projs[<font color='#979000'>2</font>]<font face='Lucida Console'>)</font>;
+
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>std::<font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font>d1a<font color='#5555FF'>-</font>d1b<font face='Lucida Console'>)</font><font color='#5555FF'>/</font>d1a <font color='#5555FF'>&lt;</font> <font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>8</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>std::<font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font>d2<font color='#5555FF'>/</font>d1a<font color='#5555FF'>-</font><font color='#979000'>2</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> <font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>8</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+    <font color='#0000FF'><u>void</u></font> <b><a name='runtest4'></a>runtest4</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> num_dims<font face='Lucida Console'>)</font>
+    <b>{</b>
+        sammon_projection s;
+        std::vector<font color='#5555FF'>&lt;</font>matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>, <font color='#979000'>0</font>, <font color='#979000'>1</font><font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font>  projs;
+        matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>3</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> m;
+        m <font color='#5555FF'>=</font> <font color='#979000'>1</font>, <font color='#979000'>1</font>, <font color='#979000'>1</font>;
+        projs.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>m<font face='Lucida Console'>)</font>;
+
+        m <font color='#5555FF'>=</font> <font color='#979000'>1</font>, <font color='#979000'>2</font>, <font color='#979000'>1</font>;
+        projs.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>m<font face='Lucida Console'>)</font>;
+
+
+        projs <font color='#5555FF'>=</font> <font color='#BB00BB'>s</font><font face='Lucida Console'>(</font>projs,num_dims<font face='Lucida Console'>)</font>;
+
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>length</font><font face='Lucida Console'>(</font>projs[<font color='#979000'>0</font>] <font color='#5555FF'>-</font> projs[<font color='#979000'>1</font>]<font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> <font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>5</font><font face='Lucida Console'>)</font>; 
+    <b>}</b>
+
+    <font color='#0000FF'>class</font> <b><a name='sammon_tester'></a>sammon_tester</b> : <font color='#0000FF'>public</font> tester
+    <b>{</b>
+    <font color='#0000FF'>public</font>:
+        <b><a name='sammon_tester'></a>sammon_tester</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> :
+            tester <font face='Lucida Console'>(</font>"<font color='#CC0000'>test_sammon</font>",
+                    "<font color='#CC0000'>Runs tests on the sammon_projection component.</font>"<font face='Lucida Console'>)</font>
+        <b>{</b><b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='perform_test'></a>perform_test</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#BB00BB'>print_spinner</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>runtest</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>print_spinner</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>runtest2</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>print_spinner</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>runtest3</font><font face='Lucida Console'>(</font><font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>print_spinner</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>runtest4</font><font face='Lucida Console'>(</font><font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>runtest3</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>print_spinner</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>runtest4</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+    <b>}</b> a;
+
+<b>}</b>
+
+
+
+
+</pre></body></html>

@@ -1,0 +1,268 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - structural_graph_labeling_trainer_abstract.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2012  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#undef</font> DLIB_STRUCTURAL_GRAPH_LABELING_tRAINER_ABSTRACT_Hh_
+<font color='#0000FF'>#ifdef</font> DLIB_STRUCTURAL_GRAPH_LABELING_tRAINER_ABSTRACT_Hh_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../algs.h.html'>../algs.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../optimization.h.html'>../optimization.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='structural_svm_graph_labeling_problem_abstract.h.html'>structural_svm_graph_labeling_problem_abstract.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../graph_cuts/graph_labeler_abstract.h.html'>../graph_cuts/graph_labeler_abstract.h</a>"
+
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> vector_type 
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>class</font> <b><a name='structural_graph_labeling_trainer'></a>structural_graph_labeling_trainer</b>
+    <b>{</b>
+        <font color='#009900'>/*!
+            REQUIREMENTS ON vector_type 
+                - vector_type is a dlib::matrix capable of representing column 
+                  vectors or it is a sparse vector type as defined in dlib/svm/sparse_vector_abstract.h.  
+
+            WHAT THIS OBJECT REPRESENTS
+                This object is a tool for learning to solve a graph labeling problem based
+                on a training dataset of example labeled graphs.  The training procedure 
+                produces a graph_labeler object which can be used to predict the labelings
+                of new graphs.
+
+                Note that this is just a convenience wrapper around the 
+                structural_svm_graph_labeling_problem to make it look 
+                similar to all the other trainers in dlib.  
+        !*/</font>
+
+    <font color='#0000FF'>public</font>:
+        <font color='#0000FF'>typedef</font> std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>bool</u></font><font color='#5555FF'>&gt;</font> label_type;
+        <font color='#0000FF'>typedef</font> graph_labeler<font color='#5555FF'>&lt;</font>vector_type<font color='#5555FF'>&gt;</font> trained_function_type;
+
+        <b><a name='structural_graph_labeling_trainer'></a>structural_graph_labeling_trainer</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #get_c() == 10
+                - this object isn't verbose
+                - #get_epsilon() == 0.1
+                - #get_num_threads() == 2
+                - #get_max_cache_size() == 5
+                - #get_loss_on_positive_class() == 1.0
+                - #get_loss_on_negative_class() == 1.0
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_num_threads'></a>set_num_threads</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> num
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #get_num_threads() == num
+        !*/</font>
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='get_num_threads'></a>get_num_threads</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the number of threads used during training.  You should 
+                  usually set this equal to the number of processing cores on your
+                  machine.
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_epsilon'></a>set_epsilon</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>double</u></font> eps
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - eps &gt; 0
+            ensures
+                - #get_epsilon() == eps
+        !*/</font>
+
+        <font color='#0000FF'><u>double</u></font> <b><a name='get_epsilon'></a>get_epsilon</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the error epsilon that determines when training should stop.
+                  Smaller values may result in a more accurate solution but take longer 
+                  to train.  You can think of this epsilon value as saying "solve the 
+                  optimization problem until the average number of labeling mistakes per 
+                  example graph is within epsilon of its optimal value".
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_max_cache_size'></a>set_max_cache_size</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> max_size
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #get_max_cache_size() == max_size
+        !*/</font>
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='get_max_cache_size'></a>get_max_cache_size</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - During training, this object basically runs the graph_labeler on each 
+                  training sample, over and over.  To speed this up, it is possible to 
+                  cache the results of these invocations.  This function returns the number 
+                  of cache elements per training sample kept in the cache.  Note that a value 
+                  of 0 means caching is not used at all.  
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='be_verbose'></a>be_verbose</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - This object will print status messages to standard out so that a 
+                  user can observe the progress of the algorithm.
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='be_quiet'></a>be_quiet</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - this object will not print anything to standard out
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_oca'></a>set_oca</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> oca<font color='#5555FF'>&amp;</font> item
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #get_oca() == item 
+        !*/</font>
+
+        <font color='#0000FF'>const</font> oca <b><a name='get_oca'></a>get_oca</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns a copy of the optimizer used to solve the structural SVM problem.  
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_c'></a>set_c</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>double</u></font> C
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - C &gt; 0
+            ensures
+                - #get_c() = C
+        !*/</font>
+
+        <font color='#0000FF'><u>double</u></font> <b><a name='get_c'></a>get_c</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the SVM regularization parameter.  It is the parameter 
+                  that determines the trade-off between trying to fit the training 
+                  data (i.e. minimize the loss) or allowing more errors but hopefully 
+                  improving the generalization of the resulting graph_labeler.  Larger 
+                  values encourage exact fitting while smaller values of C may encourage 
+                  better generalization. 
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_loss_on_positive_class'></a>set_loss_on_positive_class</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>double</u></font> loss
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - loss &gt;= 0
+            ensures
+                - #get_loss_on_positive_class() == loss
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_loss_on_negative_class'></a>set_loss_on_negative_class</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>double</u></font> loss
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - loss &gt;= 0
+            ensures
+                - #get_loss_on_negative_class() == loss
+        !*/</font>
+
+        <font color='#0000FF'><u>double</u></font> <b><a name='get_loss_on_positive_class'></a>get_loss_on_positive_class</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the loss incurred when a graph node which is supposed to have
+                  a label of true gets misclassified.  This value controls how much we care 
+                  about correctly classifying nodes which should be labeled as true.  Larger 
+                  loss values indicate that we care more strongly than smaller values.
+        !*/</font>
+
+        <font color='#0000FF'><u>double</u></font> <b><a name='get_loss_on_negative_class'></a>get_loss_on_negative_class</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the loss incurred when a graph node which is supposed to have
+                  a label of false gets misclassified.  This value controls how much we care 
+                  about correctly classifying nodes which should be labeled as false.  Larger 
+                  loss values indicate that we care more strongly than smaller values.
+        !*/</font>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'>typename</font> graph_type
+            <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>const</font> graph_labeler<font color='#5555FF'>&lt;</font>vector_type<font color='#5555FF'>&gt;</font> <b><a name='train'></a>train</b> <font face='Lucida Console'>(</font>  
+            <font color='#0000FF'>const</font> dlib::array<font color='#5555FF'>&lt;</font>graph_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> samples,
+            <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>label_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> labels
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - is_graph_labeling_problem(samples,labels) == true
+            ensures
+                - Uses the structural_svm_graph_labeling_problem to train a graph_labeler
+                  on the given samples/labels training pairs.  The idea is to learn to
+                  predict a label given an input sample.
+                - The values of get_loss_on_positive_class() and get_loss_on_negative_class() 
+                  are used to determine how to value mistakes on each node during training.
+                - returns a function F with the following properties:
+                    - F(new_sample) == The predicted labels for the nodes in the graph
+                      new_sample.
+        !*/</font>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'>typename</font> graph_type
+            <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>const</font> graph_labeler<font color='#5555FF'>&lt;</font>vector_type<font color='#5555FF'>&gt;</font> <b><a name='train'></a>train</b> <font face='Lucida Console'>(</font>  
+            <font color='#0000FF'>const</font> dlib::array<font color='#5555FF'>&lt;</font>graph_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> samples,
+            <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>label_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> labels,
+            <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> losses
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - is_graph_labeling_problem(samples,labels) == true
+                - if (losses.size() != 0) then
+                    - sizes_match(labels, losses) == true
+                    - all_values_are_nonnegative(losses) == true
+            ensures
+                - Uses the structural_svm_graph_labeling_problem to train a graph_labeler
+                  on the given samples/labels training pairs.  The idea is to learn to
+                  predict a label given an input sample.
+                - returns a function F with the following properties:
+                    - F(new_sample) == The predicted labels for the nodes in the graph
+                      new_sample.
+                - if (losses.size() == 0) then
+                    - The values of get_loss_on_positive_class() and get_loss_on_negative_class() 
+                      are used to determine how to value mistakes on each node during training.
+                    - The losses argument is effectively ignored if its size is zero.
+                - else
+                    - Each node in the training data has its own loss value defined by the
+                      corresponding entry of losses.  In particular, this means that the
+                      node with label labels[i][j] incurs a loss of losses[i][j] if it is
+                      incorrectly labeled.
+                    - The get_loss_on_positive_class() and get_loss_on_negative_class()
+                      parameters are ignored.  Only losses is used in this case.
+        !*/</font>
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_STRUCTURAL_GRAPH_LABELING_tRAINER_ABSTRACT_Hh_
+</font>
+
+</pre></body></html>

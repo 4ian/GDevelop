@@ -1,0 +1,168 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - queue_sort_1.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2003  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_QUEUE_SORt_1_
+<font color='#0000FF'>#define</font> DLIB_QUEUE_SORt_1_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='queue_sort_abstract.h.html'>queue_sort_abstract.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../algs.h.html'>../algs.h</a>"
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>vector<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../sort.h.html'>../sort.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> queue_base 
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>class</font> <b><a name='queue_sort_1'></a>queue_sort_1</b> : <font color='#0000FF'>public</font> queue_base
+    <b>{</b>
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> queue_base::type T;
+
+        <font color='#0000FF'>public</font>:
+
+            <font color='#009900'>/*!
+                This implementation uses the QuickSort algorithm and
+                when the quicksort depth goes too high it uses the dlib::qsort_array()
+                function on the data.
+            !*/</font>
+
+            <font color='#0000FF'><u>void</u></font> <b><a name='sort'></a>sort</b> <font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> compare_type<font color='#5555FF'>&gt;</font>
+            <font color='#0000FF'><u>void</u></font> <b><a name='sort'></a>sort</b> <font face='Lucida Console'>(</font>
+                <font color='#0000FF'>const</font> compare_type<font color='#5555FF'>&amp;</font> compare
+            <font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#0000FF'>this</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#BB00BB'>sort_this_queue</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font>,<font color='#979000'>0</font>,compare<font face='Lucida Console'>)</font>;
+                <b>}</b>
+            <b>}</b>
+
+        <font color='#0000FF'>private</font>:
+
+            <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> compare_type<font color='#5555FF'>&gt;</font>
+            <font color='#0000FF'><u>void</u></font> <b><a name='sort_this_queue'></a>sort_this_queue</b> <font face='Lucida Console'>(</font>
+                queue_base<font color='#5555FF'>&amp;</font> queue,
+                <font color='#0000FF'><u>long</u></font> depth,
+                <font color='#0000FF'>const</font> compare_type<font color='#5555FF'>&amp;</font> compare
+            <font face='Lucida Console'>)</font>
+            <font color='#009900'>/*!
+                ensures
+                    each element in the queue is &lt; the element behind it according
+                    to compare
+            !*/</font>
+            <b>{</b>
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>queue.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#009900'>// already sorted
+</font>                <b>}</b>
+                <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>queue.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#979000'>29</font><font face='Lucida Console'>)</font>
+                <b>{</b>
+                    T vect[<font color='#979000'>29</font>];
+                    <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> size <font color='#5555FF'>=</font> queue.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> size; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        queue.<font color='#BB00BB'>dequeue</font><font face='Lucida Console'>(</font>vect[i]<font face='Lucida Console'>)</font>;
+                    <b>}</b>
+                    <font color='#BB00BB'>isort_array</font><font face='Lucida Console'>(</font>vect,<font color='#979000'>0</font>,size<font color='#5555FF'>-</font><font color='#979000'>1</font>,compare<font face='Lucida Console'>)</font>;
+                    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> size; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        queue.<font color='#BB00BB'>enqueue</font><font face='Lucida Console'>(</font>vect[i]<font face='Lucida Console'>)</font>;
+                    <b>}</b>
+                <b>}</b>
+                <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>depth <font color='#5555FF'>&gt;</font> <font color='#979000'>50</font><font face='Lucida Console'>)</font>
+                <b>{</b>
+                    std::vector<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font> <font color='#BB00BB'>vect</font><font face='Lucida Console'>(</font>queue.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> vect.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        queue.<font color='#BB00BB'>dequeue</font><font face='Lucida Console'>(</font>vect[i]<font face='Lucida Console'>)</font>;
+                    <b>}</b>
+                    <font color='#BB00BB'>hsort_array</font><font face='Lucida Console'>(</font>vect,<font color='#979000'>0</font>,vect.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#979000'>1</font>,compare<font face='Lucida Console'>)</font>;
+                    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> vect.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        queue.<font color='#BB00BB'>enqueue</font><font face='Lucida Console'>(</font>vect[i]<font face='Lucida Console'>)</font>;
+                    <b>}</b>
+                <b>}</b>
+                <font color='#0000FF'>else</font>
+                <b>{</b>
+                    queue_base left, right;
+                    T partition_element;
+                    T temp;
+                    <font color='#009900'>// do this just to avoid a compiler warning
+</font>                    <font color='#BB00BB'>assign_zero_if_built_in_scalar_type</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font>;
+                    <font color='#BB00BB'>assign_zero_if_built_in_scalar_type</font><font face='Lucida Console'>(</font>partition_element<font face='Lucida Console'>)</font>;
+
+                    queue.<font color='#BB00BB'>dequeue</font><font face='Lucida Console'>(</font>partition_element<font face='Lucida Console'>)</font>;
+
+                    <font color='#009900'>// partition queue into left and right
+</font>                    <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>queue.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        queue.<font color='#BB00BB'>dequeue</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font>;
+                        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>compare</font><font face='Lucida Console'>(</font>temp , partition_element<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                        <b>{</b>
+                            left.<font color='#BB00BB'>enqueue</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font>;
+                        <b>}</b>
+                        <font color='#0000FF'>else</font>
+                        <b>{</b>
+                            right.<font color='#BB00BB'>enqueue</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font>;
+                        <b>}</b>
+                    <b>}</b>
+
+
+                    <font color='#0000FF'><u>long</u></font> ratio;
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>left.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> right.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                        ratio <font color='#5555FF'>=</font> left.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>/</font><font face='Lucida Console'>(</font>right.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>+</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;  <font color='#009900'>// add 1 so we can't divide by zero
+</font>                    <font color='#0000FF'>else</font>
+                        ratio <font color='#5555FF'>=</font> right.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>/</font><font face='Lucida Console'>(</font>left.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>+</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+
+                    <font color='#BB00BB'>sort_this_queue</font><font face='Lucida Console'>(</font>left,ratio<font color='#5555FF'>+</font>depth,compare<font face='Lucida Console'>)</font>;
+                    <font color='#BB00BB'>sort_this_queue</font><font face='Lucida Console'>(</font>right,ratio<font color='#5555FF'>+</font>depth,compare<font face='Lucida Console'>)</font>;
+
+                    <font color='#009900'>// combine the two queues
+</font>                    left.<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>queue<font face='Lucida Console'>)</font>;
+                    queue.<font color='#BB00BB'>enqueue</font><font face='Lucida Console'>(</font>partition_element<font face='Lucida Console'>)</font>;
+                    queue.<font color='#BB00BB'>cat</font><font face='Lucida Console'>(</font>right<font face='Lucida Console'>)</font>;
+                <b>}</b>
+            <b>}</b>
+
+
+    <b>}</b>;
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> queue_base
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='swap'></a>swap</b> <font face='Lucida Console'>(</font>
+        queue_sort_1<font color='#5555FF'>&lt;</font>queue_base<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> a, 
+        queue_sort_1<font color='#5555FF'>&lt;</font>queue_base<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> b 
+    <font face='Lucida Console'>)</font> <b>{</b> a.<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>b<font face='Lucida Console'>)</font>; <b>}</b>   
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>    <font color='#009900'>// member function definitions
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> queue_base
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> queue_sort_1<font color='#5555FF'>&lt;</font>queue_base<font color='#5555FF'>&gt;</font>::
+    <b><a name='sort'></a>sort</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#0000FF'>this</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#BB00BB'>sort_this_queue</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font>,<font color='#979000'>0</font>,std::less<font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> queue_base::type<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_QUEUE_SORt_1_
+</font>
+
+</pre></body></html>

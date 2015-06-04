@@ -1,0 +1,398 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - thread_pool.cpp</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2008  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font>
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>sstream<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>string<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>cstdlib<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>ctime<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>misc_api.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>threads.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>any.h<font color='#5555FF'>&gt;</font>
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='tester.h.html'>tester.h</a>"
+
+<font color='#0000FF'>namespace</font>  
+<b>{</b>
+    <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> test;
+    <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> dlib;
+    <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> std;
+
+    logger <b><a name='dlog'></a>dlog</b><font face='Lucida Console'>(</font>"<font color='#CC0000'>test.thread_pool</font>"<font face='Lucida Console'>)</font>;
+
+
+    <font color='#0000FF'>struct</font> <b><a name='some_struct'></a>some_struct</b> : noncopyable
+    <b>{</b>
+        <font color='#0000FF'><u>float</u></font> val;
+    <b>}</b>;
+
+    <font color='#0000FF'><u>int</u></font> global_var <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+
+    <font color='#0000FF'>struct</font> <b><a name='add_functor'></a>add_functor</b>
+    <b>{</b>
+        <b><a name='add_functor'></a>add_functor</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <b>{</b> var <font color='#5555FF'>=</font> <font color='#979000'>1</font>;<b>}</b>
+        <b><a name='add_functor'></a>add_functor</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> v<font face='Lucida Console'>)</font>:var<font face='Lucida Console'>(</font>v<font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> U, <font color='#0000FF'>typename</font> V<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>T a, U b, V<font color='#5555FF'>&amp;</font> res<font face='Lucida Console'>)</font>
+        <b>{</b>
+            dlib::<font color='#BB00BB'>sleep</font><font face='Lucida Console'>(</font><font color='#979000'>20</font><font face='Lucida Console'>)</font>;
+            res <font color='#5555FF'>=</font> a <font color='#5555FF'>+</font> b;
+        <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_global_var'></a>set_global_var</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <b>{</b> global_var <font color='#5555FF'>=</font> <font color='#979000'>9</font>; <b>}</b>
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_global_var_const'></a>set_global_var_const</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> global_var <font color='#5555FF'>=</font> <font color='#979000'>9</font>; <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_global_var_arg1'></a>set_global_var_arg1</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> val<font face='Lucida Console'>)</font> <b>{</b> global_var <font color='#5555FF'>=</font> val; <b>}</b>
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_global_var_const_arg1'></a>set_global_var_const_arg1</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> val<font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> global_var <font color='#5555FF'>=</font> val; <b>}</b>
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_global_var_arg2'></a>set_global_var_arg2</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> val, <font color='#0000FF'><u>int</u></font> val2<font face='Lucida Console'>)</font> <b>{</b> global_var <font color='#5555FF'>=</font> val<font color='#5555FF'>+</font>val2; <b>}</b>
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_global_var_const_arg2'></a>set_global_var_const_arg2</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> val, <font color='#0000FF'><u>int</u></font> val2<font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> global_var <font color='#5555FF'>=</font> val<font color='#5555FF'>+</font>val2; <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            global_var <font color='#5555FF'>=</font> <font color='#979000'>9</font>;
+        <b>}</b>
+
+        <font color='#009900'>// use an any just so that if this object goes out of scope
+</font>        <font color='#009900'>// then var will get all messed up.
+</font>        any var;
+        <font color='#0000FF'><u>void</u></font> <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font color='#5555FF'>&amp;</font> a<font face='Lucida Console'>)</font> <b>{</b> dlib::<font color='#BB00BB'>sleep</font><font face='Lucida Console'>(</font><font color='#979000'>100</font><font face='Lucida Console'>)</font>; a <font color='#5555FF'>=</font> var.get<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>int</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <b>}</b>
+        <font color='#0000FF'><u>void</u></font> <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font color='#5555FF'>&amp;</font> a, <font color='#0000FF'><u>int</u></font><font color='#5555FF'>&amp;</font> b<font face='Lucida Console'>)</font> <b>{</b> dlib::<font color='#BB00BB'>sleep</font><font face='Lucida Console'>(</font><font color='#979000'>100</font><font face='Lucida Console'>)</font>; a <font color='#5555FF'>=</font> var.get<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>int</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; b <font color='#5555FF'>=</font> <font color='#979000'>2</font>; <b>}</b>
+        <font color='#0000FF'><u>void</u></font> <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font color='#5555FF'>&amp;</font> a, <font color='#0000FF'><u>int</u></font><font color='#5555FF'>&amp;</font> b, <font color='#0000FF'><u>int</u></font><font color='#5555FF'>&amp;</font> c<font face='Lucida Console'>)</font> <b>{</b> dlib::<font color='#BB00BB'>sleep</font><font face='Lucida Console'>(</font><font color='#979000'>100</font><font face='Lucida Console'>)</font>; a <font color='#5555FF'>=</font> var.get<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>int</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; b <font color='#5555FF'>=</font> <font color='#979000'>2</font>; c <font color='#5555FF'>=</font> <font color='#979000'>3</font>; <b>}</b>
+        <font color='#0000FF'><u>void</u></font> <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font color='#5555FF'>&amp;</font> a, <font color='#0000FF'><u>int</u></font><font color='#5555FF'>&amp;</font> b, <font color='#0000FF'><u>int</u></font><font color='#5555FF'>&amp;</font> c, <font color='#0000FF'><u>int</u></font><font color='#5555FF'>&amp;</font> d<font face='Lucida Console'>)</font> <b>{</b> dlib::<font color='#BB00BB'>sleep</font><font face='Lucida Console'>(</font><font color='#979000'>100</font><font face='Lucida Console'>)</font>; a <font color='#5555FF'>=</font> var.get<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>int</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; b <font color='#5555FF'>=</font> <font color='#979000'>2</font>; c <font color='#5555FF'>=</font> <font color='#979000'>3</font>; d <font color='#5555FF'>=</font> <font color='#979000'>4</font>; <b>}</b>
+    <b>}</b>;
+
+
+    <font color='#0000FF'><u>void</u></font> <b><a name='set_global_var'></a>set_global_var</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <b>{</b>  global_var <font color='#5555FF'>=</font> <font color='#979000'>9</font>; <b>}</b>
+
+    <font color='#0000FF'><u>void</u></font> <b><a name='gset_struct_to_zero'></a>gset_struct_to_zero</b> <font face='Lucida Console'>(</font>some_struct<font color='#5555FF'>&amp;</font> a<font face='Lucida Console'>)</font> <b>{</b> a.val <font color='#5555FF'>=</font> <font color='#979000'>0</font>; <b>}</b>
+    <font color='#0000FF'><u>void</u></font> <b><a name='gset_to_zero'></a>gset_to_zero</b> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font color='#5555FF'>&amp;</font> a<font face='Lucida Console'>)</font> <b>{</b> a <font color='#5555FF'>=</font> <font color='#979000'>0</font>; <b>}</b>
+    <font color='#0000FF'><u>void</u></font> <b><a name='gincrement'></a>gincrement</b> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font color='#5555FF'>&amp;</font> a<font face='Lucida Console'>)</font> <b>{</b> <font color='#5555FF'>+</font><font color='#5555FF'>+</font>a; <b>}</b>
+    <font color='#0000FF'><u>void</u></font> <b><a name='gadd'></a>gadd</b> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> a, <font color='#0000FF'>const</font> <font color='#0000FF'><u>int</u></font><font color='#5555FF'>&amp;</font> b, <font color='#0000FF'><u>int</u></font><font color='#5555FF'>&amp;</font> res<font face='Lucida Console'>)</font> <b>{</b> dlib::<font color='#BB00BB'>sleep</font><font face='Lucida Console'>(</font><font color='#979000'>20</font><font face='Lucida Console'>)</font>; res <font color='#5555FF'>=</font> a <font color='#5555FF'>+</font> b; <b>}</b>
+    <font color='#0000FF'><u>void</u></font> <b><a name='gadd1'></a>gadd1</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font color='#5555FF'>&amp;</font> a, <font color='#0000FF'><u>int</u></font><font color='#5555FF'>&amp;</font> res<font face='Lucida Console'>)</font> <b>{</b> res <font color='#5555FF'>+</font><font color='#5555FF'>=</font> a; <b>}</b>
+    <font color='#0000FF'><u>void</u></font> <b><a name='gadd2'></a>gadd2</b> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> c, <font color='#0000FF'><u>int</u></font> a, <font color='#0000FF'>const</font> <font color='#0000FF'><u>int</u></font><font color='#5555FF'>&amp;</font> b, <font color='#0000FF'><u>int</u></font><font color='#5555FF'>&amp;</font> res<font face='Lucida Console'>)</font> <b>{</b> dlib::<font color='#BB00BB'>sleep</font><font face='Lucida Console'>(</font><font color='#979000'>20</font><font face='Lucida Console'>)</font>; res <font color='#5555FF'>=</font> a <font color='#5555FF'>+</font> b <font color='#5555FF'>+</font> c; <b>}</b>
+
+    <font color='#0000FF'>class</font> <b><a name='thread_pool_tester'></a>thread_pool_tester</b> : <font color='#0000FF'>public</font> tester
+    <b>{</b>
+    <font color='#0000FF'>public</font>:
+        <b><a name='thread_pool_tester'></a>thread_pool_tester</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> :
+            tester <font face='Lucida Console'>(</font>"<font color='#CC0000'>test_thread_pool</font>",
+                    "<font color='#CC0000'>Runs tests on the thread_pool component.</font>"<font face='Lucida Console'>)</font>
+        <b>{</b><b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='perform_test'></a>perform_test</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            add_functor f;
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> num_threads<font color='#5555FF'>=</font> <font color='#979000'>0</font>; num_threads <font color='#5555FF'>&lt;</font> <font color='#979000'>4</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>num_threads<font face='Lucida Console'>)</font>
+            <b>{</b>
+                future<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>int</u></font><font color='#5555FF'>&gt;</font> a, b, c, res, d;
+                thread_pool <font color='#BB00BB'>tp</font><font face='Lucida Console'>(</font>num_threads<font face='Lucida Console'>)</font>;
+                <font color='#BB00BB'>print_spinner</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+                future<font color='#5555FF'>&lt;</font>some_struct<font color='#5555FF'>&gt;</font> obj;
+
+
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> <font color='#979000'>4</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    a <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+                    b <font color='#5555FF'>=</font> <font color='#979000'>2</font>;
+                    c <font color='#5555FF'>=</font> <font color='#979000'>3</font>;
+                    res <font color='#5555FF'>=</font> <font color='#979000'>4</font>;
+
+
+                    <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>a<font color='#5555FF'>=</font><font color='#5555FF'>=</font>a<font face='Lucida Console'>)</font>;
+                    <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>a<font color='#5555FF'>!</font><font color='#5555FF'>=</font>b<font face='Lucida Console'>)</font>;
+                    <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>a<font color='#5555FF'>=</font><font color='#5555FF'>=</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+
+                    tp.<font color='#BB00BB'>add_task</font><font face='Lucida Console'>(</font>gset_to_zero, a<font face='Lucida Console'>)</font>;
+                    tp.<font color='#BB00BB'>add_task</font><font face='Lucida Console'>(</font>gset_to_zero, b<font face='Lucida Console'>)</font>;
+                    tp.<font color='#BB00BB'>add_task</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font>, <font color='#5555FF'>&amp;</font>thread_pool_tester::set_to_zero, c<font face='Lucida Console'>)</font>;
+                    tp.<font color='#BB00BB'>add_task</font><font face='Lucida Console'>(</font>gset_to_zero, res<font face='Lucida Console'>)</font>;
+                    <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>a <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+                    <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>b <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+                    <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>c <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+                    <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>res <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+
+
+                    tp.<font color='#BB00BB'>add_task</font><font face='Lucida Console'>(</font>gincrement, a<font face='Lucida Console'>)</font>;
+                    tp.<font color='#BB00BB'>add_task</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font>, <font color='#5555FF'>&amp;</font>thread_pool_tester::increment, b<font face='Lucida Console'>)</font>;
+                    tp.<font color='#BB00BB'>add_task</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font>, <font color='#5555FF'>&amp;</font>thread_pool_tester::increment, c<font face='Lucida Console'>)</font>;
+                    tp.<font color='#BB00BB'>add_task</font><font face='Lucida Console'>(</font>gincrement, res<font face='Lucida Console'>)</font>;
+
+                    <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>a <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+                    <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>b <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+                    <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>c <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+                    <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>res <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+
+                    tp.<font color='#BB00BB'>add_task</font><font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>gincrement, a<font face='Lucida Console'>)</font>;
+                    tp.<font color='#BB00BB'>add_task</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font>, <font color='#5555FF'>&amp;</font>thread_pool_tester::increment, b<font face='Lucida Console'>)</font>;
+                    tp.<font color='#BB00BB'>add_task</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font>, <font color='#5555FF'>&amp;</font>thread_pool_tester::increment, c<font face='Lucida Console'>)</font>;
+                    tp.<font color='#BB00BB'>add_task</font><font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>gincrement, res<font face='Lucida Console'>)</font>;
+                    tp.<font color='#BB00BB'>add_task</font><font face='Lucida Console'>(</font>gincrement, a<font face='Lucida Console'>)</font>;
+                    tp.<font color='#BB00BB'>add_task</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font>, <font color='#5555FF'>&amp;</font>thread_pool_tester::increment, b<font face='Lucida Console'>)</font>;
+                    tp.<font color='#BB00BB'>add_task</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font>, <font color='#5555FF'>&amp;</font>thread_pool_tester::increment, c<font face='Lucida Console'>)</font>;
+                    tp.<font color='#BB00BB'>add_task</font><font face='Lucida Console'>(</font>gincrement, res<font face='Lucida Console'>)</font>;
+
+                    <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>a <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>3</font><font face='Lucida Console'>)</font>;
+                    <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>b <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>3</font><font face='Lucida Console'>)</font>;
+                    <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>c <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>3</font><font face='Lucida Console'>)</font>;
+                    <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>res <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>3</font><font face='Lucida Console'>)</font>;
+
+                    tp.<font color='#BB00BB'>add_task</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font>, <font color='#5555FF'>&amp;</font>thread_pool_tester::increment, c<font face='Lucida Console'>)</font>;
+                    tp.<font color='#BB00BB'>add_task</font><font face='Lucida Console'>(</font>gincrement, res<font face='Lucida Console'>)</font>;
+                    <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>c <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>4</font><font face='Lucida Console'>)</font>;
+                    <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>res <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>4</font><font face='Lucida Console'>)</font>;
+
+
+                    tp.<font color='#BB00BB'>add_task</font><font face='Lucida Console'>(</font>gadd, a, b, res<font face='Lucida Console'>)</font>;
+                    <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>res <font color='#5555FF'>=</font><font color='#5555FF'>=</font> a<font color='#5555FF'>+</font>b<font face='Lucida Console'>)</font>;
+                    <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>res <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>6</font><font face='Lucida Console'>)</font>;
+                    a <font color='#5555FF'>=</font> <font color='#979000'>3</font>;
+                    b <font color='#5555FF'>=</font> <font color='#979000'>4</font>;
+                    res <font color='#5555FF'>=</font> <font color='#979000'>99</font>;
+                    <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>res <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>99</font><font face='Lucida Console'>)</font>;
+                    tp.<font color='#BB00BB'>add_task</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font>, <font color='#5555FF'>&amp;</font>thread_pool_tester::add, a, b, res<font face='Lucida Console'>)</font>;
+                    <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>res <font color='#5555FF'>=</font><font color='#5555FF'>=</font> a<font color='#5555FF'>+</font>b<font face='Lucida Console'>)</font>;
+                    <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>res <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>7</font><font face='Lucida Console'>)</font>;
+
+                    a <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+                    b <font color='#5555FF'>=</font> <font color='#979000'>2</font>;
+                    c <font color='#5555FF'>=</font> <font color='#979000'>3</font>;
+                    res <font color='#5555FF'>=</font> <font color='#979000'>88</font>;
+                    <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>res <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>88</font><font face='Lucida Console'>)</font>;
+                    <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>a <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+                    <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>b <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+                    <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>c <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>3</font><font face='Lucida Console'>)</font>;
+
+                    tp.<font color='#BB00BB'>add_task</font><font face='Lucida Console'>(</font>gadd2, a, b, c, res<font face='Lucida Console'>)</font>;
+                    <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>res <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>6</font><font face='Lucida Console'>)</font>;
+                    <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>a <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+                    <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>b <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+                    <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>c <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>3</font><font face='Lucida Console'>)</font>;
+
+                    a <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+                    b <font color='#5555FF'>=</font> <font color='#979000'>2</font>;
+                    c <font color='#5555FF'>=</font> <font color='#979000'>3</font>;
+                    res <font color='#5555FF'>=</font> <font color='#979000'>88</font>;
+                    <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>res <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>88</font><font face='Lucida Console'>)</font>;
+                    <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>a <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+                    <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>b <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+                    <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>c <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>3</font><font face='Lucida Console'>)</font>;
+                    tp.<font color='#BB00BB'>add_task</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font>, <font color='#5555FF'>&amp;</font>thread_pool_tester::add2, a, b, c, res<font face='Lucida Console'>)</font>;
+                    <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>res <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>6</font><font face='Lucida Console'>)</font>;
+                    <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>a <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+                    <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>b <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+                    <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>c <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>3</font><font face='Lucida Console'>)</font>;
+
+                    a <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+                    b <font color='#5555FF'>=</font> <font color='#979000'>2</font>;
+                    c <font color='#5555FF'>=</font> <font color='#979000'>3</font>;
+                    res <font color='#5555FF'>=</font> <font color='#979000'>88</font>;
+                    tp.<font color='#BB00BB'>add_task</font><font face='Lucida Console'>(</font>gadd1, a, b<font face='Lucida Console'>)</font>;
+                    <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>a <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+                    <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>b <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>3</font><font face='Lucida Console'>)</font>;
+                    a <font color='#5555FF'>=</font> <font color='#979000'>2</font>;
+                    tp.<font color='#BB00BB'>add_task</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font>, <font color='#5555FF'>&amp;</font>thread_pool_tester::add1, a, b<font face='Lucida Console'>)</font>;
+                    <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>a <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+                    <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>b <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>5</font><font face='Lucida Console'>)</font>;
+
+
+                    val <font color='#5555FF'>=</font> <font color='#979000'>4</font>;
+                    uint64 id <font color='#5555FF'>=</font> tp.<font color='#BB00BB'>add_task</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font>, <font color='#5555FF'>&amp;</font>thread_pool_tester::zero_val<font face='Lucida Console'>)</font>;
+                    tp.<font color='#BB00BB'>wait_for_task</font><font face='Lucida Console'>(</font>id<font face='Lucida Console'>)</font>;
+                    <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>val <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+                    id <font color='#5555FF'>=</font> tp.<font color='#BB00BB'>add_task</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font>, <font color='#5555FF'>&amp;</font>thread_pool_tester::accum2, <font color='#979000'>1</font>,<font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+                    tp.<font color='#BB00BB'>wait_for_all_tasks</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                    <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>val <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>3</font><font face='Lucida Console'>)</font>;
+                    id <font color='#5555FF'>=</font> tp.<font color='#BB00BB'>add_task</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font>, <font color='#5555FF'>&amp;</font>thread_pool_tester::accum1, <font color='#979000'>3</font><font face='Lucida Console'>)</font>;
+                    tp.<font color='#BB00BB'>wait_for_task</font><font face='Lucida Console'>(</font>id<font face='Lucida Console'>)</font>;
+                    <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>val <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>6</font><font face='Lucida Console'>)</font>;
+
+
+                    obj.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.val <font color='#5555FF'>=</font> <font color='#979000'>8</font>;
+                    <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>obj.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.val <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>8</font><font face='Lucida Console'>)</font>;
+                    tp.<font color='#BB00BB'>add_task</font><font face='Lucida Console'>(</font>gset_struct_to_zero, obj<font face='Lucida Console'>)</font>;
+                    <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>obj.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.val <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+                    obj.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.val <font color='#5555FF'>=</font> <font color='#979000'>8</font>;
+                    <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>obj.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.val <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>8</font><font face='Lucida Console'>)</font>;
+                    tp.<font color='#BB00BB'>add_task</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font>,<font color='#5555FF'>&amp;</font>thread_pool_tester::set_struct_to_zero, obj<font face='Lucida Console'>)</font>;
+                    <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>obj.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.val <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+
+                    a <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+                    b <font color='#5555FF'>=</font> <font color='#979000'>2</font>;
+                    res <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                    tp.<font color='#BB00BB'>add_task</font><font face='Lucida Console'>(</font>f, a, b, res<font face='Lucida Console'>)</font>;
+                    <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>a <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+                    <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>b <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+                    <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>res <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>3</font><font face='Lucida Console'>)</font>;
+
+
+                    global_var <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                    <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>global_var <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+                    id <font color='#5555FF'>=</font> tp.<font color='#BB00BB'>add_task</font><font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>set_global_var<font face='Lucida Console'>)</font>;
+                    tp.<font color='#BB00BB'>wait_for_task</font><font face='Lucida Console'>(</font>id<font face='Lucida Console'>)</font>;
+                    <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>global_var <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>9</font><font face='Lucida Console'>)</font>;
+
+                    global_var <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                    <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>global_var <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+                    id <font color='#5555FF'>=</font> tp.<font color='#BB00BB'>add_task</font><font face='Lucida Console'>(</font>f<font face='Lucida Console'>)</font>;
+                    tp.<font color='#BB00BB'>wait_for_task</font><font face='Lucida Console'>(</font>id<font face='Lucida Console'>)</font>;
+                    <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>global_var <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>9</font><font face='Lucida Console'>)</font>;
+
+                    global_var <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                    <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>global_var <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+                    id <font color='#5555FF'>=</font> tp.<font color='#BB00BB'>add_task</font><font face='Lucida Console'>(</font>f, <font color='#5555FF'>&amp;</font>add_functor::set_global_var<font face='Lucida Console'>)</font>;
+                    tp.<font color='#BB00BB'>wait_for_task</font><font face='Lucida Console'>(</font>id<font face='Lucida Console'>)</font>;
+                    <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>global_var <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>9</font><font face='Lucida Console'>)</font>;
+
+                    global_var <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                    a <font color='#5555FF'>=</font> <font color='#979000'>4</font>;
+                    <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>global_var <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+                    id <font color='#5555FF'>=</font> tp.<font color='#BB00BB'>add_task</font><font face='Lucida Console'>(</font>f, <font color='#5555FF'>&amp;</font>add_functor::set_global_var_arg1, a<font face='Lucida Console'>)</font>;
+                    tp.<font color='#BB00BB'>wait_for_task</font><font face='Lucida Console'>(</font>id<font face='Lucida Console'>)</font>;
+                    <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>global_var <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>4</font><font face='Lucida Console'>)</font>;
+
+                    global_var <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                    a <font color='#5555FF'>=</font> <font color='#979000'>4</font>;
+                    <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>global_var <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+                    id <font color='#5555FF'>=</font> tp.<font color='#BB00BB'>add_task_by_value</font><font face='Lucida Console'>(</font>f, <font color='#5555FF'>&amp;</font>add_functor::set_global_var_arg1, a<font face='Lucida Console'>)</font>;
+                    tp.<font color='#BB00BB'>wait_for_task</font><font face='Lucida Console'>(</font>id<font face='Lucida Console'>)</font>;
+                    <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>global_var <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>4</font><font face='Lucida Console'>)</font>;
+
+
+
+                    global_var <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                    a <font color='#5555FF'>=</font> <font color='#979000'>4</font>;
+                    b <font color='#5555FF'>=</font> <font color='#979000'>3</font>;
+                    <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>global_var <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+                    id <font color='#5555FF'>=</font> tp.<font color='#BB00BB'>add_task</font><font face='Lucida Console'>(</font>f, <font color='#5555FF'>&amp;</font>add_functor::set_global_var_arg2, a, b<font face='Lucida Console'>)</font>;
+                    tp.<font color='#BB00BB'>wait_for_task</font><font face='Lucida Console'>(</font>id<font face='Lucida Console'>)</font>;
+                    <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>global_var <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>7</font><font face='Lucida Console'>)</font>;
+
+                    global_var <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                    a <font color='#5555FF'>=</font> <font color='#979000'>4</font>;
+                    b <font color='#5555FF'>=</font> <font color='#979000'>3</font>;
+                    <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>global_var <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+                    id <font color='#5555FF'>=</font> tp.<font color='#BB00BB'>add_task_by_value</font><font face='Lucida Console'>(</font>f, <font color='#5555FF'>&amp;</font>add_functor::set_global_var_arg2, a, b<font face='Lucida Console'>)</font>;
+                    tp.<font color='#BB00BB'>wait_for_task</font><font face='Lucida Console'>(</font>id<font face='Lucida Console'>)</font>;
+                    <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>global_var <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>7</font><font face='Lucida Console'>)</font>;
+
+                    global_var <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                    a <font color='#5555FF'>=</font> <font color='#979000'>4</font>;
+                    b <font color='#5555FF'>=</font> <font color='#979000'>3</font>;
+                    <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>global_var <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+                    id <font color='#5555FF'>=</font> tp.<font color='#BB00BB'>add_task</font><font face='Lucida Console'>(</font>f, <font color='#5555FF'>&amp;</font>add_functor::set_global_var_const_arg2, a, b<font face='Lucida Console'>)</font>;
+                    tp.<font color='#BB00BB'>wait_for_task</font><font face='Lucida Console'>(</font>id<font face='Lucida Console'>)</font>;
+                    <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>global_var <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>7</font><font face='Lucida Console'>)</font>;
+
+                    global_var <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                    a <font color='#5555FF'>=</font> <font color='#979000'>4</font>;
+                    b <font color='#5555FF'>=</font> <font color='#979000'>3</font>;
+                    <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>global_var <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+                    id <font color='#5555FF'>=</font> tp.<font color='#BB00BB'>add_task_by_value</font><font face='Lucida Console'>(</font>f, <font color='#5555FF'>&amp;</font>add_functor::set_global_var_const_arg2, a, b<font face='Lucida Console'>)</font>;
+                    tp.<font color='#BB00BB'>wait_for_task</font><font face='Lucida Console'>(</font>id<font face='Lucida Console'>)</font>;
+                    <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>global_var <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>7</font><font face='Lucida Console'>)</font>;
+
+
+
+
+
+
+                    global_var <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                    a <font color='#5555FF'>=</font> <font color='#979000'>4</font>;
+                    <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>global_var <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+                    id <font color='#5555FF'>=</font> tp.<font color='#BB00BB'>add_task</font><font face='Lucida Console'>(</font>f, <font color='#5555FF'>&amp;</font>add_functor::set_global_var_const_arg1, a<font face='Lucida Console'>)</font>;
+                    tp.<font color='#BB00BB'>wait_for_task</font><font face='Lucida Console'>(</font>id<font face='Lucida Console'>)</font>;
+                    <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>global_var <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>4</font><font face='Lucida Console'>)</font>;
+
+                    global_var <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                    a <font color='#5555FF'>=</font> <font color='#979000'>4</font>;
+                    <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>global_var <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+                    id <font color='#5555FF'>=</font> tp.<font color='#BB00BB'>add_task_by_value</font><font face='Lucida Console'>(</font>f, <font color='#5555FF'>&amp;</font>add_functor::set_global_var_const_arg1, a<font face='Lucida Console'>)</font>;
+                    tp.<font color='#BB00BB'>wait_for_task</font><font face='Lucida Console'>(</font>id<font face='Lucida Console'>)</font>;
+                    <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>global_var <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>4</font><font face='Lucida Console'>)</font>;
+
+                    global_var <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                    <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>global_var <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+                    id <font color='#5555FF'>=</font> tp.<font color='#BB00BB'>add_task_by_value</font><font face='Lucida Console'>(</font>f, <font color='#5555FF'>&amp;</font>add_functor::set_global_var<font face='Lucida Console'>)</font>;
+                    tp.<font color='#BB00BB'>wait_for_task</font><font face='Lucida Console'>(</font>id<font face='Lucida Console'>)</font>;
+                    <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>global_var <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>9</font><font face='Lucida Console'>)</font>;
+
+
+                    global_var <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                    <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>global_var <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+                    id <font color='#5555FF'>=</font> tp.<font color='#BB00BB'>add_task</font><font face='Lucida Console'>(</font>f, <font color='#5555FF'>&amp;</font>add_functor::set_global_var_const<font face='Lucida Console'>)</font>;
+                    tp.<font color='#BB00BB'>wait_for_task</font><font face='Lucida Console'>(</font>id<font face='Lucida Console'>)</font>;
+                    <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>global_var <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>9</font><font face='Lucida Console'>)</font>;
+
+
+                    global_var <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                    <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>global_var <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+                    id <font color='#5555FF'>=</font> tp.<font color='#BB00BB'>add_task_by_value</font><font face='Lucida Console'>(</font>f, <font color='#5555FF'>&amp;</font>add_functor::set_global_var_const<font face='Lucida Console'>)</font>;
+                    tp.<font color='#BB00BB'>wait_for_task</font><font face='Lucida Console'>(</font>id<font face='Lucida Console'>)</font>;
+                    <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>global_var <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>9</font><font face='Lucida Console'>)</font>;
+
+
+
+                <b>}</b>
+
+                <font color='#009900'>// add this task just to to perterb the thread pool before it goes out of scope
+</font>                tp.<font color='#BB00BB'>add_task</font><font face='Lucida Console'>(</font>f, a, b, res<font face='Lucida Console'>)</font>;
+
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> k <font color='#5555FF'>=</font> <font color='#979000'>0</font>; k <font color='#5555FF'>&lt;</font> <font color='#979000'>3</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>k<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#BB00BB'>print_spinner</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                    global_var <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                    tp.<font color='#BB00BB'>add_task_by_value</font><font face='Lucida Console'>(</font><font color='#BB00BB'>add_functor</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                    tp.<font color='#BB00BB'>wait_for_all_tasks</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                    <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>global_var <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>9</font><font face='Lucida Console'>)</font>;
+
+                    a <font color='#5555FF'>=</font> <font color='#979000'>0</font>; b <font color='#5555FF'>=</font> <font color='#979000'>0</font>; c <font color='#5555FF'>=</font> <font color='#979000'>0</font>; d <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                    tp.<font color='#BB00BB'>add_task_by_value</font><font face='Lucida Console'>(</font><font color='#BB00BB'>add_functor</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, a<font face='Lucida Console'>)</font>;
+                    <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>a <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+                    a <font color='#5555FF'>=</font> <font color='#979000'>0</font>; b <font color='#5555FF'>=</font> <font color='#979000'>0</font>; c <font color='#5555FF'>=</font> <font color='#979000'>0</font>; d <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                    tp.<font color='#BB00BB'>add_task_by_value</font><font face='Lucida Console'>(</font><font color='#BB00BB'>add_functor</font><font face='Lucida Console'>(</font><font color='#979000'>8</font><font face='Lucida Console'>)</font>, a, b<font face='Lucida Console'>)</font>;
+                    <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>a <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>8</font><font face='Lucida Console'>)</font>;
+                    <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>b <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+                    a <font color='#5555FF'>=</font> <font color='#979000'>0</font>; b <font color='#5555FF'>=</font> <font color='#979000'>0</font>; c <font color='#5555FF'>=</font> <font color='#979000'>0</font>; d <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                    tp.<font color='#BB00BB'>add_task_by_value</font><font face='Lucida Console'>(</font><font color='#BB00BB'>add_functor</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, a, b, c<font face='Lucida Console'>)</font>;
+                    <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>a <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+                    <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>b <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+                    <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>c <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>3</font><font face='Lucida Console'>)</font>;
+                    a <font color='#5555FF'>=</font> <font color='#979000'>0</font>; b <font color='#5555FF'>=</font> <font color='#979000'>0</font>; c <font color='#5555FF'>=</font> <font color='#979000'>0</font>; d <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                    tp.<font color='#BB00BB'>add_task_by_value</font><font face='Lucida Console'>(</font><font color='#BB00BB'>add_functor</font><font face='Lucida Console'>(</font><font color='#979000'>5</font><font face='Lucida Console'>)</font>, a, b, c, d<font face='Lucida Console'>)</font>;
+                    <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>a <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>5</font><font face='Lucida Console'>)</font>;
+                    <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>b <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+                    <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>c <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>3</font><font face='Lucida Console'>)</font>;
+                    <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>d <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>4</font><font face='Lucida Console'>)</font>;
+                <b>}</b>
+
+            <b>}</b>
+        <b>}</b>
+
+        <font color='#0000FF'><u>long</u></font> val;
+        <font color='#0000FF'><u>void</u></font> <b><a name='accum1'></a>accum1</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> a<font face='Lucida Console'>)</font> <b>{</b> val <font color='#5555FF'>+</font><font color='#5555FF'>=</font> a; <b>}</b>
+        <font color='#0000FF'><u>void</u></font> <b><a name='accum2'></a>accum2</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> a, <font color='#0000FF'><u>long</u></font> b<font face='Lucida Console'>)</font> <b>{</b> val <font color='#5555FF'>+</font><font color='#5555FF'>=</font> a <font color='#5555FF'>+</font> b; <b>}</b>
+        <font color='#0000FF'><u>void</u></font> <b><a name='zero_val'></a>zero_val</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <b>{</b> dlib::<font color='#BB00BB'>sleep</font><font face='Lucida Console'>(</font><font color='#979000'>20</font><font face='Lucida Console'>)</font>; val <font color='#5555FF'>=</font> <font color='#979000'>0</font>; <b>}</b>
+
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_struct_to_zero'></a>set_struct_to_zero</b> <font face='Lucida Console'>(</font>some_struct<font color='#5555FF'>&amp;</font> a<font face='Lucida Console'>)</font> <b>{</b> a.val <font color='#5555FF'>=</font> <font color='#979000'>0</font>; <b>}</b>
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_to_zero'></a>set_to_zero</b> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font color='#5555FF'>&amp;</font> a<font face='Lucida Console'>)</font> <b>{</b> dlib::<font color='#BB00BB'>sleep</font><font face='Lucida Console'>(</font><font color='#979000'>20</font><font face='Lucida Console'>)</font>; a <font color='#5555FF'>=</font> <font color='#979000'>0</font>; <b>}</b>
+        <font color='#0000FF'><u>void</u></font> <b><a name='increment'></a>increment</b> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font color='#5555FF'>&amp;</font> a<font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> dlib::<font color='#BB00BB'>sleep</font><font face='Lucida Console'>(</font><font color='#979000'>20</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>a; <b>}</b>
+        <font color='#0000FF'><u>void</u></font> <b><a name='add'></a>add</b> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> a, <font color='#0000FF'>const</font> <font color='#0000FF'><u>int</u></font><font color='#5555FF'>&amp;</font> b, <font color='#0000FF'><u>int</u></font><font color='#5555FF'>&amp;</font> res<font face='Lucida Console'>)</font> <b>{</b> dlib::<font color='#BB00BB'>sleep</font><font face='Lucida Console'>(</font><font color='#979000'>20</font><font face='Lucida Console'>)</font>; res <font color='#5555FF'>=</font> a <font color='#5555FF'>+</font> b; <b>}</b>
+        <font color='#0000FF'><u>void</u></font> <b><a name='add1'></a>add1</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font color='#5555FF'>&amp;</font> a, <font color='#0000FF'><u>int</u></font><font color='#5555FF'>&amp;</font> res<font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> res <font color='#5555FF'>+</font><font color='#5555FF'>=</font> a; <b>}</b>
+        <font color='#0000FF'><u>void</u></font> <b><a name='add2'></a>add2</b> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> c, <font color='#0000FF'><u>int</u></font> a, <font color='#0000FF'>const</font> <font color='#0000FF'><u>int</u></font><font color='#5555FF'>&amp;</font> b, <font color='#0000FF'><u>int</u></font><font color='#5555FF'>&amp;</font> res<font face='Lucida Console'>)</font> <b>{</b> res <font color='#5555FF'>=</font> a <font color='#5555FF'>+</font> b <font color='#5555FF'>+</font> c; <b>}</b>
+
+
+    <b>}</b> a;
+
+
+<b>}</b>
+
+
+
+
+</pre></body></html>

@@ -1,0 +1,655 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - string_abstract.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2006  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#undef</font> DLIB_STRINg_ABSTRACT_
+<font color='#0000FF'>#ifdef</font> DLIB_STRINg_ABSTRACT_
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>string<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>iostream<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>vector<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../error.h.html'>../error.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ---------------------------------------------------------------------------------------- 
+</font>
+    <font color='#0000FF'>class</font> <b><a name='string_cast_error'></a>string_cast_error</b> : <font color='#0000FF'>public</font> error
+    <b>{</b>
+    <font color='#0000FF'>public</font>:
+        <b><a name='string_cast_error'></a>string_cast_error</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>:error<font face='Lucida Console'>(</font>ECAST_TO_STRING<font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+    <b>}</b>;
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T,
+        <font color='#0000FF'>typename</font> charT,
+        <font color='#0000FF'>typename</font> traits,
+        <font color='#0000FF'>typename</font> alloc
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>const</font> T <b><a name='string_cast'></a>string_cast</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> std::basic_string<font color='#5555FF'>&lt;</font>charT,traits,alloc<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> str
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - T is not a pointer type
+        ensures
+            - returns str converted to T
+        throws
+            - string_cast_error
+                This exception is thrown if string_cast() is unable to convert
+                str into a T.  Also, string_cast_error::info == str
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>class</font> <b><a name='string_assign'></a>string_assign</b>
+    <b>{</b>
+        <font color='#009900'>/*!
+            WHAT THIS OBJECT REPRESENTS
+                This is a simple tool which provides an alternative syntax for using
+                the string_cast() function.  It can be understood by considering
+                the following example:
+
+                    string_assign sa;
+                    int val;
+                    double dval;
+
+                    val  = sa = "1234";   // executes: val = string_cast&lt;int&gt;("1234");
+                    dval = sa = "3.141";  // executes: val = string_cast&lt;double&gt;("3.141");
+
+                After executing, val will be equal to 1234 and dval will be 3.141.
+                Note that you can use string_assign to assign to any type which you could
+                use with string_cast(), except for std::basic_string, assigning to this
+                type is ambiguous for boring technical reasons.  But there isn't much
+                point in using this tool to assign from one string to another so it doesn't 
+                matter.   
+
+                Additionally, note that there is a global instance of this object, dlib::sa. 
+                So you never have to create a string_assign object yourself.  Finally, this 
+                object is totally stateless and threadsafe.   
+        !*/</font>
+    <b>}</b>;
+
+    <font color='#0000FF'>const</font> string_assign sa <font color='#5555FF'>=</font> <b><a name='string_assign'></a>string_assign</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>class</font> <b><a name='cast_to_string_error'></a>cast_to_string_error</b> : <font color='#0000FF'>public</font> error
+    <b>{</b>
+    <font color='#0000FF'>public</font>:
+        <b><a name='cast_to_string_error'></a>cast_to_string_error</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>:error<font face='Lucida Console'>(</font>ECAST_TO_STRING<font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+    <b>}</b>;
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>const</font> std::string <b><a name='cast_to_string'></a>cast_to_string</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> item 
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - T is not a pointer type
+        ensures
+            - returns item converted to std::string
+        throws
+            - cast_to_string_error
+                This exception is thrown if cast_to_string() is unable to convert
+                item into a std::string.  
+    !*/</font>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>const</font> std::wstring <b><a name='cast_to_wstring'></a>cast_to_wstring</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> item 
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - T is not a pointer type
+        ensures
+            - returns item converted to std::wstring
+        throws
+            - cast_to_string_error
+                This exception is thrown if cast_to_string() is unable to convert
+                item into a std::string.  
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    std::string <b><a name='pad_int_with_zeros'></a>pad_int_with_zeros</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'><u>int</u></font> i,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> width <font color='#5555FF'>=</font> <font color='#979000'>6</font>
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        ensures
+            - converts i into a string of at least width characters in length.  If
+              necessary, the string will be padded with leading zeros to get
+              to width characters.
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> charT,
+        <font color='#0000FF'>typename</font> traits,
+        <font color='#0000FF'>typename</font> alloc
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>const</font> std::string <b><a name='narrow'></a>narrow</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> std::basic_string<font color='#5555FF'>&lt;</font>charT,traits,alloc<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> str
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        ensures
+            - returns str as a std::string by converting every character in it to a char.
+              Note that any characters that do not have a mapping to type char will be 
+              converted to a space.
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> charT,
+        <font color='#0000FF'>typename</font> traits,
+        <font color='#0000FF'>typename</font> alloc
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>const</font> std::basic_string<font color='#5555FF'>&lt;</font>charT,traits,alloc<font color='#5555FF'>&gt;</font> <b><a name='wrap_string'></a>wrap_string</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> std::basic_string<font color='#5555FF'>&lt;</font>charT,traits,alloc<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> str,
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> first_pad <font color='#5555FF'>=</font> <font color='#979000'>0</font>,
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> rest_pad <font color='#5555FF'>=</font> <font color='#979000'>0</font>,
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> max_per_line <font color='#5555FF'>=</font> <font color='#979000'>79</font>
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - first_pad &lt; max_per_line
+            - rest_pad &lt; max_per_line
+            - rest_pad &gt;= first_pad
+        ensures
+            - returns a copy of str S such that:
+                - S is broken up into lines separated by the \n character.
+                - The first line starts with first_pad space characters.
+                - The second and all subsequent lines start with rest_pad space characters.
+                - The first line is no longer than max_per_line - (rest_pad-first_pad) characters.
+                - The second and all subsequent lines are no longer than max_per_line characters. 
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> traits 
+        <font color='#0000FF'>typename</font> alloc
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>const</font> std::basic_string<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>char</u></font>,traits,alloc<font color='#5555FF'>&gt;</font> <b><a name='tolower'></a>tolower</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> std::basic_string<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>char</u></font>,traits,alloc<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> str
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        ensures
+            - returns a copy of str S such that:
+                - #S.size() == str.size()
+                - #S[i] == std::tolower(str[i])
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> traits,
+        <font color='#0000FF'>typename</font> alloc
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>const</font> std::basic_string<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>char</u></font>,traits,alloc<font color='#5555FF'>&gt;</font> <b><a name='toupper'></a>toupper</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> std::basic_string<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>char</u></font>,traits,alloc<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> str
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        ensures
+            - returns a copy of str S such that:
+                - #S.size() == str.size()
+                - #S[i] == std::toupper(str[i])
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> traits,
+        <font color='#0000FF'>typename</font> alloc
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>bool</u></font> <b><a name='strings_equal_ignore_case'></a>strings_equal_ignore_case</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> std::basic_string<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>char</u></font>,traits,alloc<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> str1,
+        <font color='#0000FF'>const</font> std::basic_string<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>char</u></font>,traits,alloc<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> str2
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        ensures
+            - returns tolower(str1) == tolower(str2)
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> traits,
+        <font color='#0000FF'>typename</font> alloc
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>bool</u></font> <b><a name='strings_equal_ignore_case'></a>strings_equal_ignore_case</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> std::basic_string<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>char</u></font>,traits,alloc<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> str1,
+        <font color='#0000FF'>const</font> std::basic_string<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>char</u></font>,traits,alloc<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> str2,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> num
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        ensures
+            - returns tolower(str1.substr(0,num)) == tolower(str2.substr(0,num))
+              (i.e. only compares the first num characters)
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> charT,
+        <font color='#0000FF'>typename</font> traits,
+        <font color='#0000FF'>typename</font> alloc
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>const</font> std::basic_string<font color='#5555FF'>&lt;</font>charT,traits,alloc<font color='#5555FF'>&gt;</font> <b><a name='ltrim'></a>ltrim</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> std::basic_string<font color='#5555FF'>&lt;</font>charT,traits,alloc<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> str,
+        <font color='#0000FF'>const</font> std::basic_string<font color='#5555FF'>&lt;</font>charT,traits,alloc<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> trim_chars 
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        ensures
+            - returns a copy of str with any leading trim_chars  
+              from the left side of the string removed. 
+    !*/</font>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> charT,
+        <font color='#0000FF'>typename</font> traits,
+        <font color='#0000FF'>typename</font> alloc
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>const</font> std::basic_string<font color='#5555FF'>&lt;</font>charT,traits,alloc<font color='#5555FF'>&gt;</font> <b><a name='ltrim'></a>ltrim</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> std::basic_string<font color='#5555FF'>&lt;</font>charT,traits,alloc<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> str,
+        <font color='#0000FF'>const</font> charT<font color='#5555FF'>*</font> trim_chars <font color='#5555FF'>=</font> <font color='#BB00BB'>_dT</font><font face='Lucida Console'>(</font>charT,"<font color='#CC0000'> \t\r\n</font>"<font face='Lucida Console'>)</font>
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - trim_chars == a valid null-terminated C string
+        ensures
+            - returns ltrim(str, std::basic_string&lt;charT,traits,alloc&gt;(trim_chars))
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> charT,
+        <font color='#0000FF'>typename</font> traits,
+        <font color='#0000FF'>typename</font> alloc
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>const</font> std::basic_string<font color='#5555FF'>&lt;</font>charT,traits,alloc<font color='#5555FF'>&gt;</font> <b><a name='rtrim'></a>rtrim</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> std::basic_string<font color='#5555FF'>&lt;</font>charT,traits,alloc<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> str,
+        <font color='#0000FF'>const</font> std::basic_string<font color='#5555FF'>&lt;</font>charT,traits,alloc<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> trim_chars 
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        ensures
+            - returns a copy of str with any trailing trim_chars 
+              from the right side of the string removed. 
+    !*/</font>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> charT,
+        <font color='#0000FF'>typename</font> traits,
+        <font color='#0000FF'>typename</font> alloc
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>const</font> std::basic_string<font color='#5555FF'>&lt;</font>charT,traits,alloc<font color='#5555FF'>&gt;</font> <b><a name='rtrim'></a>rtrim</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> std::basic_string<font color='#5555FF'>&lt;</font>charT,traits,alloc<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> str,
+        <font color='#0000FF'>const</font> charT<font color='#5555FF'>*</font> trim_chars <font color='#5555FF'>=</font> <font color='#BB00BB'>_dT</font><font face='Lucida Console'>(</font>charT,"<font color='#CC0000'> \t\r\n</font>"<font face='Lucida Console'>)</font>
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - trim_chars == a valid null-terminated C string
+        ensures
+            - returns rtrim(str, std::basic_string&lt;charT,traits,alloc&gt;(trim_chars))
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> charT,
+        <font color='#0000FF'>typename</font> traits,
+        <font color='#0000FF'>typename</font> alloc
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>const</font> std::basic_string<font color='#5555FF'>&lt;</font>charT,traits,alloc<font color='#5555FF'>&gt;</font> <b><a name='trim'></a>trim</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> std::basic_string<font color='#5555FF'>&lt;</font>charT,traits,alloc<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> str,
+        <font color='#0000FF'>const</font> std::basic_string<font color='#5555FF'>&lt;</font>charT,traits,alloc<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> trim_chars 
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        ensures
+            - returns a copy of str with any leading or trailing trim_chars 
+              from the ends of the string removed. 
+    !*/</font>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> charT,
+        <font color='#0000FF'>typename</font> traits,
+        <font color='#0000FF'>typename</font> alloc
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>const</font> std::basic_string<font color='#5555FF'>&lt;</font>charT,traits,alloc<font color='#5555FF'>&gt;</font> <b><a name='trim'></a>trim</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> std::basic_string<font color='#5555FF'>&lt;</font>charT,traits,alloc<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> str,
+        <font color='#0000FF'>const</font> charT<font color='#5555FF'>*</font> trim_chars <font color='#5555FF'>=</font> <font color='#BB00BB'>_dT</font><font face='Lucida Console'>(</font>charT,"<font color='#CC0000'> \t\r\n</font>"<font face='Lucida Console'>)</font>
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - trim_chars == a valid null-terminated C string
+        ensures
+            - returns trim(str, std::basic_string&lt;charT,traits,alloc&gt;(trim_chars))
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> charT,
+        <font color='#0000FF'>typename</font> traits,
+        <font color='#0000FF'>typename</font> alloc
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>const</font> std::basic_string<font color='#5555FF'>&lt;</font>charT,traits,alloc<font color='#5555FF'>&gt;</font> <b><a name='rpad'></a>rpad</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> std::basic_string<font color='#5555FF'>&lt;</font>charT,traits,alloc<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> str,
+        <font color='#0000FF'><u>long</u></font> pad_length,
+        <font color='#0000FF'>const</font> std::basic_string<font color='#5555FF'>&lt;</font>charT,traits,alloc<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> pad_string 
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        ensures
+            - if (pad_length &lt;= str.size()) then
+                - returns str
+            - else
+                - let P be a string defined as follows:
+                    - P.size() == pad_length - str.size()
+                    - P == (pad_string + pad_string + ... + pad_string).substr(0,pad_length - str.size())
+                      (i.e. P == a string with the above specified size that contains just
+                      repitions of the pad_string)
+                - returns the string str + P 
+    !*/</font>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> charT,
+        <font color='#0000FF'>typename</font> traits,
+        <font color='#0000FF'>typename</font> alloc
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>const</font> std::basic_string<font color='#5555FF'>&lt;</font>charT,traits,alloc<font color='#5555FF'>&gt;</font> <b><a name='rpad'></a>rpad</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> std::basic_string<font color='#5555FF'>&lt;</font>charT,traits,alloc<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> str,
+        <font color='#0000FF'><u>long</u></font> pad_length,
+        <font color='#0000FF'>const</font> charT<font color='#5555FF'>*</font> pad_string <font color='#5555FF'>=</font> <font color='#BB00BB'>_dT</font><font face='Lucida Console'>(</font>charT,"<font color='#CC0000'> </font>"<font face='Lucida Console'>)</font>
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - pad_string == a valid null-terminated C string
+        ensures
+            - returns rpad(str, pad_length, std::basic_string&lt;charT,traits,alloc&gt;(pad_string))
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> charT,
+        <font color='#0000FF'>typename</font> traits,
+        <font color='#0000FF'>typename</font> alloc
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>const</font> std::basic_string<font color='#5555FF'>&lt;</font>charT,traits,alloc<font color='#5555FF'>&gt;</font> <b><a name='lpad'></a>lpad</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> std::basic_string<font color='#5555FF'>&lt;</font>charT,traits,alloc<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> str,
+        <font color='#0000FF'><u>long</u></font> pad_length,
+        <font color='#0000FF'>const</font> std::basic_string<font color='#5555FF'>&lt;</font>charT,traits,alloc<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> pad_string 
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        ensures
+            - if (pad_length &lt;= str.size()) then
+                - returns str
+            - else
+                - let P be a string defined as follows:
+                    - P.size() == pad_length - str.size()
+                    - P == (pad_string + pad_string + ... + pad_string).substr(0,pad_length - str.size())
+                      (i.e. P == a string with the above specified size that contains just
+                      repitions of the pad_string)
+                - returns the string P + str
+    !*/</font>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> charT,
+        <font color='#0000FF'>typename</font> traits,
+        <font color='#0000FF'>typename</font> alloc
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>const</font> std::basic_string<font color='#5555FF'>&lt;</font>charT,traits,alloc<font color='#5555FF'>&gt;</font> <b><a name='lpad'></a>lpad</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> std::basic_string<font color='#5555FF'>&lt;</font>charT,traits,alloc<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> str,
+        <font color='#0000FF'><u>long</u></font> pad_length,
+        <font color='#0000FF'>const</font> charT<font color='#5555FF'>*</font> pad_string <font color='#5555FF'>=</font> <font color='#BB00BB'>_dT</font><font face='Lucida Console'>(</font>charT,"<font color='#CC0000'> </font>"<font face='Lucida Console'>)</font>
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - pad_string == a valid null-terminated C string
+        ensures
+            - returns lpad(str, pad_length, std::basic_string&lt;charT,traits,alloc&gt;(pad_string))
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> charT,
+        <font color='#0000FF'>typename</font> traits,
+        <font color='#0000FF'>typename</font> alloc
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>const</font> std::basic_string<font color='#5555FF'>&lt;</font>charT,traits,alloc<font color='#5555FF'>&gt;</font> <b><a name='pad'></a>pad</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> std::basic_string<font color='#5555FF'>&lt;</font>charT,traits,alloc<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> str,
+        <font color='#0000FF'><u>long</u></font> pad_length,
+        <font color='#0000FF'>const</font> std::basic_string<font color='#5555FF'>&lt;</font>charT,traits,alloc<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> pad_string 
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        ensures
+            - let str_size == static_cast&lt;long&gt;(str.size())
+            - returns rpad( lpad(str, (pad_length-str_size)/2 + str_size, pad_string),  
+                            pad_length, 
+                            pad_string);
+    !*/</font>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> charT,
+        <font color='#0000FF'>typename</font> traits,
+        <font color='#0000FF'>typename</font> alloc
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>const</font> std::basic_string<font color='#5555FF'>&lt;</font>charT,traits,alloc<font color='#5555FF'>&gt;</font> <b><a name='pad'></a>pad</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> std::basic_string<font color='#5555FF'>&lt;</font>charT,traits,alloc<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> str,
+        <font color='#0000FF'><u>long</u></font> pad_length,
+        <font color='#0000FF'>const</font> charT<font color='#5555FF'>*</font> pad_string <font color='#5555FF'>=</font> <font color='#BB00BB'>_dT</font><font face='Lucida Console'>(</font>charT,"<font color='#CC0000'> </font>"<font face='Lucida Console'>)</font>
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - pad_string == a valid null-terminated C string
+        ensures
+            - returns pad(str, pad_length, std::basic_string&lt;charT,traits,alloc&gt;(pad_string))
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> charT,
+        <font color='#0000FF'>typename</font> traits,
+        <font color='#0000FF'>typename</font> alloc
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>const</font> std::basic_string<font color='#5555FF'>&lt;</font>charT,traits,alloc<font color='#5555FF'>&gt;</font> <b><a name='left_substr'></a>left_substr</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> std::basic_string<font color='#5555FF'>&lt;</font>charT,traits,alloc<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> str,
+        <font color='#0000FF'>const</font> std::basic_string<font color='#5555FF'>&lt;</font>charT,traits,alloc<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> delim 
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        ensures
+            - let delim_pos = str.find_first_of(delim)
+            - returns str.substr(0,delim_pos)
+    !*/</font>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> charT,
+        <font color='#0000FF'>typename</font> traits,
+        <font color='#0000FF'>typename</font> alloc
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>const</font> std::basic_string<font color='#5555FF'>&lt;</font>charT,traits,alloc<font color='#5555FF'>&gt;</font> <b><a name='left_substr'></a>left_substr</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> std::basic_string<font color='#5555FF'>&lt;</font>charT,traits,alloc<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> str,
+        <font color='#0000FF'>const</font> charT<font color='#5555FF'>*</font> delim <font color='#5555FF'>=</font> <font color='#BB00BB'>_dT</font><font face='Lucida Console'>(</font>charT,"<font color='#CC0000'> \n\r\t</font>"<font face='Lucida Console'>)</font>
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - delim == a valid null-terminated C string
+        ensures
+            - returns left_substr(str, std::basic_string&lt;charT,traits,alloc&gt;(delim))
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> charT,
+        <font color='#0000FF'>typename</font> traits,
+        <font color='#0000FF'>typename</font> alloc
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>const</font> std::basic_string<font color='#5555FF'>&lt;</font>charT,traits,alloc<font color='#5555FF'>&gt;</font> <b><a name='right_substr'></a>right_substr</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> std::basic_string<font color='#5555FF'>&lt;</font>charT,traits,alloc<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> str,
+        <font color='#0000FF'>const</font> std::basic_string<font color='#5555FF'>&lt;</font>charT,traits,alloc<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> delim 
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        ensures
+            - let delim_pos = str.find_last_of(delim)
+            - if (delim_pos == std::string::npos) then
+                - returns ""
+            - else
+                - returns str.substr(delim_pos+1)
+    !*/</font>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> charT,
+        <font color='#0000FF'>typename</font> traits
+        <font color='#0000FF'>typename</font> alloc
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>const</font> std::basic_string<font color='#5555FF'>&lt;</font>charT,traits,alloc<font color='#5555FF'>&gt;</font> <b><a name='right_substr'></a>right_substr</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> std::basic_string<font color='#5555FF'>&lt;</font>charT,traits,alloc<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> str,
+        <font color='#0000FF'>const</font> charT<font color='#5555FF'>*</font> delim <font color='#5555FF'>=</font> <font color='#BB00BB'>_dT</font><font face='Lucida Console'>(</font>charT,"<font color='#CC0000'> \n\r\t</font>"<font face='Lucida Console'>)</font>
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - delim == a valid null-terminated C string
+        ensures
+            - returns right_substr(str, std::basic_string&lt;charT,traits,alloc&gt;(delim))
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> charT,
+        <font color='#0000FF'>typename</font> traits,
+        <font color='#0000FF'>typename</font> alloc
+        <font color='#5555FF'>&gt;</font>
+    std::pair<font color='#5555FF'>&lt;</font>std::basic_string<font color='#5555FF'>&lt;</font>charT,traits,alloc<font color='#5555FF'>&gt;</font>, std::basic_string<font color='#5555FF'>&lt;</font>charT,traits,alloc<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> 
+    <b><a name='split_on_first'></a>split_on_first</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> std::basic_string<font color='#5555FF'>&lt;</font>charT,traits,alloc<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> str,
+        <font color='#0000FF'>const</font> charT<font color='#5555FF'>*</font> delim <font color='#5555FF'>=</font> <font color='#BB00BB'>_dT</font><font face='Lucida Console'>(</font>charT, "<font color='#CC0000'> \n\r\t</font>"<font face='Lucida Console'>)</font>
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        ensures
+            - This function splits string into two parts, the split is based on the first
+              occurrence of any character from delim.  
+            - let delim_pos = str.find_first_of(delim)
+            - if (delim_pos == std::string::npos) then
+                - returns make_pair(str,"")
+            - else
+                - return make_pair(str.substr(0, delim_pos), str.substr(delim_pos+1));
+    !*/</font>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> charT,
+        <font color='#0000FF'>typename</font> traits,
+        <font color='#0000FF'>typename</font> alloc
+        <font color='#5555FF'>&gt;</font>
+    std::pair<font color='#5555FF'>&lt;</font>std::basic_string<font color='#5555FF'>&lt;</font>charT,traits,alloc<font color='#5555FF'>&gt;</font>, std::basic_string<font color='#5555FF'>&lt;</font>charT,traits,alloc<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> 
+    <b><a name='split_on_first'></a>split_on_first</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> std::basic_string<font color='#5555FF'>&lt;</font>charT,traits,alloc<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> str,
+        <font color='#0000FF'>const</font> std::basic_string<font color='#5555FF'>&lt;</font>charT,traits,alloc<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> delim 
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - delim == a valid null-terminated C string
+        ensures
+            - returns split_on_first(str, delim.c_str())
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> charT,
+        <font color='#0000FF'>typename</font> traits,
+        <font color='#0000FF'>typename</font> alloc
+        <font color='#5555FF'>&gt;</font>
+    std::pair<font color='#5555FF'>&lt;</font>std::basic_string<font color='#5555FF'>&lt;</font>charT,traits,alloc<font color='#5555FF'>&gt;</font>, std::basic_string<font color='#5555FF'>&lt;</font>charT,traits,alloc<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> 
+    <b><a name='split_on_last'></a>split_on_last</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> std::basic_string<font color='#5555FF'>&lt;</font>charT,traits,alloc<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> str,
+        <font color='#0000FF'>const</font> charT<font color='#5555FF'>*</font> delim <font color='#5555FF'>=</font> <font color='#BB00BB'>_dT</font><font face='Lucida Console'>(</font>charT, "<font color='#CC0000'> \n\r\t</font>"<font face='Lucida Console'>)</font>
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        ensures
+            - This function splits string into two parts, the split is based on the last 
+              occurrence of any character from delim.  
+            - let delim_pos = str.find_last_of(delim)
+            - if (delim_pos == std::string::npos) then
+                - returns make_pair(str,"")
+            - else
+                - return make_pair(str.substr(0, delim_pos), str.substr(delim_pos+1));
+    !*/</font>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> charT,
+        <font color='#0000FF'>typename</font> traits,
+        <font color='#0000FF'>typename</font> alloc
+        <font color='#5555FF'>&gt;</font>
+    std::pair<font color='#5555FF'>&lt;</font>std::basic_string<font color='#5555FF'>&lt;</font>charT,traits,alloc<font color='#5555FF'>&gt;</font>, std::basic_string<font color='#5555FF'>&lt;</font>charT,traits,alloc<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> 
+    <b><a name='split_on_last'></a>split_on_last</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> std::basic_string<font color='#5555FF'>&lt;</font>charT,traits,alloc<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> str,
+        <font color='#0000FF'>const</font> std::basic_string<font color='#5555FF'>&lt;</font>charT,traits,alloc<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> delim 
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - delim == a valid null-terminated C string
+        ensures
+            - returns split_on_last(str, delim.c_str())
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> charT,
+        <font color='#0000FF'>typename</font> traits,
+        <font color='#0000FF'>typename</font> alloc
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>std::basic_string<font color='#5555FF'>&lt;</font>charT,traits,alloc<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> <b><a name='split'></a>split</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> std::basic_string<font color='#5555FF'>&lt;</font>charT,traits,alloc<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> str,
+        <font color='#0000FF'>const</font> std::basic_string<font color='#5555FF'>&lt;</font>charT,traits,alloc<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> delim 
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        ensures
+            - Breaks the given string str into a sequence of substrings delimited
+              by characters in delim and returns the results.  
+            - returns a vector V such that:
+                - V.size() == the number of substrings found in str.
+                - for all i: V[i] == The ith substring.  Note that it will not contain
+                  any delimiter characters (i.e. characters in delim).  It will also
+                  never be an empty string.
+                - V contains the substrings in the order in which they appear in str.
+                  That is, V[0] contains the first substring, V[1] the second, and
+                  so on.
+    !*/</font>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> charT,
+        <font color='#0000FF'>typename</font> traits,
+        <font color='#0000FF'>typename</font> alloc
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>std::basic_string<font color='#5555FF'>&lt;</font>charT,traits,alloc<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> <b><a name='split'></a>split</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> std::basic_string<font color='#5555FF'>&lt;</font>charT,traits,alloc<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> str,
+        <font color='#0000FF'>const</font> charT<font color='#5555FF'>*</font> delim <font color='#5555FF'>=</font> <font color='#BB00BB'>_dT</font><font face='Lucida Console'>(</font>charT,"<font color='#CC0000'> \n\r\t</font>"<font face='Lucida Console'>)</font>
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - trim_chars == a valid null-terminated C string
+        ensures
+            - returns split(str, std::basic_string&lt;charT,traits,alloc&gt;(delim))
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_STRINg_ABSTRACT_
+</font>
+
+</pre></body></html>

@@ -1,0 +1,176 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - optimization_stop_strategies.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2008  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_OPTIMIZATIOn_STOP_STRATEGIES_H_
+<font color='#0000FF'>#define</font> DLIB_OPTIMIZATIOn_STOP_STRATEGIES_H_
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>cmath<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>limits<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../matrix.h.html'>../matrix.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../algs.h.html'>../algs.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='optimization_stop_strategies_abstract.h.html'>optimization_stop_strategies_abstract.h</a>"
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>iostream<font color='#5555FF'>&gt;</font>
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>class</font> <b><a name='objective_delta_stop_strategy'></a>objective_delta_stop_strategy</b>
+    <b>{</b>
+    <font color='#0000FF'>public</font>:
+        <font color='#0000FF'>explicit</font> <b><a name='objective_delta_stop_strategy'></a>objective_delta_stop_strategy</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>double</u></font> min_delta <font color='#5555FF'>=</font> <font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>7</font>
+        <font face='Lucida Console'>)</font> : _verbose<font face='Lucida Console'>(</font><font color='#979000'>false</font><font face='Lucida Console'>)</font>, _been_used<font face='Lucida Console'>(</font><font color='#979000'>false</font><font face='Lucida Console'>)</font>, _min_delta<font face='Lucida Console'>(</font>min_delta<font face='Lucida Console'>)</font>, _max_iter<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>, _cur_iter<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>, _prev_funct_value<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font> 
+        <b>{</b>
+            <font color='#BB00BB'>DLIB_ASSERT</font> <font face='Lucida Console'>(</font>
+                min_delta <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#979000'>0</font>,
+                "<font color='#CC0000'>\t objective_delta_stop_strategy(min_delta)</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t min_delta can't be negative</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t min_delta: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> min_delta
+            <font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <b><a name='objective_delta_stop_strategy'></a>objective_delta_stop_strategy</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>double</u></font> min_delta,
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> max_iter
+        <font face='Lucida Console'>)</font> : _verbose<font face='Lucida Console'>(</font><font color='#979000'>false</font><font face='Lucida Console'>)</font>, _been_used<font face='Lucida Console'>(</font><font color='#979000'>false</font><font face='Lucida Console'>)</font>, _min_delta<font face='Lucida Console'>(</font>min_delta<font face='Lucida Console'>)</font>, _max_iter<font face='Lucida Console'>(</font>max_iter<font face='Lucida Console'>)</font>, _cur_iter<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>, _prev_funct_value<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font> 
+        <b>{</b>
+            <font color='#BB00BB'>DLIB_ASSERT</font> <font face='Lucida Console'>(</font>
+                min_delta <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#979000'>0</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> max_iter <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font>,
+                "<font color='#CC0000'>\t objective_delta_stop_strategy(min_delta, max_iter)</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t min_delta can't be negative and max_iter can't be 0</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t min_delta: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> min_delta
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t max_iter:  </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> max_iter 
+            <font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        objective_delta_stop_strategy<font color='#5555FF'>&amp;</font> <b><a name='be_verbose'></a>be_verbose</b><font face='Lucida Console'>(</font> 
+        <font face='Lucida Console'>)</font> 
+        <b>{</b>
+            _verbose <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+            <font color='#0000FF'>return</font> <font color='#5555FF'>*</font><font color='#0000FF'>this</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>bool</u></font> <b><a name='should_continue_search'></a>should_continue_search</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> ,
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> funct_value,
+            <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> 
+        <font face='Lucida Console'>)</font> 
+        <b>{</b>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>_verbose<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> std;
+                cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>iteration: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> _cur_iter <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>   objective: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> funct_value <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+            <b>}</b>
+
+            <font color='#5555FF'>+</font><font color='#5555FF'>+</font>_cur_iter;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>_been_used<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#009900'>// Check if we have hit the max allowable number of iterations.  (but only
+</font>                <font color='#009900'>// check if _max_iter is enabled (i.e. not 0)).
+</font>                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>_max_iter <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> _cur_iter <font color='#5555FF'>&gt;</font> _max_iter<font face='Lucida Console'>)</font>
+                    <font color='#0000FF'>return</font> <font color='#979000'>false</font>;
+
+                <font color='#009900'>// check if the function change was too small
+</font>                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>std::<font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font>funct_value <font color='#5555FF'>-</font> _prev_funct_value<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> _min_delta<font face='Lucida Console'>)</font>
+                    <font color='#0000FF'>return</font> <font color='#979000'>false</font>;
+            <b>}</b>
+
+            _been_used <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+            _prev_funct_value <font color='#5555FF'>=</font> funct_value;
+            <font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+        <b>}</b>
+
+    <font color='#0000FF'>private</font>:
+        <font color='#0000FF'><u>bool</u></font> _verbose;
+
+        <font color='#0000FF'><u>bool</u></font> _been_used;
+        <font color='#0000FF'><u>double</u></font> _min_delta;
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> _max_iter;
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> _cur_iter;
+        <font color='#0000FF'><u>double</u></font> _prev_funct_value;
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>class</font> <b><a name='gradient_norm_stop_strategy'></a>gradient_norm_stop_strategy</b>
+    <b>{</b>
+    <font color='#0000FF'>public</font>:
+        <font color='#0000FF'>explicit</font> <b><a name='gradient_norm_stop_strategy'></a>gradient_norm_stop_strategy</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>double</u></font> min_norm <font color='#5555FF'>=</font> <font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>7</font>
+        <font face='Lucida Console'>)</font> : _verbose<font face='Lucida Console'>(</font><font color='#979000'>false</font><font face='Lucida Console'>)</font>, _min_norm<font face='Lucida Console'>(</font>min_norm<font face='Lucida Console'>)</font>, _max_iter<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>, _cur_iter<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font> 
+        <b>{</b>
+            <font color='#BB00BB'>DLIB_ASSERT</font> <font face='Lucida Console'>(</font>
+                min_norm <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#979000'>0</font>,
+                "<font color='#CC0000'>\t gradient_norm_stop_strategy(min_norm)</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t min_norm can't be negative</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t min_norm: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> min_norm
+            <font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <b><a name='gradient_norm_stop_strategy'></a>gradient_norm_stop_strategy</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>double</u></font> min_norm,
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> max_iter
+        <font face='Lucida Console'>)</font> : _verbose<font face='Lucida Console'>(</font><font color='#979000'>false</font><font face='Lucida Console'>)</font>, _min_norm<font face='Lucida Console'>(</font>min_norm<font face='Lucida Console'>)</font>, _max_iter<font face='Lucida Console'>(</font>max_iter<font face='Lucida Console'>)</font>, _cur_iter<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font> 
+        <b>{</b>
+            <font color='#BB00BB'>DLIB_ASSERT</font> <font face='Lucida Console'>(</font>
+                min_norm <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#979000'>0</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> max_iter <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font>,
+                "<font color='#CC0000'>\t gradient_norm_stop_strategy(min_norm, max_iter)</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t min_norm can't be negative and max_iter can't be 0</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t min_norm: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> min_norm
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t max_iter:  </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> max_iter 
+            <font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        gradient_norm_stop_strategy<font color='#5555FF'>&amp;</font> <b><a name='be_verbose'></a>be_verbose</b><font face='Lucida Console'>(</font> 
+        <font face='Lucida Console'>)</font> 
+        <b>{</b>
+            _verbose <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+            <font color='#0000FF'>return</font> <font color='#5555FF'>*</font><font color='#0000FF'>this</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>bool</u></font> <b><a name='should_continue_search'></a>should_continue_search</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> ,
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> funct_value,
+            <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> funct_derivative
+        <font face='Lucida Console'>)</font> 
+        <b>{</b>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>_verbose<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> std;
+                cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>iteration: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> _cur_iter <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>   objective: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> funct_value <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>   gradient norm: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>length</font><font face='Lucida Console'>(</font>funct_derivative<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+            <b>}</b>
+
+            <font color='#5555FF'>+</font><font color='#5555FF'>+</font>_cur_iter;
+
+            <font color='#009900'>// Check if we have hit the max allowable number of iterations.  (but only
+</font>            <font color='#009900'>// check if _max_iter is enabled (i.e. not 0)).
+</font>            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>_max_iter <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> _cur_iter <font color='#5555FF'>&gt;</font> _max_iter<font face='Lucida Console'>)</font>
+                <font color='#0000FF'>return</font> <font color='#979000'>false</font>;
+
+            <font color='#009900'>// check if the gradient norm is too small 
+</font>            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>length</font><font face='Lucida Console'>(</font>funct_derivative<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> _min_norm<font face='Lucida Console'>)</font>
+                <font color='#0000FF'>return</font> <font color='#979000'>false</font>;
+
+            <font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+        <b>}</b>
+
+    <font color='#0000FF'>private</font>:
+        <font color='#0000FF'><u>bool</u></font> _verbose;
+
+        <font color='#0000FF'><u>double</u></font> _min_norm;
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> _max_iter;
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> _cur_iter;
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_OPTIMIZATIOn_STOP_STRATEGIES_H_
+</font>
+
+</pre></body></html>

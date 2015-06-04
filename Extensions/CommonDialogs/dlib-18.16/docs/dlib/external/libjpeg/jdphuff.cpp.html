@@ -1,0 +1,671 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - jdphuff.cpp</title></head><body bgcolor='white'><pre>
+<font color='#009900'>/*
+ * jdphuff.c
+ *
+ * Copyright (C) 1995-1997, Thomas G. Lane.
+ * This file is part of the Independent JPEG Group's software.
+ * For conditions of distribution and use, see the accompanying README file.
+ *
+ * This file contains Huffman entropy decoding routines for progressive JPEG.
+ *
+ * Much of the complexity here has to do with supporting input suspension.
+ * If the data source module demands suspension, we want to be able to back
+ * up to the start of the current MCU.  To do this, we copy state variables
+ * into local working storage, and update them back to the permanent
+ * storage only upon successful completion of an MCU.
+ */</font>
+
+<font color='#0000FF'>#define</font> JPEG_INTERNALS
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='jinclude.h.html'>jinclude.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='jpeglib.h.html'>jpeglib.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='jdhuff.h.html'>jdhuff.h</a>"		<font color='#009900'>/* Declarations shared with jdhuff.c */</font>
+
+
+<font color='#0000FF'>#ifdef</font> D_PROGRESSIVE_SUPPORTED
+
+<font color='#009900'>/*
+ * Expanded entropy decoder object for progressive Huffman decoding.
+ *
+ * The savable_state subrecord contains fields that change within an MCU,
+ * but must not be updated permanently until we complete the MCU.
+ */</font>
+
+<font color='#0000FF'>typedef</font> <font color='#0000FF'>struct</font> <b>{</b>
+  <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>int</u></font> EOBRUN;			<font color='#009900'>/* remaining EOBs in EOBRUN */</font>
+  <font color='#0000FF'><u>int</u></font> last_dc_val[MAX_COMPS_IN_SCAN];	<font color='#009900'>/* last DC coef for each component */</font>
+<b>}</b> savable_state;
+
+<font color='#009900'>/* This macro is to work around compilers with missing or broken
+ * structure assignment.  You'll need to fix this code if you have
+ * such a compiler and you change MAX_COMPS_IN_SCAN.
+ */</font>
+
+<font color='#0000FF'>#ifndef</font> NO_STRUCT_ASSIGN
+<font color='#0000FF'>#define</font> ASSIGN_STATE<font face='Lucida Console'>(</font>dest,src<font face='Lucida Console'>)</font>  <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>dest<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>src<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+<font color='#0000FF'>#else</font>
+<font color='#0000FF'>#if</font> MAX_COMPS_IN_SCAN <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>4</font>
+<font color='#0000FF'>#define</font> ASSIGN_STATE<font face='Lucida Console'>(</font>dest,src<font face='Lucida Console'>)</font>  \
+	<font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>dest<font face='Lucida Console'>)</font>.EOBRUN <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>src<font face='Lucida Console'>)</font>.EOBRUN, \
+	 <font face='Lucida Console'>(</font>dest<font face='Lucida Console'>)</font>.last_dc_val[<font color='#979000'>0</font>] <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>src<font face='Lucida Console'>)</font>.last_dc_val[<font color='#979000'>0</font>], \
+	 <font face='Lucida Console'>(</font>dest<font face='Lucida Console'>)</font>.last_dc_val[<font color='#979000'>1</font>] <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>src<font face='Lucida Console'>)</font>.last_dc_val[<font color='#979000'>1</font>], \
+	 <font face='Lucida Console'>(</font>dest<font face='Lucida Console'>)</font>.last_dc_val[<font color='#979000'>2</font>] <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>src<font face='Lucida Console'>)</font>.last_dc_val[<font color='#979000'>2</font>], \
+	 <font face='Lucida Console'>(</font>dest<font face='Lucida Console'>)</font>.last_dc_val[<font color='#979000'>3</font>] <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>src<font face='Lucida Console'>)</font>.last_dc_val[<font color='#979000'>3</font>]<font face='Lucida Console'>)</font>
+<font color='#0000FF'>#endif</font>
+<font color='#0000FF'>#endif</font>
+
+
+<font color='#0000FF'>typedef</font> <font color='#0000FF'>struct</font> <b>{</b>
+  <font color='#0000FF'>struct</font> jpeg_entropy_decoder pub; <font color='#009900'>/* public fields */</font>
+
+  <font color='#009900'>/* These fields are loaded into local variables at start of each MCU.
+   * In case of suspension, we exit WITHOUT updating them.
+   */</font>
+  bitread_perm_state bitstate;	<font color='#009900'>/* Bit buffer at start of MCU */</font>
+  savable_state saved;		<font color='#009900'>/* Other state at start of MCU */</font>
+
+  <font color='#009900'>/* These fields are NOT loaded into local working state. */</font>
+  <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>int</u></font> restarts_to_go;	<font color='#009900'>/* MCUs left in this restart interval */</font>
+
+  <font color='#009900'>/* Pointers to derived tables (these workspaces have image lifespan) */</font>
+  d_derived_tbl <font color='#5555FF'>*</font> derived_tbls[NUM_HUFF_TBLS];
+
+  d_derived_tbl <font color='#5555FF'>*</font> ac_derived_tbl; <font color='#009900'>/* active table during an AC scan */</font>
+<b>}</b> phuff_entropy_decoder;
+
+<font color='#0000FF'>typedef</font> phuff_entropy_decoder <font color='#5555FF'>*</font> phuff_entropy_ptr;
+
+<font color='#009900'>/* Forward declarations */</font>
+<b><a name='METHODDEF'></a>METHODDEF</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font> decode_mcu_DC_first <b><a name='JPP'></a>JPP</b><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>j_decompress_ptr cinfo,
+					    JBLOCKROW <font color='#5555FF'>*</font>MCU_data<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+<b><a name='METHODDEF'></a>METHODDEF</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font> decode_mcu_AC_first <b><a name='JPP'></a>JPP</b><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>j_decompress_ptr cinfo,
+					    JBLOCKROW <font color='#5555FF'>*</font>MCU_data<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+<b><a name='METHODDEF'></a>METHODDEF</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font> decode_mcu_DC_refine <b><a name='JPP'></a>JPP</b><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>j_decompress_ptr cinfo,
+					     JBLOCKROW <font color='#5555FF'>*</font>MCU_data<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+<b><a name='METHODDEF'></a>METHODDEF</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font> decode_mcu_AC_refine <b><a name='JPP'></a>JPP</b><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>j_decompress_ptr cinfo,
+					     JBLOCKROW <font color='#5555FF'>*</font>MCU_data<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+
+<font color='#009900'>/*
+ * Initialize for a Huffman-compressed scan.
+ */</font>
+
+<b><a name='METHODDEF'></a>METHODDEF</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font>
+<b><a name='start_pass_phuff_decoder'></a>start_pass_phuff_decoder</b> <font face='Lucida Console'>(</font>j_decompress_ptr cinfo<font face='Lucida Console'>)</font>
+<b>{</b>
+  phuff_entropy_ptr entropy <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>phuff_entropy_ptr<font face='Lucida Console'>)</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>entropy;
+  <font color='#0000FF'><u>int</u></font> is_DC_band, bad;
+  <font color='#0000FF'><u>int</u></font> ci, coefi, tbl;
+  <font color='#0000FF'><u>int</u></font> <font color='#5555FF'>*</font>coef_bit_ptr;
+  jpeg_component_info <font color='#5555FF'>*</font> compptr;
+
+  is_DC_band <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>Ss <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+
+  <font color='#009900'>/* Validate scan parameters */</font>
+  bad <font color='#5555FF'>=</font> FALSE;
+  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>is_DC_band<font face='Lucida Console'>)</font> <b>{</b>
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>Se <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+      bad <font color='#5555FF'>=</font> TRUE;
+  <b>}</b> <font color='#0000FF'>else</font> <b>{</b>
+    <font color='#009900'>/* need not check Ss/Se &lt; 0 since they came from unsigned bytes */</font>
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>Ss <font color='#5555FF'>&gt;</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>Se <font color='#5555FF'>|</font><font color='#5555FF'>|</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>Se <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> DCTSIZE2<font face='Lucida Console'>)</font>
+      bad <font color='#5555FF'>=</font> TRUE;
+    <font color='#009900'>/* AC scans may have only one component */</font>
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>comps_in_scan <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>
+      bad <font color='#5555FF'>=</font> TRUE;
+  <b>}</b>
+  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>Ah <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font> <b>{</b>
+    <font color='#009900'>/* Successive approximation refinement scan: must have Al = Ah-1. */</font>
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>Al <font color='#5555FF'>!</font><font color='#5555FF'>=</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>Ah<font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>
+      bad <font color='#5555FF'>=</font> TRUE;
+  <b>}</b>
+  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>Al <font color='#5555FF'>&gt;</font> <font color='#979000'>13</font><font face='Lucida Console'>)</font>		<font color='#009900'>/* need not check for &lt; 0 */</font>
+    bad <font color='#5555FF'>=</font> TRUE;
+  <font color='#009900'>/* Arguably the maximum Al value should be less than 13 for 8-bit precision,
+   * but the spec doesn't say so, and we try to be liberal about what we
+   * accept.  Note: large Al values could result in out-of-range DC
+   * coefficients during early scans, leading to bizarre displays due to
+   * overflows in the IDCT math.  But we won't crash.
+   */</font>
+  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>bad<font face='Lucida Console'>)</font>
+    <font color='#BB00BB'>ERREXIT4</font><font face='Lucida Console'>(</font>cinfo, JERR_BAD_PROGRESSION,
+	     cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>Ss, cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>Se, cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>Ah, cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>Al<font face='Lucida Console'>)</font>;
+  <font color='#009900'>/* Update progression status, and verify that scan order is legal.
+   * Note that inter-scan inconsistencies are treated as warnings
+   * not fatal errors ... not clear if this is right way to behave.
+   */</font>
+  <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>ci <font color='#5555FF'>=</font> <font color='#979000'>0</font>; ci <font color='#5555FF'>&lt;</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>comps_in_scan; ci<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> <b>{</b>
+    <font color='#0000FF'><u>int</u></font> cindex <font color='#5555FF'>=</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>cur_comp_info[ci]<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>component_index;
+    coef_bit_ptr <font color='#5555FF'>=</font> <font color='#5555FF'>&amp;</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>coef_bits[cindex][<font color='#979000'>0</font>];
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font>is_DC_band <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> coef_bit_ptr[<font color='#979000'>0</font>] <font color='#5555FF'>&lt;</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font> <font color='#009900'>/* AC without prior DC scan */</font>
+      <font color='#BB00BB'>WARNMS2</font><font face='Lucida Console'>(</font>cinfo, JWRN_BOGUS_PROGRESSION, cindex, <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>coefi <font color='#5555FF'>=</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>Ss; coefi <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>Se; coefi<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> <b>{</b>
+      <font color='#0000FF'><u>int</u></font> expected <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>coef_bit_ptr[coefi] <font color='#5555FF'>&lt;</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font> ? <font color='#979000'>0</font> : coef_bit_ptr[coefi];
+      <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>Ah <font color='#5555FF'>!</font><font color='#5555FF'>=</font> expected<font face='Lucida Console'>)</font>
+	<font color='#BB00BB'>WARNMS2</font><font face='Lucida Console'>(</font>cinfo, JWRN_BOGUS_PROGRESSION, cindex, coefi<font face='Lucida Console'>)</font>;
+      coef_bit_ptr[coefi] <font color='#5555FF'>=</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>Al;
+    <b>}</b>
+  <b>}</b>
+
+  <font color='#009900'>/* Select MCU decoding routine */</font>
+  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>Ah <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font> <b>{</b>
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>is_DC_band<font face='Lucida Console'>)</font>
+      entropy<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>pub.decode_mcu <font color='#5555FF'>=</font> decode_mcu_DC_first;
+    <font color='#0000FF'>else</font>
+      entropy<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>pub.decode_mcu <font color='#5555FF'>=</font> decode_mcu_AC_first;
+  <b>}</b> <font color='#0000FF'>else</font> <b>{</b>
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>is_DC_band<font face='Lucida Console'>)</font>
+      entropy<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>pub.decode_mcu <font color='#5555FF'>=</font> decode_mcu_DC_refine;
+    <font color='#0000FF'>else</font>
+      entropy<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>pub.decode_mcu <font color='#5555FF'>=</font> decode_mcu_AC_refine;
+  <b>}</b>
+
+  <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>ci <font color='#5555FF'>=</font> <font color='#979000'>0</font>; ci <font color='#5555FF'>&lt;</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>comps_in_scan; ci<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> <b>{</b>
+    compptr <font color='#5555FF'>=</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>cur_comp_info[ci];
+    <font color='#009900'>/* Make sure requested tables are present, and compute derived tables.
+     * We may build same derived table more than once, but it's not expensive.
+     */</font>
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>is_DC_band<font face='Lucida Console'>)</font> <b>{</b>
+      <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>Ah <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font> <b>{</b>	<font color='#009900'>/* DC refinement needs no table */</font>
+	tbl <font color='#5555FF'>=</font> compptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>dc_tbl_no;
+	<font color='#BB00BB'>jpeg_make_d_derived_tbl</font><font face='Lucida Console'>(</font>cinfo, TRUE, tbl,
+				<font color='#5555FF'>&amp;</font> entropy<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>derived_tbls[tbl]<font face='Lucida Console'>)</font>;
+      <b>}</b>
+    <b>}</b> <font color='#0000FF'>else</font> <b>{</b>
+      tbl <font color='#5555FF'>=</font> compptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>ac_tbl_no;
+      <font color='#BB00BB'>jpeg_make_d_derived_tbl</font><font face='Lucida Console'>(</font>cinfo, FALSE, tbl,
+			      <font color='#5555FF'>&amp;</font> entropy<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>derived_tbls[tbl]<font face='Lucida Console'>)</font>;
+      <font color='#009900'>/* remember the single active table */</font>
+      entropy<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>ac_derived_tbl <font color='#5555FF'>=</font> entropy<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>derived_tbls[tbl];
+    <b>}</b>
+    <font color='#009900'>/* Initialize DC predictions to 0 */</font>
+    entropy<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>saved.last_dc_val[ci] <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+  <b>}</b>
+
+  <font color='#009900'>/* Initialize bitread state variables */</font>
+  entropy<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>bitstate.bits_left <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+  entropy<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>bitstate.get_buffer <font color='#5555FF'>=</font> <font color='#979000'>0</font>; <font color='#009900'>/* unnecessary, but keeps Purify quiet */</font>
+  entropy<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>pub.insufficient_data <font color='#5555FF'>=</font> FALSE;
+
+  <font color='#009900'>/* Initialize private state variables */</font>
+  entropy<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>saved.EOBRUN <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+
+  <font color='#009900'>/* Initialize restart counter */</font>
+  entropy<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>restarts_to_go <font color='#5555FF'>=</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>restart_interval;
+<b>}</b>
+
+
+<font color='#009900'>/*
+ * Figure F.12: extend sign bit.
+ * On some machines, a shift and add will be faster than a table lookup.
+ */</font>
+
+<font color='#0000FF'>#ifdef</font> AVOID_TABLES
+
+<font color='#0000FF'>#define</font> HUFF_EXTEND<font face='Lucida Console'>(</font>x,s<font face='Lucida Console'>)</font>  <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>x<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> <font face='Lucida Console'>(</font><font color='#979000'>1</font><font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>s<font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> ? <font face='Lucida Console'>(</font>x<font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font><font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font><font face='Lucida Console'>(</font>s<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font> : <font face='Lucida Console'>(</font>x<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+
+<font color='#0000FF'>#else</font>
+
+<font color='#0000FF'>#define</font> HUFF_EXTEND<font face='Lucida Console'>(</font>x,s<font face='Lucida Console'>)</font>  <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>x<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> extend_test[s] ? <font face='Lucida Console'>(</font>x<font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> extend_offset[s] : <font face='Lucida Console'>(</font>x<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+
+<font color='#0000FF'>static</font> <font color='#0000FF'>const</font> <font color='#0000FF'><u>int</u></font> extend_test[<font color='#979000'>16</font>] <font color='#5555FF'>=</font>   <font color='#009900'>/* entry n is 2**(n-1) */</font>
+  <b>{</b> <font color='#979000'>0</font>, <font color='#979000'>0x0001</font>, <font color='#979000'>0x0002</font>, <font color='#979000'>0x0004</font>, <font color='#979000'>0x0008</font>, <font color='#979000'>0x0010</font>, <font color='#979000'>0x0020</font>, <font color='#979000'>0x0040</font>, <font color='#979000'>0x0080</font>,
+    <font color='#979000'>0x0100</font>, <font color='#979000'>0x0200</font>, <font color='#979000'>0x0400</font>, <font color='#979000'>0x0800</font>, <font color='#979000'>0x1000</font>, <font color='#979000'>0x2000</font>, <font color='#979000'>0x4000</font> <b>}</b>;
+
+<font color='#0000FF'>static</font> <font color='#0000FF'>const</font> <font color='#0000FF'><u>int</u></font> extend_offset[<font color='#979000'>16</font>] <font color='#5555FF'>=</font> <font color='#009900'>/* entry n is (-1 &lt;&lt; n) + 1 */</font>
+  <b>{</b> <font color='#979000'>0</font>, <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font><font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font><font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> <font color='#979000'>1</font>, <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font><font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font><font color='#979000'>2</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> <font color='#979000'>1</font>, <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font><font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font><font color='#979000'>3</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> <font color='#979000'>1</font>, <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font><font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font><font color='#979000'>4</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> <font color='#979000'>1</font>,
+    <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font><font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font><font color='#979000'>5</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> <font color='#979000'>1</font>, <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font><font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font><font color='#979000'>6</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> <font color='#979000'>1</font>, <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font><font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font><font color='#979000'>7</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> <font color='#979000'>1</font>, <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font><font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font><font color='#979000'>8</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> <font color='#979000'>1</font>,
+    <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font><font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font><font color='#979000'>9</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> <font color='#979000'>1</font>, <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font><font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font><font color='#979000'>10</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> <font color='#979000'>1</font>, <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font><font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font><font color='#979000'>11</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> <font color='#979000'>1</font>, <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font><font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font><font color='#979000'>12</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> <font color='#979000'>1</font>,
+    <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font><font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font><font color='#979000'>13</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> <font color='#979000'>1</font>, <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font><font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font><font color='#979000'>14</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> <font color='#979000'>1</font>, <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font><font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font><font color='#979000'>15</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> <font color='#979000'>1</font> <b>}</b>;
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>/* AVOID_TABLES */</font>
+
+
+<font color='#009900'>/*
+ * Check for a restart marker &amp; resynchronize decoder.
+ * Returns FALSE if must suspend.
+ */</font>
+
+<b><a name='LOCAL'></a>LOCAL</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font>
+<b><a name='process_restart'></a>process_restart</b> <font face='Lucida Console'>(</font>j_decompress_ptr cinfo<font face='Lucida Console'>)</font>
+<b>{</b>
+  phuff_entropy_ptr entropy <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>phuff_entropy_ptr<font face='Lucida Console'>)</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>entropy;
+  <font color='#0000FF'><u>int</u></font> ci;
+
+  <font color='#009900'>/* Throw away any unused bits remaining in bit buffer; */</font>
+  <font color='#009900'>/* include any full bytes in next_marker's count of discarded bytes */</font>
+  cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>marker<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>discarded_bytes <font color='#5555FF'>+</font><font color='#5555FF'>=</font> entropy<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>bitstate.bits_left <font color='#5555FF'>/</font> <font color='#979000'>8</font>;
+  entropy<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>bitstate.bits_left <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+
+  <font color='#009900'>/* Advance past the RSTn marker */</font>
+  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font> <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>marker<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>read_restart_marker<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>cinfo<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+    <font color='#0000FF'>return</font> FALSE;
+
+  <font color='#009900'>/* Re-initialize DC predictions to 0 */</font>
+  <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>ci <font color='#5555FF'>=</font> <font color='#979000'>0</font>; ci <font color='#5555FF'>&lt;</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>comps_in_scan; ci<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font>
+    entropy<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>saved.last_dc_val[ci] <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+  <font color='#009900'>/* Re-init EOB run count, too */</font>
+  entropy<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>saved.EOBRUN <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+
+  <font color='#009900'>/* Reset restart counter */</font>
+  entropy<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>restarts_to_go <font color='#5555FF'>=</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>restart_interval;
+
+  <font color='#009900'>/* Reset out-of-data flag, unless read_restart_marker left us smack up
+   * against a marker.  In that case we will end up treating the next data
+   * segment as empty, and we can avoid producing bogus output pixels by
+   * leaving the flag set.
+   */</font>
+  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>unread_marker <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+    entropy<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>pub.insufficient_data <font color='#5555FF'>=</font> FALSE;
+
+  <font color='#0000FF'>return</font> TRUE;
+<b>}</b>
+
+
+<font color='#009900'>/*
+ * Huffman MCU decoding.
+ * Each of these routines decodes and returns one MCU's worth of
+ * Huffman-compressed coefficients. 
+ * The coefficients are reordered from zigzag order into natural array order,
+ * but are not dequantized.
+ *
+ * The i'th block of the MCU is stored into the block pointed to by
+ * MCU_data[i].  WE ASSUME THIS AREA IS INITIALLY ZEROED BY THE CALLER.
+ *
+ * We return FALSE if data source requested suspension.  In that case no
+ * changes have been made to permanent state.  (Exception: some output
+ * coefficients may already have been assigned.  This is harmless for
+ * spectral selection, since we'll just re-assign them on the next call.
+ * Successive approximation AC refinement has to be more careful, however.)
+ */</font>
+
+<font color='#009900'>/*
+ * MCU decoding for DC initial scan (either spectral selection,
+ * or first pass of successive approximation).
+ */</font>
+
+<b><a name='METHODDEF'></a>METHODDEF</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font>
+<b><a name='decode_mcu_DC_first'></a>decode_mcu_DC_first</b> <font face='Lucida Console'>(</font>j_decompress_ptr cinfo, JBLOCKROW <font color='#5555FF'>*</font>MCU_data<font face='Lucida Console'>)</font>
+<b>{</b>   
+  phuff_entropy_ptr entropy <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>phuff_entropy_ptr<font face='Lucida Console'>)</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>entropy;
+  <font color='#0000FF'><u>int</u></font> Al <font color='#5555FF'>=</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>Al;
+  <font color='#0000FF'>register</font> <font color='#0000FF'><u>int</u></font> s, r;
+  <font color='#0000FF'><u>int</u></font> blkn, ci;
+  JBLOCKROW block;
+  BITREAD_STATE_VARS;
+  savable_state state;
+  d_derived_tbl <font color='#5555FF'>*</font> tbl;
+  jpeg_component_info <font color='#5555FF'>*</font> compptr;
+
+  <font color='#009900'>/* Process restart marker if needed; may have to suspend */</font>
+  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>restart_interval<font face='Lucida Console'>)</font> <b>{</b>
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>entropy<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>restarts_to_go <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+      <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font> <font color='#BB00BB'>process_restart</font><font face='Lucida Console'>(</font>cinfo<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+	<font color='#0000FF'>return</font> FALSE;
+  <b>}</b>
+
+  <font color='#009900'>/* If we've run out of data, just leave the MCU set to zeroes.
+   * This way, we return uniform gray for the remainder of the segment.
+   */</font>
+  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font> entropy<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>pub.insufficient_data<font face='Lucida Console'>)</font> <b>{</b>
+
+    <font color='#009900'>/* Load up working state */</font>
+    <font color='#BB00BB'>BITREAD_LOAD_STATE</font><font face='Lucida Console'>(</font>cinfo,entropy<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>bitstate<font face='Lucida Console'>)</font>;
+    <font color='#BB00BB'>ASSIGN_STATE</font><font face='Lucida Console'>(</font>state, entropy<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>saved<font face='Lucida Console'>)</font>;
+
+    <font color='#009900'>/* Outer loop handles each block in the MCU */</font>
+
+    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>blkn <font color='#5555FF'>=</font> <font color='#979000'>0</font>; blkn <font color='#5555FF'>&lt;</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>blocks_in_MCU; blkn<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> <b>{</b>
+      block <font color='#5555FF'>=</font> MCU_data[blkn];
+      ci <font color='#5555FF'>=</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>MCU_membership[blkn];
+      compptr <font color='#5555FF'>=</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>cur_comp_info[ci];
+      tbl <font color='#5555FF'>=</font> entropy<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>derived_tbls[compptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>dc_tbl_no];
+
+      <font color='#009900'>/* Decode a single block's worth of coefficients */</font>
+
+      <font color='#009900'>/* Section F.2.2.1: decode the DC coefficient difference */</font>
+      <font color='#BB00BB'>HUFF_DECODE</font><font face='Lucida Console'>(</font>s, br_state, tbl, <font color='#0000FF'>return</font> FALSE, label1<font face='Lucida Console'>)</font>;
+      <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>s<font face='Lucida Console'>)</font> <b>{</b>
+	<font color='#BB00BB'>CHECK_BIT_BUFFER</font><font face='Lucida Console'>(</font>br_state, s, <font color='#0000FF'>return</font> FALSE<font face='Lucida Console'>)</font>;
+	r <font color='#5555FF'>=</font> <font color='#BB00BB'>GET_BITS</font><font face='Lucida Console'>(</font>s<font face='Lucida Console'>)</font>;
+	s <font color='#5555FF'>=</font> <font color='#BB00BB'>HUFF_EXTEND</font><font face='Lucida Console'>(</font>r, s<font face='Lucida Console'>)</font>;
+      <b>}</b>
+
+      <font color='#009900'>/* Convert DC difference to actual value, update last_dc_val */</font>
+      s <font color='#5555FF'>+</font><font color='#5555FF'>=</font> state.last_dc_val[ci];
+      state.last_dc_val[ci] <font color='#5555FF'>=</font> s;
+      <font color='#009900'>/* Scale and output the coefficient (assumes jpeg_natural_order[0]=0) */</font>
+      <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>block<font face='Lucida Console'>)</font>[<font color='#979000'>0</font>] <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>JCOEF<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>s <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> Al<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+    <font color='#009900'>/* Completed MCU, so update state */</font>
+    <font color='#BB00BB'>BITREAD_SAVE_STATE</font><font face='Lucida Console'>(</font>cinfo,entropy<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>bitstate<font face='Lucida Console'>)</font>;
+    <font color='#BB00BB'>ASSIGN_STATE</font><font face='Lucida Console'>(</font>entropy<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>saved, state<font face='Lucida Console'>)</font>;
+  <b>}</b>
+
+  <font color='#009900'>/* Account for restart interval (no-op if not using restarts) */</font>
+  entropy<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>restarts_to_go<font color='#5555FF'>-</font><font color='#5555FF'>-</font>;
+
+  <font color='#0000FF'>return</font> TRUE;
+<b>}</b>
+
+
+<font color='#009900'>/*
+ * MCU decoding for AC initial scan (either spectral selection,
+ * or first pass of successive approximation).
+ */</font>
+
+<b><a name='METHODDEF'></a>METHODDEF</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font>
+<b><a name='decode_mcu_AC_first'></a>decode_mcu_AC_first</b> <font face='Lucida Console'>(</font>j_decompress_ptr cinfo, JBLOCKROW <font color='#5555FF'>*</font>MCU_data<font face='Lucida Console'>)</font>
+<b>{</b>   
+  phuff_entropy_ptr entropy <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>phuff_entropy_ptr<font face='Lucida Console'>)</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>entropy;
+  <font color='#0000FF'><u>int</u></font> Se <font color='#5555FF'>=</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>Se;
+  <font color='#0000FF'><u>int</u></font> Al <font color='#5555FF'>=</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>Al;
+  <font color='#0000FF'>register</font> <font color='#0000FF'><u>int</u></font> s, k, r;
+  <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>int</u></font> EOBRUN;
+  JBLOCKROW block;
+  BITREAD_STATE_VARS;
+  d_derived_tbl <font color='#5555FF'>*</font> tbl;
+
+  <font color='#009900'>/* Process restart marker if needed; may have to suspend */</font>
+  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>restart_interval<font face='Lucida Console'>)</font> <b>{</b>
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>entropy<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>restarts_to_go <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+      <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font> <font color='#BB00BB'>process_restart</font><font face='Lucida Console'>(</font>cinfo<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+	<font color='#0000FF'>return</font> FALSE;
+  <b>}</b>
+
+  <font color='#009900'>/* If we've run out of data, just leave the MCU set to zeroes.
+   * This way, we return uniform gray for the remainder of the segment.
+   */</font>
+  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font> entropy<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>pub.insufficient_data<font face='Lucida Console'>)</font> <b>{</b>
+
+    <font color='#009900'>/* Load up working state.
+     * We can avoid loading/saving bitread state if in an EOB run.
+     */</font>
+    EOBRUN <font color='#5555FF'>=</font> entropy<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>saved.EOBRUN;	<font color='#009900'>/* only part of saved state we need */</font>
+
+    <font color='#009900'>/* There is always only one block per MCU */</font>
+
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>EOBRUN <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>		<font color='#009900'>/* if it's a band of zeroes... */</font>
+      EOBRUN<font color='#5555FF'>-</font><font color='#5555FF'>-</font>;			<font color='#009900'>/* ...process it now (we do nothing) */</font>
+    <font color='#0000FF'>else</font> <b>{</b>
+      <font color='#BB00BB'>BITREAD_LOAD_STATE</font><font face='Lucida Console'>(</font>cinfo,entropy<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>bitstate<font face='Lucida Console'>)</font>;
+      block <font color='#5555FF'>=</font> MCU_data[<font color='#979000'>0</font>];
+      tbl <font color='#5555FF'>=</font> entropy<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>ac_derived_tbl;
+
+      <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>k <font color='#5555FF'>=</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>Ss; k <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> Se; k<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> <b>{</b>
+	<font color='#BB00BB'>HUFF_DECODE</font><font face='Lucida Console'>(</font>s, br_state, tbl, <font color='#0000FF'>return</font> FALSE, label2<font face='Lucida Console'>)</font>;
+	r <font color='#5555FF'>=</font> s <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font> <font color='#979000'>4</font>;
+	s <font color='#5555FF'>&amp;</font><font color='#5555FF'>=</font> <font color='#979000'>15</font>;
+	<font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>s<font face='Lucida Console'>)</font> <b>{</b>
+	  k <font color='#5555FF'>+</font><font color='#5555FF'>=</font> r;
+	  <font color='#BB00BB'>CHECK_BIT_BUFFER</font><font face='Lucida Console'>(</font>br_state, s, <font color='#0000FF'>return</font> FALSE<font face='Lucida Console'>)</font>;
+	  r <font color='#5555FF'>=</font> <font color='#BB00BB'>GET_BITS</font><font face='Lucida Console'>(</font>s<font face='Lucida Console'>)</font>;
+	  s <font color='#5555FF'>=</font> <font color='#BB00BB'>HUFF_EXTEND</font><font face='Lucida Console'>(</font>r, s<font face='Lucida Console'>)</font>;
+	  <font color='#009900'>/* Scale and output coefficient in natural (dezigzagged) order */</font>
+	  <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>block<font face='Lucida Console'>)</font>[jpeg_natural_order[k]] <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>JCOEF<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>s <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> Al<font face='Lucida Console'>)</font>;
+	<b>}</b> <font color='#0000FF'>else</font> <b>{</b>
+	  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>r <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>15</font><font face='Lucida Console'>)</font> <b>{</b>	<font color='#009900'>/* ZRL */</font>
+	    k <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#979000'>15</font>;		<font color='#009900'>/* skip 15 zeroes in band */</font>
+	  <b>}</b> <font color='#0000FF'>else</font> <b>{</b>		<font color='#009900'>/* EOBr, run length is 2^r + appended bits */</font>
+	    EOBRUN <font color='#5555FF'>=</font> <font color='#979000'>1</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> r;
+	    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>r<font face='Lucida Console'>)</font> <b>{</b>		<font color='#009900'>/* EOBr, r &gt; 0 */</font>
+	      <font color='#BB00BB'>CHECK_BIT_BUFFER</font><font face='Lucida Console'>(</font>br_state, r, <font color='#0000FF'>return</font> FALSE<font face='Lucida Console'>)</font>;
+	      r <font color='#5555FF'>=</font> <font color='#BB00BB'>GET_BITS</font><font face='Lucida Console'>(</font>r<font face='Lucida Console'>)</font>;
+	      EOBRUN <font color='#5555FF'>+</font><font color='#5555FF'>=</font> r;
+	    <b>}</b>
+	    EOBRUN<font color='#5555FF'>-</font><font color='#5555FF'>-</font>;		<font color='#009900'>/* this band is processed at this moment */</font>
+	    <font color='#0000FF'>break</font>;		<font color='#009900'>/* force end-of-band */</font>
+	  <b>}</b>
+	<b>}</b>
+      <b>}</b>
+
+      <font color='#BB00BB'>BITREAD_SAVE_STATE</font><font face='Lucida Console'>(</font>cinfo,entropy<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>bitstate<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+    <font color='#009900'>/* Completed MCU, so update state */</font>
+    entropy<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>saved.EOBRUN <font color='#5555FF'>=</font> EOBRUN;	<font color='#009900'>/* only part of saved state we need */</font>
+  <b>}</b>
+
+  <font color='#009900'>/* Account for restart interval (no-op if not using restarts) */</font>
+  entropy<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>restarts_to_go<font color='#5555FF'>-</font><font color='#5555FF'>-</font>;
+
+  <font color='#0000FF'>return</font> TRUE;
+<b>}</b>
+
+
+<font color='#009900'>/*
+ * MCU decoding for DC successive approximation refinement scan.
+ * Note: we assume such scans can be multi-component, although the spec
+ * is not very clear on the point.
+ */</font>
+
+<b><a name='METHODDEF'></a>METHODDEF</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font>
+<b><a name='decode_mcu_DC_refine'></a>decode_mcu_DC_refine</b> <font face='Lucida Console'>(</font>j_decompress_ptr cinfo, JBLOCKROW <font color='#5555FF'>*</font>MCU_data<font face='Lucida Console'>)</font>
+<b>{</b>   
+  phuff_entropy_ptr entropy <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>phuff_entropy_ptr<font face='Lucida Console'>)</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>entropy;
+  <font color='#0000FF'><u>int</u></font> p1 <font color='#5555FF'>=</font> <font color='#979000'>1</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>Al;	<font color='#009900'>/* 1 in the bit position being coded */</font>
+  <font color='#0000FF'><u>int</u></font> blkn;
+  JBLOCKROW block;
+  BITREAD_STATE_VARS;
+
+  <font color='#009900'>/* Process restart marker if needed; may have to suspend */</font>
+  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>restart_interval<font face='Lucida Console'>)</font> <b>{</b>
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>entropy<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>restarts_to_go <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+      <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font> <font color='#BB00BB'>process_restart</font><font face='Lucida Console'>(</font>cinfo<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+	<font color='#0000FF'>return</font> FALSE;
+  <b>}</b>
+
+  <font color='#009900'>/* Not worth the cycles to check insufficient_data here,
+   * since we will not change the data anyway if we read zeroes.
+   */</font>
+
+  <font color='#009900'>/* Load up working state */</font>
+  <font color='#BB00BB'>BITREAD_LOAD_STATE</font><font face='Lucida Console'>(</font>cinfo,entropy<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>bitstate<font face='Lucida Console'>)</font>;
+
+  <font color='#009900'>/* Outer loop handles each block in the MCU */</font>
+
+  <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>blkn <font color='#5555FF'>=</font> <font color='#979000'>0</font>; blkn <font color='#5555FF'>&lt;</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>blocks_in_MCU; blkn<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> <b>{</b>
+    block <font color='#5555FF'>=</font> MCU_data[blkn];
+
+    <font color='#009900'>/* Encoded data is simply the next bit of the two's-complement DC value */</font>
+    <font color='#BB00BB'>CHECK_BIT_BUFFER</font><font face='Lucida Console'>(</font>br_state, <font color='#979000'>1</font>, <font color='#0000FF'>return</font> FALSE<font face='Lucida Console'>)</font>;
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>GET_BITS</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+      <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>block<font face='Lucida Console'>)</font>[<font color='#979000'>0</font>] <font color='#5555FF'>|</font><font color='#5555FF'>=</font> p1;
+    <font color='#009900'>/* Note: since we use |=, repeating the assignment later is safe */</font>
+  <b>}</b>
+
+  <font color='#009900'>/* Completed MCU, so update state */</font>
+  <font color='#BB00BB'>BITREAD_SAVE_STATE</font><font face='Lucida Console'>(</font>cinfo,entropy<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>bitstate<font face='Lucida Console'>)</font>;
+
+  <font color='#009900'>/* Account for restart interval (no-op if not using restarts) */</font>
+  entropy<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>restarts_to_go<font color='#5555FF'>-</font><font color='#5555FF'>-</font>;
+
+  <font color='#0000FF'>return</font> TRUE;
+<b>}</b>
+
+
+<font color='#009900'>/*
+ * MCU decoding for AC successive approximation refinement scan.
+ */</font>
+
+<b><a name='METHODDEF'></a>METHODDEF</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font>
+<b><a name='decode_mcu_AC_refine'></a>decode_mcu_AC_refine</b> <font face='Lucida Console'>(</font>j_decompress_ptr cinfo, JBLOCKROW <font color='#5555FF'>*</font>MCU_data<font face='Lucida Console'>)</font>
+<b>{</b>   
+  phuff_entropy_ptr entropy <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>phuff_entropy_ptr<font face='Lucida Console'>)</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>entropy;
+  <font color='#0000FF'><u>int</u></font> Se <font color='#5555FF'>=</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>Se;
+  <font color='#0000FF'><u>int</u></font> p1 <font color='#5555FF'>=</font> <font color='#979000'>1</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>Al;	<font color='#009900'>/* 1 in the bit position being coded */</font>
+  <font color='#0000FF'><u>int</u></font> m1 <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>Al;	<font color='#009900'>/* -1 in the bit position being coded */</font>
+  <font color='#0000FF'>register</font> <font color='#0000FF'><u>int</u></font> s, k, r;
+  <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>int</u></font> EOBRUN;
+  JBLOCKROW block;
+  JCOEFPTR thiscoef;
+  BITREAD_STATE_VARS;
+  d_derived_tbl <font color='#5555FF'>*</font> tbl;
+  <font color='#0000FF'><u>int</u></font> num_newnz;
+  <font color='#0000FF'><u>int</u></font> newnz_pos[DCTSIZE2];
+
+  <font color='#009900'>/* Process restart marker if needed; may have to suspend */</font>
+  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>restart_interval<font face='Lucida Console'>)</font> <b>{</b>
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>entropy<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>restarts_to_go <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+      <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font> <font color='#BB00BB'>process_restart</font><font face='Lucida Console'>(</font>cinfo<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+	<font color='#0000FF'>return</font> FALSE;
+  <b>}</b>
+
+  <font color='#009900'>/* If we've run out of data, don't modify the MCU.
+   */</font>
+  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font> entropy<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>pub.insufficient_data<font face='Lucida Console'>)</font> <b>{</b>
+
+    <font color='#009900'>/* Load up working state */</font>
+    <font color='#BB00BB'>BITREAD_LOAD_STATE</font><font face='Lucida Console'>(</font>cinfo,entropy<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>bitstate<font face='Lucida Console'>)</font>;
+    EOBRUN <font color='#5555FF'>=</font> entropy<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>saved.EOBRUN; <font color='#009900'>/* only part of saved state we need */</font>
+
+    <font color='#009900'>/* There is always only one block per MCU */</font>
+    block <font color='#5555FF'>=</font> MCU_data[<font color='#979000'>0</font>];
+    tbl <font color='#5555FF'>=</font> entropy<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>ac_derived_tbl;
+
+    <font color='#009900'>/* If we are forced to suspend, we must undo the assignments to any newly
+     * nonzero coefficients in the block, because otherwise we'd get confused
+     * next time about which coefficients were already nonzero.
+     * But we need not undo addition of bits to already-nonzero coefficients;
+     * instead, we can test the current bit to see if we already did it.
+     */</font>
+    num_newnz <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+
+    <font color='#009900'>/* initialize coefficient loop counter to start of band */</font>
+    k <font color='#5555FF'>=</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>Ss;
+
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>EOBRUN <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font> <b>{</b>
+      <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>; k <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> Se; k<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> <b>{</b>
+	<font color='#BB00BB'>HUFF_DECODE</font><font face='Lucida Console'>(</font>s, br_state, tbl, <font color='#0000FF'>goto</font> undoit, label3<font face='Lucida Console'>)</font>;
+	r <font color='#5555FF'>=</font> s <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font> <font color='#979000'>4</font>;
+	s <font color='#5555FF'>&amp;</font><font color='#5555FF'>=</font> <font color='#979000'>15</font>;
+	<font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>s<font face='Lucida Console'>)</font> <b>{</b>
+	  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>s <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>		<font color='#009900'>/* size of new coef should always be 1 */</font>
+	    <font color='#BB00BB'>WARNMS</font><font face='Lucida Console'>(</font>cinfo, JWRN_HUFF_BAD_CODE<font face='Lucida Console'>)</font>;
+	  <font color='#BB00BB'>CHECK_BIT_BUFFER</font><font face='Lucida Console'>(</font>br_state, <font color='#979000'>1</font>, <font color='#0000FF'>goto</font> undoit<font face='Lucida Console'>)</font>;
+	  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>GET_BITS</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+	    s <font color='#5555FF'>=</font> p1;		<font color='#009900'>/* newly nonzero coef is positive */</font>
+	  <font color='#0000FF'>else</font>
+	    s <font color='#5555FF'>=</font> m1;		<font color='#009900'>/* newly nonzero coef is negative */</font>
+	<b>}</b> <font color='#0000FF'>else</font> <b>{</b>
+	  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>r <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>15</font><font face='Lucida Console'>)</font> <b>{</b>
+	    EOBRUN <font color='#5555FF'>=</font> <font color='#979000'>1</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> r;	<font color='#009900'>/* EOBr, run length is 2^r + appended bits */</font>
+	    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>r<font face='Lucida Console'>)</font> <b>{</b>
+	      <font color='#BB00BB'>CHECK_BIT_BUFFER</font><font face='Lucida Console'>(</font>br_state, r, <font color='#0000FF'>goto</font> undoit<font face='Lucida Console'>)</font>;
+	      r <font color='#5555FF'>=</font> <font color='#BB00BB'>GET_BITS</font><font face='Lucida Console'>(</font>r<font face='Lucida Console'>)</font>;
+	      EOBRUN <font color='#5555FF'>+</font><font color='#5555FF'>=</font> r;
+	    <b>}</b>
+	    <font color='#0000FF'>break</font>;		<font color='#009900'>/* rest of block is handled by EOB logic */</font>
+	  <b>}</b>
+	  <font color='#009900'>/* note s = 0 for processing ZRL */</font>
+	<b>}</b>
+	<font color='#009900'>/* Advance over already-nonzero coefs and r still-zero coefs,
+	 * appending correction bits to the nonzeroes.  A correction bit is 1
+	 * if the absolute value of the coefficient must be increased.
+	 */</font>
+	<font color='#0000FF'>do</font> <b>{</b>
+	  thiscoef <font color='#5555FF'>=</font> <font color='#5555FF'>*</font>block <font color='#5555FF'>+</font> jpeg_natural_order[k];
+	  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>thiscoef <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font> <b>{</b>
+	    <font color='#BB00BB'>CHECK_BIT_BUFFER</font><font face='Lucida Console'>(</font>br_state, <font color='#979000'>1</font>, <font color='#0000FF'>goto</font> undoit<font face='Lucida Console'>)</font>;
+	    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>GET_BITS</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <b>{</b>
+	      <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font>thiscoef <font color='#5555FF'>&amp;</font> p1<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font> <b>{</b> <font color='#009900'>/* do nothing if already set it */</font>
+		<font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>thiscoef <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+		  <font color='#5555FF'>*</font>thiscoef <font color='#5555FF'>+</font><font color='#5555FF'>=</font> p1;
+		<font color='#0000FF'>else</font>
+		  <font color='#5555FF'>*</font>thiscoef <font color='#5555FF'>+</font><font color='#5555FF'>=</font> m1;
+	      <b>}</b>
+	    <b>}</b>
+	  <b>}</b> <font color='#0000FF'>else</font> <b>{</b>
+	    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>-</font><font color='#5555FF'>-</font>r <font color='#5555FF'>&lt;</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+	      <font color='#0000FF'>break</font>;		<font color='#009900'>/* reached target zero coefficient */</font>
+	  <b>}</b>
+	  k<font color='#5555FF'>+</font><font color='#5555FF'>+</font>;
+	<b>}</b> <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>k <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> Se<font face='Lucida Console'>)</font>;
+	<font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>s<font face='Lucida Console'>)</font> <b>{</b>
+	  <font color='#0000FF'><u>int</u></font> pos <font color='#5555FF'>=</font> jpeg_natural_order[k];
+	  <font color='#009900'>/* Output newly nonzero coefficient */</font>
+	  <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>block<font face='Lucida Console'>)</font>[pos] <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>JCOEF<font face='Lucida Console'>)</font> s;
+	  <font color='#009900'>/* Remember its position in case we have to suspend */</font>
+	  newnz_pos[num_newnz<font color='#5555FF'>+</font><font color='#5555FF'>+</font>] <font color='#5555FF'>=</font> pos;
+	<b>}</b>
+      <b>}</b>
+    <b>}</b>
+
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>EOBRUN <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font> <b>{</b>
+      <font color='#009900'>/* Scan any remaining coefficient positions after the end-of-band
+       * (the last newly nonzero coefficient, if any).  Append a correction
+       * bit to each already-nonzero coefficient.  A correction bit is 1
+       * if the absolute value of the coefficient must be increased.
+       */</font>
+      <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>; k <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> Se; k<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> <b>{</b>
+	thiscoef <font color='#5555FF'>=</font> <font color='#5555FF'>*</font>block <font color='#5555FF'>+</font> jpeg_natural_order[k];
+	<font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>thiscoef <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font> <b>{</b>
+	  <font color='#BB00BB'>CHECK_BIT_BUFFER</font><font face='Lucida Console'>(</font>br_state, <font color='#979000'>1</font>, <font color='#0000FF'>goto</font> undoit<font face='Lucida Console'>)</font>;
+	  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>GET_BITS</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <b>{</b>
+	    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font>thiscoef <font color='#5555FF'>&amp;</font> p1<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font> <b>{</b> <font color='#009900'>/* do nothing if already changed it */</font>
+	      <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>thiscoef <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+		<font color='#5555FF'>*</font>thiscoef <font color='#5555FF'>+</font><font color='#5555FF'>=</font> p1;
+	      <font color='#0000FF'>else</font>
+		<font color='#5555FF'>*</font>thiscoef <font color='#5555FF'>+</font><font color='#5555FF'>=</font> m1;
+	    <b>}</b>
+	  <b>}</b>
+	<b>}</b>
+      <b>}</b>
+      <font color='#009900'>/* Count one block completed in EOB run */</font>
+      EOBRUN<font color='#5555FF'>-</font><font color='#5555FF'>-</font>;
+    <b>}</b>
+
+    <font color='#009900'>/* Completed MCU, so update state */</font>
+    <font color='#BB00BB'>BITREAD_SAVE_STATE</font><font face='Lucida Console'>(</font>cinfo,entropy<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>bitstate<font face='Lucida Console'>)</font>;
+    entropy<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>saved.EOBRUN <font color='#5555FF'>=</font> EOBRUN; <font color='#009900'>/* only part of saved state we need */</font>
+  <b>}</b>
+
+  <font color='#009900'>/* Account for restart interval (no-op if not using restarts) */</font>
+  entropy<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>restarts_to_go<font color='#5555FF'>-</font><font color='#5555FF'>-</font>;
+
+  <font color='#0000FF'>return</font> TRUE;
+
+undoit:
+  <font color='#009900'>/* Re-zero any output coefficients that we made newly nonzero */</font>
+  <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>num_newnz <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+    <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>block<font face='Lucida Console'>)</font>[newnz_pos[<font color='#5555FF'>-</font><font color='#5555FF'>-</font>num_newnz]] <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+
+  <font color='#0000FF'>return</font> FALSE;
+<b>}</b>
+
+
+<font color='#009900'>/*
+ * Module initialization routine for progressive Huffman entropy decoding.
+ */</font>
+
+<b><a name='GLOBAL'></a>GLOBAL</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font>
+<b><a name='jinit_phuff_decoder'></a>jinit_phuff_decoder</b> <font face='Lucida Console'>(</font>j_decompress_ptr cinfo<font face='Lucida Console'>)</font>
+<b>{</b>
+  phuff_entropy_ptr entropy;
+  <font color='#0000FF'><u>int</u></font> <font color='#5555FF'>*</font>coef_bit_ptr;
+  <font color='#0000FF'><u>int</u></font> ci, i;
+
+  entropy <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>phuff_entropy_ptr<font face='Lucida Console'>)</font>
+    <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>mem<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>alloc_small<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>j_common_ptr<font face='Lucida Console'>)</font> cinfo, JPOOL_IMAGE,
+				<font color='#BB00BB'>SIZEOF</font><font face='Lucida Console'>(</font>phuff_entropy_decoder<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+  cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>entropy <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'>struct</font> jpeg_entropy_decoder <font color='#5555FF'>*</font><font face='Lucida Console'>)</font> entropy;
+  entropy<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>pub.start_pass <font color='#5555FF'>=</font> start_pass_phuff_decoder;
+
+  <font color='#009900'>/* Mark derived tables unallocated */</font>
+  <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> NUM_HUFF_TBLS; i<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> <b>{</b>
+    entropy<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>derived_tbls[i] <font color='#5555FF'>=</font> NULL;
+  <b>}</b>
+
+  <font color='#009900'>/* Create progression status table */</font>
+  cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>coef_bits <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> <font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font face='Lucida Console'>)</font>[DCTSIZE2]<font face='Lucida Console'>)</font>
+    <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>mem<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>alloc_small<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>j_common_ptr<font face='Lucida Console'>)</font> cinfo, JPOOL_IMAGE,
+				cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>num_components<font color='#5555FF'>*</font>DCTSIZE2<font color='#5555FF'>*</font><font color='#BB00BB'>SIZEOF</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+  coef_bit_ptr <font color='#5555FF'>=</font> <font color='#5555FF'>&amp;</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>coef_bits[<font color='#979000'>0</font>][<font color='#979000'>0</font>];
+  <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>ci <font color='#5555FF'>=</font> <font color='#979000'>0</font>; ci <font color='#5555FF'>&lt;</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>num_components; ci<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> 
+    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> DCTSIZE2; i<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font>
+      <font color='#5555FF'>*</font>coef_bit_ptr<font color='#5555FF'>+</font><font color='#5555FF'>+</font> <font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>1</font>;
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>/* D_PROGRESSIVE_SUPPORTED */</font>
+
+</pre></body></html>

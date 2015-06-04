@@ -1,0 +1,331 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - linear_manifold_regularizer.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2010  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_LINEAR_MANIFOLD_ReGULARIZER_Hh_
+<font color='#0000FF'>#define</font> DLIB_LINEAR_MANIFOLD_ReGULARIZER_Hh_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='linear_manifold_regularizer_abstract.h.html'>linear_manifold_regularizer_abstract.h</a>"
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>limits<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>vector<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../serialize.h.html'>../serialize.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../matrix.h.html'>../matrix.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+    <font color='#0000FF'>namespace</font> impl
+    <b>{</b>
+        <font color='#0000FF'>class</font> <b><a name='undirected_adjacency_list'></a>undirected_adjacency_list</b>
+        <b>{</b>
+            <font color='#009900'>/*!
+                WHAT THIS OBJECT REPRESENTS
+                    This object is simply a tool for turning a vector of sample_pair objects
+                    into an adjacency list with floating point weights on each edge.  
+            !*/</font>
+        <font color='#0000FF'>public</font>:
+
+            <b><a name='undirected_adjacency_list'></a>undirected_adjacency_list</b> <font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font>
+            <b>{</b>
+                _size <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                sum_edge_weights <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            <b>}</b>
+
+            <font color='#0000FF'>struct</font> <b><a name='neighbor'></a>neighbor</b> 
+            <b>{</b>
+                <b><a name='neighbor'></a>neighbor</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> idx, <font color='#0000FF'><u>double</u></font> w<font face='Lucida Console'>)</font>:index<font face='Lucida Console'>(</font>idx<font face='Lucida Console'>)</font>, weight<font face='Lucida Console'>(</font>w<font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+                <b><a name='neighbor'></a>neighbor</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>:index<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>, weight<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+
+                <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> index;
+                <font color='#0000FF'><u>double</u></font> weight;
+            <b>}</b>;
+
+            <font color='#0000FF'>typedef</font> std::vector<font color='#5555FF'>&lt;</font>neighbor<font color='#5555FF'>&gt;</font>::const_iterator const_iterator;
+
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='size'></a>size</b> <font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+            <font color='#009900'>/*!
+                ensures
+                    - returns the number of vertices in this graph
+            !*/</font>
+            <b>{</b>
+                <font color='#0000FF'>return</font> _size;
+            <b>}</b>
+
+            const_iterator <b><a name='begin'></a>begin</b><font face='Lucida Console'>(</font>
+                <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> idx
+            <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+            <font color='#009900'>/*!
+                requires
+                    - idx &lt; size()
+                ensures
+                    - returns an iterator that points to the first neighbor of 
+                      the idx'th vertex.
+            !*/</font>
+            <b>{</b>
+                <font color='#0000FF'>return</font> blocks[idx];
+            <b>}</b>
+
+            const_iterator <b><a name='end'></a>end</b><font face='Lucida Console'>(</font>
+                <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> idx
+            <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+            <font color='#009900'>/*!
+                requires
+                    - idx &lt; size()
+                ensures
+                    - returns an iterator that points one past the last neighbor
+                      of the idx'th vertex.
+            !*/</font>
+            <b>{</b>
+                <font color='#0000FF'>return</font> blocks[idx<font color='#5555FF'>+</font><font color='#979000'>1</font>];
+            <b>}</b>
+
+
+            <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> vector_type, <font color='#0000FF'>typename</font> weight_function_type<font color='#5555FF'>&gt;</font>
+            <font color='#0000FF'><u>void</u></font> <b><a name='build'></a>build</b> <font face='Lucida Console'>(</font>
+                <font color='#0000FF'>const</font> vector_type<font color='#5555FF'>&amp;</font> edges,
+                <font color='#0000FF'>const</font> weight_function_type<font color='#5555FF'>&amp;</font> weight_funct
+            <font face='Lucida Console'>)</font> 
+            <font color='#009900'>/*!
+                requires
+                    - vector_type == a type with an interface compatible with std::vector and 
+                      it must in turn contain objects with an interface compatible with dlib::sample_pair
+                    - edges.size() &gt; 0
+                    - contains_duplicate_pairs(edges) == false
+                    - weight_funct(edges[i]) must be a valid expression that evaluates to a
+                      floating point number &gt;= 0
+                ensures
+                    - #size() == one greater than the max index in edges.
+                    - builds the adjacency list so that it contains all the given edges.
+                    - The weight in each neighbor is set to the output of the weight_funct()
+                      for the associated edge.
+            !*/</font>
+            <b>{</b>
+
+
+                <font color='#009900'>// Figure out how many neighbors each sample ultimately has.  We do this so 
+</font>                <font color='#009900'>// we will know how much space to allocate in the data vector.
+</font>                std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font> num_neighbors;
+                num_neighbors.<font color='#BB00BB'>reserve</font><font face='Lucida Console'>(</font>edges.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> edges.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#009900'>// make sure num_neighbors is always big enough 
+</font>                    <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> min_size <font color='#5555FF'>=</font> std::<font color='#BB00BB'>max</font><font face='Lucida Console'>(</font>edges[i].<font color='#BB00BB'>index1</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, edges[i].<font color='#BB00BB'>index2</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font color='#5555FF'>+</font><font color='#979000'>1</font>;
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>num_neighbors.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> min_size<font face='Lucida Console'>)</font>
+                        num_neighbors.<font color='#BB00BB'>resize</font><font face='Lucida Console'>(</font>min_size,  <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+
+                    num_neighbors[edges[i].<font color='#BB00BB'>index1</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>] <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+                    num_neighbors[edges[i].<font color='#BB00BB'>index2</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>] <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+                <b>}</b>
+
+                _size <font color='#5555FF'>=</font> num_neighbors.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+                <font color='#009900'>// Now setup the iterators in blocks.  Also setup a version of blocks that holds
+</font>                <font color='#009900'>// non-const iterators so we can use it below when we populate data.
+</font>                std::vector<font color='#5555FF'>&lt;</font>std::vector<font color='#5555FF'>&lt;</font>neighbor<font color='#5555FF'>&gt;</font>::iterator<font color='#5555FF'>&gt;</font> mutable_blocks;
+                data.<font color='#BB00BB'>resize</font><font face='Lucida Console'>(</font>edges.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>*</font><font color='#979000'>2</font><font face='Lucida Console'>)</font>; <font color='#009900'>// each edge will show up twice 
+</font>                blocks.<font color='#BB00BB'>resize</font><font face='Lucida Console'>(</font>_size <font color='#5555FF'>+</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+                blocks[<font color='#979000'>0</font>] <font color='#5555FF'>=</font> data.<font color='#BB00BB'>begin</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                mutable_blocks.<font color='#BB00BB'>resize</font><font face='Lucida Console'>(</font>_size <font color='#5555FF'>+</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+                mutable_blocks[<font color='#979000'>0</font>] <font color='#5555FF'>=</font> data.<font color='#BB00BB'>begin</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> num_neighbors.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    blocks[i<font color='#5555FF'>+</font><font color='#979000'>1</font>]         <font color='#5555FF'>=</font> blocks[i]         <font color='#5555FF'>+</font> num_neighbors[i];
+                    mutable_blocks[i<font color='#5555FF'>+</font><font color='#979000'>1</font>] <font color='#5555FF'>=</font> mutable_blocks[i] <font color='#5555FF'>+</font> num_neighbors[i];
+                <b>}</b>
+
+                sum_edge_weights <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                <font color='#009900'>// finally, put the edges into data
+</font>                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> edges.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> weight <font color='#5555FF'>=</font> <font color='#BB00BB'>weight_funct</font><font face='Lucida Console'>(</font>edges[i]<font face='Lucida Console'>)</font>;
+                    sum_edge_weights <font color='#5555FF'>+</font><font color='#5555FF'>=</font> weight;
+
+                    <font color='#009900'>// make sure requires clause is not broken
+</font>                    <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font>weight <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#979000'>0</font>,
+                        "<font color='#CC0000'>\t void linear_manifold_regularizer::build()</font>"
+                        <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t You supplied a weight_funct() that generated a negative weight.</font>"
+                        <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t weight: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> weight 
+                        <font face='Lucida Console'>)</font>;
+
+                    <font color='#5555FF'>*</font>mutable_blocks[edges[i].<font color='#BB00BB'>index1</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>]<font color='#5555FF'>+</font><font color='#5555FF'>+</font> <font color='#5555FF'>=</font> <font color='#BB00BB'>neighbor</font><font face='Lucida Console'>(</font>edges[i].<font color='#BB00BB'>index2</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, weight<font face='Lucida Console'>)</font>;
+                    <font color='#5555FF'>*</font>mutable_blocks[edges[i].<font color='#BB00BB'>index2</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>]<font color='#5555FF'>+</font><font color='#5555FF'>+</font> <font color='#5555FF'>=</font> <font color='#BB00BB'>neighbor</font><font face='Lucida Console'>(</font>edges[i].<font color='#BB00BB'>index1</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, weight<font face='Lucida Console'>)</font>;
+                <b>}</b>
+
+            <b>}</b>
+
+            <font color='#0000FF'><u>double</u></font> <b><a name='sum_of_edge_weights'></a>sum_of_edge_weights</b> <font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+            <b>{</b>
+                <font color='#0000FF'>return</font> sum_edge_weights;
+            <b>}</b>
+
+        <font color='#0000FF'>private</font>:
+
+            <font color='#009900'>/*!
+                INITIAL VALUE
+                    - _size == 0
+                    - data.size() == 0
+                    - blocks.size() == 0
+                    - sum_edge_weights == 0
+
+                CONVENTION
+                    - size() == _size
+                    - blocks.size() == _size + 1
+                    - sum_of_edge_weights() == sum_edge_weights
+                    - blocks == a vector of iterators that point into data.  
+                      For all valid i:
+                        - The iterator range [blocks[i], blocks[i+1]) contains all the edges
+                          for the i'th node in the graph
+            !*/</font>
+
+            std::vector<font color='#5555FF'>&lt;</font>neighbor<font color='#5555FF'>&gt;</font> data;
+            std::vector<font color='#5555FF'>&lt;</font>const_iterator<font color='#5555FF'>&gt;</font> blocks; 
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> _size;
+
+            <font color='#0000FF'><u>double</u></font> sum_edge_weights;
+        <b>}</b>;
+
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> matrix_type
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>class</font> <b><a name='linear_manifold_regularizer'></a>linear_manifold_regularizer</b>
+    <b>{</b>
+
+    <font color='#0000FF'>public</font>:
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> matrix_type::mem_manager_type mem_manager_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> matrix_type::type scalar_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> matrix_type::layout_type layout_type;
+        <font color='#0000FF'>typedef</font> matrix<font color='#5555FF'>&lt;</font>scalar_type,<font color='#979000'>0</font>,<font color='#979000'>0</font>,mem_manager_type,layout_type<font color='#5555FF'>&gt;</font> general_matrix;
+
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'>typename</font> vector_type1, 
+            <font color='#0000FF'>typename</font> vector_type2, 
+            <font color='#0000FF'>typename</font> weight_function_type
+            <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='build'></a>build</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> vector_type1<font color='#5555FF'>&amp;</font> samples,
+            <font color='#0000FF'>const</font> vector_type2<font color='#5555FF'>&amp;</font> edges,
+            <font color='#0000FF'>const</font> weight_function_type<font color='#5555FF'>&amp;</font> weight_funct
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#009900'>// make sure requires clause is not broken
+</font>            <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font>edges.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font>
+                        <font color='#BB00BB'>contains_duplicate_pairs</font><font face='Lucida Console'>(</font>edges<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font>
+                        <font color='#BB00BB'>max_index_plus_one</font><font face='Lucida Console'>(</font>edges<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> samples.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,
+                "<font color='#CC0000'>\t void linear_manifold_regularizer::build()</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t Invalid inputs were given to this function.</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t edges.size():                    </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> edges.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t samples.size():                  </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> samples.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t contains_duplicate_pairs(edges): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>contains_duplicate_pairs</font><font face='Lucida Console'>(</font>edges<font face='Lucida Console'>)</font> 
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t max_index_plus_one(edges):       </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>max_index_plus_one</font><font face='Lucida Console'>(</font>edges<font face='Lucida Console'>)</font> 
+                <font face='Lucida Console'>)</font>;
+
+
+            impl::undirected_adjacency_list graph;
+            graph.<font color='#BB00BB'>build</font><font face='Lucida Console'>(</font>edges, weight_funct<font face='Lucida Console'>)</font>;
+
+            sum_edge_weights <font color='#5555FF'>=</font> graph.<font color='#BB00BB'>sum_of_edge_weights</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+            <font color='#BB00BB'>make_mr_matrix</font><font face='Lucida Console'>(</font>samples, graph<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'><u>long</u></font> <b><a name='dimensionality'></a>dimensionality</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> reg_mat.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <b>}</b>
+
+        general_matrix <b><a name='get_transformation_matrix'></a>get_transformation_matrix</b> <font face='Lucida Console'>(</font>
+            scalar_type intrinsic_regularization_strength
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#009900'>// make sure requires clause is not broken
+</font>            <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font>intrinsic_regularization_strength <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#979000'>0</font>,
+                "<font color='#CC0000'>\t matrix linear_manifold_regularizer::get_transformation_matrix()</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t This value must not be negative</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t intrinsic_regularization_strength: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> intrinsic_regularization_strength 
+                <font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>dimensionality</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                <font color='#0000FF'>return</font> <font color='#BB00BB'>general_matrix</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+
+            <font color='#009900'>// This isn't how it's defined in the referenced paper but normalizing these kinds of
+</font>            <font color='#009900'>// sums is typical of most machine learning algorithms.  Moreover, doing this makes
+</font>            <font color='#009900'>// the argument to this function more invariant to the size of the edge set.  So it
+</font>            <font color='#009900'>// should make it easier for the user.
+</font>            intrinsic_regularization_strength <font color='#5555FF'>/</font><font color='#5555FF'>=</font> sum_edge_weights;
+
+            <font color='#0000FF'>return</font> <font color='#BB00BB'>inv_lower_triangular</font><font face='Lucida Console'>(</font><font color='#BB00BB'>chol</font><font face='Lucida Console'>(</font>identity_matrix<font color='#5555FF'>&lt;</font>scalar_type<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>reg_mat.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> intrinsic_regularization_strength<font color='#5555FF'>*</font>reg_mat<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+    <font color='#0000FF'>private</font>:
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> vector_type<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='make_mr_matrix'></a>make_mr_matrix</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> vector_type<font color='#5555FF'>&amp;</font> samples,
+            <font color='#0000FF'>const</font> impl::undirected_adjacency_list<font color='#5555FF'>&amp;</font> graph
+        <font face='Lucida Console'>)</font>
+        <font color='#009900'>/*!
+            requires
+                - samples.size() == graph.size()
+            ensures
+                - computes trans(X)*lap(graph)*X where X is the data matrix 
+                  (i.e. the matrix that contains all the samples in its rows)
+                  and lap(graph) is the laplacian matrix of the graph.  The
+                  resulting matrix is stored in reg_mat.
+        !*/</font>
+        <b>{</b>
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> dims <font color='#5555FF'>=</font> samples[<font color='#979000'>0</font>].<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            reg_mat.<font color='#BB00BB'>set_size</font><font face='Lucida Console'>(</font>dims,dims<font face='Lucida Console'>)</font>;
+            reg_mat <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+
+
+            <font color='#0000FF'>typename</font> impl::undirected_adjacency_list::const_iterator beg, end;
+
+            <font color='#009900'>// loop over the columns of the X matrix
+</font>            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> d <font color='#5555FF'>=</font> <font color='#979000'>0</font>; d <font color='#5555FF'>&lt;</font> dims; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>d<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#009900'>// loop down the row of X
+</font>                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> graph.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    beg <font color='#5555FF'>=</font> graph.<font color='#BB00BB'>begin</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>;
+                    end <font color='#5555FF'>=</font> graph.<font color='#BB00BB'>end</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>;
+
+                    <font color='#009900'>// if this node in the graph has any neighbors
+</font>                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>beg <font color='#5555FF'>!</font><font color='#5555FF'>=</font> end<font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        <font color='#0000FF'><u>double</u></font> weight_sum <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                        <font color='#0000FF'><u>double</u></font> val <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>; beg <font color='#5555FF'>!</font><font color='#5555FF'>=</font> end; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>beg<font face='Lucida Console'>)</font>
+                        <b>{</b>
+                            val <font color='#5555FF'>-</font><font color='#5555FF'>=</font> beg<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>weight <font color='#5555FF'>*</font> samples[beg<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>index]<font face='Lucida Console'>(</font>d<font face='Lucida Console'>)</font>;
+                            weight_sum <font color='#5555FF'>+</font><font color='#5555FF'>=</font> beg<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>weight;
+                        <b>}</b>
+                        val <font color='#5555FF'>+</font><font color='#5555FF'>=</font> weight_sum <font color='#5555FF'>*</font> samples[i]<font face='Lucida Console'>(</font>d<font face='Lucida Console'>)</font>;
+
+                        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> j <font color='#5555FF'>=</font> <font color='#979000'>0</font>; j <font color='#5555FF'>&lt;</font> dims; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>j<font face='Lucida Console'>)</font>
+                        <b>{</b>
+                            <font color='#BB00BB'>reg_mat</font><font face='Lucida Console'>(</font>d,j<font face='Lucida Console'>)</font> <font color='#5555FF'>+</font><font color='#5555FF'>=</font> val<font color='#5555FF'>*</font>samples[i]<font face='Lucida Console'>(</font>j<font face='Lucida Console'>)</font>;
+                        <b>}</b>
+                    <b>}</b>
+                <b>}</b>
+            <b>}</b>
+
+        <b>}</b>
+
+        general_matrix reg_mat;
+        <font color='#0000FF'><u>double</u></font> sum_edge_weights;
+    <b>}</b>;
+
+<b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_LINEAR_MANIFOLD_ReGULARIZER_Hh_
+</font>
+
+</pre></body></html>

@@ -1,0 +1,175 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - pipe_ex.cpp</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// The contents of this file are in the public domain. See LICENSE_FOR_EXAMPLE_PROGRAMS.txt
+</font>
+
+<font color='#009900'>/*
+    This is an example illustrating the use of the threading API and pipe object 
+    from the dlib C++ Library.
+
+    In this example we will create three threads that will read "jobs" off the end of 
+    a pipe object and process them.  It shows you how you can use the pipe object
+    to communicate between threads.  
+
+
+    Example program output:
+    0 INFO  [0] pipe_example: Add job 0 to pipe
+    0 INFO  [0] pipe_example: Add job 1 to pipe
+    0 INFO  [0] pipe_example: Add job 2 to pipe
+    0 INFO  [0] pipe_example: Add job 3 to pipe
+    0 INFO  [0] pipe_example: Add job 4 to pipe
+    0 INFO  [0] pipe_example: Add job 5 to pipe
+    0 INFO  [1] pipe_example: got job 0
+    0 INFO  [0] pipe_example: Add job 6 to pipe
+    0 INFO  [2] pipe_example: got job 1
+    0 INFO  [0] pipe_example: Add job 7 to pipe
+    0 INFO  [3] pipe_example: got job 2
+  103 INFO  [0] pipe_example: Add job 8 to pipe
+  103 INFO  [1] pipe_example: got job 3
+  103 INFO  [0] pipe_example: Add job 9 to pipe
+  103 INFO  [2] pipe_example: got job 4
+  103 INFO  [0] pipe_example: Add job 10 to pipe
+  103 INFO  [3] pipe_example: got job 5
+  207 INFO  [0] pipe_example: Add job 11 to pipe
+  207 INFO  [1] pipe_example: got job 6
+  207 INFO  [0] pipe_example: Add job 12 to pipe
+  207 INFO  [2] pipe_example: got job 7
+  207 INFO  [0] pipe_example: Add job 13 to pipe
+  207 INFO  [3] pipe_example: got job 8
+  311 INFO  [1] pipe_example: got job 9
+  311 INFO  [2] pipe_example: got job 10
+  311 INFO  [3] pipe_example: got job 11
+  311 INFO  [0] pipe_example: Add job 14 to pipe
+  311 INFO  [0] pipe_example: main ending
+  311 INFO  [0] pipe_example: destructing pipe object: wait for job_pipe to be empty
+  415 INFO  [1] pipe_example: got job 12
+  415 INFO  [2] pipe_example: got job 13
+  415 INFO  [3] pipe_example: got job 14
+  415 INFO  [0] pipe_example: destructing pipe object: job_pipe is empty
+  519 INFO  [1] pipe_example: thread ending
+  519 INFO  [2] pipe_example: thread ending
+  519 INFO  [3] pipe_example: thread ending
+  519 INFO  [0] pipe_example: destructing pipe object: all threads have ended
+
+
+  The first column is the number of milliseconds since program start, the second
+  column is the logging level, the third column is the thread id, and the rest
+  is the log message.
+*/</font>
+
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>threads.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>misc_api.h<font color='#5555FF'>&gt;</font>  <font color='#009900'>// for dlib::sleep
+</font><font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>pipe.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>logger.h<font color='#5555FF'>&gt;</font>
+
+<font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> dlib;
+
+<font color='#0000FF'>struct</font> <b><a name='job'></a>job</b>
+<b>{</b>
+    <font color='#009900'>/*
+        This object represents the jobs we are going to send out to our threads.  
+    */</font>
+    <font color='#0000FF'><u>int</u></font> id;
+<b>}</b>;
+
+dlib::logger <b><a name='dlog'></a>dlog</b><font face='Lucida Console'>(</font>"<font color='#CC0000'>pipe_example</font>"<font face='Lucida Console'>)</font>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<font color='#0000FF'>class</font> <b><a name='pipe_example'></a>pipe_example</b> : <font color='#0000FF'>private</font> multithreaded_object
+<b>{</b>
+<font color='#0000FF'>public</font>:
+    <b><a name='pipe_example'></a>pipe_example</b><font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font> : 
+        job_pipe<font face='Lucida Console'>(</font><font color='#979000'>4</font><font face='Lucida Console'>)</font> <font color='#009900'>// This 4 here is the size of our job_pipe.  The significance is that
+</font>                    <font color='#009900'>// if you try to enqueue more than 4 jobs onto the pipe then enqueue() will
+</font>                    <font color='#009900'>// block until there is room.  
+</font>    <b>{</b>
+        <font color='#009900'>// register 3 threads
+</font>        <font color='#BB00BB'>register_thread</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font>,<font color='#5555FF'>&amp;</font>pipe_example::thread<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>register_thread</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font>,<font color='#5555FF'>&amp;</font>pipe_example::thread<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>register_thread</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font>,<font color='#5555FF'>&amp;</font>pipe_example::thread<font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// start the 3 threads we registered above
+</font>        <font color='#BB00BB'>start</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+    ~<b><a name='pipe_example'></a>pipe_example</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>destructing pipe object: wait for job_pipe to be empty</font>";
+        <font color='#009900'>// wait for all the jobs to be processed
+</font>        job_pipe.<font color='#BB00BB'>wait_until_empty</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+        dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>destructing pipe object: job_pipe is empty</font>";
+
+        <font color='#009900'>// now disable the job_pipe.  doing this will cause all calls to 
+</font>        <font color='#009900'>// job_pipe.dequeue() to return false so our threads will terminate
+</font>        job_pipe.<font color='#BB00BB'>disable</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// now block until all the threads have terminated
+</font>        <font color='#BB00BB'>wait</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>destructing pipe object: all threads have ended</font>";
+    <b>}</b>
+
+    <font color='#009900'>// Here we declare our pipe object.  It will contain our job objects.
+</font>    <font color='#009900'>// There are only two requirements on the type of objects you can use in a
+</font>    <font color='#009900'>// pipe, first they must have a default constructor and second they must
+</font>    <font color='#009900'>// be swappable by a global swap().
+</font>    dlib::pipe<font color='#5555FF'>&lt;</font>job<font color='#5555FF'>&gt;</font> job_pipe;
+
+<font color='#0000FF'>private</font>:
+    <font color='#0000FF'><u>void</u></font> <b><a name='thread'></a>thread</b> <font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+    <b>{</b>
+        job j;
+        <font color='#009900'>// Here we loop on jobs from the job_pipe.  
+</font>        <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>job_pipe.<font color='#BB00BB'>dequeue</font><font face='Lucida Console'>(</font>j<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#009900'>// process our job j in some way.   
+</font>            dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>got job </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> j.id;
+
+            <font color='#009900'>// sleep for 0.1 seconds
+</font>            dlib::<font color='#BB00BB'>sleep</font><font face='Lucida Console'>(</font><font color='#979000'>100</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+        dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>thread ending</font>";
+    <b>}</b>
+
+<b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<font color='#0000FF'><u>int</u></font> <b><a name='main'></a>main</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+<b>{</b>
+    <font color='#009900'>// Set the dlog object so that it logs everything.
+</font>    dlog.<font color='#BB00BB'>set_level</font><font face='Lucida Console'>(</font>LALL<font face='Lucida Console'>)</font>;
+
+    pipe_example pe;
+
+    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> <font color='#979000'>15</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+    <b>{</b>
+        dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>Add job </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> i <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'> to pipe</font>";
+        job j;
+        j.id <font color='#5555FF'>=</font> i;
+
+
+        <font color='#009900'>// Add this job to the pipe.  One of our three threads will get it and process it.
+</font>        <font color='#009900'>// It should also be pointed out that the enqueue() function uses the global
+</font>        <font color='#009900'>// swap function to move jobs into the pipe.  This means that it modifies the
+</font>        <font color='#009900'>// jobs we are passing in to it.  This allows you to implement a fast swap 
+</font>        <font color='#009900'>// operator for your jobs.  For example, std::vector objects have a global
+</font>        <font color='#009900'>// swap and it can execute in constant time by just swapping pointers inside 
+</font>        <font color='#009900'>// std::vector.  This means that the dlib::pipe is effectively a zero-copy 
+</font>        <font color='#009900'>// message passing system if you setup global swap for your jobs.   
+</font>        pe.job_pipe.<font color='#BB00BB'>enqueue</font><font face='Lucida Console'>(</font>j<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+    dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>main ending</font>";
+
+    <font color='#009900'>// the main function won't really terminate here.  It will call the destructor for pe
+</font>    <font color='#009900'>// which will block until all the jobs have been processed.
+</font><b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+
+</pre></body></html>

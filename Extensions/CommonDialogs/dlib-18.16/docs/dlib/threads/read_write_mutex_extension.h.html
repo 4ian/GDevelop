@@ -1,0 +1,180 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - read_write_mutex_extension.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2010  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_READ_WRITE_MUTEX_EXTENSIOn_
+<font color='#0000FF'>#define</font> DLIB_READ_WRITE_MUTEX_EXTENSIOn_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='threads_kernel.h.html'>threads_kernel.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='read_write_mutex_extension_abstract.h.html'>read_write_mutex_extension_abstract.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>class</font> <b><a name='read_write_mutex'></a>read_write_mutex</b>
+    <b>{</b>
+        <font color='#009900'>/*!
+            INITIAL VALUE
+                - max_locks == defined by constructor 
+                - available_locks == max_locks
+                - write_lock_in_progress == false
+                - write_lock_active == false
+
+            CONVENTION
+                - Each time someone gets a read only lock they take one of the "available locks"
+                  and each write lock takes all possible locks (i.e. max_locks).  The number of
+                  available locks is recorded in available_locks.  Any time you try to lock this 
+                  object and there aren't available locks you have to wait.
+
+                - max_locks == max_readonly_locks()
+
+                - if (some thread is on the process of obtaining a write lock) then
+                    - write_lock_in_progress == true
+                - else
+                    - write_lock_in_progress == false
+
+                - if (some thread currently has a write lock on this mutex) then
+                    - write_lock_active == true
+                - else
+                    - write_lock_active == false
+        !*/</font>
+
+    <font color='#0000FF'>public</font>:
+
+        <b><a name='read_write_mutex'></a>read_write_mutex</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> : s<font face='Lucida Console'>(</font>m<font face='Lucida Console'>)</font>,
+            max_locks<font face='Lucida Console'>(</font><font color='#979000'>0xFFFFFFFF</font><font face='Lucida Console'>)</font>,
+            available_locks<font face='Lucida Console'>(</font>max_locks<font face='Lucida Console'>)</font>,
+            write_lock_in_progress<font face='Lucida Console'>(</font><font color='#979000'>false</font><font face='Lucida Console'>)</font>,
+            write_lock_active<font face='Lucida Console'>(</font><font color='#979000'>false</font><font face='Lucida Console'>)</font>
+        <b>{</b><b>}</b>
+
+        <font color='#0000FF'>explicit</font> <b><a name='read_write_mutex'></a>read_write_mutex</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> max_locks_
+        <font face='Lucida Console'>)</font> : s<font face='Lucida Console'>(</font>m<font face='Lucida Console'>)</font>,
+            max_locks<font face='Lucida Console'>(</font>max_locks_<font face='Lucida Console'>)</font>,
+            available_locks<font face='Lucida Console'>(</font>max_locks_<font face='Lucida Console'>)</font>,
+            write_lock_in_progress<font face='Lucida Console'>(</font><font color='#979000'>false</font><font face='Lucida Console'>)</font>,
+            write_lock_active<font face='Lucida Console'>(</font><font color='#979000'>false</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#009900'>// make sure requires clause is not broken
+</font>            <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font>max_locks <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font>,
+                "<font color='#CC0000'>\t read_write_mutex::read_write_mutex(max_locks)</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t You must give a non-zero value for max_locks</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t this: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font>
+                <font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        ~<b><a name='read_write_mutex'></a>read_write_mutex</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>
+        <b>{</b><b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='lock'></a>lock</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            m.<font color='#BB00BB'>lock</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// If another write lock is already in progress then wait for it to finish
+</font>            <font color='#009900'>// before we start trying to grab all the available locks.  This way we 
+</font>            <font color='#009900'>// don't end up fighting over the locks.
+</font>            <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>write_lock_in_progress<font face='Lucida Console'>)</font>
+                s.<font color='#BB00BB'>wait</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// grab the right to perform a write lock
+</font>            write_lock_in_progress <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+
+            <font color='#009900'>// now start grabbing all the locks
+</font>            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> locks_obtained <font color='#5555FF'>=</font> available_locks;
+            available_locks <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>locks_obtained <font color='#5555FF'>!</font><font color='#5555FF'>=</font> max_locks<font face='Lucida Console'>)</font>
+            <b>{</b>
+                s.<font color='#BB00BB'>wait</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                locks_obtained <font color='#5555FF'>+</font><font color='#5555FF'>=</font> available_locks;
+                available_locks <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            <b>}</b>
+
+            write_lock_in_progress <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+            write_lock_active <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+
+            m.<font color='#BB00BB'>unlock</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='unlock'></a>unlock</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            m.<font color='#BB00BB'>lock</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// only do something if there really was a lock in place
+</font>            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>write_lock_active<font face='Lucida Console'>)</font>
+            <b>{</b>
+                available_locks <font color='#5555FF'>=</font> max_locks;
+                write_lock_active <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+                s.<font color='#BB00BB'>broadcast</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+            m.<font color='#BB00BB'>unlock</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='lock_readonly'></a>lock_readonly</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            m.<font color='#BB00BB'>lock</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>available_locks <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                s.<font color='#BB00BB'>wait</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+            <font color='#5555FF'>-</font><font color='#5555FF'>-</font>available_locks;
+
+            m.<font color='#BB00BB'>unlock</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='unlock_readonly'></a>unlock_readonly</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            m.<font color='#BB00BB'>lock</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// If this condition is false then it means there are no more readonly locks
+</font>            <font color='#009900'>// to free.  So we don't do anything.
+</font>            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>available_locks <font color='#5555FF'>!</font><font color='#5555FF'>=</font> max_locks <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> <font color='#5555FF'>!</font>write_lock_active<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#5555FF'>+</font><font color='#5555FF'>+</font>available_locks;
+
+                <font color='#009900'>// only perform broadcast when there is another thread that might be listening
+</font>                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>available_locks <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>1</font> <font color='#5555FF'>|</font><font color='#5555FF'>|</font> write_lock_in_progress<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    s.<font color='#BB00BB'>broadcast</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                <b>}</b>
+            <b>}</b>
+
+            m.<font color='#BB00BB'>unlock</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='max_readonly_locks'></a>max_readonly_locks</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#0000FF'>return</font> max_locks;
+        <b>}</b>
+
+    <font color='#0000FF'>private</font>:
+        mutex m;
+        signaler s;
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> max_locks;
+        <font color='#0000FF'>mutable</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> available_locks;
+        <font color='#0000FF'>mutable</font> <font color='#0000FF'><u>bool</u></font> write_lock_in_progress; 
+        <font color='#0000FF'>mutable</font> <font color='#0000FF'><u>bool</u></font> write_lock_active;
+
+        <font color='#009900'>// restricted functions
+</font>        <b><a name='read_write_mutex'></a>read_write_mutex</b><font face='Lucida Console'>(</font>read_write_mutex<font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font>;        <font color='#009900'>// copy constructor
+</font>        read_write_mutex<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>=</font><font face='Lucida Console'>(</font>read_write_mutex<font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font>;    <font color='#009900'>// assignment operator
+</font>    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_READ_WRITE_MUTEX_EXTENSIOn_
+</font>
+
+
+</pre></body></html>

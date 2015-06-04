@@ -1,0 +1,480 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - feature_ranking.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2008  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_KERNEL_FEATURE_RANKINg_H_
+<font color='#0000FF'>#define</font> DLIB_KERNEL_FEATURE_RANKINg_H_
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>vector<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>limits<font color='#5555FF'>&gt;</font>
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='feature_ranking_abstract.h.html'>feature_ranking_abstract.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='kcentroid.h.html'>kcentroid.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../optimization.h.html'>../optimization.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../statistics.h.html'>../statistics.h</a>"
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>iostream<font color='#5555FF'>&gt;</font>
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> kernel_type,
+        <font color='#0000FF'>typename</font> sample_matrix_type,
+        <font color='#0000FF'>typename</font> label_matrix_type
+        <font color='#5555FF'>&gt;</font>
+    matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> kernel_type::scalar_type,<font color='#979000'>0</font>,<font color='#979000'>2</font>,<font color='#0000FF'>typename</font> kernel_type::mem_manager_type<font color='#5555FF'>&gt;</font> <b><a name='rank_features_impl'></a>rank_features_impl</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> kcentroid<font color='#5555FF'>&lt;</font>kernel_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> kc,
+        <font color='#0000FF'>const</font> sample_matrix_type<font color='#5555FF'>&amp;</font> samples,
+        <font color='#0000FF'>const</font> label_matrix_type<font color='#5555FF'>&amp;</font> labels
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#009900'>/*
+            This function ranks features by doing recursive feature elimination
+
+        */</font>
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> kernel_type::scalar_type scalar_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> kernel_type::mem_manager_type mm;
+
+
+        <font color='#009900'>// make sure requires clause is not broken
+</font>        <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font><font color='#BB00BB'>is_binary_classification_problem</font><font face='Lucida Console'>(</font>samples, labels<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>true</font>,
+            "<font color='#CC0000'>\tmatrix rank_features()</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t you have given invalid arguments to this function</font>"
+            <font face='Lucida Console'>)</font>;
+
+        matrix<font color='#5555FF'>&lt;</font>scalar_type,<font color='#979000'>0</font>,<font color='#979000'>2</font>,mm<font color='#5555FF'>&gt;</font> <font color='#BB00BB'>results</font><font face='Lucida Console'>(</font><font color='#BB00BB'>samples</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, <font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+        matrix<font color='#5555FF'>&lt;</font>scalar_type,sample_matrix_type::type::NR,<font color='#979000'>1</font>,mm<font color='#5555FF'>&gt;</font> <font color='#BB00BB'>mask</font><font face='Lucida Console'>(</font><font color='#BB00BB'>samples</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>set_all_elements</font><font face='Lucida Console'>(</font>mask,<font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// figure out what the separation is between the two centroids when all the features are 
+</font>        <font color='#009900'>// present.
+</font>        scalar_type first_separation;
+        <b>{</b>
+            kcentroid<font color='#5555FF'>&lt;</font>kernel_type<font color='#5555FF'>&gt;</font> <font color='#BB00BB'>c1</font><font face='Lucida Console'>(</font>kc<font face='Lucida Console'>)</font>;
+            kcentroid<font color='#5555FF'>&lt;</font>kernel_type<font color='#5555FF'>&gt;</font> <font color='#BB00BB'>c2</font><font face='Lucida Console'>(</font>kc<font face='Lucida Console'>)</font>;
+            <font color='#009900'>// find the centers of each class
+</font>            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> s <font color='#5555FF'>=</font> <font color='#979000'>0</font>; s <font color='#5555FF'>&lt;</font> samples.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>s<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>labels</font><font face='Lucida Console'>(</font>s<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                <b>{</b>
+                    c1.<font color='#BB00BB'>train</font><font face='Lucida Console'>(</font><font color='#BB00BB'>samples</font><font face='Lucida Console'>(</font>s<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                <b>}</b>
+                <font color='#0000FF'>else</font>
+                <b>{</b>
+                    c2.<font color='#BB00BB'>train</font><font face='Lucida Console'>(</font><font color='#BB00BB'>samples</font><font face='Lucida Console'>(</font>s<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                <b>}</b>
+
+            <b>}</b>
+            first_separation <font color='#5555FF'>=</font> <font color='#BB00BB'>c1</font><font face='Lucida Console'>(</font>c2<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+
+        <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> std;
+
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> results.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#979000'>1</font>; i <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#979000'>0</font>; <font color='#5555FF'>-</font><font color='#5555FF'>-</font>i<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'><u>long</u></font> worst_feature_idx <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            scalar_type worst_feature_score <font color='#5555FF'>=</font> <font color='#5555FF'>-</font>std::numeric_limits<font color='#5555FF'>&lt;</font>scalar_type<font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>infinity</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// figure out which feature to remove next
+</font>            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> j <font color='#5555FF'>=</font> <font color='#979000'>0</font>; j <font color='#5555FF'>&lt;</font> mask.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>j<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#009900'>// skip features we have already removed
+</font>                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>mask</font><font face='Lucida Console'>(</font>j<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                    <font color='#0000FF'>continue</font>;
+
+                kcentroid<font color='#5555FF'>&lt;</font>kernel_type<font color='#5555FF'>&gt;</font> <font color='#BB00BB'>c1</font><font face='Lucida Console'>(</font>kc<font face='Lucida Console'>)</font>;
+                kcentroid<font color='#5555FF'>&lt;</font>kernel_type<font color='#5555FF'>&gt;</font> <font color='#BB00BB'>c2</font><font face='Lucida Console'>(</font>kc<font face='Lucida Console'>)</font>;
+
+                <font color='#009900'>// temporarily remove this feature from the working set of features
+</font>                <font color='#BB00BB'>mask</font><font face='Lucida Console'>(</font>j<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+
+                <font color='#009900'>// find the centers of each class
+</font>                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> s <font color='#5555FF'>=</font> <font color='#979000'>0</font>; s <font color='#5555FF'>&lt;</font> samples.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>s<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>labels</font><font face='Lucida Console'>(</font>s<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        c1.<font color='#BB00BB'>train</font><font face='Lucida Console'>(</font><font color='#BB00BB'>pointwise_multiply</font><font face='Lucida Console'>(</font><font color='#BB00BB'>samples</font><font face='Lucida Console'>(</font>s<font face='Lucida Console'>)</font>,mask<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                    <b>}</b>
+                    <font color='#0000FF'>else</font>
+                    <b>{</b>
+                        c2.<font color='#BB00BB'>train</font><font face='Lucida Console'>(</font><font color='#BB00BB'>pointwise_multiply</font><font face='Lucida Console'>(</font><font color='#BB00BB'>samples</font><font face='Lucida Console'>(</font>s<font face='Lucida Console'>)</font>,mask<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                    <b>}</b>
+
+                <b>}</b>
+
+                <font color='#009900'>// find the distance between the two centroids and use that
+</font>                <font color='#009900'>// as the score
+</font>                <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> score <font color='#5555FF'>=</font> <font color='#BB00BB'>c1</font><font face='Lucida Console'>(</font>c2<font face='Lucida Console'>)</font>;
+
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>score <font color='#5555FF'>&gt;</font> worst_feature_score<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    worst_feature_score <font color='#5555FF'>=</font> score;
+                    worst_feature_idx <font color='#5555FF'>=</font> j;
+                <b>}</b>
+
+                <font color='#009900'>// add this feature back to the working set of features
+</font>                <font color='#BB00BB'>mask</font><font face='Lucida Console'>(</font>j<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+
+            <b>}</b>
+
+            <font color='#009900'>// now that we know what the next worst feature is record it 
+</font>            <font color='#BB00BB'>mask</font><font face='Lucida Console'>(</font>worst_feature_idx<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            <font color='#BB00BB'>results</font><font face='Lucida Console'>(</font>i,<font color='#979000'>0</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> worst_feature_idx;
+            <font color='#BB00BB'>results</font><font face='Lucida Console'>(</font>i,<font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> worst_feature_score; 
+        <b>}</b>
+
+        <font color='#009900'>// now normalize the results 
+</font>        <font color='#0000FF'>const</font> scalar_type max_separation <font color='#5555FF'>=</font> std::<font color='#BB00BB'>max</font><font face='Lucida Console'>(</font><font color='#BB00BB'>max</font><font face='Lucida Console'>(</font><font color='#BB00BB'>colm</font><font face='Lucida Console'>(</font>results,<font color='#979000'>1</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>, first_separation<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>set_colm</font><font face='Lucida Console'>(</font>results,<font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#BB00BB'>colm</font><font face='Lucida Console'>(</font>results,<font color='#979000'>1</font><font face='Lucida Console'>)</font><font color='#5555FF'>/</font>max_separation;
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> r <font color='#5555FF'>=</font> <font color='#979000'>0</font>; r <font color='#5555FF'>&lt;</font> results.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#979000'>1</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>r<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#BB00BB'>results</font><font face='Lucida Console'>(</font>r,<font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#BB00BB'>results</font><font face='Lucida Console'>(</font>r<font color='#5555FF'>+</font><font color='#979000'>1</font>,<font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+        <font color='#BB00BB'>results</font><font face='Lucida Console'>(</font>results.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#979000'>1</font>,<font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> first_separation<font color='#5555FF'>/</font>max_separation;
+
+        <font color='#0000FF'>return</font> results;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> kernel_type,
+        <font color='#0000FF'>typename</font> sample_matrix_type,
+        <font color='#0000FF'>typename</font> label_matrix_type
+        <font color='#5555FF'>&gt;</font>
+    matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> kernel_type::scalar_type,<font color='#979000'>0</font>,<font color='#979000'>2</font>,<font color='#0000FF'>typename</font> kernel_type::mem_manager_type<font color='#5555FF'>&gt;</font> <b><a name='rank_features'></a>rank_features</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> kcentroid<font color='#5555FF'>&lt;</font>kernel_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> kc,
+        <font color='#0000FF'>const</font> sample_matrix_type<font color='#5555FF'>&amp;</font> samples,
+        <font color='#0000FF'>const</font> label_matrix_type<font color='#5555FF'>&amp;</font> labels
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>return</font> <font color='#BB00BB'>rank_features_impl</font><font face='Lucida Console'>(</font>kc, <font color='#BB00BB'>mat</font><font face='Lucida Console'>(</font>samples<font face='Lucida Console'>)</font>, <font color='#BB00BB'>mat</font><font face='Lucida Console'>(</font>labels<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> kernel_type,
+        <font color='#0000FF'>typename</font> sample_matrix_type,
+        <font color='#0000FF'>typename</font> label_matrix_type
+        <font color='#5555FF'>&gt;</font>
+    matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> kernel_type::scalar_type,<font color='#979000'>0</font>,<font color='#979000'>2</font>,<font color='#0000FF'>typename</font> kernel_type::mem_manager_type<font color='#5555FF'>&gt;</font> <b><a name='rank_features_impl'></a>rank_features_impl</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> kcentroid<font color='#5555FF'>&lt;</font>kernel_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> kc,
+        <font color='#0000FF'>const</font> sample_matrix_type<font color='#5555FF'>&amp;</font> samples,
+        <font color='#0000FF'>const</font> label_matrix_type<font color='#5555FF'>&amp;</font> labels,
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> num_features
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#009900'>/*
+            This function ranks features by doing recursive feature addition 
+
+        */</font>
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> kernel_type::scalar_type scalar_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> kernel_type::mem_manager_type mm;
+
+        <font color='#009900'>// make sure requires clause is not broken
+</font>        <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font><font color='#BB00BB'>is_binary_classification_problem</font><font face='Lucida Console'>(</font>samples, labels<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>true</font>,
+            "<font color='#CC0000'>\tmatrix rank_features()</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t you have given invalid arguments to this function</font>"
+            <font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font><font color='#979000'>0</font> <font color='#5555FF'>&lt;</font> num_features <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> num_features <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#BB00BB'>samples</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,
+            "<font color='#CC0000'>\tmatrix rank_features()</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t you have given invalid arguments to this function</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t num_features:    </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> num_features
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t samples(0).nr(): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>samples</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> 
+            <font face='Lucida Console'>)</font>;
+
+        matrix<font color='#5555FF'>&lt;</font>scalar_type,<font color='#979000'>0</font>,<font color='#979000'>2</font>,mm<font color='#5555FF'>&gt;</font> <font color='#BB00BB'>results</font><font face='Lucida Console'>(</font>num_features, <font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+        matrix<font color='#5555FF'>&lt;</font>scalar_type,sample_matrix_type::type::NR,<font color='#979000'>1</font>,mm<font color='#5555FF'>&gt;</font> <font color='#BB00BB'>mask</font><font face='Lucida Console'>(</font><font color='#BB00BB'>samples</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>set_all_elements</font><font face='Lucida Console'>(</font>mask,<font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> std;
+
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> results.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'><u>long</u></font> best_feature_idx <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            scalar_type best_feature_score <font color='#5555FF'>=</font> <font color='#5555FF'>-</font>std::numeric_limits<font color='#5555FF'>&lt;</font>scalar_type<font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>infinity</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// figure out which feature to add next
+</font>            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> j <font color='#5555FF'>=</font> <font color='#979000'>0</font>; j <font color='#5555FF'>&lt;</font> mask.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>j<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#009900'>// skip features we have already added 
+</font>                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>mask</font><font face='Lucida Console'>(</font>j<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>
+                    <font color='#0000FF'>continue</font>;
+
+                kcentroid<font color='#5555FF'>&lt;</font>kernel_type<font color='#5555FF'>&gt;</font> <font color='#BB00BB'>c1</font><font face='Lucida Console'>(</font>kc<font face='Lucida Console'>)</font>;
+                kcentroid<font color='#5555FF'>&lt;</font>kernel_type<font color='#5555FF'>&gt;</font> <font color='#BB00BB'>c2</font><font face='Lucida Console'>(</font>kc<font face='Lucida Console'>)</font>;
+
+                <font color='#009900'>// temporarily add this feature to the working set of features
+</font>                <font color='#BB00BB'>mask</font><font face='Lucida Console'>(</font>j<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+
+                <font color='#009900'>// find the centers of each class
+</font>                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> s <font color='#5555FF'>=</font> <font color='#979000'>0</font>; s <font color='#5555FF'>&lt;</font> samples.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>s<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>labels</font><font face='Lucida Console'>(</font>s<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        c1.<font color='#BB00BB'>train</font><font face='Lucida Console'>(</font><font color='#BB00BB'>pointwise_multiply</font><font face='Lucida Console'>(</font><font color='#BB00BB'>samples</font><font face='Lucida Console'>(</font>s<font face='Lucida Console'>)</font>,mask<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                    <b>}</b>
+                    <font color='#0000FF'>else</font>
+                    <b>{</b>
+                        c2.<font color='#BB00BB'>train</font><font face='Lucida Console'>(</font><font color='#BB00BB'>pointwise_multiply</font><font face='Lucida Console'>(</font><font color='#BB00BB'>samples</font><font face='Lucida Console'>(</font>s<font face='Lucida Console'>)</font>,mask<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                    <b>}</b>
+
+                <b>}</b>
+
+                <font color='#009900'>// find the distance between the two centroids and use that
+</font>                <font color='#009900'>// as the score
+</font>                <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> score <font color='#5555FF'>=</font> <font color='#BB00BB'>c1</font><font face='Lucida Console'>(</font>c2<font face='Lucida Console'>)</font>;
+
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>score <font color='#5555FF'>&gt;</font> best_feature_score<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    best_feature_score <font color='#5555FF'>=</font> score;
+                    best_feature_idx <font color='#5555FF'>=</font> j;
+                <b>}</b>
+
+                <font color='#009900'>// take this feature back out of the working set of features
+</font>                <font color='#BB00BB'>mask</font><font face='Lucida Console'>(</font>j<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+
+            <b>}</b>
+
+            <font color='#009900'>// now that we know what the next best feature is record it 
+</font>            <font color='#BB00BB'>mask</font><font face='Lucida Console'>(</font>best_feature_idx<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+            <font color='#BB00BB'>results</font><font face='Lucida Console'>(</font>i,<font color='#979000'>0</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> best_feature_idx;
+            <font color='#BB00BB'>results</font><font face='Lucida Console'>(</font>i,<font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> best_feature_score; 
+        <b>}</b>
+
+        <font color='#009900'>// now normalize the results 
+</font>        <font color='#BB00BB'>set_colm</font><font face='Lucida Console'>(</font>results,<font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#BB00BB'>colm</font><font face='Lucida Console'>(</font>results,<font color='#979000'>1</font><font face='Lucida Console'>)</font><font color='#5555FF'>/</font><font color='#BB00BB'>max</font><font face='Lucida Console'>(</font><font color='#BB00BB'>colm</font><font face='Lucida Console'>(</font>results,<font color='#979000'>1</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>return</font> results;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> kernel_type,
+        <font color='#0000FF'>typename</font> sample_matrix_type,
+        <font color='#0000FF'>typename</font> label_matrix_type
+        <font color='#5555FF'>&gt;</font>
+    matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> kernel_type::scalar_type,<font color='#979000'>0</font>,<font color='#979000'>2</font>,<font color='#0000FF'>typename</font> kernel_type::mem_manager_type<font color='#5555FF'>&gt;</font> <b><a name='rank_features'></a>rank_features</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> kcentroid<font color='#5555FF'>&lt;</font>kernel_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> kc,
+        <font color='#0000FF'>const</font> sample_matrix_type<font color='#5555FF'>&amp;</font> samples,
+        <font color='#0000FF'>const</font> label_matrix_type<font color='#5555FF'>&amp;</font> labels,
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> num_features
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>mat</font><font face='Lucida Console'>(</font>samples<font face='Lucida Console'>)</font>.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> num_features <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#BB00BB'>mat</font><font face='Lucida Console'>(</font>samples<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#009900'>// if we are going to rank them all then might as well do the recursive feature elimination version
+</font>            <font color='#0000FF'>return</font> <font color='#BB00BB'>rank_features_impl</font><font face='Lucida Console'>(</font>kc, <font color='#BB00BB'>mat</font><font face='Lucida Console'>(</font>samples<font face='Lucida Console'>)</font>, <font color='#BB00BB'>mat</font><font face='Lucida Console'>(</font>labels<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+        <font color='#0000FF'>else</font>
+        <b>{</b>
+            <font color='#0000FF'>return</font> <font color='#BB00BB'>rank_features_impl</font><font face='Lucida Console'>(</font>kc, <font color='#BB00BB'>mat</font><font face='Lucida Console'>(</font>samples<font face='Lucida Console'>)</font>, <font color='#BB00BB'>mat</font><font face='Lucida Console'>(</font>labels<font face='Lucida Console'>)</font>, num_features<font face='Lucida Console'>)</font>;
+        <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>namespace</font> rank_features_helpers
+    <b>{</b>
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'>typename</font> K,
+            <font color='#0000FF'>typename</font> sample_matrix_type,
+            <font color='#0000FF'>typename</font> label_matrix_type
+            <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>typename</font> K::scalar_type <b><a name='centroid_gap'></a>centroid_gap</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> kcentroid<font color='#5555FF'>&lt;</font>K<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> kc,
+            <font color='#0000FF'>const</font> sample_matrix_type<font color='#5555FF'>&amp;</font> samples,
+            <font color='#0000FF'>const</font> label_matrix_type<font color='#5555FF'>&amp;</font> labels
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            kcentroid<font color='#5555FF'>&lt;</font>K<font color='#5555FF'>&gt;</font> <font color='#BB00BB'>kc1</font><font face='Lucida Console'>(</font>kc<font face='Lucida Console'>)</font>;
+            kcentroid<font color='#5555FF'>&lt;</font>K<font color='#5555FF'>&gt;</font> <font color='#BB00BB'>kc2</font><font face='Lucida Console'>(</font>kc<font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// toss all the samples into our kcentroids
+</font>            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> samples.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>labels</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                    kc1.<font color='#BB00BB'>train</font><font face='Lucida Console'>(</font><font color='#BB00BB'>samples</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>else</font>
+                    kc2.<font color='#BB00BB'>train</font><font face='Lucida Console'>(</font><font color='#BB00BB'>samples</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+            <font color='#009900'>// now return the separation between the mean of these two centroids
+</font>            <font color='#0000FF'>return</font> <font color='#BB00BB'>kc1</font><font face='Lucida Console'>(</font>kc2<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'>typename</font> sample_matrix_type,
+            <font color='#0000FF'>typename</font> label_matrix_type
+            <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>class</font> <b><a name='test'></a>test</b>
+        <b>{</b>
+            <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> sample_matrix_type::type sample_type;
+            <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> sample_type::type scalar_type;
+            <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> sample_type::mem_manager_type mem_manager_type;
+
+        <font color='#0000FF'>public</font>:
+            <b><a name='test'></a>test</b> <font face='Lucida Console'>(</font>
+                <font color='#0000FF'>const</font> sample_matrix_type<font color='#5555FF'>&amp;</font> samples_,
+                <font color='#0000FF'>const</font> label_matrix_type<font color='#5555FF'>&amp;</font> labels_,
+                <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> num_sv_,
+                <font color='#0000FF'><u>bool</u></font> verbose_
+            <font face='Lucida Console'>)</font> : samples<font face='Lucida Console'>(</font>samples_<font face='Lucida Console'>)</font>, labels<font face='Lucida Console'>(</font>labels_<font face='Lucida Console'>)</font>, num_sv<font face='Lucida Console'>(</font>num_sv_<font face='Lucida Console'>)</font>, verbose<font face='Lucida Console'>(</font>verbose_<font face='Lucida Console'>)</font>
+            <b>{</b>
+            <b>}</b>
+
+            <font color='#0000FF'><u>double</u></font> <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>
+                <font color='#0000FF'><u>double</u></font> gamma
+            <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+            <b>{</b>
+                <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> std;
+
+                <font color='#009900'>// we are doing the optimization in log space so don't forget to convert back to normal space
+</font>                gamma <font color='#5555FF'>=</font> std::<font color='#BB00BB'>exp</font><font face='Lucida Console'>(</font>gamma<font face='Lucida Console'>)</font>;
+
+                <font color='#0000FF'>typedef</font> radial_basis_kernel<font color='#5555FF'>&lt;</font>sample_type<font color='#5555FF'>&gt;</font> kernel_type;
+                <font color='#009900'>// Make a kcentroid and find out what the gap is at the current gamma.  Try to pick a reasonable
+</font>                <font color='#009900'>// tolerance.
+</font>                <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> tolerance <font color='#5555FF'>=</font> std::<font color='#BB00BB'>min</font><font face='Lucida Console'>(</font>gamma<font color='#5555FF'>*</font><font color='#979000'>0.01</font>, <font color='#979000'>0.01</font><font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>const</font> kernel_type <font color='#BB00BB'>kern</font><font face='Lucida Console'>(</font>gamma<font face='Lucida Console'>)</font>;
+                kcentroid<font color='#5555FF'>&lt;</font>kernel_type<font color='#5555FF'>&gt;</font> <font color='#BB00BB'>kc</font><font face='Lucida Console'>(</font>kern, tolerance, num_sv<font face='Lucida Console'>)</font>;
+                scalar_type temp <font color='#5555FF'>=</font> <font color='#BB00BB'>centroid_gap</font><font face='Lucida Console'>(</font>kc, samples, labels<font face='Lucida Console'>)</font>;
+
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>verbose<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\rChecking goodness of gamma = </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> gamma <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>.  Goodness = </font>" 
+                         <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> temp <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>                    </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> flush;
+                <b>}</b>
+                <font color='#0000FF'>return</font> temp;
+            <b>}</b>
+
+            <font color='#0000FF'>const</font> sample_matrix_type<font color='#5555FF'>&amp;</font> samples;
+            <font color='#0000FF'>const</font> label_matrix_type<font color='#5555FF'>&amp;</font> labels;
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> num_sv;
+            <font color='#0000FF'><u>bool</u></font> verbose;
+
+        <b>}</b>;
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'>typename</font> sample_matrix_type,
+            <font color='#0000FF'>typename</font> label_matrix_type
+            <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>double</u></font> <b><a name='find_gamma_with_big_centroid_gap_impl'></a>find_gamma_with_big_centroid_gap_impl</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> sample_matrix_type<font color='#5555FF'>&amp;</font> samples,
+            <font color='#0000FF'>const</font> label_matrix_type<font color='#5555FF'>&amp;</font> labels,
+            <font color='#0000FF'><u>double</u></font> initial_gamma,
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> num_sv,
+            <font color='#0000FF'><u>bool</u></font> verbose
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> std;
+
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>verbose<font face='Lucida Console'>)</font>
+            <b>{</b>
+                cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+            <b>}</b>
+
+            test<font color='#5555FF'>&lt;</font>sample_matrix_type, label_matrix_type<font color='#5555FF'>&gt;</font> <font color='#BB00BB'>funct</font><font face='Lucida Console'>(</font>samples, labels, num_sv, verbose<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'><u>double</u></font> best_gamma <font color='#5555FF'>=</font> std::<font color='#BB00BB'>log</font><font face='Lucida Console'>(</font>initial_gamma<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'><u>double</u></font> goodness <font color='#5555FF'>=</font> <font color='#BB00BB'>find_max_single_variable</font><font face='Lucida Console'>(</font>funct, best_gamma, <font color='#5555FF'>-</font><font color='#979000'>15</font>, <font color='#979000'>15</font>, <font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>3</font>, <font color='#979000'>100</font><font face='Lucida Console'>)</font>;
+            
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>verbose<font face='Lucida Console'>)</font>
+            <b>{</b>
+                cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\rBest gamma = </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> std::<font color='#BB00BB'>exp</font><font face='Lucida Console'>(</font>best_gamma<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>.  Goodness = </font>" 
+                    <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> goodness <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>                    </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+            <b>}</b>
+
+            <font color='#0000FF'>return</font> std::<font color='#BB00BB'>exp</font><font face='Lucida Console'>(</font>best_gamma<font face='Lucida Console'>)</font>;
+        <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> sample_matrix_type,
+        <font color='#0000FF'>typename</font> label_matrix_type
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>double</u></font> <b><a name='find_gamma_with_big_centroid_gap'></a>find_gamma_with_big_centroid_gap</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> sample_matrix_type<font color='#5555FF'>&amp;</font> samples,
+        <font color='#0000FF'>const</font> label_matrix_type<font color='#5555FF'>&amp;</font> labels,
+        <font color='#0000FF'><u>double</u></font> initial_gamma <font color='#5555FF'>=</font> <font color='#979000'>0.1</font>,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> num_sv <font color='#5555FF'>=</font> <font color='#979000'>40</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font>initial_gamma <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> num_sv <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> <font color='#BB00BB'>is_binary_classification_problem</font><font face='Lucida Console'>(</font>samples, labels<font face='Lucida Console'>)</font>,
+            "<font color='#CC0000'>\t double find_gamma_with_big_centroid_gap()</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t initial_gamma: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> initial_gamma
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t num_sv:        </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> num_sv 
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t is_binary_classification_problem(): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>is_binary_classification_problem</font><font face='Lucida Console'>(</font>samples, labels<font face='Lucida Console'>)</font> 
+            <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>return</font> rank_features_helpers::<font color='#BB00BB'>find_gamma_with_big_centroid_gap_impl</font><font face='Lucida Console'>(</font><font color='#BB00BB'>mat</font><font face='Lucida Console'>(</font>samples<font face='Lucida Console'>)</font>, 
+                                                             <font color='#BB00BB'>mat</font><font face='Lucida Console'>(</font>labels<font face='Lucida Console'>)</font>,
+                                                             initial_gamma,
+                                                             num_sv,
+                                                             <font color='#979000'>false</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> sample_matrix_type,
+        <font color='#0000FF'>typename</font> label_matrix_type
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>double</u></font> <b><a name='verbose_find_gamma_with_big_centroid_gap'></a>verbose_find_gamma_with_big_centroid_gap</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> sample_matrix_type<font color='#5555FF'>&amp;</font> samples,
+        <font color='#0000FF'>const</font> label_matrix_type<font color='#5555FF'>&amp;</font> labels,
+        <font color='#0000FF'><u>double</u></font> initial_gamma <font color='#5555FF'>=</font> <font color='#979000'>0.1</font>,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> num_sv <font color='#5555FF'>=</font> <font color='#979000'>40</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font>initial_gamma <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> num_sv <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> <font color='#BB00BB'>is_binary_classification_problem</font><font face='Lucida Console'>(</font>samples, labels<font face='Lucida Console'>)</font>,
+            "<font color='#CC0000'>\t double verbose_find_gamma_with_big_centroid_gap()</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t initial_gamma: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> initial_gamma
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t num_sv:        </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> num_sv 
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t is_binary_classification_problem(): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>is_binary_classification_problem</font><font face='Lucida Console'>(</font>samples, labels<font face='Lucida Console'>)</font> 
+            <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>return</font> rank_features_helpers::<font color='#BB00BB'>find_gamma_with_big_centroid_gap_impl</font><font face='Lucida Console'>(</font><font color='#BB00BB'>mat</font><font face='Lucida Console'>(</font>samples<font face='Lucida Console'>)</font>, 
+                                                             <font color='#BB00BB'>mat</font><font face='Lucida Console'>(</font>labels<font face='Lucida Console'>)</font>,
+                                                             initial_gamma,
+                                                             num_sv,
+                                                             <font color='#979000'>true</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> vector_type
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>double</u></font> <b><a name='compute_mean_squared_distance'></a>compute_mean_squared_distance</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> vector_type<font color='#5555FF'>&amp;</font> samples
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        running_stats<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font> rs;
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> samples.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> j <font color='#5555FF'>=</font> i<font color='#5555FF'>+</font><font color='#979000'>1</font>; j <font color='#5555FF'>&lt;</font> samples.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>j<font face='Lucida Console'>)</font>
+            <b>{</b>
+                rs.<font color='#BB00BB'>add</font><font face='Lucida Console'>(</font><font color='#BB00BB'>length_squared</font><font face='Lucida Console'>(</font>samples[i] <font color='#5555FF'>-</font> samples[j]<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+        <b>}</b>
+
+        <font color='#0000FF'>return</font> rs.<font color='#BB00BB'>mean</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_KERNEL_FEATURE_RANKINg_H_
+</font>
+
+
+</pre></body></html>

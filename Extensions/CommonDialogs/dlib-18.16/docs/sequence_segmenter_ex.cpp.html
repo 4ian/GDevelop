@@ -1,0 +1,241 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - sequence_segmenter_ex.cpp</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// The contents of this file are in the public domain. See LICENSE_FOR_EXAMPLE_PROGRAMS.txt
+</font><font color='#009900'>/*
+
+    This example shows how to use dlib to learn to do sequence segmentation.  In a sequence
+    segmentation task we are given a sequence of objects (e.g. words in a sentence) and we
+    are supposed to detect certain subsequences (e.g. the names of people).  Therefore, in
+    the code below we create some very simple training sequences and use them to learn a
+    sequence segmentation model.  In particular, our sequences will be sentences
+    represented as arrays of words and our task will be to learn to identify person names.
+    Once we have our segmentation model we can use it to find names in new sentences, as we
+    will show.
+
+*/</font>
+
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>iostream<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>cctype<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>svm_threaded.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>string.h<font color='#5555FF'>&gt;</font>
+
+<font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> std;
+<font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> dlib;
+
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<font color='#0000FF'>class</font> <b><a name='feature_extractor'></a>feature_extractor</b>
+<b>{</b>
+    <font color='#009900'>/*
+        The sequence segmentation models we work with in this example are chain structured
+        conditional random field style models.  Therefore, central to a sequence
+        segmentation model is a feature extractor object.  This object defines all the
+        properties of the model such as how many features it will use, and more importantly,
+        how they are calculated.  
+    */</font>
+
+<font color='#0000FF'>public</font>:
+    <font color='#009900'>// This should be the type used to represent an input sequence.  It can be
+</font>    <font color='#009900'>// anything so long as it has a .size() which returns the length of the sequence.
+</font>    <font color='#0000FF'>typedef</font> std::vector<font color='#5555FF'>&lt;</font>std::string<font color='#5555FF'>&gt;</font> sequence_type;
+
+    <font color='#009900'>// The next four lines define high-level properties of the feature extraction model.
+</font>    <font color='#009900'>// See the documentation for the sequence_labeler object for an extended discussion of
+</font>    <font color='#009900'>// how they are used (note that the main body of the documentation is at the top of the
+</font>    <font color='#009900'>// file documenting the sequence_labeler).
+</font>    <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>bool</u></font> use_BIO_model           <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+    <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>bool</u></font> use_high_order_features <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+    <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>bool</u></font> allow_negative_weights  <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+    <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='window_size'></a>window_size</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>  <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> <font color='#979000'>3</font>; <b>}</b>
+
+    <font color='#009900'>// This function defines the dimensionality of the vectors output by the get_features()
+</font>    <font color='#009900'>// function defined below.
+</font>    <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='num_features'></a>num_features</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> <font color='#979000'>1</font>; <b>}</b>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> feature_setter<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='get_features'></a>get_features</b> <font face='Lucida Console'>(</font>
+        feature_setter<font color='#5555FF'>&amp;</font> set_feature,
+        <font color='#0000FF'>const</font> sequence_type<font color='#5555FF'>&amp;</font> sentence,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> position
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <font color='#009900'>/*!
+        requires
+            - position &lt; sentence.size()
+            - set_feature is a function object which allows expressions of the form:
+                - set_features((unsigned long)feature_index, (double)feature_value);
+                - set_features((unsigned long)feature_index);
+        ensures
+            - This function computes a feature vector which should capture the properties
+              of sentence[position] that are informative relative to the sequence
+              segmentation task you are trying to perform.
+            - The output feature vector is returned as a sparse vector by invoking set_feature().
+              For example, to set the feature with an index of 55 to the value of 1
+              this method would call:
+                set_feature(55);
+              Or equivalently:
+                set_feature(55,1);
+              Therefore, the first argument to set_feature is the index of the feature
+              to be set while the second argument is the value the feature should take.
+              Additionally, note that calling set_feature() multiple times with the
+              same feature index does NOT overwrite the old value, it adds to the
+              previous value.  For example, if you call set_feature(55) 3 times then it
+              will result in feature 55 having a value of 3.
+            - This function only calls set_feature() with feature_index values &lt; num_features()
+    !*/</font>
+    <b>{</b>
+        <font color='#009900'>// The model in this example program is very simple.  Our features only look at the 
+</font>        <font color='#009900'>// capitalization pattern of the words.  So we have a single feature which checks
+</font>        <font color='#009900'>// if the first letter is capitalized or not.  
+</font>        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>isupper</font><font face='Lucida Console'>(</font>sentence[position][<font color='#979000'>0</font>]<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+            <font color='#BB00BB'>set_feature</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+<b>}</b>;
+
+<font color='#009900'>// We need to define serialize() and deserialize() for our feature extractor if we want 
+</font><font color='#009900'>// to be able to serialize and deserialize our learned models.  In this case the 
+</font><font color='#009900'>// implementation is empty since our feature_extractor doesn't have any state.  But you 
+</font><font color='#009900'>// might define more complex feature extractors which have state that needs to be saved.
+</font><font color='#0000FF'><u>void</u></font> <b><a name='serialize'></a>serialize</b><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> feature_extractor<font color='#5555FF'>&amp;</font>, std::ostream<font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+<font color='#0000FF'><u>void</u></font> <b><a name='deserialize'></a>deserialize</b><font face='Lucida Console'>(</font>feature_extractor<font color='#5555FF'>&amp;</font>, std::istream<font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<font color='#0000FF'><u>void</u></font> <b><a name='make_training_examples'></a>make_training_examples</b> <font face='Lucida Console'>(</font>
+    std::vector<font color='#5555FF'>&lt;</font>std::vector<font color='#5555FF'>&lt;</font>std::string<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> samples,
+    std::vector<font color='#5555FF'>&lt;</font>std::vector<font color='#5555FF'>&lt;</font>std::pair<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font>, <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> segments
+<font face='Lucida Console'>)</font>
+<font color='#009900'>/*!
+    ensures
+        - This function fills samples with example sentences and segments with the
+          locations of person names that should be segmented out.
+        - #samples.size() == #segments.size()
+!*/</font>
+<b>{</b>
+    std::vector<font color='#5555FF'>&lt;</font>std::pair<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font>, <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> names;
+
+
+    <font color='#009900'>// Here we make our first training example.  split() turns the string into an array of
+</font>    <font color='#009900'>// 10 words and then we store that into samples.
+</font>    samples.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font><font color='#BB00BB'>split</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>The other day I saw a man named Jim Smith</font>"<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+    <font color='#009900'>// We want to detect person names.  So we note that the name is located within the
+</font>    <font color='#009900'>// range [8, 10).  Note that we use half open ranges to identify segments.  So in this
+</font>    <font color='#009900'>// case, the segment identifies the string "Jim Smith".
+</font>    names.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font><font color='#BB00BB'>make_pair</font><font face='Lucida Console'>(</font><font color='#979000'>8</font>, <font color='#979000'>10</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+    segments.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>names<font face='Lucida Console'>)</font>; names.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+    <font color='#009900'>// Now we add a few more example sentences
+</font>
+    samples.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font><font color='#BB00BB'>split</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>Davis King is the main author of the dlib Library</font>"<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+    names.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font><font color='#BB00BB'>make_pair</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>, <font color='#979000'>2</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+    segments.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>names<font face='Lucida Console'>)</font>; names.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+
+    samples.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font><font color='#BB00BB'>split</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>Bob Jones is a name and so is George Clinton</font>"<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+    names.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font><font color='#BB00BB'>make_pair</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>, <font color='#979000'>2</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+    names.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font><font color='#BB00BB'>make_pair</font><font face='Lucida Console'>(</font><font color='#979000'>8</font>, <font color='#979000'>10</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+    segments.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>names<font face='Lucida Console'>)</font>; names.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+
+    samples.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font><font color='#BB00BB'>split</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>My dog is named Bob Barker</font>"<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+    names.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font><font color='#BB00BB'>make_pair</font><font face='Lucida Console'>(</font><font color='#979000'>4</font>, <font color='#979000'>6</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+    segments.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>names<font face='Lucida Console'>)</font>; names.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+
+    samples.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font><font color='#BB00BB'>split</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>ABC is an acronym but John James Smith is a name</font>"<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+    names.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font><font color='#BB00BB'>make_pair</font><font face='Lucida Console'>(</font><font color='#979000'>5</font>, <font color='#979000'>8</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+    segments.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>names<font face='Lucida Console'>)</font>; names.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+
+    samples.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font><font color='#BB00BB'>split</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>No names in this sentence at all</font>"<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+    segments.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>names<font face='Lucida Console'>)</font>; names.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+<b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<font color='#0000FF'><u>void</u></font> <b><a name='print_segment'></a>print_segment</b> <font face='Lucida Console'>(</font>
+    <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>std::string<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> sentence,
+    <font color='#0000FF'>const</font> std::pair<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font>,<font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> segment
+<font face='Lucida Console'>)</font>
+<b>{</b>
+    <font color='#009900'>// Recall that a segment is a half open range starting with .first and ending just
+</font>    <font color='#009900'>// before .second. 
+</font>    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> segment.first; i <font color='#5555FF'>&lt;</font> segment.second; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+        cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> sentence[i] <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'> </font>";
+    cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+<b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<font color='#0000FF'><u>int</u></font> <b><a name='main'></a>main</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+<b>{</b>
+    <font color='#009900'>// Finally we make it into the main program body.  So the first thing we do is get our
+</font>    <font color='#009900'>// training data.
+</font>    std::vector<font color='#5555FF'>&lt;</font>std::vector<font color='#5555FF'>&lt;</font>std::string<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> samples;
+    std::vector<font color='#5555FF'>&lt;</font>std::vector<font color='#5555FF'>&lt;</font>std::pair<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font>, <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> segments;
+    <font color='#BB00BB'>make_training_examples</font><font face='Lucida Console'>(</font>samples, segments<font face='Lucida Console'>)</font>;
+
+
+    <font color='#009900'>// Next we use the structural_sequence_segmentation_trainer to learn our segmentation
+</font>    <font color='#009900'>// model based on just the samples and segments.  But first we setup some of its
+</font>    <font color='#009900'>// parameters.
+</font>    structural_sequence_segmentation_trainer<font color='#5555FF'>&lt;</font>feature_extractor<font color='#5555FF'>&gt;</font> trainer;
+    <font color='#009900'>// This is the common SVM C parameter.  Larger values encourage the trainer to attempt
+</font>    <font color='#009900'>// to fit the data exactly but might overfit.  In general, you determine this parameter
+</font>    <font color='#009900'>// by cross-validation.
+</font>    trainer.<font color='#BB00BB'>set_c</font><font face='Lucida Console'>(</font><font color='#979000'>10</font><font face='Lucida Console'>)</font>;
+    <font color='#009900'>// This trainer can use multiple CPU cores to speed up the training.  So set this to
+</font>    <font color='#009900'>// the number of available CPU cores. 
+</font>    trainer.<font color='#BB00BB'>set_num_threads</font><font face='Lucida Console'>(</font><font color='#979000'>4</font><font face='Lucida Console'>)</font>;
+
+
+    <font color='#009900'>// Learn to do sequence segmentation from the dataset
+</font>    sequence_segmenter<font color='#5555FF'>&lt;</font>feature_extractor<font color='#5555FF'>&gt;</font> segmenter <font color='#5555FF'>=</font> trainer.<font color='#BB00BB'>train</font><font face='Lucida Console'>(</font>samples, segments<font face='Lucida Console'>)</font>;
+
+
+    <font color='#009900'>// Let's print out all the segments our segmenter detects.
+</font>    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> samples.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#009900'>// get all the detected segments in samples[i]
+</font>        std::vector<font color='#5555FF'>&lt;</font>std::pair<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font>,<font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> seg <font color='#5555FF'>=</font> <font color='#BB00BB'>segmenter</font><font face='Lucida Console'>(</font>samples[i]<font face='Lucida Console'>)</font>;
+        <font color='#009900'>// Print each of them
+</font>        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> j <font color='#5555FF'>=</font> <font color='#979000'>0</font>; j <font color='#5555FF'>&lt;</font> seg.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>j<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#BB00BB'>print_segment</font><font face='Lucida Console'>(</font>samples[i], seg[j]<font face='Lucida Console'>)</font>;
+        <b>}</b>
+    <b>}</b>
+
+
+    <font color='#009900'>// Now let's test it on a new sentence and see what it detects.  
+</font>    std::vector<font color='#5555FF'>&lt;</font>std::string<font color='#5555FF'>&gt;</font> <font color='#BB00BB'>sentence</font><font face='Lucida Console'>(</font><font color='#BB00BB'>split</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>There once was a man from Nantucket whose name rhymed with Bob Bucket</font>"<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+    std::vector<font color='#5555FF'>&lt;</font>std::pair<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font>,<font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> seg <font color='#5555FF'>=</font> <font color='#BB00BB'>segmenter</font><font face='Lucida Console'>(</font>sentence<font face='Lucida Console'>)</font>;
+    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> j <font color='#5555FF'>=</font> <font color='#979000'>0</font>; j <font color='#5555FF'>&lt;</font> seg.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>j<font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#BB00BB'>print_segment</font><font face='Lucida Console'>(</font>sentence, seg[j]<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+
+
+    <font color='#009900'>// We can also test the accuracy of the segmenter on a dataset.  This statement simply
+</font>    <font color='#009900'>// tests on the training data.  In this case we will see that it predicts everything
+</font>    <font color='#009900'>// correctly.
+</font>    cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\nprecision, recall, f1-score: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>test_sequence_segmenter</font><font face='Lucida Console'>(</font>segmenter, samples, segments<font face='Lucida Console'>)</font>;
+    <font color='#009900'>// Similarly, we can do 5-fold cross-validation and print the results.  Just as before,
+</font>    <font color='#009900'>// we see everything is predicted correctly.
+</font>    cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>precision, recall, f1-score: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>cross_validate_sequence_segmenter</font><font face='Lucida Console'>(</font>trainer, samples, segments, <font color='#979000'>5</font><font face='Lucida Console'>)</font>;
+
+
+
+
+
+    <font color='#009900'>// Finally, the segmenter can be serialized to disk just like most dlib objects.
+</font>    <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>segmenter.dat</font>"<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> segmenter;
+
+    <font color='#009900'>// recall from disk
+</font>    <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>segmenter.dat</font>"<font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font> segmenter;
+<b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+
+</pre></body></html>

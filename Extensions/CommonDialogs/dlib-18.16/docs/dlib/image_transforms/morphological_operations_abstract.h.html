@@ -1,0 +1,319 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - morphological_operations_abstract.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2006  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#undef</font> DLIB_MORPHOLOGICAL_OPERATIONs_ABSTRACT_
+<font color='#0000FF'>#ifdef</font> DLIB_MORPHOLOGICAL_OPERATIONs_ABSTRACT_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../pixel.h.html'>../pixel.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='thresholding_abstract.h.html'>thresholding_abstract.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../image_processing/generic_image.h.html'>../image_processing/generic_image.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> in_image_type,
+        <font color='#0000FF'>typename</font> out_image_type,
+        <font color='#0000FF'><u>long</u></font> M,
+        <font color='#0000FF'><u>long</u></font> N
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='binary_dilation'></a>binary_dilation</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> in_image_type<font color='#5555FF'>&amp;</font> in_img,
+        out_image_type<font color='#5555FF'>&amp;</font> out_img,
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> <font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>structuring_element<font face='Lucida Console'>)</font>[M][N]
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - in_image_type and out_image_type are image objects that implement the
+              interface defined in dlib/image_processing/generic_image.h 
+            - in_img must contain a grayscale pixel type.
+            - both in_img and out_img must contain pixels with no alpha channel.
+              (i.e. pixel_traits::has_alpha==false for their pixels)
+            - is_same_object(in_img,out_img) == false
+            - M % 2 == 1  (i.e. M must be odd)
+            - N % 2 == 1  (i.e. N must be odd)
+            - all pixels in in_img are set to either on_pixel or off_pixel
+              (i.e. it must be a binary image)
+            - all pixels in structuring_element are set to either on_pixel or off_pixel
+              (i.e. it must be a binary image)
+        ensures
+            - Does a binary dilation of in_img using the given structuring element and 
+              stores the result in out_img.
+            - #out_img.nc() == in_img.nc()
+            - #out_img.nr() == in_img.nr()
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> in_image_type,
+        <font color='#0000FF'>typename</font> out_image_type,
+        <font color='#0000FF'><u>long</u></font> M,
+        <font color='#0000FF'><u>long</u></font> N
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='binary_erosion'></a>binary_erosion</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> in_image_type<font color='#5555FF'>&amp;</font> in_img,
+        out_image_type<font color='#5555FF'>&amp;</font> out_img,
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> <font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>structuring_element<font face='Lucida Console'>)</font>[M][N]
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - in_image_type and out_image_type are image objects that implement the
+              interface defined in dlib/image_processing/generic_image.h 
+            - in_img must contain a grayscale pixel type.
+            - both in_img and out_img must contain pixels with no alpha channel.
+              (i.e. pixel_traits::has_alpha==false for their pixels)
+            - is_same_object(in_img,out_img) == false
+            - M % 2 == 1  (i.e. M must be odd)
+            - N % 2 == 1  (i.e. N must be odd)
+            - all pixels in in_img are set to either on_pixel or off_pixel
+              (i.e. it must be a binary image)
+            - all pixels in structuring_element are set to either on_pixel or off_pixel
+              (i.e. it must be a binary image)
+        ensures
+            - Does a binary erosion of in_img using the given structuring element and 
+              stores the result in out_img.
+            - #out_img.nc() == in_img.nc()
+            - #out_img.nr() == in_img.nr()
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> in_image_type,
+        <font color='#0000FF'>typename</font> out_image_type,
+        <font color='#0000FF'><u>long</u></font> M,
+        <font color='#0000FF'><u>long</u></font> N
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='binary_open'></a>binary_open</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> in_image_type<font color='#5555FF'>&amp;</font> in_img,
+        out_image_type<font color='#5555FF'>&amp;</font> out_img,
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> <font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>structuring_element<font face='Lucida Console'>)</font>[M][N],
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> iter <font color='#5555FF'>=</font> <font color='#979000'>1</font>
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - in_image_type and out_image_type are image objects that implement the
+              interface defined in dlib/image_processing/generic_image.h 
+            - in_img must contain a grayscale pixel type.
+            - both in_img and out_img must contain pixels with no alpha channel.
+              (i.e. pixel_traits::has_alpha==false for their pixels)
+            - is_same_object(in_img,out_img) == false
+            - M % 2 == 1  (i.e. M must be odd)
+            - N % 2 == 1  (i.e. N must be odd)
+            - all pixels in in_img are set to either on_pixel or off_pixel
+              (i.e. it must be a binary image)
+            - all pixels in structuring_element are set to either on_pixel or off_pixel
+              (i.e. it must be a binary image)
+        ensures
+            - Does a binary open of in_img using the given structuring element and 
+              stores the result in out_img.  Specifically, iter iterations of binary 
+              erosion are applied and then iter iterations of binary dilation.
+            - #out_img.nc() == in_img.nc()
+            - #out_img.nr() == in_img.nr()
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> in_image_type,
+        <font color='#0000FF'>typename</font> out_image_type,
+        <font color='#0000FF'><u>long</u></font> M,
+        <font color='#0000FF'><u>long</u></font> N
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='binary_close'></a>binary_close</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> in_image_type<font color='#5555FF'>&amp;</font> in_img,
+        out_image_type<font color='#5555FF'>&amp;</font> out_img,
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> <font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>structuring_element<font face='Lucida Console'>)</font>[M][N],
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> iter <font color='#5555FF'>=</font> <font color='#979000'>1</font>
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - in_image_type and out_image_type are image objects that implement the
+              interface defined in dlib/image_processing/generic_image.h 
+            - in_img must contain a grayscale pixel type.
+            - both in_img and out_img must contain pixels with no alpha channel.
+              (i.e. pixel_traits::has_alpha==false for their pixels)
+            - is_same_object(in_img,out_img) == false
+            - M % 2 == 1  (i.e. M must be odd)
+            - N % 2 == 1  (i.e. N must be odd)
+            - all pixels in in_img are set to either on_pixel or off_pixel
+              (i.e. it must be a binary image)
+            - all pixels in structuring_element are set to either on_pixel or off_pixel
+              (i.e. it must be a binary image)
+        ensures
+            - Does a binary close of in_img using the given structuring element and 
+              stores the result in out_img.  Specifically, iter iterations of binary 
+              dilation are applied and then iter iterations of binary erosion.
+            - #out_img.nc() == in_img.nc()
+            - #out_img.nr() == in_img.nr()
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> in_image_type1,
+        <font color='#0000FF'>typename</font> in_image_type2,
+        <font color='#0000FF'>typename</font> out_image_type
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='binary_intersection'></a>binary_intersection</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> in_image_type1<font color='#5555FF'>&amp;</font> in_img1,
+        <font color='#0000FF'>const</font> in_image_type2<font color='#5555FF'>&amp;</font> in_img2,
+        out_image_type<font color='#5555FF'>&amp;</font> out_img
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - in_image_type1, in_image_type2, and out_image_type are image objects that
+              implement the interface defined in dlib/image_processing/generic_image.h 
+            - in_img1 and in_img2 must contain grayscale pixel types.
+            - in_img1, in_img2, and out_img must contain pixels with no alpha channel.
+              (i.e. pixel_traits::has_alpha==false for their pixels)
+            - all pixels in in_img1 and in_img2 are set to either on_pixel or off_pixel
+              (i.e. they must be binary images)
+            - in_img1.nc() == in_img2.nc()
+            - in_img1.nr() == in_img2.nr()
+        ensures
+            - #out_img == the binary intersection of in_img1 and in_img2.  (i.e. All
+              the pixels that are set to on_pixel in both in_img1 and in_img2 will be set
+              to on_pixel in #out_img.  All other pixels will be set to off_pixel)
+            - #out_img.nc() == in_img.nc()
+            - #out_img.nr() == in_img.nr()
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> in_image_type1,
+        <font color='#0000FF'>typename</font> in_image_type2,
+        <font color='#0000FF'>typename</font> out_image_type
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='binary_union'></a>binary_union</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> in_image_type1<font color='#5555FF'>&amp;</font> in_img1,
+        <font color='#0000FF'>const</font> in_image_type2<font color='#5555FF'>&amp;</font> in_img2,
+        out_image_type<font color='#5555FF'>&amp;</font> out_img
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - in_image_type1, in_image_type2, and out_image_type are image objects that
+              implement the interface defined in dlib/image_processing/generic_image.h 
+            - in_img1 and in_img2 must contain grayscale pixel types.
+            - in_img1, in_img2, and out_img must contain pixels with no alpha channel.
+              (i.e. pixel_traits::has_alpha==false for their pixels)
+            - all pixels in in_img1 and in_img2 are set to either on_pixel or off_pixel
+              (i.e. they must be binary images)
+            - in_img1.nc() == in_img2.nc()
+            - in_img1.nr() == in_img2.nr()
+        ensures
+            - #out_img == the binary union of in_img1 and in_img2.  (i.e. All
+              the pixels that are set to on_pixel in in_img1 and/or in_img2 will be set
+              to on_pixel in #out_img.  All other pixels will be set to off_pixel)
+            - #out_img.nc() == in_img.nc()
+            - #out_img.nr() == in_img.nr()
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> in_image_type1,
+        <font color='#0000FF'>typename</font> in_image_type2,
+        <font color='#0000FF'>typename</font> out_image_type
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='binary_difference'></a>binary_difference</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> in_image_type1<font color='#5555FF'>&amp;</font> in_img1,
+        <font color='#0000FF'>const</font> in_image_type2<font color='#5555FF'>&amp;</font> in_img2,
+        out_image_type<font color='#5555FF'>&amp;</font> out_img
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - in_image_type1, in_image_type2, and out_image_type are image objects that
+              implement the interface defined in dlib/image_processing/generic_image.h 
+            - in_img1 and in_img2 must contain grayscale pixel types.
+            - in_img1, in_img2, and out_img must contain pixels with no alpha channel.
+              (i.e. pixel_traits::has_alpha==false for their pixels)
+            - all pixels in in_img1 and in_img2 are set to either on_pixel or off_pixel
+              (i.e. they must be binary images)
+            - in_img1.nc() == in_img2.nc()
+            - in_img1.nr() == in_img2.nr()
+        ensures
+            - #out_img == the binary difference of in_img1 and in_img2.  (i.e. #out_img
+              will be a copy of in_img1 except that any pixels in in_img2 that are set to 
+              on_pixel will be set to off_pixel)
+            - #out_img.nc() == in_img.nc()
+            - #out_img.nr() == in_img.nr()
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> in_image_type,
+        <font color='#0000FF'>typename</font> out_image_type
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='binary_complement'></a>binary_complement</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> in_image_type<font color='#5555FF'>&amp;</font> in_img,
+        out_image_type<font color='#5555FF'>&amp;</font> out_img
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - in_image_type and out_image_type are image objects that implement the
+              interface defined in dlib/image_processing/generic_image.h 
+            - in_img must contain a grayscale pixel type.
+            - both in_img and out_img must contain pixels with no alpha channel.
+              (i.e. pixel_traits::has_alpha==false for their pixels)
+            - all pixels in in_img are set to either on_pixel or off_pixel
+              (i.e. it must be a binary image)
+        ensures
+            - #out_img == the binary complement of in_img.  (i.e. For each pixel in
+              in_img, if it is on_pixel then it will be set to off_pixel in #out_img and
+              if it was off_pixel in in_img then it will be on_pixel in #out_img)
+            - #out_img.nc() == in_img.nc()
+            - #out_img.nr() == in_img.nr()
+    !*/</font>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> image_type
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='binary_complement'></a>binary_complement</b> <font face='Lucida Console'>(</font>
+        image_type<font color='#5555FF'>&amp;</font> img
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - it must be valid to call binary_complement(img,img);
+        ensures
+            - calls binary_complement(img,img);
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> image_type
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='skeleton'></a>skeleton</b><font face='Lucida Console'>(</font>
+        image_type<font color='#5555FF'>&amp;</font> img
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - image_type is an object that implement the interface defined in
+              dlib/image_processing/generic_image.h 
+            - img must contain a grayscale pixel type.
+            - all pixels in img are set to either on_pixel or off_pixel.
+              (i.e. it must be a binary image)
+        ensures
+            - This function computes the skeletonization of img and stores the result in
+              #img.  That is, given a binary image, we progressively thin the binary blobs
+              (composed of on_pixel values) until only a single pixel wide skeleton of the
+              original blobs remains.
+            - #img.nc() == img.nc()
+            - #img.nr() == img.nr()
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_MORPHOLOGICAL_OPERATIONs_ABSTRACT_
+</font>
+
+
+</pre></body></html>

@@ -1,0 +1,239 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - blas_bindings_scal_axpy.cpp</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2009  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font>
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../tester.h.html'>../tester.h</a>"
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>matrix.h<font color='#5555FF'>&gt;</font>
+
+<font color='#0000FF'>#ifndef</font> DLIB_USE_BLAS
+<font color='#0000FF'>#error</font> "<font color='#CC0000'>BLAS bindings must be used for this test to make any sense</font>"
+<font color='#0000FF'>#endif</font>
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+    <font color='#0000FF'>namespace</font> blas_bindings
+    <b>{</b>
+        <font color='#009900'>// This is a little screwy.  This function is used inside the BLAS
+</font>        <font color='#009900'>// bindings to count how many times each of the BLAS functions get called.
+</font><font color='#0000FF'>#ifdef</font> DLIB_TEST_BLAS_BINDINGS
+        <font color='#0000FF'><u>int</u></font><font color='#5555FF'>&amp;</font> <b><a name='counter_axpy'></a>counter_axpy</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <b>{</b> <font color='#0000FF'>static</font> <font color='#0000FF'><u>int</u></font> counter <font color='#5555FF'>=</font> <font color='#979000'>0</font>; <font color='#0000FF'>return</font> counter; <b>}</b>
+        <font color='#0000FF'><u>int</u></font><font color='#5555FF'>&amp;</font> <b><a name='counter_scal'></a>counter_scal</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <b>{</b> <font color='#0000FF'>static</font> <font color='#0000FF'><u>int</u></font> counter <font color='#5555FF'>=</font> <font color='#979000'>0</font>; <font color='#0000FF'>return</font> counter; <b>}</b>
+<font color='#0000FF'>#endif</font>
+
+    <b>}</b>
+<b>}</b>
+
+<font color='#0000FF'>namespace</font>  
+<b>{</b>
+    <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> test;
+    <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> std;
+    <font color='#009900'>// Declare the logger we will use in this test.  The name of the logger 
+</font>    <font color='#009900'>// should start with "test."
+</font>    dlib::logger <b><a name='dlog'></a>dlog</b><font face='Lucida Console'>(</font>"<font color='#CC0000'>test.scal_axpy</font>"<font face='Lucida Console'>)</font>;
+
+
+    <font color='#0000FF'>class</font> <b><a name='blas_bindings_scal_axpy_tester'></a>blas_bindings_scal_axpy_tester</b> : <font color='#0000FF'>public</font> tester
+    <b>{</b>
+    <font color='#0000FF'>public</font>:
+        <b><a name='blas_bindings_scal_axpy_tester'></a>blas_bindings_scal_axpy_tester</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> :
+            tester <font face='Lucida Console'>(</font>
+                "<font color='#CC0000'>test_scal_axpy</font>", <font color='#009900'>// the command line argument name for this test
+</font>                "<font color='#CC0000'>Run tests for DOT routines.</font>", <font color='#009900'>// the command line argument description
+</font>                <font color='#979000'>0</font>                     <font color='#009900'>// the number of command line arguments for this test
+</font>            <font face='Lucida Console'>)</font>
+        <b>{</b><b>}</b>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> matrix_type, <font color='#0000FF'>typename</font> cv_type, <font color='#0000FF'>typename</font> rv_type<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='test_scal_axpy_stuff'></a>test_scal_axpy_stuff</b><font face='Lucida Console'>(</font>
+            matrix_type<font color='#5555FF'>&amp;</font> m,
+            rv_type<font color='#5555FF'>&amp;</font> rv,
+            cv_type<font color='#5555FF'>&amp;</font> cv
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> dlib;
+            <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> dlib::blas_bindings;
+
+            rv_type rv2 <font color='#5555FF'>=</font> rv;
+            cv_type cv2 <font color='#5555FF'>=</font> cv;
+            matrix_type m2 <font color='#5555FF'>=</font> m;
+            <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> matrix_type::type scalar_type;
+            scalar_type val;
+
+            <font color='#BB00BB'>counter_scal</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            m <font color='#5555FF'>=</font> <font color='#979000'>5</font><font color='#5555FF'>*</font>m;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>counter_scal</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+
+            <font color='#BB00BB'>counter_scal</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            rv <font color='#5555FF'>=</font> <font color='#979000'>5</font><font color='#5555FF'>*</font>rv;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>counter_scal</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+
+            <font color='#BB00BB'>counter_scal</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            rv <font color='#5555FF'>=</font> <font color='#979000'>5</font><font color='#5555FF'>*</font>rv;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>counter_scal</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+
+
+            <font color='#BB00BB'>counter_axpy</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            m2 <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#979000'>5</font><font color='#5555FF'>*</font>m;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>counter_axpy</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+
+            <font color='#BB00BB'>counter_axpy</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            rv2 <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#979000'>5</font><font color='#5555FF'>*</font>rv;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>counter_axpy</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+
+            <font color='#BB00BB'>counter_axpy</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            rv2 <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#979000'>5</font><font color='#5555FF'>*</font>rv;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>counter_axpy</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+
+
+
+            <font color='#BB00BB'>counter_scal</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            m <font color='#5555FF'>=</font> m<font color='#5555FF'>*</font><font color='#979000'>5</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>counter_scal</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+
+            <font color='#BB00BB'>counter_scal</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            rv <font color='#5555FF'>=</font> rv<font color='#5555FF'>*</font><font color='#979000'>5</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>counter_scal</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+
+            <font color='#BB00BB'>counter_scal</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            cv <font color='#5555FF'>=</font> cv<font color='#5555FF'>*</font><font color='#979000'>5</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>counter_scal</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+
+
+            <font color='#BB00BB'>counter_axpy</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            m2 <font color='#5555FF'>+</font><font color='#5555FF'>=</font> m<font color='#5555FF'>*</font><font color='#979000'>5</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>counter_axpy</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+
+            <font color='#BB00BB'>counter_axpy</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            rv2 <font color='#5555FF'>+</font><font color='#5555FF'>=</font> rv<font color='#5555FF'>*</font><font color='#979000'>5</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>counter_axpy</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+
+            <font color='#BB00BB'>counter_axpy</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            cv2 <font color='#5555FF'>+</font><font color='#5555FF'>=</font> cv<font color='#5555FF'>*</font><font color='#979000'>5</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>counter_axpy</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+
+
+
+
+            <font color='#BB00BB'>counter_axpy</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            m2 <font color='#5555FF'>=</font> m2 <font color='#5555FF'>+</font> m<font color='#5555FF'>*</font><font color='#979000'>5</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>counter_axpy</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+
+            <font color='#BB00BB'>counter_axpy</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            rv2 <font color='#5555FF'>=</font> rv2 <font color='#5555FF'>+</font> rv<font color='#5555FF'>*</font><font color='#979000'>5</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>counter_axpy</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+
+            <font color='#BB00BB'>counter_axpy</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            cv2 <font color='#5555FF'>=</font> cv2 <font color='#5555FF'>+</font> cv<font color='#5555FF'>*</font><font color='#979000'>5</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>counter_axpy</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+
+
+            <font color='#BB00BB'>counter_axpy</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            cv2 <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+            cv <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+            cv2 <font color='#5555FF'>=</font> <font color='#979000'>2</font><font color='#5555FF'>*</font>cv2 <font color='#5555FF'>+</font> cv<font color='#5555FF'>*</font><font color='#979000'>5</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>counter_axpy</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>max</font><font face='Lucida Console'>(</font><font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font>cv2 <font color='#5555FF'>-</font> <font color='#979000'>7</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+
+
+            <font color='#BB00BB'>counter_axpy</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            rv2 <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+            rv <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+            rv2 <font color='#5555FF'>=</font> <font color='#979000'>2</font><font color='#5555FF'>*</font>rv2 <font color='#5555FF'>+</font> rv<font color='#5555FF'>*</font><font color='#979000'>5</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>counter_axpy</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>max</font><font face='Lucida Console'>(</font><font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font>rv2 <font color='#5555FF'>-</font> <font color='#979000'>7</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+
+
+            <font color='#BB00BB'>counter_axpy</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            m2 <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+            m <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+            m2 <font color='#5555FF'>=</font> <font color='#979000'>2</font><font color='#5555FF'>*</font>m2 <font color='#5555FF'>+</font> m<font color='#5555FF'>*</font><font color='#979000'>5</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>counter_axpy</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>max</font><font face='Lucida Console'>(</font><font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font>m2 <font color='#5555FF'>-</font> <font color='#979000'>7</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='perform_test'></a>perform_test</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> dlib;
+            <font color='#0000FF'>typedef</font> dlib::memory_manager<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font>::kernel_1a mm;
+
+            dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> dlib::LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>test double</font>";
+            <b>{</b>
+                matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font> m <font color='#5555FF'>=</font> <font color='#BB00BB'>randm</font><font face='Lucida Console'>(</font><font color='#979000'>4</font>,<font color='#979000'>4</font><font face='Lucida Console'>)</font>;
+                matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>1</font>,<font color='#979000'>0</font><font color='#5555FF'>&gt;</font> rv <font color='#5555FF'>=</font> <font color='#BB00BB'>randm</font><font face='Lucida Console'>(</font><font color='#979000'>1</font>,<font color='#979000'>4</font><font face='Lucida Console'>)</font>;
+                matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>0</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> cv <font color='#5555FF'>=</font> <font color='#BB00BB'>randm</font><font face='Lucida Console'>(</font><font color='#979000'>4</font>,<font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+                <font color='#BB00BB'>test_scal_axpy_stuff</font><font face='Lucida Console'>(</font>m,rv,cv<font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+            dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> dlib::LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>test float</font>";
+            <b>{</b>
+                matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>float</u></font><font color='#5555FF'>&gt;</font> m <font color='#5555FF'>=</font> matrix_cast<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>float</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#BB00BB'>randm</font><font face='Lucida Console'>(</font><font color='#979000'>4</font>,<font color='#979000'>4</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>float</u></font>,<font color='#979000'>1</font>,<font color='#979000'>0</font><font color='#5555FF'>&gt;</font> rv <font color='#5555FF'>=</font> matrix_cast<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>float</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#BB00BB'>randm</font><font face='Lucida Console'>(</font><font color='#979000'>1</font>,<font color='#979000'>4</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>float</u></font>,<font color='#979000'>0</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> cv <font color='#5555FF'>=</font> matrix_cast<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>float</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#BB00BB'>randm</font><font face='Lucida Console'>(</font><font color='#979000'>4</font>,<font color='#979000'>1</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                <font color='#BB00BB'>test_scal_axpy_stuff</font><font face='Lucida Console'>(</font>m,rv,cv<font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+            dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> dlib::LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>test complex&lt;double&gt;</font>";
+            <b>{</b>
+                matrix<font color='#5555FF'>&lt;</font>complex<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> m <font color='#5555FF'>=</font> <font color='#BB00BB'>complex_matrix</font><font face='Lucida Console'>(</font><font color='#BB00BB'>randm</font><font face='Lucida Console'>(</font><font color='#979000'>4</font>,<font color='#979000'>4</font><font face='Lucida Console'>)</font>, <font color='#BB00BB'>randm</font><font face='Lucida Console'>(</font><font color='#979000'>4</font>,<font color='#979000'>4</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                matrix<font color='#5555FF'>&lt;</font>complex<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font>,<font color='#979000'>1</font>,<font color='#979000'>0</font><font color='#5555FF'>&gt;</font> rv <font color='#5555FF'>=</font> <font color='#BB00BB'>complex_matrix</font><font face='Lucida Console'>(</font><font color='#BB00BB'>randm</font><font face='Lucida Console'>(</font><font color='#979000'>1</font>,<font color='#979000'>4</font><font face='Lucida Console'>)</font>, <font color='#BB00BB'>randm</font><font face='Lucida Console'>(</font><font color='#979000'>1</font>,<font color='#979000'>4</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                matrix<font color='#5555FF'>&lt;</font>complex<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font>,<font color='#979000'>0</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> cv <font color='#5555FF'>=</font> <font color='#BB00BB'>complex_matrix</font><font face='Lucida Console'>(</font><font color='#BB00BB'>randm</font><font face='Lucida Console'>(</font><font color='#979000'>4</font>,<font color='#979000'>1</font><font face='Lucida Console'>)</font>, <font color='#BB00BB'>randm</font><font face='Lucida Console'>(</font><font color='#979000'>4</font>,<font color='#979000'>1</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                <font color='#BB00BB'>test_scal_axpy_stuff</font><font face='Lucida Console'>(</font>m,rv,cv<font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+            dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> dlib::LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>test complex&lt;float&gt;</font>";
+            <b>{</b>
+                matrix<font color='#5555FF'>&lt;</font>complex<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>float</u></font><font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> m <font color='#5555FF'>=</font> matrix_cast<font color='#5555FF'>&lt;</font>complex<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>float</u></font><font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#BB00BB'>complex_matrix</font><font face='Lucida Console'>(</font><font color='#BB00BB'>randm</font><font face='Lucida Console'>(</font><font color='#979000'>4</font>,<font color='#979000'>4</font><font face='Lucida Console'>)</font>, <font color='#BB00BB'>randm</font><font face='Lucida Console'>(</font><font color='#979000'>4</font>,<font color='#979000'>4</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                matrix<font color='#5555FF'>&lt;</font>complex<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>float</u></font><font color='#5555FF'>&gt;</font>,<font color='#979000'>1</font>,<font color='#979000'>0</font><font color='#5555FF'>&gt;</font> rv <font color='#5555FF'>=</font> matrix_cast<font color='#5555FF'>&lt;</font>complex<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>float</u></font><font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#BB00BB'>complex_matrix</font><font face='Lucida Console'>(</font><font color='#BB00BB'>randm</font><font face='Lucida Console'>(</font><font color='#979000'>1</font>,<font color='#979000'>4</font><font face='Lucida Console'>)</font>, <font color='#BB00BB'>randm</font><font face='Lucida Console'>(</font><font color='#979000'>1</font>,<font color='#979000'>4</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                matrix<font color='#5555FF'>&lt;</font>complex<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>float</u></font><font color='#5555FF'>&gt;</font>,<font color='#979000'>0</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> cv <font color='#5555FF'>=</font> matrix_cast<font color='#5555FF'>&lt;</font>complex<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>float</u></font><font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#BB00BB'>complex_matrix</font><font face='Lucida Console'>(</font><font color='#BB00BB'>randm</font><font face='Lucida Console'>(</font><font color='#979000'>4</font>,<font color='#979000'>1</font><font face='Lucida Console'>)</font>, <font color='#BB00BB'>randm</font><font face='Lucida Console'>(</font><font color='#979000'>4</font>,<font color='#979000'>1</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                <font color='#BB00BB'>test_scal_axpy_stuff</font><font face='Lucida Console'>(</font>m,rv,cv<font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+
+            dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> dlib::LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>test double, column major</font>";
+            <b>{</b>
+                matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,mm,column_major_layout<font color='#5555FF'>&gt;</font> m <font color='#5555FF'>=</font> <font color='#BB00BB'>randm</font><font face='Lucida Console'>(</font><font color='#979000'>4</font>,<font color='#979000'>4</font><font face='Lucida Console'>)</font>;
+                matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>1</font>,<font color='#979000'>0</font>,mm,column_major_layout<font color='#5555FF'>&gt;</font> rv <font color='#5555FF'>=</font> <font color='#BB00BB'>randm</font><font face='Lucida Console'>(</font><font color='#979000'>1</font>,<font color='#979000'>4</font><font face='Lucida Console'>)</font>;
+                matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>0</font>,<font color='#979000'>1</font>,mm,column_major_layout<font color='#5555FF'>&gt;</font> cv <font color='#5555FF'>=</font> <font color='#BB00BB'>randm</font><font face='Lucida Console'>(</font><font color='#979000'>4</font>,<font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+                <font color='#BB00BB'>test_scal_axpy_stuff</font><font face='Lucida Console'>(</font>m,rv,cv<font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+            dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> dlib::LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>test float, column major</font>";
+            <b>{</b>
+                matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>float</u></font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,mm,column_major_layout<font color='#5555FF'>&gt;</font> m <font color='#5555FF'>=</font> matrix_cast<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>float</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#BB00BB'>randm</font><font face='Lucida Console'>(</font><font color='#979000'>4</font>,<font color='#979000'>4</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>float</u></font>,<font color='#979000'>1</font>,<font color='#979000'>0</font>,mm,column_major_layout<font color='#5555FF'>&gt;</font> rv <font color='#5555FF'>=</font> matrix_cast<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>float</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#BB00BB'>randm</font><font face='Lucida Console'>(</font><font color='#979000'>1</font>,<font color='#979000'>4</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>float</u></font>,<font color='#979000'>0</font>,<font color='#979000'>1</font>,mm,column_major_layout<font color='#5555FF'>&gt;</font> cv <font color='#5555FF'>=</font> matrix_cast<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>float</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#BB00BB'>randm</font><font face='Lucida Console'>(</font><font color='#979000'>4</font>,<font color='#979000'>1</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                <font color='#BB00BB'>test_scal_axpy_stuff</font><font face='Lucida Console'>(</font>m,rv,cv<font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+            dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> dlib::LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>test complex&lt;double&gt;, column major</font>";
+            <b>{</b>
+                matrix<font color='#5555FF'>&lt;</font>complex<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,mm,column_major_layout <font color='#5555FF'>&gt;</font> m <font color='#5555FF'>=</font> <font color='#BB00BB'>complex_matrix</font><font face='Lucida Console'>(</font><font color='#BB00BB'>randm</font><font face='Lucida Console'>(</font><font color='#979000'>4</font>,<font color='#979000'>4</font><font face='Lucida Console'>)</font>, <font color='#BB00BB'>randm</font><font face='Lucida Console'>(</font><font color='#979000'>4</font>,<font color='#979000'>4</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                matrix<font color='#5555FF'>&lt;</font>complex<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font>,<font color='#979000'>1</font>,<font color='#979000'>0</font>,mm,column_major_layout<font color='#5555FF'>&gt;</font> rv <font color='#5555FF'>=</font> <font color='#BB00BB'>complex_matrix</font><font face='Lucida Console'>(</font><font color='#BB00BB'>randm</font><font face='Lucida Console'>(</font><font color='#979000'>1</font>,<font color='#979000'>4</font><font face='Lucida Console'>)</font>, <font color='#BB00BB'>randm</font><font face='Lucida Console'>(</font><font color='#979000'>1</font>,<font color='#979000'>4</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                matrix<font color='#5555FF'>&lt;</font>complex<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font>,<font color='#979000'>0</font>,<font color='#979000'>1</font>,mm,column_major_layout<font color='#5555FF'>&gt;</font> cv <font color='#5555FF'>=</font> <font color='#BB00BB'>complex_matrix</font><font face='Lucida Console'>(</font><font color='#BB00BB'>randm</font><font face='Lucida Console'>(</font><font color='#979000'>4</font>,<font color='#979000'>1</font><font face='Lucida Console'>)</font>, <font color='#BB00BB'>randm</font><font face='Lucida Console'>(</font><font color='#979000'>4</font>,<font color='#979000'>1</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                <font color='#BB00BB'>test_scal_axpy_stuff</font><font face='Lucida Console'>(</font>m,rv,cv<font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+            dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> dlib::LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>test complex&lt;float&gt;, column major</font>";
+            <b>{</b>
+                matrix<font color='#5555FF'>&lt;</font>complex<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>float</u></font><font color='#5555FF'>&gt;</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,mm,column_major_layout <font color='#5555FF'>&gt;</font> m <font color='#5555FF'>=</font> matrix_cast<font color='#5555FF'>&lt;</font>complex<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>float</u></font><font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#BB00BB'>complex_matrix</font><font face='Lucida Console'>(</font><font color='#BB00BB'>randm</font><font face='Lucida Console'>(</font><font color='#979000'>4</font>,<font color='#979000'>4</font><font face='Lucida Console'>)</font>, <font color='#BB00BB'>randm</font><font face='Lucida Console'>(</font><font color='#979000'>4</font>,<font color='#979000'>4</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                matrix<font color='#5555FF'>&lt;</font>complex<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>float</u></font><font color='#5555FF'>&gt;</font>,<font color='#979000'>1</font>,<font color='#979000'>0</font>,mm,column_major_layout<font color='#5555FF'>&gt;</font> rv <font color='#5555FF'>=</font> matrix_cast<font color='#5555FF'>&lt;</font>complex<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>float</u></font><font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#BB00BB'>complex_matrix</font><font face='Lucida Console'>(</font><font color='#BB00BB'>randm</font><font face='Lucida Console'>(</font><font color='#979000'>1</font>,<font color='#979000'>4</font><font face='Lucida Console'>)</font>, <font color='#BB00BB'>randm</font><font face='Lucida Console'>(</font><font color='#979000'>1</font>,<font color='#979000'>4</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                matrix<font color='#5555FF'>&lt;</font>complex<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>float</u></font><font color='#5555FF'>&gt;</font>,<font color='#979000'>0</font>,<font color='#979000'>1</font>,mm,column_major_layout<font color='#5555FF'>&gt;</font> cv <font color='#5555FF'>=</font> matrix_cast<font color='#5555FF'>&lt;</font>complex<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>float</u></font><font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#BB00BB'>complex_matrix</font><font face='Lucida Console'>(</font><font color='#BB00BB'>randm</font><font face='Lucida Console'>(</font><font color='#979000'>4</font>,<font color='#979000'>1</font><font face='Lucida Console'>)</font>, <font color='#BB00BB'>randm</font><font face='Lucida Console'>(</font><font color='#979000'>4</font>,<font color='#979000'>1</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                <font color='#BB00BB'>test_scal_axpy_stuff</font><font face='Lucida Console'>(</font>m,rv,cv<font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+
+            <font color='#BB00BB'>print_spinner</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+    <b>}</b>;
+
+    blas_bindings_scal_axpy_tester a;
+
+<b>}</b>
+
+
+
+</pre></body></html>

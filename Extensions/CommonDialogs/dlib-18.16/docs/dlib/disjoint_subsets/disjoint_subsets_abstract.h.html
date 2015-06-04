@@ -1,0 +1,102 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - disjoint_subsets_abstract.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2011  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#undef</font> DLIB_DISJOINT_SUBsETS_ABSTRACT_Hh_
+<font color='#0000FF'>#ifdef</font> DLIB_DISJOINT_SUBsETS_ABSTRACT_Hh_
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>vector<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../algs.h.html'>../algs.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>class</font> <b><a name='disjoint_subsets'></a>disjoint_subsets</b>
+    <b>{</b>
+        <font color='#009900'>/*!
+            INITIAL VALUE
+                - size() == 0
+
+            WHAT THIS OBJECT REPRESENTS
+                This object represents a set of integers which is partitioned into
+                a number of disjoint subsets.  It supports the two fundamental operations
+                of finding which subset a particular integer belongs to as well as 
+                merging subsets.
+        !*/</font>
+    <font color='#0000FF'>public</font>:
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='clear'></a>clear</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #size() == 0
+                - returns this object to its initial value
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_size'></a>set_size</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> new_size
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #size() == new_size
+                - for all valid i:
+                    - #find_set(i) == i
+                      (i.e. this object contains new_size subsets, each containing exactly one element)
+        !*/</font>
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='size'></a>size</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the total number of integer elements represented
+                  by this object.  
+        !*/</font>
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='find_set'></a>find_set</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> item 
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - item &lt; size()
+            ensures
+                - Each disjoint subset can be represented by any of its elements (since 
+                  the sets are all disjoint).  In particular, for each subset we define 
+                  a special "representative element" which is used to represent it.  
+                  Therefore, this function returns the representative element for the 
+                  set which contains item.
+                - find_set(find_set(item)) == find_set(item)
+                - Note that if A and B are both elements of the same subset then we always
+                  have find_set(A) == find_set(B).  
+        !*/</font>
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='merge_sets'></a>merge_sets</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> a,
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> b
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - a != b
+                - a &lt; size()
+                - b &lt; size()
+                - find_set(a) == a
+                  (i.e. a is the representative element of some set)
+                - find_set(b) == b
+                  (i.e. b is the representative element of some set)
+            ensures
+                - #find_set(a) == #find_set(b)
+                  (i.e. merges the set's containing a and b)
+                - returns #find_set(a)
+        !*/</font>
+
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_DISJOINT_SUBsETS_ABSTRACT_Hh_
+</font>
+
+
+</pre></body></html>

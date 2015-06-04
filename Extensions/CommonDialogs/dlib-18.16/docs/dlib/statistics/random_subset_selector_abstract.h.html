@@ -1,0 +1,391 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - random_subset_selector_abstract.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2010  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#undef</font> DLIB_RANDOM_SUBSeT_SELECTOR_ABSTRACT_H_
+<font color='#0000FF'>#ifdef</font> DLIB_RANDOM_SUBSeT_SELECTOR_ABSTRACT_H_
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>vector<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../rand/rand_kernel_abstract.h.html'>../rand/rand_kernel_abstract.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../algs.h.html'>../algs.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../string.h.html'>../string.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T,
+        <font color='#0000FF'>typename</font> Rand_type <font color='#5555FF'>=</font> dlib::rand
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>class</font> <b><a name='random_subset_selector'></a>random_subset_selector</b>
+    <b>{</b>
+        <font color='#009900'>/*!
+            REQUIREMENTS ON T
+                T must be a copyable type
+
+            REQUIREMENTS ON Rand_type
+                must be an implementation of dlib/rand/rand_kernel_abstract.h
+
+            INITIAL VALUE
+                - size() == 0
+                - max_size() == 0
+                - next_add_accepts() == false
+
+            WHAT THIS OBJECT REPRESENTS
+                This object is a tool to help you select a random subset of a large body of data.  
+                In particular, it is useful when the body of data is too large to fit into memory.
+
+                So for example, suppose you have 1000000 data samples and you want to select a
+                random subset of size 1000.   Then you could do that as follows:
+                    
+                    random_subset_selector&lt;sample_type&gt; rand_subset;
+                    rand_subset.set_max_size(1000)
+                    for (int i = 0; i &lt; 1000000; ++i)
+                        rand_subset.add( get_next_data_sample());
+
+              
+                At the end of the for loop you will have your random subset of 1000 samples.  And by
+                random I mean that each of the 1000000 data samples has an equal chance of ending
+                up in the rand_subset object.
+
+
+                Note that the above example calls get_next_data_sample() for each data sample.  This 
+                may be inefficient since most of the data samples are just ignored.  An alternative 
+                method that doesn't require you to load each sample can also be used.  Consider the 
+                following:
+
+                    random_subset_selector&lt;sample_type&gt; rand_subset;
+                    rand_subset.set_max_size(1000)
+                    for (int i = 0; i &lt; 1000000; ++i)
+                        if (rand_subset.next_add_accepts())
+                            rand_subset.add(get_data_sample(i));
+                        else
+                            rand_subset.add() 
+
+                In the above example we only actually fetch the data sample into memory if we
+                know that the rand_subset would include it into the random subset.  Otherwise,
+                we can just call the empty add().
+                
+
+                Finally, note that the random_subset_selector uses a deterministic pseudo-random
+                number generator under the hood.  Moreover, the default constructor always seeds
+                the random number generator in the same way.  So unless you call set_seed() 
+                each instance of the random_subset_selector will function identically.
+        !*/</font>
+    <font color='#0000FF'>public</font>:
+        <font color='#0000FF'>typedef</font> T type;
+        <font color='#0000FF'>typedef</font> T value_type;
+        <font color='#0000FF'>typedef</font> default_memory_manager mem_manager_type;
+        <font color='#0000FF'>typedef</font> Rand_type rand_type;
+
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> std::vector<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font>::iterator iterator;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> std::vector<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font>::const_iterator const_iterator;
+
+        <b><a name='random_subset_selector'></a>random_subset_selector</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - this object is properly initialized
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_seed'></a>set_seed</b><font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> value
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - sets the seed of the random number generator that is embedded in
+                  this object to the given value.
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='make_empty'></a>make_empty</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #size() == 0
+        !*/</font>
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='size'></a>size</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the number of items of type T currently contained in this object
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_max_size'></a>set_max_size</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> new_max_size
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #max_size() == new_max_size
+                - #size() == 0
+        !*/</font>
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='max_size'></a>max_size</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the maximum allowable size for this object
+        !*/</font>
+
+        T<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b>[] <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> idx
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - idx &lt; size()
+            ensures
+                - returns a non-const reference to the idx'th element of this object
+        !*/</font>
+
+        <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b>[] <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> idx
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - idx &lt; size()
+            ensures
+                - returns a const reference to the idx'th element of this object
+        !*/</font>
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='next_add_accepts'></a>next_add_accepts</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - if (the next call to add(item) will result in item being included
+                  into *this) then
+                    - returns true
+                    - Note that the next item will always be accepted if size() &lt; max_size().
+                - else
+                    - returns false
+                    - Note that the next item will never be accepted if max_size() == 0.
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='add'></a>add</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> new_item
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - if (next_add_accepts()) then
+                    - places new_item into *this object at a random location
+                    - if (size() &lt; max_size()) then
+                        - #size() == size() + 1
+                - #next_add_accepts() == The updated information about the acceptance
+                  of the next call to add()
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='add'></a>add</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - next_add_accepts() == false
+            ensures
+                - This function does nothing but update the value of #next_add_accepts()
+        !*/</font>
+
+        iterator <b><a name='begin'></a>begin</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - if (size() &gt; 0) then
+                    - returns an iterator referring to the first element in 
+                      this container.
+                - else
+                    - returns end()
+        !*/</font>
+        
+        const_iterator <b><a name='begin'></a>begin</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - if (size() &gt; 0) then
+                    - returns a const_iterator referring to the first element in 
+                      this container.
+                - else
+                    - returns end()
+        !*/</font>
+
+        iterator <b><a name='end'></a>end</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>; 
+        <font color='#009900'>/*!
+            ensures
+                - returns an iterator that represents one past the end of
+                  this container
+        !*/</font>
+
+        const_iterator <b><a name='end'></a>end</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns an iterator that represents one past the end of
+                  this container
+        !*/</font>
+
+        <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> <b><a name='to_std_vector'></a>to_std_vector</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns a const reference to the underlying std::vector&lt;T&gt; that contains
+                  all elements in this object.  That is, this function returns a vector, V,
+                  which has the following properties:  
+                    - V.size()  == this-&gt;size()
+                    - V.begin() == this-&gt;begin()
+                    - V.end()   == this-&gt;end()
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='swap'></a>swap</b> <font face='Lucida Console'>(</font>
+            random_subset_selector<font color='#5555FF'>&amp;</font> item
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - swaps *this and item
+        !*/</font>
+
+    <b>}</b>;
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T,
+        <font color='#0000FF'>typename</font> rand_type 
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='swap'></a>swap</b> <font face='Lucida Console'>(</font>
+        random_subset_selector<font color='#5555FF'>&lt;</font>T,rand_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> a,
+        random_subset_selector<font color='#5555FF'>&lt;</font>T,rand_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> b
+    <font face='Lucida Console'>)</font> <b>{</b> a.<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>b<font face='Lucida Console'>)</font>; <b>}</b>
+    <font color='#009900'>/*!
+        provides global swap support
+    !*/</font>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T,
+        <font color='#0000FF'>typename</font> rand_type 
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='serialize'></a>serialize</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> random_subset_selector<font color='#5555FF'>&lt;</font>T,rand_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> item,
+        std::ostream<font color='#5555FF'>&amp;</font> out 
+    <font face='Lucida Console'>)</font>;   
+    <font color='#009900'>/*!
+        provides serialization support 
+    !*/</font>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T,
+        <font color='#0000FF'>typename</font> rand_type 
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='deserialize'></a>deserialize</b> <font face='Lucida Console'>(</font>
+        random_subset_selector<font color='#5555FF'>&lt;</font>T,rand_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> item,
+        std::istream<font color='#5555FF'>&amp;</font> in
+    <font face='Lucida Console'>)</font>;   
+    <font color='#009900'>/*!
+        provides deserialization support 
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T,
+        <font color='#0000FF'>typename</font> alloc
+        <font color='#5555FF'>&gt;</font>
+    random_subset_selector<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font> <b><a name='randomly_subsample'></a>randomly_subsample</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>T,alloc<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> samples,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> num
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        ensures
+            - returns a random subset R such that:
+                - R contains a random subset of the given samples
+                - R.size() == min(num, samples.size())
+                - R.max_size() == num
+            - The random number generator used by this function will always be
+              initialized in the same way.  I.e. this function will always pick
+              the same random subsample if called multiple times.
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T,
+        <font color='#0000FF'>typename</font> alloc,
+        <font color='#0000FF'>typename</font> U
+        <font color='#5555FF'>&gt;</font>
+    random_subset_selector<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font> <b><a name='randomly_subsample'></a>randomly_subsample</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>T,alloc<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> samples,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> num,
+        <font color='#0000FF'>const</font> U<font color='#5555FF'>&amp;</font> random_seed
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - random_seed must be convertible to a string by dlib::cast_to_string()
+        ensures
+            - returns a random subset R such that:
+                - R contains a random subset of the given samples
+                - R.size() == min(num, samples.size())
+                - R.max_size() == num
+            - The given random_seed will be used to initialize the random number
+              generator used by this function.
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    random_subset_selector<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font> <b><a name='randomly_subsample'></a>randomly_subsample</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> random_subset_selector<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> samples,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> num
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        ensures
+            - returns a random subset R such that:
+                - R contains a random subset of the given samples
+                - R.size() == min(num, samples.size())
+                - R.max_size() == num
+            - The random number generator used by this function will always be
+              initialized in the same way.  I.e. this function will always pick
+              the same random subsample if called multiple times.
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T,
+        <font color='#0000FF'>typename</font> U
+        <font color='#5555FF'>&gt;</font>
+    random_subset_selector<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font> <b><a name='randomly_subsample'></a>randomly_subsample</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> random_subset_selector<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> samples,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> num,
+        <font color='#0000FF'>const</font> U<font color='#5555FF'>&amp;</font> random_seed
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - random_seed must be convertible to a string by dlib::cast_to_string()
+        ensures
+            - returns a random subset R such that:
+                - R contains a random subset of the given samples
+                - R.size() == min(num, samples.size())
+                - R.max_size() == num
+            - The given random_seed will be used to initialize the random number
+              generator used by this function.
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>const</font> matrix_exp <b><a name='mat'></a>mat</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> random_subset_selector<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> m 
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        ensures
+            - returns a matrix R such that:
+                - is_col_vector(R) == true 
+                - R.size() == m.size()
+                - for all valid r:
+                  R(r) == m[r]
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_RANDOM_SUBSeT_SELECTOR_ABSTRACT_H_
+</font>
+
+</pre></body></html>

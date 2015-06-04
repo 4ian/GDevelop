@@ -1,0 +1,62 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - uncompr.c</title></head><body bgcolor='white'><pre>
+<font color='#009900'>/* uncompr.c -- decompress a memory buffer
+ * Copyright (C) 1995-2003, 2010 Jean-loup Gailly.
+ * For conditions of distribution and use, see copyright notice in zlib.h
+ */</font>
+
+<font color='#009900'>/* @(#) $Id$ */</font>
+
+<font color='#0000FF'>#define</font> ZLIB_INTERNAL
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='zlib.h.html'>zlib.h</a>"
+
+<font color='#009900'>/* ===========================================================================
+     Decompresses the source buffer into the destination buffer.  sourceLen is
+   the byte length of the source buffer. Upon entry, destLen is the total
+   size of the destination buffer, which must be large enough to hold the
+   entire uncompressed data. (The size of the uncompressed data must have
+   been saved previously by the compressor and transmitted to the decompressor
+   by some mechanism outside the scope of this compression library.)
+   Upon exit, destLen is the actual size of the compressed buffer.
+
+     uncompress returns Z_OK if success, Z_MEM_ERROR if there was not
+   enough memory, Z_BUF_ERROR if there was not enough room in the output
+   buffer, or Z_DATA_ERROR if the input data was corrupted.
+*/</font>
+<font color='#0000FF'><u>int</u></font> ZEXPORT <b><a name='uncompress'></a>uncompress</b> <font face='Lucida Console'>(</font>dest, destLen, source, sourceLen<font face='Lucida Console'>)</font>
+    Bytef <font color='#5555FF'>*</font>dest;
+    uLongf <font color='#5555FF'>*</font>destLen;
+    <font color='#0000FF'>const</font> Bytef <font color='#5555FF'>*</font>source;
+    uLong sourceLen;
+<b>{</b>
+    z_stream stream;
+    <font color='#0000FF'><u>int</u></font> err;
+
+    stream.next_in <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>z_const Bytef <font color='#5555FF'>*</font><font face='Lucida Console'>)</font>source;
+    stream.avail_in <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>uInt<font face='Lucida Console'>)</font>sourceLen;
+    <font color='#009900'>/* Check for source &gt; 64K on 16-bit machine: */</font>
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>uLong<font face='Lucida Console'>)</font>stream.avail_in <font color='#5555FF'>!</font><font color='#5555FF'>=</font> sourceLen<font face='Lucida Console'>)</font> <font color='#0000FF'>return</font> Z_BUF_ERROR;
+
+    stream.next_out <font color='#5555FF'>=</font> dest;
+    stream.avail_out <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>uInt<font face='Lucida Console'>)</font><font color='#5555FF'>*</font>destLen;
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>uLong<font face='Lucida Console'>)</font>stream.avail_out <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#5555FF'>*</font>destLen<font face='Lucida Console'>)</font> <font color='#0000FF'>return</font> Z_BUF_ERROR;
+
+    stream.zalloc <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>alloc_func<font face='Lucida Console'>)</font><font color='#979000'>0</font>;
+    stream.zfree <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>free_func<font face='Lucida Console'>)</font><font color='#979000'>0</font>;
+
+    err <font color='#5555FF'>=</font> <font color='#BB00BB'>inflateInit</font><font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>stream<font face='Lucida Console'>)</font>;
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>err <font color='#5555FF'>!</font><font color='#5555FF'>=</font> Z_OK<font face='Lucida Console'>)</font> <font color='#0000FF'>return</font> err;
+
+    err <font color='#5555FF'>=</font> <font color='#BB00BB'>inflate</font><font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>stream, Z_FINISH<font face='Lucida Console'>)</font>;
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>err <font color='#5555FF'>!</font><font color='#5555FF'>=</font> Z_STREAM_END<font face='Lucida Console'>)</font> <b>{</b>
+        <font color='#BB00BB'>inflateEnd</font><font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>stream<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>err <font color='#5555FF'>=</font><font color='#5555FF'>=</font> Z_NEED_DICT <font color='#5555FF'>|</font><font color='#5555FF'>|</font> <font face='Lucida Console'>(</font>err <font color='#5555FF'>=</font><font color='#5555FF'>=</font> Z_BUF_ERROR <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> stream.avail_in <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+            <font color='#0000FF'>return</font> Z_DATA_ERROR;
+        <font color='#0000FF'>return</font> err;
+    <b>}</b>
+    <font color='#5555FF'>*</font>destLen <font color='#5555FF'>=</font> stream.total_out;
+
+    err <font color='#5555FF'>=</font> <font color='#BB00BB'>inflateEnd</font><font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>stream<font face='Lucida Console'>)</font>;
+    <font color='#0000FF'>return</font> err;
+<b>}</b>
+
+</pre></body></html>

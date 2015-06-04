@@ -1,0 +1,518 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - modularity_clustering.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2012  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_MODULARITY_ClUSTERING__H__
+<font color='#0000FF'>#define</font> DLIB_MODULARITY_ClUSTERING__H__
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='modularity_clustering_abstract.h.html'>modularity_clustering_abstract.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../sparse_vector.h.html'>../sparse_vector.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../graph_utils/edge_list_graphs.h.html'>../graph_utils/edge_list_graphs.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../matrix.h.html'>../matrix.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../rand.h.html'>../rand.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// -----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>namespace</font> impl
+    <b>{</b>
+        <font color='#0000FF'>inline</font> <font color='#0000FF'><u>double</u></font> <b><a name='newman_cluster_split'></a>newman_cluster_split</b> <font face='Lucida Console'>(</font>
+            dlib::rand<font color='#5555FF'>&amp;</font> rnd,
+            <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>ordered_sample_pair<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> edges,
+            <font color='#0000FF'>const</font> matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>0</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> node_degrees, <font color='#009900'>// k from the Newman paper
+</font>            <font color='#0000FF'>const</font> matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>0</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> Bdiag,        <font color='#009900'>// diag(B) from the Newman paper
+</font>            <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font><font color='#5555FF'>&amp;</font> edge_sum,                 <font color='#009900'>// m from the Newman paper
+</font>            matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>0</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> labels,
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> eps,
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> max_iterations
+        <font face='Lucida Console'>)</font>
+        <font color='#009900'>/*!
+            requires
+                - node_degrees.size() == max_index_plus_one(edges)
+                - Bdiag.size() == max_index_plus_one(edges)
+                - edges must be sorted according to order_by_index()
+            ensures
+                - This routine splits a graph into two subgraphs using the Newman 
+                  clustering method.  
+                - returns the modularity obtained when the graph is split according
+                  to the contents of #labels. 
+                - #labels.size() == node_degrees.size()
+                - for all valid i: #labels(i) == -1 or +1
+                - if (this function returns 0) then
+                    - all the labels are equal, i.e. the graph is not split.
+        !*/</font>
+        <b>{</b>
+            <font color='#009900'>// Scale epsilon so that it is relative to the expected value of an element of a
+</font>            <font color='#009900'>// unit vector of length node_degrees.size().
+</font>            <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> power_iter_eps <font color='#5555FF'>=</font> eps <font color='#5555FF'>*</font> std::<font color='#BB00BB'>sqrt</font><font face='Lucida Console'>(</font><font color='#979000'>1.0</font><font color='#5555FF'>/</font>node_degrees.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// Make a random unit vector and put in labels.
+</font>            labels.<font color='#BB00BB'>set_size</font><font face='Lucida Console'>(</font>node_degrees.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> labels.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                <font color='#BB00BB'>labels</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> rnd.<font color='#BB00BB'>get_random_gaussian</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            labels <font color='#5555FF'>/</font><font color='#5555FF'>=</font> <font color='#BB00BB'>length</font><font face='Lucida Console'>(</font>labels<font face='Lucida Console'>)</font>;
+
+            matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>0</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> Bv, Bv_unit;
+
+            <font color='#009900'>// Do the power iteration for a while.
+</font>            <font color='#0000FF'><u>double</u></font> eig <font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>1</font>;
+            <font color='#0000FF'><u>double</u></font> offset <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>eig <font color='#5555FF'>&lt;</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+
+                <font color='#009900'>// any number larger than power_iter_eps
+</font>                <font color='#0000FF'><u>double</u></font> iteration_change <font color='#5555FF'>=</font> power_iter_eps<font color='#5555FF'>*</font><font color='#979000'>2</font><font color='#5555FF'>+</font><font color='#979000'>1</font>; 
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> max_iterations <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> iteration_change <font color='#5555FF'>&gt;</font> power_iter_eps; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font> 
+                <b>{</b>
+                    <font color='#BB00BB'>sparse_matrix_vector_multiply</font><font face='Lucida Console'>(</font>edges, labels, Bv<font face='Lucida Console'>)</font>;
+                    Bv <font color='#5555FF'>-</font><font color='#5555FF'>=</font> <font color='#BB00BB'>dot</font><font face='Lucida Console'>(</font>node_degrees, labels<font face='Lucida Console'>)</font><font color='#5555FF'>/</font><font face='Lucida Console'>(</font><font color='#979000'>2</font><font color='#5555FF'>*</font>edge_sum<font face='Lucida Console'>)</font> <font color='#5555FF'>*</font> node_degrees;
+
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>offset <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        Bv <font color='#5555FF'>-</font><font color='#5555FF'>=</font> offset<font color='#5555FF'>*</font>labels;
+                    <b>}</b>
+
+
+                    <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> len <font color='#5555FF'>=</font> <font color='#BB00BB'>length</font><font face='Lucida Console'>(</font>Bv<font face='Lucida Console'>)</font>;
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>len <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        Bv_unit <font color='#5555FF'>=</font> Bv<font color='#5555FF'>/</font>len;
+                        iteration_change <font color='#5555FF'>=</font> <font color='#BB00BB'>max</font><font face='Lucida Console'>(</font><font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font>labels<font color='#5555FF'>-</font>Bv_unit<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                        labels.<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>Bv_unit<font face='Lucida Console'>)</font>;
+                    <b>}</b>
+                    <font color='#0000FF'>else</font>
+                    <b>{</b>
+                        <font color='#009900'>// Had a bad time, pick another random vector and try it with the
+</font>                        <font color='#009900'>// power iteration.
+</font>                        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> labels.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                            <font color='#BB00BB'>labels</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> rnd.<font color='#BB00BB'>get_random_gaussian</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                    <b>}</b>
+                <b>}</b>
+
+                eig <font color='#5555FF'>=</font> <font color='#BB00BB'>dot</font><font face='Lucida Console'>(</font>Bv,labels<font face='Lucida Console'>)</font>;
+                <font color='#009900'>// we will repeat this loop if the largest eigenvalue is negative
+</font>                offset <font color='#5555FF'>=</font> eig;
+            <b>}</b>
+
+
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> labels.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>labels</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                    <font color='#BB00BB'>labels</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+                <font color='#0000FF'>else</font>
+                    <font color='#BB00BB'>labels</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>1</font>;
+            <b>}</b>
+
+
+            <font color='#009900'>// compute B*labels, store result in Bv.
+</font>            <font color='#BB00BB'>sparse_matrix_vector_multiply</font><font face='Lucida Console'>(</font>edges, labels, Bv<font face='Lucida Console'>)</font>;
+            Bv <font color='#5555FF'>-</font><font color='#5555FF'>=</font> <font color='#BB00BB'>dot</font><font face='Lucida Console'>(</font>node_degrees, labels<font face='Lucida Console'>)</font><font color='#5555FF'>/</font><font face='Lucida Console'>(</font><font color='#979000'>2</font><font color='#5555FF'>*</font>edge_sum<font face='Lucida Console'>)</font> <font color='#5555FF'>*</font> node_degrees;
+
+            <font color='#009900'>// Do some label refinement.  In this step we swap labels if it
+</font>            <font color='#009900'>// improves the modularity score.
+</font>            <font color='#0000FF'><u>bool</u></font> flipped_label <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+            <font color='#0000FF'>while</font><font face='Lucida Console'>(</font>flipped_label<font face='Lucida Console'>)</font>
+            <b>{</b>
+                flipped_label <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+                <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> idx <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> labels.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> val <font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>2</font><font color='#5555FF'>*</font><font color='#BB00BB'>labels</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>;
+                    <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> increase <font color='#5555FF'>=</font> <font color='#979000'>4</font><font color='#5555FF'>*</font><font color='#BB00BB'>Bdiag</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> <font color='#979000'>2</font><font color='#5555FF'>*</font>val<font color='#5555FF'>*</font><font color='#BB00BB'>Bv</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>;
+
+                    <font color='#009900'>// if there is an increase in modularity for swapping this label
+</font>                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>increase <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        <font color='#BB00BB'>labels</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font> <font color='#5555FF'>*</font><font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>1</font>;
+                        <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>idx <font color='#5555FF'>&lt;</font> edges.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> edges[idx].<font color='#BB00BB'>index1</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font>i<font face='Lucida Console'>)</font>
+                        <b>{</b>
+                            <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> j <font color='#5555FF'>=</font> edges[idx].<font color='#BB00BB'>index2</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                            <font color='#BB00BB'>Bv</font><font face='Lucida Console'>(</font>j<font face='Lucida Console'>)</font> <font color='#5555FF'>+</font><font color='#5555FF'>=</font> val<font color='#5555FF'>*</font>edges[idx].<font color='#BB00BB'>distance</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                            <font color='#5555FF'>+</font><font color='#5555FF'>+</font>idx;
+                        <b>}</b>
+
+                        Bv <font color='#5555FF'>-</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>val<font color='#5555FF'>*</font><font color='#BB00BB'>node_degrees</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font><font color='#5555FF'>/</font><font face='Lucida Console'>(</font><font color='#979000'>2</font><font color='#5555FF'>*</font>edge_sum<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font color='#5555FF'>*</font>node_degrees;
+
+                        flipped_label <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+                    <b>}</b>
+                    <font color='#0000FF'>else</font>
+                    <b>{</b>
+                        <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>idx <font color='#5555FF'>&lt;</font> edges.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> edges[idx].<font color='#BB00BB'>index1</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font>i<font face='Lucida Console'>)</font>
+                        <b>{</b>
+                            <font color='#5555FF'>+</font><font color='#5555FF'>+</font>idx;
+                        <b>}</b>
+                    <b>}</b>
+                <b>}</b>
+            <b>}</b>
+
+
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> modularity <font color='#5555FF'>=</font> <font color='#BB00BB'>dot</font><font face='Lucida Console'>(</font>Bv, labels<font face='Lucida Console'>)</font><font color='#5555FF'>/</font><font face='Lucida Console'>(</font><font color='#979000'>4</font><font color='#5555FF'>*</font>edge_sum<font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>return</font> modularity;
+        <b>}</b>
+
+    <font color='#009900'>// -------------------------------------------------------------------------------------
+</font>
+        <font color='#0000FF'>inline</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='newman_cluster_helper'></a>newman_cluster_helper</b> <font face='Lucida Console'>(</font>
+            dlib::rand<font color='#5555FF'>&amp;</font> rnd,
+            <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>ordered_sample_pair<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> edges,
+            <font color='#0000FF'>const</font> matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>0</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> node_degrees, <font color='#009900'>// k from the Newman paper
+</font>            <font color='#0000FF'>const</font> matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>0</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> Bdiag,        <font color='#009900'>// diag(B) from the Newman paper
+</font>            <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font><font color='#5555FF'>&amp;</font> edge_sum,                 <font color='#009900'>// m from the Newman paper
+</font>            std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> labels,
+            <font color='#0000FF'><u>double</u></font> modularity_threshold,
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> eps,
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> max_iterations
+        <font face='Lucida Console'>)</font>
+        <font color='#009900'>/*!
+            ensures
+                - returns the number of clusters the data was split into
+        !*/</font>
+        <b>{</b>
+            matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>0</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> l;
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> modularity <font color='#5555FF'>=</font> <font color='#BB00BB'>newman_cluster_split</font><font face='Lucida Console'>(</font>rnd,edges,node_degrees,Bdiag,edge_sum,l,eps,max_iterations<font face='Lucida Console'>)</font>;
+
+
+            <font color='#009900'>// We need to collapse the node index values down to contiguous values.  So
+</font>            <font color='#009900'>// we use the following two vectors to contain the mappings from input index
+</font>            <font color='#009900'>// values to their corresponding index values in each split.
+</font>            std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font> <font color='#BB00BB'>left_idx_map</font><font face='Lucida Console'>(</font>node_degrees.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font> <font color='#BB00BB'>right_idx_map</font><font face='Lucida Console'>(</font>node_degrees.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// figure out how many nodes went into each side of the split.
+</font>            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> num_left_split <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> num_right_split <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> l.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>l</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                <b>{</b>
+                    left_idx_map[i] <font color='#5555FF'>=</font> num_left_split;
+                    <font color='#5555FF'>+</font><font color='#5555FF'>+</font>num_left_split;
+                <b>}</b>
+                <font color='#0000FF'>else</font>
+                <b>{</b>
+                    right_idx_map[i] <font color='#5555FF'>=</font> num_right_split;
+                    <font color='#5555FF'>+</font><font color='#5555FF'>+</font>num_right_split;
+                <b>}</b>
+            <b>}</b>
+
+            <font color='#009900'>// do a recursive split if it will improve the modularity.
+</font>            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>modularity <font color='#5555FF'>&gt;</font> modularity_threshold <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> num_left_split <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> num_right_split <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+
+                <font color='#009900'>// split the node_degrees and Bdiag matrices into left and right split parts
+</font>                matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>0</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> <font color='#BB00BB'>left_node_degrees</font><font face='Lucida Console'>(</font>num_left_split<font face='Lucida Console'>)</font>;
+                matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>0</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> <font color='#BB00BB'>right_node_degrees</font><font face='Lucida Console'>(</font>num_right_split<font face='Lucida Console'>)</font>;
+                matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>0</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> <font color='#BB00BB'>left_Bdiag</font><font face='Lucida Console'>(</font>num_left_split<font face='Lucida Console'>)</font>;
+                matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>0</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> <font color='#BB00BB'>right_Bdiag</font><font face='Lucida Console'>(</font>num_right_split<font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> l.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>l</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        <font color='#BB00BB'>left_node_degrees</font><font face='Lucida Console'>(</font>left_idx_map[i]<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#BB00BB'>node_degrees</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>;
+                        <font color='#BB00BB'>left_Bdiag</font><font face='Lucida Console'>(</font>left_idx_map[i]<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#BB00BB'>Bdiag</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>;
+                    <b>}</b>
+                    <font color='#0000FF'>else</font>
+                    <b>{</b>
+                        <font color='#BB00BB'>right_node_degrees</font><font face='Lucida Console'>(</font>right_idx_map[i]<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#BB00BB'>node_degrees</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>;
+                        <font color='#BB00BB'>right_Bdiag</font><font face='Lucida Console'>(</font>right_idx_map[i]<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#BB00BB'>Bdiag</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>;
+                    <b>}</b>
+                <b>}</b>
+
+
+                <font color='#009900'>// put the edges from one side of the split into split_edges
+</font>                std::vector<font color='#5555FF'>&lt;</font>ordered_sample_pair<font color='#5555FF'>&gt;</font> split_edges;
+                modularity_threshold <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> k <font color='#5555FF'>=</font> <font color='#979000'>0</font>; k <font color='#5555FF'>&lt;</font> edges.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>k<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> edges[k].<font color='#BB00BB'>index1</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                    <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> j <font color='#5555FF'>=</font> edges[k].<font color='#BB00BB'>index2</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                    <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> d <font color='#5555FF'>=</font> edges[k].<font color='#BB00BB'>distance</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>l</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> <font color='#BB00BB'>l</font><font face='Lucida Console'>(</font>j<font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        split_edges.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font><font color='#BB00BB'>ordered_sample_pair</font><font face='Lucida Console'>(</font>left_idx_map[i], left_idx_map[j], d<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                        modularity_threshold <font color='#5555FF'>+</font><font color='#5555FF'>=</font> d;
+                    <b>}</b>
+                <b>}</b>
+                modularity_threshold <font color='#5555FF'>-</font><font color='#5555FF'>=</font> <font color='#BB00BB'>sum</font><font face='Lucida Console'>(</font>left_node_degrees<font color='#5555FF'>*</font><font color='#BB00BB'>sum</font><font face='Lucida Console'>(</font>left_node_degrees<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font color='#5555FF'>/</font><font face='Lucida Console'>(</font><font color='#979000'>2</font><font color='#5555FF'>*</font>edge_sum<font face='Lucida Console'>)</font>;
+                modularity_threshold <font color='#5555FF'>/</font><font color='#5555FF'>=</font> <font color='#979000'>4</font><font color='#5555FF'>*</font>edge_sum;
+
+                <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> num_left_clusters;
+                std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font> left_labels;
+                num_left_clusters <font color='#5555FF'>=</font> <font color='#BB00BB'>newman_cluster_helper</font><font face='Lucida Console'>(</font>rnd,split_edges,left_node_degrees,left_Bdiag,
+                                                          edge_sum,left_labels,modularity_threshold,
+                                                          eps, max_iterations<font face='Lucida Console'>)</font>;
+
+                <font color='#009900'>// now load the other side into split_edges and cluster it as well
+</font>                split_edges.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                modularity_threshold <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> k <font color='#5555FF'>=</font> <font color='#979000'>0</font>; k <font color='#5555FF'>&lt;</font> edges.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>k<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> edges[k].<font color='#BB00BB'>index1</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                    <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> j <font color='#5555FF'>=</font> edges[k].<font color='#BB00BB'>index2</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                    <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> d <font color='#5555FF'>=</font> edges[k].<font color='#BB00BB'>distance</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>l</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> <font color='#979000'>0</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> <font color='#BB00BB'>l</font><font face='Lucida Console'>(</font>j<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        split_edges.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font><font color='#BB00BB'>ordered_sample_pair</font><font face='Lucida Console'>(</font>right_idx_map[i], right_idx_map[j], d<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                        modularity_threshold <font color='#5555FF'>+</font><font color='#5555FF'>=</font> d;
+                    <b>}</b>
+                <b>}</b>
+                modularity_threshold <font color='#5555FF'>-</font><font color='#5555FF'>=</font> <font color='#BB00BB'>sum</font><font face='Lucida Console'>(</font>right_node_degrees<font color='#5555FF'>*</font><font color='#BB00BB'>sum</font><font face='Lucida Console'>(</font>right_node_degrees<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font color='#5555FF'>/</font><font face='Lucida Console'>(</font><font color='#979000'>2</font><font color='#5555FF'>*</font>edge_sum<font face='Lucida Console'>)</font>;
+                modularity_threshold <font color='#5555FF'>/</font><font color='#5555FF'>=</font> <font color='#979000'>4</font><font color='#5555FF'>*</font>edge_sum;
+
+                <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> num_right_clusters;
+                std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font> right_labels;
+                num_right_clusters <font color='#5555FF'>=</font> <font color='#BB00BB'>newman_cluster_helper</font><font face='Lucida Console'>(</font>rnd,split_edges,right_node_degrees,right_Bdiag,
+                                                           edge_sum,right_labels,modularity_threshold,
+                                                           eps, max_iterations<font face='Lucida Console'>)</font>;
+
+                <font color='#009900'>// Now merge the labels from the two splits.
+</font>                labels.<font color='#BB00BB'>resize</font><font face='Lucida Console'>(</font>node_degrees.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> labels.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#009900'>// if this node was in the left split
+</font>                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>l</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        labels[i] <font color='#5555FF'>=</font> left_labels[left_idx_map[i]];
+                    <b>}</b>
+                    <font color='#0000FF'>else</font> <font color='#009900'>// if this node was in the right split
+</font>                    <b>{</b>
+                        labels[i] <font color='#5555FF'>=</font> right_labels[right_idx_map[i]] <font color='#5555FF'>+</font> num_left_clusters;
+                    <b>}</b>
+                <b>}</b>
+
+
+                <font color='#0000FF'>return</font> num_left_clusters <font color='#5555FF'>+</font> num_right_clusters;
+            <b>}</b>
+            <font color='#0000FF'>else</font>
+            <b>{</b>
+                labels.<font color='#BB00BB'>assign</font><font face='Lucida Console'>(</font>node_degrees.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>return</font> <font color='#979000'>1</font>;
+            <b>}</b>
+
+        <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='newman_cluster'></a>newman_cluster</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>ordered_sample_pair<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> edges,
+        std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> labels,
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> eps <font color='#5555FF'>=</font> <font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>4</font>,
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> max_iterations <font color='#5555FF'>=</font> <font color='#979000'>2000</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#009900'>// make sure requires clause is not broken
+</font>        <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font><font color='#BB00BB'>is_ordered_by_index</font><font face='Lucida Console'>(</font>edges<font face='Lucida Console'>)</font>,
+                    "<font color='#CC0000'>\t unsigned long newman_cluster()</font>"
+                    <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t Invalid inputs were given to this function</font>"
+        <font face='Lucida Console'>)</font>;
+
+        labels.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>edges.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+            <font color='#0000FF'>return</font> <font color='#979000'>0</font>;
+
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> num_nodes <font color='#5555FF'>=</font> <font color='#BB00BB'>max_index_plus_one</font><font face='Lucida Console'>(</font>edges<font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// compute the node_degrees vector, edge_sum value, and diag(B).
+</font>        matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>0</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> <font color='#BB00BB'>node_degrees</font><font face='Lucida Console'>(</font>num_nodes<font face='Lucida Console'>)</font>;
+        matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>0</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> <font color='#BB00BB'>Bdiag</font><font face='Lucida Console'>(</font>num_nodes<font face='Lucida Console'>)</font>;
+        Bdiag <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <font color='#0000FF'><u>double</u></font> edge_sum <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        node_degrees <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> edges.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#BB00BB'>node_degrees</font><font face='Lucida Console'>(</font>edges[i].<font color='#BB00BB'>index1</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font><font color='#5555FF'>=</font> edges[i].<font color='#BB00BB'>distance</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            edge_sum <font color='#5555FF'>+</font><font color='#5555FF'>=</font> edges[i].<font color='#BB00BB'>distance</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>edges[i].<font color='#BB00BB'>index1</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> edges[i].<font color='#BB00BB'>index2</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                <font color='#BB00BB'>Bdiag</font><font face='Lucida Console'>(</font>edges[i].<font color='#BB00BB'>index1</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font><font color='#5555FF'>=</font> edges[i].<font color='#BB00BB'>distance</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+        edge_sum <font color='#5555FF'>/</font><font color='#5555FF'>=</font> <font color='#979000'>2</font>;
+        Bdiag <font color='#5555FF'>-</font><font color='#5555FF'>=</font> <font color='#BB00BB'>squared</font><font face='Lucida Console'>(</font>node_degrees<font face='Lucida Console'>)</font><font color='#5555FF'>/</font><font face='Lucida Console'>(</font><font color='#979000'>2</font><font color='#5555FF'>*</font>edge_sum<font face='Lucida Console'>)</font>;
+
+
+        dlib::rand rnd;
+        <font color='#0000FF'>return</font> impl::<font color='#BB00BB'>newman_cluster_helper</font><font face='Lucida Console'>(</font>rnd,edges,node_degrees,Bdiag,edge_sum,labels,<font color='#979000'>0</font>,eps,max_iterations<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='newman_cluster'></a>newman_cluster</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>sample_pair<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> edges,
+        std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> labels,
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> eps <font color='#5555FF'>=</font> <font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>4</font>,
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> max_iterations <font color='#5555FF'>=</font> <font color='#979000'>2000</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        std::vector<font color='#5555FF'>&lt;</font>ordered_sample_pair<font color='#5555FF'>&gt;</font> oedges;
+        <font color='#BB00BB'>convert_unordered_to_ordered</font><font face='Lucida Console'>(</font>edges, oedges<font face='Lucida Console'>)</font>;
+        std::<font color='#BB00BB'>sort</font><font face='Lucida Console'>(</font>oedges.<font color='#BB00BB'>begin</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, oedges.<font color='#BB00BB'>end</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, <font color='#5555FF'>&amp;</font>order_by_index<font color='#5555FF'>&lt;</font>ordered_sample_pair<font color='#5555FF'>&gt;</font><font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>return</font> <font color='#BB00BB'>newman_cluster</font><font face='Lucida Console'>(</font>oedges, labels, eps, max_iterations<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>namespace</font> impl
+    <b>{</b>
+        <font color='#0000FF'>inline</font> std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font> <b><a name='remap_labels'></a>remap_labels</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> labels,
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&amp;</font> num_labels
+        <font face='Lucida Console'>)</font>
+        <font color='#009900'>/*!
+            ensures
+                - This function takes labels and produces a mapping which maps elements of
+                  labels into the most compact range in [0, max] as possible.  In particular,
+                  there won't be any unused integers in the mapped range.
+                - #num_labels == the number of distinct values in labels.
+                - returns a vector V such that:
+                    - V.size() == labels.size()
+                    - max(mat(V))+1 == num_labels.
+                    - for all valid i,j:
+                        - if (labels[i] == labels[j]) then
+                            - V[i] == V[j]
+                        - else
+                            - V[i] != V[j]
+        !*/</font>
+        <b>{</b>
+            std::map<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font>, <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font> temp;
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> labels.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>temp.<font color='#BB00BB'>count</font><font face='Lucida Console'>(</font>labels[i]<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> next <font color='#5555FF'>=</font> temp.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                    temp[labels[i]] <font color='#5555FF'>=</font> next;
+                <b>}</b>
+            <b>}</b>
+
+            num_labels <font color='#5555FF'>=</font> temp.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+            std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font> <font color='#BB00BB'>result</font><font face='Lucida Console'>(</font>labels.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> labels.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                result[i] <font color='#5555FF'>=</font> temp[labels[i]];
+            <b>}</b>
+            <font color='#0000FF'>return</font> result;
+        <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>double</u></font> <b><a name='modularity'></a>modularity</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>sample_pair<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> edges,
+        <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> labels
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> num_nodes <font color='#5555FF'>=</font> <font color='#BB00BB'>max_index_plus_one</font><font face='Lucida Console'>(</font>edges<font face='Lucida Console'>)</font>;
+        <font color='#009900'>// make sure requires clause is not broken
+</font>        <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font>labels.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> num_nodes,
+                    "<font color='#CC0000'>\t double modularity()</font>"
+                    <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t Invalid inputs were given to this function</font>"
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> num_labels;
+        <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> labels_ <font color='#5555FF'>=</font> dlib::impl::<font color='#BB00BB'>remap_labels</font><font face='Lucida Console'>(</font>labels,num_labels<font face='Lucida Console'>)</font>;
+
+        std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font> <font color='#BB00BB'>cluster_sums</font><font face='Lucida Console'>(</font>num_labels,<font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+        std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font> <font color='#BB00BB'>k</font><font face='Lucida Console'>(</font>num_nodes,<font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'><u>double</u></font> Q <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <font color='#0000FF'><u>double</u></font> m <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> edges.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> n1 <font color='#5555FF'>=</font> edges[i].<font color='#BB00BB'>index1</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> n2 <font color='#5555FF'>=</font> edges[i].<font color='#BB00BB'>index2</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            k[n1] <font color='#5555FF'>+</font><font color='#5555FF'>=</font> edges[i].<font color='#BB00BB'>distance</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>n1 <font color='#5555FF'>!</font><font color='#5555FF'>=</font> n2<font face='Lucida Console'>)</font>
+                k[n2] <font color='#5555FF'>+</font><font color='#5555FF'>=</font> edges[i].<font color='#BB00BB'>distance</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>n1 <font color='#5555FF'>!</font><font color='#5555FF'>=</font> n2<font face='Lucida Console'>)</font>
+                m <font color='#5555FF'>+</font><font color='#5555FF'>=</font> edges[i].<font color='#BB00BB'>distance</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>else</font>
+                m <font color='#5555FF'>+</font><font color='#5555FF'>=</font> edges[i].<font color='#BB00BB'>distance</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>/</font><font color='#979000'>2</font>;
+
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>labels_[n1] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> labels_[n2]<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>n1 <font color='#5555FF'>!</font><font color='#5555FF'>=</font> n2<font face='Lucida Console'>)</font>
+                    Q <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#979000'>2</font><font color='#5555FF'>*</font>edges[i].<font color='#BB00BB'>distance</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>else</font>
+                    Q <font color='#5555FF'>+</font><font color='#5555FF'>=</font> edges[i].<font color='#BB00BB'>distance</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+        <b>}</b>
+
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>m <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+            <font color='#0000FF'>return</font> <font color='#979000'>0</font>;
+
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> labels_.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+        <b>{</b>
+            cluster_sums[labels_[i]] <font color='#5555FF'>+</font><font color='#5555FF'>=</font> k[i];
+        <b>}</b>
+
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> labels_.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+        <b>{</b>
+            Q <font color='#5555FF'>-</font><font color='#5555FF'>=</font> k[i]<font color='#5555FF'>*</font>cluster_sums[labels_[i]]<font color='#5555FF'>/</font><font face='Lucida Console'>(</font><font color='#979000'>2</font><font color='#5555FF'>*</font>m<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>return</font> <font color='#979000'>1.0</font><font color='#5555FF'>/</font><font face='Lucida Console'>(</font><font color='#979000'>2</font><font color='#5555FF'>*</font>m<font face='Lucida Console'>)</font><font color='#5555FF'>*</font>Q;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>double</u></font> <b><a name='modularity'></a>modularity</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>ordered_sample_pair<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> edges,
+        <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> labels
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> num_nodes <font color='#5555FF'>=</font> <font color='#BB00BB'>max_index_plus_one</font><font face='Lucida Console'>(</font>edges<font face='Lucida Console'>)</font>;
+        <font color='#009900'>// make sure requires clause is not broken
+</font>        <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font>labels.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> num_nodes,
+                    "<font color='#CC0000'>\t double modularity()</font>"
+                    <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t Invalid inputs were given to this function</font>"
+        <font face='Lucida Console'>)</font>;
+
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> num_labels;
+        <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> labels_ <font color='#5555FF'>=</font> dlib::impl::<font color='#BB00BB'>remap_labels</font><font face='Lucida Console'>(</font>labels,num_labels<font face='Lucida Console'>)</font>;
+
+        std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font> <font color='#BB00BB'>cluster_sums</font><font face='Lucida Console'>(</font>num_labels,<font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+        std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font> <font color='#BB00BB'>k</font><font face='Lucida Console'>(</font>num_nodes,<font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'><u>double</u></font> Q <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <font color='#0000FF'><u>double</u></font> m <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> edges.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> n1 <font color='#5555FF'>=</font> edges[i].<font color='#BB00BB'>index1</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> n2 <font color='#5555FF'>=</font> edges[i].<font color='#BB00BB'>index2</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            k[n1] <font color='#5555FF'>+</font><font color='#5555FF'>=</font> edges[i].<font color='#BB00BB'>distance</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            m <font color='#5555FF'>+</font><font color='#5555FF'>=</font> edges[i].<font color='#BB00BB'>distance</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>labels_[n1] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> labels_[n2]<font face='Lucida Console'>)</font>
+            <b>{</b>
+                Q <font color='#5555FF'>+</font><font color='#5555FF'>=</font> edges[i].<font color='#BB00BB'>distance</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+        <b>}</b>
+
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>m <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+            <font color='#0000FF'>return</font> <font color='#979000'>0</font>;
+
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> labels_.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+        <b>{</b>
+            cluster_sums[labels_[i]] <font color='#5555FF'>+</font><font color='#5555FF'>=</font> k[i];
+        <b>}</b>
+
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> labels_.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+        <b>{</b>
+            Q <font color='#5555FF'>-</font><font color='#5555FF'>=</font> k[i]<font color='#5555FF'>*</font>cluster_sums[labels_[i]]<font color='#5555FF'>/</font>m;
+        <b>}</b>
+
+        <font color='#0000FF'>return</font> <font color='#979000'>1.0</font><font color='#5555FF'>/</font>m<font color='#5555FF'>*</font>Q;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_MODULARITY_ClUSTERING__H__
+</font>
+
+</pre></body></html>

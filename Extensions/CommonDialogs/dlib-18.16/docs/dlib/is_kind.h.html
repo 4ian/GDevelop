@@ -1,0 +1,165 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - is_kind.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2007  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_IS_KINd_H_
+<font color='#0000FF'>#define</font> DLIB_IS_KINd_H_
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>vector<font color='#5555FF'>&gt;</font>
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+    <font color='#009900'>/*!
+        This file contains a set of templates that enable you to determine if
+        a given type implements an abstract interface defined in one of the
+        dlib *_abstract.h files.
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>struct</font> <b><a name='default_is_kind_value'></a>default_is_kind_value</b> <b>{</b> <font color='#0000FF'>static</font> <font color='#0000FF'>const</font> <font color='#0000FF'><u>bool</u></font> value <font color='#5555FF'>=</font> <font color='#979000'>false</font>; <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>struct</font> <b><a name='is_graph'></a>is_graph</b> : <font color='#0000FF'>public</font> default_is_kind_value
+    <b>{</b>
+        <font color='#009900'>/*!
+            - if (T is an implementation of graph/graph_kernel_abstract.h) then
+                - is_graph&lt;T&gt;::value == true
+            - else
+                - is_graph&lt;T&gt;::value == false
+        !*/</font>
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>struct</font> <b><a name='is_directed_graph'></a>is_directed_graph</b> : <font color='#0000FF'>public</font> default_is_kind_value
+    <b>{</b>
+        <font color='#009900'>/*!
+            - if (T is an implementation of directed_graph/directed_graph_kernel_abstract.h) then
+                - is_directed_graph&lt;T&gt;::value == true
+            - else
+                - is_directed_graph&lt;T&gt;::value == false
+        !*/</font>
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> helper <font color='#5555FF'>=</font> <font color='#0000FF'><u>void</u></font><font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>struct</font> <b><a name='is_matrix'></a>is_matrix</b> : <font color='#0000FF'>public</font> default_is_kind_value  
+    <b>{</b>
+        <font color='#009900'>/*!
+            - if (T is some kind of matrix expression from the matrix/matrix_exp_abstract.h component) then
+                - is_matrix&lt;T&gt;::value == true
+            - else
+                - is_matrix&lt;T&gt;::value == false
+        !*/</font>
+
+        <font color='#009900'>// Don't set the helper to anything.  Just let it be void.
+</font>        <b><a name='ASSERT_ARE_SAME_TYPE'></a>ASSERT_ARE_SAME_TYPE</b><font face='Lucida Console'>(</font>helper,<font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font>;
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>struct</font> <b><a name='is_array2d'></a>is_array2d</b> : <font color='#0000FF'>public</font> default_is_kind_value  
+    <b>{</b>
+        <font color='#009900'>/*!
+            - if (T is an implementation of array2d/array2d_kernel_abstract.h) then
+                - is_array2d&lt;T&gt;::value == true
+            - else
+                - is_array2d&lt;T&gt;::value == false
+        !*/</font>
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>struct</font> <b><a name='is_array'></a>is_array</b> : <font color='#0000FF'>public</font> default_is_kind_value  
+    <b>{</b>
+        <font color='#009900'>/*!
+            - if (T is an implementation of array/array_kernel_abstract.h) then
+                - is_array&lt;T&gt;::value == true
+            - else
+                - is_array&lt;T&gt;::value == false
+        !*/</font>
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>struct</font> <b><a name='is_std_vector'></a>is_std_vector</b> : <font color='#0000FF'>public</font> default_is_kind_value  
+    <b>{</b>
+        <font color='#009900'>/*!
+            - if (T is an implementation of the standard C++ std::vector object) then
+                - is_std_vector&lt;T&gt;::value == true
+            - else
+                - is_std_vector&lt;T&gt;::value == false
+        !*/</font>
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>struct</font> <b><a name='is_pair'></a>is_pair</b> : <font color='#0000FF'>public</font> default_is_kind_value  
+    <b>{</b>
+        <font color='#009900'>/*!
+            - if (T is a std::pair object) then
+                - is_std_vector&lt;T&gt;::value == true
+            - else
+                - is_std_vector&lt;T&gt;::value == false
+        !*/</font>
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>struct</font> <b><a name='is_rand'></a>is_rand</b> : <font color='#0000FF'>public</font> default_is_kind_value  
+    <b>{</b>
+        <font color='#009900'>/*!
+            - if (T is an implementation of rand/rand_kernel_abstract.h) then
+                - is_rand&lt;T&gt;::value == true
+            - else
+                - is_rand&lt;T&gt;::value == false
+        !*/</font>
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>struct</font> <b><a name='is_config_reader'></a>is_config_reader</b> : <font color='#0000FF'>public</font> default_is_kind_value  
+    <b>{</b>
+        <font color='#009900'>/*!
+            - if (T is an implementation of config_reader/config_reader_kernel_abstract.h) then
+                - is_config_reader&lt;T&gt;::value == true
+            - else
+                - is_config_reader&lt;T&gt;::value == false
+        !*/</font>
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>//                              Implementation details
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> alloc<font color='#5555FF'>&gt;</font> 
+    <font color='#0000FF'>struct</font> <b><a name='is_std_vector'></a>is_std_vector</b><font color='#5555FF'>&lt;</font>std::vector<font color='#5555FF'>&lt;</font>T,alloc<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font>         <b>{</b> <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>bool</u></font> value <font color='#5555FF'>=</font> <font color='#979000'>true</font>; <b>}</b>;
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font> <font color='#0000FF'>struct</font> <b><a name='is_std_vector'></a>is_std_vector</b><font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&amp;</font><font color='#5555FF'>&gt;</font>      <b>{</b> <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>bool</u></font> value <font color='#5555FF'>=</font> is_std_vector<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font>::value; <b>}</b>;
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font> <font color='#0000FF'>struct</font> <b><a name='is_std_vector'></a>is_std_vector</b><font color='#5555FF'>&lt;</font><font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font><font color='#5555FF'>&gt;</font><b>{</b> <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>bool</u></font> value <font color='#5555FF'>=</font> is_std_vector<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font>::value; <b>}</b>;
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font> <font color='#0000FF'>struct</font> <b><a name='is_std_vector'></a>is_std_vector</b><font color='#5555FF'>&lt;</font><font color='#0000FF'>const</font> T<font color='#5555FF'>&gt;</font> <b>{</b> <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>bool</u></font> value <font color='#5555FF'>=</font> is_std_vector<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font>::value; <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> U<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>struct</font> <b><a name='is_pair'></a>is_pair</b><font color='#5555FF'>&lt;</font>std::pair<font color='#5555FF'>&lt;</font>T,U<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> <b>{</b> <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>bool</u></font> value <font color='#5555FF'>=</font> <font color='#979000'>true</font>; <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_IS_KINd_H_
+</font>
+
+</pre></body></html>

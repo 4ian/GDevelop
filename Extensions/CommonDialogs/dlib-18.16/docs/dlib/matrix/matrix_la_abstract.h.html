@@ -1,0 +1,993 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - matrix_la_abstract.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2009  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#undef</font> DLIB_MATRIx_LA_FUNCTS_ABSTRACT_
+<font color='#0000FF'>#ifdef</font> DLIB_MATRIx_LA_FUNCTS_ABSTRACT_ 
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='matrix_abstract.h.html'>matrix_abstract.h</a>"
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>complex<font color='#5555FF'>&gt;</font>
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>//                             Global linear algebra functions 
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>const</font> matrix_exp::matrix_type <b><a name='inv'></a>inv</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&amp;</font> m
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - m is a square matrix
+        ensures
+            - returns the inverse of m 
+              (Note that if m is singular or so close to being singular that there
+              is a lot of numerical error then the returned matrix will be bogus.  
+              You can check by seeing if m*inv(m) is an identity matrix)
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>const</font> matrix <b><a name='pinv'></a>pinv</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&amp;</font> m,
+        <font color='#0000FF'><u>double</u></font> tol <font color='#5555FF'>=</font> <font color='#979000'>0</font>
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - tol &gt;= 0
+        ensures
+            - returns the Moore-Penrose pseudoinverse of m.
+            - The returned matrix has m.nc() rows and m.nr() columns.
+            - if (tol == 0) then
+                - singular values less than max(m.nr(),m.nc()) times the machine epsilon 
+                  times the largest singular value are ignored.  
+            - else
+                - singular values less than tol are ignored.
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='svd'></a>svd</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&amp;</font> m,
+        matrix<font color='#5555FF'>&lt;</font>matrix_exp::type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> u,
+        matrix<font color='#5555FF'>&lt;</font>matrix_exp::type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> w,
+        matrix<font color='#5555FF'>&lt;</font>matrix_exp::type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> v
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        ensures
+            - computes the singular value decomposition of m
+            - m == #u*#w*trans(#v)
+            - trans(#u)*#u == identity matrix
+            - trans(#v)*#v == identity matrix
+            - diag(#w) == the singular values of the matrix m in no 
+              particular order.  All non-diagonal elements of #w are
+              set to 0.
+            - #u.nr() == m.nr()
+            - #u.nc() == m.nc()
+            - #w.nr() == m.nc()
+            - #w.nc() == m.nc()
+            - #v.nr() == m.nc()
+            - #v.nc() == m.nc()
+            - if DLIB_USE_LAPACK is #defined then the xGESVD routine
+              from LAPACK is used to compute the SVD.
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>long</u></font> <b><a name='svd2'></a>svd2</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'><u>bool</u></font> withu, 
+        <font color='#0000FF'><u>bool</u></font> withv, 
+        <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&amp;</font> m,
+        matrix<font color='#5555FF'>&lt;</font>matrix_exp::type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> u,
+        matrix<font color='#5555FF'>&lt;</font>matrix_exp::type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> w,
+        matrix<font color='#5555FF'>&lt;</font>matrix_exp::type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> v
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - m.nr() &gt;= m.nc()
+        ensures
+            - computes the singular value decomposition of matrix m
+            - m == subm(#u,get_rect(m))*diagm(#w)*trans(#v)
+            - trans(#u)*#u == identity matrix
+            - trans(#v)*#v == identity matrix
+            - #w == the singular values of the matrix m in no 
+              particular order.  
+            - #u.nr() == m.nr()
+            - #u.nc() == m.nr()
+            - #w.nr() == m.nc()
+            - #w.nc() == 1 
+            - #v.nr() == m.nc()
+            - #v.nc() == m.nc()
+            - if (widthu == false) then
+                - ignore the above regarding #u, it isn't computed and its
+                  output state is undefined.
+            - if (widthv == false) then
+                - ignore the above regarding #v, it isn't computed and its
+                  output state is undefined.
+            - returns an error code of 0, if no errors and 'k' if we fail to
+              converge at the 'kth' singular value.
+            - if (DLIB_USE_LAPACK is #defined) then 
+                - if (withu == withv) then
+                    - the xGESDD routine from LAPACK is used to compute the SVD.
+                - else
+                    - the xGESVD routine from LAPACK is used to compute the SVD.
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='svd3'></a>svd3</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&amp;</font> m,
+        matrix<font color='#5555FF'>&lt;</font>matrix_exp::type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> u,
+        matrix<font color='#5555FF'>&lt;</font>matrix_exp::type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> w,
+        matrix<font color='#5555FF'>&lt;</font>matrix_exp::type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> v
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        ensures
+            - computes the singular value decomposition of m
+            - m == #u*diagm(#w)*trans(#v)
+            - trans(#u)*#u == identity matrix
+            - trans(#v)*#v == identity matrix
+            - #w == the singular values of the matrix m in no 
+              particular order.  
+            - #u.nr() == m.nr()
+            - #u.nc() == m.nc()
+            - #w.nr() == m.nc()
+            - #w.nc() == 1 
+            - #v.nr() == m.nc()
+            - #v.nc() == m.nc()
+            - if DLIB_USE_LAPACK is #defined then the xGESVD routine
+              from LAPACK is used to compute the SVD.
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='svd_fast'></a>svd_fast</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> matrix<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> A,
+        matrix<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> u,
+        matrix<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> w,
+        matrix<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> v,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> l,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> q <font color='#5555FF'>=</font> <font color='#979000'>1</font>
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - l &gt; 0
+            - A.size() &gt; 0 
+              (i.e. A can't be an empty matrix)
+        ensures
+            - computes the singular value decomposition of A.  
+            - Lets define some constants we use to document the behavior of svd_fast():
+                - Let m = A.nr()
+                - Let n = A.nc() 
+                - Let k = min(l, min(m,n))
+                - Therefore, A represents an m by n matrix and svd_fast() is designed
+                  to find a rank-k representation of it.
+            - if (the rank of A is &lt;= k) then 
+                - A == #u*diagm(#w)*trans(#v)
+            - else
+                - A is approximated by #u*diagm(#w)*trans(#v)
+                  (i.e. In this case A can't be represented with a rank-k matrix, so the
+                  matrix you get by trying to reconstruct A from the output of the SVD is
+                  not exactly the same.)
+            - trans(#u)*#u == identity matrix
+            - trans(#v)*#v == identity matrix
+            - #w == the top k singular values of the matrix A (in no particular order).  
+            - #u.nr() == m 
+            - #u.nc() == k 
+            - #w.nr() == k 
+            - #w.nc() == 1 
+            - #v.nr() == n 
+            - #v.nc() == k 
+            - This function implements the randomized subspace iteration defined in the
+              algorithm 4.4 and 5.1 boxes of the paper: 
+                Finding Structure with Randomness: Probabilistic Algorithms for
+                Constructing Approximate Matrix Decompositions by Halko et al.
+              Therefore, it is very fast and suitable for use with very large matrices.
+              Moreover, q is the number of subspace iterations performed.  Larger
+              values of q might increase the accuracy of the solution but the default
+              value should be good for many problems.
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> sparse_vector_type, 
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='svd_fast'></a>svd_fast</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>sparse_vector_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> A,
+        matrix<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> u,
+        matrix<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> w,
+        matrix<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> v,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> l,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> q <font color='#5555FF'>=</font> <font color='#979000'>1</font>
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - A contains a set of sparse vectors.  See dlib/svm/sparse_vector_abstract.h
+              for a definition of what constitutes a sparse vector.
+            - l &gt; 0
+            - max_index_plus_one(A) &gt; 0
+              (i.e. A can't be an empty matrix)
+        ensures
+            - computes the singular value decomposition of A.  In this case, we interpret A
+              as a matrix of A.size() rows, where each row is defined by a sparse vector.
+            - Lets define some constants we use to document the behavior of svd_fast():
+                - Let m = A.size()
+                - Let n = max_index_plus_one(A)
+                - Let k = min(l, min(m,n))
+                - Therefore, A represents an m by n matrix and svd_fast() is designed
+                  to find a rank-k representation of it.
+            - if (the rank of A is &lt;= k) then 
+                - A == #u*diagm(#w)*trans(#v)
+            - else
+                - A is approximated by #u*diagm(#w)*trans(#v)
+                  (i.e. In this case A can't be represented with a rank-k matrix, so the
+                  matrix you get by trying to reconstruct A from the output of the SVD is
+                  not exactly the same.)
+            - trans(#u)*#u == identity matrix
+            - trans(#v)*#v == identity matrix
+            - #w == the top k singular values of the matrix A (in no particular order).  
+            - #u.nr() == m 
+            - #u.nc() == k 
+            - #w.nr() == k 
+            - #w.nc() == 1 
+            - #v.nr() == n 
+            - #v.nc() == k 
+            - This function implements the randomized subspace iteration defined in the
+              algorithm 4.4 and 5.1 boxes of the paper: 
+                Finding Structure with Randomness: Probabilistic Algorithms for
+                Constructing Approximate Matrix Decompositions by Halko et al.
+              Therefore, it is very fast and suitable for use with very large matrices.
+              Moreover, q is the number of subspace iterations performed.  Larger
+              values of q might increase the accuracy of the solution but the default
+              value should be good for many problems.
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T,
+        <font color='#0000FF'><u>long</u></font> NR,
+        <font color='#0000FF'><u>long</u></font> NC,
+        <font color='#0000FF'>typename</font> MM,
+        <font color='#0000FF'>typename</font> L
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='orthogonalize'></a>orthogonalize</b> <font face='Lucida Console'>(</font>
+        matrix<font color='#5555FF'>&lt;</font>T,NR,NC,MM,L<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> m
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - m.nr() &gt;= m.nc()
+            - m.size() &gt; 0
+        ensures
+            - #m == an orthogonal matrix with the same dimensions as m.  In particular,
+              the columns of #m have the same span as the columns of m.
+            - trans(#m)*#m == identity matrix
+            - This function is just shorthand for computing the QR decomposition of m
+              and then storing the Q factor into #m.
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>const</font> matrix <b><a name='real_eigenvalues'></a>real_eigenvalues</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&amp;</font> m
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - m.nr() == m.nc()
+            - matrix_exp::type == float or double
+        ensures
+            - returns a matrix E such that:
+                - E.nr() == m.nr()
+                - E.nc() == 1
+                - E contains the real part of all eigenvalues of the matrix m.
+                  (note that the eigenvalues are not sorted)
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>const</font> matrix_exp::type <b><a name='det'></a>det</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&amp;</font> m
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - m is a square matrix
+        ensures
+            - returns the determinant of m
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>const</font> matrix_exp::type <b><a name='trace'></a>trace</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&amp;</font> m
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - m is a square matrix
+        ensures
+            - returns the trace of m
+              (i.e. returns sum(diag(m)))
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>const</font> matrix_exp::matrix_type <b><a name='chol'></a>chol</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&amp;</font> A
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - A is a square matrix
+        ensures
+            - if (A has a Cholesky Decomposition) then
+                - returns the decomposition of A.  That is, returns a matrix L
+                  such that L*trans(L) == A.  L will also be lower triangular.
+            - else
+                - returns a matrix with the same dimensions as A but it 
+                  will have a bogus value.  I.e. it won't be a decomposition.
+                  In this case the algorithm returns a partial decomposition.
+                - You can tell when chol fails by looking at the lower right
+                  element of the returned matrix.  If it is 0 then it means
+                  A does not have a cholesky decomposition.  
+
+            - If DLIB_USE_LAPACK is defined then the LAPACK routine xPOTRF 
+              is used to compute the cholesky decomposition.
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>const</font> matrix_exp::matrix_type <b><a name='inv_lower_triangular'></a>inv_lower_triangular</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&amp;</font> A
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - A is a square matrix
+        ensures
+            - if (A is lower triangular) then
+                - returns the inverse of A. 
+            - else
+                - returns a matrix with the same dimensions as A but it 
+                  will have a bogus value.  I.e. it won't be an inverse.
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>const</font> matrix_exp::matrix_type <b><a name='inv_upper_triangular'></a>inv_upper_triangular</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&amp;</font> A
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - A is a square matrix
+        ensures
+            - if (A is upper triangular) then
+                - returns the inverse of A. 
+            - else
+                - returns a matrix with the same dimensions as A but it 
+                  will have a bogus value.  I.e. it won't be an inverse.
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>//                             Matrix decomposition classes 
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> matrix_exp_type
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>class</font> <b><a name='lu_decomposition'></a>lu_decomposition</b>
+    <b>{</b>
+        <font color='#009900'>/*!
+            REQUIREMENTS ON matrix_exp_type
+                must be some kind of matrix expression as defined in the 
+                dlib/matrix/matrix_abstract.h file.   (e.g. a dlib::matrix object)
+                The matrix type must also contain float or double values.
+
+            WHAT THIS OBJECT REPRESENTS
+                This object represents something that can compute an LU 
+                decomposition of a real valued matrix.  That is, for any 
+                matrix A it computes matrices L, U, and a pivot vector P such 
+                that rowm(A,P) == L*U.
+
+                The LU decomposition with pivoting always exists, even if the matrix is
+                singular, so the constructor will never fail.  The primary use of the
+                LU decomposition is in the solution of square systems of simultaneous
+                linear equations.  This will fail if is_singular() returns true (or
+                if A is very nearly singular).
+
+                If DLIB_USE_LAPACK is defined then the LAPACK routine xGETRF 
+                is used to compute the LU decomposition.
+        !*/</font>
+
+    <font color='#0000FF'>public</font>:
+
+        <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>long</u></font> NR <font color='#5555FF'>=</font> matrix_exp_type::NR;
+        <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>long</u></font> NC <font color='#5555FF'>=</font> matrix_exp_type::NC;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> matrix_exp_type::type type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> matrix_exp_type::mem_manager_type mem_manager_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> matrix_exp_type::layout_type layout_type;
+
+        <font color='#0000FF'>typedef</font> matrix<font color='#5555FF'>&lt;</font>type,<font color='#979000'>0</font>,<font color='#979000'>0</font>,mem_manager_type,layout_type<font color='#5555FF'>&gt;</font>  matrix_type;
+        <font color='#0000FF'>typedef</font> matrix<font color='#5555FF'>&lt;</font>type,NR,<font color='#979000'>1</font>,mem_manager_type,layout_type<font color='#5555FF'>&gt;</font> column_vector_type;
+        <font color='#0000FF'>typedef</font> matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>long</u></font>,NR,<font color='#979000'>1</font>,mem_manager_type,layout_type<font color='#5555FF'>&gt;</font> pivot_column_vector_type;
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> EXP<font color='#5555FF'>&gt;</font>
+        <b><a name='lu_decomposition'></a>lu_decomposition</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&lt;</font>EXP<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&amp;</font>A
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - EXP::type == lu_decomposition::type 
+                - A.size() &gt; 0
+            ensures
+                - #nr() == A.nr()
+                - #nc() == A.nc()
+                - #is_square() == (A.nr() == A.nc())
+                - computes the LU factorization of the given A matrix.
+        !*/</font>
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='is_square'></a>is_square</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - if (the input A matrix was a square matrix) then
+                    - returns true
+                - else
+                    - returns false
+        !*/</font>
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='is_singular'></a>is_singular</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - is_square() == true
+            ensures
+                - if (the input A matrix is singular) then
+                    - returns true
+                - else
+                    - returns false
+        !*/</font>
+
+        <font color='#0000FF'><u>long</u></font> <b><a name='nr'></a>nr</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the number of rows in the input matrix
+        !*/</font>
+
+        <font color='#0000FF'><u>long</u></font> <b><a name='nc'></a>nc</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the number of columns in the input matrix
+        !*/</font>
+
+        <font color='#0000FF'>const</font> matrix_type <b><a name='get_l'></a>get_l</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>; 
+        <font color='#009900'>/*!
+            ensures
+                - returns the lower triangular L factor of the LU factorization.  
+                - L.nr() == nr()
+                - L.nc() == min(nr(),nc())
+        !*/</font>
+
+        <font color='#0000FF'>const</font> matrix_type <b><a name='get_u'></a>get_u</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the upper triangular U factor of the LU factorization.  
+                - U.nr() == min(nr(),nc())
+                - U.nc() == nc()
+        !*/</font>
+
+        <font color='#0000FF'>const</font> pivot_column_vector_type<font color='#5555FF'>&amp;</font> <b><a name='get_pivot'></a>get_pivot</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the pivot permutation vector.  That is,
+                  if A is the input matrix then this function 
+                  returns a vector P such that:
+                    - rowm(A,P) == get_l()*get_u() 
+                    - P.nr() == A.nr()
+        !*/</font>
+
+        type <b><a name='det'></a>det</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - is_square() == true
+            ensures
+                - computes and returns the determinant of the input 
+                  matrix using LU factors.
+        !*/</font>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> EXP<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>const</font> matrix_type <b><a name='solve'></a>solve</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&lt;</font>EXP<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&amp;</font>B
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - EXP::type == lu_decomposition::type
+                - is_square() == true
+                - B.nr() == nr()
+            ensures
+                - Let A denote the input matrix to this class's constructor.  
+                  Then this function solves A*X == B for X and returns X.  
+                - Note that if A is singular (or very close to singular) then
+                  the X returned by this function won't fit A*X == B very well (if at all).
+        !*/</font>
+
+    <b>}</b>; 
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> matrix_exp_type
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>class</font> <b><a name='cholesky_decomposition'></a>cholesky_decomposition</b>
+    <b>{</b>
+        <font color='#009900'>/*! 
+            REQUIREMENTS ON matrix_exp_type
+                must be some kind of matrix expression as defined in the 
+                dlib/matrix/matrix_abstract.h file.   (e.g. a dlib::matrix object)
+                The matrix type must also contain float or double values.
+
+            WHAT THIS OBJECT REPRESENTS
+                This object represents something that can compute a cholesky 
+                decomposition of a real valued matrix.  That is, for any 
+                symmetric, positive definite matrix A, it computes a lower 
+                triangular matrix L such that A == L*trans(L).
+                
+                If the matrix is not symmetric or positive definite, the function
+                computes only a partial decomposition.  This can be tested with
+                the is_spd() flag.
+            
+                If DLIB_USE_LAPACK is defined then the LAPACK routine xPOTRF 
+                is used to compute the cholesky decomposition.
+        !*/</font>
+
+    <font color='#0000FF'>public</font>:
+
+        <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>long</u></font> NR <font color='#5555FF'>=</font> matrix_exp_type::NR;
+        <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>long</u></font> NC <font color='#5555FF'>=</font> matrix_exp_type::NC;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> matrix_exp_type::type type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> matrix_exp_type::mem_manager_type mem_manager_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> matrix_exp_type::layout_type layout_type;
+
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> matrix_exp_type::matrix_type matrix_type;
+        <font color='#0000FF'>typedef</font> matrix<font color='#5555FF'>&lt;</font>type,NR,<font color='#979000'>1</font>,mem_manager_type,layout_type<font color='#5555FF'>&gt;</font> column_vector_type;
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> EXP<font color='#5555FF'>&gt;</font>
+        <b><a name='cholesky_decomposition'></a>cholesky_decomposition</b><font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&lt;</font>EXP<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> A
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - EXP::type == cholesky_decomposition::type 
+                - A.size() &gt; 0
+                - A.nr() == A.nc() 
+                  (i.e. A must be a square matrix)
+            ensures
+                - if (A is symmetric positive-definite) then
+                    - #is_spd() == true 
+                    - Constructs a lower triangular matrix L, such that L*trans(L) == A.
+                      and #get_l() == L
+                - else
+                    - #is_spd() == false
+        !*/</font>
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='is_spd'></a>is_spd</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - if (the input matrix was symmetric positive-definite) then
+                    - returns true
+                - else
+                    - returns false
+        !*/</font>
+
+        <font color='#0000FF'>const</font> matrix_type<font color='#5555FF'>&amp;</font> <b><a name='get_l'></a>get_l</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the lower triangular factor, L, such that L*trans(L) == A
+                  (where A is the input matrix to this class's constructor)
+                - Note that if A is not symmetric positive definite or positive semi-definite
+                  then the equation L*trans(L) == A won't hold.  
+        !*/</font>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> EXP<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>const</font> matrix <b><a name='solve'></a>solve</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&lt;</font>EXP<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> B
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - EXP::type == cholesky_decomposition::type
+                - B.nr() == get_l().nr()
+                  (i.e. the number of rows in B must match the number of rows in the
+                  input matrix A)
+            ensures
+                - Let A denote the input matrix to this class's constructor.  Then 
+                  this function solves A*X = B for X and returns X.  
+                - Note that if is_spd() == false or A was really close to being
+                  non-SPD then the solver will fail to find an accurate solution.
+        !*/</font>
+
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> matrix_exp_type
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>class</font> <b><a name='qr_decomposition'></a>qr_decomposition</b> 
+    <b>{</b>
+        <font color='#009900'>/*! 
+            REQUIREMENTS ON matrix_exp_type
+                must be some kind of matrix expression as defined in the 
+                dlib/matrix/matrix_abstract.h file.   (e.g. a dlib::matrix object)
+                The matrix type must also contain float or double values.
+
+            WHAT THIS OBJECT REPRESENTS
+                This object represents something that can compute a classical
+                QR decomposition of an m-by-n real valued matrix A with m &gt;= n.  
+
+                The QR decomposition is an m-by-n orthogonal matrix Q and an 
+                n-by-n upper triangular matrix R so that A == Q*R. The QR decomposition 
+                always exists, even if the matrix does not have full rank, so the 
+                constructor will never fail.  The primary use of the QR decomposition 
+                is in the least squares solution of non-square systems of simultaneous 
+                linear equations.  This will fail if is_full_rank() returns false or
+                A is very nearly not full rank.
+
+                The Q and R factors can be retrieved via the get_q() and get_r()
+                methods. Furthermore, a solve() method is provided to find the
+                least squares solution of Ax=b using the QR factors.  
+
+                If DLIB_USE_LAPACK is #defined then the xGEQRF routine
+                from LAPACK is used to compute the QR decomposition.
+        !*/</font>
+
+    <font color='#0000FF'>public</font>:
+
+        <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>long</u></font> NR <font color='#5555FF'>=</font> matrix_exp_type::NR;
+        <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>long</u></font> NC <font color='#5555FF'>=</font> matrix_exp_type::NC;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> matrix_exp_type::type type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> matrix_exp_type::mem_manager_type mem_manager_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> matrix_exp_type::layout_type layout_type;
+
+        <font color='#0000FF'>typedef</font> matrix<font color='#5555FF'>&lt;</font>type,<font color='#979000'>0</font>,<font color='#979000'>0</font>,mem_manager_type,layout_type<font color='#5555FF'>&gt;</font> matrix_type;
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> EXP<font color='#5555FF'>&gt;</font>
+        <b><a name='qr_decomposition'></a>qr_decomposition</b><font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&lt;</font>EXP<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> A
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - EXP::type == qr_decomposition::type
+                - A.nr() &gt;= A.nc()
+                - A.size() &gt; 0
+            ensures
+                - #nr() == A.nr()
+                - #nc() == A.nc()
+                - computes the QR decomposition of the given A matrix.
+        !*/</font>
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='is_full_rank'></a>is_full_rank</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - if (the input A matrix had full rank) then
+                    - returns true
+                - else
+                    - returns false
+        !*/</font>
+
+        <font color='#0000FF'><u>long</u></font> <b><a name='nr'></a>nr</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the number of rows in the input matrix
+        !*/</font>
+
+        <font color='#0000FF'><u>long</u></font> <b><a name='nc'></a>nc</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the number of columns in the input matrix
+        !*/</font>
+
+        <font color='#0000FF'>const</font> matrix_type <b><a name='get_r'></a>get_r</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns a matrix R such that: 
+                    - R is the upper triangular factor, R, of the QR factorization
+                    - get_q()*R == input matrix A
+                    - R.nr() == nc()
+                    - R.nc() == nc()
+        !*/</font>
+
+        <font color='#0000FF'>const</font> matrix_type <b><a name='get_q'></a>get_q</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns a matrix Q such that:
+                    - Q is the economy-sized orthogonal factor Q from the QR 
+                      factorization.  
+                    - trans(Q)*Q == identity matrix
+                    - Q*get_r() == input matrix A 
+                    - Q.nr() == nr()
+                    - Q.nc() == nc()
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='get_q'></a>get_q</b> <font face='Lucida Console'>(</font>
+            matrix_type<font color='#5555FF'>&amp;</font> Q
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #Q == get_q()
+                - This function exists to allow a user to get the Q matrix without the
+                  overhead of returning a matrix by value.
+        !*/</font>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> EXP<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>const</font> matrix_type <b><a name='solve'></a>solve</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&lt;</font>EXP<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> B
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - EXP::type == qr_decomposition::type
+                - B.nr() == nr()
+            ensures
+                - Let A denote the input matrix to this class's constructor.  
+                  Then this function finds the least squares solution to the equation A*X = B 
+                  and returns X.  X has the following properties: 
+                    - X is the matrix that minimizes the two norm of A*X-B.  That is, it
+                      minimizes sum(squared(A*X - B)).
+                    - X.nr() == nc()
+                    - X.nc() == B.nc()
+                - Note that this function will fail to output a good solution if is_full_rank() == false
+                  or the A matrix is close to not being full rank.
+        !*/</font>
+
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> matrix_exp_type
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>class</font> <b><a name='eigenvalue_decomposition'></a>eigenvalue_decomposition</b>
+    <b>{</b>
+        <font color='#009900'>/*!
+            REQUIREMENTS ON matrix_exp_type
+                must be some kind of matrix expression as defined in the 
+                dlib/matrix/matrix_abstract.h file.   (e.g. a dlib::matrix object)
+                The matrix type must also contain float or double values.
+
+            WHAT THIS OBJECT REPRESENTS
+                This object represents something that can compute an eigenvalue 
+                decomposition of a real valued matrix.   So it gives 
+                you the set of eigenvalues and eigenvectors for a matrix.   
+
+                Let A denote the input matrix to this object's constructor.  Then 
+                what this object does is it finds two matrices, D and V, such that
+                    - A*V == V*D
+                Where V is a square matrix that contains all the eigenvectors
+                of the A matrix (each column of V is an eigenvector) and
+                D is a diagonal matrix containing the eigenvalues of A.
+
+
+                It is important to note that if A is symmetric or non-symmetric you
+                get somewhat different results.  If A is a symmetric matrix (i.e. A == trans(A))
+                then:
+                    - All the eigenvalues and eigenvectors of A are real numbers. 
+                        - Because of this there isn't really any point in using the
+                          part of this class's interface that returns complex matrices.
+                          All you need are the get_real_eigenvalues() and
+                          get_pseudo_v() functions.  
+                    - V*trans(V) should be equal to the identity matrix.  That is, all the
+                      eigenvectors in V should be orthonormal. 
+                        - So A == V*D*trans(V)
+                    - If DLIB_USE_LAPACK is #defined then this object uses the xSYEVR LAPACK
+                      routine.
+
+                On the other hand, if A is not symmetric then:
+                    - Some of the eigenvalues and eigenvectors might be complex numbers.  
+                        - An eigenvalue is complex if and only if its corresponding eigenvector 
+                          is complex.  So you can check for this case by just checking 
+                          get_imag_eigenvalues() to see if any values are non-zero.  You don't 
+                          have to check the V matrix as well.
+                    - V*trans(V) won't be equal to the identity matrix but it is usually
+                      invertible.  So A == V*D*inv(V) is usually a valid statement but
+                      A == V*D*trans(V) won't be.
+                    - If DLIB_USE_LAPACK is #defined then this object uses the xGEEV LAPACK
+                      routine.
+        !*/</font>
+
+    <font color='#0000FF'>public</font>:
+
+        <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>long</u></font> NR <font color='#5555FF'>=</font> matrix_exp_type::NR;
+        <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>long</u></font> NC <font color='#5555FF'>=</font> matrix_exp_type::NC;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> matrix_exp_type::type type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> matrix_exp_type::mem_manager_type mem_manager_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> matrix_exp_type::layout_type layout_type;
+
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> matrix_exp_type::matrix_type matrix_type;
+        <font color='#0000FF'>typedef</font> matrix<font color='#5555FF'>&lt;</font>type,NR,<font color='#979000'>1</font>,mem_manager_type,layout_type<font color='#5555FF'>&gt;</font> column_vector_type;
+
+        <font color='#0000FF'>typedef</font> matrix<font color='#5555FF'>&lt;</font>std::complex<font color='#5555FF'>&lt;</font>type<font color='#5555FF'>&gt;</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,mem_manager_type,layout_type<font color='#5555FF'>&gt;</font> complex_matrix_type;
+        <font color='#0000FF'>typedef</font> matrix<font color='#5555FF'>&lt;</font>std::complex<font color='#5555FF'>&lt;</font>type<font color='#5555FF'>&gt;</font>,NR,<font color='#979000'>1</font>,mem_manager_type,layout_type<font color='#5555FF'>&gt;</font> complex_column_vector_type;
+
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> EXP<font color='#5555FF'>&gt;</font>
+        <b><a name='eigenvalue_decomposition'></a>eigenvalue_decomposition</b><font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&lt;</font>EXP<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> A
+        <font face='Lucida Console'>)</font>; 
+        <font color='#009900'>/*!
+            requires
+                - A.nr() == A.nc() 
+                - A.size() &gt; 0
+                - EXP::type == eigenvalue_decomposition::type 
+            ensures
+                - #dim() == A.nr()
+                - computes the eigenvalue decomposition of A.  
+                - #get_eigenvalues() == the eigenvalues of A
+                - #get_v() == all the eigenvectors of A
+        !*/</font>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> EXP<font color='#5555FF'>&gt;</font>
+        <b><a name='eigenvalue_decomposition'></a>eigenvalue_decomposition</b><font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> matrix_op<font color='#5555FF'>&lt;</font>op_make_symmetric<font color='#5555FF'>&lt;</font>EXP<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> A
+        <font face='Lucida Console'>)</font>; 
+        <font color='#009900'>/*!
+            requires
+                - A.nr() == A.nc() 
+                - A.size() &gt; 0
+                - EXP::type == eigenvalue_decomposition::type 
+            ensures
+                - #dim() == A.nr()
+                - computes the eigenvalue decomposition of the symmetric matrix A.  Does so
+                  using a method optimized for symmetric matrices.
+                - #get_eigenvalues() == the eigenvalues of A
+                - #get_v() == all the eigenvectors of A
+                - moreover, since A is symmetric there won't be any imaginary eigenvalues. So 
+                  we will have:
+                    - #get_imag_eigenvalues() == 0
+                    - #get_real_eigenvalues() == the eigenvalues of A
+                    - #get_pseudo_v() == all the eigenvectors of A
+                    - diagm(#get_real_eigenvalues()) == #get_pseudo_d()
+
+                Note that the symmetric matrix operator is created by the
+                dlib::make_symmetric() function.  This function simply reflects
+                the lower triangular part of a square matrix into the upper triangular
+                part to create a symmetric matrix.  It can also be used to denote that a 
+                matrix is already symmetric using the C++ type system.
+        !*/</font>
+
+        <font color='#0000FF'><u>long</u></font> <b><a name='dim'></a>dim</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - dim() == the number of rows/columns in the input matrix A 
+        !*/</font>
+
+        <font color='#0000FF'>const</font> complex_column_vector_type <b><a name='get_eigenvalues'></a>get_eigenvalues</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns diag(get_d()).  That is, returns a 
+                  vector that contains the eigenvalues of the input 
+                  matrix.
+                - the returned vector has dim() rows
+                - the eigenvalues are not sorted in any particular way
+        !*/</font>
+
+        <font color='#0000FF'>const</font> column_vector_type<font color='#5555FF'>&amp;</font> <b><a name='get_real_eigenvalues'></a>get_real_eigenvalues</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*! 
+            ensures
+                - returns the real parts of the eigenvalues.  That is,
+                  returns real(get_eigenvalues()) 
+                - the returned vector has dim() rows
+                - the eigenvalues are not sorted in any particular way
+        !*/</font>
+
+        <font color='#0000FF'>const</font> column_vector_type<font color='#5555FF'>&amp;</font> <b><a name='get_imag_eigenvalues'></a>get_imag_eigenvalues</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*! 
+            ensures
+                - returns the imaginary parts of the eigenvalues.  That is,
+                  returns imag(get_eigenvalues()) 
+                - the returned vector has dim() rows
+                - the eigenvalues are not sorted in any particular way
+        !*/</font>
+
+        <font color='#0000FF'>const</font> complex_matrix_type <b><a name='get_v'></a>get_v</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the eigenvector matrix V that is 
+                  dim() rows by dim() columns
+                - Each column in V is one of the eigenvectors of the input 
+                  matrix
+        !*/</font>
+
+        <font color='#0000FF'>const</font> complex_matrix_type <b><a name='get_d'></a>get_d</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>; 
+        <font color='#009900'>/*!
+            ensures
+                - returns a matrix D such that:
+                    - D.nr() == dim()
+                    - D.nc() == dim()
+                    - diag(D) == get_eigenvalues()
+                      (i.e. the diagonal of D contains all the eigenvalues in the input matrix)
+                    - all off diagonal elements of D are set to 0
+        !*/</font>
+
+        <font color='#0000FF'>const</font> matrix_type<font color='#5555FF'>&amp;</font> <b><a name='get_pseudo_v'></a>get_pseudo_v</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns a matrix that is dim() rows by dim() columns
+                - Let A denote the input matrix given to this object's constructor.
+                - if (A has any imaginary eigenvalues) then
+                    - returns the pseudo-eigenvector matrix V  
+                    - The matrix V returned by this function is structured such that:
+                        - A*V == V*get_pseudo_d()
+                - else
+                    - returns the eigenvector matrix V with A's eigenvectors as
+                      the columns of V
+                    - A*V == V*diagm(get_real_eigenvalues())
+        !*/</font>
+
+        <font color='#0000FF'>const</font> matrix_type <b><a name='get_pseudo_d'></a>get_pseudo_d</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>; 
+        <font color='#009900'>/*!
+            ensures
+                - The returned matrix is dim() rows by dim() columns
+                - Computes and returns the block diagonal eigenvalue matrix.
+                  If the original matrix A is not symmetric, then the eigenvalue 
+                  matrix D is block diagonal with the real eigenvalues in 1-by-1 
+                  blocks and any complex eigenvalues,
+                  a + i*b, in 2-by-2 blocks, (a, b; -b, a).  That is, if the complex
+                  eigenvalues look like
+
+                      u + iv     .        .          .      .    .
+                        .      u - iv     .          .      .    .
+                        .        .      a + ib       .      .    .
+                        .        .        .        a - ib   .    .
+                        .        .        .          .      x    .
+                        .        .        .          .      .    y
+
+                  Then D looks like
+
+                        u        v        .          .      .    .
+                       -v        u        .          .      .    . 
+                        .        .        a          b      .    .
+                        .        .       -b          a      .    .
+                        .        .        .          .      x    .
+                        .        .        .          .      .    y
+
+                  This keeps V (The V you get from get_pseudo_v()) a real matrix in both 
+                  symmetric and non-symmetric cases, and A*V = V*D.
+                - the eigenvalues are not sorted in any particular way
+        !*/</font>
+
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_MATRIx_LA_FUNCTS_ABSTRACT_
+</font>
+
+</pre></body></html>

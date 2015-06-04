@@ -1,0 +1,123 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - bit_stream_kernel_1.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2003  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_BIT_STREAM_KERNEl_1_
+<font color='#0000FF'>#define</font> DLIB_BIT_STREAM_KERNEl_1_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='bit_stream_kernel_abstract.h.html'>bit_stream_kernel_abstract.h</a>"
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>iosfwd<font color='#5555FF'>&gt;</font>
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+    <font color='#0000FF'>class</font> <b><a name='bit_stream_kernel_1'></a>bit_stream_kernel_1</b>
+    <b>{</b>
+
+        <font color='#009900'>/*!
+            INITIAL VALUE
+                write_mode          == false
+                read_mode           == false    
+
+            CONVENTION
+                write_mode          == is_in_write_mode()
+                read_mode           == is_in_read_mode()
+
+                if (write_mode)
+                {
+                    osp             == pointer to an ostream object
+                    buffer          == the low order bits of buffer are the bits to be 
+                                       written
+                    buffer_size     == the number of low order bits in buffer that are 
+                                       bits that should be written
+                    the lowest order bit is the last bit entered by the user
+                }
+
+                if (read_mode)
+                {
+                    isp             == pointer to an istream object
+                    buffer          == the high order bits of buffer are the bits 
+                                       waiting to be read by the user
+                    buffer_size     == the number of high order bits in buffer that 
+                                       are bits that are waiting to be read
+                    the highest order bit is the next bit to give to the user
+                }
+        !*/</font>
+
+
+    <font color='#0000FF'>public</font>:
+
+        <b><a name='bit_stream_kernel_1'></a>bit_stream_kernel_1</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> :
+            write_mode<font face='Lucida Console'>(</font><font color='#979000'>false</font><font face='Lucida Console'>)</font>,
+            read_mode<font face='Lucida Console'>(</font><font color='#979000'>false</font><font face='Lucida Console'>)</font>
+        <b>{</b><b>}</b>
+
+        <font color='#0000FF'>virtual</font> ~<b><a name='bit_stream_kernel_1'></a>bit_stream_kernel_1</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>
+        <b>{</b><b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='clear'></a>clear</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_input_stream'></a>set_input_stream</b> <font face='Lucida Console'>(</font>
+            std::istream<font color='#5555FF'>&amp;</font> is
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_output_stream'></a>set_output_stream</b> <font face='Lucida Console'>(</font>
+            std::ostream<font color='#5555FF'>&amp;</font> os
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='close'></a>close</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>inline</font> <font color='#0000FF'><u>bool</u></font> <b><a name='is_in_write_mode'></a>is_in_write_mode</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+        <font color='#0000FF'>inline</font> <font color='#0000FF'><u>bool</u></font> <b><a name='is_in_read_mode'></a>is_in_read_mode</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+        <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='write'></a>write</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>int</u></font> bit
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='read'></a>read</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>int</u></font><font color='#5555FF'>&amp;</font> bit
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='swap'></a>swap</b> <font face='Lucida Console'>(</font>
+            bit_stream_kernel_1<font color='#5555FF'>&amp;</font> item
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>private</font>:
+
+            <font color='#009900'>// member data
+</font>            std::istream<font color='#5555FF'>*</font> isp;
+            std::ostream<font color='#5555FF'>*</font> osp;
+            <font color='#0000FF'><u>bool</u></font> write_mode;
+            <font color='#0000FF'><u>bool</u></font> read_mode;
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> buffer;
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>short</u></font> buffer_size;
+            
+            <font color='#009900'>// restricted functions
+</font>            <b><a name='bit_stream_kernel_1'></a>bit_stream_kernel_1</b><font face='Lucida Console'>(</font>bit_stream_kernel_1<font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font>;        <font color='#009900'>// copy constructor
+</font>            bit_stream_kernel_1<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>=</font><font face='Lucida Console'>(</font>bit_stream_kernel_1<font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font>;  <font color='#009900'>// assignment operator
+</font>
+    <b>}</b>;
+
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='swap'></a>swap</b> <font face='Lucida Console'>(</font>
+        bit_stream_kernel_1<font color='#5555FF'>&amp;</font> a, 
+        bit_stream_kernel_1<font color='#5555FF'>&amp;</font> b
+    <font face='Lucida Console'>)</font>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#ifdef</font> NO_MAKEFILE
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='bit_stream_kernel_1.cpp.html'>bit_stream_kernel_1.cpp</a>"
+<font color='#0000FF'>#endif</font>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_BIT_STREAM_KERNEl_1_
+</font>
+
+</pre></body></html>

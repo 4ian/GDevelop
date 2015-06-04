@@ -1,0 +1,167 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - sqlite_tools_abstract.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2011  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#undef</font> DLIB_SQLiTE_TOOLS_ABSTRACT_H_
+<font color='#0000FF'>#ifdef</font> DLIB_SQLiTE_TOOLS_ABSTRACT_H_
+
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='sqlite_abstract.h.html'>sqlite_abstract.h</a>"
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+    <font color='#0000FF'>class</font> <b><a name='transaction'></a>transaction</b> : noncopyable
+    <b>{</b>
+        <font color='#009900'>/*!
+            WHAT THIS OBJECT REPRESENTS
+                This object is a tool for creating exception safe
+                database transactions.
+        !*/</font>
+
+    <font color='#0000FF'>public</font>:
+        <b><a name='transaction'></a>transaction</b> <font face='Lucida Console'>(</font>
+            database<font color='#5555FF'>&amp;</font> db
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - Begins a database transaction which will be rolled back
+                  if commit() isn't called eventually.
+                - In particular, performs: db.exec("begin transaction");
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='commit'></a>commit</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - if (commit() hasn't already been called) then
+                    - Commits all changes made during this database transaction.
+                    - In particular, performs: db.exec("commit");
+                - else
+                    - does nothing
+        !*/</font>
+
+        ~<b><a name='transaction'></a>transaction</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - if (commit() was never called) then
+                    - rolls back any changes made to the database during this transaction.
+                    - In particular, performs: db.exec("rollback");
+                - else
+                    - does nothing
+        !*/</font>
+
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='query_object'></a>query_object</b> <font face='Lucida Console'>(</font>
+        database<font color='#5555FF'>&amp;</font> db,
+        <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> query,
+        T<font color='#5555FF'>&amp;</font> item
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        ensures
+            - executes the given SQL query against db.  If the query results in a 
+              single row and column being returned then the data in the column is 
+              interpreted as a binary BLOB and deserialized into item.
+        throws
+            - sqlite_error or serialization_error if an error occurs which prevents
+              this operation from succeeding.
+
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    std::string <b><a name='query_text'></a>query_text</b> <font face='Lucida Console'>(</font>
+        database<font color='#5555FF'>&amp;</font> db,
+        <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> query
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        ensures
+            - executes the given SQL query against db.  If the query results in a 
+              single row and column being returned then the data in the column is 
+              converted to text and returned.
+        throws
+            - sqlite_error if an error occurs which prevents this operation from 
+              succeeding.
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>double</u></font> <b><a name='query_double'></a>query_double</b> <font face='Lucida Console'>(</font>
+        database<font color='#5555FF'>&amp;</font> db,
+        <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> query
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        ensures
+            - executes the given SQL query against db.  If the query results in a 
+              single row and column being returned then the data in the column is 
+              converted to a double and returned.
+        throws
+            - sqlite_error if an error occurs which prevents this operation from 
+              succeeding.
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>int</u></font> <b><a name='query_int'></a>query_int</b> <font face='Lucida Console'>(</font>
+        database<font color='#5555FF'>&amp;</font> db,
+        <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> query
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        ensures
+            - executes the given SQL query against db.  If the query results in a 
+              single row and column being returned then the data in the column is 
+              converted to an int and returned.
+        throws
+            - sqlite_error if an error occurs which prevents this operation from 
+              succeeding.
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    int64 <b><a name='query_int64'></a>query_int64</b> <font face='Lucida Console'>(</font>
+        database<font color='#5555FF'>&amp;</font> db,
+        <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> query
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        ensures
+            - executes the given SQL query against db.  If the query results in a 
+              single row and column being returned then the data in the column is 
+              converted to an int64 and returned.
+        throws
+            - sqlite_error if an error occurs which prevents this operation from 
+              succeeding.
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font> <b><a name='query_blob'></a>query_blob</b> <font face='Lucida Console'>(</font>
+        database<font color='#5555FF'>&amp;</font> db,
+        <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> query
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        ensures
+            - executes the given SQL query against db.  If the query results in a 
+              single row and column being returned then the data in the column is 
+              returned as a binary BLOB.
+        throws
+            - sqlite_error if an error occurs which prevents this operation from 
+              succeeding.
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_SQLiTE_TOOLS_H_
+</font>
+
+
+</pre></body></html>

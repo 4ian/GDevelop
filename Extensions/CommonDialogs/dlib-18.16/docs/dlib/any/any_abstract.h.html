@@ -1,0 +1,213 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - any_abstract.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2010  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#undef</font> DLIB_AnY_ABSTRACT_H_
+<font color='#0000FF'>#ifdef</font> DLIB_AnY_ABSTRACT_H_
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>typeinfo<font color='#5555FF'>&gt;</font>
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>class</font> <b><a name='bad_any_cast'></a>bad_any_cast</b> : <font color='#0000FF'>public</font> std::bad_cast 
+    <b>{</b>
+        <font color='#009900'>/*!
+            WHAT THIS OBJECT REPRESENTS
+                This object is the exception class used by the any object.
+                It is used to indicate when someone attempts to cast an any
+                object into a type which isn't contained in the any object.
+        !*/</font>
+
+    <font color='#0000FF'>public</font>:
+          <font color='#0000FF'>virtual</font> <font color='#0000FF'>const</font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>*</font> <b><a name='what'></a>what</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <font color='#0000FF'>throw</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <b>{</b> <font color='#0000FF'>return</font> "<font color='#CC0000'>bad_any_cast</font>"; <b>}</b>
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>class</font> <b><a name='any'></a>any</b>
+    <b>{</b>
+        <font color='#009900'>/*!
+            INITIAL VALUE
+                - is_empty() == true
+                - for all T: contains&lt;T&gt;() == false
+
+            WHAT THIS OBJECT REPRESENTS
+                This object is basically a type-safe version of a void*.  In particular,
+                it is a container which can contain only one object but the object may
+                be of any type.  
+
+                It is somewhat like the type_safe_union except you don't have to declare 
+                the set of possible content types beforehand.  So in some sense this is 
+                like a less type-strict version of the type_safe_union.
+        !*/</font>
+
+    <font color='#0000FF'>public</font>:
+
+        <b><a name='any'></a>any</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - this object is properly initialized
+        !*/</font>
+
+        <b><a name='any'></a>any</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> any<font color='#5555FF'>&amp;</font> item
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - copies the state of item into *this.  
+                - Note that *this and item will contain independent copies of the
+                  contents of item.  That is, this function performs a deep
+                  copy and therefore does not result in *this containing
+                  any kind of reference to item.
+        !*/</font>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font> <font color='#0000FF'>typename</font> T <font color='#5555FF'>&gt;</font>
+        <b><a name='any'></a>any</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> item
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #contains&lt;T&gt;() == true
+                - #cast_to&lt;T&gt;() == item
+                  (i.e. a copy of item will be stored in *this)
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='clear'></a>clear</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #*this will have its default value.  I.e. #is_empty() == true
+        !*/</font>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>bool</u></font> <b><a name='contains'></a>contains</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - if (this object currently contains an object of type T) then
+                    - returns true
+                - else
+                    - returns false
+        !*/</font>
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='is_empty'></a>is_empty</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - if (this object contains any kind of object) then
+                    - returns false 
+                - else
+                    - returns true 
+        !*/</font>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+        T<font color='#5555FF'>&amp;</font> <b><a name='cast_to'></a>cast_to</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - if (contains&lt;T&gt;() == true) then
+                    - returns a non-const reference to the object contained within *this
+                - else
+                    - throws bad_any_cast
+        !*/</font>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> <b><a name='cast_to'></a>cast_to</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - if (contains&lt;T&gt;() == true) then
+                    - returns a const reference to the object contained within *this
+                - else
+                    - throws bad_any_cast
+        !*/</font>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+        T<font color='#5555FF'>&amp;</font> <b><a name='get'></a>get</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #is_empty() == false
+                - #contains&lt;T&gt;() == true
+                - if (contains&lt;T&gt;() == true)
+                    - returns a non-const reference to the object contained in *this.
+                - else
+                    - Constructs an object of type T inside *this
+                    - Any previous object stored in this any object is destructed and its
+                      state is lost.
+                    - returns a non-const reference to the newly created T object.
+        !*/</font>
+
+        any<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> any<font color='#5555FF'>&amp;</font> item
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - copies the state of item into *this.  
+                - Note that *this and item will contain independent copies of the
+                  contents of item.  That is, this function performs a deep
+                  copy and therefore does not result in *this containing
+                  any kind of reference to item.
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='swap'></a>swap</b> <font face='Lucida Console'>(</font>
+            any<font color='#5555FF'>&amp;</font> item
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - swaps *this and item
+                - does not invalidate pointers or references to the object contained 
+                  inside *this or item.  Moreover, a pointer or reference to the object in 
+                  *this will now refer to the contents of #item and vice versa.
+        !*/</font>
+
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='swap'></a>swap</b> <font face='Lucida Console'>(</font>
+        any<font color='#5555FF'>&amp;</font> a,
+        any<font color='#5555FF'>&amp;</font> b
+    <font face='Lucida Console'>)</font> <b>{</b> a.<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>b<font face='Lucida Console'>)</font>; <b>}</b>
+    <font color='#009900'>/*!
+        provides a global swap function
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font> 
+    T<font color='#5555FF'>&amp;</font> <b><a name='any_cast'></a>any_cast</b><font face='Lucida Console'>(</font>
+        any<font color='#5555FF'>&amp;</font> a
+    <font face='Lucida Console'>)</font> <b>{</b> <font color='#0000FF'>return</font> a.cast_to<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <b>}</b>
+    <font color='#009900'>/*!
+        ensures
+            - returns a.cast_to&lt;T&gt;()
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font> 
+    <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> <b><a name='any_cast'></a>any_cast</b><font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> any<font color='#5555FF'>&amp;</font> a
+    <font face='Lucida Console'>)</font> <b>{</b> <font color='#0000FF'>return</font> a.cast_to<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <b>}</b>
+    <font color='#009900'>/*!
+        ensures
+            - returns a.cast_to&lt;T&gt;()
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_AnY_ABSTRACT_H_
+</font>
+
+
+</pre></body></html>

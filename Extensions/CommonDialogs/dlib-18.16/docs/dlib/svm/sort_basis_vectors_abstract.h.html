@@ -1,0 +1,62 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - sort_basis_vectors_abstract.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2010  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#undef</font> DLIB_SORT_BASIS_VECTORs_ABSTRACT_Hh_
+<font color='#0000FF'>#ifdef</font> DLIB_SORT_BASIS_VECTORs_ABSTRACT_Hh_
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>vector<font color='#5555FF'>&gt;</font>
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../matrix.h.html'>../matrix.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../statistics.h.html'>../statistics.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> kernel_type,
+        <font color='#0000FF'>typename</font> vect1_type,
+        <font color='#0000FF'>typename</font> vect2_type,
+        <font color='#0000FF'>typename</font> vect3_type
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> kernel_type::sample_type<font color='#5555FF'>&gt;</font> <b><a name='sort_basis_vectors'></a>sort_basis_vectors</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> kernel_type<font color='#5555FF'>&amp;</font> kern,
+        <font color='#0000FF'>const</font> vect1_type<font color='#5555FF'>&amp;</font> samples,
+        <font color='#0000FF'>const</font> vect2_type<font color='#5555FF'>&amp;</font> labels,
+        <font color='#0000FF'>const</font> vect3_type<font color='#5555FF'>&amp;</font> basis,
+        <font color='#0000FF'><u>double</u></font> eps <font color='#5555FF'>=</font> <font color='#979000'>0.99</font>
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - is_binary_classification_problem(samples, labels)
+            - 0 &lt; eps &lt;= 1
+            - basis.size() &gt; 0
+            - kernel_type is a kernel function object as defined in dlib/svm/kernel_abstract.h 
+              It must be capable of operating on the elements of samples and basis.
+            - vect1_type == a matrix or something convertible to a matrix via mat()
+            - vect2_type == a matrix or something convertible to a matrix via mat()
+            - vect3_type == a matrix or something convertible to a matrix via mat()
+        ensures
+            - A kernel based learning method ultimately needs to select a set of basis functions
+              represented by a particular choice of kernel and a set of basis vectors.  
+              sort_basis_vectors() attempts to order the elements of basis so that elements which are
+              most useful in solving the binary classification problem defined by samples and
+              labels come first. 
+            - In particular, this function returns a std::vector, SB, of sorted basis vectors such that:
+                - 0 &lt; SB.size() &lt;= basis.size()
+                - SB will contain elements from basis but they will have been sorted so that 
+                  the most useful elements come first (i.e. SB[0] is the most important). 
+                - eps notionally controls how big SB will be.  Bigger eps corresponds to a 
+                  bigger basis.  You can think of it like asking for eps percent of the 
+                  discriminating power from the input basis.
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_SORT_BASIS_VECTORs_ABSTRACT_Hh_
+</font>
+
+</pre></body></html>

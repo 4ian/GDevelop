@@ -1,0 +1,349 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - deflate.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>/* deflate.h -- internal compression state
+ * Copyright (C) 1995-2012 Jean-loup Gailly
+ * For conditions of distribution and use, see copyright notice in zlib.h
+ */</font>
+
+<font color='#009900'>/* WARNING: this file should *not* be used by applications. It is
+   part of the implementation of the compression library and is
+   subject to change. Applications should only use zlib.h.
+ */</font>
+
+<font color='#009900'>/* @(#) $Id$ */</font>
+
+<font color='#0000FF'>#ifndef</font> DEFLATE_H
+<font color='#0000FF'>#define</font> DEFLATE_H
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='zutil.h.html'>zutil.h</a>"
+
+<font color='#009900'>/* define NO_GZIP when compiling if you want to disable gzip header and
+   trailer creation by deflate().  NO_GZIP would be used to avoid linking in
+   the crc code when it is not needed.  For shared libraries, gzip encoding
+   should be left enabled. */</font>
+<font color='#0000FF'>#ifndef</font> NO_GZIP
+#  define GZIP
+<font color='#0000FF'>#endif</font>
+
+<font color='#009900'>/* ===========================================================================
+ * Internal compression state.
+ */</font>
+
+<font color='#0000FF'>#define</font> LENGTH_CODES <font color='#979000'>29</font>
+<font color='#009900'>/* number of length codes, not counting the special END_BLOCK code */</font>
+
+<font color='#0000FF'>#define</font> LITERALS  <font color='#979000'>256</font>
+<font color='#009900'>/* number of literal bytes 0..255 */</font>
+
+<font color='#0000FF'>#define</font> L_CODES <font face='Lucida Console'>(</font>LITERALS<font color='#5555FF'>+</font><font color='#979000'>1</font><font color='#5555FF'>+</font>LENGTH_CODES<font face='Lucida Console'>)</font>
+<font color='#009900'>/* number of Literal or Length codes, including the END_BLOCK code */</font>
+
+<font color='#0000FF'>#define</font> D_CODES   <font color='#979000'>30</font>
+<font color='#009900'>/* number of distance codes */</font>
+
+<font color='#0000FF'>#define</font> BL_CODES  <font color='#979000'>19</font>
+<font color='#009900'>/* number of codes used to transfer the bit lengths */</font>
+
+<font color='#0000FF'>#define</font> HEAP_SIZE <font face='Lucida Console'>(</font><font color='#979000'>2</font><font color='#5555FF'>*</font>L_CODES<font color='#5555FF'>+</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>
+<font color='#009900'>/* maximum heap size */</font>
+
+<font color='#0000FF'>#define</font> MAX_BITS <font color='#979000'>15</font>
+<font color='#009900'>/* All codes must not exceed MAX_BITS bits */</font>
+
+<font color='#0000FF'>#define</font> Buf_size <font color='#979000'>16</font>
+<font color='#009900'>/* size of bit buffer in bi_buf */</font>
+
+<font color='#0000FF'>#define</font> INIT_STATE    <font color='#979000'>42</font>
+<font color='#0000FF'>#define</font> EXTRA_STATE   <font color='#979000'>69</font>
+<font color='#0000FF'>#define</font> NAME_STATE    <font color='#979000'>73</font>
+<font color='#0000FF'>#define</font> COMMENT_STATE <font color='#979000'>91</font>
+<font color='#0000FF'>#define</font> HCRC_STATE   <font color='#979000'>103</font>
+<font color='#0000FF'>#define</font> BUSY_STATE   <font color='#979000'>113</font>
+<font color='#0000FF'>#define</font> FINISH_STATE <font color='#979000'>666</font>
+<font color='#009900'>/* Stream status */</font>
+
+
+<font color='#009900'>/* Data structure describing a single value and its code string. */</font>
+<font color='#0000FF'>typedef</font> <font color='#0000FF'>struct</font> <b><a name='ct_data_s'></a>ct_data_s</b> <b>{</b>
+    <font color='#0000FF'>union</font> <b>{</b>
+        ush  freq;       <font color='#009900'>/* frequency count */</font>
+        ush  code;       <font color='#009900'>/* bit string */</font>
+    <b>}</b> fc;
+    <font color='#0000FF'>union</font> <b>{</b>
+        ush  dad;        <font color='#009900'>/* father node in Huffman tree */</font>
+        ush  len;        <font color='#009900'>/* length of bit string */</font>
+    <b>}</b> dl;
+<b>}</b> FAR ct_data;
+
+<font color='#0000FF'>#define</font> Freq fc.freq
+<font color='#0000FF'>#define</font> Code fc.code
+<font color='#0000FF'>#define</font> Dad  dl.dad
+<font color='#0000FF'>#define</font> Len  dl.len
+
+<font color='#0000FF'>typedef</font> <font color='#0000FF'>struct</font> static_tree_desc_s  static_tree_desc;
+
+<font color='#0000FF'>typedef</font> <font color='#0000FF'>struct</font> <b><a name='tree_desc_s'></a>tree_desc_s</b> <b>{</b>
+    ct_data <font color='#5555FF'>*</font>dyn_tree;           <font color='#009900'>/* the dynamic tree */</font>
+    <font color='#0000FF'><u>int</u></font>     max_code;            <font color='#009900'>/* largest code with non zero frequency */</font>
+    static_tree_desc <font color='#5555FF'>*</font>stat_desc; <font color='#009900'>/* the corresponding static tree */</font>
+<b>}</b> FAR tree_desc;
+
+<font color='#0000FF'>typedef</font> ush Pos;
+<font color='#0000FF'>typedef</font> Pos FAR Posf;
+<font color='#0000FF'>typedef</font> <font color='#0000FF'><u>unsigned</u></font> IPos;
+
+<font color='#009900'>/* A Pos is an index in the character window. We use short instead of int to
+ * save space in the various tables. IPos is used only for parameter passing.
+ */</font>
+
+<font color='#0000FF'>typedef</font> <font color='#0000FF'>struct</font> <b><a name='internal_state'></a>internal_state</b> <b>{</b>
+    z_streamp strm;      <font color='#009900'>/* pointer back to this zlib stream */</font>
+    <font color='#0000FF'><u>int</u></font>   status;        <font color='#009900'>/* as the name implies */</font>
+    Bytef <font color='#5555FF'>*</font>pending_buf;  <font color='#009900'>/* output still pending */</font>
+    ulg   pending_buf_size; <font color='#009900'>/* size of pending_buf */</font>
+    Bytef <font color='#5555FF'>*</font>pending_out;  <font color='#009900'>/* next pending byte to output to the stream */</font>
+    uInt   pending;      <font color='#009900'>/* nb of bytes in the pending buffer */</font>
+    <font color='#0000FF'><u>int</u></font>   wrap;          <font color='#009900'>/* bit 0 true for zlib, bit 1 true for gzip */</font>
+    gz_headerp  gzhead;  <font color='#009900'>/* gzip header information to write */</font>
+    uInt   gzindex;      <font color='#009900'>/* where in extra, name, or comment */</font>
+    Byte  method;        <font color='#009900'>/* can only be DEFLATED */</font>
+    <font color='#0000FF'><u>int</u></font>   last_flush;    <font color='#009900'>/* value of flush param for previous deflate call */</font>
+
+                <font color='#009900'>/* used by deflate.c: */</font>
+
+    uInt  w_size;        <font color='#009900'>/* LZ77 window size (32K by default) */</font>
+    uInt  w_bits;        <font color='#009900'>/* log2(w_size)  (8..16) */</font>
+    uInt  w_mask;        <font color='#009900'>/* w_size - 1 */</font>
+
+    Bytef <font color='#5555FF'>*</font>window;
+    <font color='#009900'>/* Sliding window. Input bytes are read into the second half of the window,
+     * and move to the first half later to keep a dictionary of at least wSize
+     * bytes. With this organization, matches are limited to a distance of
+     * wSize-MAX_MATCH bytes, but this ensures that IO is always
+     * performed with a length multiple of the block size. Also, it limits
+     * the window size to 64K, which is quite useful on MSDOS.
+     * To do: use the user input buffer as sliding window.
+     */</font>
+
+    ulg window_size;
+    <font color='#009900'>/* Actual size of window: 2*wSize, except when the user input buffer
+     * is directly used as sliding window.
+     */</font>
+
+    Posf <font color='#5555FF'>*</font>prev;
+    <font color='#009900'>/* Link to older string with same hash index. To limit the size of this
+     * array to 64K, this link is maintained only for the last 32K strings.
+     * An index in this array is thus a window index modulo 32K.
+     */</font>
+
+    Posf <font color='#5555FF'>*</font>head; <font color='#009900'>/* Heads of the hash chains or NIL. */</font>
+
+    uInt  ins_h;          <font color='#009900'>/* hash index of string to be inserted */</font>
+    uInt  hash_size;      <font color='#009900'>/* number of elements in hash table */</font>
+    uInt  hash_bits;      <font color='#009900'>/* log2(hash_size) */</font>
+    uInt  hash_mask;      <font color='#009900'>/* hash_size-1 */</font>
+
+    uInt  hash_shift;
+    <font color='#009900'>/* Number of bits by which ins_h must be shifted at each input
+     * step. It must be such that after MIN_MATCH steps, the oldest
+     * byte no longer takes part in the hash key, that is:
+     *   hash_shift * MIN_MATCH &gt;= hash_bits
+     */</font>
+
+    <font color='#0000FF'><u>long</u></font> block_start;
+    <font color='#009900'>/* Window position at the beginning of the current output block. Gets
+     * negative when the window is moved backwards.
+     */</font>
+
+    uInt match_length;           <font color='#009900'>/* length of best match */</font>
+    IPos prev_match;             <font color='#009900'>/* previous match */</font>
+    <font color='#0000FF'><u>int</u></font> match_available;         <font color='#009900'>/* set if previous match exists */</font>
+    uInt strstart;               <font color='#009900'>/* start of string to insert */</font>
+    uInt match_start;            <font color='#009900'>/* start of matching string */</font>
+    uInt lookahead;              <font color='#009900'>/* number of valid bytes ahead in window */</font>
+
+    uInt prev_length;
+    <font color='#009900'>/* Length of the best match at previous step. Matches not greater than this
+     * are discarded. This is used in the lazy match evaluation.
+     */</font>
+
+    uInt max_chain_length;
+    <font color='#009900'>/* To speed up deflation, hash chains are never searched beyond this
+     * length.  A higher limit improves compression ratio but degrades the
+     * speed.
+     */</font>
+
+    uInt max_lazy_match;
+    <font color='#009900'>/* Attempt to find a better match only when the current match is strictly
+     * smaller than this value. This mechanism is used only for compression
+     * levels &gt;= 4.
+     */</font>
+#   define max_insert_length  max_lazy_match
+    <font color='#009900'>/* Insert new strings in the hash table only if the match length is not
+     * greater than this length. This saves time but degrades compression.
+     * max_insert_length is used only for compression levels &lt;= 3.
+     */</font>
+
+    <font color='#0000FF'><u>int</u></font> level;    <font color='#009900'>/* compression level (1..9) */</font>
+    <font color='#0000FF'><u>int</u></font> strategy; <font color='#009900'>/* favor or force Huffman coding*/</font>
+
+    uInt good_match;
+    <font color='#009900'>/* Use a faster search when the previous match is longer than this */</font>
+
+    <font color='#0000FF'><u>int</u></font> nice_match; <font color='#009900'>/* Stop searching when current match exceeds this */</font>
+
+                <font color='#009900'>/* used by trees.c: */</font>
+    <font color='#009900'>/* Didn't use ct_data typedef below to suppress compiler warning */</font>
+    <font color='#0000FF'>struct</font> ct_data_s dyn_ltree[HEAP_SIZE];   <font color='#009900'>/* literal and length tree */</font>
+    <font color='#0000FF'>struct</font> ct_data_s dyn_dtree[<font color='#979000'>2</font><font color='#5555FF'>*</font>D_CODES<font color='#5555FF'>+</font><font color='#979000'>1</font>]; <font color='#009900'>/* distance tree */</font>
+    <font color='#0000FF'>struct</font> ct_data_s bl_tree[<font color='#979000'>2</font><font color='#5555FF'>*</font>BL_CODES<font color='#5555FF'>+</font><font color='#979000'>1</font>];  <font color='#009900'>/* Huffman tree for bit lengths */</font>
+
+    <font color='#0000FF'>struct</font> tree_desc_s l_desc;               <font color='#009900'>/* desc. for literal tree */</font>
+    <font color='#0000FF'>struct</font> tree_desc_s d_desc;               <font color='#009900'>/* desc. for distance tree */</font>
+    <font color='#0000FF'>struct</font> tree_desc_s bl_desc;              <font color='#009900'>/* desc. for bit length tree */</font>
+
+    ush bl_count[MAX_BITS<font color='#5555FF'>+</font><font color='#979000'>1</font>];
+    <font color='#009900'>/* number of codes at each bit length for an optimal tree */</font>
+
+    <font color='#0000FF'><u>int</u></font> heap[<font color='#979000'>2</font><font color='#5555FF'>*</font>L_CODES<font color='#5555FF'>+</font><font color='#979000'>1</font>];      <font color='#009900'>/* heap used to build the Huffman trees */</font>
+    <font color='#0000FF'><u>int</u></font> heap_len;               <font color='#009900'>/* number of elements in the heap */</font>
+    <font color='#0000FF'><u>int</u></font> heap_max;               <font color='#009900'>/* element of largest frequency */</font>
+    <font color='#009900'>/* The sons of heap[n] are heap[2*n] and heap[2*n+1]. heap[0] is not used.
+     * The same heap array is used to build all trees.
+     */</font>
+
+    uch depth[<font color='#979000'>2</font><font color='#5555FF'>*</font>L_CODES<font color='#5555FF'>+</font><font color='#979000'>1</font>];
+    <font color='#009900'>/* Depth of each subtree used as tie breaker for trees of equal frequency
+     */</font>
+
+    uchf <font color='#5555FF'>*</font>l_buf;          <font color='#009900'>/* buffer for literals or lengths */</font>
+
+    uInt  lit_bufsize;
+    <font color='#009900'>/* Size of match buffer for literals/lengths.  There are 4 reasons for
+     * limiting lit_bufsize to 64K:
+     *   - frequencies can be kept in 16 bit counters
+     *   - if compression is not successful for the first block, all input
+     *     data is still in the window so we can still emit a stored block even
+     *     when input comes from standard input.  (This can also be done for
+     *     all blocks if lit_bufsize is not greater than 32K.)
+     *   - if compression is not successful for a file smaller than 64K, we can
+     *     even emit a stored file instead of a stored block (saving 5 bytes).
+     *     This is applicable only for zip (not gzip or zlib).
+     *   - creating new Huffman trees less frequently may not provide fast
+     *     adaptation to changes in the input data statistics. (Take for
+     *     example a binary file with poorly compressible code followed by
+     *     a highly compressible string table.) Smaller buffer sizes give
+     *     fast adaptation but have of course the overhead of transmitting
+     *     trees more frequently.
+     *   - I can't count above 4
+     */</font>
+
+    uInt last_lit;      <font color='#009900'>/* running index in l_buf */</font>
+
+    ushf <font color='#5555FF'>*</font>d_buf;
+    <font color='#009900'>/* Buffer for distances. To simplify the code, d_buf and l_buf have
+     * the same number of elements. To use different lengths, an extra flag
+     * array would be necessary.
+     */</font>
+
+    ulg opt_len;        <font color='#009900'>/* bit length of current block with optimal trees */</font>
+    ulg static_len;     <font color='#009900'>/* bit length of current block with static trees */</font>
+    uInt matches;       <font color='#009900'>/* number of string matches in current block */</font>
+    uInt insert;        <font color='#009900'>/* bytes at end of window left to insert */</font>
+
+<font color='#0000FF'>#ifdef</font> DEBUG
+    ulg compressed_len; <font color='#009900'>/* total bit length of compressed file mod 2^32 */</font>
+    ulg bits_sent;      <font color='#009900'>/* bit length of compressed data sent mod 2^32 */</font>
+<font color='#0000FF'>#endif</font>
+
+    ush bi_buf;
+    <font color='#009900'>/* Output buffer. bits are inserted starting at the bottom (least
+     * significant bits).
+     */</font>
+    <font color='#0000FF'><u>int</u></font> bi_valid;
+    <font color='#009900'>/* Number of valid bits in bi_buf.  All bits above the last valid bit
+     * are always zero.
+     */</font>
+
+    ulg high_water;
+    <font color='#009900'>/* High water mark offset in window for initialized bytes -- bytes above
+     * this are set to zero in order to avoid memory check warnings when
+     * longest match routines access bytes past the input.  This is then
+     * updated to the new high water mark.
+     */</font>
+
+<b>}</b> FAR deflate_state;
+
+<font color='#009900'>/* Output a byte on the stream.
+ * IN assertion: there is enough room in pending_buf.
+ */</font>
+<font color='#0000FF'>#define</font> put_byte<font face='Lucida Console'>(</font>s, c<font face='Lucida Console'>)</font> <b>{</b>s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>pending_buf[s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>pending<font color='#5555FF'>+</font><font color='#5555FF'>+</font>] <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>c<font face='Lucida Console'>)</font>;<b>}</b>
+
+
+<font color='#0000FF'>#define</font> MIN_LOOKAHEAD <font face='Lucida Console'>(</font>MAX_MATCH<font color='#5555FF'>+</font>MIN_MATCH<font color='#5555FF'>+</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>
+<font color='#009900'>/* Minimum amount of lookahead, except at the end of the input file.
+ * See deflate.c for comments about the MIN_MATCH+1.
+ */</font>
+
+<font color='#0000FF'>#define</font> MAX_DIST<font face='Lucida Console'>(</font>s<font face='Lucida Console'>)</font>  <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>s<font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>w_size<font color='#5555FF'>-</font>MIN_LOOKAHEAD<font face='Lucida Console'>)</font>
+<font color='#009900'>/* In order to simplify the code, particularly on 16 bit machines, match
+ * distances are limited to MAX_DIST instead of WSIZE.
+ */</font>
+
+<font color='#0000FF'>#define</font> WIN_INIT MAX_MATCH
+<font color='#009900'>/* Number of bytes after end of data in window to initialize in order to avoid
+   memory checker errors from longest match routines */</font>
+
+        <font color='#009900'>/* in trees.c */</font>
+<font color='#0000FF'><u>void</u></font> ZLIB_INTERNAL _tr_init <b><a name='OF'></a>OF</b><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>deflate_state <font color='#5555FF'>*</font>s<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+<font color='#0000FF'><u>int</u></font> ZLIB_INTERNAL _tr_tally <b><a name='OF'></a>OF</b><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>deflate_state <font color='#5555FF'>*</font>s, <font color='#0000FF'><u>unsigned</u></font> dist, <font color='#0000FF'><u>unsigned</u></font> lc<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+<font color='#0000FF'><u>void</u></font> ZLIB_INTERNAL _tr_flush_block <b><a name='OF'></a>OF</b><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>deflate_state <font color='#5555FF'>*</font>s, charf <font color='#5555FF'>*</font>buf,
+                        ulg stored_len, <font color='#0000FF'><u>int</u></font> last<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+<font color='#0000FF'><u>void</u></font> ZLIB_INTERNAL _tr_flush_bits <b><a name='OF'></a>OF</b><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>deflate_state <font color='#5555FF'>*</font>s<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+<font color='#0000FF'><u>void</u></font> ZLIB_INTERNAL _tr_align <b><a name='OF'></a>OF</b><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>deflate_state <font color='#5555FF'>*</font>s<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+<font color='#0000FF'><u>void</u></font> ZLIB_INTERNAL _tr_stored_block <b><a name='OF'></a>OF</b><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>deflate_state <font color='#5555FF'>*</font>s, charf <font color='#5555FF'>*</font>buf,
+                        ulg stored_len, <font color='#0000FF'><u>int</u></font> last<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+<font color='#0000FF'>#define</font> d_code<font face='Lucida Console'>(</font>dist<font face='Lucida Console'>)</font> \
+   <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>dist<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> <font color='#979000'>256</font> ? _dist_code[dist] : _dist_code[<font color='#979000'>256</font><font color='#5555FF'>+</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>dist<font face='Lucida Console'>)</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font><font color='#979000'>7</font><font face='Lucida Console'>)</font>]<font face='Lucida Console'>)</font>
+<font color='#009900'>/* Mapping from a distance to a distance code. dist is the distance - 1 and
+ * must not have side effects. _dist_code[256] and _dist_code[257] are never
+ * used.
+ */</font>
+
+<font color='#0000FF'>#ifndef</font> DEBUG
+<font color='#009900'>/* Inline versions of _tr_tally for speed: */</font>
+
+<font color='#0000FF'>#if</font> defined<font face='Lucida Console'>(</font>GEN_TREES_H<font face='Lucida Console'>)</font> <font color='#5555FF'>|</font><font color='#5555FF'>|</font> <font color='#5555FF'>!</font>defined<font face='Lucida Console'>(</font>STDC<font face='Lucida Console'>)</font>
+  <font color='#0000FF'>extern</font> uch ZLIB_INTERNAL _length_code[];
+  <font color='#0000FF'>extern</font> uch ZLIB_INTERNAL _dist_code[];
+<font color='#0000FF'>#else</font>
+  <font color='#0000FF'>extern</font> <font color='#0000FF'>const</font> uch ZLIB_INTERNAL _length_code[];
+  <font color='#0000FF'>extern</font> <font color='#0000FF'>const</font> uch ZLIB_INTERNAL _dist_code[];
+<font color='#0000FF'>#endif</font>
+
+# define <b><a name='_tr_tally_lit'></a>_tr_tally_lit</b><font face='Lucida Console'>(</font>s, c, flush<font face='Lucida Console'>)</font> \
+  <b>{</b> uch cc <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>c<font face='Lucida Console'>)</font>; \
+    s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>d_buf[s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>last_lit] <font color='#5555FF'>=</font> <font color='#979000'>0</font>; \
+    s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>l_buf[s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>last_lit<font color='#5555FF'>+</font><font color='#5555FF'>+</font>] <font color='#5555FF'>=</font> cc; \
+    s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>dyn_ltree[cc].Freq<font color='#5555FF'>+</font><font color='#5555FF'>+</font>; \
+    flush <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>last_lit <font color='#5555FF'>=</font><font color='#5555FF'>=</font> s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>lit_bufsize<font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>; \
+   <b>}</b>
+# define <b><a name='_tr_tally_dist'></a>_tr_tally_dist</b><font face='Lucida Console'>(</font>s, distance, length, flush<font face='Lucida Console'>)</font> \
+  <b>{</b> uch len <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>length<font face='Lucida Console'>)</font>; \
+    ush dist <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>distance<font face='Lucida Console'>)</font>; \
+    s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>d_buf[s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>last_lit] <font color='#5555FF'>=</font> dist; \
+    s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>l_buf[s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>last_lit<font color='#5555FF'>+</font><font color='#5555FF'>+</font>] <font color='#5555FF'>=</font> len; \
+    dist<font color='#5555FF'>-</font><font color='#5555FF'>-</font>; \
+    s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>dyn_ltree[_length_code[len]<font color='#5555FF'>+</font>LITERALS<font color='#5555FF'>+</font><font color='#979000'>1</font>].Freq<font color='#5555FF'>+</font><font color='#5555FF'>+</font>; \
+    s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>dyn_dtree[<font color='#BB00BB'>d_code</font><font face='Lucida Console'>(</font>dist<font face='Lucida Console'>)</font>].Freq<font color='#5555FF'>+</font><font color='#5555FF'>+</font>; \
+    flush <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>last_lit <font color='#5555FF'>=</font><font color='#5555FF'>=</font> s<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>lit_bufsize<font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>; \
+  <b>}</b>
+<font color='#0000FF'>#else</font>
+# define <b><a name='_tr_tally_lit'></a>_tr_tally_lit</b><font face='Lucida Console'>(</font>s, c, flush<font face='Lucida Console'>)</font> flush <font color='#5555FF'>=</font> <b><a name='_tr_tally'></a>_tr_tally</b><font face='Lucida Console'>(</font>s, <font color='#979000'>0</font>, c<font face='Lucida Console'>)</font>
+# define <b><a name='_tr_tally_dist'></a>_tr_tally_dist</b><font face='Lucida Console'>(</font>s, distance, length, flush<font face='Lucida Console'>)</font> \
+              flush <font color='#5555FF'>=</font> <b><a name='_tr_tally'></a>_tr_tally</b><font face='Lucida Console'>(</font>s, distance, length<font face='Lucida Console'>)</font>
+<font color='#0000FF'>#endif</font>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>/* DEFLATE_H */</font>
+
+</pre></body></html>

@@ -1,0 +1,63 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - platform.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2006  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_PLATFORm_
+<font color='#0000FF'>#define</font> DLIB_PLATFORm_
+
+
+<font color='#009900'>/*!
+    This file ensures that:
+        - if (we are compiling under a posix platform) then
+            - POSIX will be defined
+            - if (this is also Mac OS X) then
+                - MACOSX will be defined
+            - if (this is also HP-UX) then
+                - HPUX will be defined
+        - if (we are compiling under an MS Windows platform) then
+            - WIN32 will be defined
+!*/</font>
+
+
+<font color='#009900'>/*
+    A good reference for this sort of information is
+    http://predef.sourceforge.net/
+*/</font>
+
+<font color='#009900'>// Define WIN32 if this is MS Windows
+</font><font color='#0000FF'>#ifndef</font> WIN32
+    <font color='#0000FF'>#if</font> defined<font face='Lucida Console'>(</font> _MSC_VER<font face='Lucida Console'>)</font> <font color='#5555FF'>|</font><font color='#5555FF'>|</font> defined<font face='Lucida Console'>(</font>__BORLANDC__<font face='Lucida Console'>)</font> <font color='#5555FF'>|</font><font color='#5555FF'>|</font> defined<font face='Lucida Console'>(</font>_WIN32<font face='Lucida Console'>)</font> <font color='#5555FF'>|</font><font color='#5555FF'>|</font> defined<font face='Lucida Console'>(</font>__WIN32__<font face='Lucida Console'>)</font> <font color='#5555FF'>|</font><font color='#5555FF'>|</font> defined<font face='Lucida Console'>(</font>__TOS_WIN__<font face='Lucida Console'>)</font>
+    <font color='#0000FF'>#define</font> WIN32 
+    <font color='#0000FF'>#endif</font> 
+<font color='#0000FF'>#endif</font>
+
+<font color='#0000FF'>#ifndef</font> WIN32
+    <font color='#009900'>// since this is the only other platform the library currently supports
+</font>    <font color='#009900'>// just assume it is POSIX if it isn't WIN32
+</font>    <font color='#0000FF'>#ifndef</font> POSIX
+        <font color='#0000FF'>#define</font> POSIX
+    <font color='#0000FF'>#endif</font>
+ 
+    <font color='#0000FF'>#ifndef</font> HPUX
+       <font color='#0000FF'>#if</font> defined<font face='Lucida Console'>(</font>__hpux <font face='Lucida Console'>)</font> <font color='#5555FF'>|</font><font color='#5555FF'>|</font> defined<font face='Lucida Console'>(</font>hpux<font face='Lucida Console'>)</font> <font color='#5555FF'>|</font><font color='#5555FF'>|</font> defined <font face='Lucida Console'>(</font>_hpux<font face='Lucida Console'>)</font>
+       <font color='#0000FF'>#define</font> HPUX
+       <font color='#0000FF'>#endif</font>	
+    <font color='#0000FF'>#endif</font>
+
+    <font color='#0000FF'>#ifndef</font> MACOSX
+        <font color='#0000FF'>#ifdef</font> __MACOSX__
+        <font color='#0000FF'>#define</font> MACOSX
+        <font color='#0000FF'>#endif</font> 
+        <font color='#0000FF'>#ifdef</font> __APPLE__
+        <font color='#0000FF'>#define</font> MACOSX
+        <font color='#0000FF'>#endif</font>
+    <font color='#0000FF'>#endif</font>
+
+<font color='#0000FF'>#endif</font>
+
+
+
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_PLATFORm_
+</font>
+
+</pre></body></html>

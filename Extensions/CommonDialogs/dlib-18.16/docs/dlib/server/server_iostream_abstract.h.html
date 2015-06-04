@@ -1,0 +1,87 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - server_iostream_abstract.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2006  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#undef</font> DLIB_SERVER_IOSTREAm_ABSTRACT_
+<font color='#0000FF'>#ifdef</font> DLIB_SERVER_IOSTREAm_ABSTRACT_
+
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='server_kernel_abstract.h.html'>server_kernel_abstract.h</a>"
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>iostream<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>string<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../uintn.h.html'>../uintn.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+    <font color='#0000FF'>class</font> <b><a name='server_iostream'></a>server_iostream</b> : <font color='#0000FF'>public</font> server 
+    <b>{</b>
+
+        <font color='#009900'>/*!
+            WHAT THIS EXTENSION DOES FOR server 
+                This extension redefines the on_connect() function so that
+                instead of giving you a connection object you get an istream 
+                and ostream object.
+
+            THREAD SAFETY
+                Note that in on_connect() the input stream in is tied to the output stream 
+                out.  This means that when you read from in it will modify out and thus 
+                it is not safe to touch in and out concurrently from different threads 
+                unless you untie them (which you do by saying in.tie(0);)
+        !*/</font>
+
+    <font color='#0000FF'>protected</font>:
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='shutdown_connection'></a>shutdown_connection</b> <font face='Lucida Console'>(</font>
+            uint64 id
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - if (there is a connection currently being serviced with the given id) then
+                    - the specified connection is shutdown. (i.e. connection::shutdown() is
+                      called on it so the iostreams operating on it will return EOF)
+        !*/</font>
+
+    <font color='#0000FF'>private</font>:
+
+        <font color='#0000FF'>virtual</font> <font color='#0000FF'><u>void</u></font> <b><a name='on_connect'></a>on_connect</b> <font face='Lucida Console'>(</font>
+            std::istream<font color='#5555FF'>&amp;</font> in,
+            std::ostream<font color='#5555FF'>&amp;</font> out,
+            <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> foreign_ip,
+            <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> local_ip,
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>short</u></font> foreign_port,
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>short</u></font> local_port,
+            uint64 connection_id
+        <font face='Lucida Console'>)</font><font color='#5555FF'>=</font><font color='#979000'>0</font>;
+        <font color='#009900'>/*!
+            requires
+                - on_connect() is called when there is a new TCP connection that needs
+                  to be serviced.
+                - in == the input stream that reads data from the new connection
+                - out == the output stream that writes data to the new connection
+                - in.tie() == &amp;out (i.e. when you read from in it automatically calls out.flush())
+                - foreign_ip == the foreign ip address for this connection 
+                - foreign_port == the foreign port number for this connection 
+                - local_ip == the IP of the local interface this connection is using
+                - local_port == the local port number for this connection
+                - on_connect() is run in its own thread 
+                - is_running() == true 
+                - the number of current connections &lt; get_max_connection() 
+                - connection_id == an integer that uniquely identifies this connection. 
+                  It can be used by shutdown_connection() to terminate this connection.
+            ensures
+                - when the iostreams hit EOF on_connect() will terminate.  
+                  (because this is how clear() signals you the server is shutting down)
+                - this function will not call clear()  
+            throws
+                - does not throw any exceptions
+        !*/</font>
+
+    <b>}</b>;
+
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_SERVER_IOSTREAm_ABSTRACT_ 
+</font>
+
+
+</pre></body></html>

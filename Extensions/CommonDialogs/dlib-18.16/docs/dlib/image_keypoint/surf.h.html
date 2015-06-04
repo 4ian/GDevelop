@@ -1,0 +1,298 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - surf.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2009  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_SURf_H_
+<font color='#0000FF'>#define</font> DLIB_SURf_H_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='surf_abstract.h.html'>surf_abstract.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='hessian_pyramid.h.html'>hessian_pyramid.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../matrix.h.html'>../matrix.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>    
+    <font color='#0000FF'>struct</font> <b><a name='surf_point'></a>surf_point</b>
+    <b>{</b>
+        interest_point p;
+        matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>64</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> des;
+        <font color='#0000FF'><u>double</u></font> angle;
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='serialize'></a>serialize</b><font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> surf_point<font color='#5555FF'>&amp;</font> item,  
+        std::ostream<font color='#5555FF'>&amp;</font> out
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>try</font>
+        <b>{</b>
+            <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item.p,out<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item.des,out<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item.angle,out<font face='Lucida Console'>)</font>;
+        <b>}</b>
+        <font color='#0000FF'>catch</font> <font face='Lucida Console'>(</font>serialization_error<font color='#5555FF'>&amp;</font> e<font face='Lucida Console'>)</font>
+        <b>{</b> 
+            <font color='#0000FF'>throw</font> <font color='#BB00BB'>serialization_error</font><font face='Lucida Console'>(</font>e.info <font color='#5555FF'>+</font> "<font color='#CC0000'>\n   while serializing object of type surf_point</font>"<font face='Lucida Console'>)</font>; 
+        <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='deserialize'></a>deserialize</b><font face='Lucida Console'>(</font>
+        surf_point<font color='#5555FF'>&amp;</font> item,  
+        std::istream<font color='#5555FF'>&amp;</font> in 
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>try</font>
+        <b>{</b>
+            <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item.p,in<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item.des,in<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item.angle,in<font face='Lucida Console'>)</font>;
+        <b>}</b>
+        <font color='#0000FF'>catch</font> <font face='Lucida Console'>(</font>serialization_error<font color='#5555FF'>&amp;</font> e<font face='Lucida Console'>)</font>
+        <b>{</b> 
+            <font color='#0000FF'>throw</font> <font color='#BB00BB'>serialization_error</font><font face='Lucida Console'>(</font>e.info <font color='#5555FF'>+</font> "<font color='#CC0000'>\n   while deserializing object of type surf_point</font>"<font face='Lucida Console'>)</font>; 
+        <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>double</u></font> <b><a name='gaussian'></a>gaussian</b> <font face='Lucida Console'>(</font><font color='#0000FF'><u>double</u></font> x, <font color='#0000FF'><u>double</u></font> y, <font color='#0000FF'><u>double</u></font> sig<font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font>sig <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font>,
+            "<font color='#CC0000'>\tdouble gaussian()</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t sig must be bigger than 0</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t sig: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> sig 
+        <font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> sqrt_2_pi <font color='#5555FF'>=</font> <font color='#979000'>2.5066282746310002416123552393401041626930</font>;
+        <font color='#0000FF'>return</font> <font color='#979000'>1.0</font><font color='#5555FF'>/</font><font face='Lucida Console'>(</font>sig<font color='#5555FF'>*</font>sqrt_2_pi<font face='Lucida Console'>)</font> <font color='#5555FF'>*</font> std::<font color='#BB00BB'>exp</font><font face='Lucida Console'>(</font> <font color='#5555FF'>-</font><font face='Lucida Console'>(</font>x<font color='#5555FF'>*</font>x <font color='#5555FF'>+</font> y<font color='#5555FF'>*</font>y<font face='Lucida Console'>)</font><font color='#5555FF'>/</font><font face='Lucida Console'>(</font><font color='#979000'>2</font><font color='#5555FF'>*</font>sig<font color='#5555FF'>*</font>sig<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> integral_image_type, <font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>double</u></font> <b><a name='compute_dominant_angle'></a>compute_dominant_angle</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> integral_image_type<font color='#5555FF'>&amp;</font> img,
+        <font color='#0000FF'>const</font> dlib::vector<font color='#5555FF'>&lt;</font>T,<font color='#979000'>2</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> center,
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font><font color='#5555FF'>&amp;</font> scale
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font><font color='#BB00BB'>get_rect</font><font face='Lucida Console'>(</font>img<font face='Lucida Console'>)</font>.<font color='#BB00BB'>contains</font><font face='Lucida Console'>(</font><font color='#BB00BB'>centered_rect</font><font face='Lucida Console'>(</font>center, <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font><font face='Lucida Console'>(</font><font color='#979000'>17</font><font color='#5555FF'>*</font>scale<font face='Lucida Console'>)</font>,<font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font><font face='Lucida Console'>(</font><font color='#979000'>17</font><font color='#5555FF'>*</font>scale<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>true</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font>
+                    scale <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font>,
+            "<font color='#CC0000'>\tdouble compute_dominant_angle(img, center, scale)</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tAll arguments to this function must be &gt; 0</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t get_rect(img): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>get_rect</font><font face='Lucida Console'>(</font>img<font face='Lucida Console'>)</font> 
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t center:        </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> center 
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t scale:         </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> scale 
+        <font face='Lucida Console'>)</font>;
+
+
+        std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font> ang;
+        std::vector<font color='#5555FF'>&lt;</font>dlib::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>2</font><font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> samples;
+
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> sc <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>scale<font color='#5555FF'>+</font><font color='#979000'>0.5</font><font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// accumulate a bunch of angle and vector samples
+</font>        dlib::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>2</font><font color='#5555FF'>&gt;</font> vect;
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> r <font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>6</font>; r <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#979000'>6</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>r<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> c <font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>6</font>; c <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#979000'>6</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>c<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>r<font color='#5555FF'>*</font>r <font color='#5555FF'>+</font> c<font color='#5555FF'>*</font>c <font color='#5555FF'>&lt;</font> <font color='#979000'>36</font><font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#009900'>// compute a Gaussian weighted gradient and the gradient's angle.
+</font>                    <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> gauss <font color='#5555FF'>=</font> <font color='#BB00BB'>gaussian</font><font face='Lucida Console'>(</font>c,r, <font color='#979000'>2.5</font><font face='Lucida Console'>)</font>;
+                    vect.<font color='#BB00BB'>x</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> gauss<font color='#5555FF'>*</font><font color='#BB00BB'>haar_x</font><font face='Lucida Console'>(</font>img, sc<font color='#5555FF'>*</font><font color='#BB00BB'>point</font><font face='Lucida Console'>(</font>c,r<font face='Lucida Console'>)</font><font color='#5555FF'>+</font>center, <font color='#979000'>4</font><font color='#5555FF'>*</font>sc<font face='Lucida Console'>)</font>;
+                    vect.<font color='#BB00BB'>y</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> gauss<font color='#5555FF'>*</font><font color='#BB00BB'>haar_y</font><font face='Lucida Console'>(</font>img, sc<font color='#5555FF'>*</font><font color='#BB00BB'>point</font><font face='Lucida Console'>(</font>c,r<font face='Lucida Console'>)</font><font color='#5555FF'>+</font>center, <font color='#979000'>4</font><font color='#5555FF'>*</font>sc<font face='Lucida Console'>)</font>;
+                    samples.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>vect<font face='Lucida Console'>)</font>;
+                    ang.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font><font color='#BB00BB'>atan2</font><font face='Lucida Console'>(</font>vect.<font color='#BB00BB'>y</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, vect.<font color='#BB00BB'>x</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                <b>}</b>
+            <b>}</b>
+        <b>}</b>
+
+
+        <font color='#009900'>// now find the dominant direction
+</font>        <font color='#0000FF'><u>double</u></font> max_length <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <font color='#0000FF'><u>double</u></font> best_ang <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <font color='#009900'>// look at a bunch of pie shaped slices of a circle 
+</font>        <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> slices <font color='#5555FF'>=</font> <font color='#979000'>45</font>;
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> ang_step <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#979000'>2</font><font color='#5555FF'>*</font>pi<font face='Lucida Console'>)</font><font color='#5555FF'>/</font>slices;
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> ang_i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; ang_i <font color='#5555FF'>&lt;</font> slices; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>ang_i<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#009900'>// compute the bounding angles
+</font>            <font color='#0000FF'><u>double</u></font> ang1 <font color='#5555FF'>=</font> ang_step<font color='#5555FF'>*</font>ang_i <font color='#5555FF'>-</font> pi;
+            <font color='#0000FF'><u>double</u></font> ang2 <font color='#5555FF'>=</font> ang1 <font color='#5555FF'>+</font> pi<font color='#5555FF'>/</font><font color='#979000'>3</font>;
+
+
+            <font color='#009900'>// compute sum of all vectors that are within the above two angles
+</font>            vect.<font color='#BB00BB'>x</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            vect.<font color='#BB00BB'>y</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> ang.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>ang1 <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> ang[i] <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> ang[i] <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> ang2<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    vect <font color='#5555FF'>+</font><font color='#5555FF'>=</font> samples[i];
+                <b>}</b>
+                <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>ang2 <font color='#5555FF'>&gt;</font> pi <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> <font face='Lucida Console'>(</font>ang[i] <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> ang1 <font color='#5555FF'>|</font><font color='#5555FF'>|</font> ang[i] <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#5555FF'>-</font><font color='#979000'>2</font><font color='#5555FF'>*</font>pi<font color='#5555FF'>+</font>ang2<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                <b>{</b>
+                    vect <font color='#5555FF'>+</font><font color='#5555FF'>=</font> samples[i];
+                <b>}</b>
+            <b>}</b>
+
+
+            <font color='#009900'>// record the angle of the best vectors
+</font>            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>length_squared</font><font face='Lucida Console'>(</font>vect<font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> max_length<font face='Lucida Console'>)</font>
+            <b>{</b>
+                max_length <font color='#5555FF'>=</font> <font color='#BB00BB'>length_squared</font><font face='Lucida Console'>(</font>vect<font face='Lucida Console'>)</font>;
+                best_ang <font color='#5555FF'>=</font> <font color='#BB00BB'>atan2</font><font face='Lucida Console'>(</font>vect.<font color='#BB00BB'>y</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, vect.<font color='#BB00BB'>x</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+        <b>}</b>
+
+        <font color='#0000FF'>return</font> best_ang;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> integral_image_type, <font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> MM, <font color='#0000FF'>typename</font> L<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='compute_surf_descriptor'></a>compute_surf_descriptor</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> integral_image_type<font color='#5555FF'>&amp;</font> img,
+        <font color='#0000FF'>const</font> dlib::vector<font color='#5555FF'>&lt;</font>T,<font color='#979000'>2</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> center,
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> scale,
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> angle,
+        matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>64</font>,<font color='#979000'>1</font>,MM,L<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> des
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font><font color='#BB00BB'>get_rect</font><font face='Lucida Console'>(</font>img<font face='Lucida Console'>)</font>.<font color='#BB00BB'>contains</font><font face='Lucida Console'>(</font><font color='#BB00BB'>centered_rect</font><font face='Lucida Console'>(</font>center, <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font><font face='Lucida Console'>(</font><font color='#979000'>32</font><font color='#5555FF'>*</font>scale<font face='Lucida Console'>)</font>,<font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font><font face='Lucida Console'>(</font><font color='#979000'>32</font><font color='#5555FF'>*</font>scale<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>true</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font>
+                    scale <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font>,
+            "<font color='#CC0000'>\tvoid compute_surf_descriptor(img, center, scale, angle)</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tAll arguments to this function must be &gt; 0</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t get_rect(img): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>get_rect</font><font face='Lucida Console'>(</font>img<font face='Lucida Console'>)</font> 
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t center:        </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> center 
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t scale:         </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> scale 
+        <font face='Lucida Console'>)</font>;
+
+        point_rotator <font color='#BB00BB'>rot</font><font face='Lucida Console'>(</font>angle<font face='Lucida Console'>)</font>;
+        point_rotator <font color='#BB00BB'>inv_rot</font><font face='Lucida Console'>(</font><font color='#5555FF'>-</font>angle<font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> sc <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>scale<font color='#5555FF'>+</font><font color='#979000'>0.5</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'><u>long</u></font> count <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+
+        <font color='#009900'>// loop over the 4x4 grid of histogram buckets 
+</font>        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> r <font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>10</font>; r <font color='#5555FF'>&lt;</font> <font color='#979000'>10</font>; r <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#979000'>5</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> c <font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>10</font>; c <font color='#5555FF'>&lt;</font> <font color='#979000'>10</font>; c <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#979000'>5</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                dlib::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>2</font><font color='#5555FF'>&gt;</font> vect, abs_vect, temp;
+
+                <font color='#009900'>// now loop over 25 points in this bucket and sum their features.  Note
+</font>                <font color='#009900'>// that we include 1 pixels worth of padding around the outside of each 5x5
+</font>                <font color='#009900'>// cell.  This is to help neighboring cells interpolate their counts into
+</font>                <font color='#009900'>// each other a little bit.
+</font>                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> y <font color='#5555FF'>=</font> r<font color='#5555FF'>-</font><font color='#979000'>1</font>; y <font color='#5555FF'>&lt;</font> r<font color='#5555FF'>+</font><font color='#979000'>5</font><font color='#5555FF'>+</font><font color='#979000'>1</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>y<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>y <font color='#5555FF'>&lt;</font> <font color='#5555FF'>-</font><font color='#979000'>10</font> <font color='#5555FF'>|</font><font color='#5555FF'>|</font> y <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#979000'>10</font><font face='Lucida Console'>)</font>
+                        <font color='#0000FF'>continue</font>;
+                    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> x <font color='#5555FF'>=</font> c<font color='#5555FF'>-</font><font color='#979000'>1</font>; x <font color='#5555FF'>&lt;</font> c<font color='#5555FF'>+</font><font color='#979000'>5</font><font color='#5555FF'>+</font><font color='#979000'>1</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>x<font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>x <font color='#5555FF'>&lt;</font> <font color='#5555FF'>-</font><font color='#979000'>10</font> <font color='#5555FF'>|</font><font color='#5555FF'>|</font> x <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#979000'>10</font><font face='Lucida Console'>)</font>
+                            <font color='#0000FF'>continue</font>;
+
+                        <font color='#009900'>// get the rotated point for this extraction point
+</font>                        point <font color='#BB00BB'>p</font><font face='Lucida Console'>(</font><font color='#BB00BB'>rot</font><font face='Lucida Console'>(</font><font color='#BB00BB'>point</font><font face='Lucida Console'>(</font>x,y<font face='Lucida Console'>)</font><font color='#5555FF'>*</font>scale<font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> center<font face='Lucida Console'>)</font>; 
+
+                        <font color='#009900'>// Give points farther from the center of the bucket a lower weight.  
+</font>                        <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> center_r <font color='#5555FF'>=</font> r<font color='#5555FF'>+</font><font color='#979000'>2</font>;
+                        <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> center_c <font color='#5555FF'>=</font> c<font color='#5555FF'>+</font><font color='#979000'>2</font>;
+                        <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> weight <font color='#5555FF'>=</font> <font color='#979000'>1.0</font><font color='#5555FF'>/</font><font face='Lucida Console'>(</font><font color='#979000'>4</font><font color='#5555FF'>+</font>std::<font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font>center_r<font color='#5555FF'>-</font>y<font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> std::<font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font>center_c<font color='#5555FF'>-</font>x<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+                        temp.<font color='#BB00BB'>x</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> weight<font color='#5555FF'>*</font><font color='#BB00BB'>haar_x</font><font face='Lucida Console'>(</font>img, p, <font color='#979000'>2</font><font color='#5555FF'>*</font>sc<font face='Lucida Console'>)</font>;
+                        temp.<font color='#BB00BB'>y</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> weight<font color='#5555FF'>*</font><font color='#BB00BB'>haar_y</font><font face='Lucida Console'>(</font>img, p, <font color='#979000'>2</font><font color='#5555FF'>*</font>sc<font face='Lucida Console'>)</font>;
+
+                        <font color='#009900'>// rotate this vector into alignment with the surf descriptor box 
+</font>                        temp <font color='#5555FF'>=</font> <font color='#BB00BB'>inv_rot</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font>;
+
+                        vect <font color='#5555FF'>+</font><font color='#5555FF'>=</font> temp;
+                        abs_vect <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font>;
+                    <b>}</b>
+                <b>}</b>
+
+                <font color='#BB00BB'>des</font><font face='Lucida Console'>(</font>count<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> vect.<font color='#BB00BB'>x</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                <font color='#BB00BB'>des</font><font face='Lucida Console'>(</font>count<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> vect.<font color='#BB00BB'>y</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                <font color='#BB00BB'>des</font><font face='Lucida Console'>(</font>count<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> abs_vect.<font color='#BB00BB'>x</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                <font color='#BB00BB'>des</font><font face='Lucida Console'>(</font>count<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> abs_vect.<font color='#BB00BB'>y</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+        <b>}</b>
+
+        <font color='#009900'>// Return the length normalized descriptor.  Add a small number
+</font>        <font color='#009900'>// to guard against division by zero.
+</font>        <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> len <font color='#5555FF'>=</font> <font color='#BB00BB'>length</font><font face='Lucida Console'>(</font>des<font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> <font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>7</font>;
+        des <font color='#5555FF'>=</font> des<font color='#5555FF'>/</font>len;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> image_type<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>surf_point<font color='#5555FF'>&gt;</font> <b><a name='get_surf_points'></a>get_surf_points</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> image_type<font color='#5555FF'>&amp;</font> img,
+        <font color='#0000FF'><u>long</u></font> max_points <font color='#5555FF'>=</font> <font color='#979000'>10000</font>,
+        <font color='#0000FF'><u>double</u></font> detection_threshold <font color='#5555FF'>=</font> <font color='#979000'>30.0</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font>max_points <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> detection_threshold <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#979000'>0</font>,
+            "<font color='#CC0000'>\t std::vector&lt;surf_point&gt; get_surf_points()</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t Invalid arguments were given to this function.</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t max_points:          </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> max_points 
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t detection_threshold: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> detection_threshold 
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// Figure out the proper scalar type we should use to work with these pixels.  
+</font>        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> pixel_traits<font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> image_traits<font color='#5555FF'>&lt;</font>image_type<font color='#5555FF'>&gt;</font>::pixel_type<font color='#5555FF'>&gt;</font>::basic_pixel_type bp_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> promote<font color='#5555FF'>&lt;</font>bp_type<font color='#5555FF'>&gt;</font>::type working_pixel_type;
+
+        <font color='#009900'>// make an integral image first
+</font>        integral_image_generic<font color='#5555FF'>&lt;</font>working_pixel_type<font color='#5555FF'>&gt;</font> int_img;
+        int_img.<font color='#BB00BB'>load</font><font face='Lucida Console'>(</font>img<font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// now make a hessian pyramid
+</font>        hessian_pyramid pyr;
+        pyr.<font color='#BB00BB'>build_pyramid</font><font face='Lucida Console'>(</font>int_img, <font color='#979000'>4</font>, <font color='#979000'>6</font>, <font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// now get all the interest points from the hessian pyramid
+</font>        std::vector<font color='#5555FF'>&lt;</font>interest_point<font color='#5555FF'>&gt;</font> points; 
+        <font color='#BB00BB'>get_interest_points</font><font face='Lucida Console'>(</font>pyr, detection_threshold, points<font face='Lucida Console'>)</font>;
+        std::vector<font color='#5555FF'>&lt;</font>surf_point<font color='#5555FF'>&gt;</font> spoints;
+
+        <font color='#009900'>// sort all the points by how strong their detect is
+</font>        std::<font color='#BB00BB'>sort</font><font face='Lucida Console'>(</font>points.<font color='#BB00BB'>rbegin</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, points.<font color='#BB00BB'>rend</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// now extract SURF descriptors for the points
+</font>        surf_point sp;
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> std::<font color='#BB00BB'>min</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>size_t</u></font><font face='Lucida Console'>)</font>max_points,points.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#009900'>// ignore points that are close to the edge of the image
+</font>            <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> border <font color='#5555FF'>=</font> <font color='#979000'>32</font>;
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> border_size <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>border<font color='#5555FF'>*</font>points[i].scale<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>get_rect</font><font face='Lucida Console'>(</font>int_img<font face='Lucida Console'>)</font>.<font color='#BB00BB'>contains</font><font face='Lucida Console'>(</font><font color='#BB00BB'>centered_rect</font><font face='Lucida Console'>(</font>points[i].center, border_size, border_size<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                sp.angle <font color='#5555FF'>=</font> <font color='#BB00BB'>compute_dominant_angle</font><font face='Lucida Console'>(</font>int_img, points[i].center, points[i].scale<font face='Lucida Console'>)</font>;
+                <font color='#BB00BB'>compute_surf_descriptor</font><font face='Lucida Console'>(</font>int_img, points[i].center, points[i].scale, sp.angle, sp.des<font face='Lucida Console'>)</font>;
+                sp.p <font color='#5555FF'>=</font> points[i];
+
+                spoints.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>sp<font face='Lucida Console'>)</font>;
+            <b>}</b>
+        <b>}</b>
+
+        <font color='#0000FF'>return</font> spoints;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_SURf_H_
+</font>
+
+</pre></body></html>

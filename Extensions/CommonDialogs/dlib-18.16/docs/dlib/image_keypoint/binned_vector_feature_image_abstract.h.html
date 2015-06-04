@@ -1,0 +1,290 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - binned_vector_feature_image_abstract.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2013  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#undef</font> DLIB_BINNED_VECTOR_FEATUrES_ABSTRACT_Hh_
+<font color='#0000FF'>#ifdef</font> DLIB_BINNED_VECTOR_FEATUrES_ABSTRACT_Hh_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../lsh/projection_hash_abstract.h.html'>../lsh/projection_hash_abstract.h</a>"
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>vector<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../matrix.h.html'>../matrix.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> feature_extractor,
+        <font color='#0000FF'>typename</font> hash_function_type_ <font color='#5555FF'>=</font> projection_hash
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>class</font> <b><a name='binned_vector_feature_image'></a>binned_vector_feature_image</b> : noncopyable
+    <b>{</b>
+        <font color='#009900'>/*!
+            REQUIREMENTS ON feature_extractor 
+                - must be an object with an interface compatible with dlib::hog_image
+
+            REQUIREMENTS ON hash_function_type_ 
+                - must be an object with an interface compatible with projection_hash 
+
+            INITIAL VALUE
+                 - size() == 0
+
+            WHAT THIS OBJECT REPRESENTS
+                This object is a tool for performing image feature extraction.  In
+                particular, it wraps another image feature extractor and converts the
+                wrapped image feature vectors into a high dimensional sparse vector.  For
+                example, if the lower level feature extractor outputs the vector [3,4,5]
+                and this vector is hashed into the second bin of four bins then the output
+                sparse vector is:
+                    [0,0,0,0, 3,4,5,1, 0,0,0,0, 0,0,0,0]. 
+                That is, the output vector has a dimensionality that is equal to the number
+                of hash bins times the dimensionality of the lower level vector plus one.
+                The value in the extra dimension concatenated onto the end of the vector is
+                always a constant value of of 1 and serves as a bias value.  This means
+                that, if there are N hash bins, these vectors are capable of representing N
+                different linear functions, each operating on the vectors that fall into
+                their corresponding hash bin.
+
+
+            THREAD SAFETY
+                Concurrent access to an instance of this object is not safe and should be
+                protected by a mutex lock except for the case where you are copying the
+                configuration (via copy_configuration()) of a binned_vector_feature_image
+                object to many other threads.  In this case, it is safe to copy the
+                configuration of a shared object so long as no other operations are
+                performed on it.
+
+
+            NOTATION 
+                let BASE_FE denote the base feature_extractor object contained inside the
+                binned_vector_feature_image.
+        !*/</font>
+
+    <font color='#0000FF'>public</font>:
+
+        <font color='#0000FF'>typedef</font> feature_extractor feature_extractor_type;
+        <font color='#0000FF'>typedef</font> hash_function_type_ hash_function_type;
+        <font color='#0000FF'>typedef</font> std::vector<font color='#5555FF'>&lt;</font>std::pair<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>int</u></font>,<font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> descriptor_type;
+
+        <b><a name='binned_vector_feature_image'></a>binned_vector_feature_image</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>; 
+        <font color='#009900'>/*!
+            ensures
+                - this object is properly initialized
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='clear'></a>clear</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - this object will have its initial value
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_hash'></a>set_hash</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> hash_function_type<font color='#5555FF'>&amp;</font> hash
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #get_hash() == hash
+        !*/</font>
+
+        <font color='#0000FF'>const</font> hash_function_type<font color='#5555FF'>&amp;</font> <b><a name='get_hash'></a>get_hash</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the hash function used by this object to hash
+                  base feature vectors into integers.
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='copy_configuration'></a>copy_configuration</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> feature_extractor<font color='#5555FF'>&amp;</font> item
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - performs BASE_FE.copy_configuration(item)
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='copy_configuration'></a>copy_configuration</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> binned_vector_feature_image<font color='#5555FF'>&amp;</font> item
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - copies all the state information of item into *this, except for state 
+                  information populated by load().  More precisely, given two binned_vector_feature_image 
+                  objects H1 and H2, the following sequence of instructions should always 
+                  result in both of them having the exact same state.
+                    H2.copy_configuration(H1);
+                    H1.load(img);
+                    H2.load(img);
+        !*/</font>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'>typename</font> image_type
+            <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='load'></a>load</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> image_type<font color='#5555FF'>&amp;</font> img
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - image_type == any type that can be supplied to feature_extractor::load() 
+            ensures
+                - performs BASE_FE.load(img)
+                  i.e. does feature extraction.  The features can be accessed using
+                  operator() as defined below.
+        !*/</font>
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='size'></a>size</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns BASE_FE.size() 
+        !*/</font>
+
+        <font color='#0000FF'><u>long</u></font> <b><a name='nr'></a>nr</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns BASE_FE.nr() 
+        !*/</font>
+
+        <font color='#0000FF'><u>long</u></font> <b><a name='nc'></a>nc</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns BASE_FE.nc() 
+        !*/</font>
+
+        <font color='#0000FF'><u>long</u></font> <b><a name='get_num_dimensions'></a>get_num_dimensions</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the dimensionality of the feature vectors returned by operator().
+                  In this case, this is the number of hash bins times the dimensionality of
+                  the features produced by BASE_FE plus one.  That is, this function
+                  returns get_hash().num_hash_bins()*(BASE_FE.get_num_dimensions()+1)
+        !*/</font>
+
+        <font color='#0000FF'>const</font> descriptor_type<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>long</u></font> row,
+            <font color='#0000FF'><u>long</u></font> col
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - 0 &lt;= row &lt; nr()
+                - 0 &lt;= col &lt; nc()
+                - It must be legal to evaluate expressions of the form: get_hash()(BASE_FE(row,col))
+                  (e.g. the hash function must be properly configured to process the feature
+                  vectors produced by the base feature extractor)
+            ensures
+                - hashes BASE_FE(row,col) and returns the resulting sparse vector.  In
+                  particular, we return a vector that is a copy of BASE_FE(row,col) that
+                  has been shifted into the part of the sparse vector indicated by the hash
+                  function.  It will also have a constant bias value of 1 appended to it.
+                - To be precise, this function returns a sparse vector V such that:
+                    - V.size() == BASE_FE.get_num_dimensions()+1
+                    - let IDX = get_hash()(BASE_FE(row,col))
+                    - for i where 0 &lt;= i &lt; BASE_FE.get_num_dimensions():
+                        - V[i].first == IDX*(BASE_FE.get_num_dimensions()+1) + i
+                        - V[i].second == BASE_FE(row,col)(i)
+                    - V[BASE_FE.get_num_dimensions()].first == IDX*(BASE_FE.get_num_dimensions()+1) + BASE_FE.get_num_dimensions()
+                    - V[BASE_FE.get_num_dimensions()].second == 1
+        !*/</font>
+
+        <font color='#0000FF'>const</font> rectangle <b><a name='get_block_rect'></a>get_block_rect</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>long</u></font> row,
+            <font color='#0000FF'><u>long</u></font> col
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns BASE_FE.get_block_rect(row,col)
+                  I.e. returns a rectangle that tells you what part of the original image is associated
+                  with a particular feature vector.
+        !*/</font>
+
+        <font color='#0000FF'>const</font> point <b><a name='image_to_feat_space'></a>image_to_feat_space</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> point<font color='#5555FF'>&amp;</font> p
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns BASE_FE.image_to_feat_space(p)
+                  I.e. Each local feature is extracted from a certain point in the input image.
+                  This function returns the identity of the local feature corresponding
+                  to the image location p.  Or in other words, let P == image_to_feat_space(p), 
+                  then (*this)(P.y(),P.x()) == the local feature closest to, or centered at, 
+                  the point p in the input image.  Note that some image points might not have 
+                  corresponding feature locations.  E.g. border points or points outside the 
+                  image.  In these cases the returned point will be outside get_rect(*this).
+        !*/</font>
+
+        <font color='#0000FF'>const</font> rectangle <b><a name='image_to_feat_space'></a>image_to_feat_space</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> rectangle<font color='#5555FF'>&amp;</font> rect
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns BASE_FE.image_to_feat_space(rect)
+                  I.e. returns rectangle(image_to_feat_space(rect.tl_corner()), image_to_feat_space(rect.br_corner()));
+                  (i.e. maps a rectangle from image space to feature space)
+        !*/</font>
+
+        <font color='#0000FF'>const</font> point <b><a name='feat_to_image_space'></a>feat_to_image_space</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> point<font color='#5555FF'>&amp;</font> p
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns BASE_FE.feat_to_image_space(p)
+                  I.e. returns the location in the input image space corresponding to the center
+                  of the local feature at point p.  In other words, this function computes
+                  the inverse of image_to_feat_space().  Note that it may only do so approximately, 
+                  since more than one image location might correspond to the same local feature.  
+                  That is, image_to_feat_space() might not be invertible so this function gives 
+                  the closest possible result.
+        !*/</font>
+
+        <font color='#0000FF'>const</font> rectangle <b><a name='feat_to_image_space'></a>feat_to_image_space</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> rectangle<font color='#5555FF'>&amp;</font> rect
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns BASE_FE.feat_to_image_space(rect)
+                  I.e. return rectangle(feat_to_image_space(rect.tl_corner()), feat_to_image_space(rect.br_corner()));
+                  (i.e. maps a rectangle from feature space to image space)
+        !*/</font>
+
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T,
+        <font color='#0000FF'>typename</font> U
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='serialize'></a>serialize</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> binned_vector_feature_image<font color='#5555FF'>&lt;</font>T,U<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> item,
+        std::ostream<font color='#5555FF'>&amp;</font> out
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        provides serialization support 
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T,
+        <font color='#0000FF'>typename</font> U
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='deserialize'></a>deserialize</b> <font face='Lucida Console'>(</font>
+        binned_vector_feature_image<font color='#5555FF'>&lt;</font>T,U<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> item,
+        std::istream<font color='#5555FF'>&amp;</font> in 
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        provides deserialization support 
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_BINNED_VECTOR_FEATUrES_ABSTRACT_Hh_
+</font>
+
+</pre></body></html>

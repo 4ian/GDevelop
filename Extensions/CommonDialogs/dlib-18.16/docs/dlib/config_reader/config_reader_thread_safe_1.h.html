@@ -1,0 +1,459 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - config_reader_thread_safe_1.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2007  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_CONFIG_READER_THREAD_SAFe_
+<font color='#0000FF'>#define</font> DLIB_CONFIG_READER_THREAD_SAFe_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='config_reader_kernel_abstract.h.html'>config_reader_kernel_abstract.h</a>"
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>string<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>iostream<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>sstream<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../algs.h.html'>../algs.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../interfaces/enumerable.h.html'>../interfaces/enumerable.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../threads.h.html'>../threads.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='config_reader_thread_safe_abstract.h.html'>config_reader_thread_safe_abstract.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> config_reader_base,
+        <font color='#0000FF'>typename</font> map_string_void
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>class</font> <b><a name='config_reader_thread_safe_1'></a>config_reader_thread_safe_1</b> 
+    <b>{</b>
+
+        <font color='#009900'>/*!                
+            CONVENTION
+                - get_mutex() == *m
+                - *cr == the config reader being extended
+                - block_table[x] == (void*)&amp;block(x)
+                - block_table.size() == the number of blocks in *cr
+                - block_table[key] == a config_reader_thread_safe_1 that contains &amp;cr.block(key)
+                - if (own_pointers) then
+                    - this object owns the m and cr pointers and should delete them when destructed 
+        !*/</font>
+        
+    <font color='#0000FF'>public</font>:
+
+        <b><a name='config_reader_thread_safe_1'></a>config_reader_thread_safe_1</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> config_reader_base<font color='#5555FF'>*</font> base,
+            rmutex<font color='#5555FF'>*</font> m_
+        <font face='Lucida Console'>)</font>;
+
+        <b><a name='config_reader_thread_safe_1'></a>config_reader_thread_safe_1</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> config_reader_base::config_reader_error config_reader_error;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> config_reader_base::config_reader_access_error config_reader_access_error;
+
+        <b><a name='config_reader_thread_safe_1'></a>config_reader_thread_safe_1</b><font face='Lucida Console'>(</font>
+            std::istream<font color='#5555FF'>&amp;</font> in
+        <font face='Lucida Console'>)</font>;
+
+        <b><a name='config_reader_thread_safe_1'></a>config_reader_thread_safe_1</b><font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> config_file 
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>virtual</font> ~<b><a name='config_reader_thread_safe_1'></a>config_reader_thread_safe_1</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>; 
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='clear'></a>clear</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='load_from'></a>load_from</b> <font face='Lucida Console'>(</font>
+            std::istream<font color='#5555FF'>&amp;</font> in
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='load_from'></a>load_from</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> config_file 
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='is_key_defined'></a>is_key_defined</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> key
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='is_block_defined'></a>is_block_defined</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> name
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+        <font color='#0000FF'>typedef</font> config_reader_thread_safe_1 this_type;
+        <font color='#0000FF'>const</font> this_type<font color='#5555FF'>&amp;</font> <b><a name='block'></a>block</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> name
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+        <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b>[] <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> key
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'>typename</font> queue_of_strings
+            <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='get_keys'></a>get_keys</b> <font face='Lucida Console'>(</font>
+            queue_of_strings<font color='#5555FF'>&amp;</font> keys
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'>typename</font> queue_of_strings
+            <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='get_blocks'></a>get_blocks</b> <font face='Lucida Console'>(</font>
+            queue_of_strings<font color='#5555FF'>&amp;</font> blocks
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+        <font color='#0000FF'>inline</font> <font color='#0000FF'>const</font> rmutex<font color='#5555FF'>&amp;</font> <b><a name='get_mutex'></a>get_mutex</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+    <font color='#0000FF'>private</font>:
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='fill_block_table'></a>fill_block_table</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - block_table.size() == the number of blocks in cr 
+                - block_table[key] == a config_reader_thread_safe_1 that contains &amp;cr.block(key)
+        !*/</font>
+
+        rmutex<font color='#5555FF'>*</font> m;
+        config_reader_base<font color='#5555FF'>*</font> cr;
+        map_string_void block_table;
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>bool</u></font> own_pointers;
+
+        <font color='#009900'>// restricted functions
+</font>        <b><a name='config_reader_thread_safe_1'></a>config_reader_thread_safe_1</b><font face='Lucida Console'>(</font>config_reader_thread_safe_1<font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font>;     
+        config_reader_thread_safe_1<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>=</font><font face='Lucida Console'>(</font>config_reader_thread_safe_1<font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font>;
+
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>    <font color='#009900'>// member function definitions
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> config_reader_base,
+        <font color='#0000FF'>typename</font> map_string_void
+        <font color='#5555FF'>&gt;</font>
+    config_reader_thread_safe_1<font color='#5555FF'>&lt;</font>config_reader_base,map_string_void<font color='#5555FF'>&gt;</font>::
+    <b><a name='config_reader_thread_safe_1'></a>config_reader_thread_safe_1</b><font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> config_reader_base<font color='#5555FF'>*</font> base,
+        rmutex<font color='#5555FF'>*</font> m_
+    <font face='Lucida Console'>)</font> :
+        m<font face='Lucida Console'>(</font>m_<font face='Lucida Console'>)</font>,
+        cr<font face='Lucida Console'>(</font><font color='#0000FF'>const_cast</font><font color='#5555FF'>&lt;</font>config_reader_base<font color='#5555FF'>*</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>base<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>,
+        own_pointers<font face='Lucida Console'>(</font><font color='#979000'>false</font><font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#BB00BB'>fill_block_table</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> config_reader_base,
+        <font color='#0000FF'>typename</font> map_string_void
+        <font color='#5555FF'>&gt;</font>
+    config_reader_thread_safe_1<font color='#5555FF'>&lt;</font>config_reader_base,map_string_void<font color='#5555FF'>&gt;</font>::
+    <b><a name='config_reader_thread_safe_1'></a>config_reader_thread_safe_1</b><font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font> :
+        m<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>,
+        cr<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>,
+        own_pointers<font face='Lucida Console'>(</font><font color='#979000'>true</font><font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>try</font>
+        <b>{</b>
+            m <font color='#5555FF'>=</font> <font color='#0000FF'>new</font> rmutex;
+            cr <font color='#5555FF'>=</font> <font color='#0000FF'>new</font> config_reader_base;
+        <b>}</b>
+        <font color='#0000FF'>catch</font> <font face='Lucida Console'>(</font>...<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>m<font face='Lucida Console'>)</font> <font color='#0000FF'>delete</font> m;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>cr<font face='Lucida Console'>)</font> <font color='#0000FF'>delete</font> cr;
+            <font color='#0000FF'>throw</font>;
+        <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> config_reader_base,
+        <font color='#0000FF'>typename</font> map_string_void
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> config_reader_thread_safe_1<font color='#5555FF'>&lt;</font>config_reader_base,map_string_void<font color='#5555FF'>&gt;</font>::
+    <b><a name='clear'></a>clear</b><font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        auto_mutex <font color='#BB00BB'>M</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font>m<font face='Lucida Console'>)</font>;
+        cr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>fill_block_table</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> config_reader_base,
+        <font color='#0000FF'>typename</font> map_string_void
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> config_reader_thread_safe_1<font color='#5555FF'>&lt;</font>config_reader_base,map_string_void<font color='#5555FF'>&gt;</font>::
+    <b><a name='load_from'></a>load_from</b><font face='Lucida Console'>(</font>
+        std::istream<font color='#5555FF'>&amp;</font> in
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        auto_mutex <font color='#BB00BB'>M</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font>m<font face='Lucida Console'>)</font>;
+        cr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>load_from</font><font face='Lucida Console'>(</font>in<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>fill_block_table</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> config_reader_base,
+        <font color='#0000FF'>typename</font> map_string_void
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> config_reader_thread_safe_1<font color='#5555FF'>&lt;</font>config_reader_base,map_string_void<font color='#5555FF'>&gt;</font>::
+    <b><a name='load_from'></a>load_from</b><font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> config_file
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        auto_mutex <font color='#BB00BB'>M</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font>m<font face='Lucida Console'>)</font>;
+        cr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>load_from</font><font face='Lucida Console'>(</font>config_file<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>fill_block_table</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> config_reader_base,
+        <font color='#0000FF'>typename</font> map_string_void
+        <font color='#5555FF'>&gt;</font>
+    config_reader_thread_safe_1<font color='#5555FF'>&lt;</font>config_reader_base,map_string_void<font color='#5555FF'>&gt;</font>::
+    <b><a name='config_reader_thread_safe_1'></a>config_reader_thread_safe_1</b><font face='Lucida Console'>(</font>
+        std::istream<font color='#5555FF'>&amp;</font> in
+    <font face='Lucida Console'>)</font> :
+        m<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>,
+        cr<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>,
+        own_pointers<font face='Lucida Console'>(</font><font color='#979000'>true</font><font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>try</font>
+        <b>{</b>
+            m <font color='#5555FF'>=</font> <font color='#0000FF'>new</font> rmutex;
+            cr <font color='#5555FF'>=</font> <font color='#0000FF'>new</font> <font color='#BB00BB'>config_reader_base</font><font face='Lucida Console'>(</font>in<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>fill_block_table</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+        <font color='#0000FF'>catch</font> <font face='Lucida Console'>(</font>...<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>m<font face='Lucida Console'>)</font> <font color='#0000FF'>delete</font> m;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>cr<font face='Lucida Console'>)</font> <font color='#0000FF'>delete</font> cr;
+            <font color='#0000FF'>throw</font>;
+        <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> config_reader_base,
+        <font color='#0000FF'>typename</font> map_string_void
+        <font color='#5555FF'>&gt;</font>
+    config_reader_thread_safe_1<font color='#5555FF'>&lt;</font>config_reader_base,map_string_void<font color='#5555FF'>&gt;</font>::
+    <b><a name='config_reader_thread_safe_1'></a>config_reader_thread_safe_1</b><font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> config_file
+    <font face='Lucida Console'>)</font> :
+        m<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>,
+        cr<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>,
+        own_pointers<font face='Lucida Console'>(</font><font color='#979000'>true</font><font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>try</font>
+        <b>{</b>
+            m <font color='#5555FF'>=</font> <font color='#0000FF'>new</font> rmutex;
+            cr <font color='#5555FF'>=</font> <font color='#0000FF'>new</font> <font color='#BB00BB'>config_reader_base</font><font face='Lucida Console'>(</font>config_file<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>fill_block_table</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+        <font color='#0000FF'>catch</font> <font face='Lucida Console'>(</font>...<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>m<font face='Lucida Console'>)</font> <font color='#0000FF'>delete</font> m;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>cr<font face='Lucida Console'>)</font> <font color='#0000FF'>delete</font> cr;
+            <font color='#0000FF'>throw</font>;
+        <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> config_reader_base,
+        <font color='#0000FF'>typename</font> map_string_void
+        <font color='#5555FF'>&gt;</font>
+    config_reader_thread_safe_1<font color='#5555FF'>&lt;</font>config_reader_base,map_string_void<font color='#5555FF'>&gt;</font>::
+    ~<b><a name='config_reader_thread_safe_1'></a>config_reader_thread_safe_1</b><font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font> 
+    <b>{</b>
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>own_pointers<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>delete</font> m;
+            <font color='#0000FF'>delete</font> cr;
+        <b>}</b>
+
+        <font color='#009900'>// clear out the block table
+</font>        block_table.<font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>block_table.<font color='#BB00BB'>move_next</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>delete</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font>config_reader_thread_safe_1<font color='#5555FF'>*</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>block_table.<font color='#BB00BB'>element</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>value</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+        block_table.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> config_reader_base,
+        <font color='#0000FF'>typename</font> map_string_void
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>bool</u></font> config_reader_thread_safe_1<font color='#5555FF'>&lt;</font>config_reader_base,map_string_void<font color='#5555FF'>&gt;</font>::
+    <b><a name='is_key_defined'></a>is_key_defined</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> key
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        auto_mutex <font color='#BB00BB'>M</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font>m<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>return</font> cr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>is_key_defined</font><font face='Lucida Console'>(</font>key<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> config_reader_base,
+        <font color='#0000FF'>typename</font> map_string_void
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>bool</u></font> config_reader_thread_safe_1<font color='#5555FF'>&lt;</font>config_reader_base,map_string_void<font color='#5555FF'>&gt;</font>::
+    <b><a name='is_block_defined'></a>is_block_defined</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> name
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        auto_mutex <font color='#BB00BB'>M</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font>m<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>return</font> cr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>is_block_defined</font><font face='Lucida Console'>(</font>name<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> config_reader_base,
+        <font color='#0000FF'>typename</font> map_string_void
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>const</font> config_reader_thread_safe_1<font color='#5555FF'>&lt;</font>config_reader_base,map_string_void<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> config_reader_thread_safe_1<font color='#5555FF'>&lt;</font>config_reader_base,map_string_void<font color='#5555FF'>&gt;</font>::
+    <b><a name='block'></a>block</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> name
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        auto_mutex <font color='#BB00BB'>M</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font>m<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>block_table.<font color='#BB00BB'>is_in_domain</font><font face='Lucida Console'>(</font>name<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>throw</font> <font color='#BB00BB'>config_reader_access_error</font><font face='Lucida Console'>(</font>name,"<font color='#CC0000'></font>"<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>return</font> <font color='#5555FF'>*</font><font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font>config_reader_thread_safe_1<font color='#5555FF'>*</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>block_table[name]<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> config_reader_base,
+        <font color='#0000FF'>typename</font> map_string_void
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> config_reader_thread_safe_1<font color='#5555FF'>&lt;</font>config_reader_base,map_string_void<font color='#5555FF'>&gt;</font>::
+    <b><a name='operator'></a>operator</b>[] <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> key
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        auto_mutex <font color='#BB00BB'>M</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font>m<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>return</font> <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>cr<font face='Lucida Console'>)</font>[key];
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> config_reader_base,
+        <font color='#0000FF'>typename</font> map_string_void
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> queue_of_strings
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> config_reader_thread_safe_1<font color='#5555FF'>&lt;</font>config_reader_base,map_string_void<font color='#5555FF'>&gt;</font>::
+    <b><a name='get_keys'></a>get_keys</b> <font face='Lucida Console'>(</font>
+        queue_of_strings<font color='#5555FF'>&amp;</font> keys
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        auto_mutex <font color='#BB00BB'>M</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font>m<font face='Lucida Console'>)</font>;
+        cr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>get_keys</font><font face='Lucida Console'>(</font>keys<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> config_reader_base,
+        <font color='#0000FF'>typename</font> map_string_void
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> queue_of_strings
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> config_reader_thread_safe_1<font color='#5555FF'>&lt;</font>config_reader_base,map_string_void<font color='#5555FF'>&gt;</font>::
+    <b><a name='get_blocks'></a>get_blocks</b> <font face='Lucida Console'>(</font>
+        queue_of_strings<font color='#5555FF'>&amp;</font> blocks
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        auto_mutex <font color='#BB00BB'>M</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font>m<font face='Lucida Console'>)</font>;
+        cr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>get_blocks</font><font face='Lucida Console'>(</font>blocks<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> config_reader_base,
+        <font color='#0000FF'>typename</font> map_string_void
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>const</font> rmutex<font color='#5555FF'>&amp;</font> config_reader_thread_safe_1<font color='#5555FF'>&lt;</font>config_reader_base,map_string_void<font color='#5555FF'>&gt;</font>::
+    <b><a name='get_mutex'></a>get_mutex</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        <font color='#0000FF'>return</font> <font color='#5555FF'>*</font>m;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>//      private member functions
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> config_reader_base,
+        <font color='#0000FF'>typename</font> map_string_void
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> config_reader_thread_safe_1<font color='#5555FF'>&lt;</font>config_reader_base,map_string_void<font color='#5555FF'>&gt;</font>::
+    <b><a name='fill_block_table'></a>fill_block_table</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font> 
+    <b>{</b>
+        <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> std;
+        <font color='#009900'>// first empty out the block table
+</font>        block_table.<font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>block_table.<font color='#BB00BB'>move_next</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>delete</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font>config_reader_thread_safe_1<font color='#5555FF'>*</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>block_table.<font color='#BB00BB'>element</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>value</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+        block_table.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+        std::vector<font color='#5555FF'>&lt;</font>std::string<font color='#5555FF'>&gt;</font> blocks;
+        cr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>get_blocks</font><font face='Lucida Console'>(</font>blocks<font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// now fill the block table up to match what is in cr
+</font>        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> blocks.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+        <b>{</b>
+            config_reader_thread_safe_1<font color='#5555FF'>*</font> block <font color='#5555FF'>=</font> <font color='#0000FF'>new</font> <font color='#BB00BB'>config_reader_thread_safe_1</font><font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>cr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>block</font><font face='Lucida Console'>(</font>blocks[i]<font face='Lucida Console'>)</font>,m<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'><u>void</u></font><font color='#5555FF'>*</font> temp <font color='#5555FF'>=</font> block;
+            block_table.<font color='#BB00BB'>add</font><font face='Lucida Console'>(</font>blocks[i],temp<font face='Lucida Console'>)</font>;
+        <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_CONFIG_READER_THREAD_SAFe_
+</font>
+
+
+</pre></body></html>

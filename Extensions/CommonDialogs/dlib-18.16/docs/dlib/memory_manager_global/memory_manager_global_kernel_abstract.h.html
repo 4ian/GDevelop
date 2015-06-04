@@ -1,0 +1,184 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - memory_manager_global_kernel_abstract.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2006  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#undef</font> DLIB_MEMORY_MANAGER_GLOBAl_ABSTRACT_
+<font color='#0000FF'>#ifdef</font> DLIB_MEMORY_MANAGER_GLOBAl_ABSTRACT_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../algs.h.html'>../algs.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../memory_manager/memory_manager_kernel_abstract.h.html'>../memory_manager/memory_manager_kernel_abstract.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T,
+        <font color='#0000FF'>typename</font> factory
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>class</font> <b><a name='memory_manager_global'></a>memory_manager_global</b>
+    <b>{</b>
+        <font color='#009900'>/*!      
+            REQUIREMENTS ON T
+                T must have a default constructor.      
+
+            REQUIREMENTS ON factory
+                factory must be defined as follows:
+                struct factory
+                {
+                    template &lt;typename U&gt;
+                    struct return_type {
+                        typedef typename memory_manager_type&lt;U&gt; type;
+                    };
+
+                    template &lt;typename U&gt;
+                    static typename return_type&lt;U&gt;::type* get_instance (
+                    );
+                    / *!
+                        ensures
+                            - returns a pointer to an instance of a memory_manager object
+                              where memory_manager_type implements the interface defined 
+                              by dlib/memory_manager/memory_manager_kernel_abstract.h
+                    !* /
+                };
+
+            WHAT THIS OBJECT REPRESENTS
+                This object represents some kind of global memory manager or memory pool.  
+                It is identical to the memory_manager object except that it gets all of 
+                its allocations from a global instance of a memory_manager object which 
+                is provided by the factory object's static member get_instance().
+
+            THREAD SAFETY
+                This object is, by itself, threadsafe.  However, if you want to use this
+                object in multiple threads then you must ensure that your factory is
+                threadsafe.  This means its factory::get_instance() method should be 
+                threadsafe and the memory_manager object it returns must also be threadsafe.
+        !*/</font>
+        
+        <font color='#0000FF'>public</font>:
+
+            <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> factory::<font color='#0000FF'>template</font> return_type<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font>::type mm_global_type; 
+
+            <font color='#0000FF'>typedef</font> T type;
+
+            <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> U<font color='#5555FF'>&gt;</font>
+            <font color='#0000FF'>struct</font> <b><a name='rebind'></a>rebind</b> <b>{</b>
+                <font color='#0000FF'>typedef</font> memory_manager_global<font color='#5555FF'>&lt;</font>U,factory<font color='#5555FF'>&gt;</font> other;
+            <b>}</b>;
+
+            <b><a name='memory_manager_global'></a>memory_manager_global</b><font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font>;
+            <font color='#009900'>/*!
+                ensures 
+                    - #*this is properly initialized
+                    - #get_global_memory_manager() == the memory manager that was 
+                      returned by a call to factory::get_instance&lt;T&gt;()
+                throws
+                    - std::bad_alloc
+            !*/</font>
+
+            <font color='#0000FF'>virtual</font> ~<b><a name='memory_manager_global'></a>memory_manager_global</b><font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font>; 
+            <font color='#009900'>/*!
+                ensures
+                    - This destructor has no effect on the global memory_manager
+                      get_global_memory_manager().
+            !*/</font>
+
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='get_number_of_allocations'></a>get_number_of_allocations</b> <font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+            <font color='#009900'>/*!
+                ensures
+                    - returns get_global_memory_manager().get_number_of_allocations()
+            !*/</font>
+
+            mm_global_type<font color='#5555FF'>&amp;</font> <b><a name='get_global_memory_manager'></a>get_global_memory_manager</b> <font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font>;
+            <font color='#009900'>/*!
+                ensures
+                    - returns a reference to the global memory manager instance being
+                      used by *this.
+            !*/</font>
+
+            T<font color='#5555FF'>*</font> <b><a name='allocate'></a>allocate</b> <font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font>;
+            <font color='#009900'>/*!
+                ensures
+                    - #get_number_of_allocations() == get_number_of_allocations() + 1
+                    - returns get_global_memory_manager().allocate()
+                throws
+                    - std::bad_alloc or any exception thrown by T's constructor.
+                        If this exception is thrown then the call to allocate() 
+                        has no effect on #*this.
+            !*/</font>
+
+            <font color='#0000FF'><u>void</u></font> <b><a name='deallocate'></a>deallocate</b> <font face='Lucida Console'>(</font>
+                T<font color='#5555FF'>*</font> item
+            <font face='Lucida Console'>)</font>;
+            <font color='#009900'>/*!
+                requires
+                    - item == is a pointer to memory that was obtained from a call to
+                      the get_global_memory_manager() object's allocate() method.
+                    - the memory pointed to by item hasn't already been deallocated.
+                ensures
+                    - calls get_global_memory_manager().deallocate(item)
+                    - #get_number_of_allocations() == get_number_of_allocations() - 1
+            !*/</font>
+
+            T<font color='#5555FF'>*</font> <b><a name='allocate_array'></a>allocate_array</b> <font face='Lucida Console'>(</font>
+                <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> size
+            <font face='Lucida Console'>)</font>;
+            <font color='#009900'>/*!
+                ensures
+                    - #get_number_of_allocations() == get_number_of_allocations() + 1
+                    - returns get_global_memory_manager().allocate_array()
+                throws
+                    - std::bad_alloc or any exception thrown by T's constructor.
+                        If this exception is thrown then the call to allocate_array() 
+                        has no effect on #*this.
+            !*/</font>
+
+            <font color='#0000FF'><u>void</u></font> <b><a name='deallocate_array'></a>deallocate_array</b> <font face='Lucida Console'>(</font>
+                T<font color='#5555FF'>*</font> item
+            <font face='Lucida Console'>)</font>;
+            <font color='#009900'>/*!
+                requires
+                    - item == is a pointer to memory that was obtained from a call to
+                      the get_global_memory_manager() object's allocate_array() method.
+                    - the memory pointed to by item hasn't already been deallocated.
+                ensures
+                    - calls get_global_memory_manager().deallocate_array(item)
+                    - #get_number_of_allocations() == get_number_of_allocations() - 1
+            !*/</font>
+
+            <font color='#0000FF'><u>void</u></font> <b><a name='swap'></a>swap</b> <font face='Lucida Console'>(</font>
+                memory_manager_global<font color='#5555FF'>&amp;</font> item
+            <font face='Lucida Console'>)</font>;
+            <font color='#009900'>/*!
+                ensures
+                    - swaps *this and item
+            !*/</font> 
+
+        <font color='#0000FF'>private</font>:
+
+            <font color='#009900'>// restricted functions
+</font>            <b><a name='memory_manager_global'></a>memory_manager_global</b><font face='Lucida Console'>(</font>memory_manager_global<font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font>;        <font color='#009900'>// copy constructor
+</font>            memory_manager_global<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>=</font><font face='Lucida Console'>(</font>memory_manager_global<font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font>;    <font color='#009900'>// assignment operator
+</font>    <b>}</b>;
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T,
+        <font color='#0000FF'>typename</font> factory
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='swap'></a>swap</b> <font face='Lucida Console'>(</font>
+        memory_manager_global<font color='#5555FF'>&lt;</font>T,factory<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> a, 
+        memory_manager_global<font color='#5555FF'>&lt;</font>T,factory<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> b 
+    <font face='Lucida Console'>)</font> <b>{</b> a.<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>b<font face='Lucida Console'>)</font>; <b>}</b>   
+    <font color='#009900'>/*!
+        provides a global swap function
+    !*/</font>
+
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_MEMORY_MANAGER_GLOBAl_ABSTRACT_
+</font>
+
+
+</pre></body></html>

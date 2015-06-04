@@ -1,0 +1,137 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - face_landmark_detection_ex.cpp</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// The contents of this file are in the public domain. See LICENSE_FOR_EXAMPLE_PROGRAMS.txt
+</font><font color='#009900'>/*
+
+    This example program shows how to find frontal human faces in an image and
+    estimate their pose.  The pose takes the form of 68 landmarks.  These are
+    points on the face such as the corners of the mouth, along the eyebrows, on
+    the eyes, and so forth.  
+    
+
+
+    This face detector is made using the classic Histogram of Oriented
+    Gradients (HOG) feature combined with a linear classifier, an image pyramid,
+    and sliding window detection scheme.  The pose estimator was created by
+    using dlib's implementation of the paper:
+        One Millisecond Face Alignment with an Ensemble of Regression Trees by
+        Vahid Kazemi and Josephine Sullivan, CVPR 2014
+    and was trained on the iBUG 300-W face landmark dataset.  
+
+    Also, note that you can train your own models using dlib's machine learning
+    tools.  See <a href="train_shape_predictor_ex.cpp.html">train_shape_predictor_ex.cpp</a> to see an example.
+
+    
+
+
+    Finally, note that the face detector is fastest when compiled with at least
+    SSE2 instructions enabled.  So if you are using a PC with an Intel or AMD
+    chip then you should enable at least SSE2 instructions.  If you are using
+    cmake to compile this program you can enable them by using one of the
+    following commands when you create the build project:
+        cmake path_to_dlib_root/examples -DUSE_SSE2_INSTRUCTIONS=ON
+        cmake path_to_dlib_root/examples -DUSE_SSE4_INSTRUCTIONS=ON
+        cmake path_to_dlib_root/examples -DUSE_AVX_INSTRUCTIONS=ON
+    This will set the appropriate compiler options for GCC, clang, Visual
+    Studio, or the Intel compiler.  If you are using another compiler then you
+    need to consult your compiler's manual to determine how to enable these
+    instructions.  Note that AVX is the fastest but requires a CPU from at least
+    2011.  SSE4 is the next fastest and is supported by most current machines.  
+*/</font>
+
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>image_processing<font color='#5555FF'>/</font>frontal_face_detector.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>image_processing<font color='#5555FF'>/</font>render_face_detections.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>image_processing.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>gui_widgets.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>image_io.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>iostream<font color='#5555FF'>&gt;</font>
+
+<font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> dlib;
+<font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> std;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<font color='#0000FF'><u>int</u></font> <b><a name='main'></a>main</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> argc, <font color='#0000FF'><u>char</u></font><font color='#5555FF'>*</font><font color='#5555FF'>*</font> argv<font face='Lucida Console'>)</font>
+<b>{</b>  
+    <font color='#0000FF'>try</font>
+    <b>{</b>
+        <font color='#009900'>// This example takes in a shape model file and then a list of images to
+</font>        <font color='#009900'>// process.  We will take these filenames in as command line arguments.
+</font>        <font color='#009900'>// Dlib comes with example images in the examples/faces folder so give
+</font>        <font color='#009900'>// those as arguments to this program.
+</font>        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>argc <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>Call this program like this:</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+            cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>./face_landmark_detection_ex shape_predictor_68_face_landmarks.dat faces/*.jpg</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+            cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\nYou can get the shape_predictor_68_face_landmarks.dat file from:\n</font>";
+            cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>http://sourceforge.net/projects/dclib/files/dlib/v18.10/shape_predictor_68_face_landmarks.dat.bz2</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+            <font color='#0000FF'>return</font> <font color='#979000'>0</font>;
+        <b>}</b>
+
+        <font color='#009900'>// We need a face detector.  We will use this to get bounding boxes for
+</font>        <font color='#009900'>// each face in an image.
+</font>        frontal_face_detector detector <font color='#5555FF'>=</font> <font color='#BB00BB'>get_frontal_face_detector</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <font color='#009900'>// And we also need a shape_predictor.  This is the tool that will predict face
+</font>        <font color='#009900'>// landmark positions given an image and face bounding box.  Here we are just
+</font>        <font color='#009900'>// loading the model from the shape_predictor_68_face_landmarks.dat file you gave
+</font>        <font color='#009900'>// as a command line argument.
+</font>        shape_predictor sp;
+        <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>argv[<font color='#979000'>1</font>]<font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font> sp;
+
+
+        image_window win, win_faces;
+        <font color='#009900'>// Loop over all the images provided on the command line.
+</font>        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>2</font>; i <font color='#5555FF'>&lt;</font> argc; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+        <b>{</b>
+            cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>processing image </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> argv[i] <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+            array2d<font color='#5555FF'>&lt;</font>rgb_pixel<font color='#5555FF'>&gt;</font> img;
+            <font color='#BB00BB'>load_image</font><font face='Lucida Console'>(</font>img, argv[i]<font face='Lucida Console'>)</font>;
+            <font color='#009900'>// Make the image larger so we can detect small faces.
+</font>            <font color='#BB00BB'>pyramid_up</font><font face='Lucida Console'>(</font>img<font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// Now tell the face detector to give us a list of bounding boxes
+</font>            <font color='#009900'>// around all the faces in the image.
+</font>            std::vector<font color='#5555FF'>&lt;</font>rectangle<font color='#5555FF'>&gt;</font> dets <font color='#5555FF'>=</font> <font color='#BB00BB'>detector</font><font face='Lucida Console'>(</font>img<font face='Lucida Console'>)</font>;
+            cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>Number of faces detected: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> dets.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+
+            <font color='#009900'>// Now we will go ask the shape_predictor to tell us the pose of
+</font>            <font color='#009900'>// each face we detected.
+</font>            std::vector<font color='#5555FF'>&lt;</font>full_object_detection<font color='#5555FF'>&gt;</font> shapes;
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> j <font color='#5555FF'>=</font> <font color='#979000'>0</font>; j <font color='#5555FF'>&lt;</font> dets.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>j<font face='Lucida Console'>)</font>
+            <b>{</b>
+                full_object_detection shape <font color='#5555FF'>=</font> <font color='#BB00BB'>sp</font><font face='Lucida Console'>(</font>img, dets[j]<font face='Lucida Console'>)</font>;
+                cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>number of parts: </font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> shape.<font color='#BB00BB'>num_parts</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+                cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>pixel position of first part:  </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> shape.<font color='#BB00BB'>part</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+                cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>pixel position of second part: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> shape.<font color='#BB00BB'>part</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+                <font color='#009900'>// You get the idea, you can get all the face part locations if
+</font>                <font color='#009900'>// you want them.  Here we just store them in shapes so we can
+</font>                <font color='#009900'>// put them on the screen.
+</font>                shapes.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>shape<font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+            <font color='#009900'>// Now let's view our face poses on the screen.
+</font>            win.<font color='#BB00BB'>clear_overlay</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            win.<font color='#BB00BB'>set_image</font><font face='Lucida Console'>(</font>img<font face='Lucida Console'>)</font>;
+            win.<font color='#BB00BB'>add_overlay</font><font face='Lucida Console'>(</font><font color='#BB00BB'>render_face_detections</font><font face='Lucida Console'>(</font>shapes<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// We can also extract copies of each face that are cropped, rotated upright,
+</font>            <font color='#009900'>// and scaled to a standard size as shown here:
+</font>            dlib::array<font color='#5555FF'>&lt;</font>array2d<font color='#5555FF'>&lt;</font>rgb_pixel<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> face_chips;
+            <font color='#BB00BB'>extract_image_chips</font><font face='Lucida Console'>(</font>img, <font color='#BB00BB'>get_face_chip_details</font><font face='Lucida Console'>(</font>shapes<font face='Lucida Console'>)</font>, face_chips<font face='Lucida Console'>)</font>;
+            win_faces.<font color='#BB00BB'>set_image</font><font face='Lucida Console'>(</font><font color='#BB00BB'>tile_images</font><font face='Lucida Console'>(</font>face_chips<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+            cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>Hit enter to process the next image...</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+            cin.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+    <b>}</b>
+    <font color='#0000FF'>catch</font> <font face='Lucida Console'>(</font>exception<font color='#5555FF'>&amp;</font> e<font face='Lucida Console'>)</font>
+    <b>{</b>
+        cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\nexception thrown!</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+        cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> e.<font color='#BB00BB'>what</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+    <b>}</b>
+<b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+
+</pre></body></html>

@@ -1,0 +1,536 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - conditioning_class_kernel_4.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2004  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_CONDITIONING_CLASS_KERNEl_4_
+<font color='#0000FF'>#define</font> DLIB_CONDITIONING_CLASS_KERNEl_4_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='conditioning_class_kernel_abstract.h.html'>conditioning_class_kernel_abstract.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../assert.h.html'>../assert.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../algs.h.html'>../algs.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> alphabet_size,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> pool_size,
+        <font color='#0000FF'>typename</font> mem_manager
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>class</font> <b><a name='conditioning_class_kernel_4'></a>conditioning_class_kernel_4</b> 
+    <b>{</b>
+        <font color='#009900'>/*!
+            REQUIREMENTS ON pool_size
+                pool_size &gt; 0
+                this will be the number of nodes contained in our memory pool
+
+            REQUIREMENTS ON mem_manager
+                mem_manager is an implementation of memory_manager/memory_manager_kernel_abstract.h
+
+            INITIAL VALUE
+                total == 1
+                escapes == 1
+                next == 0
+                
+            CONVENTION                
+                get_total() == total
+                get_count(alphabet_size-1) == escapes
+
+                if (next != 0) then
+                    next == pointer to the start of a linked list and the linked list
+                            is terminated by a node with a next pointer of 0.
+
+                get_count(symbol) == node::count for the node where node::symbol==symbol 
+                                     or 0 if no such node currently exists.
+
+                if (there is a node for the symbol) then
+                    LOW_COUNT(symbol) == the sum of all node's counts in the linked list
+                    up to but not including the node for the symbol.
+
+                get_memory_usage() == global_state.memory_usage
+        !*/</font>
+
+
+        <font color='#0000FF'>struct</font> <b><a name='node'></a>node</b>
+        <b>{</b>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>short</u></font> symbol;
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>short</u></font> count;
+            node<font color='#5555FF'>*</font> next;
+        <b>}</b>;
+
+    <font color='#0000FF'>public</font>:
+
+        <font color='#0000FF'>class</font> <b><a name='global_state_type'></a>global_state_type</b>
+        <b>{</b>
+        <font color='#0000FF'>public</font>:
+            <b><a name='global_state_type'></a>global_state_type</b> <font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font> : 
+                memory_usage<font face='Lucida Console'>(</font>pool_size<font color='#5555FF'>*</font><font color='#0000FF'>sizeof</font><font face='Lucida Console'>(</font>node<font face='Lucida Console'>)</font><font color='#5555FF'>+</font><font color='#0000FF'>sizeof</font><font face='Lucida Console'>(</font>global_state_type<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                <b>{</b><b>}</b>
+        <font color='#0000FF'>private</font>:
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> memory_usage;
+
+            <font color='#0000FF'>typename</font> mem_manager::<font color='#0000FF'>template</font> rebind<font color='#5555FF'>&lt;</font>node<font color='#5555FF'>&gt;</font>::other pool;
+
+            <font color='#0000FF'>friend</font> <font color='#0000FF'>class</font> <b><a name='conditioning_class_kernel_4'></a>conditioning_class_kernel_4</b><font color='#5555FF'>&lt;</font>alphabet_size,pool_size,mem_manager<font color='#5555FF'>&gt;</font>;
+        <b>}</b>;
+
+        <b><a name='conditioning_class_kernel_4'></a>conditioning_class_kernel_4</b> <font face='Lucida Console'>(</font>
+            global_state_type<font color='#5555FF'>&amp;</font> global_state_
+        <font face='Lucida Console'>)</font>;
+
+        ~<b><a name='conditioning_class_kernel_4'></a>conditioning_class_kernel_4</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='clear'></a>clear</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='increment_count'></a>increment_count</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> symbol,
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>short</u></font> amount <font color='#5555FF'>=</font> <font color='#979000'>1</font>
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='get_count'></a>get_count</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> symbol
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+        <font color='#0000FF'>inline</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='get_total'></a>get_total</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='get_range'></a>get_range</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> symbol,
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&amp;</font> low_count,
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&amp;</font> high_count,
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&amp;</font> total_count
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='get_symbol'></a>get_symbol</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> target,
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&amp;</font> symbol,            
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&amp;</font> low_count,
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&amp;</font> high_count
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='get_memory_usage'></a>get_memory_usage</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+        global_state_type<font color='#5555FF'>&amp;</font> <b><a name='get_global_state'></a>get_global_state</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>static</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='get_alphabet_size'></a>get_alphabet_size</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+
+
+    <font color='#0000FF'>private</font>:
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='half_counts'></a>half_counts</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - divides all counts by 2 but ensures that escapes is always at least 1
+        !*/</font>
+
+        <font color='#009900'>// restricted functions
+</font>        <b><a name='conditioning_class_kernel_4'></a>conditioning_class_kernel_4</b><font face='Lucida Console'>(</font>conditioning_class_kernel_4<font color='#5555FF'>&lt;</font>alphabet_size,pool_size,mem_manager<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font>;        <font color='#009900'>// copy constructor
+</font>        conditioning_class_kernel_4<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>=</font><font face='Lucida Console'>(</font>conditioning_class_kernel_4<font color='#5555FF'>&lt;</font>alphabet_size,pool_size,mem_manager<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font>;    <font color='#009900'>// assignment operator
+</font>
+        <font color='#009900'>// data members
+</font>        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>short</u></font> total;
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>short</u></font> escapes;
+        node<font color='#5555FF'>*</font> next;
+        global_state_type<font color='#5555FF'>&amp;</font> global_state;
+
+    <b>}</b>;   
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>    <font color='#009900'>// member function definitions
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> alphabet_size,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> pool_size,
+        <font color='#0000FF'>typename</font> mem_manager
+        <font color='#5555FF'>&gt;</font>
+    conditioning_class_kernel_4<font color='#5555FF'>&lt;</font>alphabet_size,pool_size,mem_manager<font color='#5555FF'>&gt;</font>::
+    <b><a name='conditioning_class_kernel_4'></a>conditioning_class_kernel_4</b> <font face='Lucida Console'>(</font>
+        global_state_type<font color='#5555FF'>&amp;</font> global_state_
+    <font face='Lucida Console'>)</font> :
+        total<font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>,
+        escapes<font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>,
+        next<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>,
+        global_state<font face='Lucida Console'>(</font>global_state_<font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#BB00BB'>COMPILE_TIME_ASSERT</font><font face='Lucida Console'>(</font> <font color='#979000'>1</font> <font color='#5555FF'>&lt;</font> alphabet_size <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> alphabet_size <font color='#5555FF'>&lt;</font> <font color='#979000'>65536</font> <font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// update memory usage
+</font>        global_state.memory_usage <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#0000FF'>sizeof</font><font face='Lucida Console'>(</font>conditioning_class_kernel_4<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> alphabet_size,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> pool_size,
+        <font color='#0000FF'>typename</font> mem_manager
+        <font color='#5555FF'>&gt;</font>
+    conditioning_class_kernel_4<font color='#5555FF'>&lt;</font>alphabet_size,pool_size,mem_manager<font color='#5555FF'>&gt;</font>::
+    ~<b><a name='conditioning_class_kernel_4'></a>conditioning_class_kernel_4</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <font color='#009900'>// update memory usage
+</font>        global_state.memory_usage <font color='#5555FF'>-</font><font color='#5555FF'>=</font> <font color='#0000FF'>sizeof</font><font face='Lucida Console'>(</font>conditioning_class_kernel_4<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> alphabet_size,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> pool_size,
+        <font color='#0000FF'>typename</font> mem_manager
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> conditioning_class_kernel_4<font color='#5555FF'>&lt;</font>alphabet_size,pool_size,mem_manager<font color='#5555FF'>&gt;</font>::
+    <b><a name='clear'></a>clear</b><font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        total <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+        escapes <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+        <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>next<font face='Lucida Console'>)</font>
+        <b>{</b>
+            node<font color='#5555FF'>*</font> temp <font color='#5555FF'>=</font> next;
+            next <font color='#5555FF'>=</font> next<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>next;
+            global_state.pool.<font color='#BB00BB'>deallocate</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font>;
+        <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> alphabet_size,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> pool_size,
+        <font color='#0000FF'>typename</font> mem_manager
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> conditioning_class_kernel_4<font color='#5555FF'>&lt;</font>alphabet_size,pool_size,mem_manager<font color='#5555FF'>&gt;</font>::
+    <b><a name='get_memory_usage'></a>get_memory_usage</b><font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        <font color='#0000FF'>return</font> global_state.memory_usage;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> alphabet_size,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> pool_size,
+        <font color='#0000FF'>typename</font> mem_manager
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>typename</font> conditioning_class_kernel_4<font color='#5555FF'>&lt;</font>alphabet_size,pool_size,mem_manager<font color='#5555FF'>&gt;</font>::global_state_type<font color='#5555FF'>&amp;</font> conditioning_class_kernel_4<font color='#5555FF'>&lt;</font>alphabet_size,pool_size,mem_manager<font color='#5555FF'>&gt;</font>::
+    <b><a name='get_global_state'></a>get_global_state</b><font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>return</font> global_state;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> alphabet_size,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> pool_size,
+        <font color='#0000FF'>typename</font> mem_manager
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>bool</u></font> conditioning_class_kernel_4<font color='#5555FF'>&lt;</font>alphabet_size,pool_size,mem_manager<font color='#5555FF'>&gt;</font>::
+    <b><a name='increment_count'></a>increment_count</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> symbol,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>short</u></font> amount
+    <font face='Lucida Console'>)</font>
+    <b>{</b>        
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>symbol <font color='#5555FF'>=</font><font color='#5555FF'>=</font> alphabet_size<font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#009900'>// make sure we won't cause any overflow
+</font>            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>total <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#979000'>65536</font> <font color='#5555FF'>-</font> amount <font face='Lucida Console'>)</font>                        
+                <font color='#BB00BB'>half_counts</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+            escapes <font color='#5555FF'>+</font><font color='#5555FF'>=</font> amount;
+            total <font color='#5555FF'>+</font><font color='#5555FF'>=</font> amount;
+            <font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+        <b>}</b>
+
+        
+        <font color='#009900'>// find the symbol and increment it or add a new node to the list
+</font>        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>next<font face='Lucida Console'>)</font>
+        <b>{</b>
+            node<font color='#5555FF'>*</font> temp <font color='#5555FF'>=</font> next;
+            node<font color='#5555FF'>*</font> previous <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font><font color='#979000'>true</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>temp<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>symbol <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>short</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>symbol<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#009900'>// make sure we won't cause any overflow
+</font>                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>total <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#979000'>65536</font> <font color='#5555FF'>-</font> amount <font face='Lucida Console'>)</font>                        
+                        <font color='#BB00BB'>half_counts</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                    
+                    <font color='#009900'>// we have found the symbol
+</font>                    total <font color='#5555FF'>+</font><font color='#5555FF'>=</font> amount;
+                    temp<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>count <font color='#5555FF'>+</font><font color='#5555FF'>=</font> amount;
+
+                    <font color='#009900'>// if this node now has a count greater than its parent node
+</font>                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>previous <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> temp<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>count <font color='#5555FF'>&gt;</font> previous<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>count<font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        <font color='#009900'>// swap the nodes so that the nodes will be in semi-sorted order
+</font>                        <font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>temp<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>count,previous<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>count<font face='Lucida Console'>)</font>;
+                        <font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>temp<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>symbol,previous<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>symbol<font face='Lucida Console'>)</font>;
+                    <b>}</b>
+                    <font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+                <b>}</b>
+                <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>temp<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>next <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#009900'>// we did not find the symbol so try to add it to the list
+</font>                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>global_state.pool.<font color='#BB00BB'>get_number_of_allocations</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> pool_size<font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        <font color='#009900'>// make sure we won't cause any overflow
+</font>                        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>total <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#979000'>65536</font> <font color='#5555FF'>-</font> amount <font face='Lucida Console'>)</font>                        
+                            <font color='#BB00BB'>half_counts</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+                        node<font color='#5555FF'>*</font> t <font color='#5555FF'>=</font> global_state.pool.<font color='#BB00BB'>allocate</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                        t<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>next <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                        t<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>symbol <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>short</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>symbol<font face='Lucida Console'>)</font>;
+                        t<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>count <font color='#5555FF'>=</font> amount;
+                        temp<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>next <font color='#5555FF'>=</font> t;
+                        total <font color='#5555FF'>+</font><font color='#5555FF'>=</font> amount;
+                        <font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+                    <b>}</b>
+                    <font color='#0000FF'>else</font>
+                    <b>{</b>
+                        <font color='#009900'>// no memory left
+</font>                        <font color='#0000FF'>return</font> <font color='#979000'>false</font>;
+                    <b>}</b>
+                <b>}</b>
+                <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>temp<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>count <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#009900'>// remove nodes that have a zero count
+</font>                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>previous<font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        previous<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>next <font color='#5555FF'>=</font> temp<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>next;
+                        node<font color='#5555FF'>*</font> t <font color='#5555FF'>=</font> temp;
+                        temp <font color='#5555FF'>=</font> temp<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>next;
+                        global_state.pool.<font color='#BB00BB'>deallocate</font><font face='Lucida Console'>(</font>t<font face='Lucida Console'>)</font>;
+                    <b>}</b>
+                    <font color='#0000FF'>else</font>
+                    <b>{</b>
+                        next <font color='#5555FF'>=</font> temp<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>next;
+                        node<font color='#5555FF'>*</font> t <font color='#5555FF'>=</font> temp;
+                        temp <font color='#5555FF'>=</font> temp<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>next;
+                        global_state.pool.<font color='#BB00BB'>deallocate</font><font face='Lucida Console'>(</font>t<font face='Lucida Console'>)</font>;
+                    <b>}</b>
+                <b>}</b>
+                <font color='#0000FF'>else</font>
+                <b>{</b>
+                    previous <font color='#5555FF'>=</font> temp;
+                    temp <font color='#5555FF'>=</font> temp<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>next;
+                <b>}</b>
+            <b>}</b> <font color='#009900'>// while (true)
+</font>        <b>}</b>
+        <font color='#009900'>// if there aren't any nodes in the list yet then do this instead
+</font>        <font color='#0000FF'>else</font>
+        <b>{</b>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>global_state.pool.<font color='#BB00BB'>get_number_of_allocations</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> pool_size<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#009900'>// make sure we won't cause any overflow
+</font>                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>total <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#979000'>65536</font> <font color='#5555FF'>-</font> amount <font face='Lucida Console'>)</font>                        
+                    <font color='#BB00BB'>half_counts</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+                next <font color='#5555FF'>=</font> global_state.pool.<font color='#BB00BB'>allocate</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                next<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>next <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                next<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>symbol <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>short</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>symbol<font face='Lucida Console'>)</font>;
+                next<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>count <font color='#5555FF'>=</font> amount;
+                total <font color='#5555FF'>+</font><font color='#5555FF'>=</font> amount;
+                <font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+            <b>}</b>
+            <font color='#0000FF'>else</font>
+            <b>{</b>
+                <font color='#009900'>// no memory left
+</font>                <font color='#0000FF'>return</font> <font color='#979000'>false</font>;
+            <b>}</b>
+        <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> alphabet_size,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> pool_size,
+        <font color='#0000FF'>typename</font> mem_manager
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> conditioning_class_kernel_4<font color='#5555FF'>&lt;</font>alphabet_size,pool_size,mem_manager<font color='#5555FF'>&gt;</font>::
+    <b><a name='get_count'></a>get_count</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> symbol
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>symbol <font color='#5555FF'>=</font><font color='#5555FF'>=</font> alphabet_size<font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>
+        <b>{</b> 
+            <font color='#0000FF'>return</font> escapes;
+        <b>}</b>
+        <font color='#0000FF'>else</font>
+        <b>{</b>
+            node<font color='#5555FF'>*</font> temp <font color='#5555FF'>=</font> next;
+            <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>temp<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>symbol <font color='#5555FF'>=</font><font color='#5555FF'>=</font> symbol<font face='Lucida Console'>)</font>
+                    <font color='#0000FF'>return</font> temp<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>count;
+                temp <font color='#5555FF'>=</font> temp<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>next;
+            <b>}</b>
+            <font color='#0000FF'>return</font> <font color='#979000'>0</font>;
+        <b>}</b>        
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> alphabet_size,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> pool_size,
+        <font color='#0000FF'>typename</font> mem_manager
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> conditioning_class_kernel_4<font color='#5555FF'>&lt;</font>alphabet_size,pool_size,mem_manager<font color='#5555FF'>&gt;</font>::
+    <b><a name='get_alphabet_size'></a>get_alphabet_size</b> <font face='Lucida Console'>(</font>        
+    <font face='Lucida Console'>)</font> 
+    <b>{</b>
+        <font color='#0000FF'>return</font> alphabet_size;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> alphabet_size,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> pool_size,
+        <font color='#0000FF'>typename</font> mem_manager
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> conditioning_class_kernel_4<font color='#5555FF'>&lt;</font>alphabet_size,pool_size,mem_manager<font color='#5555FF'>&gt;</font>::
+    <b><a name='get_total'></a>get_total</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        <font color='#0000FF'>return</font> total;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> alphabet_size,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> pool_size,
+        <font color='#0000FF'>typename</font> mem_manager
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> conditioning_class_kernel_4<font color='#5555FF'>&lt;</font>alphabet_size,pool_size,mem_manager<font color='#5555FF'>&gt;</font>::
+    <b><a name='get_range'></a>get_range</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> symbol,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&amp;</font> low_count,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&amp;</font> high_count,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&amp;</font> total_count
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>   
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>symbol <font color='#5555FF'>!</font><font color='#5555FF'>=</font> alphabet_size<font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            node<font color='#5555FF'>*</font> temp <font color='#5555FF'>=</font> next;
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> low <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>temp<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>symbol <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>short</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>symbol<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                <b>{</b>
+                    high_count <font color='#5555FF'>=</font> temp<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>count <font color='#5555FF'>+</font> low;
+                    low_count <font color='#5555FF'>=</font> low;                
+                    total_count <font color='#5555FF'>=</font> total;
+                    <font color='#0000FF'>return</font> temp<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>count;
+                <b>}</b>
+                low <font color='#5555FF'>+</font><font color='#5555FF'>=</font> temp<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>count;
+                temp <font color='#5555FF'>=</font> temp<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>next;
+            <b>}</b>
+            <font color='#0000FF'>return</font> <font color='#979000'>0</font>;
+        <b>}</b>
+        <font color='#0000FF'>else</font>
+        <b>{</b>
+            total_count <font color='#5555FF'>=</font> total;
+            high_count <font color='#5555FF'>=</font> total;
+            low_count <font color='#5555FF'>=</font> total<font color='#5555FF'>-</font>escapes;
+            <font color='#0000FF'>return</font> escapes;
+        <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> alphabet_size,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> pool_size,
+        <font color='#0000FF'>typename</font> mem_manager
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> conditioning_class_kernel_4<font color='#5555FF'>&lt;</font>alphabet_size,pool_size,mem_manager<font color='#5555FF'>&gt;</font>::
+    <b><a name='get_symbol'></a>get_symbol</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> target,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&amp;</font> symbol,            
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&amp;</font> low_count,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&amp;</font> high_count
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        node<font color='#5555FF'>*</font> temp <font color='#5555FF'>=</font> next;
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> high <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font><font color='#979000'>true</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>temp <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                high <font color='#5555FF'>+</font><font color='#5555FF'>=</font> temp<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>count;
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>target <font color='#5555FF'>&lt;</font> high<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    symbol <font color='#5555FF'>=</font> temp<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>symbol;
+                    high_count <font color='#5555FF'>=</font> high;
+                    low_count <font color='#5555FF'>=</font> high <font color='#5555FF'>-</font> temp<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>count;
+                    <font color='#0000FF'>return</font>;
+                <b>}</b>
+                temp <font color='#5555FF'>=</font> temp<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>next;
+            <b>}</b>
+            <font color='#0000FF'>else</font>
+            <b>{</b>
+                <font color='#009900'>// this must be the escape symbol
+</font>                symbol <font color='#5555FF'>=</font> alphabet_size<font color='#5555FF'>-</font><font color='#979000'>1</font>;
+                low_count <font color='#5555FF'>=</font> total<font color='#5555FF'>-</font>escapes;
+                high_count <font color='#5555FF'>=</font> total;
+                <font color='#0000FF'>return</font>;
+            <b>}</b>            
+        <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>    <font color='#009900'>// private member function definitions
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> alphabet_size,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> pool_size,
+        <font color='#0000FF'>typename</font> mem_manager
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> conditioning_class_kernel_4<font color='#5555FF'>&lt;</font>alphabet_size,pool_size,mem_manager<font color='#5555FF'>&gt;</font>::
+    <b><a name='half_counts'></a>half_counts</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font> 
+    <b>{</b>
+        total <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>escapes <font color='#5555FF'>&gt;</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>
+            escapes <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+
+        <font color='#009900'>//divide all counts by 2
+</font>        node<font color='#5555FF'>*</font> temp <font color='#5555FF'>=</font> next;
+        <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font>
+        <b>{</b>
+            temp<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>count <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+            total <font color='#5555FF'>+</font><font color='#5555FF'>=</font> temp<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>count;
+            temp <font color='#5555FF'>=</font> temp<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>next;
+        <b>}</b>
+        total <font color='#5555FF'>+</font><font color='#5555FF'>=</font> escapes;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font> 
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_CONDITIONING_CLASS_KERNEl_4_
+</font>
+
+</pre></body></html>

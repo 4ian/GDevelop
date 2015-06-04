@@ -1,0 +1,86 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - bayes_net_from_disk_ex.cpp</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// The contents of this file are in the public domain. See LICENSE_FOR_EXAMPLE_PROGRAMS.txt
+</font><font color='#009900'>/*
+    This is an example illustrating the use of the Bayesian Network 
+    inference utilities found in the dlib C++ library.  In this example
+    we load a saved Bayesian Network from disk.  
+*/</font>
+
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>bayes_utils.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>graph_utils.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>graph.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>directed_graph.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>iostream<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>fstream<font color='#5555FF'>&gt;</font>
+
+
+<font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> dlib;
+<font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> std;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<font color='#0000FF'><u>int</u></font> <b><a name='main'></a>main</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> argc, <font color='#0000FF'><u>char</u></font><font color='#5555FF'>*</font><font color='#5555FF'>*</font> argv<font face='Lucida Console'>)</font>
+<b>{</b>
+    <font color='#0000FF'>try</font>
+    <b>{</b>
+        <font color='#009900'>// This statement declares a bayesian network called bn.  Note that a bayesian network
+</font>        <font color='#009900'>// in the dlib world is just a directed_graph object that contains a special kind 
+</font>        <font color='#009900'>// of node called a bayes_node.
+</font>        directed_graph<font color='#5555FF'>&lt;</font>bayes_node<font color='#5555FF'>&gt;</font>::kernel_1a_c bn;
+
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>argc <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>2</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>You must supply a file name on the command line.  The file should </font>"
+                 <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>contain a serialized Bayesian Network</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+            <font color='#0000FF'>return</font> <font color='#979000'>1</font>;
+        <b>}</b>
+
+        ifstream <font color='#BB00BB'>fin</font><font face='Lucida Console'>(</font>argv[<font color='#979000'>1</font>],ios::binary<font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// Note that the saved networks produced by the <a href="bayes_net_gui_ex.cpp.html">bayes_net_gui_ex.cpp</a> example can be deserialized
+</font>        <font color='#009900'>// into a network.  So you can make your networks using that GUI if you like.
+</font>        cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>Loading the network from disk...</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+        <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>bn, fin<font face='Lucida Console'>)</font>;
+
+        cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>Number of nodes in the network: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> bn.<font color='#BB00BB'>number_of_nodes</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+
+        <font color='#009900'>// Let's compute some probability values using the loaded network using the join tree (aka. Junction 
+</font>        <font color='#009900'>// Tree) algorithm.
+</font>
+        <font color='#009900'>// First we need to create an undirected graph which contains set objects at each node and
+</font>        <font color='#009900'>// edge.  This long declaration does the trick.
+</font>        <font color='#0000FF'>typedef</font> graph<font color='#5555FF'>&lt;</font>dlib::set<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font>::compare_1b_c, dlib::set<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font>::compare_1b_c<font color='#5555FF'>&gt;</font>::kernel_1a_c join_tree_type;
+        join_tree_type join_tree;
+
+        <font color='#009900'>// Now we need to populate the join_tree with data from our bayesian network.  The next two 
+</font>        <font color='#009900'>// function calls do this.  Explaining exactly what they do is outside the scope of this
+</font>        <font color='#009900'>// example.  Just think of them as filling join_tree with information that is useful 
+</font>        <font color='#009900'>// later on for dealing with our bayesian network.  
+</font>        <font color='#BB00BB'>create_moral_graph</font><font face='Lucida Console'>(</font>bn, join_tree<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>create_join_tree</font><font face='Lucida Console'>(</font>join_tree, join_tree<font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// Now we have a proper join_tree we can use it to obtain a solution to our
+</font>        <font color='#009900'>// bayesian network.  Doing this is as simple as declaring an instance of
+</font>        <font color='#009900'>// the bayesian_network_join_tree object as follows:
+</font>        bayesian_network_join_tree <font color='#BB00BB'>solution</font><font face='Lucida Console'>(</font>bn, join_tree<font face='Lucida Console'>)</font>;
+
+
+        <font color='#009900'>// now print out the probabilities for each node
+</font>        cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>Using the join tree algorithm:\n</font>";
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> bn.<font color='#BB00BB'>number_of_nodes</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#009900'>// print out the probability distribution for node i.  
+</font>            cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>p(node </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> i <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font>"<font color='#CC0000'>) = </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> solution.<font color='#BB00BB'>probability</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>;
+        <b>}</b>
+    <b>}</b>
+    <font color='#0000FF'>catch</font> <font face='Lucida Console'>(</font>exception<font color='#5555FF'>&amp;</font> e<font face='Lucida Console'>)</font>
+    <b>{</b>
+        cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>exception thrown: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> e.<font color='#BB00BB'>what</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+        <font color='#0000FF'>return</font> <font color='#979000'>1</font>;
+    <b>}</b>
+<b>}</b>
+
+
+
+</pre></body></html>

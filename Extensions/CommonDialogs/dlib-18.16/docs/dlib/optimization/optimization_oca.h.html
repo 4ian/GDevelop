@@ -1,0 +1,361 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - optimization_oca.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2010  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_OPTIMIZATIoN_OCA_Hh_
+<font color='#0000FF'>#define</font> DLIB_OPTIMIZATIoN_OCA_Hh_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='optimization_oca_abstract.h.html'>optimization_oca_abstract.h</a>"
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../matrix.h.html'>../matrix.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='optimization_solve_qp_using_smo.h.html'>optimization_solve_qp_using_smo.h</a>"
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>vector<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../sequence.h.html'>../sequence.h</a>"
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> matrix_type<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>class</font> <b><a name='oca_problem'></a>oca_problem</b>
+    <b>{</b>
+    <font color='#0000FF'>public</font>:
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> matrix_type::type scalar_type;
+
+        <font color='#0000FF'>virtual</font> ~<b><a name='oca_problem'></a>oca_problem</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+
+        <font color='#0000FF'>virtual</font> <font color='#0000FF'><u>bool</u></font> <b><a name='risk_has_lower_bound'></a>risk_has_lower_bound</b> <font face='Lucida Console'>(</font>
+            scalar_type<font color='#5555FF'>&amp;</font> 
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> <font color='#979000'>false</font>; <b>}</b>
+
+        <font color='#0000FF'>virtual</font> <font color='#0000FF'><u>bool</u></font> <b><a name='optimization_status'></a>optimization_status</b> <font face='Lucida Console'>(</font>
+            scalar_type ,
+            scalar_type ,
+            scalar_type ,
+            scalar_type ,
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font>,
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+
+        <font color='#0000FF'>virtual</font> scalar_type <b><a name='get_c'></a>get_c</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+
+        <font color='#0000FF'>virtual</font> <font color='#0000FF'><u>long</u></font> <b><a name='get_num_dimensions'></a>get_num_dimensions</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+
+        <font color='#0000FF'>virtual</font> <font color='#0000FF'><u>void</u></font> <b><a name='get_risk'></a>get_risk</b> <font face='Lucida Console'>(</font>
+            matrix_type<font color='#5555FF'>&amp;</font> current_solution,
+            scalar_type<font color='#5555FF'>&amp;</font> risk_value,
+            matrix_type<font color='#5555FF'>&amp;</font> risk_subgradient
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>class</font> <b><a name='oca'></a>oca</b>
+    <b>{</b>
+    <font color='#0000FF'>public</font>:
+
+        <b><a name='oca'></a>oca</b> <font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> 
+        <b>{</b>
+            sub_eps <font color='#5555FF'>=</font> <font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>2</font>;
+            sub_max_iter <font color='#5555FF'>=</font> <font color='#979000'>50000</font>;
+
+            inactive_thresh <font color='#5555FF'>=</font> <font color='#979000'>20</font>;
+        <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_subproblem_epsilon'></a>set_subproblem_epsilon</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>double</u></font> eps_
+        <font face='Lucida Console'>)</font> <b>{</b> sub_eps <font color='#5555FF'>=</font> eps_; <b>}</b>
+
+        <font color='#0000FF'><u>double</u></font> <b><a name='get_subproblem_epsilon'></a>get_subproblem_epsilon</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> sub_eps; <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_subproblem_max_iterations'></a>set_subproblem_max_iterations</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> sub_max_iter_
+        <font face='Lucida Console'>)</font> 
+        <b>{</b> 
+            <font color='#009900'>// make sure requires clause is not broken
+</font>            <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font>sub_max_iter_ <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font>,
+                "<font color='#CC0000'>\t void oca::set_subproblem_max_iterations</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t max iterations must be greater than 0</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t sub_max_iter_: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> sub_max_iter_
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t this: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font>
+                <font face='Lucida Console'>)</font>;
+
+            sub_max_iter <font color='#5555FF'>=</font> sub_max_iter_; 
+        <b>}</b>
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='get_subproblem_max_iterations'></a>get_subproblem_max_iterations</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> sub_max_iter; <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_inactive_plane_threshold'></a>set_inactive_plane_threshold</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> inactive_thresh_
+        <font face='Lucida Console'>)</font> 
+        <b>{</b> 
+            <font color='#009900'>// make sure requires clause is not broken
+</font>            <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font>inactive_thresh_ <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font>,
+                "<font color='#CC0000'>\t void oca::set_inactive_plane_threshold</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t inactive threshold must be greater than 0</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t inactive_thresh_: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> inactive_thresh_
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t this: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font>
+                <font face='Lucida Console'>)</font>;
+
+            inactive_thresh <font color='#5555FF'>=</font> inactive_thresh_; 
+        <b>}</b>
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='get_inactive_plane_threshold'></a>get_inactive_plane_threshold</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> inactive_thresh; <b>}</b>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'>typename</font> matrix_type
+            <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>typename</font> matrix_type::type <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> oca_problem<font color='#5555FF'>&lt;</font>matrix_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> problem,
+            matrix_type<font color='#5555FF'>&amp;</font> w,
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> num_nonnegative <font color='#5555FF'>=</font> <font color='#979000'>0</font>,
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> force_weight_to_1 <font color='#5555FF'>=</font> std::numeric_limits<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>max</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            matrix_type empty_prior;
+            <font color='#0000FF'>return</font> <font color='#BB00BB'>oca_impl</font><font face='Lucida Console'>(</font>problem, w, empty_prior, <font color='#979000'>false</font>, num_nonnegative, force_weight_to_1<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'>typename</font> matrix_type
+            <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>typename</font> matrix_type::type <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> oca_problem<font color='#5555FF'>&lt;</font>matrix_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> problem,
+            matrix_type<font color='#5555FF'>&amp;</font> w,
+            <font color='#0000FF'>const</font> matrix_type<font color='#5555FF'>&amp;</font> prior
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#009900'>// make sure requires clause is not broken
+</font>            <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font><font color='#BB00BB'>is_col_vector</font><font face='Lucida Console'>(</font>prior<font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> prior.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> problem.<font color='#BB00BB'>get_num_dimensions</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,
+                "<font color='#CC0000'>\t scalar_type oca::operator()</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t The prior vector does not have the correct dimensions.</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t is_col_vector(prior):         </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>is_col_vector</font><font face='Lucida Console'>(</font>prior<font face='Lucida Console'>)</font> 
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t prior.size():                 </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> prior.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> 
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t problem.get_num_dimensions(): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> problem.<font color='#BB00BB'>get_num_dimensions</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> 
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t this:                         </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font>
+                <font face='Lucida Console'>)</font>;
+            <font color='#009900'>// disable the force weight to 1 option for this mode.  We also disable the
+</font>            <font color='#009900'>// non-negative constraints.
+</font>            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> force_weight_to_1 <font color='#5555FF'>=</font> std::numeric_limits<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>max</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>return</font> <font color='#BB00BB'>oca_impl</font><font face='Lucida Console'>(</font>problem, w, prior, <font color='#979000'>true</font>, <font color='#979000'>0</font>, force_weight_to_1<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+    <font color='#0000FF'>private</font>:
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'>typename</font> matrix_type
+            <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>typename</font> matrix_type::type <b><a name='oca_impl'></a>oca_impl</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> oca_problem<font color='#5555FF'>&lt;</font>matrix_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> problem,
+            matrix_type<font color='#5555FF'>&amp;</font> w,
+            <font color='#0000FF'>const</font> matrix_type prior,
+            <font color='#0000FF'><u>bool</u></font> have_prior,
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> num_nonnegative,
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> force_weight_to_1
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> num_dims <font color='#5555FF'>=</font> problem.<font color='#BB00BB'>get_num_dimensions</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// make sure requires clause is not broken
+</font>            <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font>problem.<font color='#BB00BB'>get_c</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font>
+                        problem.<font color='#BB00BB'>get_num_dimensions</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font>,
+                "<font color='#CC0000'>\t scalar_type oca::operator()</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t The oca_problem is invalid</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t problem.get_c():              </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> problem.<font color='#BB00BB'>get_c</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> 
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t problem.get_num_dimensions(): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> num_dims 
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t this: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font>
+                <font face='Lucida Console'>)</font>;
+
+
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>num_nonnegative <font color='#5555FF'>&gt;</font> num_dims<font face='Lucida Console'>)</font>
+                num_nonnegative <font color='#5555FF'>=</font> num_dims;
+
+            <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> matrix_type::type scalar_type;
+            <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> matrix_type::layout_type layout_type;
+            <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> matrix_type::mem_manager_type mem_manager_type;
+            <font color='#0000FF'>typedef</font> matrix_type vect_type;
+
+            <font color='#0000FF'>const</font> scalar_type C <font color='#5555FF'>=</font> problem.<font color='#BB00BB'>get_c</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>typename</font> sequence<font color='#5555FF'>&lt;</font>vect_type<font color='#5555FF'>&gt;</font>::kernel_2a planes;
+            std::vector<font color='#5555FF'>&lt;</font>scalar_type<font color='#5555FF'>&gt;</font> bs, miss_count;
+
+            vect_type new_plane, alpha;
+
+            w.<font color='#BB00BB'>set_size</font><font face='Lucida Console'>(</font>num_dims, <font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+            w <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+
+            <font color='#009900'>// The current objective value.  Note also that w always contains 
+</font>            <font color='#009900'>// the current solution.
+</font>            scalar_type cur_obj <font color='#5555FF'>=</font> std::numeric_limits<font color='#5555FF'>&lt;</font>scalar_type<font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>max</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// This will hold the cutting plane objective value.  This value is
+</font>            <font color='#009900'>// a lower bound on the true optimal objective value.
+</font>            scalar_type cp_obj <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+
+            matrix<font color='#5555FF'>&lt;</font>scalar_type,<font color='#979000'>0</font>,<font color='#979000'>0</font>,mem_manager_type, layout_type<font color='#5555FF'>&gt;</font> K, Ktmp;
+
+            scalar_type R_lower_bound;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>problem.<font color='#BB00BB'>risk_has_lower_bound</font><font face='Lucida Console'>(</font>R_lower_bound<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#009900'>// The flat lower bounding plane is always good to have if we know
+</font>                <font color='#009900'>// what it is.
+</font>                bs.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>R_lower_bound<font face='Lucida Console'>)</font>;
+                new_plane <font color='#5555FF'>=</font> <font color='#BB00BB'>zeros_matrix</font><font face='Lucida Console'>(</font>w<font face='Lucida Console'>)</font>;
+                planes.<font color='#BB00BB'>add</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>, new_plane<font face='Lucida Console'>)</font>;
+                alpha <font color='#5555FF'>=</font> uniform_matrix<font color='#5555FF'>&lt;</font>scalar_type<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#979000'>1</font>,<font color='#979000'>1</font>, C<font face='Lucida Console'>)</font>;
+                miss_count.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+
+                K.<font color='#BB00BB'>set_size</font><font face='Lucida Console'>(</font><font color='#979000'>1</font>,<font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+                <font color='#BB00BB'>K</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            <b>}</b>
+
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> prior_norm <font color='#5555FF'>=</font> have_prior ?  <font color='#979000'>0.5</font><font color='#5555FF'>*</font><font color='#BB00BB'>dot</font><font face='Lucida Console'>(</font>prior,prior<font face='Lucida Console'>)</font> : <font color='#979000'>0</font>;
+
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> counter <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font><font color='#979000'>true</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+
+                <font color='#009900'>// add the next cutting plane
+</font>                scalar_type cur_risk;
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>force_weight_to_1 <font color='#5555FF'>&lt;</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font>w.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                    <font color='#BB00BB'>w</font><font face='Lucida Console'>(</font>force_weight_to_1<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+
+                problem.<font color='#BB00BB'>get_risk</font><font face='Lucida Console'>(</font>w, cur_risk, new_plane<font face='Lucida Console'>)</font>;
+
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>force_weight_to_1 <font color='#5555FF'>&lt;</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font>w.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#009900'>// We basically arrange for the w(force_weight_to_1) element and all
+</font>                    <font color='#009900'>// subsequent elements of w to not be involved in the optimization at
+</font>                    <font color='#009900'>// all.  An easy way to do this is to just make sure the elements of w
+</font>                    <font color='#009900'>// corresponding elements in the subgradient are always set to zero
+</font>                    <font color='#009900'>// while we run the cutting plane algorithm.  The only time
+</font>                    <font color='#009900'>// w(force_weight_to_1) is 1 is when we pass it to the oca_problem.
+</font>                    <font color='#BB00BB'>set_rowm</font><font face='Lucida Console'>(</font>w, <font color='#BB00BB'>range</font><font face='Lucida Console'>(</font>force_weight_to_1, w.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                    <font color='#BB00BB'>set_rowm</font><font face='Lucida Console'>(</font>new_plane, <font color='#BB00BB'>range</font><font face='Lucida Console'>(</font>force_weight_to_1, new_plane.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                <b>}</b>
+
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>have_prior<font face='Lucida Console'>)</font>
+                    bs.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>cur_risk <font color='#5555FF'>-</font> <font color='#BB00BB'>dot</font><font face='Lucida Console'>(</font>w,new_plane<font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> <font color='#BB00BB'>dot</font><font face='Lucida Console'>(</font>prior,new_plane<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>else</font>
+                    bs.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>cur_risk <font color='#5555FF'>-</font> <font color='#BB00BB'>dot</font><font face='Lucida Console'>(</font>w,new_plane<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                planes.<font color='#BB00BB'>add</font><font face='Lucida Console'>(</font>planes.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, new_plane<font face='Lucida Console'>)</font>;
+                miss_count.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+
+                <font color='#009900'>// If alpha is empty then initialize it (we must always have sum(alpha) == C).  
+</font>                <font color='#009900'>// But otherwise, just append a zero.
+</font>                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>alpha.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                    alpha <font color='#5555FF'>=</font> uniform_matrix<font color='#5555FF'>&lt;</font>scalar_type<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#979000'>1</font>,<font color='#979000'>1</font>, C<font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>else</font>
+                    alpha <font color='#5555FF'>=</font> <font color='#BB00BB'>join_cols</font><font face='Lucida Console'>(</font>alpha,zeros_matrix<font color='#5555FF'>&lt;</font>scalar_type<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#979000'>1</font>,<font color='#979000'>1</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+                <font color='#0000FF'>const</font> scalar_type wnorm <font color='#5555FF'>=</font> <font color='#979000'>0.5</font><font color='#5555FF'>*</font><font color='#BB00BB'>trans</font><font face='Lucida Console'>(</font>w<font face='Lucida Console'>)</font><font color='#5555FF'>*</font>w;
+                <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> prior_part <font color='#5555FF'>=</font> have_prior? <font color='#BB00BB'>dot</font><font face='Lucida Console'>(</font>w,prior<font face='Lucida Console'>)</font> : <font color='#979000'>0</font>;
+                cur_obj <font color='#5555FF'>=</font> wnorm <font color='#5555FF'>+</font> C<font color='#5555FF'>*</font>cur_risk <font color='#5555FF'>+</font> prior_norm<font color='#5555FF'>-</font>prior_part;
+
+                <font color='#009900'>// report current status
+</font>                <font color='#0000FF'>const</font> scalar_type risk_gap <font color='#5555FF'>=</font> cur_risk <font color='#5555FF'>-</font> <font face='Lucida Console'>(</font>cp_obj<font color='#5555FF'>-</font>wnorm<font color='#5555FF'>+</font>prior_part<font color='#5555FF'>-</font>prior_norm<font face='Lucida Console'>)</font><font color='#5555FF'>/</font>C;
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>counter <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> problem.<font color='#BB00BB'>optimization_status</font><font face='Lucida Console'>(</font>cur_obj, cur_obj <font color='#5555FF'>-</font> cp_obj, 
+                                                               cur_risk, risk_gap, planes.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, counter<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#0000FF'>break</font>;
+                <b>}</b>
+
+                <font color='#009900'>// compute kernel matrix for all the planes
+</font>                K.<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>Ktmp<font face='Lucida Console'>)</font>;
+                K.<font color='#BB00BB'>set_size</font><font face='Lucida Console'>(</font>planes.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, planes.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                <font color='#009900'>// copy over the old K matrix
+</font>                <font color='#BB00BB'>set_subm</font><font face='Lucida Console'>(</font>K, <font color='#979000'>0</font>,<font color='#979000'>0</font>, Ktmp.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, Ktmp.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> Ktmp;
+
+                <font color='#009900'>// now add the new row and column to K
+</font>                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> c <font color='#5555FF'>=</font> <font color='#979000'>0</font>; c <font color='#5555FF'>&lt;</font> planes.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>c<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#BB00BB'>K</font><font face='Lucida Console'>(</font>c, Ktmp.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#BB00BB'>dot</font><font face='Lucida Console'>(</font>planes[c], planes[planes.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#979000'>1</font>]<font face='Lucida Console'>)</font>;
+                    <font color='#BB00BB'>K</font><font face='Lucida Console'>(</font>Ktmp.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, c<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#BB00BB'>K</font><font face='Lucida Console'>(</font>c,Ktmp.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                <b>}</b>
+
+
+                <font color='#009900'>// solve the cutting plane subproblem for the next w.   We solve it to an
+</font>                <font color='#009900'>// accuracy that is related to how big the error gap is
+</font>                scalar_type eps <font color='#5555FF'>=</font> std::min<font color='#5555FF'>&lt;</font>scalar_type<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>sub_eps, <font color='#979000'>0.1</font><font color='#5555FF'>*</font><font face='Lucida Console'>(</font>cur_obj<font color='#5555FF'>-</font>cp_obj<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> ;
+                <font color='#009900'>// just a sanity check
+</font>                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>eps <font color='#5555FF'>&lt;</font> <font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>16</font><font face='Lucida Console'>)</font>
+                    eps <font color='#5555FF'>=</font> <font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>16</font>;
+                <font color='#009900'>// Note that we warm start this optimization by using the alpha from the last
+</font>                <font color='#009900'>// iteration as the starting point.
+</font>                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>num_nonnegative <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#009900'>// copy planes into a matrix so we can call solve_qp4_using_smo()
+</font>                    matrix<font color='#5555FF'>&lt;</font>scalar_type,<font color='#979000'>0</font>,<font color='#979000'>0</font>,mem_manager_type, layout_type<font color='#5555FF'>&gt;</font> <font color='#BB00BB'>planes_mat</font><font face='Lucida Console'>(</font>num_nonnegative,planes.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> planes.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                        <font color='#BB00BB'>set_colm</font><font face='Lucida Console'>(</font>planes_mat,i<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#BB00BB'>colm</font><font face='Lucida Console'>(</font>planes[i],<font color='#979000'>0</font>,num_nonnegative<font face='Lucida Console'>)</font>;
+
+                    <font color='#BB00BB'>solve_qp4_using_smo</font><font face='Lucida Console'>(</font>planes_mat, K, <font color='#BB00BB'>mat</font><font face='Lucida Console'>(</font>bs<font face='Lucida Console'>)</font>, alpha, eps, sub_max_iter<font face='Lucida Console'>)</font>; 
+                <b>}</b>
+                <font color='#0000FF'>else</font>
+                <b>{</b>
+                    <font color='#BB00BB'>solve_qp_using_smo</font><font face='Lucida Console'>(</font>K, <font color='#BB00BB'>mat</font><font face='Lucida Console'>(</font>bs<font face='Lucida Console'>)</font>, alpha, eps, sub_max_iter<font face='Lucida Console'>)</font>; 
+                <b>}</b>
+
+                <font color='#009900'>// construct the w that minimized the subproblem.
+</font>                w <font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#BB00BB'>alpha</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font><font color='#5555FF'>*</font>planes[<font color='#979000'>0</font>];
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>1</font>; i <font color='#5555FF'>&lt;</font> planes.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                    w <font color='#5555FF'>-</font><font color='#5555FF'>=</font> <font color='#BB00BB'>alpha</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font><font color='#5555FF'>*</font>planes[i];
+                <font color='#009900'>// threshold the first num_nonnegative w elements if necessary.
+</font>                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>num_nonnegative <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                    <font color='#BB00BB'>set_rowm</font><font face='Lucida Console'>(</font>w,<font color='#BB00BB'>range</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>,num_nonnegative<font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#BB00BB'>lowerbound</font><font face='Lucida Console'>(</font><font color='#BB00BB'>rowm</font><font face='Lucida Console'>(</font>w,<font color='#BB00BB'>range</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>,num_nonnegative<font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> alpha.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>alpha</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font> <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                        miss_count[i] <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                    <font color='#0000FF'>else</font>
+                        miss_count[i] <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+                <b>}</b>
+
+                <font color='#009900'>// Compute the lower bound on the true objective given to us by the cutting 
+</font>                <font color='#009900'>// plane subproblem.
+</font>                cp_obj <font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>0.5</font><font color='#5555FF'>*</font><font color='#BB00BB'>trans</font><font face='Lucida Console'>(</font>w<font face='Lucida Console'>)</font><font color='#5555FF'>*</font>w <font color='#5555FF'>+</font> <font color='#BB00BB'>trans</font><font face='Lucida Console'>(</font>alpha<font face='Lucida Console'>)</font><font color='#5555FF'>*</font><font color='#BB00BB'>mat</font><font face='Lucida Console'>(</font>bs<font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>have_prior<font face='Lucida Console'>)</font>
+                    w <font color='#5555FF'>+</font><font color='#5555FF'>=</font> prior;
+
+                <font color='#009900'>// If it has been a while since a cutting plane was an active constraint then
+</font>                <font color='#009900'>// we should throw it away.
+</font>                <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>max</font><font face='Lucida Console'>(</font><font color='#BB00BB'>mat</font><font face='Lucida Console'>(</font>miss_count<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> inactive_thresh<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> idx <font color='#5555FF'>=</font> <font color='#BB00BB'>index_of_max</font><font face='Lucida Console'>(</font><font color='#BB00BB'>mat</font><font face='Lucida Console'>(</font>miss_count<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                    bs.<font color='#BB00BB'>erase</font><font face='Lucida Console'>(</font>bs.<font color='#BB00BB'>begin</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>+</font>idx<font face='Lucida Console'>)</font>;
+                    miss_count.<font color='#BB00BB'>erase</font><font face='Lucida Console'>(</font>miss_count.<font color='#BB00BB'>begin</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>+</font>idx<font face='Lucida Console'>)</font>;
+                    K <font color='#5555FF'>=</font> <font color='#BB00BB'>removerc</font><font face='Lucida Console'>(</font>K, idx, idx<font face='Lucida Console'>)</font>;
+                    alpha <font color='#5555FF'>=</font> <font color='#BB00BB'>remove_row</font><font face='Lucida Console'>(</font>alpha,idx<font face='Lucida Console'>)</font>;
+                    planes.<font color='#BB00BB'>remove</font><font face='Lucida Console'>(</font>idx, new_plane<font face='Lucida Console'>)</font>;
+                <b>}</b>
+
+                <font color='#5555FF'>+</font><font color='#5555FF'>+</font>counter;
+            <b>}</b>
+
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>force_weight_to_1 <font color='#5555FF'>&lt;</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font>w.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                <font color='#BB00BB'>w</font><font face='Lucida Console'>(</font>force_weight_to_1<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+
+            <font color='#0000FF'>return</font> cur_obj;
+        <b>}</b>
+
+        <font color='#0000FF'><u>double</u></font> sub_eps;
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> sub_max_iter;
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> inactive_thresh;
+    <b>}</b>;
+<b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_OPTIMIZATIoN_OCA_Hh_
+</font>
+
+</pre></body></html>

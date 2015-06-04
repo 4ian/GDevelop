@@ -1,0 +1,280 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - pngmem.c</title></head><body bgcolor='white'><pre>
+
+<font color='#009900'>/* pngmem.c - stub functions for memory allocation
+ *
+ * Last changed in libpng 1.6.0 [February 14, 2013]
+ * Copyright (c) 1998-2013 Glenn Randers-Pehrson
+ * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
+ * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
+ *
+ * This code is released under the libpng license.
+ * For conditions of distribution and use, see the disclaimer
+ * and license in png.h
+ *
+ * This file provides a location for all memory allocation.  Users who
+ * need special memory handling are expected to supply replacement
+ * functions for png_malloc() and png_free(), and to use
+ * png_create_read_struct_2() and png_create_write_struct_2() to
+ * identify the replacement functions.
+ */</font>
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='pngpriv.h.html'>pngpriv.h</a>"
+
+<font color='#0000FF'>#if</font> defined<font face='Lucida Console'>(</font>PNG_READ_SUPPORTED<font face='Lucida Console'>)</font> <font color='#5555FF'>|</font><font color='#5555FF'>|</font> defined<font face='Lucida Console'>(</font>PNG_WRITE_SUPPORTED<font face='Lucida Console'>)</font>
+<font color='#009900'>/* Free a png_struct */</font>
+<font color='#0000FF'><u>void</u></font> <font color='#009900'>/* PRIVATE */</font>
+<b><a name='png_destroy_png_struct'></a>png_destroy_png_struct</b><font face='Lucida Console'>(</font>png_structrp png_ptr<font face='Lucida Console'>)</font>
+<b>{</b>
+   <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>png_ptr <font color='#5555FF'>!</font><font color='#5555FF'>=</font> NULL<font face='Lucida Console'>)</font>
+   <b>{</b>
+      <font color='#009900'>/* png_free might call png_error and may certainly call
+       * png_get_mem_ptr, so fake a temporary png_struct to support this.
+       */</font>
+      png_struct dummy_struct <font color='#5555FF'>=</font> <font color='#5555FF'>*</font>png_ptr;
+      <font color='#BB00BB'>memset</font><font face='Lucida Console'>(</font>png_ptr, <font color='#979000'>0</font>, <font face='Lucida Console'>(</font><font color='#0000FF'>sizeof</font> <font color='#5555FF'>*</font>png_ptr<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+      <font color='#BB00BB'>png_free</font><font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>dummy_struct, png_ptr<font face='Lucida Console'>)</font>;
+
+#     ifdef PNG_SETJMP_SUPPORTED
+         <font color='#009900'>/* We may have a jmp_buf left to deallocate. */</font>
+         <font color='#BB00BB'>png_free_jmpbuf</font><font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>dummy_struct<font face='Lucida Console'>)</font>;
+#     endif
+   <b>}</b>
+<b>}</b>
+
+<font color='#009900'>/* Allocate memory.  For reasonable files, size should never exceed
+ * 64K.  However, zlib may allocate more then 64K if you don't tell
+ * it not to.  See zconf.h and png.h for more information.  zlib does
+ * need to allocate exactly 64K, so whatever you call here must
+ * have the ability to do that.
+ */</font>
+<b><a name='PNG_FUNCTION'></a>PNG_FUNCTION</b><font face='Lucida Console'>(</font>png_voidp,PNGAPI
+png_calloc,<font face='Lucida Console'>(</font>png_const_structrp png_ptr, png_alloc_size_t size<font face='Lucida Console'>)</font>,PNG_ALLOCATED<font face='Lucida Console'>)</font>
+<b>{</b>
+   png_voidp ret;
+
+   ret <font color='#5555FF'>=</font> <font color='#BB00BB'>png_malloc</font><font face='Lucida Console'>(</font>png_ptr, size<font face='Lucida Console'>)</font>;
+
+   <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>ret <font color='#5555FF'>!</font><font color='#5555FF'>=</font> NULL<font face='Lucida Console'>)</font>
+      <font color='#BB00BB'>memset</font><font face='Lucida Console'>(</font>ret, <font color='#979000'>0</font>, size<font face='Lucida Console'>)</font>;
+
+   <font color='#0000FF'>return</font> ret;
+<b>}</b>
+
+<font color='#009900'>/* png_malloc_base, an internal function added at libpng 1.6.0, does the work of
+ * allocating memory, taking into account limits and PNG_USER_MEM_SUPPORTED.
+ * Checking and error handling must happen outside this routine; it returns NULL
+ * if the allocation cannot be done (for any reason.)
+ */</font>
+<b><a name='PNG_FUNCTION'></a>PNG_FUNCTION</b><font face='Lucida Console'>(</font>png_voidp <font color='#009900'>/* PRIVATE */</font>,
+png_malloc_base,<font face='Lucida Console'>(</font>png_const_structrp png_ptr, png_alloc_size_t size<font face='Lucida Console'>)</font>,
+   PNG_ALLOCATED<font face='Lucida Console'>)</font>
+<b>{</b>
+   <font color='#009900'>/* Moved to png_malloc_base from png_malloc_default in 1.6.0; the DOS
+    * allocators have also been removed in 1.6.0, so any 16-bit system now has
+    * to implement a user memory handler.  This checks to be sure it isn't
+    * called with big numbers.
+    */</font>
+<font color='#0000FF'>#ifdef</font> PNG_USER_MEM_SUPPORTED
+   <font color='#BB00BB'>PNG_UNUSED</font><font face='Lucida Console'>(</font>png_ptr<font face='Lucida Console'>)</font>
+<font color='#0000FF'>#endif</font>
+   <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>size <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> size <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> PNG_SIZE_MAX
+#     ifdef PNG_MAX_MALLOC_64K
+         <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> size <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#979000'>65536</font>U
+#     endif
+      <font face='Lucida Console'>)</font>
+   <b>{</b>
+<font color='#0000FF'>#ifdef</font> PNG_USER_MEM_SUPPORTED
+      <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>png_ptr <font color='#5555FF'>!</font><font color='#5555FF'>=</font> NULL <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>malloc_fn <font color='#5555FF'>!</font><font color='#5555FF'>=</font> NULL<font face='Lucida Console'>)</font>
+         <font color='#0000FF'>return</font> png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>malloc_fn</font><font face='Lucida Console'>(</font><font color='#BB00BB'>png_constcast</font><font face='Lucida Console'>(</font>png_structrp,png_ptr<font face='Lucida Console'>)</font>, size<font face='Lucida Console'>)</font>;
+
+      <font color='#0000FF'>else</font>
+<font color='#0000FF'>#endif</font>
+         <font color='#0000FF'>return</font> <font color='#BB00BB'>malloc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>size_t</u></font><font face='Lucida Console'>)</font>size<font face='Lucida Console'>)</font>; <font color='#009900'>/* checked for truncation above */</font>
+   <b>}</b>
+
+   <font color='#0000FF'>else</font>
+      <font color='#0000FF'>return</font> NULL;
+<b>}</b>
+
+<font color='#009900'>/* This is really here only to work round a spurious warning in GCC 4.6 and 4.7
+ * that arises because of the checks in png_realloc_array that are repeated in
+ * png_malloc_array.
+ */</font>
+<font color='#0000FF'>static</font> png_voidp
+<b><a name='png_malloc_array_checked'></a>png_malloc_array_checked</b><font face='Lucida Console'>(</font>png_const_structrp png_ptr, <font color='#0000FF'><u>int</u></font> nelements,
+   <font color='#0000FF'><u>size_t</u></font> element_size<font face='Lucida Console'>)</font>
+<b>{</b>
+   png_alloc_size_t req <font color='#5555FF'>=</font> nelements; <font color='#009900'>/* known to be &gt; 0 */</font>
+
+   <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>req <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> PNG_SIZE_MAX<font color='#5555FF'>/</font>element_size<font face='Lucida Console'>)</font>
+      <font color='#0000FF'>return</font> <font color='#BB00BB'>png_malloc_base</font><font face='Lucida Console'>(</font>png_ptr, req <font color='#5555FF'>*</font> element_size<font face='Lucida Console'>)</font>;
+
+   <font color='#009900'>/* The failure case when the request is too large */</font>
+   <font color='#0000FF'>return</font> NULL;
+<b>}</b>
+
+<b><a name='PNG_FUNCTION'></a>PNG_FUNCTION</b><font face='Lucida Console'>(</font>png_voidp <font color='#009900'>/* PRIVATE */</font>,
+png_malloc_array,<font face='Lucida Console'>(</font>png_const_structrp png_ptr, <font color='#0000FF'><u>int</u></font> nelements,
+   <font color='#0000FF'><u>size_t</u></font> element_size<font face='Lucida Console'>)</font>,PNG_ALLOCATED<font face='Lucida Console'>)</font>
+<b>{</b>
+   <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>nelements <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#979000'>0</font> <font color='#5555FF'>|</font><font color='#5555FF'>|</font> element_size <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+      <font color='#BB00BB'>png_error</font><font face='Lucida Console'>(</font>png_ptr, "<font color='#CC0000'>internal error: array alloc</font>"<font face='Lucida Console'>)</font>;
+
+   <font color='#0000FF'>return</font> <font color='#BB00BB'>png_malloc_array_checked</font><font face='Lucida Console'>(</font>png_ptr, nelements, element_size<font face='Lucida Console'>)</font>;
+<b>}</b>
+
+<b><a name='PNG_FUNCTION'></a>PNG_FUNCTION</b><font face='Lucida Console'>(</font>png_voidp <font color='#009900'>/* PRIVATE */</font>,
+png_realloc_array,<font face='Lucida Console'>(</font>png_const_structrp png_ptr, png_const_voidp old_array,
+   <font color='#0000FF'><u>int</u></font> old_elements, <font color='#0000FF'><u>int</u></font> add_elements, <font color='#0000FF'><u>size_t</u></font> element_size<font face='Lucida Console'>)</font>,PNG_ALLOCATED<font face='Lucida Console'>)</font>
+<b>{</b>
+   <font color='#009900'>/* These are internal errors: */</font>
+   <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>add_elements <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#979000'>0</font> <font color='#5555FF'>|</font><font color='#5555FF'>|</font> element_size <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font> <font color='#5555FF'>|</font><font color='#5555FF'>|</font> old_elements <font color='#5555FF'>&lt;</font> <font color='#979000'>0</font> <font color='#5555FF'>|</font><font color='#5555FF'>|</font>
+      <font face='Lucida Console'>(</font>old_array <font color='#5555FF'>=</font><font color='#5555FF'>=</font> NULL <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> old_elements <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+      <font color='#BB00BB'>png_error</font><font face='Lucida Console'>(</font>png_ptr, "<font color='#CC0000'>internal error: array realloc</font>"<font face='Lucida Console'>)</font>;
+
+   <font color='#009900'>/* Check for overflow on the elements count (so the caller does not have to
+    * check.)
+    */</font>
+   <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>add_elements <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> INT_MAX <font color='#5555FF'>-</font> old_elements<font face='Lucida Console'>)</font>
+   <b>{</b>
+      png_voidp new_array <font color='#5555FF'>=</font> <font color='#BB00BB'>png_malloc_array_checked</font><font face='Lucida Console'>(</font>png_ptr,
+         old_elements<font color='#5555FF'>+</font>add_elements, element_size<font face='Lucida Console'>)</font>;
+
+      <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>new_array <font color='#5555FF'>!</font><font color='#5555FF'>=</font> NULL<font face='Lucida Console'>)</font>
+      <b>{</b>
+         <font color='#009900'>/* Because png_malloc_array worked the size calculations below cannot
+          * overflow.
+          */</font>
+         <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>old_elements <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+            <font color='#BB00BB'>memcpy</font><font face='Lucida Console'>(</font>new_array, old_array, element_size<font color='#5555FF'>*</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font><font face='Lucida Console'>)</font>old_elements<font face='Lucida Console'>)</font>;
+
+         <font color='#BB00BB'>memset</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>char</u></font><font color='#5555FF'>*</font><font face='Lucida Console'>)</font>new_array <font color='#5555FF'>+</font> element_size<font color='#5555FF'>*</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font><font face='Lucida Console'>)</font>old_elements, <font color='#979000'>0</font>,
+            element_size<font color='#5555FF'>*</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font><font face='Lucida Console'>)</font>add_elements<font face='Lucida Console'>)</font>;
+
+         <font color='#0000FF'>return</font> new_array;
+      <b>}</b>
+   <b>}</b>
+
+   <font color='#0000FF'>return</font> NULL; <font color='#009900'>/* error */</font>
+<b>}</b>
+
+<font color='#009900'>/* Various functions that have different error handling are derived from this.
+ * png_malloc always exists, but if PNG_USER_MEM_SUPPORTED is defined a separate
+ * function png_malloc_default is also provided.
+ */</font>
+<b><a name='PNG_FUNCTION'></a>PNG_FUNCTION</b><font face='Lucida Console'>(</font>png_voidp,PNGAPI
+png_malloc,<font face='Lucida Console'>(</font>png_const_structrp png_ptr, png_alloc_size_t size<font face='Lucida Console'>)</font>,PNG_ALLOCATED<font face='Lucida Console'>)</font>
+<b>{</b>
+   png_voidp ret;
+
+   <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>png_ptr <font color='#5555FF'>=</font><font color='#5555FF'>=</font> NULL<font face='Lucida Console'>)</font>
+      <font color='#0000FF'>return</font> NULL;
+
+   ret <font color='#5555FF'>=</font> <font color='#BB00BB'>png_malloc_base</font><font face='Lucida Console'>(</font>png_ptr, size<font face='Lucida Console'>)</font>;
+
+   <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>ret <font color='#5555FF'>=</font><font color='#5555FF'>=</font> NULL<font face='Lucida Console'>)</font>
+       <font color='#BB00BB'>png_error</font><font face='Lucida Console'>(</font>png_ptr, "<font color='#CC0000'>Out of memory</font>"<font face='Lucida Console'>)</font>; <font color='#009900'>/* 'm' means png_malloc */</font>
+
+   <font color='#0000FF'>return</font> ret;
+<b>}</b>
+
+<font color='#0000FF'>#ifdef</font> PNG_USER_MEM_SUPPORTED
+<b><a name='PNG_FUNCTION'></a>PNG_FUNCTION</b><font face='Lucida Console'>(</font>png_voidp,PNGAPI
+png_malloc_default,<font face='Lucida Console'>(</font>png_const_structrp png_ptr, png_alloc_size_t size<font face='Lucida Console'>)</font>,
+   PNG_ALLOCATED PNG_DEPRECATED<font face='Lucida Console'>)</font>
+<b>{</b>
+   png_voidp ret;
+
+   <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>png_ptr <font color='#5555FF'>=</font><font color='#5555FF'>=</font> NULL<font face='Lucida Console'>)</font>
+      <font color='#0000FF'>return</font> NULL;
+
+   <font color='#009900'>/* Passing 'NULL' here bypasses the application provided memory handler. */</font>
+   ret <font color='#5555FF'>=</font> <font color='#BB00BB'>png_malloc_base</font><font face='Lucida Console'>(</font>NULL<font color='#009900'>/*use malloc*/</font>, size<font face='Lucida Console'>)</font>;
+
+   <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>ret <font color='#5555FF'>=</font><font color='#5555FF'>=</font> NULL<font face='Lucida Console'>)</font>
+      <font color='#BB00BB'>png_error</font><font face='Lucida Console'>(</font>png_ptr, "<font color='#CC0000'>Out of Memory</font>"<font face='Lucida Console'>)</font>; <font color='#009900'>/* 'M' means png_malloc_default */</font>
+
+   <font color='#0000FF'>return</font> ret;
+<b>}</b>
+<font color='#0000FF'>#endif</font> <font color='#009900'>/* PNG_USER_MEM_SUPPORTED */</font>
+
+<font color='#009900'>/* This function was added at libpng version 1.2.3.  The png_malloc_warn()
+ * function will issue a png_warning and return NULL instead of issuing a
+ * png_error, if it fails to allocate the requested memory.
+ */</font>
+<b><a name='PNG_FUNCTION'></a>PNG_FUNCTION</b><font face='Lucida Console'>(</font>png_voidp,PNGAPI
+png_malloc_warn,<font face='Lucida Console'>(</font>png_const_structrp png_ptr, png_alloc_size_t size<font face='Lucida Console'>)</font>,
+   PNG_ALLOCATED<font face='Lucida Console'>)</font>
+<b>{</b>
+   <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>png_ptr <font color='#5555FF'>!</font><font color='#5555FF'>=</font> NULL<font face='Lucida Console'>)</font>
+   <b>{</b>
+      png_voidp ret <font color='#5555FF'>=</font> <font color='#BB00BB'>png_malloc_base</font><font face='Lucida Console'>(</font>png_ptr, size<font face='Lucida Console'>)</font>;
+
+      <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>ret <font color='#5555FF'>!</font><font color='#5555FF'>=</font> NULL<font face='Lucida Console'>)</font>
+         <font color='#0000FF'>return</font> ret;
+
+      <font color='#BB00BB'>png_warning</font><font face='Lucida Console'>(</font>png_ptr, "<font color='#CC0000'>Out of memory</font>"<font face='Lucida Console'>)</font>;
+   <b>}</b>
+
+   <font color='#0000FF'>return</font> NULL;
+<b>}</b>
+
+<font color='#009900'>/* Free a pointer allocated by png_malloc().  If ptr is NULL, return
+ * without taking any action.
+ */</font>
+<font color='#0000FF'><u>void</u></font> PNGAPI
+<b><a name='png_free'></a>png_free</b><font face='Lucida Console'>(</font>png_const_structrp png_ptr, png_voidp ptr<font face='Lucida Console'>)</font>
+<b>{</b>
+   <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>png_ptr <font color='#5555FF'>=</font><font color='#5555FF'>=</font> NULL <font color='#5555FF'>|</font><font color='#5555FF'>|</font> ptr <font color='#5555FF'>=</font><font color='#5555FF'>=</font> NULL<font face='Lucida Console'>)</font>
+      <font color='#0000FF'>return</font>;
+
+<font color='#0000FF'>#ifdef</font> PNG_USER_MEM_SUPPORTED
+   <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>free_fn <font color='#5555FF'>!</font><font color='#5555FF'>=</font> NULL<font face='Lucida Console'>)</font>
+      png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>free_fn</font><font face='Lucida Console'>(</font><font color='#BB00BB'>png_constcast</font><font face='Lucida Console'>(</font>png_structrp,png_ptr<font face='Lucida Console'>)</font>, ptr<font face='Lucida Console'>)</font>;
+
+   <font color='#0000FF'>else</font>
+      <font color='#BB00BB'>png_free_default</font><font face='Lucida Console'>(</font>png_ptr, ptr<font face='Lucida Console'>)</font>;
+<b>}</b>
+
+<b><a name='PNG_FUNCTION'></a>PNG_FUNCTION</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font>,PNGAPI
+png_free_default,<font face='Lucida Console'>(</font>png_const_structrp png_ptr, png_voidp ptr<font face='Lucida Console'>)</font>,PNG_DEPRECATED<font face='Lucida Console'>)</font>
+<b>{</b>
+   <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>png_ptr <font color='#5555FF'>=</font><font color='#5555FF'>=</font> NULL <font color='#5555FF'>|</font><font color='#5555FF'>|</font> ptr <font color='#5555FF'>=</font><font color='#5555FF'>=</font> NULL<font face='Lucida Console'>)</font>
+      <font color='#0000FF'>return</font>;
+<font color='#0000FF'>#endif</font> <font color='#009900'>/* PNG_USER_MEM_SUPPORTED */</font>
+
+   <font color='#BB00BB'>free</font><font face='Lucida Console'>(</font>ptr<font face='Lucida Console'>)</font>;
+<b>}</b>
+
+<font color='#0000FF'>#ifdef</font> PNG_USER_MEM_SUPPORTED
+<font color='#009900'>/* This function is called when the application wants to use another method
+ * of allocating and freeing memory.
+ */</font>
+<font color='#0000FF'><u>void</u></font> PNGAPI
+<b><a name='png_set_mem_fn'></a>png_set_mem_fn</b><font face='Lucida Console'>(</font>png_structrp png_ptr, png_voidp mem_ptr, png_malloc_ptr
+  malloc_fn, png_free_ptr free_fn<font face='Lucida Console'>)</font>
+<b>{</b>
+   <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>png_ptr <font color='#5555FF'>!</font><font color='#5555FF'>=</font> NULL<font face='Lucida Console'>)</font>
+   <b>{</b>
+      png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>mem_ptr <font color='#5555FF'>=</font> mem_ptr;
+      png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>malloc_fn <font color='#5555FF'>=</font> malloc_fn;
+      png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>free_fn <font color='#5555FF'>=</font> free_fn;
+   <b>}</b>
+<b>}</b>
+
+<font color='#009900'>/* This function returns a pointer to the mem_ptr associated with the user
+ * functions.  The application should free any memory associated with this
+ * pointer before png_write_destroy and png_read_destroy are called.
+ */</font>
+png_voidp PNGAPI
+<b><a name='png_get_mem_ptr'></a>png_get_mem_ptr</b><font face='Lucida Console'>(</font>png_const_structrp png_ptr<font face='Lucida Console'>)</font>
+<b>{</b>
+   <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>png_ptr <font color='#5555FF'>=</font><font color='#5555FF'>=</font> NULL<font face='Lucida Console'>)</font>
+      <font color='#0000FF'>return</font> NULL;
+
+   <font color='#0000FF'>return</font> png_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>mem_ptr;
+<b>}</b>
+<font color='#0000FF'>#endif</font> <font color='#009900'>/* PNG_USER_MEM_SUPPORTED */</font>
+<font color='#0000FF'>#endif</font> <font color='#009900'>/* PNG_READ_SUPPORTED || PNG_WRITE_SUPPORTED */</font>
+
+</pre></body></html>

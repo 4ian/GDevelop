@@ -1,0 +1,519 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - any_function_impl.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2011  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_ANY_FUNCTION_RETURN
+<font color='#0000FF'>#error</font> "<font color='#CC0000'>You aren't supposed to directly #include this file.  #include &lt;dlib/any.h&gt; instead.</font>"  
+<font color='#0000FF'>#endif</font>
+
+<font color='#0000FF'>#ifdef</font> _MSC_VER
+<font color='#009900'>// When using visual studio 2012, disable the warning "warning C4180: qualifier applied to function type has no meaning; ignored"
+</font><font color='#009900'>// that you get about some template expansions applying &amp; to function types. 
+</font><font color='#0000FF'>#pragma</font> warning<font face='Lucida Console'>(</font>disable : <font color='#979000'>4180</font><font face='Lucida Console'>)</font>
+<font color='#0000FF'>#endif</font>
+
+<font color='#0000FF'>#ifdef</font> DLIB_ANY_FUNCTION_RETURN
+
+<font color='#009900'>// This file contains the body of the any_function class.  We use the
+</font><font color='#009900'>// preprocessor to generate many different versions.  There are 
+</font><font color='#009900'>// versions which return a value and those which return void.  For
+</font><font color='#009900'>// each of these types there are versions with differing numbers
+</font><font color='#009900'>// of arguments. 
+</font>
+<font color='#0000FF'>public</font>:
+<font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> sig_traits<font color='#5555FF'>&lt;</font>function_type<font color='#5555FF'>&gt;</font>::result_type result_type;
+<font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> sig_traits<font color='#5555FF'>&lt;</font>function_type<font color='#5555FF'>&gt;</font>::arg1_type arg1_type;
+<font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> sig_traits<font color='#5555FF'>&lt;</font>function_type<font color='#5555FF'>&gt;</font>::arg2_type arg2_type;
+<font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> sig_traits<font color='#5555FF'>&lt;</font>function_type<font color='#5555FF'>&gt;</font>::arg3_type arg3_type;
+<font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> sig_traits<font color='#5555FF'>&lt;</font>function_type<font color='#5555FF'>&gt;</font>::arg4_type arg4_type;
+<font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> sig_traits<font color='#5555FF'>&lt;</font>function_type<font color='#5555FF'>&gt;</font>::arg5_type arg5_type;
+<font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> sig_traits<font color='#5555FF'>&lt;</font>function_type<font color='#5555FF'>&gt;</font>::arg6_type arg6_type;
+<font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> sig_traits<font color='#5555FF'>&lt;</font>function_type<font color='#5555FF'>&gt;</font>::arg7_type arg7_type;
+<font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> sig_traits<font color='#5555FF'>&lt;</font>function_type<font color='#5555FF'>&gt;</font>::arg8_type arg8_type;
+<font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> sig_traits<font color='#5555FF'>&lt;</font>function_type<font color='#5555FF'>&gt;</font>::arg9_type arg9_type;
+<font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> sig_traits<font color='#5555FF'>&lt;</font>function_type<font color='#5555FF'>&gt;</font>::arg10_type arg10_type;
+<font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> num_args <font color='#5555FF'>=</font> sig_traits<font color='#5555FF'>&lt;</font>function_type<font color='#5555FF'>&gt;</font>::num_args;
+
+<b><a name='any_function'></a>any_function</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+<b>{</b>
+<b>}</b>
+
+<b><a name='any_function'></a>any_function</b> <font face='Lucida Console'>(</font>
+    <font color='#0000FF'>const</font> any_function<font color='#5555FF'>&amp;</font> item
+<font face='Lucida Console'>)</font>
+<b>{</b>
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>item.data<font face='Lucida Console'>)</font>
+    <b>{</b>
+        item.data<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>copy_to</font><font face='Lucida Console'>(</font>data<font face='Lucida Console'>)</font>;
+    <b>}</b>
+<b>}</b>
+
+<font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+<b><a name='any_function'></a>any_function</b> <font face='Lucida Console'>(</font>
+    <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> item
+<font face='Lucida Console'>)</font>
+<b>{</b>
+    <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> basic_type<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font>::type U;
+    data.<font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font><font color='#0000FF'>new</font> derived<font color='#5555FF'>&lt;</font>U,function_type<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>item<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+<b>}</b>
+
+<font color='#0000FF'><u>void</u></font> <b><a name='clear'></a>clear</b> <font face='Lucida Console'>(</font>
+<font face='Lucida Console'>)</font>
+<b>{</b>
+    data.<font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+<b>}</b>
+
+<font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'><u>bool</u></font> <b><a name='contains'></a>contains</b> <font face='Lucida Console'>(</font>
+<font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+<b>{</b>
+    <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> basic_type<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font>::type U;
+    <font color='#0000FF'>return</font> <font color='#0000FF'>dynamic_cast</font><font color='#5555FF'>&lt;</font>derived<font color='#5555FF'>&lt;</font>U,function_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>*</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>data.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+<b>}</b>
+
+<font color='#0000FF'><u>bool</u></font> <b><a name='is_empty'></a>is_empty</b><font face='Lucida Console'>(</font>
+<font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+<b>{</b>
+    <font color='#0000FF'>return</font> data.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+<b>}</b>
+
+<font color='#0000FF'><u>bool</u></font> <b><a name='is_set'></a>is_set</b><font face='Lucida Console'>(</font>
+<font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+<b>{</b>
+    <font color='#0000FF'>return</font> <font color='#5555FF'>!</font><font color='#BB00BB'>is_empty</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+<b>}</b>
+
+<font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+T<font color='#5555FF'>&amp;</font> <b><a name='cast_to'></a>cast_to</b><font face='Lucida Console'>(</font>
+<font face='Lucida Console'>)</font> 
+<b>{</b>
+    <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> basic_type<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font>::type U;
+    derived<font color='#5555FF'>&lt;</font>U,function_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>*</font> d <font color='#5555FF'>=</font> <font color='#0000FF'>dynamic_cast</font><font color='#5555FF'>&lt;</font>derived<font color='#5555FF'>&lt;</font>U,function_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>*</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>data.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>d <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>throw</font> <font color='#BB00BB'>bad_any_cast</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+    <font color='#0000FF'>return</font> d<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>item;
+<b>}</b>
+
+<font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> <b><a name='cast_to'></a>cast_to</b><font face='Lucida Console'>(</font>
+<font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+<b>{</b>
+    <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> basic_type<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font>::type U;
+    derived<font color='#5555FF'>&lt;</font>U,function_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>*</font> d <font color='#5555FF'>=</font> <font color='#0000FF'>dynamic_cast</font><font color='#5555FF'>&lt;</font>derived<font color='#5555FF'>&lt;</font>U,function_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>*</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>data.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>d <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>throw</font> <font color='#BB00BB'>bad_any_cast</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+    <font color='#0000FF'>return</font> d<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>item;
+<b>}</b>
+
+<font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+T<font color='#5555FF'>&amp;</font> <b><a name='get'></a>get</b><font face='Lucida Console'>(</font>
+<font face='Lucida Console'>)</font> 
+<b>{</b>
+    <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> basic_type<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font>::type U;
+    derived<font color='#5555FF'>&lt;</font>U,function_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>*</font> d <font color='#5555FF'>=</font> <font color='#0000FF'>dynamic_cast</font><font color='#5555FF'>&lt;</font>derived<font color='#5555FF'>&lt;</font>U,function_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>*</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>data.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>d <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+    <b>{</b>
+        d <font color='#5555FF'>=</font> <font color='#0000FF'>new</font> derived<font color='#5555FF'>&lt;</font>U,function_type<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        data.<font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font>d<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+    <font color='#0000FF'>return</font> d<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>item;
+<b>}</b>
+
+any_function<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>
+    <font color='#0000FF'>const</font> any_function<font color='#5555FF'>&amp;</font> item
+<font face='Lucida Console'>)</font>
+<b>{</b>
+    <font color='#BB00BB'>any_function</font><font face='Lucida Console'>(</font>item<font face='Lucida Console'>)</font>.<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font><font face='Lucida Console'>)</font>;
+    <font color='#0000FF'>return</font> <font color='#5555FF'>*</font><font color='#0000FF'>this</font>;
+<b>}</b>
+
+<font color='#0000FF'><u>void</u></font> <b><a name='swap'></a>swap</b> <font face='Lucida Console'>(</font>
+    any_function<font color='#5555FF'>&amp;</font> item
+<font face='Lucida Console'>)</font>
+<b>{</b>
+    data.<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>item.data<font face='Lucida Console'>)</font>;
+<b>}</b>
+
+result_type <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>DLIB_ANY_FUNCTION_ARG_LIST<font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> 
+<b>{</b> <font color='#BB00BB'>validate</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; DLIB_ANY_FUNCTION_RETURN data<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>evaluate</font><font face='Lucida Console'>(</font>DLIB_ANY_FUNCTION_ARGS<font face='Lucida Console'>)</font>; <b>}</b>
+<font color='#009900'>/* !!!!!!!!    ERRORS ON THE ABOVE LINE    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    If you are getting an error on the above line then it means you
+    have attempted to call a dlib::any_function but you have supplied 
+    arguments which don't match the function signature used by the
+    dlib::any_function. 
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/</font>
+
+<font color='#0000FF'>private</font>:
+
+<font color='#0000FF'><u>void</u></font> <b><a name='validate'></a>validate</b> <font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+<b>{</b>
+    <font color='#009900'>// make sure requires clause is not broken
+</font>    <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font><font color='#BB00BB'>is_empty</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font>,
+        "<font color='#CC0000'>\t result_type any_function::operator()</font>"
+        <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t You can't call operator() on an empty any_function</font>"
+        <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t this: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font>
+        <font face='Lucida Console'>)</font>;
+<b>}</b>
+
+
+<font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> FT<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>struct</font> <b><a name='Tbase'></a>Tbase</b>
+<b>{</b>
+    <font color='#0000FF'>virtual</font> ~<b><a name='Tbase'></a>Tbase</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+    <font color='#0000FF'>virtual</font> result_type <b><a name='evaluate'></a>evaluate</b> <font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+    <font color='#0000FF'>virtual</font> <font color='#0000FF'><u>void</u></font> <b><a name='copy_to'></a>copy_to</b> <font face='Lucida Console'>(</font> scoped_ptr<font color='#5555FF'>&lt;</font>Tbase<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> dest<font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+<b>}</b>;
+
+<font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+    <font color='#0000FF'>typename</font> T, 
+    <font color='#0000FF'>typename</font> A1
+    <font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>struct</font> <b><a name='Tbase'></a>Tbase</b><font color='#5555FF'>&lt;</font><b><a name='T'></a>T</b> <font face='Lucida Console'>(</font>A1<font face='Lucida Console'>)</font><font color='#5555FF'>&gt;</font>
+<b>{</b>
+    <font color='#0000FF'>virtual</font> ~<font color='#BB00BB'>Tbase</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+    <font color='#0000FF'>virtual</font> T <font color='#BB00BB'>evaluate</font> <font face='Lucida Console'>(</font> A1<font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+    <font color='#0000FF'>virtual</font> <font color='#0000FF'><u>void</u></font> <font color='#BB00BB'>copy_to</font> <font face='Lucida Console'>(</font> scoped_ptr<font color='#5555FF'>&lt;</font>Tbase<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> dest<font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+<b>}</b>;
+
+<font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+    <font color='#0000FF'>typename</font> T, 
+    <font color='#0000FF'>typename</font> A1, <font color='#0000FF'>typename</font> A2
+    <font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>struct</font> <b><a name='Tbase'></a>Tbase</b><font color='#5555FF'>&lt;</font><b><a name='T'></a>T</b> <font face='Lucida Console'>(</font>A1,A2<font face='Lucida Console'>)</font><font color='#5555FF'>&gt;</font>
+<b>{</b>
+    <font color='#0000FF'>virtual</font> ~<font color='#BB00BB'>Tbase</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+    <font color='#0000FF'>virtual</font> T <font color='#BB00BB'>evaluate</font> <font face='Lucida Console'>(</font>A1,A2<font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+    <font color='#0000FF'>virtual</font> <font color='#0000FF'><u>void</u></font> <font color='#BB00BB'>copy_to</font> <font face='Lucida Console'>(</font> scoped_ptr<font color='#5555FF'>&lt;</font>Tbase<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> dest<font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+<b>}</b>;
+
+<font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+    <font color='#0000FF'>typename</font> T, 
+    <font color='#0000FF'>typename</font> A1, <font color='#0000FF'>typename</font> A2, <font color='#0000FF'>typename</font> A3
+    <font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>struct</font> <b><a name='Tbase'></a>Tbase</b><font color='#5555FF'>&lt;</font><b><a name='T'></a>T</b> <font face='Lucida Console'>(</font>A1,A2,A3<font face='Lucida Console'>)</font><font color='#5555FF'>&gt;</font>
+<b>{</b>
+    <font color='#0000FF'>virtual</font> ~<font color='#BB00BB'>Tbase</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+    <font color='#0000FF'>virtual</font> T <font color='#BB00BB'>evaluate</font> <font face='Lucida Console'>(</font>A1,A2,A3<font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+    <font color='#0000FF'>virtual</font> <font color='#0000FF'><u>void</u></font> <font color='#BB00BB'>copy_to</font> <font face='Lucida Console'>(</font> scoped_ptr<font color='#5555FF'>&lt;</font>Tbase<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> dest<font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+<b>}</b>;
+
+<font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+    <font color='#0000FF'>typename</font> T, 
+    <font color='#0000FF'>typename</font> A1, <font color='#0000FF'>typename</font> A2, <font color='#0000FF'>typename</font> A3,
+    <font color='#0000FF'>typename</font> A4
+    <font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>struct</font> <b><a name='Tbase'></a>Tbase</b><font color='#5555FF'>&lt;</font><b><a name='T'></a>T</b> <font face='Lucida Console'>(</font>A1,A2,A3,A4<font face='Lucida Console'>)</font><font color='#5555FF'>&gt;</font>
+<b>{</b>
+    <font color='#0000FF'>virtual</font> ~<font color='#BB00BB'>Tbase</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+    <font color='#0000FF'>virtual</font> T <font color='#BB00BB'>evaluate</font> <font face='Lucida Console'>(</font>A1,A2,A3,A4<font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+    <font color='#0000FF'>virtual</font> <font color='#0000FF'><u>void</u></font> <font color='#BB00BB'>copy_to</font> <font face='Lucida Console'>(</font> scoped_ptr<font color='#5555FF'>&lt;</font>Tbase<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> dest<font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+<b>}</b>;
+
+<font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+    <font color='#0000FF'>typename</font> T, 
+    <font color='#0000FF'>typename</font> A1, <font color='#0000FF'>typename</font> A2, <font color='#0000FF'>typename</font> A3,
+    <font color='#0000FF'>typename</font> A4, <font color='#0000FF'>typename</font> A5
+    <font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>struct</font> <b><a name='Tbase'></a>Tbase</b><font color='#5555FF'>&lt;</font><b><a name='T'></a>T</b> <font face='Lucida Console'>(</font>A1,A2,A3,A4,A5<font face='Lucida Console'>)</font><font color='#5555FF'>&gt;</font>
+<b>{</b>
+    <font color='#0000FF'>virtual</font> ~<font color='#BB00BB'>Tbase</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+    <font color='#0000FF'>virtual</font> T <font color='#BB00BB'>evaluate</font> <font face='Lucida Console'>(</font>A1,A2,A3,A4,A5<font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+    <font color='#0000FF'>virtual</font> <font color='#0000FF'><u>void</u></font> <font color='#BB00BB'>copy_to</font> <font face='Lucida Console'>(</font> scoped_ptr<font color='#5555FF'>&lt;</font>Tbase<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> dest<font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+<b>}</b>;
+
+<font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+    <font color='#0000FF'>typename</font> T, 
+    <font color='#0000FF'>typename</font> A1, <font color='#0000FF'>typename</font> A2, <font color='#0000FF'>typename</font> A3,
+    <font color='#0000FF'>typename</font> A4, <font color='#0000FF'>typename</font> A5, <font color='#0000FF'>typename</font> A6
+    <font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>struct</font> <b><a name='Tbase'></a>Tbase</b><font color='#5555FF'>&lt;</font><b><a name='T'></a>T</b> <font face='Lucida Console'>(</font>A1,A2,A3,A4,A5,A6<font face='Lucida Console'>)</font><font color='#5555FF'>&gt;</font>
+<b>{</b>
+    <font color='#0000FF'>virtual</font> ~<font color='#BB00BB'>Tbase</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+    <font color='#0000FF'>virtual</font> T <font color='#BB00BB'>evaluate</font> <font face='Lucida Console'>(</font>A1,A2,A3,A4,A5,A6<font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+    <font color='#0000FF'>virtual</font> <font color='#0000FF'><u>void</u></font> <font color='#BB00BB'>copy_to</font> <font face='Lucida Console'>(</font> scoped_ptr<font color='#5555FF'>&lt;</font>Tbase<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> dest<font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+<b>}</b>;
+
+<font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+    <font color='#0000FF'>typename</font> T, 
+    <font color='#0000FF'>typename</font> A1, <font color='#0000FF'>typename</font> A2, <font color='#0000FF'>typename</font> A3,
+    <font color='#0000FF'>typename</font> A4, <font color='#0000FF'>typename</font> A5, <font color='#0000FF'>typename</font> A6,
+    <font color='#0000FF'>typename</font> A7
+    <font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>struct</font> <b><a name='Tbase'></a>Tbase</b><font color='#5555FF'>&lt;</font><b><a name='T'></a>T</b> <font face='Lucida Console'>(</font>A1,A2,A3,A4,A5,A6,A7<font face='Lucida Console'>)</font><font color='#5555FF'>&gt;</font>
+<b>{</b>
+    <font color='#0000FF'>virtual</font> ~<font color='#BB00BB'>Tbase</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+    <font color='#0000FF'>virtual</font> T <font color='#BB00BB'>evaluate</font> <font face='Lucida Console'>(</font>A1,A2,A3,A4,A5,A6,A7<font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+    <font color='#0000FF'>virtual</font> <font color='#0000FF'><u>void</u></font> <font color='#BB00BB'>copy_to</font> <font face='Lucida Console'>(</font> scoped_ptr<font color='#5555FF'>&lt;</font>Tbase<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> dest<font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+<b>}</b>;
+
+<font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+    <font color='#0000FF'>typename</font> T, 
+    <font color='#0000FF'>typename</font> A1, <font color='#0000FF'>typename</font> A2, <font color='#0000FF'>typename</font> A3,
+    <font color='#0000FF'>typename</font> A4, <font color='#0000FF'>typename</font> A5, <font color='#0000FF'>typename</font> A6,
+    <font color='#0000FF'>typename</font> A7, <font color='#0000FF'>typename</font> A8
+    <font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>struct</font> <b><a name='Tbase'></a>Tbase</b><font color='#5555FF'>&lt;</font><b><a name='T'></a>T</b> <font face='Lucida Console'>(</font>A1,A2,A3,A4,A5,A6,A7,A8<font face='Lucida Console'>)</font><font color='#5555FF'>&gt;</font>
+<b>{</b>
+    <font color='#0000FF'>virtual</font> ~<font color='#BB00BB'>Tbase</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+    <font color='#0000FF'>virtual</font> T <font color='#BB00BB'>evaluate</font> <font face='Lucida Console'>(</font>A1,A2,A3,A4,A5,A6,A7,A8<font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+    <font color='#0000FF'>virtual</font> <font color='#0000FF'><u>void</u></font> <font color='#BB00BB'>copy_to</font> <font face='Lucida Console'>(</font> scoped_ptr<font color='#5555FF'>&lt;</font>Tbase<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> dest<font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+<b>}</b>;
+
+<font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+    <font color='#0000FF'>typename</font> T, 
+    <font color='#0000FF'>typename</font> A1, <font color='#0000FF'>typename</font> A2, <font color='#0000FF'>typename</font> A3,
+    <font color='#0000FF'>typename</font> A4, <font color='#0000FF'>typename</font> A5, <font color='#0000FF'>typename</font> A6,
+    <font color='#0000FF'>typename</font> A7, <font color='#0000FF'>typename</font> A8, <font color='#0000FF'>typename</font> A9
+    <font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>struct</font> <b><a name='Tbase'></a>Tbase</b><font color='#5555FF'>&lt;</font><b><a name='T'></a>T</b> <font face='Lucida Console'>(</font>A1,A2,A3,A4,A5,A6,A7,A8,A9<font face='Lucida Console'>)</font><font color='#5555FF'>&gt;</font>
+<b>{</b>
+    <font color='#0000FF'>virtual</font> ~<font color='#BB00BB'>Tbase</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+    <font color='#0000FF'>virtual</font> T <font color='#BB00BB'>evaluate</font> <font face='Lucida Console'>(</font>A1,A2,A3,A4,A5,A6,A7,A8,A9<font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+    <font color='#0000FF'>virtual</font> <font color='#0000FF'><u>void</u></font> <font color='#BB00BB'>copy_to</font> <font face='Lucida Console'>(</font> scoped_ptr<font color='#5555FF'>&lt;</font>Tbase<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> dest<font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+<b>}</b>;
+
+<font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+    <font color='#0000FF'>typename</font> T, 
+    <font color='#0000FF'>typename</font> A1, <font color='#0000FF'>typename</font> A2, <font color='#0000FF'>typename</font> A3,
+    <font color='#0000FF'>typename</font> A4, <font color='#0000FF'>typename</font> A5, <font color='#0000FF'>typename</font> A6,
+    <font color='#0000FF'>typename</font> A7, <font color='#0000FF'>typename</font> A8, <font color='#0000FF'>typename</font> A9,
+    <font color='#0000FF'>typename</font> A10
+    <font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>struct</font> <b><a name='Tbase'></a>Tbase</b><font color='#5555FF'>&lt;</font><b><a name='T'></a>T</b> <font face='Lucida Console'>(</font>A1,A2,A3,A4,A5,A6,A7,A8,A9,A10<font face='Lucida Console'>)</font><font color='#5555FF'>&gt;</font>
+<b>{</b>
+    <font color='#0000FF'>virtual</font> ~<font color='#BB00BB'>Tbase</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+    <font color='#0000FF'>virtual</font> T <font color='#BB00BB'>evaluate</font> <font face='Lucida Console'>(</font>A1,A2,A3,A4,A5,A6,A7,A8,A9,A10<font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+    <font color='#0000FF'>virtual</font> <font color='#0000FF'><u>void</u></font> <font color='#BB00BB'>copy_to</font> <font face='Lucida Console'>(</font> scoped_ptr<font color='#5555FF'>&lt;</font>Tbase<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> dest<font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+<b>}</b>;
+
+<font color='#0000FF'>typedef</font> Tbase<font color='#5555FF'>&lt;</font>function_type<font color='#5555FF'>&gt;</font> base;
+
+<font color='#009900'>// -----------------------------------------------
+</font>
+<font color='#009900'>// Some templates to help deal with the weirdness of storing C function types (rather than pointer to functions).
+</font><font color='#009900'>// Basically, we make sure things always get turned into function pointers even if the user gives a function reference.
+</font><font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> enabled <font color='#5555FF'>=</font> <font color='#0000FF'><u>void</u></font><font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>struct</font> <b><a name='funct_type'></a>funct_type</b> <b>{</b> <font color='#0000FF'>typedef</font> T type; <b>}</b>;
+<font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>struct</font> <b><a name='funct_type'></a>funct_type</b><font color='#5555FF'>&lt;</font>T, <font color='#0000FF'>typename</font> enable_if<font color='#5555FF'>&lt;</font>is_function<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font>::type<font color='#5555FF'>&gt;</font> <b>{</b> <font color='#0000FF'>typedef</font> T<font color='#5555FF'>*</font> type; <b>}</b>;
+
+<font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>static</font> <font color='#0000FF'>typename</font> enable_if<font color='#5555FF'>&lt;</font>is_function<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font>,<font color='#0000FF'>const</font> T<font color='#5555FF'>*</font><font color='#5555FF'>&gt;</font>::type <b><a name='copy'></a>copy</b> <font face='Lucida Console'>(</font><font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> item<font face='Lucida Console'>)</font> <b>{</b> <font color='#0000FF'>return</font> <font color='#5555FF'>&amp;</font>item; <b>}</b>
+<font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>static</font> <font color='#0000FF'>typename</font> disable_if<font color='#5555FF'>&lt;</font>is_function<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font>,<font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font><font color='#5555FF'>&gt;</font>::type <b><a name='copy'></a>copy</b> <font face='Lucida Console'>(</font><font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> item<font face='Lucida Console'>)</font> <b>{</b> <font color='#0000FF'>return</font> item; <b>}</b>
+
+<font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> U<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>static</font> <font color='#0000FF'>typename</font> enable_if<font color='#5555FF'>&lt;</font>is_function<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font>,<font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font><font color='#5555FF'>&gt;</font>::type <b><a name='deref'></a>deref</b> <font face='Lucida Console'>(</font><font color='#0000FF'>const</font> U<font color='#5555FF'>&amp;</font> item<font face='Lucida Console'>)</font> <b>{</b> <font color='#0000FF'>return</font> <font color='#5555FF'>*</font>item; <b>}</b>
+<font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> U<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>static</font> <font color='#0000FF'>typename</font> disable_if<font color='#5555FF'>&lt;</font>is_function<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font>,<font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font><font color='#5555FF'>&gt;</font>::type <b><a name='deref'></a>deref</b> <font face='Lucida Console'>(</font><font color='#0000FF'>const</font> U<font color='#5555FF'>&amp;</font> item<font face='Lucida Console'>)</font> <b>{</b> <font color='#0000FF'>return</font> item; <b>}</b>
+
+<font color='#009900'>// -----------------------------------------------
+</font>
+<font color='#0000FF'>#define</font> DLIB_ANY_FUNCTION_DERIVED_BOILERPLATE               \
+    <font color='#0000FF'>typename</font> funct_type<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font>::type item;                      \
+    <b><a name='derived'></a>derived</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <b>{</b><b>}</b>                                            \
+    <b><a name='derived'></a>derived</b><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> val<font face='Lucida Console'>)</font> : item<font face='Lucida Console'>(</font>copy<font face='Lucida Console'>(</font>val<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <b>{</b><b>}</b>              \
+    <font color='#0000FF'>virtual</font> <font color='#0000FF'><u>void</u></font> <b><a name='copy_to'></a>copy_to</b> <font face='Lucida Console'>(</font> scoped_ptr<font color='#5555FF'>&lt;</font>base<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> dest<font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>    \
+    <b>{</b> dest.<font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font><font color='#0000FF'>new</font> <font color='#BB00BB'>derived</font><font face='Lucida Console'>(</font>deref<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>item<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>; <b>}</b>
+
+<font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> FT<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>struct</font> <b><a name='derived'></a>derived</b> : <font color='#0000FF'>public</font> base
+<b>{</b>
+    DLIB_ANY_FUNCTION_DERIVED_BOILERPLATE
+
+    <font color='#0000FF'>virtual</font> result_type <b><a name='evaluate'></a>evaluate</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> DLIB_ANY_FUNCTION_RETURN <font color='#BB00BB'>item</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <b>}</b>
+    <font color='#009900'>/* !!!!!!!!    ERRORS ON THE ABOVE LINE    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        If you are getting an error on the above line then it means you
+        have attempted to assign a function or function object to a
+        dlib::any_function but the signatures of the source and
+        destination functions don't match.
+    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/</font>
+<b>}</b>;
+
+<font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> A1<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>struct</font> <b><a name='derived'></a>derived</b><font color='#5555FF'>&lt;</font>T,<b><a name='result_type'></a>result_type</b> <font face='Lucida Console'>(</font>A1<font face='Lucida Console'>)</font><font color='#5555FF'>&gt;</font> : <font color='#0000FF'>public</font> base
+<b>{</b>
+    DLIB_ANY_FUNCTION_DERIVED_BOILERPLATE
+
+    <font color='#0000FF'>virtual</font> result_type <font color='#BB00BB'>evaluate</font> <font face='Lucida Console'>(</font>
+        A1 a1
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> DLIB_ANY_FUNCTION_RETURN <font color='#BB00BB'>item</font><font face='Lucida Console'>(</font>a1<font face='Lucida Console'>)</font>; <b>}</b>
+    <font color='#009900'>/* !!!!!!!!    ERRORS ON THE ABOVE LINE    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        If you are getting an error on the above line then it means you
+        have attempted to assign a function or function object to a
+        dlib::any_function but the signatures of the source and
+        destination functions don't match.
+    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/</font>
+<b>}</b>;
+
+<font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> A1, <font color='#0000FF'>typename</font> A2<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>struct</font> <b><a name='derived'></a>derived</b><font color='#5555FF'>&lt;</font>T,<b><a name='result_type'></a>result_type</b> <font face='Lucida Console'>(</font>A1,A2<font face='Lucida Console'>)</font><font color='#5555FF'>&gt;</font> : <font color='#0000FF'>public</font> base
+<b>{</b>
+    DLIB_ANY_FUNCTION_DERIVED_BOILERPLATE
+
+    <font color='#0000FF'>virtual</font> result_type <font color='#BB00BB'>evaluate</font> <font face='Lucida Console'>(</font>
+        A1 a1, A2 a2
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> DLIB_ANY_FUNCTION_RETURN <font color='#BB00BB'>item</font><font face='Lucida Console'>(</font>a1,a2<font face='Lucida Console'>)</font>; <b>}</b>
+    <font color='#009900'>/* !!!!!!!!    ERRORS ON THE ABOVE LINE    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        If you are getting an error on the above line then it means you
+        have attempted to assign a function or function object to a
+        dlib::any_function but the signatures of the source and
+        destination functions don't match.
+    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/</font>
+<b>}</b>;
+
+<font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> A1, <font color='#0000FF'>typename</font> A2, <font color='#0000FF'>typename</font> A3<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>struct</font> <b><a name='derived'></a>derived</b><font color='#5555FF'>&lt;</font>T,<b><a name='result_type'></a>result_type</b> <font face='Lucida Console'>(</font>A1,A2,A3<font face='Lucida Console'>)</font><font color='#5555FF'>&gt;</font> : <font color='#0000FF'>public</font> base
+<b>{</b>
+    DLIB_ANY_FUNCTION_DERIVED_BOILERPLATE
+
+    <font color='#0000FF'>virtual</font> result_type <font color='#BB00BB'>evaluate</font> <font face='Lucida Console'>(</font>
+        A1 a1, A2 a2, A3 a3
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> DLIB_ANY_FUNCTION_RETURN <font color='#BB00BB'>item</font><font face='Lucida Console'>(</font>a1,a2,a3<font face='Lucida Console'>)</font>; <b>}</b>
+    <font color='#009900'>/* !!!!!!!!    ERRORS ON THE ABOVE LINE    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        If you are getting an error on the above line then it means you
+        have attempted to assign a function or function object to a
+        dlib::any_function but the signatures of the source and
+        destination functions don't match.
+    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/</font>
+<b>}</b>;
+
+<font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> A1, <font color='#0000FF'>typename</font> A2, <font color='#0000FF'>typename</font> A3,
+                      <font color='#0000FF'>typename</font> A4<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>struct</font> <b><a name='derived'></a>derived</b><font color='#5555FF'>&lt;</font>T,<b><a name='result_type'></a>result_type</b> <font face='Lucida Console'>(</font>A1,A2,A3,A4<font face='Lucida Console'>)</font><font color='#5555FF'>&gt;</font> : <font color='#0000FF'>public</font> base
+<b>{</b>
+    DLIB_ANY_FUNCTION_DERIVED_BOILERPLATE
+
+    <font color='#0000FF'>virtual</font> result_type <font color='#BB00BB'>evaluate</font> <font face='Lucida Console'>(</font>
+        A1 a1, A2 a2, A3 a3, A4 a4
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> DLIB_ANY_FUNCTION_RETURN <font color='#BB00BB'>item</font><font face='Lucida Console'>(</font>a1,a2,a3,a4<font face='Lucida Console'>)</font>; <b>}</b>
+    <font color='#009900'>/* !!!!!!!!    ERRORS ON THE ABOVE LINE    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        If you are getting an error on the above line then it means you
+        have attempted to assign a function or function object to a
+        dlib::any_function but the signatures of the source and
+        destination functions don't match.
+    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/</font>
+<b>}</b>;
+
+<font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> A1, <font color='#0000FF'>typename</font> A2, <font color='#0000FF'>typename</font> A3,
+                      <font color='#0000FF'>typename</font> A4, <font color='#0000FF'>typename</font> A5<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>struct</font> <b><a name='derived'></a>derived</b><font color='#5555FF'>&lt;</font>T,<b><a name='result_type'></a>result_type</b> <font face='Lucida Console'>(</font>A1,A2,A3,A4,A5<font face='Lucida Console'>)</font><font color='#5555FF'>&gt;</font> : <font color='#0000FF'>public</font> base
+<b>{</b>
+    DLIB_ANY_FUNCTION_DERIVED_BOILERPLATE
+
+    <font color='#0000FF'>virtual</font> result_type <font color='#BB00BB'>evaluate</font> <font face='Lucida Console'>(</font>
+        A1 a1, A2 a2, A3 a3, A4 a4, A5 a5
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> DLIB_ANY_FUNCTION_RETURN <font color='#BB00BB'>item</font><font face='Lucida Console'>(</font>a1,a2,a3,a4,a5<font face='Lucida Console'>)</font>; <b>}</b>
+    <font color='#009900'>/* !!!!!!!!    ERRORS ON THE ABOVE LINE    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        If you are getting an error on the above line then it means you
+        have attempted to assign a function or function object to a
+        dlib::any_function but the signatures of the source and
+        destination functions don't match.
+    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/</font>
+<b>}</b>;
+
+<font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> A1, <font color='#0000FF'>typename</font> A2, <font color='#0000FF'>typename</font> A3,
+                      <font color='#0000FF'>typename</font> A4, <font color='#0000FF'>typename</font> A5, <font color='#0000FF'>typename</font> A6<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>struct</font> <b><a name='derived'></a>derived</b><font color='#5555FF'>&lt;</font>T,<b><a name='result_type'></a>result_type</b> <font face='Lucida Console'>(</font>A1,A2,A3,A4,A5,A6<font face='Lucida Console'>)</font><font color='#5555FF'>&gt;</font> : <font color='#0000FF'>public</font> base
+<b>{</b>
+    DLIB_ANY_FUNCTION_DERIVED_BOILERPLATE
+
+    <font color='#0000FF'>virtual</font> result_type <font color='#BB00BB'>evaluate</font> <font face='Lucida Console'>(</font>
+        A1 a1, A2 a2, A3 a3, A4 a4, A5 a5, A6 a6
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> DLIB_ANY_FUNCTION_RETURN <font color='#BB00BB'>item</font><font face='Lucida Console'>(</font>a1,a2,a3,a4,a5,a6<font face='Lucida Console'>)</font>; <b>}</b>
+    <font color='#009900'>/* !!!!!!!!    ERRORS ON THE ABOVE LINE    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        If you are getting an error on the above line then it means you
+        have attempted to assign a function or function object to a
+        dlib::any_function but the signatures of the source and
+        destination functions don't match.
+    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/</font>
+<b>}</b>;
+
+<font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> A1, <font color='#0000FF'>typename</font> A2, <font color='#0000FF'>typename</font> A3,
+                      <font color='#0000FF'>typename</font> A4, <font color='#0000FF'>typename</font> A5, <font color='#0000FF'>typename</font> A6,
+                      <font color='#0000FF'>typename</font> A7<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>struct</font> <b><a name='derived'></a>derived</b><font color='#5555FF'>&lt;</font>T,<b><a name='result_type'></a>result_type</b> <font face='Lucida Console'>(</font>A1,A2,A3,A4,A5,A6,A7<font face='Lucida Console'>)</font><font color='#5555FF'>&gt;</font> : <font color='#0000FF'>public</font> base
+<b>{</b>
+    DLIB_ANY_FUNCTION_DERIVED_BOILERPLATE
+
+    <font color='#0000FF'>virtual</font> result_type <font color='#BB00BB'>evaluate</font> <font face='Lucida Console'>(</font>
+        A1 a1, A2 a2, A3 a3, A4 a4, A5 a5, A6 a6, A7 a7
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> DLIB_ANY_FUNCTION_RETURN <font color='#BB00BB'>item</font><font face='Lucida Console'>(</font>a1,a2,a3,a4,a5,a6,a7<font face='Lucida Console'>)</font>; <b>}</b>
+    <font color='#009900'>/* !!!!!!!!    ERRORS ON THE ABOVE LINE    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        If you are getting an error on the above line then it means you
+        have attempted to assign a function or function object to a
+        dlib::any_function but the signatures of the source and
+        destination functions don't match.
+    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/</font>
+<b>}</b>;
+
+<font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> A1, <font color='#0000FF'>typename</font> A2, <font color='#0000FF'>typename</font> A3,
+                      <font color='#0000FF'>typename</font> A4, <font color='#0000FF'>typename</font> A5, <font color='#0000FF'>typename</font> A6,
+                      <font color='#0000FF'>typename</font> A7, <font color='#0000FF'>typename</font> A8<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>struct</font> <b><a name='derived'></a>derived</b><font color='#5555FF'>&lt;</font>T,<b><a name='result_type'></a>result_type</b> <font face='Lucida Console'>(</font>A1,A2,A3,A4,A5,A6,A7,A8<font face='Lucida Console'>)</font><font color='#5555FF'>&gt;</font> : <font color='#0000FF'>public</font> base
+<b>{</b>
+    DLIB_ANY_FUNCTION_DERIVED_BOILERPLATE
+
+    <font color='#0000FF'>virtual</font> result_type <font color='#BB00BB'>evaluate</font> <font face='Lucida Console'>(</font>
+        A1 a1, A2 a2, A3 a3, A4 a4, A5 a5, A6 a6, A7 a7, A8 a8
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> DLIB_ANY_FUNCTION_RETURN <font color='#BB00BB'>item</font><font face='Lucida Console'>(</font>a1,a2,a3,a4,a5,a6,a7,a8<font face='Lucida Console'>)</font>; <b>}</b>
+    <font color='#009900'>/* !!!!!!!!    ERRORS ON THE ABOVE LINE    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        If you are getting an error on the above line then it means you
+        have attempted to assign a function or function object to a
+        dlib::any_function but the signatures of the source and
+        destination functions don't match.
+    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/</font>
+<b>}</b>;
+
+<font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> A1, <font color='#0000FF'>typename</font> A2, <font color='#0000FF'>typename</font> A3,
+                      <font color='#0000FF'>typename</font> A4, <font color='#0000FF'>typename</font> A5, <font color='#0000FF'>typename</font> A6,
+                      <font color='#0000FF'>typename</font> A7, <font color='#0000FF'>typename</font> A8, <font color='#0000FF'>typename</font> A9<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>struct</font> <b><a name='derived'></a>derived</b><font color='#5555FF'>&lt;</font>T,<b><a name='result_type'></a>result_type</b> <font face='Lucida Console'>(</font>A1,A2,A3,A4,A5,A6,A7,A8,A9<font face='Lucida Console'>)</font><font color='#5555FF'>&gt;</font> : <font color='#0000FF'>public</font> base
+<b>{</b>
+    DLIB_ANY_FUNCTION_DERIVED_BOILERPLATE
+
+    <font color='#0000FF'>virtual</font> result_type <font color='#BB00BB'>evaluate</font> <font face='Lucida Console'>(</font>
+        A1 a1, A2 a2, A3 a3, A4 a4, A5 a5, A6 a6, A7 a7, A8 a8, A9 a9
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> DLIB_ANY_FUNCTION_RETURN <font color='#BB00BB'>item</font><font face='Lucida Console'>(</font>a1,a2,a3,a4,a5,a6,a7,a8,a9<font face='Lucida Console'>)</font>; <b>}</b>
+    <font color='#009900'>/* !!!!!!!!    ERRORS ON THE ABOVE LINE    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        If you are getting an error on the above line then it means you
+        have attempted to assign a function or function object to a
+        dlib::any_function but the signatures of the source and
+        destination functions don't match.
+    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/</font>
+<b>}</b>;
+
+<font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> A1, <font color='#0000FF'>typename</font> A2, <font color='#0000FF'>typename</font> A3,
+                      <font color='#0000FF'>typename</font> A4, <font color='#0000FF'>typename</font> A5, <font color='#0000FF'>typename</font> A6,
+                      <font color='#0000FF'>typename</font> A7, <font color='#0000FF'>typename</font> A8, <font color='#0000FF'>typename</font> A9,
+                      <font color='#0000FF'>typename</font> A10<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>struct</font> <b><a name='derived'></a>derived</b><font color='#5555FF'>&lt;</font>T,<b><a name='result_type'></a>result_type</b> <font face='Lucida Console'>(</font>A1,A2,A3,A4,A5,A6,A7,A8,A9,A10<font face='Lucida Console'>)</font><font color='#5555FF'>&gt;</font> : <font color='#0000FF'>public</font> base
+<b>{</b>
+    DLIB_ANY_FUNCTION_DERIVED_BOILERPLATE
+
+    <font color='#0000FF'>virtual</font> result_type <font color='#BB00BB'>evaluate</font> <font face='Lucida Console'>(</font>
+        A1 a1, A2 a2, A3 a3, A4 a4, A5 a5, A6 a6, A7 a7, A8 a8, A9 a9, A10 a10
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> DLIB_ANY_FUNCTION_RETURN <font color='#BB00BB'>item</font><font face='Lucida Console'>(</font>a1,a2,a3,a4,a5,a6,a7,a8,a9,a10<font face='Lucida Console'>)</font>; <b>}</b>
+    <font color='#009900'>/* !!!!!!!!    ERRORS ON THE ABOVE LINE    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        If you are getting an error on the above line then it means you
+        have attempted to assign a function or function object to a
+        dlib::any_function but the signatures of the source and
+        destination functions don't match.
+    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/</font>
+<b>}</b>;
+
+scoped_ptr<font color='#5555FF'>&lt;</font>base<font color='#5555FF'>&gt;</font> data;
+
+<font color='#0000FF'>#undef</font> DLIB_ANY_FUNCTION_DERIVED_BOILERPLATE
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_ANY_FUNCTION_RETURN
+</font>
+
+</pre></body></html>

@@ -1,0 +1,213 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - lz77_buffer_kernel_abstract.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2004  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#undef</font> DLIB_LZ77_BUFFER_KERNEl_ABSTRACT_
+<font color='#0000FF'>#ifdef</font> DLIB_LZ77_BUFFER_KERNEl_ABSTRACT_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../algs.h.html'>../algs.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+    <font color='#0000FF'>class</font> <b><a name='lz77_buffer'></a>lz77_buffer</b> 
+    <b>{</b>
+        <font color='#009900'>/*!
+            INITIAL VALUE
+                get_history_buffer_limit() == defined by constructor arguments
+                get_lookahead_buffer_limit() == defined by constructor arguments
+                get_history_buffer_size() == 0
+                get_lookahead_buffer_size() == 0
+
+
+            WHAT THIS OBJECT REPRESENTS
+                This object represents a pair of buffers (history and lookahead buffers) 
+                used during lz77 style compression.
+
+                It's main function is to search the history buffer for long strings which
+                match the contents (or a part of the contents) of the lookahead buffer.
+                
+
+            HISTORY AND LOOKAHEAD BUFFERS
+                The buffers have the following structure:
+                | history buffer | lookahead buffer |  &lt;-- contents of buffers
+                |  ...9876543210 | 0123456789...    |  &lt;-- index numbers
+
+                So this means that history_buffer(0) == 'r', history_buffer(1) == 'e'
+                and so on.  And lookahead_buffer(0) == 'l', lookahead_buffer(1) == 'o'
+                and so on.
+
+
+                What shift_buffers() does in english:
+                    This function just means that the buffers have their contents shifted
+                    left by N elements and that elements shifted out of the lookahead buffer 
+                    go into the history buffer.   An example will make it clearer.
+
+                    Suppose that we have the following buffers before we apply shift_buffers()
+                        history_buffer() == "hey" and
+                        lookahead_buffer() == "lookahead buffer"
+                    And in the same format as the above diagram it would be
+                        | hey | lookahead buffer |  &lt;-- contents of buffers
+                        | 210 | 0123456789...    |  &lt;-- index numbers
+
+                    Applying shift_buffers(4) will give
+                        lookahead_buffer() == "ahead buffer"
+                        history_buffer() == "heylook" or "eylook" or "ylook" or "look"
+
+                    You might be wondering why the history_buffer can resize itself in 
+                    such a nondeterministic way.  It is just to allow a lot of freedom in the 
+                    implementations of this object.                                  
+        !*/</font>
+
+    <font color='#0000FF'>public</font>:
+
+        <b><a name='lz77_buffer'></a>lz77_buffer</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> total_limit,
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> lookahead_limit            
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - 6 &lt; total_limit &lt; 32
+                - 15 &lt; lookahead_limit &lt;= 2^(total_limit-2)
+            ensures                
+                - #*this is properly initialized
+                - #get_history_buffer_limit() == 2^total_limit  - lookahead_limit
+                - #get_lookahead_buffer_limit() == lookahead_limit
+            throws
+                - std::bad_alloc
+        !*/</font>
+
+        <font color='#0000FF'>virtual</font> ~<b><a name='lz77_buffer'></a>lz77_buffer</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - any resources associated with *this have been released
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='clear'></a>clear</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #*this has its initial value
+            throws
+                - std::bad_alloc
+                    if this exception is thrown then #*this is unusable 
+                    until clear() is called and succeeds
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='shift_buffers'></a>shift_buffers</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> N
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - N &lt;= get_lookahead_buffer_size()
+            ensures
+                - #get_lookahead_buffer_size() == get_lookahead_buffer_size() - N
+                - #get_history_buffer_size() &gt;= N
+                - #get_history_buffer_size() &lt;= get_history_buffer_size()+N
+                - #get_history_buffer_size() &lt;= get_history_buffer_limit()
+                - for all i where 0 &lt;= i &lt; N:
+                    #history_buffer(N-1-i) == lookahead_buffer(i)
+                - for all i where 0 &lt;= i &lt; #get_history_buffer_size()-N:
+                    #history_buffer(N+i) == history_buffer(i)
+                - for all i where 0 &lt;= i &lt; #get_lookahead_buffer_size()
+                    #lookahead_buffer(i) == lookahead_buffer(N+i)            
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='add'></a>add</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> symbol
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - if (get_lookahead_buffer_size() == get_lookahead_buffer_limit()) then
+                    - performs shift_buffers(1)
+                    - #lookahead_buffer(get_lookahead_buffer_limit()-1) == symbol
+                    - #get_lookahead_buffer_size() == get_lookahead_buffer_size()
+                - else
+                    - #lookahead_buffer(get_lookahead_buffer_size()) == symbol
+                    - #get_lookahead_buffer_size() == get_lookahead_buffer_size() + 1                                    
+            throws
+                - std::bad_alloc
+                    if this exception is thrown then #*this is unusable 
+                    until clear() is called and succeeds
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='find_match'></a>find_match</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&amp;</font> index,
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&amp;</font> length,
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> min_match_length
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - if (#length != 0) then
+                    - #length &gt;= min_match_length
+                    - for all i where 0 &lt;= i &lt; #length:
+                      history_buffer(#index-i) == lookahead_buffer(i)
+                    - performs shift_buffers(#length)
+            throws
+                - std::bad_alloc
+                    if this exception is thrown then #*this is unusable 
+                    until clear() is called and succeeds
+        !*/</font>
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='get_history_buffer_limit'></a>get_history_buffer_limit</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the max number of symbols that can fit in the history buffer
+        !*/</font>
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='get_lookahead_buffer_limit'></a>get_lookahead_buffer_limit</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the max number of symbols that can fit in the lookahead buffer
+        !*/</font>
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='get_history_buffer_size'></a>get_history_buffer_size</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the number of symbols currently in the history buffer
+        !*/</font>
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='get_lookahead_buffer_size'></a>get_lookahead_buffer_size</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the number of symbols currently in the lookahead buffer
+        !*/</font>
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> <b><a name='lookahead_buffer'></a>lookahead_buffer</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> index
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - index &lt; get_lookahead_buffer_size()
+            ensures
+                - returns the symbol in the lookahead buffer at location index
+        !*/</font>
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> <b><a name='history_buffer'></a>history_buffer</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> index
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - index &lt; get_history_buffer_size()
+            ensures
+                - returns the symbol in the history buffer at location index
+        !*/</font>
+
+
+    <font color='#0000FF'>private</font>:
+
+        <font color='#009900'>// restricted functions
+</font>        <b><a name='lz77_buffer'></a>lz77_buffer</b><font face='Lucida Console'>(</font>lz77_buffer<font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font>;        <font color='#009900'>// copy constructor
+</font>        lz77_buffer<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>=</font><font face='Lucida Console'>(</font>lz77_buffer<font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font>;    <font color='#009900'>// assignment operator
+</font>
+    <b>}</b>;      
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_LZ77_BUFFER_KERNEl_ABSTRACT_
+</font>
+
+</pre></body></html>

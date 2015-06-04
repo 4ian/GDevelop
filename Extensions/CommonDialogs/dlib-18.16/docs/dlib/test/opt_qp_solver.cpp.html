@@ -1,0 +1,479 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - opt_qp_solver.cpp</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2010  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font>
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>optimization.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>sstream<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>string<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>cstdlib<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>ctime<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>vector<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>rand.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>string.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>statistics.h<font color='#5555FF'>&gt;</font>
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='tester.h.html'>tester.h</a>"
+
+
+<font color='#0000FF'>namespace</font>  
+<b>{</b>
+
+    <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> test;
+    <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> dlib;
+    <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> std;
+
+    logger <b><a name='dlog'></a>dlog</b><font face='Lucida Console'>(</font>"<font color='#CC0000'>test.opt_qp_solver</font>"<font face='Lucida Console'>)</font>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>class</font> <b><a name='test_smo'></a>test_smo</b>
+    <b>{</b>
+    <font color='#0000FF'>public</font>:
+        <font color='#0000FF'><u>double</u></font> penalty;
+        <font color='#0000FF'><u>double</u></font> C;
+
+        <font color='#0000FF'><u>double</u></font> <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>0</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> alpha
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+
+            <font color='#0000FF'><u>double</u></font> obj <font color='#5555FF'>=</font>  <font color='#979000'>0.5</font><font color='#5555FF'>*</font> <font color='#BB00BB'>trans</font><font face='Lucida Console'>(</font>alpha<font face='Lucida Console'>)</font><font color='#5555FF'>*</font>Q<font color='#5555FF'>*</font>alpha <font color='#5555FF'>-</font> <font color='#BB00BB'>trans</font><font face='Lucida Console'>(</font>alpha<font face='Lucida Console'>)</font><font color='#5555FF'>*</font>b;
+            <font color='#0000FF'><u>double</u></font> c1 <font color='#5555FF'>=</font> <font color='#BB00BB'>pow</font><font face='Lucida Console'>(</font><font color='#BB00BB'>sum</font><font face='Lucida Console'>(</font>alpha<font face='Lucida Console'>)</font><font color='#5555FF'>-</font>C,<font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'><u>double</u></font> c2 <font color='#5555FF'>=</font> <font color='#BB00BB'>sum</font><font face='Lucida Console'>(</font><font color='#BB00BB'>pow</font><font face='Lucida Console'>(</font><font color='#BB00BB'>pointwise_multiply</font><font face='Lucida Console'>(</font>alpha, alpha<font color='#5555FF'>&lt;</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>, <font color='#979000'>2</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+            obj <font color='#5555FF'>+</font><font color='#5555FF'>=</font> penalty<font color='#5555FF'>*</font><font face='Lucida Console'>(</font>c1 <font color='#5555FF'>+</font> c2<font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>return</font> obj;
+        <b>}</b>
+
+        matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font> Q, b;
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>class</font> <b><a name='test_smo_derivative'></a>test_smo_derivative</b>
+    <b>{</b>
+    <font color='#0000FF'>public</font>:
+        <font color='#0000FF'><u>double</u></font> penalty;
+        <font color='#0000FF'><u>double</u></font> C;
+
+        matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>0</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>0</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> alpha
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+
+            matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>0</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> obj <font color='#5555FF'>=</font>  Q<font color='#5555FF'>*</font>alpha <font color='#5555FF'>-</font> b;
+            matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>0</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> c1 <font color='#5555FF'>=</font> uniform_matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>alpha.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,<font color='#979000'>1</font>, <font color='#979000'>2</font><font color='#5555FF'>*</font><font face='Lucida Console'>(</font><font color='#BB00BB'>sum</font><font face='Lucida Console'>(</font>alpha<font face='Lucida Console'>)</font><font color='#5555FF'>-</font>C<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>0</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> c2 <font color='#5555FF'>=</font> <font color='#979000'>2</font><font color='#5555FF'>*</font><font color='#BB00BB'>pointwise_multiply</font><font face='Lucida Console'>(</font>alpha, alpha<font color='#5555FF'>&lt;</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+            
+            <font color='#0000FF'>return</font> obj <font color='#5555FF'>+</font> penalty<font color='#5555FF'>*</font><font face='Lucida Console'>(</font>c1 <font color='#5555FF'>+</font> c2<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font> Q, b;
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>double</u></font> <b><a name='compute_objective_value'></a>compute_objective_value</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>0</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> w,
+        <font color='#0000FF'>const</font> matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> A,
+        <font color='#0000FF'>const</font> matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>0</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> b,
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> C
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>return</font> <font color='#979000'>0.5</font><font color='#5555FF'>*</font><font color='#BB00BB'>dot</font><font face='Lucida Console'>(</font>w,w<font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> C<font color='#5555FF'>*</font><font color='#BB00BB'>max</font><font face='Lucida Console'>(</font><font color='#BB00BB'>trans</font><font face='Lucida Console'>(</font>A<font face='Lucida Console'>)</font><font color='#5555FF'>*</font>w <font color='#5555FF'>+</font> b<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='test_qp4_test1'></a>test_qp4_test1</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+    <b>{</b>
+        matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font> <font color='#BB00BB'>A</font><font face='Lucida Console'>(</font><font color='#979000'>3</font>,<font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+        A <font color='#5555FF'>=</font> <font color='#979000'>1</font>,<font color='#979000'>2</font>,
+        <font color='#5555FF'>-</font><font color='#979000'>3</font>,<font color='#979000'>1</font>,
+        <font color='#979000'>6</font>,<font color='#979000'>7</font>;
+
+        matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>0</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> <font color='#BB00BB'>b</font><font face='Lucida Console'>(</font><font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+        b <font color='#5555FF'>=</font> <font color='#979000'>1</font>,
+        <font color='#979000'>2</font>;
+
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> C <font color='#5555FF'>=</font> <font color='#979000'>2</font>;
+
+        matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>0</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> <font color='#BB00BB'>alpha</font><font face='Lucida Console'>(</font><font color='#979000'>2</font><font face='Lucida Console'>)</font>, <font color='#BB00BB'>true_alpha</font><font face='Lucida Console'>(</font><font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+        alpha <font color='#5555FF'>=</font> C<font color='#5555FF'>/</font><font color='#979000'>2</font>, C<font color='#5555FF'>/</font><font color='#979000'>2</font>;
+
+        <font color='#BB00BB'>solve_qp4_using_smo</font><font face='Lucida Console'>(</font>A, <font color='#BB00BB'>tmp</font><font face='Lucida Console'>(</font><font color='#BB00BB'>trans</font><font face='Lucida Console'>(</font>A<font face='Lucida Console'>)</font><font color='#5555FF'>*</font>A<font face='Lucida Console'>)</font>, b, alpha, <font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>9</font>, <font color='#979000'>800</font><font face='Lucida Console'>)</font>;
+        matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>0</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> w <font color='#5555FF'>=</font> <font color='#BB00BB'>lowerbound</font><font face='Lucida Console'>(</font><font color='#5555FF'>-</font>A<font color='#5555FF'>*</font>alpha, <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+
+        dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>*******************************************************</font>";
+
+        dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>w:     </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>trans</font><font face='Lucida Console'>(</font>w<font face='Lucida Console'>)</font>;
+
+        dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>computed obj:      </font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>compute_objective_value</font><font face='Lucida Console'>(</font>w,A,b,C<font face='Lucida Console'>)</font>;
+        w <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>with true w obj:   </font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>compute_objective_value</font><font face='Lucida Console'>(</font>w,A,b,C<font face='Lucida Console'>)</font>;
+
+        dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>alpha:      </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>trans</font><font face='Lucida Console'>(</font>alpha<font face='Lucida Console'>)</font>;
+        true_alpha <font color='#5555FF'>=</font> <font color='#979000'>0</font>, <font color='#979000'>2</font>;
+        dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>true alpha: </font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>trans</font><font face='Lucida Console'>(</font>true_alpha<font face='Lucida Console'>)</font>;
+
+        dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>alpha error: </font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>max</font><font face='Lucida Console'>(</font><font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font>alpha<font color='#5555FF'>-</font>true_alpha<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>max</font><font face='Lucida Console'>(</font><font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font>alpha<font color='#5555FF'>-</font>true_alpha<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> <font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>9</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='test_qp4_test2'></a>test_qp4_test2</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+    <b>{</b>
+        matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font> <font color='#BB00BB'>A</font><font face='Lucida Console'>(</font><font color='#979000'>3</font>,<font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+        A <font color='#5555FF'>=</font> <font color='#979000'>1</font>,<font color='#979000'>2</font>,
+        <font color='#979000'>3</font>,<font color='#5555FF'>-</font><font color='#979000'>1</font>,
+        <font color='#979000'>6</font>,<font color='#979000'>7</font>;
+
+        matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>0</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> <font color='#BB00BB'>b</font><font face='Lucida Console'>(</font><font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+        b <font color='#5555FF'>=</font> <font color='#979000'>1</font>,
+        <font color='#979000'>2</font>;
+
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> C <font color='#5555FF'>=</font> <font color='#979000'>2</font>;
+
+        matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>0</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> <font color='#BB00BB'>alpha</font><font face='Lucida Console'>(</font><font color='#979000'>2</font><font face='Lucida Console'>)</font>, <font color='#BB00BB'>true_alpha</font><font face='Lucida Console'>(</font><font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+        alpha <font color='#5555FF'>=</font> C<font color='#5555FF'>/</font><font color='#979000'>2</font>, C<font color='#5555FF'>/</font><font color='#979000'>2</font>;
+
+        <font color='#BB00BB'>solve_qp4_using_smo</font><font face='Lucida Console'>(</font>A, <font color='#BB00BB'>tmp</font><font face='Lucida Console'>(</font><font color='#BB00BB'>trans</font><font face='Lucida Console'>(</font>A<font face='Lucida Console'>)</font><font color='#5555FF'>*</font>A<font face='Lucida Console'>)</font>, b, alpha, <font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>9</font>, <font color='#979000'>800</font><font face='Lucida Console'>)</font>;
+        matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>0</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> w <font color='#5555FF'>=</font> <font color='#BB00BB'>lowerbound</font><font face='Lucida Console'>(</font><font color='#5555FF'>-</font>A<font color='#5555FF'>*</font>alpha, <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+
+        dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>*******************************************************</font>";
+
+        dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>w:     </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>trans</font><font face='Lucida Console'>(</font>w<font face='Lucida Console'>)</font>;
+
+        dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>computed obj:      </font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>compute_objective_value</font><font face='Lucida Console'>(</font>w,A,b,C<font face='Lucida Console'>)</font>;
+        w <font color='#5555FF'>=</font> <font color='#979000'>0</font>, <font color='#979000'>0.25</font>, <font color='#979000'>0</font>;
+        dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>with true w obj:   </font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>compute_objective_value</font><font face='Lucida Console'>(</font>w,A,b,C<font face='Lucida Console'>)</font>;
+
+        dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>alpha:      </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>trans</font><font face='Lucida Console'>(</font>alpha<font face='Lucida Console'>)</font>;
+        true_alpha <font color='#5555FF'>=</font> <font color='#979000'>0.43750</font>, <font color='#979000'>1.56250</font>;
+        dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>true alpha: </font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>trans</font><font face='Lucida Console'>(</font>true_alpha<font face='Lucida Console'>)</font>;
+
+        dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>alpha error: </font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>max</font><font face='Lucida Console'>(</font><font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font>alpha<font color='#5555FF'>-</font>true_alpha<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>max</font><font face='Lucida Console'>(</font><font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font>alpha<font color='#5555FF'>-</font>true_alpha<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> <font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>9</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='test_qp4_test3'></a>test_qp4_test3</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+    <b>{</b>
+        matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font> <font color='#BB00BB'>A</font><font face='Lucida Console'>(</font><font color='#979000'>3</font>,<font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+        A <font color='#5555FF'>=</font> <font color='#979000'>1</font>,<font color='#979000'>2</font>,
+        <font color='#5555FF'>-</font><font color='#979000'>3</font>,<font color='#5555FF'>-</font><font color='#979000'>1</font>,
+        <font color='#979000'>6</font>,<font color='#979000'>7</font>;
+
+        matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>0</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> <font color='#BB00BB'>b</font><font face='Lucida Console'>(</font><font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+        b <font color='#5555FF'>=</font> <font color='#979000'>1</font>,
+        <font color='#979000'>2</font>;
+
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> C <font color='#5555FF'>=</font> <font color='#979000'>2</font>;
+
+        matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>0</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> <font color='#BB00BB'>alpha</font><font face='Lucida Console'>(</font><font color='#979000'>2</font><font face='Lucida Console'>)</font>, <font color='#BB00BB'>true_alpha</font><font face='Lucida Console'>(</font><font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+        alpha <font color='#5555FF'>=</font> C<font color='#5555FF'>/</font><font color='#979000'>2</font>, C<font color='#5555FF'>/</font><font color='#979000'>2</font>;
+
+        <font color='#BB00BB'>solve_qp4_using_smo</font><font face='Lucida Console'>(</font>A, <font color='#BB00BB'>tmp</font><font face='Lucida Console'>(</font><font color='#BB00BB'>trans</font><font face='Lucida Console'>(</font>A<font face='Lucida Console'>)</font><font color='#5555FF'>*</font>A<font face='Lucida Console'>)</font>, b, alpha, <font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>9</font>, <font color='#979000'>800</font><font face='Lucida Console'>)</font>;
+        matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>0</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> w <font color='#5555FF'>=</font> <font color='#BB00BB'>lowerbound</font><font face='Lucida Console'>(</font><font color='#5555FF'>-</font>A<font color='#5555FF'>*</font>alpha, <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+
+        dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>*******************************************************</font>";
+
+        dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>w:     </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>trans</font><font face='Lucida Console'>(</font>w<font face='Lucida Console'>)</font>;
+
+        dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>computed obj:      </font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>compute_objective_value</font><font face='Lucida Console'>(</font>w,A,b,C<font face='Lucida Console'>)</font>;
+        w <font color='#5555FF'>=</font> <font color='#979000'>0</font>, <font color='#979000'>2</font>, <font color='#979000'>0</font>;
+        dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>with true w obj:   </font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>compute_objective_value</font><font face='Lucida Console'>(</font>w,A,b,C<font face='Lucida Console'>)</font>;
+
+        dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>alpha:      </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>trans</font><font face='Lucida Console'>(</font>alpha<font face='Lucida Console'>)</font>;
+        true_alpha <font color='#5555FF'>=</font> <font color='#979000'>0</font>, <font color='#979000'>2</font>;
+        dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>true alpha: </font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>trans</font><font face='Lucida Console'>(</font>true_alpha<font face='Lucida Console'>)</font>;
+
+        dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>alpha error: </font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>max</font><font face='Lucida Console'>(</font><font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font>alpha<font color='#5555FF'>-</font>true_alpha<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>max</font><font face='Lucida Console'>(</font><font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font>alpha<font color='#5555FF'>-</font>true_alpha<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> <font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>9</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='test_qp4_test5'></a>test_qp4_test5</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+    <b>{</b>
+        matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font> <font color='#BB00BB'>A</font><font face='Lucida Console'>(</font><font color='#979000'>3</font>,<font color='#979000'>3</font><font face='Lucida Console'>)</font>;
+        A <font color='#5555FF'>=</font> <font color='#979000'>1</font>,<font color='#979000'>2</font>,<font color='#979000'>4</font>,
+        <font color='#979000'>3</font>,<font color='#979000'>1</font>,<font color='#979000'>6</font>,
+        <font color='#979000'>6</font>,<font color='#979000'>7</font>,<font color='#5555FF'>-</font><font color='#979000'>2</font>;
+
+        matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>0</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> <font color='#BB00BB'>b</font><font face='Lucida Console'>(</font><font color='#979000'>3</font><font face='Lucida Console'>)</font>;
+        b <font color='#5555FF'>=</font> <font color='#979000'>1</font>,
+        <font color='#979000'>2</font>,
+        <font color='#979000'>3</font>;
+
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> C <font color='#5555FF'>=</font> <font color='#979000'>2</font>;
+
+        matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>0</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> <font color='#BB00BB'>alpha</font><font face='Lucida Console'>(</font><font color='#979000'>3</font><font face='Lucida Console'>)</font>, <font color='#BB00BB'>true_alpha</font><font face='Lucida Console'>(</font><font color='#979000'>3</font><font face='Lucida Console'>)</font>;
+        alpha <font color='#5555FF'>=</font> C<font color='#5555FF'>/</font><font color='#979000'>2</font>, C<font color='#5555FF'>/</font><font color='#979000'>2</font>, <font color='#979000'>0</font>;
+
+        <font color='#BB00BB'>solve_qp4_using_smo</font><font face='Lucida Console'>(</font>A, <font color='#BB00BB'>tmp</font><font face='Lucida Console'>(</font><font color='#BB00BB'>trans</font><font face='Lucida Console'>(</font>A<font face='Lucida Console'>)</font><font color='#5555FF'>*</font>A<font face='Lucida Console'>)</font>, b, alpha, <font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>9</font>, <font color='#979000'>800</font><font face='Lucida Console'>)</font>;
+        matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>0</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> w <font color='#5555FF'>=</font> <font color='#BB00BB'>lowerbound</font><font face='Lucida Console'>(</font><font color='#5555FF'>-</font>A<font color='#5555FF'>*</font>alpha, <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+
+
+        dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>*******************************************************</font>";
+
+        dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>w:     </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>trans</font><font face='Lucida Console'>(</font>w<font face='Lucida Console'>)</font>;
+
+        dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>computed obj:      </font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>compute_objective_value</font><font face='Lucida Console'>(</font>w,A,b,C<font face='Lucida Console'>)</font>;
+        w <font color='#5555FF'>=</font> <font color='#979000'>0</font>, <font color='#979000'>0</font>, <font color='#979000'>0.11111111111111111111</font>;
+        dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>with true w obj:   </font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>compute_objective_value</font><font face='Lucida Console'>(</font>w,A,b,C<font face='Lucida Console'>)</font>;
+
+        dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>alpha:      </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>trans</font><font face='Lucida Console'>(</font>alpha<font face='Lucida Console'>)</font>;
+        true_alpha <font color='#5555FF'>=</font> <font color='#979000'>0</font>, <font color='#979000'>0.432098765432099</font>, <font color='#979000'>1.567901234567901</font>;
+        dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>true alpha: </font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>trans</font><font face='Lucida Console'>(</font>true_alpha<font face='Lucida Console'>)</font>;
+
+        dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>alpha error: </font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>max</font><font face='Lucida Console'>(</font><font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font>alpha<font color='#5555FF'>-</font>true_alpha<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>max</font><font face='Lucida Console'>(</font><font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font>alpha<font color='#5555FF'>-</font>true_alpha<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> <font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>9</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='test_qp4_test4'></a>test_qp4_test4</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+    <b>{</b>
+        matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font> <font color='#BB00BB'>A</font><font face='Lucida Console'>(</font><font color='#979000'>3</font>,<font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+        A <font color='#5555FF'>=</font> <font color='#979000'>1</font>,<font color='#979000'>2</font>,
+        <font color='#979000'>3</font>,<font color='#979000'>1</font>,
+        <font color='#979000'>6</font>,<font color='#979000'>7</font>;
+
+        matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>0</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> <font color='#BB00BB'>b</font><font face='Lucida Console'>(</font><font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+        b <font color='#5555FF'>=</font> <font color='#979000'>1</font>,
+        <font color='#979000'>2</font>;
+
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> C <font color='#5555FF'>=</font> <font color='#979000'>2</font>;
+
+        matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>0</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> <font color='#BB00BB'>alpha</font><font face='Lucida Console'>(</font><font color='#979000'>2</font><font face='Lucida Console'>)</font>, <font color='#BB00BB'>true_alpha</font><font face='Lucida Console'>(</font><font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+        alpha <font color='#5555FF'>=</font> C<font color='#5555FF'>/</font><font color='#979000'>2</font>, C<font color='#5555FF'>/</font><font color='#979000'>2</font>;
+
+        <font color='#BB00BB'>solve_qp4_using_smo</font><font face='Lucida Console'>(</font>A, <font color='#BB00BB'>tmp</font><font face='Lucida Console'>(</font><font color='#BB00BB'>trans</font><font face='Lucida Console'>(</font>A<font face='Lucida Console'>)</font><font color='#5555FF'>*</font>A<font face='Lucida Console'>)</font>, b, alpha, <font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>9</font>, <font color='#979000'>800</font><font face='Lucida Console'>)</font>;
+        matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>0</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> w <font color='#5555FF'>=</font> <font color='#BB00BB'>lowerbound</font><font face='Lucida Console'>(</font><font color='#5555FF'>-</font>A<font color='#5555FF'>*</font>alpha, <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+
+        dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>*******************************************************</font>";
+
+        dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>w:     </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>trans</font><font face='Lucida Console'>(</font>w<font face='Lucida Console'>)</font>;
+
+        dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>computed obj:      </font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>compute_objective_value</font><font face='Lucida Console'>(</font>w,A,b,C<font face='Lucida Console'>)</font>;
+        w <font color='#5555FF'>=</font> <font color='#979000'>0</font>, <font color='#979000'>0</font>, <font color='#979000'>0</font>;
+        dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>with true w obj:   </font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>compute_objective_value</font><font face='Lucida Console'>(</font>w,A,b,C<font face='Lucida Console'>)</font>;
+
+        dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>alpha:      </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>trans</font><font face='Lucida Console'>(</font>alpha<font face='Lucida Console'>)</font>;
+        true_alpha <font color='#5555FF'>=</font> <font color='#979000'>0</font>, <font color='#979000'>2</font>;
+        dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>true alpha: </font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>trans</font><font face='Lucida Console'>(</font>true_alpha<font face='Lucida Console'>)</font>;
+
+        dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>alpha error: </font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>max</font><font face='Lucida Console'>(</font><font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font>alpha<font color='#5555FF'>-</font>true_alpha<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>max</font><font face='Lucida Console'>(</font><font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font>alpha<font color='#5555FF'>-</font>true_alpha<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> <font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>9</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+    <font color='#0000FF'><u>void</u></font> <b><a name='test_qp4_test6'></a>test_qp4_test6</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+    <b>{</b>
+        matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font> <font color='#BB00BB'>A</font><font face='Lucida Console'>(</font><font color='#979000'>3</font>,<font color='#979000'>3</font><font face='Lucida Console'>)</font>;
+        A <font color='#5555FF'>=</font> <font color='#979000'>1</font>,<font color='#979000'>2</font>,<font color='#979000'>4</font>,
+        <font color='#979000'>3</font>,<font color='#979000'>1</font>,<font color='#979000'>6</font>,
+        <font color='#979000'>6</font>,<font color='#979000'>7</font>,<font color='#5555FF'>-</font><font color='#979000'>2</font>;
+
+        matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>0</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> <font color='#BB00BB'>b</font><font face='Lucida Console'>(</font><font color='#979000'>3</font><font face='Lucida Console'>)</font>;
+        b <font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>1</font>,
+        <font color='#5555FF'>-</font><font color='#979000'>2</font>,
+        <font color='#5555FF'>-</font><font color='#979000'>3</font>;
+
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> C <font color='#5555FF'>=</font> <font color='#979000'>2</font>;
+
+        matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>0</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> <font color='#BB00BB'>alpha</font><font face='Lucida Console'>(</font><font color='#979000'>3</font><font face='Lucida Console'>)</font>, <font color='#BB00BB'>true_alpha</font><font face='Lucida Console'>(</font><font color='#979000'>3</font><font face='Lucida Console'>)</font>;
+        alpha <font color='#5555FF'>=</font> C<font color='#5555FF'>/</font><font color='#979000'>2</font>, C<font color='#5555FF'>/</font><font color='#979000'>2</font>, <font color='#979000'>0</font>;
+
+        <font color='#BB00BB'>solve_qp4_using_smo</font><font face='Lucida Console'>(</font>A, <font color='#BB00BB'>tmp</font><font face='Lucida Console'>(</font><font color='#BB00BB'>trans</font><font face='Lucida Console'>(</font>A<font face='Lucida Console'>)</font><font color='#5555FF'>*</font>A<font face='Lucida Console'>)</font>, b, alpha, <font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>9</font>, <font color='#979000'>800</font><font face='Lucida Console'>)</font>;
+        matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>0</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> w <font color='#5555FF'>=</font> <font color='#BB00BB'>lowerbound</font><font face='Lucida Console'>(</font><font color='#5555FF'>-</font>A<font color='#5555FF'>*</font>alpha, <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+
+        dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>*******************************************************</font>";
+
+        dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>w:     </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>trans</font><font face='Lucida Console'>(</font>w<font face='Lucida Console'>)</font>;
+
+        dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>computed obj:      </font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>compute_objective_value</font><font face='Lucida Console'>(</font>w,A,b,C<font face='Lucida Console'>)</font>;
+        w <font color='#5555FF'>=</font> <font color='#979000'>0</font>, <font color='#979000'>0</font>, <font color='#979000'>0</font>;
+        dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>with true w obj:   </font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>compute_objective_value</font><font face='Lucida Console'>(</font>w,A,b,C<font face='Lucida Console'>)</font>;
+
+        dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>alpha:      </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>trans</font><font face='Lucida Console'>(</font>alpha<font face='Lucida Console'>)</font>;
+        true_alpha <font color='#5555FF'>=</font> <font color='#979000'>2</font>, <font color='#979000'>0</font>, <font color='#979000'>0</font>;
+        dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>true alpha: </font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>trans</font><font face='Lucida Console'>(</font>true_alpha<font face='Lucida Console'>)</font>;
+
+        dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>alpha error: </font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>max</font><font face='Lucida Console'>(</font><font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font>alpha<font color='#5555FF'>-</font>true_alpha<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>max</font><font face='Lucida Console'>(</font><font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font>alpha<font color='#5555FF'>-</font>true_alpha<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> <font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>9</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+    <font color='#0000FF'><u>void</u></font> <b><a name='test_qp4_test7'></a>test_qp4_test7</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+    <b>{</b>
+        matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font> <font color='#BB00BB'>A</font><font face='Lucida Console'>(</font><font color='#979000'>3</font>,<font color='#979000'>3</font><font face='Lucida Console'>)</font>;
+        A <font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>1</font>,<font color='#979000'>2</font>,<font color='#979000'>4</font>,
+        <font color='#5555FF'>-</font><font color='#979000'>3</font>,<font color='#979000'>1</font>,<font color='#979000'>6</font>,
+        <font color='#5555FF'>-</font><font color='#979000'>6</font>,<font color='#979000'>7</font>,<font color='#5555FF'>-</font><font color='#979000'>2</font>;
+
+        matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>0</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> <font color='#BB00BB'>b</font><font face='Lucida Console'>(</font><font color='#979000'>3</font><font face='Lucida Console'>)</font>;
+        b <font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>1</font>,
+        <font color='#5555FF'>-</font><font color='#979000'>2</font>,
+        <font color='#979000'>3</font>;
+
+        matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font> <font color='#BB00BB'>Q</font><font face='Lucida Console'>(</font><font color='#979000'>3</font>,<font color='#979000'>3</font><font face='Lucida Console'>)</font>;
+        Q <font color='#5555FF'>=</font> <font color='#979000'>4</font>,<font color='#5555FF'>-</font><font color='#979000'>5</font>,<font color='#979000'>6</font>,
+        <font color='#979000'>1</font>,<font color='#5555FF'>-</font><font color='#979000'>4</font>,<font color='#979000'>2</font>,
+        <font color='#5555FF'>-</font><font color='#979000'>9</font>,<font color='#5555FF'>-</font><font color='#979000'>4</font>,<font color='#979000'>5</font>;
+        Q <font color='#5555FF'>=</font> Q<font color='#5555FF'>*</font><font color='#BB00BB'>trans</font><font face='Lucida Console'>(</font>Q<font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> C <font color='#5555FF'>=</font> <font color='#979000'>2</font>;
+
+        matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>0</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> <font color='#BB00BB'>alpha</font><font face='Lucida Console'>(</font><font color='#979000'>3</font><font face='Lucida Console'>)</font>, <font color='#BB00BB'>true_alpha</font><font face='Lucida Console'>(</font><font color='#979000'>3</font><font face='Lucida Console'>)</font>;
+        alpha <font color='#5555FF'>=</font> C<font color='#5555FF'>/</font><font color='#979000'>2</font>, C<font color='#5555FF'>/</font><font color='#979000'>2</font>, <font color='#979000'>0</font>;
+
+        <font color='#BB00BB'>solve_qp4_using_smo</font><font face='Lucida Console'>(</font>A, Q, b, alpha, <font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>9</font>, <font color='#979000'>800</font><font face='Lucida Console'>)</font>;
+
+        dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>*******************************************************</font>";
+
+        dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>alpha:      </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>trans</font><font face='Lucida Console'>(</font>alpha<font face='Lucida Console'>)</font>;
+        true_alpha <font color='#5555FF'>=</font> <font color='#979000'>0</font>, <font color='#979000'>2</font>, <font color='#979000'>0</font>;
+        dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>true alpha: </font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>trans</font><font face='Lucida Console'>(</font>true_alpha<font face='Lucida Console'>)</font>;
+
+        dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>alpha error: </font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>max</font><font face='Lucida Console'>(</font><font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font>alpha<font color='#5555FF'>-</font>true_alpha<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>max</font><font face='Lucida Console'>(</font><font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font>alpha<font color='#5555FF'>-</font>true_alpha<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> <font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>9</font><font face='Lucida Console'>)</font>;
+
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='test_solve_qp4_using_smo'></a>test_solve_qp4_using_smo</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#BB00BB'>test_qp4_test1</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>test_qp4_test2</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>test_qp4_test3</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>test_qp4_test4</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>test_qp4_test5</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>test_qp4_test6</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>test_qp4_test7</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>class</font> <b><a name='opt_qp_solver_tester'></a>opt_qp_solver_tester</b> : <font color='#0000FF'>public</font> tester
+    <b>{</b>
+        <font color='#009900'>/*
+            The idea here is just to solve the same problem with two different
+            methods and check that they basically agree.  The SMO solver should be
+            very accurate but for this problem the BFGS solver is relatively
+            inaccurate.  So this test is really just a sanity check on the SMO
+            solver.
+        */</font>
+    <font color='#0000FF'>public</font>:
+        <b><a name='opt_qp_solver_tester'></a>opt_qp_solver_tester</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> :
+            tester <font face='Lucida Console'>(</font>"<font color='#CC0000'>test_opt_qp_solver</font>",
+                    "<font color='#CC0000'>Runs tests on the solve_qp_using_smo component.</font>"<font face='Lucida Console'>)</font>
+        <b>{</b>
+            thetime <font color='#5555FF'>=</font> <font color='#BB00BB'>time</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        time_t thetime;
+        dlib::rand rnd;
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='perform_test'></a>perform_test</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#BB00BB'>print_spinner</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>test_solve_qp4_using_smo</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>print_spinner</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+            <font color='#5555FF'>+</font><font color='#5555FF'>+</font>thetime;
+            <font color='#009900'>//dlog &lt;&lt; LINFO &lt;&lt; "time seed: " &lt;&lt; thetime;
+</font>            <font color='#009900'>//rnd.set_seed(cast_to_string(thetime));
+</font>
+            running_stats<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font> rs;
+
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> <font color='#979000'>40</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> dims <font color='#5555FF'>=</font> <font color='#979000'>1</font>; dims <font color='#5555FF'>&lt;</font> <font color='#979000'>6</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>dims<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    rs.<font color='#BB00BB'>add</font><font face='Lucida Console'>(</font><font color='#BB00BB'>do_the_test</font><font face='Lucida Console'>(</font>dims, <font color='#979000'>1.0</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                <b>}</b>
+            <b>}</b>
+
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> <font color='#979000'>40</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> dims <font color='#5555FF'>=</font> <font color='#979000'>1</font>; dims <font color='#5555FF'>&lt;</font> <font color='#979000'>6</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>dims<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    rs.<font color='#BB00BB'>add</font><font face='Lucida Console'>(</font><font color='#BB00BB'>do_the_test</font><font face='Lucida Console'>(</font>dims, <font color='#979000'>5.0</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                <b>}</b>
+            <b>}</b>
+
+            dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>disagreement mean: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> rs.<font color='#BB00BB'>mean</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>disagreement stddev: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> rs.<font color='#BB00BB'>stddev</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST_MSG</font><font face='Lucida Console'>(</font>rs.<font color='#BB00BB'>mean</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> <font color='#979000'>0.001</font>, rs.<font color='#BB00BB'>mean</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST_MSG</font><font face='Lucida Console'>(</font>rs.<font color='#BB00BB'>stddev</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> <font color='#979000'>0.001</font>, rs.<font color='#BB00BB'>stddev</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'><u>double</u></font> <b><a name='do_the_test'></a>do_the_test</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> dims,
+            <font color='#0000FF'><u>double</u></font> C
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#BB00BB'>print_spinner</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>dims: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> dims;
+            dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>testing with C == </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> C;
+            test_smo test;
+
+            test.Q <font color='#5555FF'>=</font> <font color='#BB00BB'>randm</font><font face='Lucida Console'>(</font>dims, dims, rnd<font face='Lucida Console'>)</font>;
+            test.Q <font color='#5555FF'>=</font> <font color='#BB00BB'>trans</font><font face='Lucida Console'>(</font>test.Q<font face='Lucida Console'>)</font><font color='#5555FF'>*</font>test.Q;
+            test.b <font color='#5555FF'>=</font> <font color='#BB00BB'>randm</font><font face='Lucida Console'>(</font>dims,<font color='#979000'>1</font>, rnd<font face='Lucida Console'>)</font>;
+            test.C <font color='#5555FF'>=</font> C;
+
+            test_smo_derivative der;
+            der.Q <font color='#5555FF'>=</font> test.Q;
+            der.b <font color='#5555FF'>=</font> test.b;
+            der.C <font color='#5555FF'>=</font> test.C;
+
+
+            matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>0</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> <font color='#BB00BB'>x</font><font face='Lucida Console'>(</font>dims<font face='Lucida Console'>)</font>, <font color='#BB00BB'>alpha</font><font face='Lucida Console'>(</font>dims<font face='Lucida Console'>)</font>;
+
+
+            test.penalty <font color='#5555FF'>=</font> <font color='#979000'>20000</font>;
+            der.penalty <font color='#5555FF'>=</font> test.penalty;
+
+            alpha <font color='#5555FF'>=</font> C<font color='#5555FF'>/</font>alpha.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            x <font color='#5555FF'>=</font> alpha;
+
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> max_iter <font color='#5555FF'>=</font> <font color='#979000'>400000</font>;
+            <font color='#BB00BB'>solve_qp_using_smo</font><font face='Lucida Console'>(</font>test.Q, test.b, alpha, <font color='#979000'>0.00000001</font>, max_iter<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST_MSG</font><font face='Lucida Console'>(</font><font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font><font color='#BB00BB'>sum</font><font face='Lucida Console'>(</font>alpha<font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> C<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> <font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>13</font>, <font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font><font color='#BB00BB'>sum</font><font face='Lucida Console'>(</font>alpha<font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> C<font face='Lucida Console'>)</font> <font face='Lucida Console'>)</font>;
+            dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LTRACE <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>alpha: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> alpha;
+            dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>SMO: true objective: </font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#979000'>0.5</font><font color='#5555FF'>*</font><font color='#BB00BB'>trans</font><font face='Lucida Console'>(</font>alpha<font face='Lucida Console'>)</font><font color='#5555FF'>*</font>test.Q<font color='#5555FF'>*</font>alpha <font color='#5555FF'>-</font> <font color='#BB00BB'>trans</font><font face='Lucida Console'>(</font>alpha<font face='Lucida Console'>)</font><font color='#5555FF'>*</font>test.b;
+
+
+            <font color='#0000FF'><u>double</u></font> obj <font color='#5555FF'>=</font> <font color='#BB00BB'>find_min</font><font face='Lucida Console'>(</font><font color='#BB00BB'>bfgs_search_strategy</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,
+                                  <font color='#BB00BB'>objective_delta_stop_strategy</font><font face='Lucida Console'>(</font><font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>13</font>, <font color='#979000'>5000</font><font face='Lucida Console'>)</font>,
+                                  test,
+                                  der,
+                                  x,
+                                  <font color='#5555FF'>-</font><font color='#979000'>10</font><font face='Lucida Console'>)</font>;
+
+
+            dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>BFGS: objective: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> obj;
+            dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>BFGS: true objective: </font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#979000'>0.5</font><font color='#5555FF'>*</font><font color='#BB00BB'>trans</font><font face='Lucida Console'>(</font>x<font face='Lucida Console'>)</font><font color='#5555FF'>*</font>test.Q<font color='#5555FF'>*</font>x <font color='#5555FF'>-</font> <font color='#BB00BB'>trans</font><font face='Lucida Console'>(</font>x<font face='Lucida Console'>)</font><font color='#5555FF'>*</font>test.b;
+            dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>sum(x): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>sum</font><font face='Lucida Console'>(</font>x<font face='Lucida Console'>)</font>;
+            dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> x;
+
+            <font color='#0000FF'><u>double</u></font> disagreement <font color='#5555FF'>=</font> <font color='#BB00BB'>max</font><font face='Lucida Console'>(</font><font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font>x<font color='#5555FF'>-</font>alpha<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>Disagreement: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> disagreement;
+            <font color='#0000FF'>return</font> disagreement;
+        <b>}</b>
+    <b>}</b> a;
+
+<b>}</b>
+
+
+
+
+</pre></body></html>

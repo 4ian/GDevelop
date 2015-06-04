@@ -1,0 +1,417 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - find_max_parse_cky.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2012  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_FIND_MAX_PaRSE_CKY_Hh_
+<font color='#0000FF'>#define</font> DLIB_FIND_MAX_PaRSE_CKY_Hh_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='find_max_parse_cky_abstract.h.html'>find_max_parse_cky_abstract.h</a>"
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>vector<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>string<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>sstream<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../serialize.h.html'>../serialize.h</a>" 
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../array2d.h.html'>../array2d.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// -----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>struct</font> <b><a name='constituent'></a>constituent</b> 
+    <b>{</b>
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> begin, end, k;
+        T left_tag; 
+        T right_tag;
+    <b>}</b>;
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='serialize'></a>serialize</b><font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> constituent<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> item,
+        std::ostream<font color='#5555FF'>&amp;</font> out
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item.begin, out<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item.end, out<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item.k, out<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item.left_tag, out<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item.right_tag, out<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='deserialize'></a>deserialize</b><font face='Lucida Console'>(</font>
+        constituent<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> item,
+        std::istream<font color='#5555FF'>&amp;</font> in 
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item.begin, in<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item.end, in<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item.k, in<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item.left_tag, in<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item.right_tag, in<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// -----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> END_OF_TREE <font color='#5555FF'>=</font> <font color='#979000'>0xFFFFFFFF</font>;
+
+<font color='#009900'>// -----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>struct</font> <b><a name='parse_tree_element'></a>parse_tree_element</b>
+    <b>{</b>
+        constituent<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font> c;
+        T tag; <font color='#009900'>// id for the constituent corresponding to this level of the tree
+</font>
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> left;
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> right; 
+        <font color='#0000FF'><u>double</u></font> score; 
+    <b>}</b>;
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='serialize'></a>serialize</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> parse_tree_element<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> item,
+        std::ostream<font color='#5555FF'>&amp;</font> out
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item.c, out<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item.tag, out<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item.left, out<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item.right, out<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item.score, out<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='deserialize'></a>deserialize</b> <font face='Lucida Console'>(</font>
+        parse_tree_element<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> item,
+        std::istream<font color='#5555FF'>&amp;</font> in 
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item.c, in<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item.tag, in<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item.left, in<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item.right, in<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item.score, in<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// -----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>namespace</font> impl
+    <b>{</b>
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='fill_parse_tree'></a>fill_parse_tree</b><font face='Lucida Console'>(</font>
+            std::vector<font color='#5555FF'>&lt;</font>parse_tree_element<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> parse_tree, 
+            <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> tag,
+            <font color='#0000FF'>const</font> array2d<font color='#5555FF'>&lt;</font>std::map<font color='#5555FF'>&lt;</font>T, parse_tree_element<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> back, 
+            <font color='#0000FF'><u>long</u></font> r, <font color='#0000FF'><u>long</u></font> c
+        <font face='Lucida Console'>)</font>
+        <font color='#009900'>/*!
+            requires
+                - back[r][c].size() == 0 || back[r][c].count(tag) != 0
+        !*/</font>
+        <b>{</b>
+            <font color='#009900'>// base case of the recursion 
+</font>            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>back[r][c].<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>return</font> END_OF_TREE;
+            <b>}</b>
+
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> idx <font color='#5555FF'>=</font> parse_tree.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>const</font> parse_tree_element<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> item <font color='#5555FF'>=</font> back[r][c].<font color='#BB00BB'>find</font><font face='Lucida Console'>(</font>tag<font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>second;
+            parse_tree.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>item<font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> k <font color='#5555FF'>=</font> item.c.k;
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> idx_left  <font color='#5555FF'>=</font> <font color='#BB00BB'>fill_parse_tree</font><font face='Lucida Console'>(</font>parse_tree, item.c.left_tag, back, r, k<font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>; 
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> idx_right <font color='#5555FF'>=</font> <font color='#BB00BB'>fill_parse_tree</font><font face='Lucida Console'>(</font>parse_tree, item.c.right_tag, back, k, c<font face='Lucida Console'>)</font>; 
+            parse_tree[idx].left <font color='#5555FF'>=</font> idx_left;
+            parse_tree[idx].right <font color='#5555FF'>=</font> idx_right;
+            <font color='#0000FF'>return</font> idx;
+        <b>}</b>
+    <b>}</b>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> production_rule_function<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='find_max_parse_cky'></a>find_max_parse_cky</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> sequence,
+        <font color='#0000FF'>const</font> production_rule_function<font color='#5555FF'>&amp;</font> production_rules,
+        std::vector<font color='#5555FF'>&lt;</font>parse_tree_element<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> parse_tree
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        parse_tree.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>sequence.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+            <font color='#0000FF'>return</font>;
+
+        array2d<font color='#5555FF'>&lt;</font>std::map<font color='#5555FF'>&lt;</font>T,<font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> <font color='#BB00BB'>table</font><font face='Lucida Console'>(</font>sequence.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, sequence.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        array2d<font color='#5555FF'>&lt;</font>std::map<font color='#5555FF'>&lt;</font>T,parse_tree_element<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> <font color='#BB00BB'>back</font><font face='Lucida Console'>(</font>sequence.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, sequence.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> std::map<font color='#5555FF'>&lt;</font>T,<font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font>::iterator itr;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> std::map<font color='#5555FF'>&lt;</font>T,parse_tree_element<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font>::iterator itr_b;
+
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> r <font color='#5555FF'>=</font> <font color='#979000'>0</font>; r <font color='#5555FF'>&lt;</font> table.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>r<font face='Lucida Console'>)</font>
+            table[r][r][sequence[r]] <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+
+        std::vector<font color='#5555FF'>&lt;</font>std::pair<font color='#5555FF'>&lt;</font>T,<font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> possible_tags;
+
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> r <font color='#5555FF'>=</font> table.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#979000'>2</font>; r <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#979000'>0</font>; <font color='#5555FF'>-</font><font color='#5555FF'>-</font>r<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> c <font color='#5555FF'>=</font> r<font color='#5555FF'>+</font><font color='#979000'>1</font>; c <font color='#5555FF'>&lt;</font> table.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>c<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> k <font color='#5555FF'>=</font> r; k <font color='#5555FF'>&lt;</font> c; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>k<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>itr i <font color='#5555FF'>=</font> table[k<font color='#5555FF'>+</font><font color='#979000'>1</font>][c].<font color='#BB00BB'>begin</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; i <font color='#5555FF'>!</font><font color='#5555FF'>=</font> table[k<font color='#5555FF'>+</font><font color='#979000'>1</font>][c].<font color='#BB00BB'>end</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>itr j <font color='#5555FF'>=</font> table[r][k].<font color='#BB00BB'>begin</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; j <font color='#5555FF'>!</font><font color='#5555FF'>=</font> table[r][k].<font color='#BB00BB'>end</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>j<font face='Lucida Console'>)</font>
+                        <b>{</b>
+                            constituent<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font> con;
+                            con.begin <font color='#5555FF'>=</font> r;
+                            con.end <font color='#5555FF'>=</font> c<font color='#5555FF'>+</font><font color='#979000'>1</font>;
+                            con.k <font color='#5555FF'>=</font> k<font color='#5555FF'>+</font><font color='#979000'>1</font>;
+                            con.left_tag <font color='#5555FF'>=</font> j<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>first;
+                            con.right_tag <font color='#5555FF'>=</font> i<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>first;
+                            possible_tags.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                            <font color='#BB00BB'>production_rules</font><font face='Lucida Console'>(</font>sequence, con, possible_tags<font face='Lucida Console'>)</font>;
+                            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> m <font color='#5555FF'>=</font> <font color='#979000'>0</font>; m <font color='#5555FF'>&lt;</font> possible_tags.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>m<font face='Lucida Console'>)</font>
+                            <b>{</b>
+                                <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> score <font color='#5555FF'>=</font> possible_tags[m].second <font color='#5555FF'>+</font> i<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>second <font color='#5555FF'>+</font> j<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>second;
+                                itr match <font color='#5555FF'>=</font> table[r][c].<font color='#BB00BB'>find</font><font face='Lucida Console'>(</font>possible_tags[m].first<font face='Lucida Console'>)</font>;
+                                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>match <font color='#5555FF'>=</font><font color='#5555FF'>=</font> table[r][c].<font color='#BB00BB'>end</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>|</font><font color='#5555FF'>|</font> score <font color='#5555FF'>&gt;</font> match<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>second<font face='Lucida Console'>)</font>
+                                <b>{</b>
+                                    table[r][c][possible_tags[m].first] <font color='#5555FF'>=</font> score;
+                                    parse_tree_element<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font> item;
+                                    item.c <font color='#5555FF'>=</font> con;
+                                    item.score <font color='#5555FF'>=</font> score;
+                                    item.tag <font color='#5555FF'>=</font> possible_tags[m].first;
+                                    item.left <font color='#5555FF'>=</font> END_OF_TREE;
+                                    item.right <font color='#5555FF'>=</font> END_OF_TREE;
+                                    back[r][c][possible_tags[m].first] <font color='#5555FF'>=</font> item;
+                                <b>}</b>
+                            <b>}</b>
+                        <b>}</b>
+                    <b>}</b>
+                <b>}</b>
+            <b>}</b>
+        <b>}</b>
+
+
+        <font color='#009900'>// now use back pointers to build the parse trees
+</font>        <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> r <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> c <font color='#5555FF'>=</font> back.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#979000'>1</font>;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>back[r][c].<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+
+            <font color='#009900'>// find the max scoring element in back[r][c]
+</font>            itr_b max_i <font color='#5555FF'>=</font> back[r][c].<font color='#BB00BB'>begin</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            itr_b i <font color='#5555FF'>=</font> max_i;
+            <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i;
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>; i <font color='#5555FF'>!</font><font color='#5555FF'>=</font> back[r][c].<font color='#BB00BB'>end</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>i<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>second.score <font color='#5555FF'>&gt;</font> max_i<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>second.score<font face='Lucida Console'>)</font>
+                    max_i <font color='#5555FF'>=</font> i;
+            <b>}</b>
+
+            parse_tree.<font color='#BB00BB'>reserve</font><font face='Lucida Console'>(</font>c<font face='Lucida Console'>)</font>;
+            impl::<font color='#BB00BB'>fill_parse_tree</font><font face='Lucida Console'>(</font>parse_tree, max_i<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>second.tag, back, r, c<font face='Lucida Console'>)</font>;
+        <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// -----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>class</font> <b><a name='parse_tree_to_string_error'></a>parse_tree_to_string_error</b> : <font color='#0000FF'>public</font> error
+    <b>{</b>
+    <font color='#0000FF'>public</font>:
+        <b><a name='parse_tree_to_string_error'></a>parse_tree_to_string_error</b><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> str<font face='Lucida Console'>)</font>: error<font face='Lucida Console'>(</font>str<font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+    <b>}</b>;
+
+    <font color='#0000FF'>namespace</font> impl
+    <b>{</b>
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'><u>bool</u></font> enabled, <font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>typename</font> enable_if_c<font color='#5555FF'>&lt;</font>enabled<font color='#5555FF'>&gt;</font>::type <b><a name='conditional_print'></a>conditional_print</b><font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> item,
+            std::ostream<font color='#5555FF'>&amp;</font> out
+        <font face='Lucida Console'>)</font> <b>{</b> out <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> item <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'> </font>"; <b>}</b>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'><u>bool</u></font> enabled, <font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>typename</font> disable_if_c<font color='#5555FF'>&lt;</font>enabled<font color='#5555FF'>&gt;</font>::type <b><a name='conditional_print'></a>conditional_print</b><font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> ,
+            std::ostream<font color='#5555FF'>&amp;</font> 
+        <font face='Lucida Console'>)</font> <b>{</b>  <b>}</b>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'><u>bool</u></font> print_tag, <font color='#0000FF'><u>bool</u></font> skip_tag, <font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> U <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='print_parse_tree_helper'></a>print_parse_tree_helper</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>parse_tree_element<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> tree,
+            <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>U<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> words,
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i,
+            <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> tag_to_skip,
+            std::ostream<font color='#5555FF'>&amp;</font> out
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font>skip_tag <font color='#5555FF'>|</font><font color='#5555FF'>|</font> tree[i].tag <font color='#5555FF'>!</font><font color='#5555FF'>=</font> tag_to_skip<font face='Lucida Console'>)</font>
+                out <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>[</font>";
+
+            <font color='#0000FF'><u>bool</u></font> left_recurse <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+
+            <font color='#009900'>// Only print if we are supposed to.  Doing it this funny way avoids compiler
+</font>            <font color='#009900'>// errors in parse_tree_to_string() for the case where tag isn't
+</font>            <font color='#009900'>// printable.
+</font>            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font>skip_tag <font color='#5555FF'>|</font><font color='#5555FF'>|</font> tree[i].tag <font color='#5555FF'>!</font><font color='#5555FF'>=</font> tag_to_skip<font face='Lucida Console'>)</font>
+                conditional_print<font color='#5555FF'>&lt;</font>print_tag<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>tree[i].tag, out<font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>tree[i].left <font color='#5555FF'>&lt;</font> tree.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                left_recurse <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+                print_parse_tree_helper<font color='#5555FF'>&lt;</font>print_tag,skip_tag<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>tree, words, tree[i].left, tag_to_skip, out<font face='Lucida Console'>)</font>;
+            <b>}</b>
+            <font color='#0000FF'>else</font>
+            <b>{</b>
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>tree[i].c.begin<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> words.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                <b>{</b>
+                    out <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> words[tree[i].c.begin] <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'> </font>";
+                <b>}</b>
+                <font color='#0000FF'>else</font>
+                <b>{</b>
+                    std::ostringstream sout;
+                    sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>Parse tree refers to element </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> tree[i].c.begin 
+                         <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'> of sequence which is only of size </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> words.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>.</font>";
+                    <font color='#0000FF'>throw</font> <font color='#BB00BB'>parse_tree_to_string_error</font><font face='Lucida Console'>(</font>sout.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                <b>}</b>
+            <b>}</b>
+
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>left_recurse <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>true</font><font face='Lucida Console'>)</font>
+                out <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'> </font>";
+
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>tree[i].right <font color='#5555FF'>&lt;</font> tree.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                print_parse_tree_helper<font color='#5555FF'>&lt;</font>print_tag,skip_tag<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>tree, words, tree[i].right, tag_to_skip, out<font face='Lucida Console'>)</font>;
+            <b>}</b>
+            <font color='#0000FF'>else</font>
+            <b>{</b>
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>tree[i].c.k <font color='#5555FF'>&lt;</font> words.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                <b>{</b>
+                    out <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> words[tree[i].c.k];
+                <b>}</b>
+                <font color='#0000FF'>else</font>
+                <b>{</b>
+                    std::ostringstream sout;
+                    sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>Parse tree refers to element </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> tree[i].c.k 
+                         <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'> of sequence which is only of size </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> words.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>.</font>";
+                    <font color='#0000FF'>throw</font> <font color='#BB00BB'>parse_tree_to_string_error</font><font face='Lucida Console'>(</font>sout.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                <b>}</b>
+            <b>}</b>
+
+
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font>skip_tag <font color='#5555FF'>|</font><font color='#5555FF'>|</font> tree[i].tag <font color='#5555FF'>!</font><font color='#5555FF'>=</font> tag_to_skip<font face='Lucida Console'>)</font>
+                out <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>]</font>";
+        <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// -----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> U<font color='#5555FF'>&gt;</font>
+    std::string <b><a name='parse_tree_to_string'></a>parse_tree_to_string</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>parse_tree_element<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> tree,
+        <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>U<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> words,
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> root_idx <font color='#5555FF'>=</font> <font color='#979000'>0</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>root_idx <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> tree.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+            <font color='#0000FF'>return</font> "<font color='#CC0000'></font>";
+
+        std::ostringstream sout;
+        impl::print_parse_tree_helper<font color='#5555FF'>&lt;</font><font color='#979000'>false</font>,<font color='#979000'>false</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>tree, words, root_idx, tree[root_idx].tag, sout<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>return</font> sout.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// -----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> U<font color='#5555FF'>&gt;</font>
+    std::string <b><a name='parse_tree_to_string_tagged'></a>parse_tree_to_string_tagged</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>parse_tree_element<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> tree,
+        <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>U<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> words,
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> root_idx <font color='#5555FF'>=</font> <font color='#979000'>0</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>root_idx <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> tree.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+            <font color='#0000FF'>return</font> "<font color='#CC0000'></font>";
+
+        std::ostringstream sout;
+        impl::print_parse_tree_helper<font color='#5555FF'>&lt;</font><font color='#979000'>true</font>,<font color='#979000'>false</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>tree, words, root_idx, tree[root_idx].tag, sout<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>return</font> sout.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// -----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> U<font color='#5555FF'>&gt;</font>
+    std::string <b><a name='parse_trees_to_string'></a>parse_trees_to_string</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>parse_tree_element<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> tree,
+        <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>U<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> words,
+        <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> tag_to_skip
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>tree.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+            <font color='#0000FF'>return</font> "<font color='#CC0000'></font>";
+
+        std::ostringstream sout;
+        impl::print_parse_tree_helper<font color='#5555FF'>&lt;</font><font color='#979000'>false</font>,<font color='#979000'>true</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>tree, words, <font color='#979000'>0</font>, tag_to_skip, sout<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>return</font> sout.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// -----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> U<font color='#5555FF'>&gt;</font>
+    std::string <b><a name='parse_trees_to_string_tagged'></a>parse_trees_to_string_tagged</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>parse_tree_element<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> tree,
+        <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>U<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> words,
+        <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> tag_to_skip
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>tree.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+            <font color='#0000FF'>return</font> "<font color='#CC0000'></font>";
+
+        std::ostringstream sout;
+        impl::print_parse_tree_helper<font color='#5555FF'>&lt;</font><font color='#979000'>true</font>,<font color='#979000'>true</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>tree, words, <font color='#979000'>0</font>, tag_to_skip, sout<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>return</font> sout.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// -----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>namespace</font> impl
+    <b>{</b>
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='helper_find_trees_without_tag'></a>helper_find_trees_without_tag</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>parse_tree_element<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> tree,
+            <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> tag,
+            std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> tree_roots,
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> idx
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>idx <font color='#5555FF'>&lt;</font> tree.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>tree[idx].tag <font color='#5555FF'>!</font><font color='#5555FF'>=</font> tag<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    tree_roots.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>idx<font face='Lucida Console'>)</font>;
+                <b>}</b>
+                <font color='#0000FF'>else</font>
+                <b>{</b>
+                    <font color='#BB00BB'>helper_find_trees_without_tag</font><font face='Lucida Console'>(</font>tree, tag, tree_roots, tree[idx].left<font face='Lucida Console'>)</font>;
+                    <font color='#BB00BB'>helper_find_trees_without_tag</font><font face='Lucida Console'>(</font>tree, tag, tree_roots, tree[idx].right<font face='Lucida Console'>)</font>;
+                <b>}</b>
+            <b>}</b>
+        <b>}</b>
+    <b>}</b>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='find_trees_not_rooted_with_tag'></a>find_trees_not_rooted_with_tag</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>parse_tree_element<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> tree,
+        <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> tag,
+        std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> tree_roots 
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        tree_roots.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        impl::<font color='#BB00BB'>helper_find_trees_without_tag</font><font face='Lucida Console'>(</font>tree, tag, tree_roots, <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// -----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_FIND_MAX_PaRSE_CKY_Hh_
+</font>
+
+</pre></body></html>

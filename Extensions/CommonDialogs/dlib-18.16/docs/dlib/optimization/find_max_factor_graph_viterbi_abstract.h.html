@@ -1,0 +1,134 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - find_max_factor_graph_viterbi_abstract.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2011  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#undef</font> DLIB_FIND_MAX_FACTOR_GRAPH_VITERBi_ABSTRACT_Hh_
+<font color='#0000FF'>#ifdef</font> DLIB_FIND_MAX_FACTOR_GRAPH_VITERBi_ABSTRACT_Hh_
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>vector<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../matrix.h.html'>../matrix.h</a>"
+
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>class</font> <b><a name='map_problem'></a>map_problem</b> 
+    <b>{</b>
+        <font color='#009900'>/*!
+            WHAT THIS OBJECT REPRESENTS
+                This object represents a chain-structured factor graph or graphical 
+                model.  In particular, this object defines the interface a MAP problem 
+                on a factor graph must implement if it is to be solved using the 
+                find_max_factor_graph_viterbi() routine defined at the bottom of this file.  
+
+                Note that there is no dlib::map_problem object.  What you are looking 
+                at here is simply the interface definition for a map problem.  You must 
+                implement your own version of this object for the problem you wish to 
+                solve and then pass it to the find_max_factor_graph_viterbi() routine.
+        !*/</font>
+
+    <font color='#0000FF'>public</font>:
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='order'></a>order</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the order of this model.  The order has the following interpretation:
+                  This model can represent a high order Markov chain.  If order()==1 then map_problem
+                  represents a basic chain-structured graph where nodes only depend on their immediate
+                  neighbors.  However, high order Markov models can also be used by setting order() &gt; 1.
+        !*/</font>
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='num_states'></a>num_states</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the number of states attainable by each variable/node in the graph.
+        !*/</font>
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='number_of_nodes'></a>number_of_nodes</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the number of nodes in the factor graph.  Or in other words, 
+                  returns the number of variables in the MAP problem.
+        !*/</font>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'>typename</font> EXP 
+            <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>double</u></font> <b><a name='factor_value'></a>factor_value</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> node_id,
+            <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&lt;</font>EXP<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> node_states
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - EXP::type == unsigned long
+                  (i.e. node_states contains unsigned longs)
+                - node_id &lt; number_of_nodes()
+                - node_states.size() == min(node_id, order()) + 1
+                - is_vector(node_states) == true
+                - max(node_states) &lt; num_states()
+            ensures
+                - In a chain-structured graph, each node has a potential function associated with
+                  it.  The potential function operates on the variable given by the node as well
+                  as the order() previous variables.  Therefore, factor_value() returns the value 
+                  of the factor/potential function associated with node node_id where the following 
+                  nodes take on the values defined below:
+                    - node_states(0) == the value of the node with ID node_id
+                    - node_states(i) == the value of the node with ID node_id-i
+                - It is ok for this function to return a value of -std::numeric_limits&lt;double&gt;::infinity().
+        !*/</font>
+
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> map_problem
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='find_max_factor_graph_viterbi'></a>find_max_factor_graph_viterbi</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> map_problem<font color='#5555FF'>&amp;</font> prob,
+        std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> map_assignment
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - prob.num_states() &gt; 0
+            - std::pow(prob.num_states(), prob.order()) &lt; std::numeric_limits&lt;unsigned long&gt;::max()
+              (i.e. The Viterbi algorithm is exponential in the order of the map problem.  So don't 
+              make order too large.)
+            - map_problem == an object with an interface compatible with the map_problem
+              object defined at the top of this file.
+        ensures
+            - This function is a tool for exactly solving the MAP problem in a chain-structured 
+              graphical model or factor graph.  That is, it attempts to solve a certain kind of 
+              optimization problem which can be defined as follows:
+                - Let X denote a set of prob.number_of_nodes() integer valued variables, each taking
+                  a value in the range [0, prob.num_states()).
+                - Let X(i) = the ith variable in X.
+                - Let F(i) = factor_value_i(X(i), X(i-1), ..., X(i-prob.order()))
+                  (This is the value returned by prob.factor_value(i, node_states).  Note that
+                  each factor's value function operates on at most prob.order()+1 variables.
+                  Moreover, the variables are adjacent and hence the graph is "chain-structured".)
+
+                 Then this function finds the assignments to the X variables which  
+                 maximizes: sum over all valid i: F(i)
+
+            - #map_assignment == the result of the optimization.   
+            - #map_assignment.size() == prob.number_of_nodes()
+            - for all valid i:
+                - #map_assignment[i] &lt; prob.num_states()
+                - #map_assignment[i] == The MAP assignment for node/variable i.
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_FIND_MAX_FACTOR_GRAPH_VITERBi_ABSTRACT_Hh_
+</font>
+
+
+
+</pre></body></html>

@@ -1,0 +1,717 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - optimization.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2008  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_OPTIMIZATIOn_H_
+<font color='#0000FF'>#define</font> DLIB_OPTIMIZATIOn_H_
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>cmath<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>limits<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='optimization_abstract.h.html'>optimization_abstract.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='optimization_search_strategies.h.html'>optimization_search_strategies.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='optimization_stop_strategies.h.html'>optimization_stop_strategies.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='optimization_line_search.h.html'>optimization_line_search.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>//                    Functions that transform other functions  
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> funct<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>class</font> <b><a name='central_differences'></a>central_differences</b>
+    <b>{</b>
+    <font color='#0000FF'>public</font>:
+        <b><a name='central_differences'></a>central_differences</b><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> funct<font color='#5555FF'>&amp;</font> f_, <font color='#0000FF'><u>double</u></font> eps_ <font color='#5555FF'>=</font> <font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>7</font><font face='Lucida Console'>)</font> : f<font face='Lucida Console'>(</font>f_<font face='Lucida Console'>)</font>, eps<font face='Lucida Console'>(</font>eps_<font face='Lucida Console'>)</font><b>{</b><b>}</b>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>typename</font> T::matrix_type <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> x<font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#009900'>// T must be some sort of dlib matrix 
+</font>            <font color='#BB00BB'>COMPILE_TIME_ASSERT</font><font face='Lucida Console'>(</font>is_matrix<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font>::value<font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>typename</font> T::matrix_type <font color='#BB00BB'>der</font><font face='Lucida Console'>(</font>x.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>typename</font> T::matrix_type <font color='#BB00BB'>e</font><font face='Lucida Console'>(</font>x<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> x.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> old_val <font color='#5555FF'>=</font> <font color='#BB00BB'>e</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>;
+
+                <font color='#BB00BB'>e</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font> <font color='#5555FF'>+</font><font color='#5555FF'>=</font> eps;
+                <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> delta_plus <font color='#5555FF'>=</font> <font color='#BB00BB'>f</font><font face='Lucida Console'>(</font>e<font face='Lucida Console'>)</font>;
+                <font color='#BB00BB'>e</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> old_val <font color='#5555FF'>-</font> eps;
+                <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> delta_minus <font color='#5555FF'>=</font> <font color='#BB00BB'>f</font><font face='Lucida Console'>(</font>e<font face='Lucida Console'>)</font>;
+
+                <font color='#BB00BB'>der</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>delta_plus <font color='#5555FF'>-</font> delta_minus<font face='Lucida Console'>)</font><font color='#5555FF'>/</font><font face='Lucida Console'>(</font><font color='#979000'>2</font><font color='#5555FF'>*</font>eps<font face='Lucida Console'>)</font>;
+
+                <font color='#009900'>// and finally restore the old value of this element
+</font>                <font color='#BB00BB'>e</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> old_val;
+            <b>}</b>
+
+            <font color='#0000FF'>return</font> der;
+        <b>}</b>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> U<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>typename</font> U::matrix_type <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> item, <font color='#0000FF'>const</font> U<font color='#5555FF'>&amp;</font> x<font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#009900'>// U must be some sort of dlib matrix 
+</font>            <font color='#BB00BB'>COMPILE_TIME_ASSERT</font><font face='Lucida Console'>(</font>is_matrix<font color='#5555FF'>&lt;</font>U<font color='#5555FF'>&gt;</font>::value<font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>typename</font> U::matrix_type <font color='#BB00BB'>der</font><font face='Lucida Console'>(</font>x.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>typename</font> U::matrix_type <font color='#BB00BB'>e</font><font face='Lucida Console'>(</font>x<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> x.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> old_val <font color='#5555FF'>=</font> <font color='#BB00BB'>e</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>;
+
+                <font color='#BB00BB'>e</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font> <font color='#5555FF'>+</font><font color='#5555FF'>=</font> eps;
+                <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> delta_plus <font color='#5555FF'>=</font> <font color='#BB00BB'>f</font><font face='Lucida Console'>(</font>item,e<font face='Lucida Console'>)</font>;
+                <font color='#BB00BB'>e</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> old_val <font color='#5555FF'>-</font> eps;
+                <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> delta_minus <font color='#5555FF'>=</font> <font color='#BB00BB'>f</font><font face='Lucida Console'>(</font>item,e<font face='Lucida Console'>)</font>;
+
+                <font color='#BB00BB'>der</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>delta_plus <font color='#5555FF'>-</font> delta_minus<font face='Lucida Console'>)</font><font color='#5555FF'>/</font><font face='Lucida Console'>(</font><font color='#979000'>2</font><font color='#5555FF'>*</font>eps<font face='Lucida Console'>)</font>;
+
+                <font color='#009900'>// and finally restore the old value of this element
+</font>                <font color='#BB00BB'>e</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> old_val;
+            <b>}</b>
+
+            <font color='#0000FF'>return</font> der;
+        <b>}</b>
+        
+
+        <font color='#0000FF'><u>double</u></font> <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font><font color='#5555FF'>&amp;</font> x<font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#0000FF'>return</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>f</font><font face='Lucida Console'>(</font>x<font color='#5555FF'>+</font>eps<font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#BB00BB'>f</font><font face='Lucida Console'>(</font>x<font color='#5555FF'>-</font>eps<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font color='#5555FF'>/</font><font face='Lucida Console'>(</font><font color='#979000'>2</font><font color='#5555FF'>*</font>eps<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+    <font color='#0000FF'>private</font>:
+        <font color='#0000FF'>const</font> funct<font color='#5555FF'>&amp;</font> f;
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> eps;
+    <b>}</b>;
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> funct<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>const</font> central_differences<font color='#5555FF'>&lt;</font>funct<font color='#5555FF'>&gt;</font> <b><a name='derivative'></a>derivative</b><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> funct<font color='#5555FF'>&amp;</font> f<font face='Lucida Console'>)</font> <b>{</b> <font color='#0000FF'>return</font> central_differences<font color='#5555FF'>&lt;</font>funct<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>f<font face='Lucida Console'>)</font>; <b>}</b>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> funct<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>const</font> central_differences<font color='#5555FF'>&lt;</font>funct<font color='#5555FF'>&gt;</font> <b><a name='derivative'></a>derivative</b><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> funct<font color='#5555FF'>&amp;</font> f, <font color='#0000FF'><u>double</u></font> eps<font face='Lucida Console'>)</font> 
+    <b>{</b> 
+        <font color='#BB00BB'>DLIB_ASSERT</font> <font face='Lucida Console'>(</font>
+            eps <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font>,
+            "<font color='#CC0000'>\tcentral_differences derivative(f,eps)</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tYou must give an epsilon &gt; 0</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\teps:     </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> eps 
+        <font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>return</font> central_differences<font color='#5555FF'>&lt;</font>funct<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>f,eps<font face='Lucida Console'>)</font>; 
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> funct, <font color='#0000FF'>typename</font> EXP1, <font color='#0000FF'>typename</font> EXP2<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>struct</font> <b><a name='clamped_function_object'></a>clamped_function_object</b>
+    <b>{</b>
+        <b><a name='clamped_function_object'></a>clamped_function_object</b><font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> funct<font color='#5555FF'>&amp;</font> f_,
+            <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&lt;</font>EXP1<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> x_lower_,
+            <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&lt;</font>EXP2<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> x_upper_ 
+        <font face='Lucida Console'>)</font> : f<font face='Lucida Console'>(</font>f_<font face='Lucida Console'>)</font>, x_lower<font face='Lucida Console'>(</font>x_lower_<font face='Lucida Console'>)</font>, x_upper<font face='Lucida Console'>(</font>x_upper_<font face='Lucida Console'>)</font>
+        <b>{</b>
+        <b>}</b>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>double</u></font> <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> x
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#0000FF'>return</font> <font color='#BB00BB'>f</font><font face='Lucida Console'>(</font><font color='#BB00BB'>clamp</font><font face='Lucida Console'>(</font>x,x_lower,x_upper<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+        
+        <font color='#0000FF'>const</font> funct<font color='#5555FF'>&amp;</font> f;
+        <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&lt;</font>EXP1<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> x_lower;
+        <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&lt;</font>EXP2<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> x_upper; 
+    <b>}</b>;
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> funct, <font color='#0000FF'>typename</font> EXP1, <font color='#0000FF'>typename</font> EXP2<font color='#5555FF'>&gt;</font>
+    clamped_function_object<font color='#5555FF'>&lt;</font>funct,EXP1,EXP2<font color='#5555FF'>&gt;</font> <b><a name='clamp_function'></a>clamp_function</b><font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> funct<font color='#5555FF'>&amp;</font> f,
+        <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&lt;</font>EXP1<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> x_lower,
+        <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&lt;</font>EXP2<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> x_upper 
+    <font face='Lucida Console'>)</font> <b>{</b> <font color='#0000FF'>return</font> clamped_function_object<font color='#5555FF'>&lt;</font>funct,EXP1,EXP2<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>f,x_lower,x_upper<font face='Lucida Console'>)</font>; <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>//                    Functions that perform unconstrained optimization 
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> search_strategy_type,
+        <font color='#0000FF'>typename</font> stop_strategy_type,
+        <font color='#0000FF'>typename</font> funct, 
+        <font color='#0000FF'>typename</font> funct_der, 
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>double</u></font> <b><a name='find_min'></a>find_min</b> <font face='Lucida Console'>(</font>
+        search_strategy_type search_strategy,
+        stop_strategy_type stop_strategy,
+        <font color='#0000FF'>const</font> funct<font color='#5555FF'>&amp;</font> f, 
+        <font color='#0000FF'>const</font> funct_der<font color='#5555FF'>&amp;</font> der, 
+        T<font color='#5555FF'>&amp;</font> x, 
+        <font color='#0000FF'><u>double</u></font> min_f
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#BB00BB'>COMPILE_TIME_ASSERT</font><font face='Lucida Console'>(</font>is_matrix<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font>::value<font face='Lucida Console'>)</font>;
+        <font color='#009900'>// The starting point (i.e. x) must be a column vector.  
+</font>        <font color='#BB00BB'>COMPILE_TIME_ASSERT</font><font face='Lucida Console'>(</font>T::NC <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+
+        <font color='#BB00BB'>DLIB_CASSERT</font> <font face='Lucida Console'>(</font>
+            <font color='#BB00BB'>is_col_vector</font><font face='Lucida Console'>(</font>x<font face='Lucida Console'>)</font>,
+            "<font color='#CC0000'>\tdouble find_min()</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tYou have to supply column vectors to this function</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tx.nc():    </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> x.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+        <font face='Lucida Console'>)</font>;
+
+
+        T g, s;
+
+        <font color='#0000FF'><u>double</u></font> f_value <font color='#5555FF'>=</font> <font color='#BB00BB'>f</font><font face='Lucida Console'>(</font>x<font face='Lucida Console'>)</font>;
+        g <font color='#5555FF'>=</font> <font color='#BB00BB'>der</font><font face='Lucida Console'>(</font>x<font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font><font color='#BB00BB'>is_finite</font><font face='Lucida Console'>(</font>f_value<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+            <font color='#0000FF'>throw</font> <font color='#BB00BB'>error</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>The objective function generated non-finite outputs</font>"<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font><font color='#BB00BB'>is_finite</font><font face='Lucida Console'>(</font>g<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+            <font color='#0000FF'>throw</font> <font color='#BB00BB'>error</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>The objective function generated non-finite outputs</font>"<font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>while</font><font face='Lucida Console'>(</font>stop_strategy.<font color='#BB00BB'>should_continue_search</font><font face='Lucida Console'>(</font>x, f_value, g<font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> f_value <font color='#5555FF'>&gt;</font> min_f<font face='Lucida Console'>)</font>
+        <b>{</b>
+            s <font color='#5555FF'>=</font> search_strategy.<font color='#BB00BB'>get_next_direction</font><font face='Lucida Console'>(</font>x, f_value, g<font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'><u>double</u></font> alpha <font color='#5555FF'>=</font> <font color='#BB00BB'>line_search</font><font face='Lucida Console'>(</font>
+                        <font color='#BB00BB'>make_line_search_function</font><font face='Lucida Console'>(</font>f,x,s, f_value<font face='Lucida Console'>)</font>,
+                        f_value,
+                        <font color='#BB00BB'>make_line_search_function</font><font face='Lucida Console'>(</font>der,x,s, g<font face='Lucida Console'>)</font>,
+                        <font color='#BB00BB'>dot</font><font face='Lucida Console'>(</font>g,s<font face='Lucida Console'>)</font>, <font color='#009900'>// compute initial gradient for the line search
+</font>                        search_strategy.<font color='#BB00BB'>get_wolfe_rho</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, search_strategy.<font color='#BB00BB'>get_wolfe_sigma</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, min_f,
+                        search_strategy.<font color='#BB00BB'>get_max_line_search_iterations</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// Take the search step indicated by the above line search
+</font>            x <font color='#5555FF'>+</font><font color='#5555FF'>=</font> alpha<font color='#5555FF'>*</font>s;
+
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font><font color='#BB00BB'>is_finite</font><font face='Lucida Console'>(</font>f_value<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                <font color='#0000FF'>throw</font> <font color='#BB00BB'>error</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>The objective function generated non-finite outputs</font>"<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font><font color='#BB00BB'>is_finite</font><font face='Lucida Console'>(</font>g<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                <font color='#0000FF'>throw</font> <font color='#BB00BB'>error</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>The objective function generated non-finite outputs</font>"<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>return</font> f_value;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> search_strategy_type,
+        <font color='#0000FF'>typename</font> stop_strategy_type,
+        <font color='#0000FF'>typename</font> funct, 
+        <font color='#0000FF'>typename</font> funct_der, 
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>double</u></font> <b><a name='find_max'></a>find_max</b> <font face='Lucida Console'>(</font>
+        search_strategy_type search_strategy,
+        stop_strategy_type stop_strategy,
+        <font color='#0000FF'>const</font> funct<font color='#5555FF'>&amp;</font> f, 
+        <font color='#0000FF'>const</font> funct_der<font color='#5555FF'>&amp;</font> der, 
+        T<font color='#5555FF'>&amp;</font> x, 
+        <font color='#0000FF'><u>double</u></font> max_f
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#BB00BB'>COMPILE_TIME_ASSERT</font><font face='Lucida Console'>(</font>is_matrix<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font>::value<font face='Lucida Console'>)</font>;
+        <font color='#009900'>// The starting point (i.e. x) must be a column vector.  
+</font>        <font color='#BB00BB'>COMPILE_TIME_ASSERT</font><font face='Lucida Console'>(</font>T::NC <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+
+        <font color='#BB00BB'>DLIB_CASSERT</font> <font face='Lucida Console'>(</font>
+            <font color='#BB00BB'>is_col_vector</font><font face='Lucida Console'>(</font>x<font face='Lucida Console'>)</font>,
+            "<font color='#CC0000'>\tdouble find_max()</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tYou have to supply column vectors to this function</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tx.nc():    </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> x.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+        <font face='Lucida Console'>)</font>;
+
+        T g, s;
+
+        <font color='#009900'>// This function is basically just a copy of find_min() but with - put in the right places
+</font>        <font color='#009900'>// to flip things around so that it ends up looking for the max rather than the min.
+</font>
+        <font color='#0000FF'><u>double</u></font> f_value <font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#BB00BB'>f</font><font face='Lucida Console'>(</font>x<font face='Lucida Console'>)</font>;
+        g <font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#BB00BB'>der</font><font face='Lucida Console'>(</font>x<font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font><font color='#BB00BB'>is_finite</font><font face='Lucida Console'>(</font>f_value<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+            <font color='#0000FF'>throw</font> <font color='#BB00BB'>error</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>The objective function generated non-finite outputs</font>"<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font><font color='#BB00BB'>is_finite</font><font face='Lucida Console'>(</font>g<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+            <font color='#0000FF'>throw</font> <font color='#BB00BB'>error</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>The objective function generated non-finite outputs</font>"<font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>while</font><font face='Lucida Console'>(</font>stop_strategy.<font color='#BB00BB'>should_continue_search</font><font face='Lucida Console'>(</font>x, f_value, g<font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> f_value <font color='#5555FF'>&gt;</font> <font color='#5555FF'>-</font>max_f<font face='Lucida Console'>)</font>
+        <b>{</b>
+            s <font color='#5555FF'>=</font> search_strategy.<font color='#BB00BB'>get_next_direction</font><font face='Lucida Console'>(</font>x, f_value, g<font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'><u>double</u></font> alpha <font color='#5555FF'>=</font> <font color='#BB00BB'>line_search</font><font face='Lucida Console'>(</font>
+                        <font color='#BB00BB'>negate_function</font><font face='Lucida Console'>(</font><font color='#BB00BB'>make_line_search_function</font><font face='Lucida Console'>(</font>f,x,s, f_value<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>,
+                        f_value,
+                        <font color='#BB00BB'>negate_function</font><font face='Lucida Console'>(</font><font color='#BB00BB'>make_line_search_function</font><font face='Lucida Console'>(</font>der,x,s, g<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>,
+                        <font color='#BB00BB'>dot</font><font face='Lucida Console'>(</font>g,s<font face='Lucida Console'>)</font>, <font color='#009900'>// compute initial gradient for the line search
+</font>                        search_strategy.<font color='#BB00BB'>get_wolfe_rho</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, search_strategy.<font color='#BB00BB'>get_wolfe_sigma</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, <font color='#5555FF'>-</font>max_f,
+                        search_strategy.<font color='#BB00BB'>get_max_line_search_iterations</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+                        <font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// Take the search step indicated by the above line search
+</font>            x <font color='#5555FF'>+</font><font color='#5555FF'>=</font> alpha<font color='#5555FF'>*</font>s;
+
+            <font color='#009900'>// Don't forget to negate these outputs from the line search since they are 
+</font>            <font color='#009900'>// from the unnegated versions of f() and der()
+</font>            g <font color='#5555FF'>*</font><font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>1</font>;
+            f_value <font color='#5555FF'>*</font><font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>1</font>;
+
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font><font color='#BB00BB'>is_finite</font><font face='Lucida Console'>(</font>f_value<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                <font color='#0000FF'>throw</font> <font color='#BB00BB'>error</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>The objective function generated non-finite outputs</font>"<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font><font color='#BB00BB'>is_finite</font><font face='Lucida Console'>(</font>g<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                <font color='#0000FF'>throw</font> <font color='#BB00BB'>error</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>The objective function generated non-finite outputs</font>"<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>return</font> <font color='#5555FF'>-</font>f_value;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> search_strategy_type,
+        <font color='#0000FF'>typename</font> stop_strategy_type,
+        <font color='#0000FF'>typename</font> funct,
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>double</u></font> <b><a name='find_min_using_approximate_derivatives'></a>find_min_using_approximate_derivatives</b> <font face='Lucida Console'>(</font>
+        search_strategy_type search_strategy,
+        stop_strategy_type stop_strategy,
+        <font color='#0000FF'>const</font> funct<font color='#5555FF'>&amp;</font> f,
+        T<font color='#5555FF'>&amp;</font> x,
+        <font color='#0000FF'><u>double</u></font> min_f,
+        <font color='#0000FF'><u>double</u></font> derivative_eps <font color='#5555FF'>=</font> <font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>7</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#BB00BB'>COMPILE_TIME_ASSERT</font><font face='Lucida Console'>(</font>is_matrix<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font>::value<font face='Lucida Console'>)</font>;
+        <font color='#009900'>// The starting point (i.e. x) must be a column vector.  
+</font>        <font color='#BB00BB'>COMPILE_TIME_ASSERT</font><font face='Lucida Console'>(</font>T::NC <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+
+        <font color='#BB00BB'>DLIB_CASSERT</font> <font face='Lucida Console'>(</font>
+            <font color='#BB00BB'>is_col_vector</font><font face='Lucida Console'>(</font>x<font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> derivative_eps <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font>,
+            "<font color='#CC0000'>\tdouble find_min_using_approximate_derivatives()</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tYou have to supply column vectors to this function</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tx.nc():         </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> x.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tderivative_eps: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> derivative_eps 
+        <font face='Lucida Console'>)</font>;
+
+        T g, s;
+
+        <font color='#0000FF'><u>double</u></font> f_value <font color='#5555FF'>=</font> <font color='#BB00BB'>f</font><font face='Lucida Console'>(</font>x<font face='Lucida Console'>)</font>;
+        g <font color='#5555FF'>=</font> <font color='#BB00BB'>derivative</font><font face='Lucida Console'>(</font>f,derivative_eps<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>x<font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font><font color='#BB00BB'>is_finite</font><font face='Lucida Console'>(</font>f_value<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+            <font color='#0000FF'>throw</font> <font color='#BB00BB'>error</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>The objective function generated non-finite outputs</font>"<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font><font color='#BB00BB'>is_finite</font><font face='Lucida Console'>(</font>g<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+            <font color='#0000FF'>throw</font> <font color='#BB00BB'>error</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>The objective function generated non-finite outputs</font>"<font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>while</font><font face='Lucida Console'>(</font>stop_strategy.<font color='#BB00BB'>should_continue_search</font><font face='Lucida Console'>(</font>x, f_value, g<font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> f_value <font color='#5555FF'>&gt;</font> min_f<font face='Lucida Console'>)</font>
+        <b>{</b>
+            s <font color='#5555FF'>=</font> search_strategy.<font color='#BB00BB'>get_next_direction</font><font face='Lucida Console'>(</font>x, f_value, g<font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'><u>double</u></font> alpha <font color='#5555FF'>=</font> <font color='#BB00BB'>line_search</font><font face='Lucida Console'>(</font>
+                        <font color='#BB00BB'>make_line_search_function</font><font face='Lucida Console'>(</font>f,x,s,f_value<font face='Lucida Console'>)</font>,
+                        f_value,
+                        <font color='#BB00BB'>derivative</font><font face='Lucida Console'>(</font><font color='#BB00BB'>make_line_search_function</font><font face='Lucida Console'>(</font>f,x,s<font face='Lucida Console'>)</font>,derivative_eps<font face='Lucida Console'>)</font>,
+                        <font color='#BB00BB'>dot</font><font face='Lucida Console'>(</font>g,s<font face='Lucida Console'>)</font>,  <font color='#009900'>// Sometimes the following line is a better way of determining the initial gradient. 
+</font>                        <font color='#009900'>//derivative(make_line_search_function(f,x,s),derivative_eps)(0),
+</font>                        search_strategy.<font color='#BB00BB'>get_wolfe_rho</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, search_strategy.<font color='#BB00BB'>get_wolfe_sigma</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, min_f,
+                        search_strategy.<font color='#BB00BB'>get_max_line_search_iterations</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+                        <font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// Take the search step indicated by the above line search
+</font>            x <font color='#5555FF'>+</font><font color='#5555FF'>=</font> alpha<font color='#5555FF'>*</font>s;
+
+            g <font color='#5555FF'>=</font> <font color='#BB00BB'>derivative</font><font face='Lucida Console'>(</font>f,derivative_eps<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>x<font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font><font color='#BB00BB'>is_finite</font><font face='Lucida Console'>(</font>f_value<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                <font color='#0000FF'>throw</font> <font color='#BB00BB'>error</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>The objective function generated non-finite outputs</font>"<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font><font color='#BB00BB'>is_finite</font><font face='Lucida Console'>(</font>g<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                <font color='#0000FF'>throw</font> <font color='#BB00BB'>error</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>The objective function generated non-finite outputs</font>"<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>return</font> f_value;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> search_strategy_type,
+        <font color='#0000FF'>typename</font> stop_strategy_type,
+        <font color='#0000FF'>typename</font> funct,
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>double</u></font> <b><a name='find_max_using_approximate_derivatives'></a>find_max_using_approximate_derivatives</b> <font face='Lucida Console'>(</font>
+        search_strategy_type search_strategy,
+        stop_strategy_type stop_strategy,
+        <font color='#0000FF'>const</font> funct<font color='#5555FF'>&amp;</font> f,
+        T<font color='#5555FF'>&amp;</font> x,
+        <font color='#0000FF'><u>double</u></font> max_f,
+        <font color='#0000FF'><u>double</u></font> derivative_eps <font color='#5555FF'>=</font> <font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>7</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#BB00BB'>COMPILE_TIME_ASSERT</font><font face='Lucida Console'>(</font>is_matrix<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font>::value<font face='Lucida Console'>)</font>;
+        <font color='#009900'>// The starting point (i.e. x) must be a column vector.  
+</font>        <font color='#BB00BB'>COMPILE_TIME_ASSERT</font><font face='Lucida Console'>(</font>T::NC <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+
+        <font color='#BB00BB'>DLIB_CASSERT</font> <font face='Lucida Console'>(</font>
+            <font color='#BB00BB'>is_col_vector</font><font face='Lucida Console'>(</font>x<font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> derivative_eps <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font>,
+            "<font color='#CC0000'>\tdouble find_max_using_approximate_derivatives()</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tYou have to supply column vectors to this function</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tx.nc():         </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> x.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tderivative_eps: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> derivative_eps 
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// Just negate the necessary things and call the find_min version of this function.
+</font>        <font color='#0000FF'>return</font> <font color='#5555FF'>-</font><font color='#BB00BB'>find_min_using_approximate_derivatives</font><font face='Lucida Console'>(</font>
+            search_strategy, 
+            stop_strategy, 
+            <font color='#BB00BB'>negate_function</font><font face='Lucida Console'>(</font>f<font face='Lucida Console'>)</font>,
+            x,
+            <font color='#5555FF'>-</font>max_f,
+            derivative_eps
+        <font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>//                      Functions for box constrained optimization
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> U, <font color='#0000FF'>typename</font> V<font color='#5555FF'>&gt;</font>
+    T <b><a name='zero_bounded_variables'></a>zero_bounded_variables</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> eps,
+        T vect,
+        <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> x,
+        <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> gradient,
+        <font color='#0000FF'>const</font> U<font color='#5555FF'>&amp;</font> x_lower,
+        <font color='#0000FF'>const</font> V<font color='#5555FF'>&amp;</font> x_upper
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> gradient.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> tol <font color='#5555FF'>=</font> eps<font color='#5555FF'>*</font>std::<font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font><font color='#BB00BB'>x</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <font color='#009900'>// if x(i) is an active bound constraint
+</font>            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>x_lower</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font><font color='#5555FF'>+</font>tol <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#BB00BB'>x</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> <font color='#BB00BB'>gradient</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                <font color='#BB00BB'>vect</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>x_upper</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font><font color='#5555FF'>-</font>tol <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#BB00BB'>x</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> <font color='#BB00BB'>gradient</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                <font color='#BB00BB'>vect</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <b>}</b>
+        <font color='#0000FF'>return</font> vect;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> U, <font color='#0000FF'>typename</font> V<font color='#5555FF'>&gt;</font>
+    T <b><a name='gap_step_assign_bounded_variables'></a>gap_step_assign_bounded_variables</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> eps,
+        T vect,
+        <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> x,
+        <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> gradient,
+        <font color='#0000FF'>const</font> U<font color='#5555FF'>&amp;</font> x_lower,
+        <font color='#0000FF'>const</font> V<font color='#5555FF'>&amp;</font> x_upper
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> gradient.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> tol <font color='#5555FF'>=</font> eps<font color='#5555FF'>*</font>std::<font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font><font color='#BB00BB'>x</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <font color='#009900'>// if x(i) is an active bound constraint then we should set it's search
+</font>            <font color='#009900'>// direction such that a single step along the direction either does nothing or
+</font>            <font color='#009900'>// closes the gap of size tol before hitting the bound exactly.
+</font>            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>x_lower</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font><font color='#5555FF'>+</font>tol <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#BB00BB'>x</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> <font color='#BB00BB'>gradient</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                <font color='#BB00BB'>vect</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#BB00BB'>x_lower</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#BB00BB'>x</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>x_upper</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font><font color='#5555FF'>-</font>tol <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#BB00BB'>x</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> <font color='#BB00BB'>gradient</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                <font color='#BB00BB'>vect</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#BB00BB'>x_upper</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#BB00BB'>x</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>;
+        <b>}</b>
+        <font color='#0000FF'>return</font> vect;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> search_strategy_type,
+        <font color='#0000FF'>typename</font> stop_strategy_type,
+        <font color='#0000FF'>typename</font> funct, 
+        <font color='#0000FF'>typename</font> funct_der, 
+        <font color='#0000FF'>typename</font> T,
+        <font color='#0000FF'>typename</font> EXP1,
+        <font color='#0000FF'>typename</font> EXP2
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>double</u></font> <b><a name='find_min_box_constrained'></a>find_min_box_constrained</b> <font face='Lucida Console'>(</font>
+        search_strategy_type search_strategy,
+        stop_strategy_type stop_strategy,
+        <font color='#0000FF'>const</font> funct<font color='#5555FF'>&amp;</font> f, 
+        <font color='#0000FF'>const</font> funct_der<font color='#5555FF'>&amp;</font> der, 
+        T<font color='#5555FF'>&amp;</font> x,
+        <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&lt;</font>EXP1<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> x_lower,
+        <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&lt;</font>EXP2<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> x_upper
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#009900'>/*
+            The implementation of this function is more or less based on the discussion in
+            the paper Projected Newton-type Methods in Machine Learning by Mark Schmidt, et al.
+        */</font>
+
+        <font color='#009900'>// make sure the requires clause is not violated
+</font>        <font color='#BB00BB'>COMPILE_TIME_ASSERT</font><font face='Lucida Console'>(</font>is_matrix<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font>::value<font face='Lucida Console'>)</font>;
+        <font color='#009900'>// The starting point (i.e. x) must be a column vector.  
+</font>        <font color='#BB00BB'>COMPILE_TIME_ASSERT</font><font face='Lucida Console'>(</font>T::NC <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+
+        <font color='#BB00BB'>DLIB_CASSERT</font> <font face='Lucida Console'>(</font>
+            <font color='#BB00BB'>is_col_vector</font><font face='Lucida Console'>(</font>x<font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> <font color='#BB00BB'>is_col_vector</font><font face='Lucida Console'>(</font>x_lower<font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> <font color='#BB00BB'>is_col_vector</font><font face='Lucida Console'>(</font>x_upper<font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font>
+            x.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> x_lower.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> x.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> x_upper.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,
+            "<font color='#CC0000'>\tdouble find_min_box_constrained()</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t The inputs to this function must be equal length column vectors.</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t is_col_vector(x):       </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>is_col_vector</font><font face='Lucida Console'>(</font>x<font face='Lucida Console'>)</font>
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t is_col_vector(x_upper): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>is_col_vector</font><font face='Lucida Console'>(</font>x_upper<font face='Lucida Console'>)</font>
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t is_col_vector(x_upper): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>is_col_vector</font><font face='Lucida Console'>(</font>x_upper<font face='Lucida Console'>)</font>
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t x.size():               </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> x.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t x_lower.size():         </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> x_lower.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t x_upper.size():         </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> x_upper.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_ASSERT</font> <font face='Lucida Console'>(</font>
+            <font color='#BB00BB'>min</font><font face='Lucida Console'>(</font>x_upper<font color='#5555FF'>-</font>x_lower<font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font>,
+            "<font color='#CC0000'>\tdouble find_min_box_constrained()</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t You have to supply proper box constraints to this function.</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\r min(x_upper-x_lower): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>min</font><font face='Lucida Console'>(</font>x_upper<font color='#5555FF'>-</font>x_lower<font face='Lucida Console'>)</font>
+        <font face='Lucida Console'>)</font>;
+
+
+        T g, s;
+        <font color='#0000FF'><u>double</u></font> f_value <font color='#5555FF'>=</font> <font color='#BB00BB'>f</font><font face='Lucida Console'>(</font>x<font face='Lucida Console'>)</font>;
+        g <font color='#5555FF'>=</font> <font color='#BB00BB'>der</font><font face='Lucida Console'>(</font>x<font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font><font color='#BB00BB'>is_finite</font><font face='Lucida Console'>(</font>f_value<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+            <font color='#0000FF'>throw</font> <font color='#BB00BB'>error</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>The objective function generated non-finite outputs</font>"<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font><font color='#BB00BB'>is_finite</font><font face='Lucida Console'>(</font>g<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+            <font color='#0000FF'>throw</font> <font color='#BB00BB'>error</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>The objective function generated non-finite outputs</font>"<font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// gap_eps determines how close we have to get to a bound constraint before we
+</font>        <font color='#009900'>// start basically dropping it from the optimization and consider it to be an
+</font>        <font color='#009900'>// active constraint.
+</font>        <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> gap_eps <font color='#5555FF'>=</font> <font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>8</font>;
+
+        <font color='#0000FF'><u>double</u></font> last_alpha <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+        <font color='#0000FF'>while</font><font face='Lucida Console'>(</font>stop_strategy.<font color='#BB00BB'>should_continue_search</font><font face='Lucida Console'>(</font>x, f_value, g<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            s <font color='#5555FF'>=</font> search_strategy.<font color='#BB00BB'>get_next_direction</font><font face='Lucida Console'>(</font>x, f_value, <font color='#BB00BB'>zero_bounded_variables</font><font face='Lucida Console'>(</font>gap_eps, g, x, g, x_lower, x_upper<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            s <font color='#5555FF'>=</font> <font color='#BB00BB'>gap_step_assign_bounded_variables</font><font face='Lucida Console'>(</font>gap_eps, s, x, g, x_lower, x_upper<font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'><u>double</u></font> alpha <font color='#5555FF'>=</font> <font color='#BB00BB'>backtracking_line_search</font><font face='Lucida Console'>(</font>
+                        <font color='#BB00BB'>make_line_search_function</font><font face='Lucida Console'>(</font><font color='#BB00BB'>clamp_function</font><font face='Lucida Console'>(</font>f,x_lower,x_upper<font face='Lucida Console'>)</font>, x, s, f_value<font face='Lucida Console'>)</font>,
+                        f_value,
+                        <font color='#BB00BB'>dot</font><font face='Lucida Console'>(</font>g,s<font face='Lucida Console'>)</font>, <font color='#009900'>// compute gradient for the line search
+</font>                        last_alpha, 
+                        search_strategy.<font color='#BB00BB'>get_wolfe_rho</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, 
+                        search_strategy.<font color='#BB00BB'>get_max_line_search_iterations</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// Do a trust region style thing for alpha.  The idea is that if we take a
+</font>            <font color='#009900'>// small step then we are likely to take another small step.  So we reuse the
+</font>            <font color='#009900'>// alpha from the last iteration unless the line search didn't shrink alpha at
+</font>            <font color='#009900'>// all, in that case, we start with a bigger alpha next time.
+</font>            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>alpha <font color='#5555FF'>=</font><font color='#5555FF'>=</font> last_alpha<font face='Lucida Console'>)</font>
+                last_alpha <font color='#5555FF'>=</font> std::<font color='#BB00BB'>min</font><font face='Lucida Console'>(</font>last_alpha<font color='#5555FF'>*</font><font color='#979000'>10</font>,<font color='#979000'>1.0</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>else</font>
+                last_alpha <font color='#5555FF'>=</font> alpha;
+
+            <font color='#009900'>// Take the search step indicated by the above line search
+</font>            x <font color='#5555FF'>=</font> <font color='#BB00BB'>clamp</font><font face='Lucida Console'>(</font>x <font color='#5555FF'>+</font> alpha<font color='#5555FF'>*</font>s, x_lower, x_upper<font face='Lucida Console'>)</font>;
+            g <font color='#5555FF'>=</font> <font color='#BB00BB'>der</font><font face='Lucida Console'>(</font>x<font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font><font color='#BB00BB'>is_finite</font><font face='Lucida Console'>(</font>f_value<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                <font color='#0000FF'>throw</font> <font color='#BB00BB'>error</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>The objective function generated non-finite outputs</font>"<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font><font color='#BB00BB'>is_finite</font><font face='Lucida Console'>(</font>g<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                <font color='#0000FF'>throw</font> <font color='#BB00BB'>error</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>The objective function generated non-finite outputs</font>"<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>return</font> f_value;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> search_strategy_type,
+        <font color='#0000FF'>typename</font> stop_strategy_type,
+        <font color='#0000FF'>typename</font> funct, 
+        <font color='#0000FF'>typename</font> funct_der, 
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>double</u></font> <b><a name='find_min_box_constrained'></a>find_min_box_constrained</b> <font face='Lucida Console'>(</font>
+        search_strategy_type search_strategy,
+        stop_strategy_type stop_strategy,
+        <font color='#0000FF'>const</font> funct<font color='#5555FF'>&amp;</font> f, 
+        <font color='#0000FF'>const</font> funct_der<font color='#5555FF'>&amp;</font> der, 
+        T<font color='#5555FF'>&amp;</font> x,
+        <font color='#0000FF'><u>double</u></font> x_lower,
+        <font color='#0000FF'><u>double</u></font> x_upper
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#009900'>// The starting point (i.e. x) must be a column vector.  
+</font>        <font color='#BB00BB'>COMPILE_TIME_ASSERT</font><font face='Lucida Console'>(</font>T::NC <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> T::type scalar_type;
+        <font color='#0000FF'>return</font> <font color='#BB00BB'>find_min_box_constrained</font><font face='Lucida Console'>(</font>search_strategy,
+                                        stop_strategy,
+                                        f,
+                                        der,
+                                        x,
+                                        uniform_matrix<font color='#5555FF'>&lt;</font>scalar_type<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>x.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,<font color='#979000'>1</font>,x_lower<font face='Lucida Console'>)</font>,
+                                        uniform_matrix<font color='#5555FF'>&lt;</font>scalar_type<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>x.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,<font color='#979000'>1</font>,x_upper<font face='Lucida Console'>)</font> <font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> search_strategy_type,
+        <font color='#0000FF'>typename</font> stop_strategy_type,
+        <font color='#0000FF'>typename</font> funct, 
+        <font color='#0000FF'>typename</font> funct_der, 
+        <font color='#0000FF'>typename</font> T,
+        <font color='#0000FF'>typename</font> EXP1,
+        <font color='#0000FF'>typename</font> EXP2
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>double</u></font> <b><a name='find_max_box_constrained'></a>find_max_box_constrained</b> <font face='Lucida Console'>(</font>
+        search_strategy_type search_strategy,
+        stop_strategy_type stop_strategy,
+        <font color='#0000FF'>const</font> funct<font color='#5555FF'>&amp;</font> f, 
+        <font color='#0000FF'>const</font> funct_der<font color='#5555FF'>&amp;</font> der, 
+        T<font color='#5555FF'>&amp;</font> x,
+        <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&lt;</font>EXP1<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> x_lower,
+        <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&lt;</font>EXP2<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> x_upper
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#009900'>// make sure the requires clause is not violated
+</font>        <font color='#BB00BB'>COMPILE_TIME_ASSERT</font><font face='Lucida Console'>(</font>is_matrix<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font>::value<font face='Lucida Console'>)</font>;
+        <font color='#009900'>// The starting point (i.e. x) must be a column vector.  
+</font>        <font color='#BB00BB'>COMPILE_TIME_ASSERT</font><font face='Lucida Console'>(</font>T::NC <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+
+        <font color='#BB00BB'>DLIB_CASSERT</font> <font face='Lucida Console'>(</font>
+            <font color='#BB00BB'>is_col_vector</font><font face='Lucida Console'>(</font>x<font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> <font color='#BB00BB'>is_col_vector</font><font face='Lucida Console'>(</font>x_lower<font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> <font color='#BB00BB'>is_col_vector</font><font face='Lucida Console'>(</font>x_upper<font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font>
+            x.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> x_lower.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> x.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> x_upper.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,
+            "<font color='#CC0000'>\tdouble find_max_box_constrained()</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t The inputs to this function must be equal length column vectors.</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t is_col_vector(x):       </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>is_col_vector</font><font face='Lucida Console'>(</font>x<font face='Lucida Console'>)</font>
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t is_col_vector(x_upper): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>is_col_vector</font><font face='Lucida Console'>(</font>x_upper<font face='Lucida Console'>)</font>
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t is_col_vector(x_upper): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>is_col_vector</font><font face='Lucida Console'>(</font>x_upper<font face='Lucida Console'>)</font>
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t x.size():               </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> x.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t x_lower.size():         </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> x_lower.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t x_upper.size():         </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> x_upper.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_ASSERT</font> <font face='Lucida Console'>(</font>
+            <font color='#BB00BB'>min</font><font face='Lucida Console'>(</font>x_upper<font color='#5555FF'>-</font>x_lower<font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font>,
+            "<font color='#CC0000'>\tdouble find_max_box_constrained()</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t You have to supply proper box constraints to this function.</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\r min(x_upper-x_lower): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>min</font><font face='Lucida Console'>(</font>x_upper<font color='#5555FF'>-</font>x_lower<font face='Lucida Console'>)</font>
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// This function is basically just a copy of find_min_box_constrained() but with - put 
+</font>        <font color='#009900'>// in the right places to flip things around so that it ends up looking for the max
+</font>        <font color='#009900'>// rather than the min.
+</font>
+        T g, s;
+        <font color='#0000FF'><u>double</u></font> f_value <font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#BB00BB'>f</font><font face='Lucida Console'>(</font>x<font face='Lucida Console'>)</font>;
+        g <font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#BB00BB'>der</font><font face='Lucida Console'>(</font>x<font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font><font color='#BB00BB'>is_finite</font><font face='Lucida Console'>(</font>f_value<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+            <font color='#0000FF'>throw</font> <font color='#BB00BB'>error</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>The objective function generated non-finite outputs</font>"<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font><font color='#BB00BB'>is_finite</font><font face='Lucida Console'>(</font>g<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+            <font color='#0000FF'>throw</font> <font color='#BB00BB'>error</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>The objective function generated non-finite outputs</font>"<font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// gap_eps determines how close we have to get to a bound constraint before we
+</font>        <font color='#009900'>// start basically dropping it from the optimization and consider it to be an
+</font>        <font color='#009900'>// active constraint.
+</font>        <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> gap_eps <font color='#5555FF'>=</font> <font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>8</font>;
+
+        <font color='#0000FF'><u>double</u></font> last_alpha <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+        <font color='#0000FF'>while</font><font face='Lucida Console'>(</font>stop_strategy.<font color='#BB00BB'>should_continue_search</font><font face='Lucida Console'>(</font>x, f_value, g<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            s <font color='#5555FF'>=</font> search_strategy.<font color='#BB00BB'>get_next_direction</font><font face='Lucida Console'>(</font>x, f_value, <font color='#BB00BB'>zero_bounded_variables</font><font face='Lucida Console'>(</font>gap_eps, g, x, g, x_lower, x_upper<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            s <font color='#5555FF'>=</font> <font color='#BB00BB'>gap_step_assign_bounded_variables</font><font face='Lucida Console'>(</font>gap_eps, s, x, g, x_lower, x_upper<font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'><u>double</u></font> alpha <font color='#5555FF'>=</font> <font color='#BB00BB'>backtracking_line_search</font><font face='Lucida Console'>(</font>
+                        <font color='#BB00BB'>negate_function</font><font face='Lucida Console'>(</font><font color='#BB00BB'>make_line_search_function</font><font face='Lucida Console'>(</font><font color='#BB00BB'>clamp_function</font><font face='Lucida Console'>(</font>f,x_lower,x_upper<font face='Lucida Console'>)</font>, x, s, f_value<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>,
+                        f_value,
+                        <font color='#BB00BB'>dot</font><font face='Lucida Console'>(</font>g,s<font face='Lucida Console'>)</font>, <font color='#009900'>// compute gradient for the line search
+</font>                        last_alpha, 
+                        search_strategy.<font color='#BB00BB'>get_wolfe_rho</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, 
+                        search_strategy.<font color='#BB00BB'>get_max_line_search_iterations</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// Do a trust region style thing for alpha.  The idea is that if we take a
+</font>            <font color='#009900'>// small step then we are likely to take another small step.  So we reuse the
+</font>            <font color='#009900'>// alpha from the last iteration unless the line search didn't shrink alpha at
+</font>            <font color='#009900'>// all, in that case, we start with a bigger alpha next time.
+</font>            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>alpha <font color='#5555FF'>=</font><font color='#5555FF'>=</font> last_alpha<font face='Lucida Console'>)</font>
+                last_alpha <font color='#5555FF'>=</font> std::<font color='#BB00BB'>min</font><font face='Lucida Console'>(</font>last_alpha<font color='#5555FF'>*</font><font color='#979000'>10</font>,<font color='#979000'>1.0</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>else</font>
+                last_alpha <font color='#5555FF'>=</font> alpha;
+
+            <font color='#009900'>// Take the search step indicated by the above line search
+</font>            x <font color='#5555FF'>=</font> <font color='#BB00BB'>clamp</font><font face='Lucida Console'>(</font>x <font color='#5555FF'>+</font> alpha<font color='#5555FF'>*</font>s, x_lower, x_upper<font face='Lucida Console'>)</font>;
+            g <font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#BB00BB'>der</font><font face='Lucida Console'>(</font>x<font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// Don't forget to negate the output from the line search since it is  from the
+</font>            <font color='#009900'>// unnegated version of f() 
+</font>            f_value <font color='#5555FF'>*</font><font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>1</font>;
+
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font><font color='#BB00BB'>is_finite</font><font face='Lucida Console'>(</font>f_value<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                <font color='#0000FF'>throw</font> <font color='#BB00BB'>error</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>The objective function generated non-finite outputs</font>"<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font><font color='#BB00BB'>is_finite</font><font face='Lucida Console'>(</font>g<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                <font color='#0000FF'>throw</font> <font color='#BB00BB'>error</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>The objective function generated non-finite outputs</font>"<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>return</font> <font color='#5555FF'>-</font>f_value;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> search_strategy_type,
+        <font color='#0000FF'>typename</font> stop_strategy_type,
+        <font color='#0000FF'>typename</font> funct, 
+        <font color='#0000FF'>typename</font> funct_der, 
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>double</u></font> <b><a name='find_max_box_constrained'></a>find_max_box_constrained</b> <font face='Lucida Console'>(</font>
+        search_strategy_type search_strategy,
+        stop_strategy_type stop_strategy,
+        <font color='#0000FF'>const</font> funct<font color='#5555FF'>&amp;</font> f, 
+        <font color='#0000FF'>const</font> funct_der<font color='#5555FF'>&amp;</font> der, 
+        T<font color='#5555FF'>&amp;</font> x,
+        <font color='#0000FF'><u>double</u></font> x_lower,
+        <font color='#0000FF'><u>double</u></font> x_upper
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#009900'>// The starting point (i.e. x) must be a column vector.  
+</font>        <font color='#BB00BB'>COMPILE_TIME_ASSERT</font><font face='Lucida Console'>(</font>T::NC <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> T::type scalar_type;
+        <font color='#0000FF'>return</font> <font color='#BB00BB'>find_max_box_constrained</font><font face='Lucida Console'>(</font>search_strategy,
+                                        stop_strategy,
+                                        f,
+                                        der,
+                                        x,
+                                        uniform_matrix<font color='#5555FF'>&lt;</font>scalar_type<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>x.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,<font color='#979000'>1</font>,x_lower<font face='Lucida Console'>)</font>,
+                                        uniform_matrix<font color='#5555FF'>&lt;</font>scalar_type<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>x.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,<font color='#979000'>1</font>,x_upper<font face='Lucida Console'>)</font> <font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_OPTIMIZATIOn_H_
+</font>
+
+</pre></body></html>

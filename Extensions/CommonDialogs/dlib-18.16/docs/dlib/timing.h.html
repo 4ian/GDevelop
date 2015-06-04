@@ -1,0 +1,198 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - timing.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2011  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_TImING_Hh_
+<font color='#0000FF'>#define</font> DLIB_TImING_Hh_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='misc_api.h.html'>misc_api.h</a>"
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>cstring<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='string.h.html'>string.h</a>"
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>iostream<font color='#5555FF'>&gt;</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<a name='timing'/><font color='#009900'>/*!A timing
+
+    This set of functions is useful for determining how much time is spent
+    executing blocks of code.  Consider the following example:
+
+    int main()
+    {
+        using namespace dlib::timing;
+        for (int i = 0; i &lt; 10; ++i)
+        {
+            // timing block #1
+            start(1,"block #1");
+            dlib::sleep(500);
+            stop(1);
+
+            // timing block #2
+            start(2,"block #2");
+            dlib::sleep(1000);
+            stop(2);
+        }
+
+        print();
+    }
+
+    This program would output:
+        Timing report: 
+            block #1: 5.0 seconds
+            block #2: 10.0 seconds
+
+    So we spent 5 seconds in block #1 and 10 seconds in block #2
+
+
+
+    Additionally, note that you can use an RAII style timing block object.  For
+    example, if we wanted to find out how much time we spent in a loop a convenient
+    way to do this would be as follows:
+
+    int main()
+    {
+        using namespace dlib::timing;
+        for (int i = 0; i &lt; 10; ++i)
+        {
+            block tb(1, "main loop");
+
+            dlib::sleep(1500);
+        } 
+
+        print();
+    }
+
+    This program would output:
+        Timing report: 
+            block main loop: 15.0 seconds
+
+!*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+    <font color='#0000FF'>namespace</font> timing
+    <b>{</b>
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>int</u></font> TIME_SLOTS <font color='#5555FF'>=</font> <font color='#979000'>500</font>;
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>int</u></font> NAME_LENGTH <font color='#5555FF'>=</font> <font color='#979000'>40</font>;
+
+        <font color='#0000FF'>inline</font> uint64<font color='#5555FF'>*</font> <b><a name='time_buf'></a>time_buf</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>static</font> uint64 buf[TIME_SLOTS] <font color='#5555FF'>=</font> <b>{</b><font color='#979000'>0</font><b>}</b>;
+            <font color='#0000FF'>return</font> buf;
+        <b>}</b>
+
+        <font color='#0000FF'>inline</font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>*</font> <b><a name='name_buf'></a>name_buf</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> i, <font color='#0000FF'>const</font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>*</font> name<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>static</font> <font color='#0000FF'><u>char</u></font> buf[TIME_SLOTS][NAME_LENGTH] <font color='#5555FF'>=</font> <b>{</b><b>{</b><font color='#979000'>0</font><b>}</b><b>}</b>;
+            <font color='#009900'>// if this name buffer is empty then copy name into it
+</font>            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>buf[i][<font color='#979000'>0</font>] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> '<font color='#FF0000'>\0</font>'<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> std;
+                <font color='#BB00BB'>strncpy</font><font face='Lucida Console'>(</font>buf[i], name, NAME_LENGTH<font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+                buf[i][NAME_LENGTH<font color='#5555FF'>-</font><font color='#979000'>1</font>] <font color='#5555FF'>=</font> '<font color='#FF0000'>\0</font>';
+            <b>}</b>
+            <font color='#009900'>// return the name buffer
+</font>            <font color='#0000FF'>return</font> buf[i];
+        <b>}</b>
+
+        <font color='#0000FF'>inline</font> timestamper<font color='#5555FF'>&amp;</font> <b><a name='ts'></a>ts</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>static</font> timestamper ts_;
+            <font color='#0000FF'>return</font> ts_;
+        <b>}</b>
+
+        <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='start'></a>start</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> i <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#BB00BB'>time_buf</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>[i] <font color='#5555FF'>-</font><font color='#5555FF'>=</font> <font color='#BB00BB'>ts</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>get_timestamp</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='start'></a>start</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> i, <font color='#0000FF'>const</font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>*</font> name<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#BB00BB'>time_buf</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>[i] <font color='#5555FF'>-</font><font color='#5555FF'>=</font> <font color='#BB00BB'>ts</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>get_timestamp</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>name_buf</font><font face='Lucida Console'>(</font>i,name<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='stop'></a>stop</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> i<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#BB00BB'>time_buf</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>[i] <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#BB00BB'>ts</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>get_timestamp</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='print'></a>print</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> std;
+            cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>Timing report: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+
+            <font color='#009900'>// figure out how long the longest name is going to be.
+</font>            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> max_name_length <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> TIME_SLOTS; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                string name;
+                <font color='#009900'>// Check if the name buffer is empty.  Use the name it contains if it isn't.
+</font>                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>name_buf</font><font face='Lucida Console'>(</font>i,"<font color='#CC0000'></font>"<font face='Lucida Console'>)</font>[<font color='#979000'>0</font>] <font color='#5555FF'>!</font><font color='#5555FF'>=</font> '<font color='#FF0000'>\0</font>'<font face='Lucida Console'>)</font>
+                    name <font color='#5555FF'>=</font> <font color='#BB00BB'>cast_to_string</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> "<font color='#CC0000'>: </font>" <font color='#5555FF'>+</font> <font color='#BB00BB'>name_buf</font><font face='Lucida Console'>(</font>i,"<font color='#CC0000'></font>"<font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>else</font> 
+                    name <font color='#5555FF'>=</font> <font color='#BB00BB'>cast_to_string</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>;
+                max_name_length <font color='#5555FF'>=</font> std::max<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>max_name_length, name.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> TIME_SLOTS; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>time_buf</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>[i] <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#0000FF'><u>double</u></font> time <font color='#5555FF'>=</font> <font color='#BB00BB'>time_buf</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>[i]<font color='#5555FF'>/</font><font color='#979000'>1000.0</font>;
+                    string name;
+                    <font color='#009900'>// Check if the name buffer is empty.  Use the name it contains if it isn't.
+</font>                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>name_buf</font><font face='Lucida Console'>(</font>i,"<font color='#CC0000'></font>"<font face='Lucida Console'>)</font>[<font color='#979000'>0</font>] <font color='#5555FF'>!</font><font color='#5555FF'>=</font> '<font color='#FF0000'>\0</font>'<font face='Lucida Console'>)</font>
+                        name <font color='#5555FF'>=</font> <font color='#BB00BB'>cast_to_string</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> "<font color='#CC0000'>: </font>" <font color='#5555FF'>+</font> <font color='#BB00BB'>name_buf</font><font face='Lucida Console'>(</font>i,"<font color='#CC0000'></font>"<font face='Lucida Console'>)</font>;
+                    <font color='#0000FF'>else</font> 
+                        name <font color='#5555FF'>=</font> <font color='#BB00BB'>cast_to_string</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>;
+
+                    <font color='#009900'>// make sure the name is always the same length.  Do so by padding with spaces
+</font>                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>name.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> max_name_length<font face='Lucida Console'>)</font>
+                        name <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#BB00BB'>string</font><font face='Lucida Console'>(</font>max_name_length<font color='#5555FF'>-</font>name.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,'<font color='#FF0000'> </font>'<font face='Lucida Console'>)</font>;
+
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>time <font color='#5555FF'>&lt;</font> <font color='#979000'>1000</font><font face='Lucida Console'>)</font>
+                        cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>  </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> name <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> time <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'> milliseconds</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+                    <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>time <font color='#5555FF'>&lt;</font> <font color='#979000'>1000</font><font color='#5555FF'>*</font><font color='#979000'>1000</font><font face='Lucida Console'>)</font>
+                        cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>  </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> name <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> time<font color='#5555FF'>/</font><font color='#979000'>1000.0</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'> seconds</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+                    <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>time <font color='#5555FF'>&lt;</font> <font color='#979000'>1000</font><font color='#5555FF'>*</font><font color='#979000'>1000</font><font color='#5555FF'>*</font><font color='#979000'>60</font><font face='Lucida Console'>)</font>
+                        cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>  </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> name <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> time<font color='#5555FF'>/</font><font color='#979000'>1000.0</font><font color='#5555FF'>/</font><font color='#979000'>60.0</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'> minutes</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+                    <font color='#0000FF'>else</font>
+                        cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>  </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> name <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> time<font color='#5555FF'>/</font><font color='#979000'>1000.0</font><font color='#5555FF'>/</font><font color='#979000'>60.0</font><font color='#5555FF'>/</font><font color='#979000'>60.0</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'> hours</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+                <b>}</b>
+            <b>}</b>
+        <b>}</b>
+
+        <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='clear'></a>clear</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> TIME_SLOTS; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#009900'>// clear timing buffer
+</font>                <font color='#BB00BB'>time_buf</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>[i] <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                <font color='#009900'>// clear name buffer
+</font>                <font color='#BB00BB'>name_buf</font><font face='Lucida Console'>(</font>i,"<font color='#CC0000'></font>"<font face='Lucida Console'>)</font>[<font color='#979000'>0</font>] <font color='#5555FF'>=</font> '<font color='#FF0000'>\0</font>';
+            <b>}</b>
+        <b>}</b>
+
+        <font color='#0000FF'>struct</font> <b><a name='block'></a>block</b>
+        <b>{</b>
+            <font color='#009900'>/*!
+                WHAT THIS OBJECT REPRESENTS
+                    This is an RAII tool for calling start() and stop()
+            !*/</font>
+
+            <b><a name='block'></a>block</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> i<font face='Lucida Console'>)</font>:idx<font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font> <b>{</b><font color='#BB00BB'>start</font><font face='Lucida Console'>(</font>idx<font face='Lucida Console'>)</font>;<b>}</b>
+            <b><a name='block'></a>block</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> i, <font color='#0000FF'>const</font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>*</font> str<font face='Lucida Console'>)</font>:idx<font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font> <b>{</b><font color='#BB00BB'>start</font><font face='Lucida Console'>(</font>idx,str<font face='Lucida Console'>)</font>;<b>}</b>
+            ~<b><a name='block'></a>block</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <b>{</b> <font color='#BB00BB'>stop</font><font face='Lucida Console'>(</font>idx<font face='Lucida Console'>)</font>; <b>}</b>
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>int</u></font> idx;
+        <b>}</b>;
+    <b>}</b>
+<b>}</b>
+
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_TImING_Hh_
+</font>
+
+</pre></body></html>

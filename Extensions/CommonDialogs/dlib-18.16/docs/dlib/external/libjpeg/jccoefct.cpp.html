@@ -1,0 +1,452 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - jccoefct.cpp</title></head><body bgcolor='white'><pre>
+<font color='#009900'>/*
+ * jccoefct.c
+ *
+ * Copyright (C) 1994-1997, Thomas G. Lane.
+ * This file is part of the Independent JPEG Group's software.
+ * For conditions of distribution and use, see the accompanying README file.
+ *
+ * This file contains the coefficient buffer controller for compression.
+ * This controller is the top level of the JPEG compressor proper.
+ * The coefficient buffer lies between forward-DCT and entropy encoding steps.
+ */</font>
+
+<font color='#0000FF'>#define</font> JPEG_INTERNALS
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='jinclude.h.html'>jinclude.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='jpeglib.h.html'>jpeglib.h</a>"
+
+
+<font color='#009900'>/* We use a full-image coefficient buffer when doing Huffman optimization,
+ * and also for writing multiple-scan JPEG files.  In all cases, the DCT
+ * step is run during the first pass, and subsequent passes need only read
+ * the buffered coefficients.
+ */</font>
+<font color='#0000FF'>#ifdef</font> ENTROPY_OPT_SUPPORTED
+<font color='#0000FF'>#define</font> FULL_COEF_BUFFER_SUPPORTED
+<font color='#0000FF'>#else</font>
+<font color='#0000FF'>#ifdef</font> C_MULTISCAN_FILES_SUPPORTED
+<font color='#0000FF'>#define</font> FULL_COEF_BUFFER_SUPPORTED
+<font color='#0000FF'>#endif</font>
+<font color='#0000FF'>#endif</font>
+
+
+<font color='#009900'>/* Private buffer controller object */</font>
+
+<font color='#0000FF'>typedef</font> <font color='#0000FF'>struct</font> <b>{</b>
+  <font color='#0000FF'>struct</font> jpeg_c_coef_controller pub; <font color='#009900'>/* public fields */</font>
+
+  JDIMENSION iMCU_row_num;	<font color='#009900'>/* iMCU row # within image */</font>
+  JDIMENSION mcu_ctr;		<font color='#009900'>/* counts MCUs processed in current row */</font>
+  <font color='#0000FF'><u>int</u></font> MCU_vert_offset;		<font color='#009900'>/* counts MCU rows within iMCU row */</font>
+  <font color='#0000FF'><u>int</u></font> MCU_rows_per_iMCU_row;	<font color='#009900'>/* number of such rows needed */</font>
+
+  <font color='#009900'>/* For single-pass compression, it's sufficient to buffer just one MCU
+   * (although this may prove a bit slow in practice).  We allocate a
+   * workspace of C_MAX_BLOCKS_IN_MCU coefficient blocks, and reuse it for each
+   * MCU constructed and sent.  (On 80x86, the workspace is FAR even though
+   * it's not really very big; this is to keep the module interfaces unchanged
+   * when a large coefficient buffer is necessary.)
+   * In multi-pass modes, this array points to the current MCU's blocks
+   * within the virtual arrays.
+   */</font>
+  JBLOCKROW MCU_buffer[C_MAX_BLOCKS_IN_MCU];
+
+  <font color='#009900'>/* In multi-pass modes, we need a virtual block array for each component. */</font>
+  jvirt_barray_ptr whole_image[MAX_COMPONENTS];
+<b>}</b> my_coef_controller;
+
+<font color='#0000FF'>typedef</font> my_coef_controller <font color='#5555FF'>*</font> my_coef_ptr;
+
+
+<font color='#009900'>/* Forward declarations */</font>
+<b><a name='METHODDEF'></a>METHODDEF</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font> compress_data
+    <b><a name='JPP'></a>JPP</b><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>j_compress_ptr cinfo, JSAMPIMAGE input_buf<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+<font color='#0000FF'>#ifdef</font> FULL_COEF_BUFFER_SUPPORTED
+<b><a name='METHODDEF'></a>METHODDEF</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font> compress_first_pass
+    <b><a name='JPP'></a>JPP</b><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>j_compress_ptr cinfo, JSAMPIMAGE input_buf<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+<b><a name='METHODDEF'></a>METHODDEF</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font> compress_output
+    <b><a name='JPP'></a>JPP</b><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>j_compress_ptr cinfo, JSAMPIMAGE input_buf<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+<font color='#0000FF'>#endif</font>
+
+
+<b><a name='LOCAL'></a>LOCAL</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font>
+<b><a name='start_iMCU_row'></a>start_iMCU_row</b> <font face='Lucida Console'>(</font>j_compress_ptr cinfo<font face='Lucida Console'>)</font>
+<font color='#009900'>/* Reset within-iMCU-row counters for a new row */</font>
+<b>{</b>
+  my_coef_ptr coef <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>my_coef_ptr<font face='Lucida Console'>)</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>coef;
+
+  <font color='#009900'>/* In an interleaved scan, an MCU row is the same as an iMCU row.
+   * In a noninterleaved scan, an iMCU row has v_samp_factor MCU rows.
+   * But at the bottom of the image, process only what's left.
+   */</font>
+  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>comps_in_scan <font color='#5555FF'>&gt;</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font> <b>{</b>
+    coef<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>MCU_rows_per_iMCU_row <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+  <b>}</b> <font color='#0000FF'>else</font> <b>{</b>
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>coef<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>iMCU_row_num <font color='#5555FF'>&lt;</font> <font face='Lucida Console'>(</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>total_iMCU_rows<font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+      coef<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>MCU_rows_per_iMCU_row <font color='#5555FF'>=</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>cur_comp_info[<font color='#979000'>0</font>]<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>v_samp_factor;
+    <font color='#0000FF'>else</font>
+      coef<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>MCU_rows_per_iMCU_row <font color='#5555FF'>=</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>cur_comp_info[<font color='#979000'>0</font>]<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>last_row_height;
+  <b>}</b>
+
+  coef<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>mcu_ctr <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+  coef<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>MCU_vert_offset <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+<b>}</b>
+
+
+<font color='#009900'>/*
+ * Initialize for a processing pass.
+ */</font>
+
+<b><a name='METHODDEF'></a>METHODDEF</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font>
+<b><a name='start_pass_coef'></a>start_pass_coef</b> <font face='Lucida Console'>(</font>j_compress_ptr cinfo, J_BUF_MODE pass_mode<font face='Lucida Console'>)</font>
+<b>{</b>
+  my_coef_ptr coef <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>my_coef_ptr<font face='Lucida Console'>)</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>coef;
+
+  coef<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>iMCU_row_num <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+  <font color='#BB00BB'>start_iMCU_row</font><font face='Lucida Console'>(</font>cinfo<font face='Lucida Console'>)</font>;
+
+  <font color='#0000FF'>switch</font> <font face='Lucida Console'>(</font>pass_mode<font face='Lucida Console'>)</font> <b>{</b>
+  <font color='#0000FF'>case</font> JBUF_PASS_THRU:
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>coef<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>whole_image[<font color='#979000'>0</font>] <font color='#5555FF'>!</font><font color='#5555FF'>=</font> NULL<font face='Lucida Console'>)</font>
+      <font color='#BB00BB'>ERREXIT</font><font face='Lucida Console'>(</font>cinfo, JERR_BAD_BUFFER_MODE<font face='Lucida Console'>)</font>;
+    coef<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>pub.compress_data <font color='#5555FF'>=</font> compress_data;
+    <font color='#0000FF'>break</font>;
+<font color='#0000FF'>#ifdef</font> FULL_COEF_BUFFER_SUPPORTED
+  <font color='#0000FF'>case</font> JBUF_SAVE_AND_PASS:
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>coef<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>whole_image[<font color='#979000'>0</font>] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> NULL<font face='Lucida Console'>)</font>
+      <font color='#BB00BB'>ERREXIT</font><font face='Lucida Console'>(</font>cinfo, JERR_BAD_BUFFER_MODE<font face='Lucida Console'>)</font>;
+    coef<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>pub.compress_data <font color='#5555FF'>=</font> compress_first_pass;
+    <font color='#0000FF'>break</font>;
+  <font color='#0000FF'>case</font> JBUF_CRANK_DEST:
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>coef<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>whole_image[<font color='#979000'>0</font>] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> NULL<font face='Lucida Console'>)</font>
+      <font color='#BB00BB'>ERREXIT</font><font face='Lucida Console'>(</font>cinfo, JERR_BAD_BUFFER_MODE<font face='Lucida Console'>)</font>;
+    coef<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>pub.compress_data <font color='#5555FF'>=</font> compress_output;
+    <font color='#0000FF'>break</font>;
+<font color='#0000FF'>#endif</font>
+  <font color='#0000FF'>default</font>:
+    <font color='#BB00BB'>ERREXIT</font><font face='Lucida Console'>(</font>cinfo, JERR_BAD_BUFFER_MODE<font face='Lucida Console'>)</font>;
+    <font color='#0000FF'>break</font>;
+  <b>}</b>
+<b>}</b>
+
+
+<font color='#009900'>/*
+ * Process some data in the single-pass case.
+ * We process the equivalent of one fully interleaved MCU row ("iMCU" row)
+ * per call, ie, v_samp_factor block rows for each component in the image.
+ * Returns TRUE if the iMCU row is completed, FALSE if suspended.
+ *
+ * NB: input_buf contains a plane for each component in image,
+ * which we index according to the component's SOF position.
+ */</font>
+
+<b><a name='METHODDEF'></a>METHODDEF</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font>
+<b><a name='compress_data'></a>compress_data</b> <font face='Lucida Console'>(</font>j_compress_ptr cinfo, JSAMPIMAGE input_buf<font face='Lucida Console'>)</font>
+<b>{</b>
+  my_coef_ptr coef <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>my_coef_ptr<font face='Lucida Console'>)</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>coef;
+  JDIMENSION MCU_col_num;	<font color='#009900'>/* index of current MCU within row */</font>
+  JDIMENSION last_MCU_col <font color='#5555FF'>=</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>MCUs_per_row <font color='#5555FF'>-</font> <font color='#979000'>1</font>;
+  JDIMENSION last_iMCU_row <font color='#5555FF'>=</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>total_iMCU_rows <font color='#5555FF'>-</font> <font color='#979000'>1</font>;
+  <font color='#0000FF'><u>int</u></font> blkn, bi, ci, yindex, yoffset, blockcnt;
+  JDIMENSION ypos, xpos;
+  jpeg_component_info <font color='#5555FF'>*</font>compptr;
+
+  <font color='#009900'>/* Loop to write as much as one whole iMCU row */</font>
+  <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>yoffset <font color='#5555FF'>=</font> coef<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>MCU_vert_offset; yoffset <font color='#5555FF'>&lt;</font> coef<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>MCU_rows_per_iMCU_row;
+       yoffset<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> <b>{</b>
+    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>MCU_col_num <font color='#5555FF'>=</font> coef<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>mcu_ctr; MCU_col_num <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> last_MCU_col;
+	 MCU_col_num<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> <b>{</b>
+      <font color='#009900'>/* Determine where data comes from in input_buf and do the DCT thing.
+       * Each call on forward_DCT processes a horizontal row of DCT blocks
+       * as wide as an MCU; we rely on having allocated the MCU_buffer[] blocks
+       * sequentially.  Dummy blocks at the right or bottom edge are filled in
+       * specially.  The data in them does not matter for image reconstruction,
+       * so we fill them with values that will encode to the smallest amount of
+       * data, viz: all zeroes in the AC entries, DC entries equal to previous
+       * block's DC value.  (Thanks to Thomas Kinsman for this idea.)
+       */</font>
+      blkn <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+      <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>ci <font color='#5555FF'>=</font> <font color='#979000'>0</font>; ci <font color='#5555FF'>&lt;</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>comps_in_scan; ci<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> <b>{</b>
+	compptr <font color='#5555FF'>=</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>cur_comp_info[ci];
+	blockcnt <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>MCU_col_num <font color='#5555FF'>&lt;</font> last_MCU_col<font face='Lucida Console'>)</font> ? compptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>MCU_width
+						: compptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>last_col_width;
+	xpos <font color='#5555FF'>=</font> MCU_col_num <font color='#5555FF'>*</font> compptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>MCU_sample_width;
+	ypos <font color='#5555FF'>=</font> yoffset <font color='#5555FF'>*</font> DCTSIZE; <font color='#009900'>/* ypos == (yoffset+yindex) * DCTSIZE */</font>
+	<font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>yindex <font color='#5555FF'>=</font> <font color='#979000'>0</font>; yindex <font color='#5555FF'>&lt;</font> compptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>MCU_height; yindex<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> <b>{</b>
+	  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>coef<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>iMCU_row_num <font color='#5555FF'>&lt;</font> last_iMCU_row <font color='#5555FF'>|</font><font color='#5555FF'>|</font>
+	      yoffset<font color='#5555FF'>+</font>yindex <font color='#5555FF'>&lt;</font> compptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>last_row_height<font face='Lucida Console'>)</font> <b>{</b>
+	    <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>fdct<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>forward_DCT<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>cinfo, compptr,
+					 input_buf[compptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>component_index],
+					 coef<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>MCU_buffer[blkn],
+					 ypos, xpos, <font face='Lucida Console'>(</font>JDIMENSION<font face='Lucida Console'>)</font> blockcnt<font face='Lucida Console'>)</font>;
+	    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>blockcnt <font color='#5555FF'>&lt;</font> compptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>MCU_width<font face='Lucida Console'>)</font> <b>{</b>
+	      <font color='#009900'>/* Create some dummy blocks at the right edge of the image. */</font>
+	      <font color='#BB00BB'>jzero_far</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font> FAR <font color='#5555FF'>*</font><font face='Lucida Console'>)</font> coef<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>MCU_buffer[blkn <font color='#5555FF'>+</font> blockcnt],
+			<font face='Lucida Console'>(</font>compptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>MCU_width <font color='#5555FF'>-</font> blockcnt<font face='Lucida Console'>)</font> <font color='#5555FF'>*</font> <font color='#BB00BB'>SIZEOF</font><font face='Lucida Console'>(</font>JBLOCK<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+	      <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>bi <font color='#5555FF'>=</font> blockcnt; bi <font color='#5555FF'>&lt;</font> compptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>MCU_width; bi<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> <b>{</b>
+		coef<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>MCU_buffer[blkn<font color='#5555FF'>+</font>bi][<font color='#979000'>0</font>][<font color='#979000'>0</font>] <font color='#5555FF'>=</font> coef<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>MCU_buffer[blkn<font color='#5555FF'>+</font>bi<font color='#5555FF'>-</font><font color='#979000'>1</font>][<font color='#979000'>0</font>][<font color='#979000'>0</font>];
+	      <b>}</b>
+	    <b>}</b>
+	  <b>}</b> <font color='#0000FF'>else</font> <b>{</b>
+	    <font color='#009900'>/* Create a row of dummy blocks at the bottom of the image. */</font>
+	    <font color='#BB00BB'>jzero_far</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font> FAR <font color='#5555FF'>*</font><font face='Lucida Console'>)</font> coef<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>MCU_buffer[blkn],
+		      compptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>MCU_width <font color='#5555FF'>*</font> <font color='#BB00BB'>SIZEOF</font><font face='Lucida Console'>(</font>JBLOCK<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+	    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>bi <font color='#5555FF'>=</font> <font color='#979000'>0</font>; bi <font color='#5555FF'>&lt;</font> compptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>MCU_width; bi<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> <b>{</b>
+	      coef<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>MCU_buffer[blkn<font color='#5555FF'>+</font>bi][<font color='#979000'>0</font>][<font color='#979000'>0</font>] <font color='#5555FF'>=</font> coef<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>MCU_buffer[blkn<font color='#5555FF'>-</font><font color='#979000'>1</font>][<font color='#979000'>0</font>][<font color='#979000'>0</font>];
+	    <b>}</b>
+	  <b>}</b>
+	  blkn <font color='#5555FF'>+</font><font color='#5555FF'>=</font> compptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>MCU_width;
+	  ypos <font color='#5555FF'>+</font><font color='#5555FF'>=</font> DCTSIZE;
+	<b>}</b>
+      <b>}</b>
+      <font color='#009900'>/* Try to write the MCU.  In event of a suspension failure, we will
+       * re-DCT the MCU on restart (a bit inefficient, could be fixed...)
+       */</font>
+      <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font> <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>entropy<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>encode_mcu<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>cinfo, coef<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>MCU_buffer<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <b>{</b>
+	<font color='#009900'>/* Suspension forced; update state counters and exit */</font>
+	coef<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>MCU_vert_offset <font color='#5555FF'>=</font> yoffset;
+	coef<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>mcu_ctr <font color='#5555FF'>=</font> MCU_col_num;
+	<font color='#0000FF'>return</font> FALSE;
+      <b>}</b>
+    <b>}</b>
+    <font color='#009900'>/* Completed an MCU row, but perhaps not an iMCU row */</font>
+    coef<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>mcu_ctr <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+  <b>}</b>
+  <font color='#009900'>/* Completed the iMCU row, advance counters for next one */</font>
+  coef<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>iMCU_row_num<font color='#5555FF'>+</font><font color='#5555FF'>+</font>;
+  <font color='#BB00BB'>start_iMCU_row</font><font face='Lucida Console'>(</font>cinfo<font face='Lucida Console'>)</font>;
+  <font color='#0000FF'>return</font> TRUE;
+<b>}</b>
+
+
+<font color='#0000FF'>#ifdef</font> FULL_COEF_BUFFER_SUPPORTED
+
+<font color='#009900'>/*
+ * Process some data in the first pass of a multi-pass case.
+ * We process the equivalent of one fully interleaved MCU row ("iMCU" row)
+ * per call, ie, v_samp_factor block rows for each component in the image.
+ * This amount of data is read from the source buffer, DCT'd and quantized,
+ * and saved into the virtual arrays.  We also generate suitable dummy blocks
+ * as needed at the right and lower edges.  (The dummy blocks are constructed
+ * in the virtual arrays, which have been padded appropriately.)  This makes
+ * it possible for subsequent passes not to worry about real vs. dummy blocks.
+ *
+ * We must also emit the data to the entropy encoder.  This is conveniently
+ * done by calling compress_output() after we've loaded the current strip
+ * of the virtual arrays.
+ *
+ * NB: input_buf contains a plane for each component in image.  All
+ * components are DCT'd and loaded into the virtual arrays in this pass.
+ * However, it may be that only a subset of the components are emitted to
+ * the entropy encoder during this first pass; be careful about looking
+ * at the scan-dependent variables (MCU dimensions, etc).
+ */</font>
+
+<b><a name='METHODDEF'></a>METHODDEF</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font>
+<b><a name='compress_first_pass'></a>compress_first_pass</b> <font face='Lucida Console'>(</font>j_compress_ptr cinfo, JSAMPIMAGE input_buf<font face='Lucida Console'>)</font>
+<b>{</b>
+  my_coef_ptr coef <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>my_coef_ptr<font face='Lucida Console'>)</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>coef;
+  JDIMENSION last_iMCU_row <font color='#5555FF'>=</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>total_iMCU_rows <font color='#5555FF'>-</font> <font color='#979000'>1</font>;
+  JDIMENSION blocks_across, MCUs_across, MCUindex;
+  <font color='#0000FF'><u>int</u></font> bi, ci, h_samp_factor, block_row, block_rows, ndummy;
+  JCOEF lastDC;
+  jpeg_component_info <font color='#5555FF'>*</font>compptr;
+  JBLOCKARRAY buffer;
+  JBLOCKROW thisblockrow, lastblockrow;
+
+  <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>ci <font color='#5555FF'>=</font> <font color='#979000'>0</font>, compptr <font color='#5555FF'>=</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>comp_info; ci <font color='#5555FF'>&lt;</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>num_components;
+       ci<font color='#5555FF'>+</font><font color='#5555FF'>+</font>, compptr<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> <b>{</b>
+    <font color='#009900'>/* Align the virtual buffer for this component. */</font>
+    buffer <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>mem<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>access_virt_barray<font face='Lucida Console'>)</font>
+      <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>j_common_ptr<font face='Lucida Console'>)</font> cinfo, coef<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>whole_image[ci],
+       coef<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>iMCU_row_num <font color='#5555FF'>*</font> compptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>v_samp_factor,
+       <font face='Lucida Console'>(</font>JDIMENSION<font face='Lucida Console'>)</font> compptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>v_samp_factor, TRUE<font face='Lucida Console'>)</font>;
+    <font color='#009900'>/* Count non-dummy DCT block rows in this iMCU row. */</font>
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>coef<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>iMCU_row_num <font color='#5555FF'>&lt;</font> last_iMCU_row<font face='Lucida Console'>)</font>
+      block_rows <font color='#5555FF'>=</font> compptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>v_samp_factor;
+    <font color='#0000FF'>else</font> <b>{</b>
+      <font color='#009900'>/* NB: can't use last_row_height here, since may not be set! */</font>
+      block_rows <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>compptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>height_in_blocks <font color='#5555FF'>%</font> compptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>v_samp_factor<font face='Lucida Console'>)</font>;
+      <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>block_rows <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font> block_rows <font color='#5555FF'>=</font> compptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>v_samp_factor;
+    <b>}</b>
+    blocks_across <font color='#5555FF'>=</font> compptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>width_in_blocks;
+    h_samp_factor <font color='#5555FF'>=</font> compptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>h_samp_factor;
+    <font color='#009900'>/* Count number of dummy blocks to be added at the right margin. */</font>
+    ndummy <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>blocks_across <font color='#5555FF'>%</font> h_samp_factor<font face='Lucida Console'>)</font>;
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>ndummy <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+      ndummy <font color='#5555FF'>=</font> h_samp_factor <font color='#5555FF'>-</font> ndummy;
+    <font color='#009900'>/* Perform DCT for all non-dummy blocks in this iMCU row.  Each call
+     * on forward_DCT processes a complete horizontal row of DCT blocks.
+     */</font>
+    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>block_row <font color='#5555FF'>=</font> <font color='#979000'>0</font>; block_row <font color='#5555FF'>&lt;</font> block_rows; block_row<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> <b>{</b>
+      thisblockrow <font color='#5555FF'>=</font> buffer[block_row];
+      <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>fdct<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>forward_DCT<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>cinfo, compptr,
+				   input_buf[ci], thisblockrow,
+				   <font face='Lucida Console'>(</font>JDIMENSION<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>block_row <font color='#5555FF'>*</font> DCTSIZE<font face='Lucida Console'>)</font>,
+				   <font face='Lucida Console'>(</font>JDIMENSION<font face='Lucida Console'>)</font> <font color='#979000'>0</font>, blocks_across<font face='Lucida Console'>)</font>;
+      <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>ndummy <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font> <b>{</b>
+	<font color='#009900'>/* Create dummy blocks at the right edge of the image. */</font>
+	thisblockrow <font color='#5555FF'>+</font><font color='#5555FF'>=</font> blocks_across; <font color='#009900'>/* =&gt; first dummy block */</font>
+	<font color='#BB00BB'>jzero_far</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font> FAR <font color='#5555FF'>*</font><font face='Lucida Console'>)</font> thisblockrow, ndummy <font color='#5555FF'>*</font> <font color='#BB00BB'>SIZEOF</font><font face='Lucida Console'>(</font>JBLOCK<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+	lastDC <font color='#5555FF'>=</font> thisblockrow[<font color='#5555FF'>-</font><font color='#979000'>1</font>][<font color='#979000'>0</font>];
+	<font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>bi <font color='#5555FF'>=</font> <font color='#979000'>0</font>; bi <font color='#5555FF'>&lt;</font> ndummy; bi<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> <b>{</b>
+	  thisblockrow[bi][<font color='#979000'>0</font>] <font color='#5555FF'>=</font> lastDC;
+	<b>}</b>
+      <b>}</b>
+    <b>}</b>
+    <font color='#009900'>/* If at end of image, create dummy block rows as needed.
+     * The tricky part here is that within each MCU, we want the DC values
+     * of the dummy blocks to match the last real block's DC value.
+     * This squeezes a few more bytes out of the resulting file...
+     */</font>
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>coef<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>iMCU_row_num <font color='#5555FF'>=</font><font color='#5555FF'>=</font> last_iMCU_row<font face='Lucida Console'>)</font> <b>{</b>
+      blocks_across <font color='#5555FF'>+</font><font color='#5555FF'>=</font> ndummy;	<font color='#009900'>/* include lower right corner */</font>
+      MCUs_across <font color='#5555FF'>=</font> blocks_across <font color='#5555FF'>/</font> h_samp_factor;
+      <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>block_row <font color='#5555FF'>=</font> block_rows; block_row <font color='#5555FF'>&lt;</font> compptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>v_samp_factor;
+	   block_row<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> <b>{</b>
+	thisblockrow <font color='#5555FF'>=</font> buffer[block_row];
+	lastblockrow <font color='#5555FF'>=</font> buffer[block_row<font color='#5555FF'>-</font><font color='#979000'>1</font>];
+	<font color='#BB00BB'>jzero_far</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font> FAR <font color='#5555FF'>*</font><font face='Lucida Console'>)</font> thisblockrow,
+		  <font face='Lucida Console'>(</font><font color='#0000FF'><u>size_t</u></font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>blocks_across <font color='#5555FF'>*</font> <font color='#BB00BB'>SIZEOF</font><font face='Lucida Console'>(</font>JBLOCK<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+	<font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>MCUindex <font color='#5555FF'>=</font> <font color='#979000'>0</font>; MCUindex <font color='#5555FF'>&lt;</font> MCUs_across; MCUindex<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> <b>{</b>
+	  lastDC <font color='#5555FF'>=</font> lastblockrow[h_samp_factor<font color='#5555FF'>-</font><font color='#979000'>1</font>][<font color='#979000'>0</font>];
+	  <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>bi <font color='#5555FF'>=</font> <font color='#979000'>0</font>; bi <font color='#5555FF'>&lt;</font> h_samp_factor; bi<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> <b>{</b>
+	    thisblockrow[bi][<font color='#979000'>0</font>] <font color='#5555FF'>=</font> lastDC;
+	  <b>}</b>
+	  thisblockrow <font color='#5555FF'>+</font><font color='#5555FF'>=</font> h_samp_factor; <font color='#009900'>/* advance to next MCU in row */</font>
+	  lastblockrow <font color='#5555FF'>+</font><font color='#5555FF'>=</font> h_samp_factor;
+	<b>}</b>
+      <b>}</b>
+    <b>}</b>
+  <b>}</b>
+  <font color='#009900'>/* NB: compress_output will increment iMCU_row_num if successful.
+   * A suspension return will result in redoing all the work above next time.
+   */</font>
+
+  <font color='#009900'>/* Emit data to the entropy encoder, sharing code with subsequent passes */</font>
+  <font color='#0000FF'>return</font> <font color='#BB00BB'>compress_output</font><font face='Lucida Console'>(</font>cinfo, input_buf<font face='Lucida Console'>)</font>;
+<b>}</b>
+
+
+<font color='#009900'>/*
+ * Process some data in subsequent passes of a multi-pass case.
+ * We process the equivalent of one fully interleaved MCU row ("iMCU" row)
+ * per call, ie, v_samp_factor block rows for each component in the scan.
+ * The data is obtained from the virtual arrays and fed to the entropy coder.
+ * Returns TRUE if the iMCU row is completed, FALSE if suspended.
+ *
+ * NB: input_buf is ignored; it is likely to be a NULL pointer.
+ */</font>
+
+<b><a name='METHODDEF'></a>METHODDEF</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font>
+<b><a name='compress_output'></a>compress_output</b> <font face='Lucida Console'>(</font>j_compress_ptr cinfo, JSAMPIMAGE <font face='Lucida Console'>)</font><font color='#009900'>//input_buf)
+</font><b>{</b>
+  my_coef_ptr coef <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>my_coef_ptr<font face='Lucida Console'>)</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>coef;
+  JDIMENSION MCU_col_num;	<font color='#009900'>/* index of current MCU within row */</font>
+  <font color='#0000FF'><u>int</u></font> blkn, ci, xindex, yindex, yoffset;
+  JDIMENSION start_col;
+  JBLOCKARRAY buffer[MAX_COMPS_IN_SCAN];
+  JBLOCKROW buffer_ptr;
+  jpeg_component_info <font color='#5555FF'>*</font>compptr;
+
+  <font color='#009900'>/* Align the virtual buffers for the components used in this scan.
+   * NB: during first pass, this is safe only because the buffers will
+   * already be aligned properly, so jmemmgr.c won't need to do any I/O.
+   */</font>
+  <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>ci <font color='#5555FF'>=</font> <font color='#979000'>0</font>; ci <font color='#5555FF'>&lt;</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>comps_in_scan; ci<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> <b>{</b>
+    compptr <font color='#5555FF'>=</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>cur_comp_info[ci];
+    buffer[ci] <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>mem<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>access_virt_barray<font face='Lucida Console'>)</font>
+      <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>j_common_ptr<font face='Lucida Console'>)</font> cinfo, coef<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>whole_image[compptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>component_index],
+       coef<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>iMCU_row_num <font color='#5555FF'>*</font> compptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>v_samp_factor,
+       <font face='Lucida Console'>(</font>JDIMENSION<font face='Lucida Console'>)</font> compptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>v_samp_factor, FALSE<font face='Lucida Console'>)</font>;
+  <b>}</b>
+
+  <font color='#009900'>/* Loop to process one whole iMCU row */</font>
+  <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>yoffset <font color='#5555FF'>=</font> coef<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>MCU_vert_offset; yoffset <font color='#5555FF'>&lt;</font> coef<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>MCU_rows_per_iMCU_row;
+       yoffset<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> <b>{</b>
+    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>MCU_col_num <font color='#5555FF'>=</font> coef<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>mcu_ctr; MCU_col_num <font color='#5555FF'>&lt;</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>MCUs_per_row;
+	 MCU_col_num<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> <b>{</b>
+      <font color='#009900'>/* Construct list of pointers to DCT blocks belonging to this MCU */</font>
+      blkn <font color='#5555FF'>=</font> <font color='#979000'>0</font>;			<font color='#009900'>/* index of current DCT block within MCU */</font>
+      <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>ci <font color='#5555FF'>=</font> <font color='#979000'>0</font>; ci <font color='#5555FF'>&lt;</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>comps_in_scan; ci<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> <b>{</b>
+	compptr <font color='#5555FF'>=</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>cur_comp_info[ci];
+	start_col <font color='#5555FF'>=</font> MCU_col_num <font color='#5555FF'>*</font> compptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>MCU_width;
+	<font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>yindex <font color='#5555FF'>=</font> <font color='#979000'>0</font>; yindex <font color='#5555FF'>&lt;</font> compptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>MCU_height; yindex<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> <b>{</b>
+	  buffer_ptr <font color='#5555FF'>=</font> buffer[ci][yindex<font color='#5555FF'>+</font>yoffset] <font color='#5555FF'>+</font> start_col;
+	  <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>xindex <font color='#5555FF'>=</font> <font color='#979000'>0</font>; xindex <font color='#5555FF'>&lt;</font> compptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>MCU_width; xindex<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> <b>{</b>
+	    coef<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>MCU_buffer[blkn<font color='#5555FF'>+</font><font color='#5555FF'>+</font>] <font color='#5555FF'>=</font> buffer_ptr<font color='#5555FF'>+</font><font color='#5555FF'>+</font>;
+	  <b>}</b>
+	<b>}</b>
+      <b>}</b>
+      <font color='#009900'>/* Try to write the MCU. */</font>
+      <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font> <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>entropy<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>encode_mcu<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>cinfo, coef<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>MCU_buffer<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <b>{</b>
+	<font color='#009900'>/* Suspension forced; update state counters and exit */</font>
+	coef<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>MCU_vert_offset <font color='#5555FF'>=</font> yoffset;
+	coef<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>mcu_ctr <font color='#5555FF'>=</font> MCU_col_num;
+	<font color='#0000FF'>return</font> FALSE;
+      <b>}</b>
+    <b>}</b>
+    <font color='#009900'>/* Completed an MCU row, but perhaps not an iMCU row */</font>
+    coef<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>mcu_ctr <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+  <b>}</b>
+  <font color='#009900'>/* Completed the iMCU row, advance counters for next one */</font>
+  coef<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>iMCU_row_num<font color='#5555FF'>+</font><font color='#5555FF'>+</font>;
+  <font color='#BB00BB'>start_iMCU_row</font><font face='Lucida Console'>(</font>cinfo<font face='Lucida Console'>)</font>;
+  <font color='#0000FF'>return</font> TRUE;
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>/* FULL_COEF_BUFFER_SUPPORTED */</font>
+
+
+<font color='#009900'>/*
+ * Initialize coefficient buffer controller.
+ */</font>
+
+<b><a name='GLOBAL'></a>GLOBAL</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font>
+<b><a name='jinit_c_coef_controller'></a>jinit_c_coef_controller</b> <font face='Lucida Console'>(</font>j_compress_ptr cinfo, <font color='#0000FF'><u>int</u></font> need_full_buffer<font face='Lucida Console'>)</font>
+<b>{</b>
+  my_coef_ptr coef;
+
+  coef <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>my_coef_ptr<font face='Lucida Console'>)</font>
+    <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>mem<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>alloc_small<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>j_common_ptr<font face='Lucida Console'>)</font> cinfo, JPOOL_IMAGE,
+				<font color='#BB00BB'>SIZEOF</font><font face='Lucida Console'>(</font>my_coef_controller<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+  cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>coef <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'>struct</font> jpeg_c_coef_controller <font color='#5555FF'>*</font><font face='Lucida Console'>)</font> coef;
+  coef<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>pub.start_pass <font color='#5555FF'>=</font> start_pass_coef;
+
+  <font color='#009900'>/* Create the coefficient buffer. */</font>
+  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>need_full_buffer<font face='Lucida Console'>)</font> <b>{</b>
+<font color='#0000FF'>#ifdef</font> FULL_COEF_BUFFER_SUPPORTED
+    <font color='#009900'>/* Allocate a full-image virtual array for each component, */</font>
+    <font color='#009900'>/* padded to a multiple of samp_factor DCT blocks in each direction. */</font>
+    <font color='#0000FF'><u>int</u></font> ci;
+    jpeg_component_info <font color='#5555FF'>*</font>compptr;
+
+    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>ci <font color='#5555FF'>=</font> <font color='#979000'>0</font>, compptr <font color='#5555FF'>=</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>comp_info; ci <font color='#5555FF'>&lt;</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>num_components;
+	 ci<font color='#5555FF'>+</font><font color='#5555FF'>+</font>, compptr<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> <b>{</b>
+      coef<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>whole_image[ci] <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>mem<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>request_virt_barray<font face='Lucida Console'>)</font>
+	<font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>j_common_ptr<font face='Lucida Console'>)</font> cinfo, JPOOL_IMAGE, FALSE,
+	 <font face='Lucida Console'>(</font>JDIMENSION<font face='Lucida Console'>)</font> <font color='#BB00BB'>jround_up</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font> compptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>width_in_blocks,
+				<font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font> compptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>h_samp_factor<font face='Lucida Console'>)</font>,
+	 <font face='Lucida Console'>(</font>JDIMENSION<font face='Lucida Console'>)</font> <font color='#BB00BB'>jround_up</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font> compptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>height_in_blocks,
+				<font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font> compptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>v_samp_factor<font face='Lucida Console'>)</font>,
+	 <font face='Lucida Console'>(</font>JDIMENSION<font face='Lucida Console'>)</font> compptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>v_samp_factor<font face='Lucida Console'>)</font>;
+    <b>}</b>
+<font color='#0000FF'>#else</font>
+    <font color='#BB00BB'>ERREXIT</font><font face='Lucida Console'>(</font>cinfo, JERR_BAD_BUFFER_MODE<font face='Lucida Console'>)</font>;
+<font color='#0000FF'>#endif</font>
+  <b>}</b> <font color='#0000FF'>else</font> <b>{</b>
+    <font color='#009900'>/* We only need a single-MCU buffer. */</font>
+    JBLOCKROW buffer;
+    <font color='#0000FF'><u>int</u></font> i;
+
+    buffer <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>JBLOCKROW<font face='Lucida Console'>)</font>
+      <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>mem<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>alloc_large<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>j_common_ptr<font face='Lucida Console'>)</font> cinfo, JPOOL_IMAGE,
+				  C_MAX_BLOCKS_IN_MCU <font color='#5555FF'>*</font> <font color='#BB00BB'>SIZEOF</font><font face='Lucida Console'>(</font>JBLOCK<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> C_MAX_BLOCKS_IN_MCU; i<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> <b>{</b>
+      coef<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>MCU_buffer[i] <font color='#5555FF'>=</font> buffer <font color='#5555FF'>+</font> i;
+    <b>}</b>
+    coef<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>whole_image[<font color='#979000'>0</font>] <font color='#5555FF'>=</font> NULL; <font color='#009900'>/* flag for no virtual arrays */</font>
+  <b>}</b>
+<b>}</b>
+
+</pre></body></html>

@@ -1,0 +1,164 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - jcapistd.cpp</title></head><body bgcolor='white'><pre>
+<font color='#009900'>/*
+ * jcapistd.c
+ *
+ * Copyright (C) 1994-1996, Thomas G. Lane.
+ * This file is part of the Independent JPEG Group's software.
+ * For conditions of distribution and use, see the accompanying README file.
+ *
+ * This file contains application interface code for the compression half
+ * of the JPEG library.  These are the "standard" API routines that are
+ * used in the normal full-compression case.  They are not used by a
+ * transcoding-only application.  Note that if an application links in
+ * jpeg_start_compress, it will end up linking in the entire compressor.
+ * We thus must separate this file from jcapimin.c to avoid linking the
+ * whole compression library into a transcoder.
+ */</font>
+
+<font color='#0000FF'>#define</font> JPEG_INTERNALS
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='jinclude.h.html'>jinclude.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='jpeglib.h.html'>jpeglib.h</a>"
+
+
+<font color='#009900'>/*
+ * Compression initialization.
+ * Before calling this, all parameters and a data destination must be set up.
+ *
+ * We require a write_all_tables parameter as a failsafe check when writing
+ * multiple datastreams from the same compression object.  Since prior runs
+ * will have left all the tables marked sent_table=TRUE, a subsequent run
+ * would emit an abbreviated stream (no tables) by default.  This may be what
+ * is wanted, but for safety's sake it should not be the default behavior:
+ * programmers should have to make a deliberate choice to emit abbreviated
+ * images.  Therefore the documentation and examples should encourage people
+ * to pass write_all_tables=TRUE; then it will take active thought to do the
+ * wrong thing.
+ */</font>
+
+<b><a name='GLOBAL'></a>GLOBAL</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font>
+<b><a name='jpeg_start_compress'></a>jpeg_start_compress</b> <font face='Lucida Console'>(</font>j_compress_ptr cinfo, <font color='#0000FF'><u>int</u></font> write_all_tables<font face='Lucida Console'>)</font>
+<b>{</b>
+  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>global_state <font color='#5555FF'>!</font><font color='#5555FF'>=</font> CSTATE_START<font face='Lucida Console'>)</font>
+    <font color='#BB00BB'>ERREXIT1</font><font face='Lucida Console'>(</font>cinfo, JERR_BAD_STATE, cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>global_state<font face='Lucida Console'>)</font>;
+
+  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>write_all_tables<font face='Lucida Console'>)</font>
+    <font color='#BB00BB'>jpeg_suppress_tables</font><font face='Lucida Console'>(</font>cinfo, FALSE<font face='Lucida Console'>)</font>;	<font color='#009900'>/* mark all tables to be written */</font>
+
+  <font color='#009900'>/* (Re)initialize error mgr and destination modules */</font>
+  <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>err<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>reset_error_mgr<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>j_common_ptr<font face='Lucida Console'>)</font> cinfo<font face='Lucida Console'>)</font>;
+  <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>dest<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>init_destination<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>cinfo<font face='Lucida Console'>)</font>;
+  <font color='#009900'>/* Perform master selection of active modules */</font>
+  <font color='#BB00BB'>jinit_compress_master</font><font face='Lucida Console'>(</font>cinfo<font face='Lucida Console'>)</font>;
+  <font color='#009900'>/* Set up for the first pass */</font>
+  <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>master<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>prepare_for_pass<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>cinfo<font face='Lucida Console'>)</font>;
+  <font color='#009900'>/* Ready for application to drive first pass through jpeg_write_scanlines
+   * or jpeg_write_raw_data.
+   */</font>
+  cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>next_scanline <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+  cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>global_state <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>raw_data_in ? CSTATE_RAW_OK : CSTATE_SCANNING<font face='Lucida Console'>)</font>;
+<b>}</b>
+
+
+<font color='#009900'>/*
+ * Write some scanlines of data to the JPEG compressor.
+ *
+ * The return value will be the number of lines actually written.
+ * This should be less than the supplied num_lines only in case that
+ * the data destination module has requested suspension of the compressor,
+ * or if more than image_height scanlines are passed in.
+ *
+ * Note: we warn about excess calls to jpeg_write_scanlines() since
+ * this likely signals an application programmer error.  However,
+ * excess scanlines passed in the last valid call are *silently* ignored,
+ * so that the application need not adjust num_lines for end-of-image
+ * when using a multiple-scanline buffer.
+ */</font>
+
+<b><a name='GLOBAL'></a>GLOBAL</b><font face='Lucida Console'>(</font>JDIMENSION<font face='Lucida Console'>)</font>
+<b><a name='jpeg_write_scanlines'></a>jpeg_write_scanlines</b> <font face='Lucida Console'>(</font>j_compress_ptr cinfo, JSAMPARRAY scanlines,
+		      JDIMENSION num_lines<font face='Lucida Console'>)</font>
+<b>{</b>
+  JDIMENSION row_ctr, rows_left;
+
+  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>global_state <font color='#5555FF'>!</font><font color='#5555FF'>=</font> CSTATE_SCANNING<font face='Lucida Console'>)</font>
+    <font color='#BB00BB'>ERREXIT1</font><font face='Lucida Console'>(</font>cinfo, JERR_BAD_STATE, cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>global_state<font face='Lucida Console'>)</font>;
+  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>next_scanline <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>image_height<font face='Lucida Console'>)</font>
+    <font color='#BB00BB'>WARNMS</font><font face='Lucida Console'>(</font>cinfo, JWRN_TOO_MUCH_DATA<font face='Lucida Console'>)</font>;
+
+  <font color='#009900'>/* Call progress monitor hook if present */</font>
+  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>progress <font color='#5555FF'>!</font><font color='#5555FF'>=</font> NULL<font face='Lucida Console'>)</font> <b>{</b>
+    cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>progress<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>pass_counter <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>next_scanline;
+    cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>progress<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>pass_limit <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>image_height;
+    <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>progress<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>progress_monitor<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>j_common_ptr<font face='Lucida Console'>)</font> cinfo<font face='Lucida Console'>)</font>;
+  <b>}</b>
+
+  <font color='#009900'>/* Give master control module another chance if this is first call to
+   * jpeg_write_scanlines.  This lets output of the frame/scan headers be
+   * delayed so that application can write COM, etc, markers between
+   * jpeg_start_compress and jpeg_write_scanlines.
+   */</font>
+  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>master<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>call_pass_startup<font face='Lucida Console'>)</font>
+    <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>master<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>pass_startup<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>cinfo<font face='Lucida Console'>)</font>;
+
+  <font color='#009900'>/* Ignore any extra scanlines at bottom of image. */</font>
+  rows_left <font color='#5555FF'>=</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>image_height <font color='#5555FF'>-</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>next_scanline;
+  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>num_lines <font color='#5555FF'>&gt;</font> rows_left<font face='Lucida Console'>)</font>
+    num_lines <font color='#5555FF'>=</font> rows_left;
+
+  row_ctr <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+  <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>main<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>process_data<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>cinfo, scanlines, <font color='#5555FF'>&amp;</font>row_ctr, num_lines<font face='Lucida Console'>)</font>;
+  cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>next_scanline <font color='#5555FF'>+</font><font color='#5555FF'>=</font> row_ctr;
+  <font color='#0000FF'>return</font> row_ctr;
+<b>}</b>
+
+
+<font color='#009900'>/*
+ * Alternate entry point to write raw data.
+ * Processes exactly one iMCU row per call, unless suspended.
+ */</font>
+
+<b><a name='GLOBAL'></a>GLOBAL</b><font face='Lucida Console'>(</font>JDIMENSION<font face='Lucida Console'>)</font>
+<b><a name='jpeg_write_raw_data'></a>jpeg_write_raw_data</b> <font face='Lucida Console'>(</font>j_compress_ptr cinfo, JSAMPIMAGE data,
+		     JDIMENSION num_lines<font face='Lucida Console'>)</font>
+<b>{</b>
+  JDIMENSION lines_per_iMCU_row;
+
+  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>global_state <font color='#5555FF'>!</font><font color='#5555FF'>=</font> CSTATE_RAW_OK<font face='Lucida Console'>)</font>
+    <font color='#BB00BB'>ERREXIT1</font><font face='Lucida Console'>(</font>cinfo, JERR_BAD_STATE, cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>global_state<font face='Lucida Console'>)</font>;
+  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>next_scanline <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>image_height<font face='Lucida Console'>)</font> <b>{</b>
+    <font color='#BB00BB'>WARNMS</font><font face='Lucida Console'>(</font>cinfo, JWRN_TOO_MUCH_DATA<font face='Lucida Console'>)</font>;
+    <font color='#0000FF'>return</font> <font color='#979000'>0</font>;
+  <b>}</b>
+
+  <font color='#009900'>/* Call progress monitor hook if present */</font>
+  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>progress <font color='#5555FF'>!</font><font color='#5555FF'>=</font> NULL<font face='Lucida Console'>)</font> <b>{</b>
+    cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>progress<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>pass_counter <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>next_scanline;
+    cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>progress<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>pass_limit <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>image_height;
+    <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>progress<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>progress_monitor<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>j_common_ptr<font face='Lucida Console'>)</font> cinfo<font face='Lucida Console'>)</font>;
+  <b>}</b>
+
+  <font color='#009900'>/* Give master control module another chance if this is first call to
+   * jpeg_write_raw_data.  This lets output of the frame/scan headers be
+   * delayed so that application can write COM, etc, markers between
+   * jpeg_start_compress and jpeg_write_raw_data.
+   */</font>
+  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>master<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>call_pass_startup<font face='Lucida Console'>)</font>
+    <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>master<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>pass_startup<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>cinfo<font face='Lucida Console'>)</font>;
+
+  <font color='#009900'>/* Verify that at least one iMCU row has been passed. */</font>
+  lines_per_iMCU_row <font color='#5555FF'>=</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>max_v_samp_factor <font color='#5555FF'>*</font> DCTSIZE;
+  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>num_lines <font color='#5555FF'>&lt;</font> lines_per_iMCU_row<font face='Lucida Console'>)</font>
+    <font color='#BB00BB'>ERREXIT</font><font face='Lucida Console'>(</font>cinfo, JERR_BUFFER_SIZE<font face='Lucida Console'>)</font>;
+
+  <font color='#009900'>/* Directly compress the row. */</font>
+  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font> <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>coef<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>compress_data<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>cinfo, data<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <b>{</b>
+    <font color='#009900'>/* If compressor did not consume the whole row, suspend processing. */</font>
+    <font color='#0000FF'>return</font> <font color='#979000'>0</font>;
+  <b>}</b>
+
+  <font color='#009900'>/* OK, we processed one iMCU row. */</font>
+  cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>next_scanline <font color='#5555FF'>+</font><font color='#5555FF'>=</font> lines_per_iMCU_row;
+  <font color='#0000FF'>return</font> lines_per_iMCU_row;
+<b>}</b>
+
+</pre></body></html>

@@ -1,0 +1,288 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - max_sum_submatrix.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2011  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_MAX_SUM_SUBMaTRIX_Hh_
+<font color='#0000FF'>#define</font> DLIB_MAX_SUM_SUBMaTRIX_Hh_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='max_sum_submatrix_abstract.h.html'>max_sum_submatrix_abstract.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../matrix.h.html'>../matrix.h</a>"
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>vector<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>queue<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../geometry.h.html'>../geometry.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+    <font color='#0000FF'>namespace</font> impl
+    <b>{</b>
+
+    <font color='#009900'>// ------------------------------------------------------------------------------------
+</font>
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>struct</font> <b><a name='range_set'></a>range_set</b>
+        <b>{</b>
+            <font color='#0000FF'><u>int</u></font> top_min;
+            <font color='#0000FF'><u>int</u></font> top_max;
+            <font color='#0000FF'><u>int</u></font> bottom_min;
+            <font color='#0000FF'><u>int</u></font> bottom_max;
+            T weight;
+
+            <font color='#0000FF'><u>bool</u></font> <b><a name='operator'></a>operator</b><font color='#5555FF'>&lt;</font><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> range_set<font color='#5555FF'>&amp;</font> item<font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> weight <font color='#5555FF'>&lt;</font> item.weight; <b>}</b>
+        <b>}</b>;
+
+    <font color='#009900'>// ------------------------------------------------------------------------------------
+</font>
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>bool</u></font> <b><a name='is_terminal_set'></a>is_terminal_set</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> range_set<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> item
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>return</font> <font face='Lucida Console'>(</font>item.top_min  <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> item.top_max <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font>
+                    item.bottom_min <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> item.bottom_max<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+    <font color='#009900'>// ------------------------------------------------------------------------------------
+</font>
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='split'></a>split</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> range_set<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> rset,
+            range_set<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> a,
+            range_set<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> b
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>rset.top_max <font color='#5555FF'>-</font> rset.top_min <font color='#5555FF'>&gt;</font> rset.bottom_max <font color='#5555FF'>-</font> rset.bottom_min<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#009900'>// split top
+</font>                <font color='#0000FF'>const</font> <font color='#0000FF'><u>int</u></font> middle <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>rset.top_max <font color='#5555FF'>+</font> rset.top_min<font face='Lucida Console'>)</font><font color='#5555FF'>/</font><font color='#979000'>2</font>;
+                a.top_min <font color='#5555FF'>=</font> rset.top_min;
+                a.top_max <font color='#5555FF'>=</font> middle;
+                b.top_min <font color='#5555FF'>=</font> middle<font color='#5555FF'>+</font><font color='#979000'>1</font>;
+                b.top_max <font color='#5555FF'>=</font> rset.top_max;
+
+                a.bottom_min <font color='#5555FF'>=</font> rset.bottom_min;
+                a.bottom_max <font color='#5555FF'>=</font> rset.bottom_max;
+                b.bottom_min <font color='#5555FF'>=</font> rset.bottom_min;
+                b.bottom_max <font color='#5555FF'>=</font> rset.bottom_max;
+            <b>}</b>
+            <font color='#0000FF'>else</font>
+            <b>{</b>
+                <font color='#009900'>// split bottom
+</font>                <font color='#0000FF'>const</font> <font color='#0000FF'><u>int</u></font> middle <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>rset.bottom_max <font color='#5555FF'>+</font> rset.bottom_min<font face='Lucida Console'>)</font><font color='#5555FF'>/</font><font color='#979000'>2</font>;
+                a.bottom_min <font color='#5555FF'>=</font> rset.bottom_min;
+                a.bottom_max <font color='#5555FF'>=</font> middle;
+                b.bottom_min <font color='#5555FF'>=</font> middle<font color='#5555FF'>+</font><font color='#979000'>1</font>;
+                b.bottom_max <font color='#5555FF'>=</font> rset.bottom_max;
+
+                a.top_min <font color='#5555FF'>=</font> rset.top_min;
+                a.top_max <font color='#5555FF'>=</font> rset.top_max;
+                b.top_min <font color='#5555FF'>=</font> rset.top_min;
+                b.top_max <font color='#5555FF'>=</font> rset.top_max;
+            <b>}</b>
+        <b>}</b>
+
+    <font color='#009900'>// ------------------------------------------------------------------------------------
+</font>
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> EXP, <font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='find_best_column_range'></a>find_best_column_range</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&lt;</font>EXP<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> sum_pos,
+            <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&lt;</font>EXP<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> sum_neg,
+            <font color='#0000FF'>const</font> range_set<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> row_range,
+            T<font color='#5555FF'>&amp;</font> weight,
+            <font color='#0000FF'><u>int</u></font><font color='#5555FF'>&amp;</font> left,
+            <font color='#0000FF'><u>int</u></font><font color='#5555FF'>&amp;</font> right
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            left <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            right <font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>1</font>;
+            weight <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            T cur_sum <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            <font color='#0000FF'><u>int</u></font> cur_pos <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> c <font color='#5555FF'>=</font> <font color='#979000'>0</font>; c <font color='#5555FF'>&lt;</font> sum_pos.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>c<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#009900'>// compute the value for the current column
+</font>                T temp <font color='#5555FF'>=</font> <font color='#BB00BB'>sum_pos</font><font face='Lucida Console'>(</font>row_range.bottom_max<font color='#5555FF'>+</font><font color='#979000'>1</font>,c<font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> <font color='#BB00BB'>sum_pos</font><font face='Lucida Console'>(</font>row_range.top_min,c<font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>row_range.top_max <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> row_range.bottom_min<font face='Lucida Console'>)</font>
+                    temp <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#BB00BB'>sum_neg</font><font face='Lucida Console'>(</font>row_range.bottom_min<font color='#5555FF'>+</font><font color='#979000'>1</font>,c<font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> <font color='#BB00BB'>sum_neg</font><font face='Lucida Console'>(</font>row_range.top_max,c<font face='Lucida Console'>)</font>;
+
+
+                cur_sum <font color='#5555FF'>+</font><font color='#5555FF'>=</font> temp;
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>cur_sum <font color='#5555FF'>&gt;</font> weight<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    left <font color='#5555FF'>=</font> cur_pos;
+                    right <font color='#5555FF'>=</font> c;
+                    weight <font color='#5555FF'>=</font> cur_sum;
+                <b>}</b>
+
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>cur_sum <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                <b>{</b>
+                    cur_sum <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                    cur_pos <font color='#5555FF'>=</font> c<font color='#5555FF'>+</font><font color='#979000'>1</font>;
+                <b>}</b>
+
+            <b>}</b>
+        <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> EXP<font color='#5555FF'>&gt;</font>
+    std::vector<font color='#5555FF'>&lt;</font>rectangle<font color='#5555FF'>&gt;</font> <b><a name='max_sum_submatrix'></a>max_sum_submatrix</b><font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&lt;</font>EXP<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> mat,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> max_rects,
+        <font color='#0000FF'><u>double</u></font> thresh_ <font color='#5555FF'>=</font> <font color='#979000'>0</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#009900'>// make sure requires clause is not broken
+</font>        <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font>thresh_ <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#979000'>0</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> mat.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font>,
+            "<font color='#CC0000'>\t std::vector&lt;rectangle&gt; max_sum_submatrix()</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t Invalid arguments were given to this function.</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t mat.size(): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> mat.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t thresh_:    </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> thresh_
+            <font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>/*
+            This function is basically an implementation of the efficient subwindow search (I-ESS)
+            algorithm presented in the following paper: 
+                Efficient Algorithms for Subwindow Search in Object Detection and Localization
+                by Senjian An, Patrick Peursum, Wanquan Liu and Svetha Venkatesh
+                In CVPR 2009
+
+        */</font>
+
+
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>max_rects <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+            <font color='#0000FF'>return</font> std::vector<font color='#5555FF'>&lt;</font>rectangle<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> dlib::impl;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> EXP::type element_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> promote<font color='#5555FF'>&lt;</font>element_type<font color='#5555FF'>&gt;</font>::type scalar_type;
+
+        <font color='#0000FF'>const</font> scalar_type thresh <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font>scalar_type<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>thresh_<font face='Lucida Console'>)</font>;
+
+
+        matrix<font color='#5555FF'>&lt;</font>scalar_type<font color='#5555FF'>&gt;</font> sum_pos;
+        matrix<font color='#5555FF'>&lt;</font>scalar_type<font color='#5555FF'>&gt;</font> sum_neg;
+        sum_pos.<font color='#BB00BB'>set_size</font><font face='Lucida Console'>(</font>mat.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>+</font><font color='#979000'>1</font>, mat.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        sum_neg.<font color='#BB00BB'>set_size</font><font face='Lucida Console'>(</font>mat.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>+</font><font color='#979000'>1</font>, mat.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <font color='#009900'>// integrate over the rows.  
+</font>        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> c <font color='#5555FF'>=</font> <font color='#979000'>0</font>; c <font color='#5555FF'>&lt;</font> mat.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>c<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#BB00BB'>sum_pos</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>,c<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            <font color='#BB00BB'>sum_neg</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>,c<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <b>}</b>
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> r <font color='#5555FF'>=</font> <font color='#979000'>0</font>; r <font color='#5555FF'>&lt;</font> mat.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>r<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> c <font color='#5555FF'>=</font> <font color='#979000'>0</font>; c <font color='#5555FF'>&lt;</font> mat.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>c<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>mat</font><font face='Lucida Console'>(</font>r,c<font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#BB00BB'>sum_pos</font><font face='Lucida Console'>(</font>r<font color='#5555FF'>+</font><font color='#979000'>1</font>,c<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#BB00BB'>mat</font><font face='Lucida Console'>(</font>r,c<font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> <font color='#BB00BB'>sum_pos</font><font face='Lucida Console'>(</font>r,c<font face='Lucida Console'>)</font>;
+                    <font color='#BB00BB'>sum_neg</font><font face='Lucida Console'>(</font>r<font color='#5555FF'>+</font><font color='#979000'>1</font>,c<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#BB00BB'>sum_neg</font><font face='Lucida Console'>(</font>r,c<font face='Lucida Console'>)</font>;
+                <b>}</b>
+                <font color='#0000FF'>else</font>
+                <b>{</b>
+                    <font color='#BB00BB'>sum_pos</font><font face='Lucida Console'>(</font>r<font color='#5555FF'>+</font><font color='#979000'>1</font>,c<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#BB00BB'>sum_pos</font><font face='Lucida Console'>(</font>r,c<font face='Lucida Console'>)</font>;
+                    <font color='#BB00BB'>sum_neg</font><font face='Lucida Console'>(</font>r<font color='#5555FF'>+</font><font color='#979000'>1</font>,c<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#BB00BB'>mat</font><font face='Lucida Console'>(</font>r,c<font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> <font color='#BB00BB'>sum_neg</font><font face='Lucida Console'>(</font>r,c<font face='Lucida Console'>)</font>;
+                <b>}</b>
+            <b>}</b>
+        <b>}</b>
+
+        std::priority_queue<font color='#5555FF'>&lt;</font>range_set<font color='#5555FF'>&lt;</font>scalar_type<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> q;
+
+        <font color='#009900'>// the range_sets will represent ranges of columns 
+</font>        range_set<font color='#5555FF'>&lt;</font>scalar_type<font color='#5555FF'>&gt;</font> universe_set;
+        universe_set.bottom_min <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        universe_set.top_min <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        universe_set.bottom_max <font color='#5555FF'>=</font> mat.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#979000'>1</font>;
+        universe_set.top_max <font color='#5555FF'>=</font> mat.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#979000'>1</font>;
+        universe_set.weight <font color='#5555FF'>=</font> <font color='#BB00BB'>sum</font><font face='Lucida Console'>(</font><font color='#BB00BB'>rowm</font><font face='Lucida Console'>(</font>dlib::<font color='#BB00BB'>mat</font><font face='Lucida Console'>(</font>sum_pos<font face='Lucida Console'>)</font>,mat.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+        q.<font color='#BB00BB'>push</font><font face='Lucida Console'>(</font>universe_set<font face='Lucida Console'>)</font>;
+
+        std::vector<font color='#5555FF'>&lt;</font>rectangle<font color='#5555FF'>&gt;</font> results;
+        std::vector<font color='#5555FF'>&lt;</font>scalar_type<font color='#5555FF'>&gt;</font> <font color='#BB00BB'>temp_pos</font><font face='Lucida Console'>(</font>mat.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        std::vector<font color='#5555FF'>&lt;</font>scalar_type<font color='#5555FF'>&gt;</font> <font color='#BB00BB'>temp_neg</font><font face='Lucida Console'>(</font>mat.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>q.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>is_terminal_set</font><font face='Lucida Console'>(</font>q.<font color='#BB00BB'>top</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'><u>int</u></font> left, right;
+                scalar_type weight;
+                <font color='#BB00BB'>find_best_column_range</font><font face='Lucida Console'>(</font>sum_pos, sum_neg, q.<font color='#BB00BB'>top</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, weight, left, right<font face='Lucida Console'>)</font>;
+
+                rectangle <font color='#BB00BB'>rect</font><font face='Lucida Console'>(</font>left, q.<font color='#BB00BB'>top</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.top_min, 
+                               right, q.<font color='#BB00BB'>top</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.bottom_min<font face='Lucida Console'>)</font>;
+
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>weight <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> thresh<font face='Lucida Console'>)</font>
+                    <font color='#0000FF'>break</font>;
+
+                results.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>rect<font face='Lucida Console'>)</font>;
+
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>results.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> max_rects<font face='Lucida Console'>)</font>
+                    <font color='#0000FF'>break</font>;
+
+                q <font color='#5555FF'>=</font> std::priority_queue<font color='#5555FF'>&lt;</font>range_set<font color='#5555FF'>&lt;</font>scalar_type<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                <font color='#009900'>// We are going to blank out the weights we just used.  So adjust the sum images appropriately.
+</font>                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> c <font color='#5555FF'>=</font> rect.<font color='#BB00BB'>left</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; c <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> rect.<font color='#BB00BB'>right</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>c<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    temp_pos[c] <font color='#5555FF'>=</font> <font color='#BB00BB'>sum_pos</font><font face='Lucida Console'>(</font>rect.<font color='#BB00BB'>bottom</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>+</font><font color='#979000'>1</font>,c<font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> <font color='#BB00BB'>sum_pos</font><font face='Lucida Console'>(</font>rect.<font color='#BB00BB'>top</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,c<font face='Lucida Console'>)</font>;
+                    temp_neg[c] <font color='#5555FF'>=</font> <font color='#BB00BB'>sum_neg</font><font face='Lucida Console'>(</font>rect.<font color='#BB00BB'>bottom</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>+</font><font color='#979000'>1</font>,c<font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> <font color='#BB00BB'>sum_neg</font><font face='Lucida Console'>(</font>rect.<font color='#BB00BB'>top</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,c<font face='Lucida Console'>)</font>;
+                <b>}</b>
+                <font color='#009900'>// blank out the area inside the rectangle
+</font>                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> r <font color='#5555FF'>=</font> rect.<font color='#BB00BB'>top</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; r <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> rect.<font color='#BB00BB'>bottom</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>r<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> c <font color='#5555FF'>=</font> rect.<font color='#BB00BB'>left</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; c <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> rect.<font color='#BB00BB'>right</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>c<font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        <font color='#BB00BB'>sum_pos</font><font face='Lucida Console'>(</font>r<font color='#5555FF'>+</font><font color='#979000'>1</font>,c<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#BB00BB'>sum_pos</font><font face='Lucida Console'>(</font>r,c<font face='Lucida Console'>)</font>;
+                        <font color='#BB00BB'>sum_neg</font><font face='Lucida Console'>(</font>r<font color='#5555FF'>+</font><font color='#979000'>1</font>,c<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#BB00BB'>sum_neg</font><font face='Lucida Console'>(</font>r,c<font face='Lucida Console'>)</font>;
+                    <b>}</b>
+                <b>}</b>
+                <font color='#009900'>// account for the area below the rectangle
+</font>                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> r <font color='#5555FF'>=</font> rect.<font color='#BB00BB'>bottom</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>+</font><font color='#979000'>2</font>; r <font color='#5555FF'>&lt;</font> sum_pos.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>r<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> c <font color='#5555FF'>=</font> rect.<font color='#BB00BB'>left</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; c <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> rect.<font color='#BB00BB'>right</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>c<font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        <font color='#BB00BB'>sum_pos</font><font face='Lucida Console'>(</font>r,c<font face='Lucida Console'>)</font> <font color='#5555FF'>-</font><font color='#5555FF'>=</font> temp_pos[c];
+                        <font color='#BB00BB'>sum_neg</font><font face='Lucida Console'>(</font>r,c<font face='Lucida Console'>)</font> <font color='#5555FF'>-</font><font color='#5555FF'>=</font> temp_neg[c];
+                    <b>}</b>
+                <b>}</b>
+
+
+                universe_set.weight <font color='#5555FF'>=</font> <font color='#BB00BB'>sum</font><font face='Lucida Console'>(</font><font color='#BB00BB'>rowm</font><font face='Lucida Console'>(</font>dlib::<font color='#BB00BB'>mat</font><font face='Lucida Console'>(</font>sum_pos<font face='Lucida Console'>)</font>,mat.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>universe_set.weight <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> thresh<font face='Lucida Console'>)</font>
+                    <font color='#0000FF'>break</font>;
+
+                q.<font color='#BB00BB'>push</font><font face='Lucida Console'>(</font>universe_set<font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>continue</font>;
+            <b>}</b>
+
+            range_set<font color='#5555FF'>&lt;</font>scalar_type<font color='#5555FF'>&gt;</font> a, b;
+            <font color='#BB00BB'>split</font><font face='Lucida Console'>(</font>q.<font color='#BB00BB'>top</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, a,b<font face='Lucida Console'>)</font>;
+            q.<font color='#BB00BB'>pop</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// these variables are not used at this point in the algorithm.
+</font>            <font color='#0000FF'><u>int</u></font> a_left, a_right;
+            <font color='#0000FF'><u>int</u></font> b_left, b_right;
+
+            <font color='#BB00BB'>find_best_column_range</font><font face='Lucida Console'>(</font>sum_pos, sum_neg, a, a.weight, a_left, a_right<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>find_best_column_range</font><font face='Lucida Console'>(</font>sum_pos, sum_neg, b, b.weight, b_left, b_right<font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>a.weight <font color='#5555FF'>&gt;</font> thresh<font face='Lucida Console'>)</font>
+                q.<font color='#BB00BB'>push</font><font face='Lucida Console'>(</font>a<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>b.weight <font color='#5555FF'>&gt;</font> thresh<font face='Lucida Console'>)</font>
+                q.<font color='#BB00BB'>push</font><font face='Lucida Console'>(</font>b<font face='Lucida Console'>)</font>;
+
+        <b>}</b>
+
+
+        <font color='#0000FF'>return</font> results;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_MAX_SUM_SUBMaTRIX_Hh_
+</font>
+
+</pre></body></html>

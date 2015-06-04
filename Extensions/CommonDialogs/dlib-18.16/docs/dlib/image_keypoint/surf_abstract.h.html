@@ -1,0 +1,166 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - surf_abstract.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2009  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#undef</font> DLIB_SURf_ABSTRACT_H_
+<font color='#0000FF'>#ifdef</font> DLIB_SURf_ABSTRACT_H_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='hessian_pyramid_abstract.h.html'>hessian_pyramid_abstract.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../geometry/vector_abstract.h.html'>../geometry/vector_abstract.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../matrix/matrix_abstract.h.html'>../matrix/matrix_abstract.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../image_processing/generic_image.h.html'>../image_processing/generic_image.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+    <font color='#009900'>/*
+        The functions in this file implement the components of the SURF algorithm
+        for extracting scale invariant feature descriptors from images.
+
+        For the full story on what this algorithm does and how it works
+        you should refer to the following papers.
+
+        This is the original paper which introduced the algorithm:
+            SURF: Speeded Up Robust Features
+            By Herbert Bay, Tinne Tuytelaars, and Luc Van Gool
+
+        This paper provides a nice detailed overview of how the algorithm works:
+            Notes on the OpenSURF Library by Christopher Evans
+    */</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>    
+    <font color='#0000FF'><u>double</u></font> <b><a name='gaussian'></a>gaussian</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'><u>double</u></font> x, 
+        <font color='#0000FF'><u>double</u></font> y,
+        <font color='#0000FF'><u>double</u></font> sig
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - sig &gt; 0
+        ensures
+            - computes and returns the value of a 2D Gaussian function with mean 0 
+              and standard deviation sig at the given (x,y) point.
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> integral_image_type, <font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>double</u></font> <b><a name='compute_dominant_angle'></a>compute_dominant_angle</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> integral_image_type<font color='#5555FF'>&amp;</font> img,
+        <font color='#0000FF'>const</font> dlib::vector<font color='#5555FF'>&lt;</font>T,<font color='#979000'>2</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> center,
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font><font color='#5555FF'>&amp;</font> scale
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - integral_image_type == an object such as dlib::integral_image or another
+              type that implements the interface defined in image_transforms/integral_image_abstract.h
+            - scale &gt; 0
+            - get_rect(img).contains(centered_rect(center, 17*scale, 17*scale)) == true
+              (i.e. center can't be within 17*scale pixels of the edge of the image)
+        ensures
+            - computes and returns the dominant angle (i.e. the angle of the dominant gradient)
+              at the given center point and scale in img.  
+            - The returned angle is in radians.  Specifically, if the angle is described by
+              a vector vect then the angle is exactly the value of std::atan2(vect.y(), vect.x())
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> integral_image_type, <font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> MM, <font color='#0000FF'>typename</font> L<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='compute_surf_descriptor'></a>compute_surf_descriptor</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> integral_image_type<font color='#5555FF'>&amp;</font> img,
+        <font color='#0000FF'>const</font> dlib::vector<font color='#5555FF'>&lt;</font>T,<font color='#979000'>2</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> center,
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> scale,
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> angle,
+        matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>64</font>,<font color='#979000'>1</font>,MM,L<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> des
+    <font face='Lucida Console'>)</font>
+    <font color='#009900'>/*!
+        requires
+            - integral_image_type == an object such as dlib::integral_image or another
+              type that implements the interface defined in image_transforms/integral_image_abstract.h
+            - scale &gt; 0
+            - get_rect(img).contains(centered_rect(center, 32*scale, 32*scale)) == true
+              (i.e. center can't be within 32*scale pixels of the edge of the image)
+        ensures
+            - computes the 64 dimensional SURF descriptor vector of a box centered
+              at the given center point, tilted at an angle determined by the given 
+              angle, and sized according to the given scale.  
+            - #des == the computed SURF descriptor vector extracted from the img object.
+            - The angle is measured in radians and measures the degree of counter-clockwise 
+              rotation around the center point.  This is the same kind of rotation as is 
+              performed by the dlib::rotate_point() function.
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>struct</font> <b><a name='surf_point'></a>surf_point</b>
+    <b>{</b>
+        <font color='#009900'>/*!
+            WHAT THIS OBJECT REPRESENTS
+                This object represents a detected SURF point.  The meanings of 
+                its fields are defined below in the get_surf_points() function.
+        !*/</font>
+
+        interest_point p;
+        matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>64</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> des;
+        <font color='#0000FF'><u>double</u></font> angle;
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='serialize'></a>serialize</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> surf_point<font color='#5555FF'>&amp;</font> item,
+        std::ostream<font color='#5555FF'>&amp;</font> out
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        provides serialization support
+    !*/</font>
+
+    <font color='#0000FF'><u>void</u></font> <b><a name='deserialize'></a>deserialize</b> <font face='Lucida Console'>(</font>
+        surf_point<font color='#5555FF'>&amp;</font> item,
+        std::istream<font color='#5555FF'>&amp;</font> in 
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        provides serialization support
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> image_type<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>surf_point<font color='#5555FF'>&gt;</font> <b><a name='get_surf_points'></a>get_surf_points</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> image_type<font color='#5555FF'>&amp;</font> img,
+        <font color='#0000FF'><u>long</u></font> max_points <font color='#5555FF'>=</font> <font color='#979000'>10000</font>,
+        <font color='#0000FF'><u>double</u></font> detection_threshold <font color='#5555FF'>=</font> <font color='#979000'>30.0</font>
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - max_points &gt; 0
+            - detection_threshold &gt;= 0
+            - image_type == an image object that implements the interface defined in
+              dlib/image_processing/generic_image.h 
+            - Let P denote the type of pixel in img, then we require:
+                - pixel_traits&lt;P&gt;::has_alpha == false 
+        ensures
+            - This function runs the complete SURF algorithm on the given input image and 
+              returns the points it found. 
+            - returns a vector V such that:
+                - V.size() &lt;= max_points
+                - for all valid i:
+                    - V[i] == a SURF point found in the given input image img
+                    - V[i].p == the interest_point extracted from the hessian pyramid for this
+                      SURF point.
+                    - V[i].des == the SURF descriptor for this point (calculated using 
+                      compute_surf_descriptor())
+                    - V[i].angle == the angle of the SURF box at this point (calculated using 
+                      compute_dominant_angle())
+                    - V[i].p.score &gt;= detection_threshold
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_SURf_ABSTRACT_H_
+</font>
+
+
+</pre></body></html>

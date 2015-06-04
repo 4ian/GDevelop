@@ -1,0 +1,189 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - build_separable_poly_filters.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2011  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_BUILD_SEPARABLE_PoLY_FILTERS_Hh_
+<font color='#0000FF'>#define</font> DLIB_BUILD_SEPARABLE_PoLY_FILTERS_Hh_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../matrix.h.html'>../matrix.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='surf.h.html'>surf.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../uintn.h.html'>../uintn.h</a>"
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>vector<font color='#5555FF'>&gt;</font>
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>typedef</font> std::pair<font color='#5555FF'>&lt;</font>matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>0</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font>, matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>0</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> separable_filter_type;
+    <font color='#0000FF'>typedef</font> std::pair<font color='#5555FF'>&lt;</font>matrix<font color='#5555FF'>&lt;</font>int32,<font color='#979000'>0</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font>, matrix<font color='#5555FF'>&lt;</font>int32,<font color='#979000'>0</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> separable_int32_filter_type;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>inline</font> std::vector<font color='#5555FF'>&lt;</font>std::vector<font color='#5555FF'>&lt;</font>separable_filter_type<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> <b><a name='build_separable_poly_filters'></a>build_separable_poly_filters</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> order,
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> window_size
+    <font face='Lucida Console'>)</font> 
+    <font color='#009900'>/*!
+        requires
+            - 1 &lt;= order &lt;= 6
+            - window_size &gt;= 3 &amp;&amp; window_size is odd
+        ensures
+            - the "first" element is the row_filter, the second is the col_filter.
+            - Some filters are not totally separable and that's why they are grouped
+              into vectors of vectors.  The groups are all the parts of a partially
+              separable filter.
+    !*/</font>
+    <b>{</b>
+        <font color='#0000FF'><u>long</u></font> num_filters <font color='#5555FF'>=</font> <font color='#979000'>6</font>;
+        <font color='#0000FF'>switch</font> <font face='Lucida Console'>(</font>order<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>case</font> <font color='#979000'>1</font>: num_filters <font color='#5555FF'>=</font> <font color='#979000'>3</font>; <font color='#0000FF'>break</font>;
+            <font color='#0000FF'>case</font> <font color='#979000'>2</font>: num_filters <font color='#5555FF'>=</font> <font color='#979000'>6</font>; <font color='#0000FF'>break</font>;
+            <font color='#0000FF'>case</font> <font color='#979000'>3</font>: num_filters <font color='#5555FF'>=</font> <font color='#979000'>10</font>; <font color='#0000FF'>break</font>;
+            <font color='#0000FF'>case</font> <font color='#979000'>4</font>: num_filters <font color='#5555FF'>=</font> <font color='#979000'>15</font>; <font color='#0000FF'>break</font>;
+            <font color='#0000FF'>case</font> <font color='#979000'>5</font>: num_filters <font color='#5555FF'>=</font> <font color='#979000'>21</font>; <font color='#0000FF'>break</font>;
+            <font color='#0000FF'>case</font> <font color='#979000'>6</font>: num_filters <font color='#5555FF'>=</font> <font color='#979000'>28</font>; <font color='#0000FF'>break</font>;
+        <b>}</b>
+
+        matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font> <font color='#BB00BB'>X</font><font face='Lucida Console'>(</font>window_size<font color='#5555FF'>*</font>window_size,num_filters<font face='Lucida Console'>)</font>;
+        matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>0</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> <font color='#BB00BB'>G</font><font face='Lucida Console'>(</font>window_size<font color='#5555FF'>*</font>window_size,<font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> sigma <font color='#5555FF'>=</font> window_size<font color='#5555FF'>/</font><font color='#979000'>4.0</font>;
+
+
+        <font color='#0000FF'><u>long</u></font> cnt <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>double</u></font> x <font color='#5555FF'>=</font> <font color='#5555FF'>-</font>window_size<font color='#5555FF'>/</font><font color='#979000'>2</font>; x <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> window_size<font color='#5555FF'>/</font><font color='#979000'>2</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>x<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>double</u></font> y <font color='#5555FF'>=</font> <font color='#5555FF'>-</font>window_size<font color='#5555FF'>/</font><font color='#979000'>2</font>; y <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> window_size<font color='#5555FF'>/</font><font color='#979000'>2</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>y<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#BB00BB'>X</font><font face='Lucida Console'>(</font>cnt, <font color='#979000'>0</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+                <font color='#BB00BB'>X</font><font face='Lucida Console'>(</font>cnt, <font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> x;
+                <font color='#BB00BB'>X</font><font face='Lucida Console'>(</font>cnt, <font color='#979000'>2</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> y;
+
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>X.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> <font color='#979000'>5</font><font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#BB00BB'>X</font><font face='Lucida Console'>(</font>cnt, <font color='#979000'>3</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> x<font color='#5555FF'>*</font>x;
+                    <font color='#BB00BB'>X</font><font face='Lucida Console'>(</font>cnt, <font color='#979000'>4</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> x<font color='#5555FF'>*</font>y;
+                    <font color='#BB00BB'>X</font><font face='Lucida Console'>(</font>cnt, <font color='#979000'>5</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> y<font color='#5555FF'>*</font>y;
+                <b>}</b>
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>X.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> <font color='#979000'>9</font><font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#BB00BB'>X</font><font face='Lucida Console'>(</font>cnt, <font color='#979000'>6</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> x<font color='#5555FF'>*</font>x<font color='#5555FF'>*</font>x;
+                    <font color='#BB00BB'>X</font><font face='Lucida Console'>(</font>cnt, <font color='#979000'>7</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> y<font color='#5555FF'>*</font>x<font color='#5555FF'>*</font>x;
+                    <font color='#BB00BB'>X</font><font face='Lucida Console'>(</font>cnt, <font color='#979000'>8</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> y<font color='#5555FF'>*</font>y<font color='#5555FF'>*</font>x;
+                    <font color='#BB00BB'>X</font><font face='Lucida Console'>(</font>cnt, <font color='#979000'>9</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> y<font color='#5555FF'>*</font>y<font color='#5555FF'>*</font>y;
+                <b>}</b>
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>X.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> <font color='#979000'>14</font><font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#BB00BB'>X</font><font face='Lucida Console'>(</font>cnt, <font color='#979000'>10</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> x<font color='#5555FF'>*</font>x<font color='#5555FF'>*</font>x<font color='#5555FF'>*</font>x;
+                    <font color='#BB00BB'>X</font><font face='Lucida Console'>(</font>cnt, <font color='#979000'>11</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> y<font color='#5555FF'>*</font>x<font color='#5555FF'>*</font>x<font color='#5555FF'>*</font>x;
+                    <font color='#BB00BB'>X</font><font face='Lucida Console'>(</font>cnt, <font color='#979000'>12</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> y<font color='#5555FF'>*</font>y<font color='#5555FF'>*</font>x<font color='#5555FF'>*</font>x;
+                    <font color='#BB00BB'>X</font><font face='Lucida Console'>(</font>cnt, <font color='#979000'>13</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> y<font color='#5555FF'>*</font>y<font color='#5555FF'>*</font>y<font color='#5555FF'>*</font>x;
+                    <font color='#BB00BB'>X</font><font face='Lucida Console'>(</font>cnt, <font color='#979000'>14</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> y<font color='#5555FF'>*</font>y<font color='#5555FF'>*</font>y<font color='#5555FF'>*</font>y;
+                <b>}</b>
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>X.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> <font color='#979000'>20</font><font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#BB00BB'>X</font><font face='Lucida Console'>(</font>cnt, <font color='#979000'>15</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> x<font color='#5555FF'>*</font>x<font color='#5555FF'>*</font>x<font color='#5555FF'>*</font>x<font color='#5555FF'>*</font>x;
+                    <font color='#BB00BB'>X</font><font face='Lucida Console'>(</font>cnt, <font color='#979000'>16</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> y<font color='#5555FF'>*</font>x<font color='#5555FF'>*</font>x<font color='#5555FF'>*</font>x<font color='#5555FF'>*</font>x;
+                    <font color='#BB00BB'>X</font><font face='Lucida Console'>(</font>cnt, <font color='#979000'>17</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> y<font color='#5555FF'>*</font>y<font color='#5555FF'>*</font>x<font color='#5555FF'>*</font>x<font color='#5555FF'>*</font>x;
+                    <font color='#BB00BB'>X</font><font face='Lucida Console'>(</font>cnt, <font color='#979000'>18</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> y<font color='#5555FF'>*</font>y<font color='#5555FF'>*</font>y<font color='#5555FF'>*</font>x<font color='#5555FF'>*</font>x;
+                    <font color='#BB00BB'>X</font><font face='Lucida Console'>(</font>cnt, <font color='#979000'>19</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> y<font color='#5555FF'>*</font>y<font color='#5555FF'>*</font>y<font color='#5555FF'>*</font>y<font color='#5555FF'>*</font>x;
+                    <font color='#BB00BB'>X</font><font face='Lucida Console'>(</font>cnt, <font color='#979000'>20</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> y<font color='#5555FF'>*</font>y<font color='#5555FF'>*</font>y<font color='#5555FF'>*</font>y<font color='#5555FF'>*</font>y;
+                <b>}</b>
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>X.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> <font color='#979000'>27</font><font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#BB00BB'>X</font><font face='Lucida Console'>(</font>cnt, <font color='#979000'>21</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> x<font color='#5555FF'>*</font>x<font color='#5555FF'>*</font>x<font color='#5555FF'>*</font>x<font color='#5555FF'>*</font>x<font color='#5555FF'>*</font>x;
+                    <font color='#BB00BB'>X</font><font face='Lucida Console'>(</font>cnt, <font color='#979000'>22</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> y<font color='#5555FF'>*</font>x<font color='#5555FF'>*</font>x<font color='#5555FF'>*</font>x<font color='#5555FF'>*</font>x<font color='#5555FF'>*</font>x;
+                    <font color='#BB00BB'>X</font><font face='Lucida Console'>(</font>cnt, <font color='#979000'>23</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> y<font color='#5555FF'>*</font>y<font color='#5555FF'>*</font>x<font color='#5555FF'>*</font>x<font color='#5555FF'>*</font>x<font color='#5555FF'>*</font>x;
+                    <font color='#BB00BB'>X</font><font face='Lucida Console'>(</font>cnt, <font color='#979000'>24</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> y<font color='#5555FF'>*</font>y<font color='#5555FF'>*</font>y<font color='#5555FF'>*</font>x<font color='#5555FF'>*</font>x<font color='#5555FF'>*</font>x;
+                    <font color='#BB00BB'>X</font><font face='Lucida Console'>(</font>cnt, <font color='#979000'>25</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> y<font color='#5555FF'>*</font>y<font color='#5555FF'>*</font>y<font color='#5555FF'>*</font>y<font color='#5555FF'>*</font>x<font color='#5555FF'>*</font>x;
+                    <font color='#BB00BB'>X</font><font face='Lucida Console'>(</font>cnt, <font color='#979000'>26</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> y<font color='#5555FF'>*</font>y<font color='#5555FF'>*</font>y<font color='#5555FF'>*</font>y<font color='#5555FF'>*</font>y<font color='#5555FF'>*</font>x;
+                    <font color='#BB00BB'>X</font><font face='Lucida Console'>(</font>cnt, <font color='#979000'>27</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> y<font color='#5555FF'>*</font>y<font color='#5555FF'>*</font>y<font color='#5555FF'>*</font>y<font color='#5555FF'>*</font>y<font color='#5555FF'>*</font>y;
+                <b>}</b>
+
+                <font color='#BB00BB'>G</font><font face='Lucida Console'>(</font>cnt<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> std::<font color='#BB00BB'>sqrt</font><font face='Lucida Console'>(</font><font color='#BB00BB'>gaussian</font><font face='Lucida Console'>(</font>x,y,sigma<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                <font color='#5555FF'>+</font><font color='#5555FF'>+</font>cnt;
+            <b>}</b>
+        <b>}</b>
+         
+        X <font color='#5555FF'>=</font> <font color='#BB00BB'>diagm</font><font face='Lucida Console'>(</font>G<font face='Lucida Console'>)</font><font color='#5555FF'>*</font>X;
+
+        <font color='#0000FF'>const</font> matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font> S <font color='#5555FF'>=</font> <font color='#BB00BB'>inv</font><font face='Lucida Console'>(</font><font color='#BB00BB'>trans</font><font face='Lucida Console'>(</font>X<font face='Lucida Console'>)</font><font color='#5555FF'>*</font>X<font face='Lucida Console'>)</font><font color='#5555FF'>*</font><font color='#BB00BB'>trans</font><font face='Lucida Console'>(</font>X<font face='Lucida Console'>)</font><font color='#5555FF'>*</font><font color='#BB00BB'>diagm</font><font face='Lucida Console'>(</font>G<font face='Lucida Console'>)</font>;
+
+        matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>0</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> row_filter, col_filter;
+
+        matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font> u,v, temp;
+        matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>0</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> w;
+
+        std::vector<font color='#5555FF'>&lt;</font>std::vector<font color='#5555FF'>&lt;</font>separable_filter_type<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> <font color='#BB00BB'>results</font><font face='Lucida Console'>(</font>num_filters<font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> r <font color='#5555FF'>=</font> <font color='#979000'>0</font>; r <font color='#5555FF'>&lt;</font> S.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>r<font face='Lucida Console'>)</font>
+        <b>{</b>
+            temp <font color='#5555FF'>=</font> <font color='#BB00BB'>reshape</font><font face='Lucida Console'>(</font><font color='#BB00BB'>rowm</font><font face='Lucida Console'>(</font>S,r<font face='Lucida Console'>)</font>, window_size, window_size<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>svd3</font><font face='Lucida Console'>(</font>temp,u,w,v<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> thresh <font color='#5555FF'>=</font> <font color='#BB00BB'>max</font><font face='Lucida Console'>(</font>w<font face='Lucida Console'>)</font><font color='#5555FF'>*</font><font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>8</font>;
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> w.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>w</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> thresh<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    col_filter <font color='#5555FF'>=</font> std::<font color='#BB00BB'>sqrt</font><font face='Lucida Console'>(</font><font color='#BB00BB'>w</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font color='#5555FF'>*</font><font color='#BB00BB'>colm</font><font face='Lucida Console'>(</font>u,i<font face='Lucida Console'>)</font>;
+                    row_filter <font color='#5555FF'>=</font> std::<font color='#BB00BB'>sqrt</font><font face='Lucida Console'>(</font><font color='#BB00BB'>w</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font color='#5555FF'>*</font><font color='#BB00BB'>colm</font><font face='Lucida Console'>(</font>v,i<font face='Lucida Console'>)</font>;
+                    results[r].<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>std::<font color='#BB00BB'>make_pair</font><font face='Lucida Console'>(</font>row_filter, col_filter<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                <b>}</b>
+            <b>}</b>
+        <b>}</b>
+
+        <font color='#0000FF'>return</font> results;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>inline</font> std::vector<font color='#5555FF'>&lt;</font>std::vector<font color='#5555FF'>&lt;</font>separable_int32_filter_type<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> <b><a name='build_separable_int32_poly_filters'></a>build_separable_int32_poly_filters</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> order,
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> window_size,
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> max_range <font color='#5555FF'>=</font> <font color='#979000'>300.0</font>
+    <font face='Lucida Console'>)</font> 
+    <font color='#009900'>/*!
+        requires
+            - 1 &lt;= order &lt;= 6
+            - window_size &gt;= 3 &amp;&amp; window_size is odd
+            - max_range &gt; 1
+        ensures
+            - the "first" element is the row_filter, the second is the col_filter.
+    !*/</font>
+    <b>{</b>
+        <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>std::vector<font color='#5555FF'>&lt;</font>separable_filter_type<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> filters <font color='#5555FF'>=</font> <font color='#BB00BB'>build_separable_poly_filters</font><font face='Lucida Console'>(</font>order, window_size<font face='Lucida Console'>)</font>;
+        std::vector<font color='#5555FF'>&lt;</font>std::vector<font color='#5555FF'>&lt;</font>separable_int32_filter_type<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> <font color='#BB00BB'>int_filters</font><font face='Lucida Console'>(</font>filters.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> filters.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+        <b>{</b>
+
+            <font color='#0000FF'><u>double</u></font> max_val <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> j <font color='#5555FF'>=</font> <font color='#979000'>0</font>; j <font color='#5555FF'>&lt;</font> filters[i].<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>j<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>const</font> separable_filter_type<font color='#5555FF'>&amp;</font> filt <font color='#5555FF'>=</font> filters[i][j];
+                max_val <font color='#5555FF'>=</font> std::<font color='#BB00BB'>max</font><font face='Lucida Console'>(</font>max_val, <font color='#BB00BB'>max</font><font face='Lucida Console'>(</font><font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font>filt.first<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                max_val <font color='#5555FF'>=</font> std::<font color='#BB00BB'>max</font><font face='Lucida Console'>(</font>max_val, <font color='#BB00BB'>max</font><font face='Lucida Console'>(</font><font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font>filt.second<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>max_val <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                max_val <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+
+            int_filters[i].<font color='#BB00BB'>resize</font><font face='Lucida Console'>(</font>filters[i].<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> j <font color='#5555FF'>=</font> <font color='#979000'>0</font>; j <font color='#5555FF'>&lt;</font> filters[i].<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>j<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>const</font> separable_filter_type<font color='#5555FF'>&amp;</font> filt <font color='#5555FF'>=</font> filters[i][j];
+                int_filters[i][j].first  <font color='#5555FF'>=</font> matrix_cast<font color='#5555FF'>&lt;</font>int32<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#BB00BB'>round</font><font face='Lucida Console'>(</font>filt.first<font color='#5555FF'>*</font>max_range<font color='#5555FF'>/</font>max_val<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                int_filters[i][j].second <font color='#5555FF'>=</font> matrix_cast<font color='#5555FF'>&lt;</font>int32<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#BB00BB'>round</font><font face='Lucida Console'>(</font>filt.second<font color='#5555FF'>*</font>max_range<font color='#5555FF'>/</font>max_val<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+        <b>}</b>
+
+        <font color='#0000FF'>return</font> int_filters;
+    <b>}</b>
+
+<b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_BUILD_SEPARABLE_PoLY_FILTERS_Hh_
+</font>
+
+</pre></body></html>

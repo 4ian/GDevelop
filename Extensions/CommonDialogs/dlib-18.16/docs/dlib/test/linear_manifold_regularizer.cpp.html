@@ -1,0 +1,411 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - linear_manifold_regularizer.cpp</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2010  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font>
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='tester.h.html'>tester.h</a>"
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>manifold_regularization.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>svm.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>rand.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>string.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>graph_utils_threaded.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>vector<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>sstream<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>ctime<font color='#5555FF'>&gt;</font>
+
+<font color='#0000FF'>namespace</font>  
+<b>{</b>
+    <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> test;
+    <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> dlib;
+    <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> std;
+    dlib::logger <b><a name='dlog'></a>dlog</b><font face='Lucida Console'>(</font>"<font color='#CC0000'>test.linear_manifold_regularizer</font>"<font face='Lucida Console'>)</font>;
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> hash_type, <font color='#0000FF'>typename</font> samples_type<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='test_find_k_nearest_neighbors_lsh'></a>test_find_k_nearest_neighbors_lsh</b><font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> samples_type<font color='#5555FF'>&amp;</font> samples
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        std::vector<font color='#5555FF'>&lt;</font>sample_pair<font color='#5555FF'>&gt;</font> edges1, edges2;
+
+        <font color='#BB00BB'>find_k_nearest_neighbors</font><font face='Lucida Console'>(</font>samples, <font color='#BB00BB'>cosine_distance</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, <font color='#979000'>2</font>, edges1<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>find_k_nearest_neighbors_lsh</font><font face='Lucida Console'>(</font>samples, <font color='#BB00BB'>cosine_distance</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, <font color='#BB00BB'>hash_type</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, <font color='#979000'>2</font>, <font color='#979000'>6</font>, edges2, <font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+
+        std::<font color='#BB00BB'>sort</font><font face='Lucida Console'>(</font>edges1.<font color='#BB00BB'>begin</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, edges1.<font color='#BB00BB'>end</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, order_by_index<font color='#5555FF'>&lt;</font>sample_pair<font color='#5555FF'>&gt;</font><font face='Lucida Console'>)</font>;
+        std::<font color='#BB00BB'>sort</font><font face='Lucida Console'>(</font>edges2.<font color='#BB00BB'>begin</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, edges2.<font color='#BB00BB'>end</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, order_by_index<font color='#5555FF'>&lt;</font>sample_pair<font color='#5555FF'>&gt;</font><font face='Lucida Console'>)</font>;
+
+        <font color='#BB00BB'>DLIB_TEST_MSG</font><font face='Lucida Console'>(</font>edges1.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> edges2.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, edges1.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>    </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> edges2.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> edges1.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>edges1[i] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> edges2[i]<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST_MSG</font><font face='Lucida Console'>(</font>std::<font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font>edges1[i].<font color='#BB00BB'>distance</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> edges2[i].<font color='#BB00BB'>distance</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> <font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>7</font>,
+                edges1[i].<font color='#BB00BB'>distance</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> edges2[i].<font color='#BB00BB'>distance</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+    <b>}</b>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> scalar_type<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='test_knn_lsh_sparse'></a>test_knn_lsh_sparse</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+    <b>{</b>
+        dlib::rand rnd;
+        std::vector<font color='#5555FF'>&lt;</font>std::map<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font>,scalar_type<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> samples;
+        samples.<font color='#BB00BB'>resize</font><font face='Lucida Console'>(</font><font color='#979000'>20</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>int</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> samples.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+        <b>{</b>
+            samples[i][<font color='#979000'>0</font>] <font color='#5555FF'>=</font> rnd.<font color='#BB00BB'>get_random_gaussian</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            samples[i][<font color='#979000'>2</font>] <font color='#5555FF'>=</font> rnd.<font color='#BB00BB'>get_random_gaussian</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        test_find_k_nearest_neighbors_lsh<font color='#5555FF'>&lt;</font>hash_similar_angles_64<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>samples<font face='Lucida Console'>)</font>;
+        test_find_k_nearest_neighbors_lsh<font color='#5555FF'>&lt;</font>hash_similar_angles_128<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>samples<font face='Lucida Console'>)</font>;
+        test_find_k_nearest_neighbors_lsh<font color='#5555FF'>&lt;</font>hash_similar_angles_256<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>samples<font face='Lucida Console'>)</font>;
+        test_find_k_nearest_neighbors_lsh<font color='#5555FF'>&lt;</font>hash_similar_angles_512<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>samples<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> scalar_type<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='test_knn_lsh_dense'></a>test_knn_lsh_dense</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+    <b>{</b>
+        dlib::rand rnd;
+        std::vector<font color='#5555FF'>&lt;</font>matrix<font color='#5555FF'>&lt;</font>scalar_type,<font color='#979000'>0</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> samples;
+        samples.<font color='#BB00BB'>resize</font><font face='Lucida Console'>(</font><font color='#979000'>20</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>int</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> samples.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+        <b>{</b>
+            samples[i].<font color='#BB00BB'>set_size</font><font face='Lucida Console'>(</font><font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+            samples[i]<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> rnd.<font color='#BB00BB'>get_random_gaussian</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            samples[i]<font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> rnd.<font color='#BB00BB'>get_random_gaussian</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        test_find_k_nearest_neighbors_lsh<font color='#5555FF'>&lt;</font>hash_similar_angles_64<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>samples<font face='Lucida Console'>)</font>;
+        test_find_k_nearest_neighbors_lsh<font color='#5555FF'>&lt;</font>hash_similar_angles_128<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>samples<font face='Lucida Console'>)</font>;
+        test_find_k_nearest_neighbors_lsh<font color='#5555FF'>&lt;</font>hash_similar_angles_256<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>samples<font face='Lucida Console'>)</font>;
+        test_find_k_nearest_neighbors_lsh<font color='#5555FF'>&lt;</font>hash_similar_angles_512<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>samples<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+
+
+    <font color='#0000FF'>class</font> <b><a name='linear_manifold_regularizer_tester'></a>linear_manifold_regularizer_tester</b> : <font color='#0000FF'>public</font> tester
+    <b>{</b>
+        <font color='#009900'>/*!
+            WHAT THIS OBJECT REPRESENTS
+                This object represents a unit test.  When it is constructed
+                it adds itself into the testing framework.
+        !*/</font>
+    <font color='#0000FF'>public</font>:
+        <b><a name='linear_manifold_regularizer_tester'></a>linear_manifold_regularizer_tester</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> :
+            tester <font face='Lucida Console'>(</font>
+                "<font color='#CC0000'>test_linear_manifold_regularizer</font>",       <font color='#009900'>// the command line argument name for this test
+</font>                "<font color='#CC0000'>Run tests on the linear_manifold_regularizer object.</font>", <font color='#009900'>// the command line argument description
+</font>                <font color='#979000'>0</font>                     <font color='#009900'>// the number of command line arguments for this test
+</font>            <font face='Lucida Console'>)</font>
+        <b>{</b>
+            seed <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+        <b>}</b>
+
+        dlib::rand rnd;
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> seed;
+
+        <font color='#0000FF'>typedef</font> matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>, <font color='#979000'>0</font>, <font color='#979000'>1</font><font color='#5555FF'>&gt;</font> sample_type;
+        <font color='#0000FF'>typedef</font> radial_basis_kernel<font color='#5555FF'>&lt;</font>sample_type<font color='#5555FF'>&gt;</font> kernel_type;
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='do_the_test'></a>do_the_test</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#BB00BB'>print_spinner</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            std::vector<font color='#5555FF'>&lt;</font>sample_type<font color='#5555FF'>&gt;</font> samples;
+
+            <font color='#009900'>// Declare an instance of the kernel we will be using.  
+</font>            <font color='#0000FF'>const</font> kernel_type <font color='#BB00BB'>kern</font><font face='Lucida Console'>(</font><font color='#979000'>0.1</font><font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> num_points <font color='#5555FF'>=</font> <font color='#979000'>200</font>;
+
+            <font color='#009900'>// create a large dataset with two concentric circles.  
+</font>            <font color='#BB00BB'>generate_circle</font><font face='Lucida Console'>(</font>samples, <font color='#979000'>1</font>, num_points<font face='Lucida Console'>)</font>;  <font color='#009900'>// circle of radius 1
+</font>            <font color='#BB00BB'>generate_circle</font><font face='Lucida Console'>(</font>samples, <font color='#979000'>5</font>, num_points<font face='Lucida Console'>)</font>;  <font color='#009900'>// circle of radius 5
+</font>
+            std::vector<font color='#5555FF'>&lt;</font>sample_pair<font color='#5555FF'>&gt;</font> edges;
+            <font color='#BB00BB'>find_percent_shortest_edges_randomly</font><font face='Lucida Console'>(</font>samples, <font color='#BB00BB'>squared_euclidean_distance</font><font face='Lucida Console'>(</font><font color='#979000'>0.1</font>, <font color='#979000'>4</font><font face='Lucida Console'>)</font>, <font color='#979000'>1</font>, <font color='#979000'>10000</font>, "<font color='#CC0000'>random seed</font>", edges<font face='Lucida Console'>)</font>;
+
+            dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LTRACE <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>number of edges generated: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> edges.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+            empirical_kernel_map<font color='#5555FF'>&lt;</font>kernel_type<font color='#5555FF'>&gt;</font> ekm;
+
+            ekm.<font color='#BB00BB'>load</font><font face='Lucida Console'>(</font>kern, <font color='#BB00BB'>randomly_subsample</font><font face='Lucida Console'>(</font>samples, <font color='#979000'>100</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// Project all the samples into the span of our 50 basis samples
+</font>            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> samples.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                samples[i] <font color='#5555FF'>=</font> ekm.<font color='#BB00BB'>project</font><font face='Lucida Console'>(</font>samples[i]<font face='Lucida Console'>)</font>;
+
+
+            <font color='#009900'>// Now create the manifold regularizer.   The result is a transformation matrix that
+</font>            <font color='#009900'>// embodies the manifold assumption discussed above. 
+</font>            linear_manifold_regularizer<font color='#5555FF'>&lt;</font>sample_type<font color='#5555FF'>&gt;</font> lmr;
+            lmr.<font color='#BB00BB'>build</font><font face='Lucida Console'>(</font>samples, edges, <font color='#BB00BB'>use_gaussian_weights</font><font face='Lucida Console'>(</font><font color='#979000'>0.1</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font> T <font color='#5555FF'>=</font> lmr.<font color='#BB00BB'>get_transformation_matrix</font><font face='Lucida Console'>(</font><font color='#979000'>10000</font><font face='Lucida Console'>)</font>;
+
+            <font color='#BB00BB'>print_spinner</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// generate the T matrix manually and make sure it matches.  The point of this test
+</font>            <font color='#009900'>// is to make sure that the more complex version of this that happens inside the linear_manifold_regularizer
+</font>            <font color='#009900'>// is correct.  It uses a tedious block of loops to do it in a way that is a lot faster for sparse
+</font>            <font color='#009900'>// W matrices but isn't super straight forward.  
+</font>            matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font> <font color='#BB00BB'>X</font><font face='Lucida Console'>(</font>samples[<font color='#979000'>0</font>].<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, samples.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> samples.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                <font color='#BB00BB'>set_colm</font><font face='Lucida Console'>(</font>X,i<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> samples[i];
+
+            matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font> <font color='#BB00BB'>W</font><font face='Lucida Console'>(</font>samples.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, samples.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            W <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> edges.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#BB00BB'>W</font><font face='Lucida Console'>(</font>edges[i].<font color='#BB00BB'>index1</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, edges[i].<font color='#BB00BB'>index2</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#BB00BB'>use_gaussian_weights</font><font face='Lucida Console'>(</font><font color='#979000'>0.1</font><font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>edges[i]<font face='Lucida Console'>)</font>;
+                <font color='#BB00BB'>W</font><font face='Lucida Console'>(</font>edges[i].<font color='#BB00BB'>index2</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, edges[i].<font color='#BB00BB'>index1</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#BB00BB'>use_gaussian_weights</font><font face='Lucida Console'>(</font><font color='#979000'>0.1</font><font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>edges[i]<font face='Lucida Console'>)</font>;
+            <b>}</b>
+            matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font> L <font color='#5555FF'>=</font> <font color='#BB00BB'>diagm</font><font face='Lucida Console'>(</font><font color='#BB00BB'>sum_rows</font><font face='Lucida Console'>(</font>W<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> W;
+            matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font> trueT <font color='#5555FF'>=</font> <font color='#BB00BB'>inv_lower_triangular</font><font face='Lucida Console'>(</font><font color='#BB00BB'>chol</font><font face='Lucida Console'>(</font>identity_matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>X.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> <font face='Lucida Console'>(</font><font color='#979000'>10000.0</font><font color='#5555FF'>/</font><font color='#BB00BB'>sum</font><font face='Lucida Console'>(</font><font color='#BB00BB'>lowerm</font><font face='Lucida Console'>(</font>W<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font color='#5555FF'>*</font>X<font color='#5555FF'>*</font>L<font color='#5555FF'>*</font><font color='#BB00BB'>trans</font><font face='Lucida Console'>(</font>X<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+            dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LTRACE <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>T error: </font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>max</font><font face='Lucida Console'>(</font><font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font>T <font color='#5555FF'>-</font> trueT<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>max</font><font face='Lucida Console'>(</font><font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font>T <font color='#5555FF'>-</font> trueT<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> <font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>7</font><font face='Lucida Console'>)</font>;
+
+
+            <font color='#BB00BB'>print_spinner</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#009900'>// Apply the transformation generated by the linear_manifold_regularizer to 
+</font>            <font color='#009900'>// all our samples.
+</font>            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> samples.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                samples[i] <font color='#5555FF'>=</font> T<font color='#5555FF'>*</font>samples[i];
+
+
+            <font color='#009900'>// For convenience, generate a projection_function and merge the transformation
+</font>            <font color='#009900'>// matrix T into it.  
+</font>            projection_function<font color='#5555FF'>&lt;</font>kernel_type<font color='#5555FF'>&gt;</font> proj <font color='#5555FF'>=</font> ekm.<font color='#BB00BB'>get_projection_function</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            proj.weights <font color='#5555FF'>=</font> T<font color='#5555FF'>*</font>proj.weights;
+
+
+            <font color='#009900'>// Pick 2 different labeled points.  One on the inner circle and another on the outer.  
+</font>            <font color='#009900'>// For each of these test points we will see if using the single plane that separates
+</font>            <font color='#009900'>// them is a good way to separate the concentric circles.  Also do this a bunch 
+</font>            <font color='#009900'>// of times with different randomly chosen points so we can see how robust the result is.
+</font>            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> itr <font color='#5555FF'>=</font> <font color='#979000'>0</font>; itr <font color='#5555FF'>&lt;</font> <font color='#979000'>10</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>itr<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#BB00BB'>print_spinner</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                std::vector<font color='#5555FF'>&lt;</font>sample_type<font color='#5555FF'>&gt;</font> test_points;
+                <font color='#009900'>// generate a random point from the radius 1 circle
+</font>                <font color='#BB00BB'>generate_circle</font><font face='Lucida Console'>(</font>test_points, <font color='#979000'>1</font>, <font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+                <font color='#009900'>// generate a random point from the radius 5 circle
+</font>                <font color='#BB00BB'>generate_circle</font><font face='Lucida Console'>(</font>test_points, <font color='#979000'>5</font>, <font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+
+                <font color='#009900'>// project the two test points into kernel space.  Recall that this projection_function
+</font>                <font color='#009900'>// has the manifold regularizer incorporated into it.  
+</font>                <font color='#0000FF'>const</font> sample_type class1_point <font color='#5555FF'>=</font> <font color='#BB00BB'>proj</font><font face='Lucida Console'>(</font>test_points[<font color='#979000'>0</font>]<font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>const</font> sample_type class2_point <font color='#5555FF'>=</font> <font color='#BB00BB'>proj</font><font face='Lucida Console'>(</font>test_points[<font color='#979000'>1</font>]<font face='Lucida Console'>)</font>;
+
+                <font color='#0000FF'><u>double</u></font> num_wrong <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+
+                <font color='#009900'>// Now attempt to classify all the data samples according to which point
+</font>                <font color='#009900'>// they are closest to.  The output of this program shows that without manifold 
+</font>                <font color='#009900'>// regularization this test will fail but with it it will perfectly classify
+</font>                <font color='#009900'>// all the points.
+</font>                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> samples.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#0000FF'><u>double</u></font> distance_to_class1 <font color='#5555FF'>=</font> <font color='#BB00BB'>length</font><font face='Lucida Console'>(</font>samples[i] <font color='#5555FF'>-</font> class1_point<font face='Lucida Console'>)</font>;
+                    <font color='#0000FF'><u>double</u></font> distance_to_class2 <font color='#5555FF'>=</font> <font color='#BB00BB'>length</font><font face='Lucida Console'>(</font>samples[i] <font color='#5555FF'>-</font> class2_point<font face='Lucida Console'>)</font>;
+
+                    <font color='#0000FF'><u>bool</u></font> predicted_as_class_1 <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>distance_to_class1 <font color='#5555FF'>&lt;</font> distance_to_class2<font face='Lucida Console'>)</font>;
+
+                    <font color='#0000FF'><u>bool</u></font> really_is_class_1 <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>i <font color='#5555FF'>&lt;</font> num_points<font face='Lucida Console'>)</font>;
+
+                    <font color='#009900'>// now count how many times we make a mistake
+</font>                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>predicted_as_class_1 <font color='#5555FF'>!</font><font color='#5555FF'>=</font> really_is_class_1<font face='Lucida Console'>)</font>
+                        <font color='#5555FF'>+</font><font color='#5555FF'>+</font>num_wrong;
+                <b>}</b>
+
+                <font color='#BB00BB'>DLIB_TEST_MSG</font><font face='Lucida Console'>(</font>num_wrong <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font>, num_wrong<font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+        <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='generate_circle'></a>generate_circle</b> <font face='Lucida Console'>(</font>
+            std::vector<font color='#5555FF'>&lt;</font>sample_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> samples,
+            <font color='#0000FF'><u>double</u></font> radius,
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> num
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            sample_type <font color='#BB00BB'>m</font><font face='Lucida Console'>(</font><font color='#979000'>2</font>,<font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> num; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'><u>double</u></font> sign <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>rnd.<font color='#BB00BB'>get_random_double</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> <font color='#979000'>0.5</font><font face='Lucida Console'>)</font>
+                    sign <font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>1</font>;
+                <font color='#BB00BB'>m</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>2</font><font color='#5555FF'>*</font>radius<font color='#5555FF'>*</font>rnd.<font color='#BB00BB'>get_random_double</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font>radius;
+                <font color='#BB00BB'>m</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> sign<font color='#5555FF'>*</font><font color='#BB00BB'>sqrt</font><font face='Lucida Console'>(</font>radius<font color='#5555FF'>*</font>radius <font color='#5555FF'>-</font> <font color='#BB00BB'>m</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font><font color='#5555FF'>*</font><font color='#BB00BB'>m</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+                samples.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>m<font face='Lucida Console'>)</font>;
+            <b>}</b>
+        <b>}</b>
+
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='test_knn1'></a>test_knn1</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            std::vector<font color='#5555FF'>&lt;</font>matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>2</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> samples;
+
+            matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>2</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> test;
+            
+            test <font color='#5555FF'>=</font> <font color='#979000'>0</font>,<font color='#979000'>0</font>;  samples.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>test<font face='Lucida Console'>)</font>;
+            test <font color='#5555FF'>=</font> <font color='#979000'>1</font>,<font color='#979000'>1</font>;  samples.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>test<font face='Lucida Console'>)</font>;
+            test <font color='#5555FF'>=</font> <font color='#979000'>1</font>,<font color='#5555FF'>-</font><font color='#979000'>1</font>;  samples.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>test<font face='Lucida Console'>)</font>;
+            test <font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>1</font>,<font color='#979000'>1</font>;  samples.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>test<font face='Lucida Console'>)</font>;
+            test <font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>1</font>,<font color='#5555FF'>-</font><font color='#979000'>1</font>;  samples.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>test<font face='Lucida Console'>)</font>;
+
+            std::vector<font color='#5555FF'>&lt;</font>sample_pair<font color='#5555FF'>&gt;</font> edges;
+            <font color='#BB00BB'>find_k_nearest_neighbors</font><font face='Lucida Console'>(</font>samples, <font color='#BB00BB'>squared_euclidean_distance</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, <font color='#979000'>1</font>, edges<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>edges.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>4</font><font face='Lucida Console'>)</font>;
+
+            std::<font color='#BB00BB'>sort</font><font face='Lucida Console'>(</font>edges.<font color='#BB00BB'>begin</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, edges.<font color='#BB00BB'>end</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, <font color='#5555FF'>&amp;</font>order_by_index<font color='#5555FF'>&lt;</font>sample_pair<font color='#5555FF'>&gt;</font><font face='Lucida Console'>)</font>;
+
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>edges[<font color='#979000'>0</font>] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#BB00BB'>sample_pair</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>,<font color='#979000'>1</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>edges[<font color='#979000'>1</font>] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#BB00BB'>sample_pair</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>,<font color='#979000'>2</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>edges[<font color='#979000'>2</font>] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#BB00BB'>sample_pair</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>,<font color='#979000'>3</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>edges[<font color='#979000'>3</font>] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#BB00BB'>sample_pair</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>,<font color='#979000'>4</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+            <font color='#BB00BB'>find_k_nearest_neighbors</font><font face='Lucida Console'>(</font>samples, <font color='#BB00BB'>squared_euclidean_distance</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, <font color='#979000'>3</font>, edges<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>edges.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>8</font><font face='Lucida Console'>)</font>;
+
+            <font color='#BB00BB'>find_k_nearest_neighbors</font><font face='Lucida Console'>(</font>samples, <font color='#BB00BB'>squared_euclidean_distance</font><font face='Lucida Console'>(</font><font color='#979000'>3.9</font>, <font color='#979000'>4.1</font><font face='Lucida Console'>)</font>, <font color='#979000'>3</font>, edges<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>edges.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>4</font><font face='Lucida Console'>)</font>;
+
+            std::<font color='#BB00BB'>sort</font><font face='Lucida Console'>(</font>edges.<font color='#BB00BB'>begin</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, edges.<font color='#BB00BB'>end</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, <font color='#5555FF'>&amp;</font>order_by_index<font color='#5555FF'>&lt;</font>sample_pair<font color='#5555FF'>&gt;</font><font face='Lucida Console'>)</font>;
+
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>edges[<font color='#979000'>0</font>] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#BB00BB'>sample_pair</font><font face='Lucida Console'>(</font><font color='#979000'>1</font>,<font color='#979000'>2</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>edges[<font color='#979000'>1</font>] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#BB00BB'>sample_pair</font><font face='Lucida Console'>(</font><font color='#979000'>1</font>,<font color='#979000'>3</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>edges[<font color='#979000'>2</font>] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#BB00BB'>sample_pair</font><font face='Lucida Console'>(</font><font color='#979000'>2</font>,<font color='#979000'>4</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>edges[<font color='#979000'>3</font>] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#BB00BB'>sample_pair</font><font face='Lucida Console'>(</font><font color='#979000'>3</font>,<font color='#979000'>4</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+            <font color='#BB00BB'>find_k_nearest_neighbors</font><font face='Lucida Console'>(</font>samples, <font color='#BB00BB'>squared_euclidean_distance</font><font face='Lucida Console'>(</font><font color='#979000'>30000</font>, <font color='#979000'>4.1</font><font face='Lucida Console'>)</font>, <font color='#979000'>3</font>, edges<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>edges.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='test_knn1_approx'></a>test_knn1_approx</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            std::vector<font color='#5555FF'>&lt;</font>matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>2</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> samples;
+
+            matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>2</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> test;
+            
+            test <font color='#5555FF'>=</font> <font color='#979000'>0</font>,<font color='#979000'>0</font>;  samples.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>test<font face='Lucida Console'>)</font>;
+            test <font color='#5555FF'>=</font> <font color='#979000'>1</font>,<font color='#979000'>1</font>;  samples.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>test<font face='Lucida Console'>)</font>;
+            test <font color='#5555FF'>=</font> <font color='#979000'>1</font>,<font color='#5555FF'>-</font><font color='#979000'>1</font>;  samples.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>test<font face='Lucida Console'>)</font>;
+            test <font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>1</font>,<font color='#979000'>1</font>;  samples.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>test<font face='Lucida Console'>)</font>;
+            test <font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>1</font>,<font color='#5555FF'>-</font><font color='#979000'>1</font>;  samples.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>test<font face='Lucida Console'>)</font>;
+
+            std::vector<font color='#5555FF'>&lt;</font>sample_pair<font color='#5555FF'>&gt;</font> edges;
+            <font color='#BB00BB'>find_approximate_k_nearest_neighbors</font><font face='Lucida Console'>(</font>samples, <font color='#BB00BB'>squared_euclidean_distance</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, <font color='#979000'>1</font>, <font color='#979000'>10000</font>, seed, edges<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>edges.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>4</font><font face='Lucida Console'>)</font>;
+
+            std::<font color='#BB00BB'>sort</font><font face='Lucida Console'>(</font>edges.<font color='#BB00BB'>begin</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, edges.<font color='#BB00BB'>end</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, <font color='#5555FF'>&amp;</font>order_by_index<font color='#5555FF'>&lt;</font>sample_pair<font color='#5555FF'>&gt;</font><font face='Lucida Console'>)</font>;
+
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>edges[<font color='#979000'>0</font>] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#BB00BB'>sample_pair</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>,<font color='#979000'>1</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>edges[<font color='#979000'>1</font>] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#BB00BB'>sample_pair</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>,<font color='#979000'>2</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>edges[<font color='#979000'>2</font>] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#BB00BB'>sample_pair</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>,<font color='#979000'>3</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>edges[<font color='#979000'>3</font>] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#BB00BB'>sample_pair</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>,<font color='#979000'>4</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+            <font color='#BB00BB'>find_approximate_k_nearest_neighbors</font><font face='Lucida Console'>(</font>samples, <font color='#BB00BB'>squared_euclidean_distance</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, <font color='#979000'>3</font>, <font color='#979000'>10000</font>, seed, edges<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>edges.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>8</font><font face='Lucida Console'>)</font>;
+
+            <font color='#BB00BB'>find_approximate_k_nearest_neighbors</font><font face='Lucida Console'>(</font>samples, <font color='#BB00BB'>squared_euclidean_distance</font><font face='Lucida Console'>(</font><font color='#979000'>3.9</font>, <font color='#979000'>4.1</font><font face='Lucida Console'>)</font>, <font color='#979000'>3</font>, <font color='#979000'>10000</font>, seed, edges<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>edges.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>4</font><font face='Lucida Console'>)</font>;
+
+            std::<font color='#BB00BB'>sort</font><font face='Lucida Console'>(</font>edges.<font color='#BB00BB'>begin</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, edges.<font color='#BB00BB'>end</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, <font color='#5555FF'>&amp;</font>order_by_index<font color='#5555FF'>&lt;</font>sample_pair<font color='#5555FF'>&gt;</font><font face='Lucida Console'>)</font>;
+
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>edges[<font color='#979000'>0</font>] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#BB00BB'>sample_pair</font><font face='Lucida Console'>(</font><font color='#979000'>1</font>,<font color='#979000'>2</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>edges[<font color='#979000'>1</font>] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#BB00BB'>sample_pair</font><font face='Lucida Console'>(</font><font color='#979000'>1</font>,<font color='#979000'>3</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>edges[<font color='#979000'>2</font>] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#BB00BB'>sample_pair</font><font face='Lucida Console'>(</font><font color='#979000'>2</font>,<font color='#979000'>4</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>edges[<font color='#979000'>3</font>] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#BB00BB'>sample_pair</font><font face='Lucida Console'>(</font><font color='#979000'>3</font>,<font color='#979000'>4</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+            <font color='#BB00BB'>find_approximate_k_nearest_neighbors</font><font face='Lucida Console'>(</font>samples, <font color='#BB00BB'>squared_euclidean_distance</font><font face='Lucida Console'>(</font><font color='#979000'>30000</font>, <font color='#979000'>4.1</font><font face='Lucida Console'>)</font>, <font color='#979000'>3</font>, <font color='#979000'>10000</font>, seed, edges<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>edges.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='test_knn2'></a>test_knn2</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            std::vector<font color='#5555FF'>&lt;</font>matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>2</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> samples;
+
+            matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>2</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> test;
+            
+            test <font color='#5555FF'>=</font> <font color='#979000'>1</font>,<font color='#979000'>1</font>;  samples.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>test<font face='Lucida Console'>)</font>;
+            test <font color='#5555FF'>=</font> <font color='#979000'>1</font>,<font color='#5555FF'>-</font><font color='#979000'>1</font>;  samples.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>test<font face='Lucida Console'>)</font>;
+            test <font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>1</font>,<font color='#979000'>1</font>;  samples.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>test<font face='Lucida Console'>)</font>;
+            test <font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>1</font>,<font color='#5555FF'>-</font><font color='#979000'>1</font>;  samples.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>test<font face='Lucida Console'>)</font>;
+
+            std::vector<font color='#5555FF'>&lt;</font>sample_pair<font color='#5555FF'>&gt;</font> edges;
+            <font color='#BB00BB'>find_k_nearest_neighbors</font><font face='Lucida Console'>(</font>samples, <font color='#BB00BB'>squared_euclidean_distance</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, <font color='#979000'>2</font>, edges<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>edges.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>4</font><font face='Lucida Console'>)</font>;
+
+            std::<font color='#BB00BB'>sort</font><font face='Lucida Console'>(</font>edges.<font color='#BB00BB'>begin</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, edges.<font color='#BB00BB'>end</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, <font color='#5555FF'>&amp;</font>order_by_index<font color='#5555FF'>&lt;</font>sample_pair<font color='#5555FF'>&gt;</font><font face='Lucida Console'>)</font>;
+
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>edges[<font color='#979000'>0</font>] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#BB00BB'>sample_pair</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>,<font color='#979000'>1</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>edges[<font color='#979000'>1</font>] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#BB00BB'>sample_pair</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>,<font color='#979000'>2</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>edges[<font color='#979000'>2</font>] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#BB00BB'>sample_pair</font><font face='Lucida Console'>(</font><font color='#979000'>1</font>,<font color='#979000'>3</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>edges[<font color='#979000'>3</font>] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#BB00BB'>sample_pair</font><font face='Lucida Console'>(</font><font color='#979000'>2</font>,<font color='#979000'>3</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+            <font color='#BB00BB'>find_k_nearest_neighbors</font><font face='Lucida Console'>(</font>samples, <font color='#BB00BB'>squared_euclidean_distance</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, <font color='#979000'>200</font>, edges<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>edges.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>4</font><font color='#5555FF'>*</font><font color='#979000'>3</font><font color='#5555FF'>/</font><font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='test_knn2_approx'></a>test_knn2_approx</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            std::vector<font color='#5555FF'>&lt;</font>matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>2</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> samples;
+
+            matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>2</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> test;
+            
+            test <font color='#5555FF'>=</font> <font color='#979000'>1</font>,<font color='#979000'>1</font>;  samples.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>test<font face='Lucida Console'>)</font>;
+            test <font color='#5555FF'>=</font> <font color='#979000'>1</font>,<font color='#5555FF'>-</font><font color='#979000'>1</font>;  samples.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>test<font face='Lucida Console'>)</font>;
+            test <font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>1</font>,<font color='#979000'>1</font>;  samples.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>test<font face='Lucida Console'>)</font>;
+            test <font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>1</font>,<font color='#5555FF'>-</font><font color='#979000'>1</font>;  samples.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>test<font face='Lucida Console'>)</font>;
+
+            std::vector<font color='#5555FF'>&lt;</font>sample_pair<font color='#5555FF'>&gt;</font> edges;
+            <font color='#009900'>// For this simple graph and high number of samples we will do we should obtain the exact 
+</font>            <font color='#009900'>// knn solution.
+</font>            <font color='#BB00BB'>find_approximate_k_nearest_neighbors</font><font face='Lucida Console'>(</font>samples, <font color='#BB00BB'>squared_euclidean_distance</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, <font color='#979000'>2</font>, <font color='#979000'>10000</font>, seed,  edges<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>edges.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>4</font><font face='Lucida Console'>)</font>;
+
+            std::<font color='#BB00BB'>sort</font><font face='Lucida Console'>(</font>edges.<font color='#BB00BB'>begin</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, edges.<font color='#BB00BB'>end</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, <font color='#5555FF'>&amp;</font>order_by_index<font color='#5555FF'>&lt;</font>sample_pair<font color='#5555FF'>&gt;</font><font face='Lucida Console'>)</font>;
+
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>edges[<font color='#979000'>0</font>] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#BB00BB'>sample_pair</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>,<font color='#979000'>1</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>edges[<font color='#979000'>1</font>] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#BB00BB'>sample_pair</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>,<font color='#979000'>2</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>edges[<font color='#979000'>2</font>] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#BB00BB'>sample_pair</font><font face='Lucida Console'>(</font><font color='#979000'>1</font>,<font color='#979000'>3</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>edges[<font color='#979000'>3</font>] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#BB00BB'>sample_pair</font><font face='Lucida Console'>(</font><font color='#979000'>2</font>,<font color='#979000'>3</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+
+            <font color='#BB00BB'>find_approximate_k_nearest_neighbors</font><font face='Lucida Console'>(</font>samples, <font color='#BB00BB'>squared_euclidean_distance</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, <font color='#979000'>200</font>, <font color='#979000'>10000</font>, seed,  edges<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>edges.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>4</font><font color='#5555FF'>*</font><font color='#979000'>3</font><font color='#5555FF'>/</font><font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='perform_test'></a>perform_test</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> <font color='#979000'>5</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#BB00BB'>do_the_test</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+                <font color='#5555FF'>+</font><font color='#5555FF'>+</font>seed;
+                <font color='#BB00BB'>test_knn1_approx</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                <font color='#BB00BB'>test_knn2_approx</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+            <font color='#BB00BB'>test_knn1</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>test_knn2</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            test_knn_lsh_sparse<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            test_knn_lsh_sparse<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>float</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            test_knn_lsh_dense<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            test_knn_lsh_dense<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>float</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+        <b>}</b>
+    <b>}</b>;
+
+    <font color='#009900'>// Create an instance of this object.  Doing this causes this test
+</font>    <font color='#009900'>// to be automatically inserted into the testing framework whenever this cpp file
+</font>    <font color='#009900'>// is linked into the project.  Note that since we are inside an unnamed-namespace 
+</font>    <font color='#009900'>// we won't get any linker errors about the symbol a being defined multiple times. 
+</font>    linear_manifold_regularizer_tester a;
+
+<b>}</b>
+
+
+
+
+</pre></body></html>

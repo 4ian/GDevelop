@@ -1,0 +1,684 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - kernel_abstract.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2007  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#undef</font> DLIB_SVm_KERNEL_ABSTRACT_
+<font color='#0000FF'>#ifdef</font> DLIB_SVm_KERNEL_ABSTRACT_
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>cmath<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>limits<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>sstream<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../matrix/matrix_abstract.h.html'>../matrix/matrix_abstract.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../algs.h.html'>../algs.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../serialize.h.html'>../serialize.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><a name='Kernel_Function_Objects'/><font color='#009900'>/*!A                               Kernel_Function_Objects                               */</font>
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#009900'>/*! 
+        WHAT IS A KERNEL FUNCTION OBJECT?
+            In the context of the dlib library documentation a kernel function object
+            is an object with an interface with the following properties:
+                - a public typedef named sample_type
+                - a public typedef named scalar_type which should be a float, double, or 
+                  long double type.
+                - an overloaded operator() that operates on two items of sample_type 
+                  and returns a scalar_type.  
+                  (e.g. scalar_type val = kernel_function(sample1,sample2); 
+                   would be a valid expression)
+                - a public typedef named mem_manager_type that is an implementation of 
+                  dlib/memory_manager/memory_manager_kernel_abstract.h or
+                  dlib/memory_manager_global/memory_manager_global_kernel_abstract.h or
+                  dlib/memory_manager_stateless/memory_manager_stateless_kernel_abstract.h 
+                - an overloaded == operator that tells you if two kernels are
+                  identical or not.
+
+        THREAD SAFETY
+            For a kernel function to be threadsafe it means that it must be safe to
+            evaluate an expression like val = kernel_function(sample1,sample2)
+            simultaneously from multiple threads, even when the threads operate on the same
+            object instances (i.e. kernel_function, sample1, and sample2).  The most common
+            way to make this safe is to ensure that the kernel function does not mutate any
+            data, either in itself or in its arguments.  
+
+        For examples of kernel functions see the following objects
+        (e.g. the radial_basis_kernel).
+    !*/</font>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>struct</font> <b><a name='radial_basis_kernel'></a>radial_basis_kernel</b>
+    <b>{</b>
+        <font color='#009900'>/*!
+            REQUIREMENTS ON T
+                T must be a dlib::matrix object 
+
+            WHAT THIS OBJECT REPRESENTS
+                This object represents a radial basis function kernel
+
+            THREAD SAFETY
+                This kernel is threadsafe.  
+        !*/</font>
+
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> T::type scalar_type;
+        <font color='#0000FF'>typedef</font> T sample_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> T::mem_manager_type mem_manager_type;
+
+        <font color='#0000FF'>const</font> scalar_type gamma;
+
+        <b><a name='radial_basis_kernel'></a>radial_basis_kernel</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #gamma == 0.1 
+        !*/</font>
+
+        <b><a name='radial_basis_kernel'></a>radial_basis_kernel</b><font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> radial_basis_kernel<font color='#5555FF'>&amp;</font> k
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #gamma == k.gamma
+        !*/</font>
+
+        <b><a name='radial_basis_kernel'></a>radial_basis_kernel</b><font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> scalar_type g
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #gamma == g
+        !*/</font>
+
+        scalar_type <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> sample_type<font color='#5555FF'>&amp;</font> a,
+            <font color='#0000FF'>const</font> sample_type<font color='#5555FF'>&amp;</font> b
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - a.nc() == 1
+                - b.nc() == 1
+                - a.nr() == b.nr()
+            ensures
+                - returns exp(-gamma * ||a-b||^2)
+        !*/</font>
+
+        radial_basis_kernel<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> radial_basis_kernel<font color='#5555FF'>&amp;</font> k
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #gamma = k.gamma
+                - returns *this
+        !*/</font>
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='operator'></a>operator</b><font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> radial_basis_kernel<font color='#5555FF'>&amp;</font> k
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - if (k and *this are identical) then
+                    - returns true
+                - else
+                    - returns false
+        !*/</font>
+
+    <b>}</b>;
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='serialize'></a>serialize</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> radial_basis_kernel<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> item,
+        std::ostream<font color='#5555FF'>&amp;</font> out
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        provides serialization support for radial_basis_kernel
+    !*/</font>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='deserialize'></a>deserialize</b> <font face='Lucida Console'>(</font>
+        radial_basis_kernel<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> item,
+        std::istream<font color='#5555FF'>&amp;</font> in 
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        provides deserialization support for radial_basis_kernel
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>struct</font> <b><a name='sigmoid_kernel'></a>sigmoid_kernel</b>
+    <b>{</b>
+        <font color='#009900'>/*!
+            REQUIREMENTS ON T
+                T must be a dlib::matrix object 
+
+            WHAT THIS OBJECT REPRESENTS
+                This object represents a sigmoid kernel
+
+            THREAD SAFETY
+                This kernel is threadsafe.  
+        !*/</font>
+
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> T::type scalar_type;
+        <font color='#0000FF'>typedef</font> T sample_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> T::mem_manager_type mem_manager_type;
+
+        <font color='#0000FF'>const</font> scalar_type gamma;
+        <font color='#0000FF'>const</font> scalar_type coef;
+
+        <b><a name='sigmoid_kernel'></a>sigmoid_kernel</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #gamma == 0.1 
+                - #coef == -1.0 
+        !*/</font>
+
+        <b><a name='sigmoid_kernel'></a>sigmoid_kernel</b><font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> sigmoid_kernel<font color='#5555FF'>&amp;</font> k
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #gamma == k.gamma
+                - #coef == k.coef
+        !*/</font>
+
+        <b><a name='sigmoid_kernel'></a>sigmoid_kernel</b><font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> scalar_type g,
+            <font color='#0000FF'>const</font> scalar_type c
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #gamma == g
+                - #coef == c
+        !*/</font>
+
+        scalar_type <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> sample_type<font color='#5555FF'>&amp;</font> a,
+            <font color='#0000FF'>const</font> sample_type<font color='#5555FF'>&amp;</font> b
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - a.nc() == 1
+                - b.nc() == 1
+                - a.nr() == b.nr()
+            ensures
+                - returns tanh(gamma*trans(a)*b + coef)
+        !*/</font>
+
+        sigmoid_kernel<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> sigmoid_kernel<font color='#5555FF'>&amp;</font> k
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #gamma = k.gamma
+                - #coef = k.coef
+                - returns *this
+        !*/</font>
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='operator'></a>operator</b><font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> sigmoid_kernel<font color='#5555FF'>&amp;</font> k
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - if (k and *this are identical) then
+                    - returns true
+                - else
+                    - returns false
+        !*/</font>
+    <b>}</b>;
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='serialize'></a>serialize</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> sigmoid_kernel<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> item,
+        std::ostream<font color='#5555FF'>&amp;</font> out
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        provides serialization support for sigmoid_kernel
+    !*/</font>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='deserialize'></a>deserialize</b> <font face='Lucida Console'>(</font>
+        sigmoid_kernel<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> item,
+        std::istream<font color='#5555FF'>&amp;</font> in 
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        provides deserialization support for sigmoid_kernel
+    !*/</font>
+
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>struct</font> <b><a name='polynomial_kernel'></a>polynomial_kernel</b>
+    <b>{</b>
+        <font color='#009900'>/*!
+            REQUIREMENTS ON T
+                T must be a dlib::matrix object 
+
+            WHAT THIS OBJECT REPRESENTS
+                This object represents a polynomial kernel
+
+            THREAD SAFETY
+                This kernel is threadsafe.  
+        !*/</font>
+
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> T::type scalar_type;
+        <font color='#0000FF'>typedef</font> T sample_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> T::mem_manager_type mem_manager_type;
+
+        <font color='#0000FF'>const</font> scalar_type gamma;
+        <font color='#0000FF'>const</font> scalar_type coef;
+        <font color='#0000FF'>const</font> scalar_type degree;
+
+        <b><a name='polynomial_kernel'></a>polynomial_kernel</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #gamma == 1 
+                - #coef == 0 
+                - #degree == 1 
+        !*/</font>
+
+        <b><a name='polynomial_kernel'></a>polynomial_kernel</b><font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> polynomial_kernel<font color='#5555FF'>&amp;</font> k
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #gamma == k.gamma
+                - #coef == k.coef
+                - #degree == k.degree
+        !*/</font>
+
+        <b><a name='polynomial_kernel'></a>polynomial_kernel</b><font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> scalar_type g,
+            <font color='#0000FF'>const</font> scalar_type c,
+            <font color='#0000FF'>const</font> scalar_type d
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #gamma == g
+                - #coef == c
+                - #degree == d
+        !*/</font>
+
+        scalar_type <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> sample_type<font color='#5555FF'>&amp;</font> a,
+            <font color='#0000FF'>const</font> sample_type<font color='#5555FF'>&amp;</font> b
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - a.nc() == 1
+                - b.nc() == 1
+                - a.nr() == b.nr()
+            ensures
+                - returns pow(gamma*trans(a)*b + coef, degree)
+        !*/</font>
+
+        polynomial_kernel<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> polynomial_kernel<font color='#5555FF'>&amp;</font> k
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #gamma = k.gamma
+                - #coef = k.coef
+                - #degree = k.degree
+                - returns *this
+        !*/</font>
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='operator'></a>operator</b><font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> polynomial_kernel<font color='#5555FF'>&amp;</font> k
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - if (k and *this are identical) then
+                    - returns true
+                - else
+                    - returns false
+        !*/</font>
+    <b>}</b>;
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='serialize'></a>serialize</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> polynomial_kernel<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> item,
+        std::ostream<font color='#5555FF'>&amp;</font> out
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        provides serialization support for polynomial_kernel
+    !*/</font>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='deserialize'></a>deserialize</b> <font face='Lucida Console'>(</font>
+        polynomial_kernel<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> item,
+        std::istream<font color='#5555FF'>&amp;</font> in 
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        provides deserialization support for polynomial_kernel
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>struct</font> <b><a name='linear_kernel'></a>linear_kernel</b>
+    <b>{</b>
+        <font color='#009900'>/*!
+            REQUIREMENTS ON T
+                T must be a dlib::matrix object 
+
+            WHAT THIS OBJECT REPRESENTS
+                This object represents a linear function kernel
+
+            THREAD SAFETY
+                This kernel is threadsafe.  
+        !*/</font>
+
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> T::type scalar_type;
+        <font color='#0000FF'>typedef</font> T sample_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> T::mem_manager_type mem_manager_type;
+
+        scalar_type <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> sample_type<font color='#5555FF'>&amp;</font> a,
+            <font color='#0000FF'>const</font> sample_type<font color='#5555FF'>&amp;</font> b
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - a.nc() == 1
+                - b.nc() == 1
+                - a.nr() == b.nr()
+            ensures
+                - returns trans(a)*b
+        !*/</font>
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='operator'></a>operator</b><font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> linear_kernel<font color='#5555FF'>&amp;</font> k
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns true
+        !*/</font>
+    <b>}</b>;
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='serialize'></a>serialize</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> linear_kernel<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> item,
+        std::ostream<font color='#5555FF'>&amp;</font> out
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        provides serialization support for linear_kernel
+    !*/</font>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='deserialize'></a>deserialize</b> <font face='Lucida Console'>(</font>
+        linear_kernel<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> item,
+        std::istream<font color='#5555FF'>&amp;</font> in 
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        provides deserialization support for linear_kernel 
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>struct</font> <b><a name='histogram_intersection_kernel'></a>histogram_intersection_kernel</b>
+    <b>{</b>
+        <font color='#009900'>/*!
+            REQUIREMENTS ON T
+                T must be a dlib::matrix object 
+
+            WHAT THIS OBJECT REPRESENTS
+                This object represents a histogram intersection kernel kernel
+
+            THREAD SAFETY
+                This kernel is threadsafe.  
+        !*/</font>
+
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> T::type scalar_type;
+        <font color='#0000FF'>typedef</font> T sample_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> T::mem_manager_type mem_manager_type;
+
+        scalar_type <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> sample_type<font color='#5555FF'>&amp;</font> a,
+            <font color='#0000FF'>const</font> sample_type<font color='#5555FF'>&amp;</font> b
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - is_vector(a) 
+                - is_vector(b) 
+                - a.size() == b.size()
+                - min(a) &gt;= 0
+                - min(b) &gt;= 0
+            ensures
+                - returns sum over all i: std::min(a(i), b(i)) 
+        !*/</font>
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='operator'></a>operator</b><font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> histogram_intersection_kernel<font color='#5555FF'>&amp;</font> k
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns true
+        !*/</font>
+    <b>}</b>;
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='serialize'></a>serialize</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> histogram_intersection_kernel<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> item,
+        std::ostream<font color='#5555FF'>&amp;</font> out
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        provides serialization support for histogram_intersection_kernel
+    !*/</font>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='deserialize'></a>deserialize</b> <font face='Lucida Console'>(</font>
+        histogram_intersection_kernel<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> item,
+        std::istream<font color='#5555FF'>&amp;</font> in 
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        provides deserialization support for histogram_intersection_kernel 
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>struct</font> <b><a name='offset_kernel'></a>offset_kernel</b>
+    <b>{</b>
+        <font color='#009900'>/*!
+            REQUIREMENTS ON T
+                T must be a kernel object (e.g. radial_basis_kernel, polynomial_kernel, etc.) 
+
+            WHAT THIS OBJECT REPRESENTS
+                This object represents a kernel with a fixed value offset
+                added to it.
+
+            THREAD SAFETY
+                This kernel is threadsafe.  
+        !*/</font>
+
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> T::scalar_type scalar_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> T::sample_type sample_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> T::mem_manager_type mem_manager_type;
+
+        <font color='#0000FF'>const</font> T kernel;
+        <font color='#0000FF'>const</font> scalar_type offset;
+
+        <b><a name='offset_kernel'></a>offset_kernel</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #offset == 0.01 
+        !*/</font>
+
+        <b><a name='offset_kernel'></a>offset_kernel</b><font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> offset_kernel<font color='#5555FF'>&amp;</font> k
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #offset == k.offset
+                - #kernel == k.kernel
+        !*/</font>
+
+        <b><a name='offset_kernel'></a>offset_kernel</b><font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> k,
+            <font color='#0000FF'>const</font> scalar_type<font color='#5555FF'>&amp;</font> off
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #kernel == k 
+                - #offset == off 
+        !*/</font>
+
+        scalar_type <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> sample_type<font color='#5555FF'>&amp;</font> a,
+            <font color='#0000FF'>const</font> sample_type<font color='#5555FF'>&amp;</font> b
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns kernel(a,b) + offset
+        !*/</font>
+
+        offset_kernel<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> offset_kernel<font color='#5555FF'>&amp;</font> k
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #offset == k.offset
+                - #kernel == k.kernel
+        !*/</font>
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='operator'></a>operator</b><font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> offset_kernel<font color='#5555FF'>&amp;</font> k
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - if (k and *this are identical) then
+                    - returns true
+                - else
+                    - returns false
+        !*/</font>
+    <b>}</b>;
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='serialize'></a>serialize</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> offset_kernel<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> item,
+        std::ostream<font color='#5555FF'>&amp;</font> out
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        provides serialization support for offset_kernel
+    !*/</font>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='deserialize'></a>deserialize</b> <font face='Lucida Console'>(</font>
+        offset_kernel<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> item,
+        std::istream<font color='#5555FF'>&amp;</font> in 
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        provides deserialization support for offset_kernel
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> kernel_type
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>struct</font> <b><a name='kernel_derivative'></a>kernel_derivative</b>
+    <b>{</b>
+        <font color='#009900'>/*!
+            REQUIREMENTS ON kernel_type
+                kernel_type must be one of the following kernel types:
+                    - radial_basis_kernel
+                    - polynomial_kernel 
+                    - sigmoid_kernel
+                    - linear_kernel
+                    - offset_kernel
+
+            WHAT THIS OBJECT REPRESENTS
+                This is a function object that computes the derivative of a kernel 
+                function object.
+
+            THREAD SAFETY
+                It is always safe to use distinct instances of this object in different
+                threads.  However, when a single instance is shared between threads then
+                the following rules apply:
+                    Instances of this object are allowed to have a mutable cache which is
+                    used by const member functions.  Therefore, it is not safe to use one
+                    instance of this object from multiple threads (unless protected by a
+                    mutex).
+        !*/</font>
+
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> kernel_type::scalar_type scalar_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> kernel_type::sample_type sample_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> kernel_type::mem_manager_type mem_manager_type;
+
+        <b><a name='kernel_derivative'></a>kernel_derivative</b><font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> kernel_type<font color='#5555FF'>&amp;</font> k_
+        <font face='Lucida Console'>)</font>; 
+        <font color='#009900'>/*!
+            ensures
+                - this object will return derivatives of the kernel object k_
+                - #k == k_
+        !*/</font>
+
+        <font color='#0000FF'>const</font> sample_type <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> sample_type<font color='#5555FF'>&amp;</font> x, 
+            <font color='#0000FF'>const</font> sample_type<font color='#5555FF'>&amp;</font> y
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the derivative of k with respect to y.  
+        !*/</font>
+
+        <font color='#0000FF'>const</font> kernel_type<font color='#5555FF'>&amp;</font> k;
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_SVm_KERNEL_ABSTRACT_
+</font>
+
+
+
+</pre></body></html>

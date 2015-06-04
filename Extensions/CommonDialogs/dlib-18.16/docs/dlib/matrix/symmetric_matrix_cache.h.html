@@ -1,0 +1,467 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - symmetric_matrix_cache.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2010  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_SYMMETRIC_MATRIX_CAcHE_Hh_
+<font color='#0000FF'>#define</font> DLIB_SYMMETRIC_MATRIX_CAcHE_Hh_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='symmetric_matrix_cache_abstract.h.html'>symmetric_matrix_cache_abstract.h</a>"
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>vector<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../matrix.h.html'>../matrix.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../algs.h.html'>../algs.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../array.h.html'>../array.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib 
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> M, <font color='#0000FF'>typename</font> cache_element_type<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>struct</font> <b><a name='op_symm_cache'></a>op_symm_cache</b> : basic_op_m<font color='#5555FF'>&lt;</font>M<font color='#5555FF'>&gt;</font>
+    <b>{</b>
+        <font color='#0000FF'>inline</font> <b><a name='op_symm_cache'></a>op_symm_cache</b><font face='Lucida Console'>(</font> 
+            <font color='#0000FF'>const</font> M<font color='#5555FF'>&amp;</font> m_,
+            <font color='#0000FF'><u>long</u></font> max_size_megabytes_
+        <font face='Lucida Console'>)</font> : 
+            basic_op_m<font color='#5555FF'>&lt;</font>M<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>m_<font face='Lucida Console'>)</font>,
+            max_size_megabytes<font face='Lucida Console'>(</font>max_size_megabytes_<font face='Lucida Console'>)</font>,
+            is_initialized<font face='Lucida Console'>(</font><font color='#979000'>false</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            lookup.<font color='#BB00BB'>assign</font><font face='Lucida Console'>(</font><font color='#0000FF'>this</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>m.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, <font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+
+            diag_cache <font color='#5555FF'>=</font> matrix_cast<font color='#5555FF'>&lt;</font>cache_element_type<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>dlib::<font color='#BB00BB'>diag</font><font face='Lucida Console'>(</font>m_<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <b><a name='op_symm_cache'></a>op_symm_cache</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> op_symm_cache<font color='#5555FF'>&amp;</font> item
+        <font face='Lucida Console'>)</font> :
+            basic_op_m<font color='#5555FF'>&lt;</font>M<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>item.m<font face='Lucida Console'>)</font>,
+            diag_cache<font face='Lucida Console'>(</font>item.diag_cache<font face='Lucida Console'>)</font>,
+            max_size_megabytes<font face='Lucida Console'>(</font>item.max_size_megabytes<font face='Lucida Console'>)</font>,
+            is_initialized<font face='Lucida Console'>(</font><font color='#979000'>false</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            lookup.<font color='#BB00BB'>assign</font><font face='Lucida Console'>(</font><font color='#0000FF'>this</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>m.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, <font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>typedef</font> cache_element_type type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>const</font> cache_element_type<font color='#5555FF'>&amp;</font> const_ret_type;
+        <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>long</u></font> cost <font color='#5555FF'>=</font> M::cost <font color='#5555FF'>+</font> <font color='#979000'>3</font>;
+
+        <font color='#0000FF'>inline</font> const_ret_type <b><a name='apply'></a>apply</b> <font face='Lucida Console'>(</font> <font color='#0000FF'><u>long</u></font> r, <font color='#0000FF'><u>long</u></font> c<font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b> 
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>lookup[c] <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>return</font> cache[lookup[c]]<font face='Lucida Console'>(</font>r<font face='Lucida Console'>)</font>;
+            <b>}</b>
+            <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>r <font color='#5555FF'>=</font><font color='#5555FF'>=</font> c<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>return</font> <font color='#BB00BB'>diag_cache</font><font face='Lucida Console'>(</font>r<font face='Lucida Console'>)</font>;
+            <b>}</b>
+            <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>lookup[r] <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#009900'>// the matrix is symmetric so this is legit
+</font>                <font color='#0000FF'>return</font> cache[lookup[r]]<font face='Lucida Console'>(</font>c<font face='Lucida Console'>)</font>;
+            <b>}</b>
+            <font color='#0000FF'>else</font>
+            <b>{</b>
+                <font color='#BB00BB'>add_col_to_cache</font><font face='Lucida Console'>(</font>c<font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>return</font> cache[lookup[c]]<font face='Lucida Console'>(</font>r<font face='Lucida Console'>)</font>;
+            <b>}</b>
+        <b>}</b>
+
+        <font color='#0000FF'>inline</font> std::pair<font color='#5555FF'>&lt;</font><font color='#0000FF'>const</font> type<font color='#5555FF'>*</font>,<font color='#0000FF'><u>long</u></font><font color='#5555FF'>*</font><font color='#5555FF'>&gt;</font> <b><a name='col'></a>col</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> i<font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> 
+        <font color='#009900'>/*!
+            requires
+                - 0 &lt;= i &lt; nc()
+            ensures
+                - returns a pair P such that:
+                    - P.first == a pointer to the first element of the ith column
+                    - P.second == a pointer to the integer used to count the number of
+                      outstanding references to the ith column.
+        !*/</font>
+        <b>{</b> 
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>is_cached</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font><font face='Lucida Console'>)</font>
+                <font color='#BB00BB'>add_col_to_cache</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// find where this column is in the cache
+</font>            <font color='#0000FF'><u>long</u></font> idx <font color='#5555FF'>=</font> lookup[i];
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>idx <font color='#5555FF'>=</font><font color='#5555FF'>=</font> next<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#009900'>// if this column was the next to be replaced
+</font>                <font color='#009900'>// then make sure that doesn't happen
+</font>                next <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>next <font color='#5555FF'>+</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font><font color='#5555FF'>%</font>cache.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+            <font color='#0000FF'>return</font> std::<font color='#BB00BB'>make_pair</font><font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>cache[idx]<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>, <font color='#5555FF'>&amp;</font>references[idx]<font face='Lucida Console'>)</font>; 
+        <b>}</b>
+
+        <font color='#0000FF'>const</font> type<font color='#5555FF'>*</font> <b><a name='diag'></a>diag</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#BB00BB'>init</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#0000FF'>return</font> <font color='#5555FF'>&amp;</font><font color='#BB00BB'>diag_cache</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>; <b>}</b>
+
+        <font color='#0000FF'><u>long</u></font><font color='#5555FF'>*</font> <b><a name='diag_ref_count'></a>diag_ref_count</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#0000FF'>return</font> <font color='#5555FF'>&amp;</font>diag_reference_count;
+        <b>}</b>
+
+    <font color='#0000FF'>private</font>:
+        <font color='#0000FF'>inline</font> <font color='#0000FF'><u>bool</u></font> <b><a name='is_cached'></a>is_cached</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>long</u></font> r
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#0000FF'>return</font> <font face='Lucida Console'>(</font>lookup[r] <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='init'></a>init</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>is_initialized <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#009900'>// figure out how many columns of the matrix we can have
+</font>                <font color='#009900'>// with the given amount of memory.
+</font>                <font color='#0000FF'><u>long</u></font> max_size <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>max_size_megabytes<font color='#5555FF'>*</font><font color='#979000'>1024</font><font color='#5555FF'>*</font><font color='#979000'>1024</font><font face='Lucida Console'>)</font><font color='#5555FF'>/</font><font face='Lucida Console'>(</font><font color='#0000FF'>this</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>m.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>*</font><font color='#0000FF'>sizeof</font><font face='Lucida Console'>(</font>type<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                <font color='#009900'>// don't let it be 0 or 1
+</font>                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>max_size <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>
+                    max_size <font color='#5555FF'>=</font> <font color='#979000'>2</font>;
+
+                <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> size <font color='#5555FF'>=</font> std::<font color='#BB00BB'>min</font><font face='Lucida Console'>(</font>max_size,<font color='#0000FF'>this</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>m.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+                diag_reference_count <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+
+                references.<font color='#BB00BB'>set_max_size</font><font face='Lucida Console'>(</font><font color='#0000FF'>this</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>m.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                references.<font color='#BB00BB'>set_size</font><font face='Lucida Console'>(</font>size<font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> references.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                    references[i] <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+
+                cache.<font color='#BB00BB'>set_max_size</font><font face='Lucida Console'>(</font><font color='#0000FF'>this</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>m.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                cache.<font color='#BB00BB'>set_size</font><font face='Lucida Console'>(</font>size<font face='Lucida Console'>)</font>;
+
+                rlookup.<font color='#BB00BB'>assign</font><font face='Lucida Console'>(</font>size,<font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+                next <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+
+                is_initialized <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+            <b>}</b>
+        <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='make_sure_next_is_unreferenced'></a>make_sure_next_is_unreferenced</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>references[next] <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#009900'>// find an unreferenced element of the cache
+</font>                <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i;
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>i <font color='#5555FF'>=</font> <font color='#979000'>1</font>; i <font color='#5555FF'>&lt;</font> references.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> idx <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>next<font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font><font color='#5555FF'>%</font>references.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>references[idx] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        next <font color='#5555FF'>=</font> idx;
+                        <font color='#0000FF'>break</font>;
+                    <b>}</b>
+                <b>}</b>
+
+                <font color='#009900'>// if all elements of the cache are referenced then make the cache bigger
+</font>                <font color='#009900'>// and use the new element.
+</font>                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>references[next] <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                <b>{</b>
+                    cache.<font color='#BB00BB'>resize</font><font face='Lucida Console'>(</font>cache.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>+</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+
+                    next <font color='#5555FF'>=</font> references.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                    references.<font color='#BB00BB'>resize</font><font face='Lucida Console'>(</font>references.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>+</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+                    references[next] <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+
+                    rlookup.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font><font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+                <b>}</b>
+            <b>}</b>
+        <b>}</b>
+
+        <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='add_col_to_cache'></a>add_col_to_cache</b><font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>long</u></font> c
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#BB00BB'>init</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>make_sure_next_is_unreferenced</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// if the lookup table is pointing to cache[next] then clear lookup[next]
+</font>            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>rlookup[next] <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>
+                lookup[rlookup[next]] <font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>1</font>;
+
+            <font color='#009900'>// make the lookup table so that it says c is now cached at the spot indicated by next
+</font>            lookup[c] <font color='#5555FF'>=</font> next;
+            rlookup[next] <font color='#5555FF'>=</font> c;
+
+            <font color='#009900'>// compute this column in the matrix and store it in the cache
+</font>            cache[next] <font color='#5555FF'>=</font> matrix_cast<font color='#5555FF'>&lt;</font>cache_element_type<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#BB00BB'>colm</font><font face='Lucida Console'>(</font><font color='#0000FF'>this</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>m,c<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+            next <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>next <font color='#5555FF'>+</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font><font color='#5555FF'>%</font>cache.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#009900'>/*!
+        INITIAL VALUE
+            - for all valid x:
+                - lookup(x) == -1 
+
+            - diag_cache == the diagonal of the original matrix
+            - is_initialized == false 
+            - max_size_megabytes == the max_size_megabytes from symmetric_matrix_cache()
+
+        CONVENTION
+            - diag_cache == the diagonal of the original matrix
+            - lookup.size() == diag_cache.size()
+
+            - if (is_initialized) then
+                - if (lookup[c] != -1) then
+                    - cache[lookup[c]] == the cached column c of the matrix
+                    - rlookup[lookup[c]] == c
+
+                - if (rlookup[x] != -1) then
+                    - lookup[rlookup[x]] == x
+                    - cache[x] == the cached column rlookup[x] of the matrix
+
+                - next == the next element in the cache table to use to cache something 
+                - references[i] == the number of outstanding references to cache element cache[i]
+
+                - diag_reference_count == the number of outstanding references to diag_cache. 
+                  (this isn't really needed.  It's just here so that we can reuse the matrix
+                  expression from colm() to implement diag())
+        !*/</font>
+
+
+        <font color='#0000FF'>mutable</font> array<font color='#5555FF'>&lt;</font>matrix<font color='#5555FF'>&lt;</font>type,<font color='#979000'>0</font>,<font color='#979000'>1</font>,<font color='#0000FF'>typename</font> M::mem_manager_type<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> cache;
+        <font color='#0000FF'>mutable</font> array<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font> references;
+        matrix<font color='#5555FF'>&lt;</font>type,<font color='#979000'>0</font>,<font color='#979000'>1</font>,<font color='#0000FF'>typename</font> M::mem_manager_type<font color='#5555FF'>&gt;</font> diag_cache;
+        <font color='#0000FF'>mutable</font> std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font> lookup;
+        <font color='#0000FF'>mutable</font> std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font> rlookup;
+        <font color='#0000FF'>mutable</font> <font color='#0000FF'><u>long</u></font> next;
+
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> max_size_megabytes;
+        <font color='#0000FF'>mutable</font> <font color='#0000FF'><u>bool</u></font> is_initialized;
+        <font color='#0000FF'>mutable</font> <font color='#0000FF'><u>long</u></font> diag_reference_count;
+
+    <b>}</b>;
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> cache_element_type,
+        <font color='#0000FF'>typename</font> EXP
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>const</font> matrix_op<font color='#5555FF'>&lt;</font>op_symm_cache<font color='#5555FF'>&lt;</font>EXP,cache_element_type<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font>  <b><a name='symmetric_matrix_cache'></a>symmetric_matrix_cache</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&lt;</font>EXP<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> m,
+        <font color='#0000FF'><u>long</u></font> max_size_megabytes
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#009900'>// Don't check that m is symmetric since doing so would be extremely onerous for the
+</font>        <font color='#009900'>// kinds of matrices intended for use with the symmetric_matrix_cache.  Check everything
+</font>        <font color='#009900'>// else though.
+</font>        <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font>m.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> m.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> m.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> max_size_megabytes <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#979000'>0</font>, 
+            "<font color='#CC0000'>\tconst matrix_exp symmetric_matrix_cache(const matrix_exp&amp; m, max_size_megabytes)</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t You have given invalid arguments to this function</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t m.nr():             </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> m.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t m.nc():             </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> m.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> 
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t m.size():           </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> m.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> 
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t max_size_megabytes: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> max_size_megabytes 
+            <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>typedef</font> op_symm_cache<font color='#5555FF'>&lt;</font>EXP,cache_element_type<font color='#5555FF'>&gt;</font> op;
+        <font color='#0000FF'>return</font> matrix_op<font color='#5555FF'>&lt;</font>op<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#BB00BB'>op</font><font face='Lucida Console'>(</font>m.<font color='#BB00BB'>ref</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, max_size_megabytes<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> M, <font color='#0000FF'>typename</font> cache_element_type<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>struct</font> <b><a name='op_colm_symm_cache'></a>op_colm_symm_cache</b> 
+    <b>{</b>
+        <font color='#0000FF'>typedef</font> cache_element_type type;
+
+        <b><a name='op_colm_symm_cache'></a>op_colm_symm_cache</b><font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> M<font color='#5555FF'>&amp;</font> m_,
+            <font color='#0000FF'>const</font> type<font color='#5555FF'>*</font> data_,
+            <font color='#0000FF'><u>long</u></font><font color='#5555FF'>*</font> ref_count_ 
+        <font face='Lucida Console'>)</font> : 
+            m<font face='Lucida Console'>(</font>m_<font face='Lucida Console'>)</font>, 
+            data<font face='Lucida Console'>(</font>data_<font face='Lucida Console'>)</font>,
+            ref_count<font face='Lucida Console'>(</font>ref_count_<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#5555FF'>*</font>ref_count <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+        <b>}</b>
+
+        <b><a name='op_colm_symm_cache'></a>op_colm_symm_cache</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> op_colm_symm_cache<font color='#5555FF'>&amp;</font> item
+        <font face='Lucida Console'>)</font> :
+            m<font face='Lucida Console'>(</font>item.m<font face='Lucida Console'>)</font>, 
+            data<font face='Lucida Console'>(</font>item.data<font face='Lucida Console'>)</font>,
+            ref_count<font face='Lucida Console'>(</font>item.ref_count<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#5555FF'>*</font>ref_count <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+        <b>}</b>
+
+        ~<b><a name='op_colm_symm_cache'></a>op_colm_symm_cache</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#5555FF'>*</font>ref_count <font color='#5555FF'>-</font><font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>const</font> M<font color='#5555FF'>&amp;</font> m;
+
+        <font color='#0000FF'>const</font> type<font color='#5555FF'>*</font> <font color='#0000FF'>const</font> data;
+        <font color='#0000FF'><u>long</u></font><font color='#5555FF'>*</font> <font color='#0000FF'>const</font> ref_count;
+
+        <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>long</u></font> cost <font color='#5555FF'>=</font> M::cost;
+        <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>long</u></font> NR <font color='#5555FF'>=</font> M::NR;
+        <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>long</u></font> NC <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>const</font> type<font color='#5555FF'>&amp;</font> const_ret_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> M::mem_manager_type mem_manager_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> M::layout_type layout_type;
+        <font color='#0000FF'>inline</font> const_ret_type <b><a name='apply'></a>apply</b> <font face='Lucida Console'>(</font> <font color='#0000FF'><u>long</u></font> r, <font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> data[r]; <b>}</b>
+
+        <font color='#0000FF'><u>long</u></font> <b><a name='nr'></a>nr</b> <font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> m.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <b>}</b>
+        <font color='#0000FF'><u>long</u></font> <b><a name='nc'></a>nc</b> <font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> <font color='#979000'>1</font>; <b>}</b>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> U<font color='#5555FF'>&gt;</font> <font color='#0000FF'><u>bool</u></font> <b><a name='aliases'></a>aliases</b>               <font face='Lucida Console'>(</font> <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&lt;</font>U<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> item<font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> m.<font color='#BB00BB'>aliases</font><font face='Lucida Console'>(</font>item<font face='Lucida Console'>)</font>; <b>}</b>
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> U<font color='#5555FF'>&gt;</font> <font color='#0000FF'><u>bool</u></font> <b><a name='destructively_aliases'></a>destructively_aliases</b> <font face='Lucida Console'>(</font> <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&lt;</font>U<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> item<font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> m.<font color='#BB00BB'>aliases</font><font face='Lucida Console'>(</font>item<font face='Lucida Console'>)</font>; <b>}</b>
+    <b>}</b>;
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> EXP,
+        <font color='#0000FF'>typename</font> cache_element_type
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>inline</font> <font color='#0000FF'>const</font> matrix_op<font color='#5555FF'>&lt;</font>op_colm_symm_cache<font color='#5555FF'>&lt;</font>EXP,cache_element_type<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> <b><a name='colm'></a>colm</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&lt;</font>matrix_op<font color='#5555FF'>&lt;</font>op_symm_cache<font color='#5555FF'>&lt;</font>EXP,cache_element_type<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> m,
+        <font color='#0000FF'><u>long</u></font> col 
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font>col <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#979000'>0</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> col <font color='#5555FF'>&lt;</font> m.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, 
+            "<font color='#CC0000'>\tconst matrix_exp colm(const matrix_exp&amp; m, row)</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tYou have specified invalid sub matrix dimensions</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tm.nr(): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> m.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tm.nc(): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> m.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> 
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tcol:    </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> col 
+            <font face='Lucida Console'>)</font>;
+
+        std::pair<font color='#5555FF'>&lt;</font><font color='#0000FF'>const</font> cache_element_type<font color='#5555FF'>*</font>,<font color='#0000FF'><u>long</u></font><font color='#5555FF'>*</font><font color='#5555FF'>&gt;</font> p <font color='#5555FF'>=</font> m.<font color='#BB00BB'>ref</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.op.<font color='#BB00BB'>col</font><font face='Lucida Console'>(</font>col<font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>typedef</font> op_colm_symm_cache<font color='#5555FF'>&lt;</font>EXP,cache_element_type<font color='#5555FF'>&gt;</font> op;
+        <font color='#0000FF'>return</font> matrix_op<font color='#5555FF'>&lt;</font>op<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#BB00BB'>op</font><font face='Lucida Console'>(</font>m.<font color='#BB00BB'>ref</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.op.m, 
+                                p.first,
+                                p.second<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> EXP,
+        <font color='#0000FF'>typename</font> cache_element_type
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>inline</font> <font color='#0000FF'>const</font> matrix_op<font color='#5555FF'>&lt;</font>op_colm_symm_cache<font color='#5555FF'>&lt;</font>EXP,cache_element_type<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> <b><a name='diag'></a>diag</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&lt;</font>matrix_op<font color='#5555FF'>&lt;</font>op_symm_cache<font color='#5555FF'>&lt;</font>EXP,cache_element_type<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> m
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>typedef</font> op_colm_symm_cache<font color='#5555FF'>&lt;</font>EXP,cache_element_type<font color='#5555FF'>&gt;</font> op;
+        <font color='#0000FF'>return</font> matrix_op<font color='#5555FF'>&lt;</font>op<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#BB00BB'>op</font><font face='Lucida Console'>(</font>m.<font color='#BB00BB'>ref</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.op.m, 
+                                m.<font color='#BB00BB'>ref</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.op.<font color='#BB00BB'>diag</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,
+                                m.<font color='#BB00BB'>ref</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.op.<font color='#BB00BB'>diag_ref_count</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> M, <font color='#0000FF'>typename</font> cache_element_type<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>struct</font> <b><a name='op_rowm_symm_cache'></a>op_rowm_symm_cache</b> 
+    <b>{</b>
+        <font color='#0000FF'>typedef</font> cache_element_type type;
+
+        <b><a name='op_rowm_symm_cache'></a>op_rowm_symm_cache</b><font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> M<font color='#5555FF'>&amp;</font> m_,
+            <font color='#0000FF'>const</font> type<font color='#5555FF'>*</font> data_,
+            <font color='#0000FF'><u>long</u></font><font color='#5555FF'>*</font> ref_count_ 
+        <font face='Lucida Console'>)</font> : 
+            m<font face='Lucida Console'>(</font>m_<font face='Lucida Console'>)</font>, 
+            data<font face='Lucida Console'>(</font>data_<font face='Lucida Console'>)</font>,
+            ref_count<font face='Lucida Console'>(</font>ref_count_<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#5555FF'>*</font>ref_count <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+        <b>}</b>
+
+        <b><a name='op_rowm_symm_cache'></a>op_rowm_symm_cache</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> op_rowm_symm_cache<font color='#5555FF'>&amp;</font> item
+        <font face='Lucida Console'>)</font> :
+            m<font face='Lucida Console'>(</font>item.m<font face='Lucida Console'>)</font>, 
+            data<font face='Lucida Console'>(</font>item.data<font face='Lucida Console'>)</font>,
+            ref_count<font face='Lucida Console'>(</font>item.ref_count<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#5555FF'>*</font>ref_count <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+        <b>}</b>
+
+        ~<b><a name='op_rowm_symm_cache'></a>op_rowm_symm_cache</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#5555FF'>*</font>ref_count <font color='#5555FF'>-</font><font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>const</font> M<font color='#5555FF'>&amp;</font> m;
+
+        <font color='#0000FF'>const</font> type<font color='#5555FF'>*</font> <font color='#0000FF'>const</font> data;
+        <font color='#0000FF'><u>long</u></font><font color='#5555FF'>*</font> <font color='#0000FF'>const</font> ref_count;
+
+        <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>long</u></font> cost <font color='#5555FF'>=</font> M::cost;
+        <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>long</u></font> NR <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+        <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>long</u></font> NC <font color='#5555FF'>=</font> M::NC;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>const</font> type<font color='#5555FF'>&amp;</font> const_ret_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> M::mem_manager_type mem_manager_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> M::layout_type layout_type;
+        <font color='#0000FF'>inline</font> const_ret_type <b><a name='apply'></a>apply</b> <font face='Lucida Console'>(</font> <font color='#0000FF'><u>long</u></font> , <font color='#0000FF'><u>long</u></font> c<font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> data[c]; <b>}</b>
+
+        <font color='#0000FF'><u>long</u></font> <b><a name='nr'></a>nr</b> <font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> <font color='#979000'>1</font>; <b>}</b>
+        <font color='#0000FF'><u>long</u></font> <b><a name='nc'></a>nc</b> <font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> m.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <b>}</b>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> U<font color='#5555FF'>&gt;</font> <font color='#0000FF'><u>bool</u></font> <b><a name='aliases'></a>aliases</b>               <font face='Lucida Console'>(</font> <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&lt;</font>U<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> item<font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> m.<font color='#BB00BB'>aliases</font><font face='Lucida Console'>(</font>item<font face='Lucida Console'>)</font>; <b>}</b>
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> U<font color='#5555FF'>&gt;</font> <font color='#0000FF'><u>bool</u></font> <b><a name='destructively_aliases'></a>destructively_aliases</b> <font face='Lucida Console'>(</font> <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&lt;</font>U<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> item<font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> m.<font color='#BB00BB'>aliases</font><font face='Lucida Console'>(</font>item<font face='Lucida Console'>)</font>; <b>}</b>
+    <b>}</b>;
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> EXP,
+        <font color='#0000FF'>typename</font> cache_element_type
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>inline</font> <font color='#0000FF'>const</font> matrix_op<font color='#5555FF'>&lt;</font>op_rowm_symm_cache<font color='#5555FF'>&lt;</font>EXP,cache_element_type<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> <b><a name='rowm'></a>rowm</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&lt;</font>matrix_op<font color='#5555FF'>&lt;</font>op_symm_cache<font color='#5555FF'>&lt;</font>EXP,cache_element_type<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> m,
+        <font color='#0000FF'><u>long</u></font> row 
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font>row <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#979000'>0</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> row <font color='#5555FF'>&lt;</font> m.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, 
+            "<font color='#CC0000'>\tconst matrix_exp rowm(const matrix_exp&amp; m, row)</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tYou have specified invalid sub matrix dimensions</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tm.nr(): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> m.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tm.nc(): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> m.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> 
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\trow:    </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> row 
+            <font face='Lucida Console'>)</font>;
+
+        std::pair<font color='#5555FF'>&lt;</font><font color='#0000FF'>const</font> cache_element_type<font color='#5555FF'>*</font>,<font color='#0000FF'><u>long</u></font><font color='#5555FF'>*</font><font color='#5555FF'>&gt;</font> p <font color='#5555FF'>=</font> m.<font color='#BB00BB'>ref</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.op.<font color='#BB00BB'>col</font><font face='Lucida Console'>(</font>row<font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>typedef</font> op_rowm_symm_cache<font color='#5555FF'>&lt;</font>EXP,cache_element_type<font color='#5555FF'>&gt;</font> op;
+        <font color='#0000FF'>return</font> matrix_op<font color='#5555FF'>&lt;</font>op<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#BB00BB'>op</font><font face='Lucida Console'>(</font>m.<font color='#BB00BB'>ref</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.op.m, 
+                                p.first,
+                                p.second<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> EXP, <font color='#0000FF'>typename</font> cache_element_type<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>struct</font> <b><a name='colm_exp'></a>colm_exp</b><font color='#5555FF'>&lt;</font>matrix_op<font color='#5555FF'>&lt;</font>op_symm_cache<font color='#5555FF'>&lt;</font>EXP, cache_element_type<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font>
+    <b>{</b>
+        <font color='#0000FF'>typedef</font> matrix_op<font color='#5555FF'>&lt;</font>op_colm_symm_cache<font color='#5555FF'>&lt;</font>EXP, cache_element_type<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> type;
+    <b>}</b>;
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> EXP, <font color='#0000FF'>typename</font> cache_element_type<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>struct</font> <b><a name='rowm_exp'></a>rowm_exp</b><font color='#5555FF'>&lt;</font>matrix_op<font color='#5555FF'>&lt;</font>op_symm_cache<font color='#5555FF'>&lt;</font>EXP, cache_element_type<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font>
+    <b>{</b>
+        <font color='#0000FF'>typedef</font> matrix_op<font color='#5555FF'>&lt;</font>op_rowm_symm_cache<font color='#5555FF'>&lt;</font>EXP, cache_element_type<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> type;
+    <b>}</b>;
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> EXP, <font color='#0000FF'>typename</font> cache_element_type<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>struct</font> <b><a name='diag_exp'></a>diag_exp</b><font color='#5555FF'>&lt;</font>matrix_op<font color='#5555FF'>&lt;</font>op_symm_cache<font color='#5555FF'>&lt;</font>EXP, cache_element_type<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font>
+    <b>{</b>
+        <font color='#0000FF'>typedef</font> matrix_op<font color='#5555FF'>&lt;</font>op_colm_symm_cache<font color='#5555FF'>&lt;</font>EXP, cache_element_type<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> type;
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_SYMMETRIC_MATRIX_CAcHE_Hh_
+</font>
+
+</pre></body></html>

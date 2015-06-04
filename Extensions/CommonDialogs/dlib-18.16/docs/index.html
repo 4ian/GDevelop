@@ -1,0 +1,295 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html xmlns:gcse="googleCustomSearch"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><link rel="shortcut icon" href="dlib-icon.ico"><meta name="verify-v1" content="02MiiaFNVzS5/u0eQhsy3/knioFHsia1X3DXRpHkE6I="><meta name="google-site-verification" content="DGSSJMKDomaDaDTIRJ8jDkv0YMx9Cz7OESbXHjjr6Jw"><title>dlib C++ Library</title><script language="JavaScript">
+
+// ---------------------------------------------
+// --- Name:    Easy DHTML Treeview           --
+// --- Author:  D.D. de Kerf                  --
+// --- Version: 0.2          Date: 13-6-2001  --
+// ---------------------------------------------
+function Toggle(node)
+{
+   // Unfold the branch if it isn't visible
+   var next_node = node.nextSibling;
+   if (next_node.style.display == 'none')
+   {
+      // Change the image (if there is an image)
+      if (node.childNodes.length > 0)
+      {
+         if (node.childNodes.length > 0)
+         { 
+            if (node.childNodes.item(0).nodeName == "IMG")
+            {
+               node.childNodes.item(0).src = "minus.gif";
+            }
+         }
+      }
+
+      next_node.style.display = 'block';
+   }
+   // Collapse the branch if it IS visible
+   else
+   {
+      // Change the image (if there is an image)
+      if (node.childNodes.length > 0)
+      {
+         if (node.childNodes.length > 0)
+         { 
+            if (node.childNodes.item(0).nodeName == "IMG")
+            {
+               node.childNodes.item(0).src = "plus.gif";
+            }
+         }
+      }
+
+      next_node.style.display = 'none';
+   }
+
+}
+function BigToggle(node)
+{
+   // Unfold the branch if it isn't visible
+   var next_node = node.nextSibling;
+   if (next_node.style.display == 'none')
+   {
+      // Change the image (if there is an image)
+      if (node.childNodes.length > 0)
+      {
+         if (node.childNodes.length > 0)
+         { 
+            if (node.childNodes.item(0).nodeName == "IMG")
+            {
+               node.childNodes.item(0).src = "bigminus.gif";
+            }
+         }
+      }
+
+      next_node.style.display = 'block';
+   }
+   // Collapse the branch if it IS visible
+   else
+   {
+      // Change the image (if there is an image)
+      if (node.childNodes.length > 0)
+      {
+         if (node.childNodes.length > 0)
+         { 
+            if (node.childNodes.item(0).nodeName == "IMG")
+            {
+               node.childNodes.item(0).src = "bigplus.gif";
+            }
+         }
+      }
+
+      next_node.style.display = 'none';
+   }
+
+}
+</script><style type="text/css">
+   body {margin:0px;}
+   pre {margin:0px;}
+
+   ul.tree  li { list-style: none;  margin-left:10px;} 
+   ul.tree  { margin:0px; padding:0px; margin-left:5px; font-size:0.95em; }
+   ul.tree  li ul { margin-left:10px; padding:0px; }
+
+   li#term { list-style: none; }
+
+   div.component {
+      background-color:white; 
+      border: 2px solid rgb(102,102,102); 
+      text-align:left;
+      margin-top: 1.5em;
+      padding: 0.7em;
+   }
+
+   div.question {
+      background-color:white; 
+      border: 2px solid rgb(102,102,102); 
+      text-align:left;
+      margin-top: 1.5em;
+      margin-bottom: 90%;
+      padding: 0.7em;
+   }
+
+   div.function {
+      background-color:white; 
+      border: 2px solid rgb(102,102,255); 
+      text-align:left;
+      margin-top: 0.3em;
+      padding: 0.3em;
+   }
+
+   div.class {
+      background-color:white; 
+      border: 2px solid rgb(255,102,102); 
+      text-align:left;
+      margin-top: 0.3em;
+      padding: 0.3em;
+   }
+
+   div.extension {
+      background-color:#FDFDFD; 
+      border: 1px solid rgb(102,102,102); 
+      text-align:left;
+      margin-top: 1.0em;
+      padding: 0.7em;
+   }
+
+   div.logb {
+      text-align:left;
+      padding: 0.0em;
+      float: left;
+      background-color:#c0c0c0; 
+      border: double ; 
+      margin: 0.5em;
+   }
+
+   div.name {
+      float: left;
+   }
+   div.line1 {
+      float:left;
+      width:100%;
+      background-color:#dfdfdf; 
+   }
+   div.line2 {
+      float:left;
+      width:100%;
+   }
+   div.inc {
+      float: right;
+   }
+
+
+   .code_box
+   {
+      color: black;
+      margin: 1em 0.25in;
+      padding: 0.5em;
+      background: rgb(240,240,240);
+      border-top: black dotted 1px;
+      border-left: black dotted 1px;
+      border-right: black solid 2px;
+      border-bottom: black solid 2px;
+   }
+
+
+
+   .bdotted {border-bottom: 1px dotted}
+   .bdashed {border-bottom: 1px dashed}
+   .bsolid {border-bottom: 1px solid}
+   .bdouble {border-bottom: 1px double}
+   .bgroove {border-bottom: 1px groove}
+   .bridge {border-bottom: 1px ridge}
+   .binset {border-bottom: 1px inset}
+   .boutset {border-bottom: 1px outset}
+
+   div.row1 {
+      background-color:#dfdfdf; 
+   }
+   div.row2 {
+      background-color:#f2f2f2; 
+   }
+
+   div.typedefs {
+      margin-left: 1.5em;
+      margin-top: 0.2em;
+      border: 1px dotted;
+      width: 52em;
+   }
+
+   div.tdn {
+      width: 10em;
+   }
+
+   .fullhr {
+      clear: both;
+   }
+
+   body {
+      text-align: center;
+   }
+
+   div.entire_page_header {
+      width:62.5em;  
+      text-align: left;
+      margin-top: 0.4em;
+      margin-left: auto;
+      margin-right: auto;
+   }
+   div.entire_page {
+      width:62.5em;  
+      text-align: left;
+      margin-left: auto;
+      margin-right: auto;
+      clear:both;
+   }
+</style></head><body bgcolor="#EDF3EE"><a name="top"></a><div class="entire_page_header"><a href="http://dlib.net"><img src="dlib-logo.png"></a></div><div class="entire_page"><table bgcolor="white" height="100%" bordercolor="#EDF3EE" CELLSPACING="0" CELLPADDING="10" style="border:0px;margin-top:2px"><tr height="100%"><td BGCOLOR="#F5F5F5" style="padding:7px; border: 1px solid rgb(102,102,102);" VALIGN="TOP" height="100%"><br><table WIDTH="145" height="100%"><tr><td VALIGN="TOP"><b>The Library</b><ul class="tree"><li><a href="algorithms.html">Algorithms</a></li><li><a href="api.html">API Wrappers</a></li><li><a href="bayes.html">Bayesian Nets</a></li><li><a href="compression.html">Compression</a></li><li><a href="containers.html">Containers</a></li><li><a href="graph_tools.html">Graph Tools</a></li><li><a href="imaging.html">Image Processing</a></li><li><a href="linear_algebra.html">Linear Algebra</a></li><li><a href="ml.html">Machine Learning</a></li><li><a href="metaprogramming.html">Metaprogramming</a></li><li><a href="other.html">Miscellaneous</a></li><li><a href="network.html">Networking</a></li><li><a href="optimization.html">Optimization</a></li><li><a href="parsing.html">Parsing</a></li></ul><br><b>Help/Info</b><ul class="tree"><li><a onclick="Toggle(this)" style="cursor: pointer;margin-left:-9px"><img src="plus.gif"><font color="green"><u>Examples: C++</u></font></a><ul style="display:none;"><li><a href="3d_point_cloud_ex.cpp.html">3D_Point_Cloud</a></li><li><a href="assignment_learning_ex.cpp.html">Assignment_Learning</a></li><li><a href="file_to_code_ex.cpp.html">Base64_Encoder</a></li><li><a href="bayes_net_ex.cpp.html">Bayesian_Network</a></li><li><a href="bayes_net_from_disk_ex.cpp.html">Bayesian_Network_From_Disk</a></li><li><a href="bayes_net_gui_ex.cpp.html">Bayesian_Network_GUI</a></li><li><a href="bridge_ex.cpp.html">Bridge</a></li><li><a href="bsp_ex.cpp.html">BSP</a></li><li><a href="svm_c_ex.cpp.html">C-Support_Vector_Machine</a></li><li><a href="compress_stream_ex.cpp.html#_top">Cmd_Line_Parser</a></li><li><a href="compress_stream_ex.cpp.html">Compress_Stream</a></li><li><a href="config_reader_ex.cpp.html">Config_File_Reader</a></li><li><a href="custom_trainer_ex.cpp.html">Custom_Trainers</a></li><li><a href="dir_nav_ex.cpp.html">Directory_Navigation</a></li><li><a href="empirical_kernel_map_ex.cpp.html">Empirical_Kernel_Map</a></li><li><a href="face_detection_ex.cpp.html">Face_Detection</a></li><li><a href="face_landmark_detection_ex.cpp.html">Face_Landmark_Detection</a></li><li><a href="fhog_ex.cpp.html">FHOG_Feature_Extraction</a></li><li><a href="fhog_object_detector_ex.cpp.html">FHOG_Object_Detection</a></li><li><a href="graph_labeling_ex.cpp.html">Graph_Labeling</a></li><li><a href="gui_api_ex.cpp.html">GUI</a></li><li><a href="hough_transform_ex.cpp.html">Hough_Transform</a></li><li><a href="server_http_ex.cpp.html">HTTP_Server</a></li><li><a href="image_ex.cpp.html">Image</a></li><li><a href="iosockstream_ex.cpp.html">IO Socket Streams</a></li><li><a href="server_iostream_ex.cpp.html">IO Streams Server</a></li><li><a href="kcentroid_ex.cpp.html">Kernel_Centroid</a></li><li><a href="kkmeans_ex.cpp.html">Kernel_K-Means_Clustering</a></li><li><a href="krr_regression_ex.cpp.html">Kernel_Ridge_Regression</a></li><li><a href="krls_filter_ex.cpp.html">Kernel_RLS_Filtering</a></li><li><a href="krls_ex.cpp.html">Kernel_RLS_Regression</a></li><li><a href="krr_classification_ex.cpp.html">KRR_Classification</a></li><li><a href="learning_to_track_ex.cpp.html">Learning_to_Track</a></li><li><a href="max_cost_assignment_ex.cpp.html">Linear_Assignment_Problems</a></li><li><a href="linear_manifold_regularizer_ex.cpp.html">Linear_Manifold_Regularizer</a></li><li><a href="mpc_ex.cpp.html">Linear_Model_Predictive_Control</a></li><li><a href="logger_ex.cpp.html">Logger</a></li><li><a href="logger_ex_2.cpp.html">Logger_Advanced</a></li><li><a href="logger_custom_output_ex.cpp.html">Logger_Custom_Output</a></li><li><a href="matrix_ex.cpp.html">Matrix</a></li><li><a href="matrix_expressions_ex.cpp.html">Matrix_Expressions</a></li><li><a href="member_function_pointer_ex.cpp.html">Member_Function_Pointer</a></li><li><a href="model_selection_ex.cpp.html">Model_Selection</a></li><li><a href="multiclass_classification_ex.cpp.html">Multiclass_Classification</a></li><li><a href="multithreaded_object_ex.cpp.html">Multithreaded_Object</a></li><li><a href="mlp_ex.cpp.html">Neural_Network</a></li><li><a href="least_squares_ex.cpp.html">Non-Linear Least Squares</a></li><li><a href="svm_ex.cpp.html">Nu-Support_Vector_Machine</a></li><li><a href="integrate_function_adapt_simp_ex.cpp.html">Numerical_Integration</a></li><li><a href="object_detector_ex.cpp.html">Object_Detector</a></li><li><a href="object_detector_advanced_ex.cpp.html">Object_Detector_Advanced</a></li><li><a href="one_class_classifiers_ex.cpp.html">One_Class_Classifiers</a></li><li><a href="svm_pegasos_ex.cpp.html">Online_SVM</a></li><li><a href="optimization_ex.cpp.html">Optimization</a></li><li><a href="parallel_for_ex.cpp.html">Parallel_For_Loops</a></li><li><a href="pipe_ex.cpp.html">Pipe</a></li><li><a href="pipe_ex_2.cpp.html">Pipe_2</a></li><li><a href="quantum_computing_ex.cpp.html">Quantum_Computing</a></li><li><a href="queue_ex.cpp.html">Queue</a></li><li><a href="rank_features_ex.cpp.html">Rank_Features</a></li><li><a href="rvm_ex.cpp.html">Relevance_Vector_Classification</a></li><li><a href="rvm_regression_ex.cpp.html">Relevance_Vector_Regression</a></li><li><a href="running_stats_ex.cpp.html">Running_Stats</a></li><li><a href="sequence_labeler_ex.cpp.html">Sequence_Labeling</a></li><li><a href="sequence_segmenter_ex.cpp.html">Sequence_Segmentation</a></li><li><a href="sockets_ex.cpp.html">Sockets</a></li><li><a href="sockstreambuf_ex.cpp.html">Sockstreambuf</a></li><li><a href="svm_sparse_ex.cpp.html">Sparse_Vectors</a></li><li><a href="sqlite_ex.cpp.html">SQLite</a></li><li><a href="std_allocator_ex.cpp.html">Std_C++_Allocator</a></li><li><a href="svm_struct_ex.cpp.html">Structural_Support_Vector_Machines</a></li><li><a href="svr_ex.cpp.html">Support_Vector_Regression</a></li><li><a href="surf_ex.cpp.html">SURF</a></li><li><a href="svm_rank_ex.cpp.html">SVM-Rank</a></li><li><a href="threaded_object_ex.cpp.html">Threaded_Object</a></li><li><a href="threads_ex.cpp.html">Threads</a></li><li><a href="thread_function_ex.cpp.html">Thread_Function</a></li><li><a href="thread_pool_ex.cpp.html">Thread_Pool</a></li><li><a href="timer_ex.cpp.html">Timer</a></li><li><a href="train_object_detector.cpp.html">Train_Object_Detector</a></li><li><a href="train_shape_predictor_ex.cpp.html">Train_Shape_Predictor</a></li><li><a href="using_custom_kernels_ex.cpp.html">Using_Custom_Kernels</a></li><li><a href="video_tracking_ex.cpp.html">Video_Object_Tracking</a></li><li><a href="webcam_face_pose_ex.cpp.html">Webcam_Face_Pose_Estimation</a></li><li><a href="xml_parser_ex.cpp.html">XML_Parser</a></li></ul></li><li><a onclick="Toggle(this)" style="cursor: pointer;margin-left:-9px"><img src="plus.gif"><font color="green"><u>Examples: Python</u></font></a><ul style="display:none;"><li><a href="face_detector.py.html">Face_Detector</a></li><li><a href="face_landmark_detection.py.html">Face_Landmark_Detection</a></li><li><a href="find_candidate_object_locations.py.html">find_candidate_object_locations</a></li><li><a href="max_cost_assignment.py.html">Linear_Assignment_Problems</a></li><li><a href="sequence_segmenter.py.html">Sequence_Segmenter</a></li><li><a href="svm_struct.py.html">Structural_Support_Vector_Machines</a></li><li><a href="svm_rank.py.html">SVM-Rank</a></li><li><a href="train_object_detector.py.html">Train_Object_Detector</a></li><li><a href="train_shape_predictor.py.html">Train_Shape_Predictor</a></li><li><a href="correlation_tracker.py.html">Video_Object_Tracking</a></li></ul></li><li><a href="faq.html">FAQ</a></li><li><a href="index.html">Home</a></li><li><a href="compile.html">How to compile</a></li><li><a href="howto_contribute.html">How to contribute</a></li><li><a href="term_index.html">Index</a></li><li><a href="intro.html">Introduction</a></li><li><a href="license.html">License</a></li><li><a href="python/index.html">Python API</a></li><li><a href="books.html">Suggested Books</a></li></ul><br><b>Current Release</b><ul class="tree"><li><a href="change_log.html">Change Log</a></li><li><a href="release_notes.html">Release Notes</a></li><li>Version: 18.16</li></ul><br></td><td width="1"></td></tr><tr><td valign="bottom"><br><br><br><br><br><br><br><br><br>
+      Last Modified:<br>Jun 03, 2015<br><br></td></tr></table></td><td VALIGN="TOP" width="100%" style="border: 1px solid rgb(102,102,102);"><p>
+
+      Dlib is a general purpose cross-platform C++ library designed using contract programming
+      and modern C++ techniques.  
+
+      It is open source software and licensed
+      under the <a href="license.html">Boost Software License</a>.
+
+      The <a href="intro.html">introduction</a> contains everything you need to know to get
+      started using the library.  However, if you have any questions, comments, or complaints feel free to 
+      <a href="mailto:davis@dlib.net">email me</a>.
+      
+      
+      </p><p>
+            For updates to this project see <a href="http://dlib.net">dlib.net</a>.
+         </p><br><p><a name="Major%20Features"></a><h2>Major Features</h2><ul><li><b>Documentation</b><ul><li>Unlike a lot of open source projects, this one provides complete and precise 
+                  documentation for every class and function.   There are also debugging modes that check the 
+                  documented preconditions for functions.  When this is enabled it will catch the vast majority of
+                  bugs caused by calling functions incorrectly or using objects in an incorrect manner.  
+               </li><li>Lots of example programs are provided</li><li><i>I consider the documentation to be the most important part of the library</i>.  So if you find anything 
+                  that isn't documented, isn't clear, or has out of date documentation, tell me and I will fix it.
+               </li></ul></li><li><b>High Quality Portable Code</b><ul><li>Good unit test coverage.  The ratio of unit test lines of code to library lines of
+                     code is about 1 to 4.</li><li>The library is tested regularly on MS Windows, Linux, and Mac OS X systems.  However, it should 
+                     work on any POSIX system and has been used on Solaris, HPUX, and the BSDs.</li><li>No other packages are required to use the library.  Only APIs that are
+                     provided by an out of the box OS are needed. </li><li>There is no installation or configure step needed before you can use the library.  See the
+                     <a href="compile.html">How to compile</a> page for details.</li><li>All operating system specific code is isolated inside the OS abstraction layers which are 
+                     kept as small as possible.   The rest of the library is either layered on top of the OS 
+                     abstraction layers or is pure ISO standard C++.  </li></ul></li><li><b>Threading</b><ul><li>The library provides a portable and simple <a href="api.html#threads">threading API</a></li><li>A message passing <a href="other.html#pipe">pipe</a> for inter-thread and <a href="network.html#bridge">inter-process</a> communication</li><li>A <a href="other.html#timer">timer</a> object capable of generating events that are regularly spaced in time</li><li><a href="api.html#threaded_object">Threaded objects</a></li><li><a href="api.html#thread_function">Threaded functions</a></li><li><a href="api.html#parallel_for">Parallel for loops</a></li><li>A <a href="api.html#thread_pool">thread_pool</a> with support for futures</li></ul></li><li><b>Networking</b><ul><li>The library provides a portable and simple <a href="api.html#sockets">TCP sockets API</a></li><li>An object to help you make TCP based <a href="network.html#server">servers</a></li><li><a href="network.html#iosockstream">iostream</a> and <a href="network.html#sockstreambuf">streambuf</a> 
+                  objects that enables TCP sockets to interoperate with the C++ iostreams library </li><li>A simple <a href="network.html#server_http">HTTP server</a> object you can use to embed a 
+                  web server into your applications</li><li>A message passing <a href="other.html#pipe">pipe</a> for inter-thread and <a href="network.html#bridge">inter-process</a> communication</li><li>A tool used to implement algorithms using the 
+                     <a href="network.html#bsp_context">Bulk Synchronous Parallel (BSP)</a> computing model</li></ul></li><li><b>Graphical User Interfaces</b><ul><li>The library provides a portable and simple core <a href="api.html#gui_core">GUI API</a></li><li>Implemented on top of the core GUI API are numerous <a href="api.html#gui_widgets">widgets</a></li><li>Unlike many other GUI toolkits, the entire dlib GUI toolkit is threadsafe</li></ul></li><li><b>Numerical Algorithms</b><ul><li>A fast <a href="linear_algebra.html#matrix">matrix</a> object implemented using the expression 
+                     templates technique and capable of using BLAS and LAPACK libraries when available.</li><li>Numerous linear algebra and mathematical operations are defined for the matrix object such as the 
+                     <a href="dlib/matrix/matrix_la_abstract.h.html#svd">singular value decomposition</a>, 
+                     <a href="dlib/matrix/matrix_utilities_abstract.h.html#trans">transpose</a>, 
+                     <a href="dlib/matrix/matrix_math_functions_abstract.h.html#sin">trig functions</a>, etc.</li><li>General purpose unconstrained non-linear optimization algorithms using the  
+                      <a href="optimization.html#cg_search_strategy">conjugate gradient</a>, 
+                      <a href="optimization.html#bfgs_search_strategy">BFGS</a>, and
+                      <a href="optimization.html#lbfgs_search_strategy">L-BFGS</a>
+                      techniques</li><li><a href="optimization.html#solve_least_squares_lm">Levenberg-Marquardt</a> for solving non-linear
+                      least squares problems </li><li>Box-constrained derivative-free optimization via the 
+                      <a href="optimization.html#find_min_bobyqa">BOBYQA</a> algorithm</li><li>An implementation of the <a href="optimization.html#oca">Optimized Cutting Plane Algorithm</a></li><li><a href="optimization.html#solve_qp_using_smo">Several</a> 
+                                      <a href="optimization.html#solve_qp2_using_smo">quadratic</a> 
+                                      <a href="optimization.html#solve_qp3_using_smo">program</a>
+                                      <a href="optimization.html#solve_qp4_using_smo">solvers</a></li><li>Combinatorial optimization tools for solving 
+                     <a href="optimization.html#max_cost_assignment">optimal assignment</a> and
+                     <a href="optimization.html#min_cut">min cut/max flow</a> problems as well as
+                     the <a href="optimization.html#find_max_parse_cky">CKY algorithm</a> for finding the most probable parse tree</li><li>A <a href="algorithms.html#bigint">big integer</a> object</li><li>A <a href="algorithms.html#rand">random number</a> object</li></ul></li><li><b>Machine Learning Algorithms</b><ul><li>Conventional SMO based Support Vector Machines for <a href="ml.html#svm_nu_trainer">classification</a> 
+                                                                    and  <a href="ml.html#svr_trainer">regression</a></li><li>Reduced-rank methods for large-scale <a href="ml.html#svm_c_ekm_trainer">classification</a>
+                     and <a href="ml.html#krr_trainer">regression</a></li><li>Relevance vector machines for <a href="ml.html#rvm_trainer">classification</a> 
+                      and <a href="ml.html#rvm_regression_trainer">regression</a></li><li>General purpose <a href="ml.html#one_vs_one_trainer">multiclass classification</a> tools</li><li>A <a href="ml.html#svm_multiclass_linear_trainer">Multiclass SVM</a></li><li>A tool for solving the optimization problem associated with 
+                     <a href="ml.html#structural_svm_problem">structural support vector machines</a>. </li><li>Structural SVM tools for <a href="ml.html#structural_sequence_labeling_trainer">sequence labeling</a></li><li>Structural SVM tools for solving <a href="ml.html#structural_assignment_trainer">assignment problems</a></li><li>Structural SVM tools for <a href="ml.html#structural_object_detection_trainer">object detection</a> in images </li><li>Structural SVM tools for <a href="ml.html#structural_graph_labeling_trainer">labeling nodes</a> in graphs </li><li>A large-scale <a href="ml.html#svm_rank_trainer">SVM-Rank</a> implementation</li><li>An online <a href="ml.html#krls">kernel RLS regression</a> algorithm</li><li>An online <a href="ml.html#svm_pegasos">SVM classification</a> algorithm</li><li><a href="ml.html#vector_normalizer_frobmetric">Semidefinite Metric Learning</a></li><li>An online kernelized <a href="ml.html#kcentroid">centroid estimator</a>/novelty detector and
+                     offline support vector <a href="ml.html#svm_one_class_trainer">one-class classification</a></li><li>Clustering algorithms: <a href="ml.html#find_clusters_using_kmeans">linear</a> 
+                        or <a href="ml.html#kkmeans">kernel k-means</a>, 
+                        <a href="ml.html#chinese_whispers">Chinese Whispers</a>, and 
+                        <a href="ml.html#newman_cluster">Newman clustering</a>.  </li><li><a href="ml.html#rbf_network_trainer">Radial Basis Function Networks</a></li><li><a href="ml.html#mlp">Multi layer perceptrons</a></li></ul></li><li><b>Graphical Model Inference Algorithms</b><ul><li><a href="bayes.html#bayesian_network_join_tree">Join tree</a> algorithm for exact inference in 
+                  a Bayesian network.</li><li><a href="bayes.html#bayesian_network_gibbs_sampler">Gibbs sampler</a> markov chain monte 
+                  carlo algorithm for approximate inference in a Bayesian network.</li><li>Routines for performing MAP inference in 
+                     <a href="optimization.html#find_max_factor_graph_viterbi">chain-structured</a>,
+                     <a href="optimization.html#find_max_factor_graph_potts">Potts</a>, or 
+                     <a href="optimization.html#find_max_factor_graph_nmplp">general</a> factor graphs.</li></ul></li><li><b>Image Processing</b><ul><li>Routines for <a href="imaging.html#load_image">reading</a> and 
+                  <a href="imaging.html#save_bmp">writing</a> common image formats.  </li><li>Automatic color space conversion between various pixel types</li><li>Common image operations such as edge finding and morphological operations</li><li>Implementations of the <a href="imaging.html#get_surf_points">SURF</a>,
+                   <a href="imaging.html#hog_image">HOG</a>, and <a href="imaging.html#extract_fhog_features">FHOG</a> 
+                   feature extraction algorithms.</li><li>Tools for <a href="imaging.html#object_detector">detecting objects</a> in images including
+                  <a href="imaging.html#get_frontal_face_detector">frontal face detection</a> and
+                   <a href="imaging.html#shape_predictor">object pose estimation</a>.</li></ul></li><li><b>Data Compression and Integrity Algorithms</b><ul><li>A <a href="algorithms.html#crc32">CRC 32</a> object</li><li><a href="algorithms.html#md5">MD5</a> functions</li><li>Various abstracted objects representing parts of <a href="compression.html">data compression</a> 
+                  algorithms.  Many forms of the PPM algorithm are included.  </li></ul></li><li><b>Testing</b><ul><li>A thread safe <a href="other.html#logger">logger</a> object styled after the popular Java logger log4j</li><li>A modular <a href="other.html#dlib_testing_suite">unit testing framework</a></li><li>Various <a href="metaprogramming.html">assert</a> macros useful for testing preconditions</li></ul></li><li><b>General Utilities</b><ul><li>A type-safe <a href="other.html#byte_orderer">object</a> to convert between big and little endian byte orderings</li><li>A <a href="parsing.html#cmd_line_parser">command line parser</a> with the ability to 
+                  parse and validate command lines with various types of arguments and options</li><li>An <a href="parsing.html#xml_parser">XML parser</a></li><li>An object that can perform <a href="parsing.html#base64">base64</a> conversions</li><li>Many <a href="containers.html">container classes</a></li><li><a href="other.html#serialize">Serialization support</a></li><li>Many <a href="other.html#memory_manager">memory manager</a> objects that implement 
+                  different memory pooling strategies</li><li>A tool that lets you easily <a href="other.html#MATLAB">call C++ from MATLAB</a></li></ul></li></ul></p></td></tr></table></div></body></html>

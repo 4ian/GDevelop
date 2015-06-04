@@ -1,0 +1,247 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - hessian_pyramid_abstract.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2009  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#undef</font> DLIB_HESSIAN_PYRAMId_ABSTRACT_Hh_
+<font color='#0000FF'>#ifdef</font> DLIB_HESSIAN_PYRAMId_ABSTRACT_Hh_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../image_transforms/integral_image_abstract.h.html'>../image_transforms/integral_image_abstract.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../noncopyable.h.html'>../noncopyable.h</a>"
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>vector<font color='#5555FF'>&gt;</font>
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+    <font color='#0000FF'>class</font> <b><a name='hessian_pyramid'></a>hessian_pyramid</b> : noncopyable
+    <b>{</b>
+        <font color='#009900'>/*!
+            INITIAL VALUE
+                - octaves() == 0
+                - intervals() == 0
+
+            WHAT THIS OBJECT REPRESENTS
+                This object represents an image pyramid where each level in the
+                pyramid holds determinants of Hessian matrices for the original 
+                input image.  This object can be used to find stable interest
+                points in an image.  For further details consult the following
+                papers.
+
+                This object is an implementation of the fast Hessian pyramid 
+                as described in the paper: 
+                   SURF: Speeded Up Robust Features
+                   By Herbert Bay, Tinne Tuytelaars, and Luc Van Gool
+
+                This implementation was also influenced by the very well documented
+                OpenSURF library and its corresponding description of how the fast
+                Hessian algorithm functions:  
+                    Notes on the OpenSURF Library
+                    Christopher Evans
+        !*/</font>
+    <font color='#0000FF'>public</font>:
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> integral_image_type<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='build_pyramid'></a>build_pyramid</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> integral_image_type<font color='#5555FF'>&amp;</font> img,
+            <font color='#0000FF'><u>long</u></font> num_octaves,
+            <font color='#0000FF'><u>long</u></font> num_intervals,
+            <font color='#0000FF'><u>long</u></font> initial_step_size
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - num_octaves &gt; 0
+                - num_intervals &gt; 0
+                - initial_step_size &gt; 0
+                - integral_image_type == an object such as dlib::integral_image or another
+                  type that implements the interface defined in image_transforms/integral_image_abstract.h
+            ensures
+                - #get_step_size(0) == initial_step_size
+                - #octaves() == num_octaves
+                - #intervals() == num_intervals
+                - creates a Hessian pyramid from the given input image.  
+        !*/</font>
+
+        <font color='#0000FF'><u>long</u></font> <b><a name='octaves'></a>octaves</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the number of octaves in this pyramid
+        !*/</font>
+
+        <font color='#0000FF'><u>long</u></font> <b><a name='intervals'></a>intervals</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>; 
+        <font color='#009900'>/*!
+            ensures
+                - returns the number of intervals in this pyramid
+        !*/</font>
+
+        <font color='#0000FF'><u>long</u></font> <b><a name='get_border_size'></a>get_border_size</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>long</u></font> interval
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - 0 &lt;= interval &lt; intervals()
+            ensures
+                - Each interval of the pyramid has a certain sized border region where we
+                  can't compute the Hessian values since they are too close to the edge
+                  of the input image.  This function returns the size of that border.
+        !*/</font>
+
+        <font color='#0000FF'><u>long</u></font> <b><a name='get_step_size'></a>get_step_size</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>long</u></font> octave
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - 0 &lt;= octave &lt; octaves()
+            ensures
+                - Each octave has a step size value.  This value determines how many
+                  input image pixels separate each pixel in the given pyramid octave.
+                  As the octave gets larger (i.e. as it goes to the top of the pyramid) the
+                  step size gets bigger and thus the pyramid narrows.
+        !*/</font>
+
+        <font color='#0000FF'><u>long</u></font> <b><a name='nr'></a>nr</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>long</u></font> octave
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - 0 &lt;= octave &lt; octaves()
+            ensures
+                - returns the number of rows there are per layer in the given 
+                  octave of pyramid
+        !*/</font>
+
+        <font color='#0000FF'><u>long</u></font> <b><a name='nc'></a>nc</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>long</u></font> octave
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - 0 &lt;= octave &lt; octaves()
+            ensures
+                - returns the number of columns there are per layer in the given 
+                  octave of pyramid
+        !*/</font>
+
+        <font color='#0000FF'><u>double</u></font> <b><a name='get_value'></a>get_value</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>long</u></font> octave,
+            <font color='#0000FF'><u>long</u></font> interval,
+            <font color='#0000FF'><u>long</u></font> r,
+            <font color='#0000FF'><u>long</u></font> c
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - 0 &lt;= octave &lt; octaves()
+                - 0 &lt;= interval &lt; intervals()
+                - Let BS == get_border_size(interval): then
+                    - BS &lt;= r &lt; nr(octave)-BS
+                    - BS &lt;= c &lt; nc(octave)-BS
+            ensures
+                - returns the determinant of the Hessian from the given octave and interval
+                  of the pyramid.  The specific point sampled at this pyramid level is
+                  the one that corresponds to the input image point (point(r,c)*get_step_size(octave)).
+        !*/</font>
+
+        <font color='#0000FF'><u>double</u></font> <b><a name='get_laplacian'></a>get_laplacian</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>long</u></font> octave,
+            <font color='#0000FF'><u>long</u></font> interval,
+            <font color='#0000FF'><u>long</u></font> r,
+            <font color='#0000FF'><u>long</u></font> c
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - 0 &lt;= octave &lt; octaves()
+                - 0 &lt;= interval &lt; intervals()
+                - Let BS == get_border_size(interval): then
+                    - BS &lt;= r &lt; nr(octave)-BS
+                    - BS &lt;= c &lt; nc(octave)-BS
+            ensures
+                - returns the sign of the laplacian for the given octave and interval
+                  of the pyramid.  The specific point sampled at this pyramid level is
+                  the one that corresponds to the input image point (point(r,c)*get_step_size(octave)).
+                - The laplacian is the trace of the Hessian at the given point.  So this 
+                  function returns either +1 or -1 depending on this number's sign.  This
+                  value can be used to distinguish bright blobs on dark backgrounds from
+                  the reverse.
+        !*/</font>
+
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>struct</font> <b><a name='interest_point'></a>interest_point</b>
+    <b>{</b>
+        <font color='#009900'>/*!
+            WHAT THIS OBJECT REPRESENTS
+                This object contains the interest points found using the 
+                hessian_pyramid object.  Its fields have the following
+                meanings:
+                    - center == the x/y location of the center of the interest point
+                      (in image space coordinates.  y gives the row and x gives the
+                      column in the image)
+                    - scale == the scale at which the point was detected.  This is a number
+                      &gt;= 1.  If it is 1 then it means the interest point was detected at
+                      the lowest scale in the image pyramid.  Larger numbers indicate that
+                      the interest point is from high up in the image pyramid.  For
+                      example, a scale of 4 would mean the interest point was located at a
+                      point in the pyramid where the image had been shrunk by a factor of 4.
+                    - score == the determinant of the Hessian for the interest point
+                    - laplacian == the sign of the laplacian for the interest point
+        !*/</font>
+
+        <b><a name='interest_point'></a>interest_point</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> : scale<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>, score<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>, laplacian<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+
+        dlib::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>2</font><font color='#5555FF'>&gt;</font> center;
+        <font color='#0000FF'><u>double</u></font> scale;
+        <font color='#0000FF'><u>double</u></font> score;
+        <font color='#0000FF'><u>double</u></font> laplacian;
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='operator'></a>operator</b> <font color='#5555FF'>&lt;</font> <font face='Lucida Console'>(</font><font color='#0000FF'>const</font> interest_point<font color='#5555FF'>&amp;</font> p<font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> score <font color='#5555FF'>&lt;</font> p.score; <b>}</b>
+        <font color='#009900'>/*!
+            This function is here so you can sort interest points according to 
+            their scores
+        !*/</font>
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='serialize'></a>serialize</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> interest_point<font color='#5555FF'>&amp;</font> item,
+        std::ostream<font color='#5555FF'>&amp;</font> out
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        provides serialization support
+    !*/</font>
+
+    <font color='#0000FF'><u>void</u></font> <b><a name='deserialize'></a>deserialize</b> <font face='Lucida Console'>(</font>
+        interest_point<font color='#5555FF'>&amp;</font> item,
+        std::istream<font color='#5555FF'>&amp;</font> in 
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        provides serialization support
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> Alloc<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='get_interest_points'></a>get_interest_points</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> hessian_pyramid<font color='#5555FF'>&amp;</font> pyr,
+        <font color='#0000FF'><u>double</u></font> threshold,
+        std::vector<font color='#5555FF'>&lt;</font>interest_point,Alloc<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> result_points
+    <font face='Lucida Console'>)</font>
+    <font color='#009900'>/*!
+        requires
+            - threshold &gt;= 0
+        ensures
+            - extracts interest points from the pyramid pyr and stores them into
+              result_points (note that result_points is cleared before these new interest
+              points are added to it).
+            - Only interest points with determinant values in the pyramid larger than
+              threshold are output.
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font>  <font color='#009900'>// DLIB_HESSIAN_PYRAMId_ABSTRACT_Hh_
+</font>
+
+</pre></body></html>

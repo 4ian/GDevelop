@@ -1,0 +1,364 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - matrix_lu.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2009  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#009900'>// This code was adapted from code from the JAMA part of NIST's TNT library.
+</font><font color='#009900'>//    See: http://math.nist.gov/tnt/ 
+</font><font color='#0000FF'>#ifndef</font> DLIB_MATRIX_LU_DECOMPOSITION_H
+<font color='#0000FF'>#define</font> DLIB_MATRIX_LU_DECOMPOSITION_H
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='matrix.h.html'>matrix.h</a>" 
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='matrix_utilities.h.html'>matrix_utilities.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='matrix_subexp.h.html'>matrix_subexp.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='matrix_trsm.h.html'>matrix_trsm.h</a>"
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>algorithm<font color='#5555FF'>&gt;</font>
+
+<font color='#0000FF'>#ifdef</font> DLIB_USE_LAPACK 
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='lapack/getrf.h.html'>lapack/getrf.h</a>"
+<font color='#0000FF'>#endif</font>
+
+
+<font color='#0000FF'>namespace</font> dlib 
+<b>{</b>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> matrix_exp_type
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>class</font> <b><a name='lu_decomposition'></a>lu_decomposition</b>
+    <b>{</b>
+    <font color='#0000FF'>public</font>:
+
+        <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>long</u></font> NR <font color='#5555FF'>=</font> matrix_exp_type::NR;
+        <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>long</u></font> NC <font color='#5555FF'>=</font> matrix_exp_type::NC;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> matrix_exp_type::type type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> matrix_exp_type::mem_manager_type mem_manager_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> matrix_exp_type::layout_type layout_type;
+
+        <font color='#0000FF'>typedef</font> matrix<font color='#5555FF'>&lt;</font>type,<font color='#979000'>0</font>,<font color='#979000'>0</font>,mem_manager_type,layout_type<font color='#5555FF'>&gt;</font>  matrix_type;
+        <font color='#0000FF'>typedef</font> matrix<font color='#5555FF'>&lt;</font>type,NR,<font color='#979000'>1</font>,mem_manager_type,layout_type<font color='#5555FF'>&gt;</font> column_vector_type;
+        <font color='#0000FF'>typedef</font> matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>long</u></font>,NR,<font color='#979000'>1</font>,mem_manager_type,layout_type<font color='#5555FF'>&gt;</font> pivot_column_vector_type;
+
+        <font color='#009900'>// You have supplied an invalid type of matrix_exp_type.  You have
+</font>        <font color='#009900'>// to use this object with matrices that contain float or double type data.
+</font>        <b><a name='COMPILE_TIME_ASSERT'></a>COMPILE_TIME_ASSERT</b><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>is_same_type<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>float</u></font>, type<font color='#5555FF'>&gt;</font>::value <font color='#5555FF'>|</font><font color='#5555FF'>|</font> 
+                             is_same_type<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>, type<font color='#5555FF'>&gt;</font>::value <font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> EXP<font color='#5555FF'>&gt;</font>
+        <b><a name='lu_decomposition'></a>lu_decomposition</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&lt;</font>EXP<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&amp;</font>A
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='is_square'></a>is_square</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='is_singular'></a>is_singular</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+        <font color='#0000FF'><u>long</u></font> <b><a name='nr'></a>nr</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+        <font color='#0000FF'><u>long</u></font> <b><a name='nc'></a>nc</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+        <font color='#0000FF'>const</font> matrix_type <b><a name='get_l'></a>get_l</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>; 
+
+        <font color='#0000FF'>const</font> matrix_type <b><a name='get_u'></a>get_u</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+        <font color='#0000FF'>const</font> pivot_column_vector_type<font color='#5555FF'>&amp;</font> <b><a name='get_pivot'></a>get_pivot</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+        type <b><a name='det'></a>det</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> EXP<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>const</font> matrix_type <b><a name='solve'></a>solve</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&lt;</font>EXP<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&amp;</font>B
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+    <font color='#0000FF'>private</font>:
+
+        <font color='#009900'>/* Array for internal storage of decomposition.  */</font>
+        matrix<font color='#5555FF'>&lt;</font>type,<font color='#979000'>0</font>,<font color='#979000'>0</font>,mem_manager_type,column_major_layout<font color='#5555FF'>&gt;</font>  LU;
+        <font color='#0000FF'><u>long</u></font> m, n, pivsign; 
+        pivot_column_vector_type piv;
+
+
+    <b>}</b>; 
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>//                              Public member functions
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> matrix_exp_type<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> EXP<font color='#5555FF'>&gt;</font>
+    lu_decomposition<font color='#5555FF'>&lt;</font>matrix_exp_type<font color='#5555FF'>&gt;</font>::
+    <b><a name='lu_decomposition'></a>lu_decomposition</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&lt;</font>EXP<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> A
+    <font face='Lucida Console'>)</font> : 
+        LU<font face='Lucida Console'>(</font>A<font face='Lucida Console'>)</font>,
+        m<font face='Lucida Console'>(</font>A.nr<font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>,
+        n<font face='Lucida Console'>(</font>A.nc<font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> std;
+        <font color='#0000FF'>using</font> std::abs;
+
+        <font color='#BB00BB'>COMPILE_TIME_ASSERT</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>is_same_type<font color='#5555FF'>&lt;</font>type, <font color='#0000FF'>typename</font> EXP::type<font color='#5555FF'>&gt;</font>::value<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// make sure requires clause is not broken
+</font>        <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font>A.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font>,
+            "<font color='#CC0000'>\tlu_decomposition::lu_decomposition(A)</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tInvalid inputs were given to this function</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tA.size(): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> A.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tthis:     </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font>
+            <font face='Lucida Console'>)</font>;
+
+<font color='#0000FF'>#ifdef</font> DLIB_USE_LAPACK
+        matrix<font color='#5555FF'>&lt;</font>lapack::integer,<font color='#979000'>0</font>,<font color='#979000'>1</font>,mem_manager_type,layout_type<font color='#5555FF'>&gt;</font> piv_temp;
+        lapack::<font color='#BB00BB'>getrf</font><font face='Lucida Console'>(</font>LU, piv_temp<font face='Lucida Console'>)</font>;
+
+        pivsign <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+
+        <font color='#009900'>// Turn the piv_temp vector into a more useful form.  This way we will have the identity
+</font>        <font color='#009900'>// rowm(A,piv) == L*U.  The permutation vector that comes out of LAPACK is somewhat
+</font>        <font color='#009900'>// different.
+</font>        piv <font color='#5555FF'>=</font> <font color='#BB00BB'>trans</font><font face='Lucida Console'>(</font><font color='#BB00BB'>range</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>,m<font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> piv_temp.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#009900'>// -1 because FORTRAN is indexed starting with 1 instead of 0
+</font>            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>piv</font><font face='Lucida Console'>(</font><font color='#BB00BB'>piv_temp</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#BB00BB'>piv</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                std::<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font><font color='#BB00BB'>piv</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>, <font color='#BB00BB'>piv</font><font face='Lucida Console'>(</font><font color='#BB00BB'>piv_temp</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                pivsign <font color='#5555FF'>=</font> <font color='#5555FF'>-</font>pivsign;
+            <b>}</b>
+        <b>}</b>
+
+<font color='#0000FF'>#else</font>
+
+        <font color='#009900'>// Use a "left-looking", dot-product, Crout/Doolittle algorithm.
+</font>
+
+        piv <font color='#5555FF'>=</font> <font color='#BB00BB'>trans</font><font face='Lucida Console'>(</font><font color='#BB00BB'>range</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>,m<font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        pivsign <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+
+        column_vector_type <font color='#BB00BB'>LUcolj</font><font face='Lucida Console'>(</font>m<font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// Outer loop.
+</font>        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> j <font color='#5555FF'>=</font> <font color='#979000'>0</font>; j <font color='#5555FF'>&lt;</font> n; j<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> 
+        <b>{</b>
+
+            <font color='#009900'>// Make a copy of the j-th column to localize references.
+</font>            LUcolj <font color='#5555FF'>=</font> <font color='#BB00BB'>colm</font><font face='Lucida Console'>(</font>LU,j<font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// Apply previous transformations.
+</font>            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> m; i<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> 
+            <b>{</b>
+                <font color='#009900'>// Most of the time is spent in the following dot product.
+</font>                <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> kmax <font color='#5555FF'>=</font> std::<font color='#BB00BB'>min</font><font face='Lucida Console'>(</font>i,j<font face='Lucida Console'>)</font>;
+                type s;
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>kmax <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                    s <font color='#5555FF'>=</font> <font color='#BB00BB'>rowm</font><font face='Lucida Console'>(</font>LU,i, kmax<font face='Lucida Console'>)</font><font color='#5555FF'>*</font><font color='#BB00BB'>colm</font><font face='Lucida Console'>(</font>LUcolj,<font color='#979000'>0</font>,kmax<font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>else</font> 
+                    s <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+
+                <font color='#BB00BB'>LU</font><font face='Lucida Console'>(</font>i,j<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#BB00BB'>LUcolj</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font> <font color='#5555FF'>-</font><font color='#5555FF'>=</font> s;
+            <b>}</b>
+
+            <font color='#009900'>// Find pivot and exchange if necessary.
+</font>            <font color='#0000FF'><u>long</u></font> p <font color='#5555FF'>=</font> j;
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> j<font color='#5555FF'>+</font><font color='#979000'>1</font>; i <font color='#5555FF'>&lt;</font> m; i<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> 
+            <b>{</b>
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font><font color='#BB00BB'>LUcolj</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> <font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font><font color='#BB00BB'>LUcolj</font><font face='Lucida Console'>(</font>p<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> 
+                <b>{</b>
+                    p <font color='#5555FF'>=</font> i;
+                <b>}</b>
+            <b>}</b>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>p <font color='#5555FF'>!</font><font color='#5555FF'>=</font> j<font face='Lucida Console'>)</font> 
+            <b>{</b>
+                <font color='#0000FF'><u>long</u></font> k<font color='#5555FF'>=</font><font color='#979000'>0</font>;
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>k <font color='#5555FF'>=</font> <font color='#979000'>0</font>; k <font color='#5555FF'>&lt;</font> n; k<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> 
+                <b>{</b>
+                    type t <font color='#5555FF'>=</font> <font color='#BB00BB'>LU</font><font face='Lucida Console'>(</font>p,k<font face='Lucida Console'>)</font>; 
+                    <font color='#BB00BB'>LU</font><font face='Lucida Console'>(</font>p,k<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#BB00BB'>LU</font><font face='Lucida Console'>(</font>j,k<font face='Lucida Console'>)</font>; 
+                    <font color='#BB00BB'>LU</font><font face='Lucida Console'>(</font>j,k<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> t;
+                <b>}</b>
+                k <font color='#5555FF'>=</font> <font color='#BB00BB'>piv</font><font face='Lucida Console'>(</font>p<font face='Lucida Console'>)</font>; 
+                <font color='#BB00BB'>piv</font><font face='Lucida Console'>(</font>p<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#BB00BB'>piv</font><font face='Lucida Console'>(</font>j<font face='Lucida Console'>)</font>; 
+                <font color='#BB00BB'>piv</font><font face='Lucida Console'>(</font>j<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> k;
+                pivsign <font color='#5555FF'>=</font> <font color='#5555FF'>-</font>pivsign;
+            <b>}</b>
+
+            <font color='#009900'>// Compute multipliers.
+</font>            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>j <font color='#5555FF'>&lt;</font> m<font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>LU</font><font face='Lucida Console'>(</font>j,j<font face='Lucida Console'>)</font> <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0.0</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> 
+            <b>{</b>
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> j<font color='#5555FF'>+</font><font color='#979000'>1</font>; i <font color='#5555FF'>&lt;</font> m; i<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> 
+                <b>{</b>
+                    <font color='#BB00BB'>LU</font><font face='Lucida Console'>(</font>i,j<font face='Lucida Console'>)</font> <font color='#5555FF'>/</font><font color='#5555FF'>=</font> <font color='#BB00BB'>LU</font><font face='Lucida Console'>(</font>j,j<font face='Lucida Console'>)</font>;
+                <b>}</b>
+            <b>}</b>
+        <b>}</b>
+
+<font color='#0000FF'>#endif</font>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> matrix_exp_type<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>bool</u></font> lu_decomposition<font color='#5555FF'>&lt;</font>matrix_exp_type<font color='#5555FF'>&gt;</font>::
+    <b><a name='is_square'></a>is_square</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        <font color='#0000FF'>return</font> m <font color='#5555FF'>=</font><font color='#5555FF'>=</font> n;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> matrix_exp_type<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>long</u></font> lu_decomposition<font color='#5555FF'>&lt;</font>matrix_exp_type<font color='#5555FF'>&gt;</font>::
+    <b><a name='nr'></a>nr</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        <font color='#0000FF'>return</font> m;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> matrix_exp_type<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>long</u></font> lu_decomposition<font color='#5555FF'>&lt;</font>matrix_exp_type<font color='#5555FF'>&gt;</font>::
+    <b><a name='nc'></a>nc</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        <font color='#0000FF'>return</font> n;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> matrix_exp_type<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>bool</u></font> lu_decomposition<font color='#5555FF'>&lt;</font>matrix_exp_type<font color='#5555FF'>&gt;</font>::
+    <b><a name='is_singular'></a>is_singular</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        <font color='#009900'>/* Is the matrix singular?
+          if upper triangular factor U (and hence A) is singular, false otherwise.
+        */</font>
+        <font color='#009900'>// make sure requires clause is not broken
+</font>        <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font><font color='#BB00BB'>is_square</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>true</font>,
+            "<font color='#CC0000'>\tbool lu_decomposition::is_singular()</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tYou can only use this on square matrices</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tthis: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font>
+            <font face='Lucida Console'>)</font>;
+
+        type max_val, min_val;
+        <font color='#BB00BB'>find_min_and_max</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font><font color='#BB00BB'>diag</font><font face='Lucida Console'>(</font>LU<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>, min_val, max_val<font face='Lucida Console'>)</font>;
+        type eps <font color='#5555FF'>=</font> max_val;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>eps <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+            eps <font color='#5555FF'>*</font><font color='#5555FF'>=</font> std::<font color='#BB00BB'>sqrt</font><font face='Lucida Console'>(</font>std::numeric_limits<font color='#5555FF'>&lt;</font>type<font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>epsilon</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font color='#5555FF'>/</font><font color='#979000'>10</font>;
+        <font color='#0000FF'>else</font>
+            eps <font color='#5555FF'>=</font> <font color='#979000'>1</font>;  <font color='#009900'>// there is no max so just use 1
+</font>
+        <font color='#0000FF'>return</font> min_val <font color='#5555FF'>&lt;</font> eps;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> matrix_exp_type<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>const</font> <font color='#0000FF'>typename</font> lu_decomposition<font color='#5555FF'>&lt;</font>matrix_exp_type<font color='#5555FF'>&gt;</font>::matrix_type lu_decomposition<font color='#5555FF'>&lt;</font>matrix_exp_type<font color='#5555FF'>&gt;</font>::
+    <b><a name='get_l'></a>get_l</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>LU.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> LU.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+            <font color='#0000FF'>return</font> <font color='#BB00BB'>lowerm</font><font face='Lucida Console'>(</font>LU,<font color='#979000'>1.0</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>else</font>
+            <font color='#0000FF'>return</font> <font color='#BB00BB'>lowerm</font><font face='Lucida Console'>(</font><font color='#BB00BB'>subm</font><font face='Lucida Console'>(</font>LU,<font color='#979000'>0</font>,<font color='#979000'>0</font>,m,m<font face='Lucida Console'>)</font>, <font color='#979000'>1.0</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> matrix_exp_type<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>const</font> <font color='#0000FF'>typename</font> lu_decomposition<font color='#5555FF'>&lt;</font>matrix_exp_type<font color='#5555FF'>&gt;</font>::matrix_type lu_decomposition<font color='#5555FF'>&lt;</font>matrix_exp_type<font color='#5555FF'>&gt;</font>::
+    <b><a name='get_u'></a>get_u</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> 
+    <b>{</b>
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>LU.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> LU.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+            <font color='#0000FF'>return</font> <font color='#BB00BB'>upperm</font><font face='Lucida Console'>(</font><font color='#BB00BB'>subm</font><font face='Lucida Console'>(</font>LU,<font color='#979000'>0</font>,<font color='#979000'>0</font>,n,n<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>else</font>
+            <font color='#0000FF'>return</font> <font color='#BB00BB'>upperm</font><font face='Lucida Console'>(</font>LU<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> matrix_exp_type<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>const</font> <font color='#0000FF'>typename</font> lu_decomposition<font color='#5555FF'>&lt;</font>matrix_exp_type<font color='#5555FF'>&gt;</font>::pivot_column_vector_type<font color='#5555FF'>&amp;</font> lu_decomposition<font color='#5555FF'>&lt;</font>matrix_exp_type<font color='#5555FF'>&gt;</font>::
+    <b><a name='get_pivot'></a>get_pivot</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        <font color='#0000FF'>return</font> piv;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> matrix_exp_type<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>typename</font> lu_decomposition<font color='#5555FF'>&lt;</font>matrix_exp_type<font color='#5555FF'>&gt;</font>::type lu_decomposition<font color='#5555FF'>&lt;</font>matrix_exp_type<font color='#5555FF'>&gt;</font>::
+    <b><a name='det'></a>det</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        <font color='#009900'>// make sure requires clause is not broken
+</font>        <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font><font color='#BB00BB'>is_square</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>true</font>,
+            "<font color='#CC0000'>\ttype lu_decomposition::det()</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tYou can only use this on square matrices</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tthis: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font>
+            <font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// Check if it is singular and if it is just return 0.  
+</font>        <font color='#009900'>// We want to do this because a prod() operation can easily
+</font>        <font color='#009900'>// overcome a single diagonal element that is effectively 0 when
+</font>        <font color='#009900'>// LU is a big enough matrix.
+</font>        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>is_singular</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+            <font color='#0000FF'>return</font> <font color='#979000'>0</font>;
+
+        <font color='#0000FF'>return</font> <font color='#BB00BB'>prod</font><font face='Lucida Console'>(</font><font color='#BB00BB'>diag</font><font face='Lucida Console'>(</font>LU<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font color='#5555FF'>*</font><font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font>type<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>pivsign<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> matrix_exp_type<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> EXP<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>const</font> <font color='#0000FF'>typename</font> lu_decomposition<font color='#5555FF'>&lt;</font>matrix_exp_type<font color='#5555FF'>&gt;</font>::matrix_type lu_decomposition<font color='#5555FF'>&lt;</font>matrix_exp_type<font color='#5555FF'>&gt;</font>::
+    <b><a name='solve'></a>solve</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&lt;</font>EXP<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&amp;</font>B
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        <font color='#BB00BB'>COMPILE_TIME_ASSERT</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>is_same_type<font color='#5555FF'>&lt;</font>type, <font color='#0000FF'>typename</font> EXP::type<font color='#5555FF'>&gt;</font>::value<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// make sure requires clause is not broken
+</font>        <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font><font color='#BB00BB'>is_square</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>true</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> B.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,
+            "<font color='#CC0000'>\ttype lu_decomposition::solve()</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tInvalid arguments to this function</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tis_square():   </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>is_square</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>? "<font color='#CC0000'>true</font>":"<font color='#CC0000'>false</font>" <font face='Lucida Console'>)</font>
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tB.nr():        </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> B.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> 
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tnr():          </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> 
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tthis:          </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font>
+            <font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// Copy right hand side with pivoting
+</font>        matrix<font color='#5555FF'>&lt;</font>type,<font color='#979000'>0</font>,<font color='#979000'>0</font>,mem_manager_type,column_major_layout<font color='#5555FF'>&gt;</font> <font color='#BB00BB'>X</font><font face='Lucida Console'>(</font><font color='#BB00BB'>rowm</font><font face='Lucida Console'>(</font>B, piv<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> blas_bindings;
+        <font color='#009900'>// Solve L*Y = B(piv,:)
+</font>        <font color='#BB00BB'>triangular_solver</font><font face='Lucida Console'>(</font>CblasLeft, CblasLower, CblasNoTrans, CblasUnit, LU, X<font face='Lucida Console'>)</font>;
+        <font color='#009900'>// Solve U*X = Y;
+</font>        <font color='#BB00BB'>triangular_solver</font><font face='Lucida Console'>(</font>CblasLeft, CblasUpper, CblasNoTrans, CblasNonUnit, LU, X<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>return</font> X;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b> 
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_MATRIX_LU_DECOMPOSITION_H 
+</font>
+
+
+</pre></body></html>

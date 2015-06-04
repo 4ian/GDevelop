@@ -1,0 +1,155 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - image_dataset_metadata.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2011  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_IMAGE_DAtASET_METADATA_Hh_
+<font color='#0000FF'>#define</font> DLIB_IMAGE_DAtASET_METADATA_Hh_
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>string<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>vector<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../geometry.h.html'>../geometry.h</a>"
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+    <font color='#0000FF'>namespace</font> image_dataset_metadata
+    <b>{</b>
+
+    <font color='#009900'>// ------------------------------------------------------------------------------------
+</font>
+        <font color='#0000FF'>struct</font> <b><a name='box'></a>box</b>
+        <b>{</b>
+            <font color='#009900'>/*!
+                WHAT THIS OBJECT REPRESENTS
+                    This object represents an annotated rectangular area of an image.  
+                    It is typically used to mark the location of an object such as a 
+                    person, car, etc.
+
+                    The main variable of interest is rect.  It gives the location of 
+                    the box.  All the other variables are optional.
+            !*/</font>
+
+            <b><a name='box'></a>box</b><font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font> : 
+                difficult<font face='Lucida Console'>(</font><font color='#979000'>false</font><font face='Lucida Console'>)</font>,
+                truncated<font face='Lucida Console'>(</font><font color='#979000'>false</font><font face='Lucida Console'>)</font>,
+                occluded<font face='Lucida Console'>(</font><font color='#979000'>false</font><font face='Lucida Console'>)</font>,
+                ignore<font face='Lucida Console'>(</font><font color='#979000'>false</font><font face='Lucida Console'>)</font>,
+                angle<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>
+            <b>{</b><b>}</b>
+
+            <b><a name='box'></a>box</b> <font face='Lucida Console'>(</font>
+                <font color='#0000FF'>const</font> rectangle<font color='#5555FF'>&amp;</font> rect_
+            <font face='Lucida Console'>)</font> : 
+                rect<font face='Lucida Console'>(</font>rect_<font face='Lucida Console'>)</font>, 
+                difficult<font face='Lucida Console'>(</font><font color='#979000'>false</font><font face='Lucida Console'>)</font>,
+                truncated<font face='Lucida Console'>(</font><font color='#979000'>false</font><font face='Lucida Console'>)</font>,
+                occluded<font face='Lucida Console'>(</font><font color='#979000'>false</font><font face='Lucida Console'>)</font>,
+                ignore<font face='Lucida Console'>(</font><font color='#979000'>false</font><font face='Lucida Console'>)</font>,
+                angle<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>
+            <b>{</b><b>}</b>
+
+            rectangle rect;
+
+            std::map<font color='#5555FF'>&lt;</font>std::string,point<font color='#5555FF'>&gt;</font> parts;
+
+            <font color='#009900'>// optional fields
+</font>            std::string label;
+            <font color='#0000FF'><u>bool</u></font> difficult;
+            <font color='#0000FF'><u>bool</u></font> truncated;
+            <font color='#0000FF'><u>bool</u></font> occluded;
+            <font color='#0000FF'><u>bool</u></font> ignore;
+
+            <font color='#009900'>// The angle of the object in radians.  Positive values indicate that the
+</font>            <font color='#009900'>// object at the center of the box is rotated clockwise by angle radians.  A
+</font>            <font color='#009900'>// value of 0 would indicate that the object is in its "standard" upright pose.
+</font>            <font color='#009900'>// Therefore, to make the object appear upright we would have to rotate the
+</font>            <font color='#009900'>// image counter-clockwise by angle radians.
+</font>            <font color='#0000FF'><u>double</u></font> angle; 
+
+            <font color='#0000FF'><u>bool</u></font> <b><a name='has_label'></a>has_label</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> label.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font>; <b>}</b>
+            <font color='#009900'>/*!
+                ensures
+                    - returns true if label metadata is present and false otherwise.
+            !*/</font>
+        <b>}</b>;
+
+    <font color='#009900'>// ------------------------------------------------------------------------------------
+</font>
+        <font color='#0000FF'>struct</font> <b><a name='image'></a>image</b>
+        <b>{</b>
+            <font color='#009900'>/*!
+                WHAT THIS OBJECT REPRESENTS
+                    This object represents an annotated image.   
+            !*/</font>
+
+            <b><a name='image'></a>image</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+            <b><a name='image'></a>image</b><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> f<font face='Lucida Console'>)</font> : filename<font face='Lucida Console'>(</font>f<font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+
+            std::string filename;
+            std::vector<font color='#5555FF'>&lt;</font>box<font color='#5555FF'>&gt;</font> boxes;
+        <b>}</b>;
+
+    <font color='#009900'>// ------------------------------------------------------------------------------------
+</font>
+        <font color='#0000FF'>struct</font> <b><a name='dataset'></a>dataset</b>
+        <b>{</b>
+            <font color='#009900'>/*!
+                WHAT THIS OBJECT REPRESENTS
+                    This object represents a labeled set of images.  In particular, it
+                    contains the filename for each image as well as annotated boxes.
+            !*/</font>
+
+            std::vector<font color='#5555FF'>&lt;</font>image<font color='#5555FF'>&gt;</font> images;
+            std::string comment;
+            std::string name;
+        <b>}</b>;
+
+    <font color='#009900'>// ------------------------------------------------------------------------------------
+</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='save_image_dataset_metadata'></a>save_image_dataset_metadata</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> dataset<font color='#5555FF'>&amp;</font> meta,
+            <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> filename
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - Writes the contents of the meta object to a file with the given
+                  filename.  The file will be in an XML format.
+            throws
+                - dlib::error 
+                  This exception is thrown if there is an error which prevents
+                  this function from succeeding.
+        !*/</font>
+
+    <font color='#009900'>// ------------------------------------------------------------------------------------
+</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='load_image_dataset_metadata'></a>load_image_dataset_metadata</b> <font face='Lucida Console'>(</font>
+            dataset<font color='#5555FF'>&amp;</font> meta,
+            <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> filename
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - Attempts to interpret filename as a file containing XML formatted data
+                  as produced by the save_image_dataset_metadata() function.  Then
+                  meta is loaded with the contents of the file.
+            throws
+                - dlib::error 
+                  This exception is thrown if there is an error which prevents
+                  this function from succeeding.
+        !*/</font>
+
+    <font color='#009900'>// ------------------------------------------------------------------------------------
+</font>
+    <b>}</b>
+<b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<font color='#0000FF'>#ifdef</font> NO_MAKEFILE
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='image_dataset_metadata.cpp.html'>image_dataset_metadata.cpp</a>"
+<font color='#0000FF'>#endif</font>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_IMAGE_DAtASET_METADATA_Hh_
+</font>
+
+</pre></body></html>

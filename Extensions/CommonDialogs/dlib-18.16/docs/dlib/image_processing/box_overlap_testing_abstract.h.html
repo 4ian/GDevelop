@@ -1,0 +1,153 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - box_overlap_testing_abstract.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2011  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#undef</font> DLIB_BOX_OVERlAP_TESTING_ABSTRACT_Hh_
+<font color='#0000FF'>#ifdef</font> DLIB_BOX_OVERlAP_TESTING_ABSTRACT_Hh_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../geometry.h.html'>../geometry.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>class</font> <b><a name='test_box_overlap'></a>test_box_overlap</b>
+    <b>{</b>
+        <font color='#009900'>/*!
+            WHAT THIS OBJECT REPRESENTS
+                This object is a simple function object for determining if two rectangles
+                overlap.  
+
+            THREAD SAFETY
+                Concurrent access to an instance of this object is safe provided that 
+                only const member functions are invoked.  Otherwise, access must be
+                protected by a mutex lock.
+        !*/</font>
+
+    <font color='#0000FF'>public</font>:
+        <b><a name='test_box_overlap'></a>test_box_overlap</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #get_match_thresh()   == 0.5
+                - #get_overlap_thresh() == 1.0
+        !*/</font>
+
+        <font color='#0000FF'>explicit</font> <b><a name='test_box_overlap'></a>test_box_overlap</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>double</u></font> match_thresh,
+            <font color='#0000FF'><u>double</u></font> overlap_thresh <font color='#5555FF'>=</font> <font color='#979000'>1.0</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - 0 &lt;= match_thresh &lt;= 1
+                - 0 &lt;= overlap_thresh &lt;= 1
+            ensures
+                - #get_match_thresh() == match_thresh 
+                - #get_overlap_thresh() == overlap_thresh
+        !*/</font>
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> dlib::rectangle<font color='#5555FF'>&amp;</font> a,
+            <font color='#0000FF'>const</font> dlib::rectangle<font color='#5555FF'>&amp;</font> b
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns true if a and b overlap "enough". This is defined precisely below.
+                - if (a.intersect(b).area()/(a+b).area() &gt; get_match_thresh() ||
+                      a.intersect(b).area()/a.area()     &gt; get_overlap_thresh() ||
+                      a.intersect(b).area()/b.area()     &gt; get_overlap_thresh() ) then
+                    - returns true
+                - else
+                    - returns false
+        !*/</font>
+
+        <font color='#0000FF'><u>double</u></font> <b><a name='get_match_thresh'></a>get_match_thresh</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the threshold used to determine if two rectangles match.
+                  Note that the match score varies from 0 to 1 and only becomes 1
+                  when two rectangles are identical.
+
+        !*/</font>
+
+        <font color='#0000FF'><u>double</u></font> <b><a name='get_overlap_thresh'></a>get_overlap_thresh</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the threshold used to determine if two rectangles overlap.  This
+                  value is the percent of a rectangle's area covered by another rectangle.
+
+        !*/</font>
+
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='serialize'></a>serialize</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> test_box_overlap<font color='#5555FF'>&amp;</font> item,
+        std::ostream<font color='#5555FF'>&amp;</font> out
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        provides serialization support
+    !*/</font>
+
+    <font color='#0000FF'><u>void</u></font> <b><a name='deserialize'></a>deserialize</b> <font face='Lucida Console'>(</font>
+        test_box_overlap<font color='#5555FF'>&amp;</font> item,
+        std::istream<font color='#5555FF'>&amp;</font> in 
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        provides deserialization support
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    test_box_overlap <b><a name='find_tight_overlap_tester'></a>find_tight_overlap_tester</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>std::vector<font color='#5555FF'>&lt;</font>rectangle<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> rects
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        ensures
+            - This function finds the most restrictive test_box_overlap object possible 
+              that is consistent with the given set of sets of rectangles.  
+            - To be precise, this function finds and returns a test_box_overlap object 
+              TBO such that:
+                - TBO.get_match_thresh() and TBO.get_overlap_thresh() are as small
+                  as possible such that the following conditions are satisfied.
+                - for all valid i:
+                    - for all distinct rectangles A and B in rects[i]:
+                        - TBO(A,B) == false
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>bool</u></font> <b><a name='overlaps_any_box'></a>overlaps_any_box</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> test_box_overlap<font color='#5555FF'>&amp;</font> tester,
+        <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>rectangle<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> rects,
+        <font color='#0000FF'>const</font> rectangle<font color='#5555FF'>&amp;</font> rect
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        ensures
+            - returns true if rect overlaps any box in rects and false otherwise.  Overlap
+              is determined based on the given tester object.
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>bool</u></font> <b><a name='overlaps_any_box'></a>overlaps_any_box</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>rectangle<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> rects,
+        <font color='#0000FF'>const</font> rectangle<font color='#5555FF'>&amp;</font> rect
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        ensures
+            - returns overlaps_any_box(test_box_overlap(), rects, rect)
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_BOX_OVERlAP_TESTING_ABSTRACT_Hh_
+</font>
+
+
+</pre></body></html>

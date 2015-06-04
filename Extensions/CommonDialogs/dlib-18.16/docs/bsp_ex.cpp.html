@@ -1,0 +1,285 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - <a href="bsp_ex.cpp.html">bsp_ex.cpp</a></title></head><body bgcolor='white'><pre>
+<font color='#009900'>// The contents of this file are in the public domain. See LICENSE_FOR_EXAMPLE_PROGRAMS.txt
+</font><font color='#009900'>/*
+
+    This is an example illustrating the use of the Bulk Synchronous Parallel (BSP)
+    processing tools from the dlib C++ Library.  These tools allow you to easily setup a
+    number of processes running on different computers which cooperate to compute some
+    result.  
+
+    In this example, we will use the BSP tools to find the minimizer of a simple function.  
+    In particular, we will setup a nested grid search where different parts of the grid are
+    searched in parallel by different processes.  
+
+
+    To run this program you should do the following (supposing you want to use three BSP
+    nodes to do the grid search and, to make things easy, you will run them all on your
+    current computer):  
+
+        1. Open three command windows and navigate each to the folder containing the 
+           compiled <a href="bsp_ex.cpp.html">bsp_ex.cpp</a> program.  Let's call these window 1, window 2, and window 3.
+
+        2. In window 1 execute this command:
+             ./bsp_ex -l12345
+           This will start a listening BSP node that listens on port 12345.  The BSP node
+           won't do anything until we tell all the nodes to start running in step 4 below.
+
+        3.  In window 2 execute this command:
+             ./bsp_ex -l12346
+           This starts another listening BSP node.  Note that since we are running this 
+           example all on one computer you need to use different listening port numbers
+           for each listening node.
+
+        4. In window 3 execute this command:
+             ./bsp_ex localhost:12345 localhost:12346
+           This will start a BSP node that connects to the others and gets them all running.
+           Additionally, as you will see when we go over the code below, it will also print
+           the final output of the BSP process, which is the minimizer of our test function.
+           Once it terminates, all the other BSP nodes will also automatically terminate.
+*/</font>
+
+
+
+
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>cmd_line_parser.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>bsp.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>matrix.h<font color='#5555FF'>&gt;</font>
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>iostream<font color='#5555FF'>&gt;</font>
+
+<font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> std;
+<font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> dlib;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<font color='#009900'>// These are the functions executed by the BSP nodes.  They are defined below.
+</font><font color='#0000FF'><u>void</u></font> <b><a name='bsp_job_node_0'></a>bsp_job_node_0</b>      <font face='Lucida Console'>(</font>bsp_context<font color='#5555FF'>&amp;</font> bsp, <font color='#0000FF'><u>double</u></font><font color='#5555FF'>&amp;</font> min_value, <font color='#0000FF'><u>double</u></font><font color='#5555FF'>&amp;</font> optimal_x<font face='Lucida Console'>)</font>;
+<font color='#0000FF'><u>void</u></font> <b><a name='bsp_job_other_nodes'></a>bsp_job_other_nodes</b> <font face='Lucida Console'>(</font>bsp_context<font color='#5555FF'>&amp;</font> bsp, <font color='#0000FF'><u>long</u></font> grid_resolution<font face='Lucida Console'>)</font>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<font color='#0000FF'><u>int</u></font> <b><a name='main'></a>main</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> argc, <font color='#0000FF'><u>char</u></font><font color='#5555FF'>*</font><font color='#5555FF'>*</font> argv<font face='Lucida Console'>)</font>
+<b>{</b>
+    <font color='#0000FF'>try</font>
+    <b>{</b>
+        <font color='#009900'>// Use the dlib command_line_parser to parse the command line.  See the
+</font>        <font color='#009900'>// <a href="compress_stream_ex.cpp.html">compress_stream_ex.cpp</a> example program for an introduction to the command line
+</font>        <font color='#009900'>// parser.
+</font>        command_line_parser parser;
+        parser.<font color='#BB00BB'>add_option</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>h</font>","<font color='#CC0000'>Display this help message.</font>"<font face='Lucida Console'>)</font>;
+        parser.<font color='#BB00BB'>add_option</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>l</font>","<font color='#CC0000'>Run as a listening BSP node.</font>",<font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+        parser.<font color='#BB00BB'>parse</font><font face='Lucida Console'>(</font>argc, argv<font face='Lucida Console'>)</font>;
+        parser.<font color='#BB00BB'>check_option_arg_range</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>l</font>", <font color='#979000'>1</font>, <font color='#979000'>65535</font><font face='Lucida Console'>)</font>;
+
+
+        <font color='#009900'>// Print a help message if the user gives -h on the command line.
+</font>        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>parser.<font color='#BB00BB'>option</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>h</font>"<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#009900'>// display all the command line options
+</font>            cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>Usage: bsp_ex (-l port | &lt;list of hosts&gt;)\n</font>";
+            parser.<font color='#BB00BB'>print_options</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; 
+            <font color='#0000FF'>return</font> <font color='#979000'>0</font>;
+        <b>}</b>
+
+
+        <font color='#009900'>// If the command line contained -l 
+</font>        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>parser.<font color='#BB00BB'>option</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>l</font>"<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#009900'>// Get the argument to -l
+</font>            <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>short</u></font> listening_port <font color='#5555FF'>=</font> <font color='#BB00BB'>get_option</font><font face='Lucida Console'>(</font>parser, "<font color='#CC0000'>l</font>", <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+            cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>Listening on port </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> listening_port <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> grid_resolution <font color='#5555FF'>=</font> <font color='#979000'>100</font>;
+
+            <font color='#009900'>// bsp_listen() starts a listening BSP job.  This means that it will wait until
+</font>            <font color='#009900'>// someone calls bsp_connect() and connects to it before it starts running.
+</font>            <font color='#009900'>// However, once it starts it will call bsp_job_other_nodes() which will then
+</font>            <font color='#009900'>// do all the real work.
+</font>            <font color='#009900'>// 
+</font>            <font color='#009900'>// The first argument is the port to listen on.  The second argument is the
+</font>            <font color='#009900'>// function which it should run to do all the work.  The other arguments are
+</font>            <font color='#009900'>// optional and allow you to pass values into the bsp_job_other_nodes()
+</font>            <font color='#009900'>// routine.  In this case, we are passing the grid_resolution to
+</font>            <font color='#009900'>// bsp_job_other_nodes().
+</font>            <font color='#BB00BB'>bsp_listen</font><font face='Lucida Console'>(</font>listening_port, bsp_job_other_nodes, grid_resolution<font face='Lucida Console'>)</font>;
+        <b>}</b>
+        <font color='#0000FF'>else</font>
+        <b>{</b>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>parser.<font color='#BB00BB'>number_of_arguments</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>You must give some listening BSP nodes as arguments to this program!</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+                <font color='#0000FF'>return</font> <font color='#979000'>0</font>;
+            <b>}</b>
+
+            <font color='#009900'>// Take the hostname:port strings from the command line and put them into the
+</font>            <font color='#009900'>// vector of hosts.
+</font>            std::vector<font color='#5555FF'>&lt;</font>network_address<font color='#5555FF'>&gt;</font> hosts;
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> parser.<font color='#BB00BB'>number_of_arguments</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                hosts.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>parser[i]<font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'><u>double</u></font> min_value, optimal_x;
+
+            <font color='#009900'>// Calling bsp_connect() does two things.  First, it tells all the BSP jobs
+</font>            <font color='#009900'>// listed in the hosts vector to start running.  Second, it starts a locally
+</font>            <font color='#009900'>// running BSP job that executes bsp_job_node_0() and passes it any arguments
+</font>            <font color='#009900'>// listed after bsp_job_node_0.  So in this case it passes it the 3rd and 4th
+</font>            <font color='#009900'>// arguments.  
+</font>            <font color='#009900'>// 
+</font>            <font color='#009900'>// Note also that we use dlib::ref() which causes these arguments to be passed
+</font>            <font color='#009900'>// by reference.  This means that bsp_job_node_0() will be able to modify them
+</font>            <font color='#009900'>// and we will see the results here in main() after bsp_connect() terminates.
+</font>            <font color='#BB00BB'>bsp_connect</font><font face='Lucida Console'>(</font>hosts, bsp_job_node_0, dlib::<font color='#BB00BB'>ref</font><font face='Lucida Console'>(</font>min_value<font face='Lucida Console'>)</font>, dlib::<font color='#BB00BB'>ref</font><font face='Lucida Console'>(</font>optimal_x<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// bsp_connect() and bsp_listen() block until all the BSP nodes have terminated.
+</font>            <font color='#009900'>// Therefore, we won't get to this part of the code until the BSP processing
+</font>            <font color='#009900'>// has finished.  But once we do we can print the results like so:
+</font>            cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>optimal_x: </font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> optimal_x <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+            cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>min_value: </font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> min_value <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+        <b>}</b>
+
+    <b>}</b>
+    <font color='#0000FF'>catch</font> <font face='Lucida Console'>(</font>std::exception<font color='#5555FF'>&amp;</font> e<font face='Lucida Console'>)</font>
+    <b>{</b>
+        cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>error in main(): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> e.<font color='#BB00BB'>what</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+    <b>}</b>
+<b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<font color='#009900'>/*
+    We are going to use the BSP tools to find the minimum of f(x).  Note that
+    it's minimizer is at x == 2.0.
+*/</font>
+<font color='#0000FF'><u>double</u></font> <b><a name='f'></a>f</b> <font face='Lucida Console'>(</font><font color='#0000FF'><u>double</u></font> x<font face='Lucida Console'>)</font>
+<b>{</b>
+    <font color='#0000FF'>return</font> std::<font color='#BB00BB'>pow</font><font face='Lucida Console'>(</font>x<font color='#5555FF'>-</font><font color='#979000'>2.0</font>, <font color='#979000'>2.0</font><font face='Lucida Console'>)</font>;
+<b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<font color='#0000FF'><u>void</u></font> <b><a name='bsp_job_node_0'></a>bsp_job_node_0</b> <font face='Lucida Console'>(</font>bsp_context<font color='#5555FF'>&amp;</font> bsp, <font color='#0000FF'><u>double</u></font><font color='#5555FF'>&amp;</font> min_value, <font color='#0000FF'><u>double</u></font><font color='#5555FF'>&amp;</font> optimal_x<font face='Lucida Console'>)</font>
+<b>{</b>
+    <font color='#009900'>// This function is called by bsp_connect().  In general, any BSP node can do anything
+</font>    <font color='#009900'>// you want.  However, in this example we use this node as a kind of controller for the
+</font>    <font color='#009900'>// other nodes.  In particular, since we are doing a nested grid search, this node's
+</font>    <font color='#009900'>// job will be to collect results from other nodes and then decide which part of the
+</font>    <font color='#009900'>// number line subsequent iterations should focus on.  
+</font>    <font color='#009900'>// 
+</font>    <font color='#009900'>// Also, each BSP node has a node ID number.  You can determine it by calling
+</font>    <font color='#009900'>// bsp.node_id().  However, the node spawned by a call to bsp_connect() always has a
+</font>    <font color='#009900'>// node ID of 0 (hence the name of this function).  Additionally, all functions
+</font>    <font color='#009900'>// executing a BSP task always take a bsp_context as their first argument.  This object
+</font>    <font color='#009900'>// is the interface that allows BSP jobs to communicate with each other. 
+</font>
+
+    <font color='#009900'>// Now let's get down to work.  Recall that we are trying to find the x value that
+</font>    <font color='#009900'>// minimizes the f(x) defined above.  The grid search will start out by considering the
+</font>    <font color='#009900'>// range [-1e100, 1e100] on the number line.  It will progressively narrow this window
+</font>    <font color='#009900'>// until it has located the minimizer of f(x) to within 1e-15 of its true value.
+</font>    <font color='#0000FF'><u>double</u></font> left <font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>1e100</font>;
+    <font color='#0000FF'><u>double</u></font> right <font color='#5555FF'>=</font> <font color='#979000'>1e100</font>;
+
+    min_value <font color='#5555FF'>=</font> std::numeric_limits<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>infinity</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    <font color='#0000FF'><u>double</u></font> interval_width <font color='#5555FF'>=</font> std::<font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font>right<font color='#5555FF'>-</font>left<font face='Lucida Console'>)</font>;
+
+    <font color='#009900'>// keep going until the window is smaller than 1e-15.
+</font>    <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>right<font color='#5555FF'>-</font>left <font color='#5555FF'>&gt;</font> <font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>15</font><font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#009900'>// At the start of each loop, we broadcast the current window to all the other BSP
+</font>        <font color='#009900'>// nodes.  They will each search a separate part of the window and then report back
+</font>        <font color='#009900'>// the smallest values they found in their respective sub-windows.  
+</font>        <font color='#009900'>// 
+</font>        <font color='#009900'>// Also, you can send/broadcast/receive anything that has global serialize() and
+</font>        <font color='#009900'>// deserialize() routines defined for it.  Dlib comes with serialization functions
+</font>        <font color='#009900'>// for a lot of types by default, so we don't have to define anything for this
+</font>        <font color='#009900'>// example program.  However, if you want to send an object you defined then you
+</font>        <font color='#009900'>// will need to write your own serialization functions.  See the documentation for
+</font>        <font color='#009900'>// dlib's serialize() routine or the <a href="bridge_ex.cpp.html">bridge_ex.cpp</a> example program for an example.  
+</font>        bsp.<font color='#BB00BB'>broadcast</font><font face='Lucida Console'>(</font>left<font face='Lucida Console'>)</font>;
+        bsp.<font color='#BB00BB'>broadcast</font><font face='Lucida Console'>(</font>right<font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// Receive the smallest values found from the other BSP nodes.
+</font>        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>int</u></font> k <font color='#5555FF'>=</font> <font color='#979000'>1</font>; k <font color='#5555FF'>&lt;</font> bsp.<font color='#BB00BB'>number_of_nodes</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>k<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#009900'>// The other nodes will send std::pairs of x/f(x) values.  So that is what we
+</font>            <font color='#009900'>// receive.
+</font>            std::pair<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font> val;
+            bsp.<font color='#BB00BB'>receive</font><font face='Lucida Console'>(</font>val<font face='Lucida Console'>)</font>;
+            <font color='#009900'>// save the smallest result.
+</font>            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>val.second <font color='#5555FF'>&lt;</font> min_value<font face='Lucida Console'>)</font>
+            <b>{</b>
+                min_value <font color='#5555FF'>=</font> val.second;
+                optimal_x <font color='#5555FF'>=</font> val.first;
+            <b>}</b>
+        <b>}</b>
+
+        <font color='#009900'>// Now narrow the search window by half.  
+</font>        interval_width <font color='#5555FF'>*</font><font color='#5555FF'>=</font> <font color='#979000'>0.5</font>;
+        left  <font color='#5555FF'>=</font> optimal_x <font color='#5555FF'>-</font> interval_width<font color='#5555FF'>/</font><font color='#979000'>2</font>;
+        right <font color='#5555FF'>=</font> optimal_x <font color='#5555FF'>+</font> interval_width<font color='#5555FF'>/</font><font color='#979000'>2</font>;
+    <b>}</b>
+<b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<font color='#0000FF'><u>void</u></font> <b><a name='bsp_job_other_nodes'></a>bsp_job_other_nodes</b> <font face='Lucida Console'>(</font>bsp_context<font color='#5555FF'>&amp;</font> bsp, <font color='#0000FF'><u>long</u></font> grid_resolution<font face='Lucida Console'>)</font>
+<b>{</b>
+    <font color='#009900'>// This is the BSP job called by bsp_listen().  In these jobs we will receive window
+</font>    <font color='#009900'>// ranges from the controller node, search our sub-window, and then report back the
+</font>    <font color='#009900'>// location of the best x value we found.
+</font>
+    <font color='#0000FF'><u>double</u></font> left, right;
+
+    <font color='#009900'>// The try_receive() function will either return true with the next message or return
+</font>    <font color='#009900'>// false if there aren't any more messages in flight between nodes and all other BSP
+</font>    <font color='#009900'>// nodes are blocked on calls to receive or have terminated.  That is, try_receive()
+</font>    <font color='#009900'>// only returns false if waiting for a message would result in all the BSP nodes
+</font>    <font color='#009900'>// waiting forever.  
+</font>    <font color='#009900'>// 
+</font>    <font color='#009900'>// Therefore, try_receive() serves both as a message receiving tool as well as an
+</font>    <font color='#009900'>// implicit form of barrier synchronization.  In this case, we use it to know when to
+</font>    <font color='#009900'>// terminate.  That is, we know it is time to terminate if all the messages between
+</font>    <font color='#009900'>// nodes have been received and all nodes are inactive due to either termination or
+</font>    <font color='#009900'>// being blocked on a receive call.  This will happen once the controller node above
+</font>    <font color='#009900'>// terminates since it will result in all the other nodes inevitably becoming blocked
+</font>    <font color='#009900'>// on this try_receive() line with no messages to process.  
+</font>    <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>bsp.<font color='#BB00BB'>try_receive</font><font face='Lucida Console'>(</font>left<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+    <b>{</b>
+        bsp.<font color='#BB00BB'>receive</font><font face='Lucida Console'>(</font>right<font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// Compute a sub-window range for us to search.  We use our node's ID value and the
+</font>        <font color='#009900'>// total number of nodes to select a subset of the [left, right] window.  We will
+</font>        <font color='#009900'>// store the grid points from our sub-window in values_to_check.
+</font>        <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> l <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>bsp.<font color='#BB00BB'>node_id</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font><font color='#5555FF'>/</font><font face='Lucida Console'>(</font>bsp.<font color='#BB00BB'>number_of_nodes</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#979000'>1.0</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> r <font color='#5555FF'>=</font> bsp.<font color='#BB00BB'>node_id</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>    <font color='#5555FF'>/</font><font face='Lucida Console'>(</font>bsp.<font color='#BB00BB'>number_of_nodes</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#979000'>1.0</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> width <font color='#5555FF'>=</font> right<font color='#5555FF'>-</font>left;
+        <font color='#009900'>// Select grid_resolution number of points which are linearly spaced throughout our
+</font>        <font color='#009900'>// sub-window.
+</font>        <font color='#0000FF'>const</font> matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font> values_to_check <font color='#5555FF'>=</font> <font color='#BB00BB'>linspace</font><font face='Lucida Console'>(</font>left<font color='#5555FF'>+</font>l<font color='#5555FF'>*</font>width, left<font color='#5555FF'>+</font>r<font color='#5555FF'>*</font>width, grid_resolution<font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// Search all the points in values_to_check and figure out which one gives the
+</font>        <font color='#009900'>// minimum value of f().
+</font>        <font color='#0000FF'><u>double</u></font> best_x <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <font color='#0000FF'><u>double</u></font> best_val <font color='#5555FF'>=</font> std::numeric_limits<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>infinity</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> j <font color='#5555FF'>=</font> <font color='#979000'>0</font>; j <font color='#5555FF'>&lt;</font> values_to_check.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>j<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'><u>double</u></font> temp <font color='#5555FF'>=</font> <font color='#BB00BB'>f</font><font face='Lucida Console'>(</font><font color='#BB00BB'>values_to_check</font><font face='Lucida Console'>(</font>j<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>temp <font color='#5555FF'>&lt;</font> best_val<font face='Lucida Console'>)</font>
+            <b>{</b>
+                best_val <font color='#5555FF'>=</font> temp;
+                best_x <font color='#5555FF'>=</font> <font color='#BB00BB'>values_to_check</font><font face='Lucida Console'>(</font>j<font face='Lucida Console'>)</font>;
+            <b>}</b>
+        <b>}</b>
+
+        <font color='#009900'>// Report back the identity of the best point we found in our sub-window.  Note
+</font>        <font color='#009900'>// that the second argument to send(), the 0, is the node ID to send to.  In this
+</font>        <font color='#009900'>// case we send our results back to the controller node.
+</font>        bsp.<font color='#BB00BB'>send</font><font face='Lucida Console'>(</font><font color='#BB00BB'>make_pair</font><font face='Lucida Console'>(</font>best_x, best_val<font face='Lucida Console'>)</font>, <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+<b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+
+</pre></body></html>

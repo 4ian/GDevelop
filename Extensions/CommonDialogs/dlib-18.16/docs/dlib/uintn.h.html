@@ -1,0 +1,99 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - uintn.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2005  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font>
+<font color='#0000FF'>#ifndef</font> DLIB_UINtn_
+<font color='#0000FF'>#define</font> DLIB_UINtn_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='assert.h.html'>assert.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+    <font color='#009900'>/*!
+        uint64 is a typedef for an unsigned integer that is exactly 64 bits wide.
+        uint32 is a typedef for an unsigned integer that is exactly 32 bits wide.
+        uint16 is a typedef for an unsigned integer that is exactly 16 bits wide.
+        uint8  is a typedef for an unsigned integer that is exactly 8  bits wide.
+
+        int64 is a typedef for an integer that is exactly 64 bits wide.
+        int32 is a typedef for an integer that is exactly 32 bits wide.
+        int16 is a typedef for an integer that is exactly 16 bits wide.
+        int8  is a typedef for an integer that is exactly 8  bits wide.
+    !*/</font>
+
+
+<font color='#0000FF'>#ifdef</font> __GNUC__
+    <font color='#0000FF'>typedef</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <font color='#0000FF'><u>long</u></font> uint64;
+    <font color='#0000FF'>typedef</font> <font color='#0000FF'><u>long</u></font> <font color='#0000FF'><u>long</u></font> int64;
+<font color='#0000FF'>#elif</font> defined<font face='Lucida Console'>(</font>__BORLANDC__<font face='Lucida Console'>)</font>
+    <font color='#0000FF'>typedef</font> <font color='#0000FF'><u>unsigned</u></font> __int64 uint64;
+    <font color='#0000FF'>typedef</font> __int64 int64;
+<font color='#0000FF'>#elif</font> defined<font face='Lucida Console'>(</font>_MSC_VER<font face='Lucida Console'>)</font>
+    <font color='#0000FF'>typedef</font> <font color='#0000FF'><u>unsigned</u></font> __int64 uint64;
+    <font color='#0000FF'>typedef</font> __int64 int64;
+<font color='#0000FF'>#else</font>
+    <font color='#0000FF'>typedef</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <font color='#0000FF'><u>long</u></font> uint64;
+    <font color='#0000FF'>typedef</font> <font color='#0000FF'><u>long</u></font> <font color='#0000FF'><u>long</u></font> int64;
+<font color='#0000FF'>#endif</font>
+
+    <font color='#0000FF'>typedef</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>short</u></font> uint16;
+    <font color='#0000FF'>typedef</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>int</u></font>   uint32;
+    <font color='#0000FF'>typedef</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font>  uint8;
+
+    <font color='#0000FF'>typedef</font> <font color='#0000FF'><u>short</u></font> int16;
+    <font color='#0000FF'>typedef</font> <font color='#0000FF'><u>int</u></font>   int32;
+    <font color='#0000FF'>typedef</font> <font color='#0000FF'><u>char</u></font>  int8;
+
+
+    <font color='#009900'>// make sure these types have the right sizes on this platform
+</font>    <b><a name='COMPILE_TIME_ASSERT'></a>COMPILE_TIME_ASSERT</b><font face='Lucida Console'>(</font><font color='#0000FF'>sizeof</font><font face='Lucida Console'>(</font>uint8<font face='Lucida Console'>)</font>  <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+    <b><a name='COMPILE_TIME_ASSERT'></a>COMPILE_TIME_ASSERT</b><font face='Lucida Console'>(</font><font color='#0000FF'>sizeof</font><font face='Lucida Console'>(</font>uint16<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+    <b><a name='COMPILE_TIME_ASSERT'></a>COMPILE_TIME_ASSERT</b><font face='Lucida Console'>(</font><font color='#0000FF'>sizeof</font><font face='Lucida Console'>(</font>uint32<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>4</font><font face='Lucida Console'>)</font>;
+    <b><a name='COMPILE_TIME_ASSERT'></a>COMPILE_TIME_ASSERT</b><font face='Lucida Console'>(</font><font color='#0000FF'>sizeof</font><font face='Lucida Console'>(</font>uint64<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>8</font><font face='Lucida Console'>)</font>;
+
+    <b><a name='COMPILE_TIME_ASSERT'></a>COMPILE_TIME_ASSERT</b><font face='Lucida Console'>(</font><font color='#0000FF'>sizeof</font><font face='Lucida Console'>(</font>int8<font face='Lucida Console'>)</font>  <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+    <b><a name='COMPILE_TIME_ASSERT'></a>COMPILE_TIME_ASSERT</b><font face='Lucida Console'>(</font><font color='#0000FF'>sizeof</font><font face='Lucida Console'>(</font>int16<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+    <b><a name='COMPILE_TIME_ASSERT'></a>COMPILE_TIME_ASSERT</b><font face='Lucida Console'>(</font><font color='#0000FF'>sizeof</font><font face='Lucida Console'>(</font>int32<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>4</font><font face='Lucida Console'>)</font>;
+    <b><a name='COMPILE_TIME_ASSERT'></a>COMPILE_TIME_ASSERT</b><font face='Lucida Console'>(</font><font color='#0000FF'>sizeof</font><font face='Lucida Console'>(</font>int64<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>8</font><font face='Lucida Console'>)</font>;
+
+
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T, <font color='#0000FF'><u>size_t</u></font> s <font color='#5555FF'>=</font> <font color='#0000FF'>sizeof</font><font face='Lucida Console'>(</font>T<font face='Lucida Console'>)</font><font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>struct</font> unsigned_type;
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>struct</font> <b><a name='unsigned_type'></a>unsigned_type</b><font color='#5555FF'>&lt;</font>T,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> <b>{</b> <font color='#0000FF'>typedef</font> uint8 type; <b>}</b>;
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>struct</font> <b><a name='unsigned_type'></a>unsigned_type</b><font color='#5555FF'>&lt;</font>T,<font color='#979000'>2</font><font color='#5555FF'>&gt;</font> <b>{</b> <font color='#0000FF'>typedef</font> uint16 type; <b>}</b>;
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>struct</font> <b><a name='unsigned_type'></a>unsigned_type</b><font color='#5555FF'>&lt;</font>T,<font color='#979000'>4</font><font color='#5555FF'>&gt;</font> <b>{</b> <font color='#0000FF'>typedef</font> uint32 type; <b>}</b>;
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>struct</font> <b><a name='unsigned_type'></a>unsigned_type</b><font color='#5555FF'>&lt;</font>T,<font color='#979000'>8</font><font color='#5555FF'>&gt;</font> <b>{</b> <font color='#0000FF'>typedef</font> uint64 type; <b>}</b>;
+    <font color='#009900'>/*!
+        ensures
+            - sizeof(unsigned_type&lt;T&gt;::type) == sizeof(T)
+            - unsigned_type&lt;T&gt;::type is an unsigned integral type
+    !*/</font>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> U<font color='#5555FF'>&gt;</font>
+    T <b><a name='zero_extend_cast'></a>zero_extend_cast</b><font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> U val
+    <font face='Lucida Console'>)</font>
+    <font color='#009900'>/*!
+        requires
+            - U and T are integral types
+        ensures
+            - let ut be a typedef for unsigned_type&lt;U&gt;::type
+            - return static_cast&lt;T&gt;(static_cast&lt;ut&gt;(val));
+    !*/</font>
+    <b>{</b>
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> unsigned_type<font color='#5555FF'>&lt;</font>U<font color='#5555FF'>&gt;</font>::type ut;
+        <font color='#0000FF'>return</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font>ut<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>val<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_UINtn_
+</font>
+
+</pre></body></html>

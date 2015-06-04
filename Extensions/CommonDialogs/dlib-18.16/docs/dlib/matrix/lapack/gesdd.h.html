@@ -1,0 +1,367 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - gesdd.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2010  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_LAPACk_SDD_Hh_
+<font color='#0000FF'>#define</font> DLIB_LAPACk_SDD_Hh_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='fortran_id.h.html'>fortran_id.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../matrix.h.html'>../matrix.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+    <font color='#0000FF'>namespace</font> lapack
+    <b>{</b>
+        <font color='#0000FF'>namespace</font> binding
+        <b>{</b>
+            <font color='#0000FF'>extern</font> "<font color='#CC0000'>C</font>"
+            <b>{</b>
+                <font color='#0000FF'><u>void</u></font> <b><a name='DLIB_FORTRAN_ID'></a>DLIB_FORTRAN_ID</b><font face='Lucida Console'>(</font>dgesdd<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>char</u></font> <font color='#0000FF'>const</font><font color='#5555FF'>*</font> jobz, 
+                                              <font color='#0000FF'>const</font> integer<font color='#5555FF'>*</font> m, <font color='#0000FF'>const</font> integer<font color='#5555FF'>*</font> n, <font color='#0000FF'><u>double</u></font><font color='#5555FF'>*</font> a, <font color='#0000FF'>const</font> integer<font color='#5555FF'>*</font> lda,
+                                              <font color='#0000FF'><u>double</u></font><font color='#5555FF'>*</font> s, <font color='#0000FF'><u>double</u></font><font color='#5555FF'>*</font> u, <font color='#0000FF'>const</font> integer<font color='#5555FF'>*</font> ldu,
+                                              <font color='#0000FF'><u>double</u></font><font color='#5555FF'>*</font> vt, <font color='#0000FF'>const</font> integer<font color='#5555FF'>*</font> ldvt,
+                                              <font color='#0000FF'><u>double</u></font><font color='#5555FF'>*</font> work, <font color='#0000FF'>const</font> integer<font color='#5555FF'>*</font> lwork, integer<font color='#5555FF'>*</font> iwork, integer<font color='#5555FF'>*</font> info<font face='Lucida Console'>)</font>;
+
+                <font color='#0000FF'><u>void</u></font> <b><a name='DLIB_FORTRAN_ID'></a>DLIB_FORTRAN_ID</b><font face='Lucida Console'>(</font>sgesdd<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>char</u></font> <font color='#0000FF'>const</font><font color='#5555FF'>*</font> jobz, 
+                                              <font color='#0000FF'>const</font> integer<font color='#5555FF'>*</font> m, <font color='#0000FF'>const</font> integer<font color='#5555FF'>*</font> n, <font color='#0000FF'><u>float</u></font><font color='#5555FF'>*</font> a, <font color='#0000FF'>const</font> integer<font color='#5555FF'>*</font> lda,
+                                              <font color='#0000FF'><u>float</u></font><font color='#5555FF'>*</font> s, <font color='#0000FF'><u>float</u></font><font color='#5555FF'>*</font> u, <font color='#0000FF'>const</font> integer<font color='#5555FF'>*</font> ldu,
+                                              <font color='#0000FF'><u>float</u></font><font color='#5555FF'>*</font> vt, <font color='#0000FF'>const</font> integer<font color='#5555FF'>*</font> ldvt,
+                                              <font color='#0000FF'><u>float</u></font><font color='#5555FF'>*</font> work, <font color='#0000FF'>const</font> integer<font color='#5555FF'>*</font> lwork, integer<font color='#5555FF'>*</font> iwork, integer<font color='#5555FF'>*</font> info<font face='Lucida Console'>)</font>;
+
+            <b>}</b>
+
+            <font color='#0000FF'>inline</font> integer <b><a name='gesdd'></a>gesdd</b> <font face='Lucida Console'>(</font><font color='#0000FF'>const</font> <font color='#0000FF'><u>char</u></font> jobz, 
+                              <font color='#0000FF'>const</font> integer m, <font color='#0000FF'>const</font> integer n, <font color='#0000FF'><u>double</u></font><font color='#5555FF'>*</font> a, <font color='#0000FF'>const</font> integer lda,
+                              <font color='#0000FF'><u>double</u></font><font color='#5555FF'>*</font> s, <font color='#0000FF'><u>double</u></font><font color='#5555FF'>*</font> u, <font color='#0000FF'>const</font> integer ldu,
+                              <font color='#0000FF'><u>double</u></font><font color='#5555FF'>*</font> vt, <font color='#0000FF'>const</font> integer ldvt,
+                              <font color='#0000FF'><u>double</u></font><font color='#5555FF'>*</font> work, <font color='#0000FF'>const</font> integer lwork, integer<font color='#5555FF'>*</font> iwork<font face='Lucida Console'>)</font>
+            <b>{</b>
+                integer info <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                <font color='#BB00BB'>DLIB_FORTRAN_ID</font><font face='Lucida Console'>(</font>dgesdd<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>jobz, <font color='#5555FF'>&amp;</font>m, <font color='#5555FF'>&amp;</font>n, a, <font color='#5555FF'>&amp;</font>lda, s, u, <font color='#5555FF'>&amp;</font>ldu, vt, <font color='#5555FF'>&amp;</font>ldvt, work, <font color='#5555FF'>&amp;</font>lwork, iwork, <font color='#5555FF'>&amp;</font>info<font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>return</font> info;
+            <b>}</b>
+
+            <font color='#0000FF'>inline</font> integer <b><a name='gesdd'></a>gesdd</b> <font face='Lucida Console'>(</font><font color='#0000FF'>const</font> <font color='#0000FF'><u>char</u></font> jobz, 
+                              <font color='#0000FF'>const</font> integer m, <font color='#0000FF'>const</font> integer n, <font color='#0000FF'><u>float</u></font><font color='#5555FF'>*</font> a, <font color='#0000FF'>const</font> integer lda,
+                              <font color='#0000FF'><u>float</u></font><font color='#5555FF'>*</font> s, <font color='#0000FF'><u>float</u></font><font color='#5555FF'>*</font> u, <font color='#0000FF'>const</font> integer ldu,
+                              <font color='#0000FF'><u>float</u></font><font color='#5555FF'>*</font> vt, <font color='#0000FF'>const</font> integer ldvt,
+                              <font color='#0000FF'><u>float</u></font><font color='#5555FF'>*</font> work, <font color='#0000FF'>const</font> integer lwork, integer<font color='#5555FF'>*</font> iwork<font face='Lucida Console'>)</font>
+            <b>{</b>
+                integer info <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                <font color='#BB00BB'>DLIB_FORTRAN_ID</font><font face='Lucida Console'>(</font>sgesdd<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>jobz, <font color='#5555FF'>&amp;</font>m, <font color='#5555FF'>&amp;</font>n, a, <font color='#5555FF'>&amp;</font>lda, s, u, <font color='#5555FF'>&amp;</font>ldu, vt, <font color='#5555FF'>&amp;</font>ldvt, work, <font color='#5555FF'>&amp;</font>lwork, iwork, <font color='#5555FF'>&amp;</font>info<font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>return</font> info;
+            <b>}</b>
+        <b>}</b>
+
+    <font color='#009900'>// ------------------------------------------------------------------------------------
+</font>
+<font color='#009900'>/*  -- LAPACK driver routine (version 3.1) -- */</font>
+<font color='#009900'>/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */</font>
+<font color='#009900'>/*     November 2006 */</font>
+
+<font color='#009900'>/*     .. Scalar Arguments .. */</font>
+<font color='#009900'>/*     .. */</font>
+<font color='#009900'>/*     .. Array Arguments .. */</font>
+<font color='#009900'>/*     .. */</font>
+
+<font color='#009900'>/*  Purpose */</font>
+<font color='#009900'>/*  ======= */</font>
+
+<font color='#009900'>/*  DGESDD computes the singular value decomposition (SVD) of a real */</font>
+<font color='#009900'>/*  M-by-N matrix A, optionally computing the left and right singular */</font>
+<font color='#009900'>/*  vectors.  If singular vectors are desired, it uses a */</font>
+<font color='#009900'>/*  divide-and-conquer algorithm. */</font>
+
+<font color='#009900'>/*  The SVD is written */</font>
+
+<font color='#009900'>/*       A = U * SIGMA * transpose(V) */</font>
+
+<font color='#009900'>/*  where SIGMA is an M-by-N matrix which is zero except for its */</font>
+<font color='#009900'>/*  min(m,n) diagonal elements, U is an M-by-M orthogonal matrix, and */</font>
+<font color='#009900'>/*  V is an N-by-N orthogonal matrix.  The diagonal elements of SIGMA */</font>
+<font color='#009900'>/*  are the singular values of A; they are real and non-negative, and */</font>
+<font color='#009900'>/*  are returned in descending order.  The first min(m,n) columns of */</font>
+<font color='#009900'>/*  U and V are the left and right singular vectors of A. */</font>
+
+<font color='#009900'>/*  Note that the routine returns VT = V**T, not V. */</font>
+
+<font color='#009900'>/*  The divide and conquer algorithm makes very mild assumptions about */</font>
+<font color='#009900'>/*  floating point arithmetic. It will work on machines with a guard */</font>
+<font color='#009900'>/*  digit in add/subtract, or on those binary machines without guard */</font>
+<font color='#009900'>/*  digits which subtract like the Cray X-MP, Cray Y-MP, Cray C-90, or */</font>
+<font color='#009900'>/*  Cray-2. It could conceivably fail on hexadecimal or decimal machines */</font>
+<font color='#009900'>/*  without guard digits, but we know of none. */</font>
+
+<font color='#009900'>/*  Arguments */</font>
+<font color='#009900'>/*  ========= */</font>
+
+<font color='#009900'>/*  JOBZ    (input) CHARACTER*1 */</font>
+<font color='#009900'>/*          Specifies options for computing all or part of the matrix U: */</font>
+<font color='#009900'>/*          = 'A':  all M columns of U and all N rows of V**T are */</font>
+<font color='#009900'>/*                  returned in the arrays U and VT; */</font>
+<font color='#009900'>/*          = 'S':  the first min(M,N) columns of U and the first */</font>
+<font color='#009900'>/*                  min(M,N) rows of V**T are returned in the arrays U */</font>
+<font color='#009900'>/*                  and VT; */</font>
+<font color='#009900'>/*          = 'O':  If M &gt;= N, the first N columns of U are overwritten */</font>
+<font color='#009900'>/*                  on the array A and all rows of V**T are returned in */</font>
+<font color='#009900'>/*                  the array VT; */</font>
+<font color='#009900'>/*                  otherwise, all columns of U are returned in the */</font>
+<font color='#009900'>/*                  array U and the first M rows of V**T are overwritten */</font>
+<font color='#009900'>/*                  in the array A; */</font>
+<font color='#009900'>/*          = 'N':  no columns of U or rows of V**T are computed. */</font>
+
+<font color='#009900'>/*  M       (input) INTEGER */</font>
+<font color='#009900'>/*          The number of rows of the input matrix A.  M &gt;= 0. */</font>
+
+<font color='#009900'>/*  N       (input) INTEGER */</font>
+<font color='#009900'>/*          The number of columns of the input matrix A.  N &gt;= 0. */</font>
+
+<font color='#009900'>/*  A       (input/output) DOUBLE PRECISION array, dimension (LDA,N) */</font>
+<font color='#009900'>/*          On entry, the M-by-N matrix A. */</font>
+<font color='#009900'>/*          On exit, */</font>
+<font color='#009900'>/*          if JOBZ = 'O',  A is overwritten with the first N columns */</font>
+<font color='#009900'>/*                          of U (the left singular vectors, stored */</font>
+<font color='#009900'>/*                          columnwise) if M &gt;= N; */</font>
+<font color='#009900'>/*                          A is overwritten with the first M rows */</font>
+<font color='#009900'>/*                          of V**T (the right singular vectors, stored */</font>
+<font color='#009900'>/*                          rowwise) otherwise. */</font>
+<font color='#009900'>/*          if JOBZ .ne. 'O', the contents of A are destroyed. */</font>
+
+<font color='#009900'>/*  LDA     (input) INTEGER */</font>
+<font color='#009900'>/*          The leading dimension of the array A.  LDA &gt;= max(1,M). */</font>
+
+<font color='#009900'>/*  S       (output) DOUBLE PRECISION array, dimension (min(M,N)) */</font>
+<font color='#009900'>/*          The singular values of A, sorted so that S(i) &gt;= S(i+1). */</font>
+
+<font color='#009900'>/*  U       (output) DOUBLE PRECISION array, dimension (LDU,UCOL) */</font>
+<font color='#009900'>/*          UCOL = M if JOBZ = 'A' or JOBZ = 'O' and M &lt; N; */</font>
+<font color='#009900'>/*          UCOL = min(M,N) if JOBZ = 'S'. */</font>
+<font color='#009900'>/*          If JOBZ = 'A' or JOBZ = 'O' and M &lt; N, U contains the M-by-M */</font>
+<font color='#009900'>/*          orthogonal matrix U; */</font>
+<font color='#009900'>/*          if JOBZ = 'S', U contains the first min(M,N) columns of U */</font>
+<font color='#009900'>/*          (the left singular vectors, stored columnwise); */</font>
+<font color='#009900'>/*          if JOBZ = 'O' and M &gt;= N, or JOBZ = 'N', U is not referenced. */</font>
+
+<font color='#009900'>/*  LDU     (input) INTEGER */</font>
+<font color='#009900'>/*          The leading dimension of the array U.  LDU &gt;= 1; if */</font>
+<font color='#009900'>/*          JOBZ = 'S' or 'A' or JOBZ = 'O' and M &lt; N, LDU &gt;= M. */</font>
+
+<font color='#009900'>/*  VT      (output) DOUBLE PRECISION array, dimension (LDVT,N) */</font>
+<font color='#009900'>/*          If JOBZ = 'A' or JOBZ = 'O' and M &gt;= N, VT contains the */</font>
+<font color='#009900'>/*          N-by-N orthogonal matrix V**T; */</font>
+<font color='#009900'>/*          if JOBZ = 'S', VT contains the first min(M,N) rows of */</font>
+<font color='#009900'>/*          V**T (the right singular vectors, stored rowwise); */</font>
+<font color='#009900'>/*          if JOBZ = 'O' and M &lt; N, or JOBZ = 'N', VT is not referenced. */</font>
+
+<font color='#009900'>/*  LDVT    (input) INTEGER */</font>
+<font color='#009900'>/*          The leading dimension of the array VT.  LDVT &gt;= 1; if */</font>
+<font color='#009900'>/*          JOBZ = 'A' or JOBZ = 'O' and M &gt;= N, LDVT &gt;= N; */</font>
+<font color='#009900'>/*          if JOBZ = 'S', LDVT &gt;= min(M,N). */</font>
+
+<font color='#009900'>/*  WORK    (workspace/output) DOUBLE PRECISION array, dimension (MAX(1,LWORK)) */</font>
+<font color='#009900'>/*          On exit, if INFO = 0, WORK(1) returns the optimal LWORK; */</font>
+
+<font color='#009900'>/*  LWORK   (input) INTEGER */</font>
+<font color='#009900'>/*          The dimension of the array WORK. LWORK &gt;= 1. */</font>
+<font color='#009900'>/*          If JOBZ = 'N', */</font>
+<font color='#009900'>/*            LWORK &gt;= 3*min(M,N) + max(max(M,N),7*min(M,N)). */</font>
+<font color='#009900'>/*          If JOBZ = 'O', */</font>
+<font color='#009900'>/*            LWORK &gt;= 3*min(M,N)*min(M,N) + */</font>
+<font color='#009900'>/*                     max(max(M,N),5*min(M,N)*min(M,N)+4*min(M,N)). */</font>
+<font color='#009900'>/*          If JOBZ = 'S' or 'A' */</font>
+<font color='#009900'>/*            LWORK &gt;= 3*min(M,N)*min(M,N) + */</font>
+<font color='#009900'>/*                     max(max(M,N),4*min(M,N)*min(M,N)+4*min(M,N)). */</font>
+<font color='#009900'>/*          For good performance, LWORK should generally be larger. */</font>
+<font color='#009900'>/*          If LWORK = -1 but other input arguments are legal, WORK(1) */</font>
+<font color='#009900'>/*          returns the optimal LWORK. */</font>
+
+<font color='#009900'>/*  IWORK   (workspace) INTEGER array, dimension (8*min(M,N)) */</font>
+
+<font color='#009900'>/*  INFO    (output) INTEGER */</font>
+<font color='#009900'>/*          = 0:  successful exit. */</font>
+<font color='#009900'>/*          &lt; 0:  if INFO = -i, the i-th argument had an illegal value. */</font>
+<font color='#009900'>/*          &gt; 0:  DBDSDC did not converge, updating process failed. */</font>
+
+<font color='#009900'>/*  Further Details */</font>
+<font color='#009900'>/*  =============== */</font>
+
+<font color='#009900'>/*  Based on contributions by */</font>
+<font color='#009900'>/*     Ming Gu and Huan Ren, Computer Science Division, University of */</font>
+<font color='#009900'>/*     California at Berkeley, USA */</font>
+
+    <font color='#009900'>// ------------------------------------------------------------------------------------
+</font>
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'>typename</font> T, 
+            <font color='#0000FF'><u>long</u></font> NR1, <font color='#0000FF'><u>long</u></font> NR2, <font color='#0000FF'><u>long</u></font> NR3, <font color='#0000FF'><u>long</u></font> NR4,
+            <font color='#0000FF'><u>long</u></font> NC1, <font color='#0000FF'><u>long</u></font> NC2, <font color='#0000FF'><u>long</u></font> NC3, <font color='#0000FF'><u>long</u></font> NC4,
+            <font color='#0000FF'>typename</font> MM
+            <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>int</u></font> <b><a name='gesdd'></a>gesdd</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>char</u></font> jobz,
+            matrix<font color='#5555FF'>&lt;</font>T,NR1,NC1,MM,column_major_layout<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> a,
+            matrix<font color='#5555FF'>&lt;</font>T,NR2,NC2,MM,column_major_layout<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> s,
+            matrix<font color='#5555FF'>&lt;</font>T,NR3,NC3,MM,column_major_layout<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> u,
+            matrix<font color='#5555FF'>&lt;</font>T,NR4,NC4,MM,column_major_layout<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> vt
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            matrix<font color='#5555FF'>&lt;</font>T,<font color='#979000'>0</font>,<font color='#979000'>1</font>,MM,column_major_layout<font color='#5555FF'>&gt;</font> work;
+            matrix<font color='#5555FF'>&lt;</font>integer,<font color='#979000'>0</font>,<font color='#979000'>1</font>,MM,column_major_layout<font color='#5555FF'>&gt;</font> iwork;
+
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> m <font color='#5555FF'>=</font> a.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> n <font color='#5555FF'>=</font> a.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            s.<font color='#BB00BB'>set_size</font><font face='Lucida Console'>(</font>std::<font color='#BB00BB'>min</font><font face='Lucida Console'>(</font>m,n<font face='Lucida Console'>)</font>, <font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// make sure the iwork memory block is big enough
+</font>            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>iwork.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> <font color='#979000'>8</font><font color='#5555FF'>*</font>std::<font color='#BB00BB'>min</font><font face='Lucida Console'>(</font>m,n<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                iwork.<font color='#BB00BB'>set_size</font><font face='Lucida Console'>(</font><font color='#979000'>8</font><font color='#5555FF'>*</font>std::<font color='#BB00BB'>min</font><font face='Lucida Console'>(</font>m,n<font face='Lucida Console'>)</font>, <font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>jobz <font color='#5555FF'>=</font><font color='#5555FF'>=</font> '<font color='#FF0000'>A</font>'<font face='Lucida Console'>)</font>
+            <b>{</b>
+                u.<font color='#BB00BB'>set_size</font><font face='Lucida Console'>(</font>m,m<font face='Lucida Console'>)</font>;
+                vt.<font color='#BB00BB'>set_size</font><font face='Lucida Console'>(</font>n,n<font face='Lucida Console'>)</font>;
+            <b>}</b>
+            <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>jobz <font color='#5555FF'>=</font><font color='#5555FF'>=</font> '<font color='#FF0000'>S</font>'<font face='Lucida Console'>)</font>
+            <b>{</b>
+                u.<font color='#BB00BB'>set_size</font><font face='Lucida Console'>(</font>m, std::<font color='#BB00BB'>min</font><font face='Lucida Console'>(</font>m,n<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                vt.<font color='#BB00BB'>set_size</font><font face='Lucida Console'>(</font>std::<font color='#BB00BB'>min</font><font face='Lucida Console'>(</font>m,n<font face='Lucida Console'>)</font>, n<font face='Lucida Console'>)</font>;
+            <b>}</b>
+            <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>jobz <font color='#5555FF'>=</font><font color='#5555FF'>=</font> '<font color='#FF0000'>O</font>'<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#BB00BB'>DLIB_CASSERT</font><font face='Lucida Console'>(</font><font color='#979000'>false</font>, "<font color='#CC0000'>jobz == 'O' not supported</font>"<font face='Lucida Console'>)</font>;
+            <b>}</b>
+            <font color='#0000FF'>else</font>
+            <b>{</b>
+                u.<font color='#BB00BB'>set_size</font><font face='Lucida Console'>(</font>NR3?NR3:<font color='#979000'>1</font>, NC3?NC3:<font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+                vt.<font color='#BB00BB'>set_size</font><font face='Lucida Console'>(</font>NR4?NR4:<font color='#979000'>1</font>, NC4?NC4:<font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+            <font color='#009900'>// figure out how big the workspace needs to be.
+</font>            T work_size <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+            <font color='#0000FF'><u>int</u></font> info <font color='#5555FF'>=</font> binding::<font color='#BB00BB'>gesdd</font><font face='Lucida Console'>(</font>jobz, a.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, a.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, <font color='#5555FF'>&amp;</font><font color='#BB00BB'>a</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font>, a.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,
+                                      <font color='#5555FF'>&amp;</font><font color='#BB00BB'>s</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font>, <font color='#5555FF'>&amp;</font><font color='#BB00BB'>u</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font>, u.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, <font color='#5555FF'>&amp;</font><font color='#BB00BB'>vt</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font>, vt.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,
+                                      <font color='#5555FF'>&amp;</font>work_size, <font color='#5555FF'>-</font><font color='#979000'>1</font>, <font color='#5555FF'>&amp;</font><font color='#BB00BB'>iwork</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>info <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                <font color='#0000FF'>return</font> info;
+
+            <font color='#009900'>// There is a bug in an older version of LAPACK in Debian etch 
+</font>            <font color='#009900'>// that causes the gesdd to return the wrong value for work_size
+</font>            <font color='#009900'>// when jobz == 'N'.  So verify the value of work_size.
+</font>            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>jobz <font color='#5555FF'>=</font><font color='#5555FF'>=</font> '<font color='#FF0000'>N</font>'<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>using</font> std::min; 
+                <font color='#0000FF'>using</font> std::max; 
+                <font color='#0000FF'>const</font> T min_work_size <font color='#5555FF'>=</font> <font color='#979000'>3</font><font color='#5555FF'>*</font><font color='#BB00BB'>min</font><font face='Lucida Console'>(</font>m,n<font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> <font color='#BB00BB'>max</font><font face='Lucida Console'>(</font><font color='#BB00BB'>max</font><font face='Lucida Console'>(</font>m,n<font face='Lucida Console'>)</font>,<font color='#979000'>7</font><font color='#5555FF'>*</font><font color='#BB00BB'>min</font><font face='Lucida Console'>(</font>m,n<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>work_size <font color='#5555FF'>&lt;</font> min_work_size<font face='Lucida Console'>)</font>
+                    work_size <font color='#5555FF'>=</font> min_work_size;
+            <b>}</b>
+
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>work.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> work_size<font face='Lucida Console'>)</font>
+                work.<font color='#BB00BB'>set_size</font><font face='Lucida Console'>(</font><font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>work_size<font face='Lucida Console'>)</font>, <font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// compute the actual SVD
+</font>            info <font color='#5555FF'>=</font> binding::<font color='#BB00BB'>gesdd</font><font face='Lucida Console'>(</font>jobz, a.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, a.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, <font color='#5555FF'>&amp;</font><font color='#BB00BB'>a</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font>, a.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,
+                                  <font color='#5555FF'>&amp;</font><font color='#BB00BB'>s</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font>, <font color='#5555FF'>&amp;</font><font color='#BB00BB'>u</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font>, u.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, <font color='#5555FF'>&amp;</font><font color='#BB00BB'>vt</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font>, vt.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,
+                                  <font color='#5555FF'>&amp;</font><font color='#BB00BB'>work</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font>, work.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, <font color='#5555FF'>&amp;</font><font color='#BB00BB'>iwork</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>return</font> info;
+        <b>}</b>
+
+    <font color='#009900'>// ------------------------------------------------------------------------------------
+</font>
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'>typename</font> T, 
+            <font color='#0000FF'><u>long</u></font> NR1, <font color='#0000FF'><u>long</u></font> NR2, <font color='#0000FF'><u>long</u></font> NR3, <font color='#0000FF'><u>long</u></font> NR4,
+            <font color='#0000FF'><u>long</u></font> NC1, <font color='#0000FF'><u>long</u></font> NC2, <font color='#0000FF'><u>long</u></font> NC3, <font color='#0000FF'><u>long</u></font> NC4,
+            <font color='#0000FF'>typename</font> MM
+            <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>int</u></font> <b><a name='gesdd'></a>gesdd</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>char</u></font> jobz,
+            matrix<font color='#5555FF'>&lt;</font>T,NR1,NC1,MM,row_major_layout<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> a,
+            matrix<font color='#5555FF'>&lt;</font>T,NR2,NC2,MM,row_major_layout<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> s,
+            matrix<font color='#5555FF'>&lt;</font>T,NR3,NC3,MM,row_major_layout<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> u_,
+            matrix<font color='#5555FF'>&lt;</font>T,NR4,NC4,MM,row_major_layout<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> vt_
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            matrix<font color='#5555FF'>&lt;</font>T,<font color='#979000'>0</font>,<font color='#979000'>1</font>,MM,row_major_layout<font color='#5555FF'>&gt;</font> work;
+            matrix<font color='#5555FF'>&lt;</font>integer,<font color='#979000'>0</font>,<font color='#979000'>1</font>,MM,row_major_layout<font color='#5555FF'>&gt;</font> iwork;
+
+            <font color='#009900'>// Row major order matrices are transposed from LAPACK's point of view.
+</font>            matrix<font color='#5555FF'>&lt;</font>T,NR4,NC4,MM,row_major_layout<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> u <font color='#5555FF'>=</font> vt_;
+            matrix<font color='#5555FF'>&lt;</font>T,NR3,NC3,MM,row_major_layout<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> vt <font color='#5555FF'>=</font> u_;
+
+
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> m <font color='#5555FF'>=</font> a.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> n <font color='#5555FF'>=</font> a.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            s.<font color='#BB00BB'>set_size</font><font face='Lucida Console'>(</font>std::<font color='#BB00BB'>min</font><font face='Lucida Console'>(</font>m,n<font face='Lucida Console'>)</font>, <font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// make sure the iwork memory block is big enough
+</font>            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>iwork.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> <font color='#979000'>8</font><font color='#5555FF'>*</font>std::<font color='#BB00BB'>min</font><font face='Lucida Console'>(</font>m,n<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                iwork.<font color='#BB00BB'>set_size</font><font face='Lucida Console'>(</font><font color='#979000'>8</font><font color='#5555FF'>*</font>std::<font color='#BB00BB'>min</font><font face='Lucida Console'>(</font>m,n<font face='Lucida Console'>)</font>, <font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>jobz <font color='#5555FF'>=</font><font color='#5555FF'>=</font> '<font color='#FF0000'>A</font>'<font face='Lucida Console'>)</font>
+            <b>{</b>
+                u.<font color='#BB00BB'>set_size</font><font face='Lucida Console'>(</font>m,m<font face='Lucida Console'>)</font>;
+                vt.<font color='#BB00BB'>set_size</font><font face='Lucida Console'>(</font>n,n<font face='Lucida Console'>)</font>;
+            <b>}</b>
+            <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>jobz <font color='#5555FF'>=</font><font color='#5555FF'>=</font> '<font color='#FF0000'>S</font>'<font face='Lucida Console'>)</font>
+            <b>{</b>
+                u.<font color='#BB00BB'>set_size</font><font face='Lucida Console'>(</font>std::<font color='#BB00BB'>min</font><font face='Lucida Console'>(</font>m,n<font face='Lucida Console'>)</font>, m<font face='Lucida Console'>)</font>;
+                vt.<font color='#BB00BB'>set_size</font><font face='Lucida Console'>(</font>n, std::<font color='#BB00BB'>min</font><font face='Lucida Console'>(</font>m,n<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+            <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>jobz <font color='#5555FF'>=</font><font color='#5555FF'>=</font> '<font color='#FF0000'>O</font>'<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#BB00BB'>DLIB_CASSERT</font><font face='Lucida Console'>(</font><font color='#979000'>false</font>, "<font color='#CC0000'>jobz == 'O' not supported</font>"<font face='Lucida Console'>)</font>;
+            <b>}</b>
+            <font color='#0000FF'>else</font>
+            <b>{</b>
+                u.<font color='#BB00BB'>set_size</font><font face='Lucida Console'>(</font>NR4?NR4:<font color='#979000'>1</font>, NC4?NC4:<font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+                vt.<font color='#BB00BB'>set_size</font><font face='Lucida Console'>(</font>NR3?NR3:<font color='#979000'>1</font>, NC3?NC3:<font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+            <font color='#009900'>// figure out how big the workspace needs to be.
+</font>            T work_size <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+            <font color='#0000FF'><u>int</u></font> info <font color='#5555FF'>=</font> binding::<font color='#BB00BB'>gesdd</font><font face='Lucida Console'>(</font>jobz, m, n, <font color='#5555FF'>&amp;</font><font color='#BB00BB'>a</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font>, a.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,
+                                      <font color='#5555FF'>&amp;</font><font color='#BB00BB'>s</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font>, <font color='#5555FF'>&amp;</font><font color='#BB00BB'>u</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font>, u.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, <font color='#5555FF'>&amp;</font><font color='#BB00BB'>vt</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font>, vt.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,
+                                      <font color='#5555FF'>&amp;</font>work_size, <font color='#5555FF'>-</font><font color='#979000'>1</font>, <font color='#5555FF'>&amp;</font><font color='#BB00BB'>iwork</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>info <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                <font color='#0000FF'>return</font> info;
+
+            <font color='#009900'>// There is a bug in an older version of LAPACK in Debian etch 
+</font>            <font color='#009900'>// that causes the gesdd to return the wrong value for work_size
+</font>            <font color='#009900'>// when jobz == 'N'.  So verify the value of work_size.
+</font>            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>jobz <font color='#5555FF'>=</font><font color='#5555FF'>=</font> '<font color='#FF0000'>N</font>'<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>using</font> std::min; 
+                <font color='#0000FF'>using</font> std::max; 
+                <font color='#0000FF'>const</font> T min_work_size <font color='#5555FF'>=</font> <font color='#979000'>3</font><font color='#5555FF'>*</font><font color='#BB00BB'>min</font><font face='Lucida Console'>(</font>m,n<font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> <font color='#BB00BB'>max</font><font face='Lucida Console'>(</font><font color='#BB00BB'>max</font><font face='Lucida Console'>(</font>m,n<font face='Lucida Console'>)</font>,<font color='#979000'>7</font><font color='#5555FF'>*</font><font color='#BB00BB'>min</font><font face='Lucida Console'>(</font>m,n<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>work_size <font color='#5555FF'>&lt;</font> min_work_size<font face='Lucida Console'>)</font>
+                    work_size <font color='#5555FF'>=</font> min_work_size;
+            <b>}</b>
+
+
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>work.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> work_size<font face='Lucida Console'>)</font>
+                work.<font color='#BB00BB'>set_size</font><font face='Lucida Console'>(</font><font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>work_size<font face='Lucida Console'>)</font>, <font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// compute the actual SVD
+</font>            info <font color='#5555FF'>=</font> binding::<font color='#BB00BB'>gesdd</font><font face='Lucida Console'>(</font>jobz, m, n, <font color='#5555FF'>&amp;</font><font color='#BB00BB'>a</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font>, a.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,
+                                  <font color='#5555FF'>&amp;</font><font color='#BB00BB'>s</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font>, <font color='#5555FF'>&amp;</font><font color='#BB00BB'>u</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font>, u.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, <font color='#5555FF'>&amp;</font><font color='#BB00BB'>vt</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font>, vt.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,
+                                  <font color='#5555FF'>&amp;</font><font color='#BB00BB'>work</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font>, work.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, <font color='#5555FF'>&amp;</font><font color='#BB00BB'>iwork</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>return</font> info;
+        <b>}</b>
+
+    <font color='#009900'>// ------------------------------------------------------------------------------------
+</font>
+    <b>}</b>
+
+<b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_LAPACk_SDD_Hh_
+</font>
+
+
+</pre></body></html>

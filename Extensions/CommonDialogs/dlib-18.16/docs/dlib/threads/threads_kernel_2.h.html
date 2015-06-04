@@ -1,0 +1,183 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - threads_kernel_2.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2003  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_THREADS_KERNEl_2_
+<font color='#0000FF'>#define</font> DLIB_THREADS_KERNEl_2_
+
+<font color='#0000FF'>#ifdef</font> DLIB_ISO_CPP_ONLY
+<font color='#0000FF'>#error</font> "<font color='#CC0000'>DLIB_ISO_CPP_ONLY is defined so you can't use this OS dependent code.  Turn DLIB_ISO_CPP_ONLY off if you want to use it.</font>"
+<font color='#0000FF'>#endif</font>
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='threads_kernel_abstract.h.html'>threads_kernel_abstract.h</a>"
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>pthread.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>errno.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>sys<font color='#5555FF'>/</font>time.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../algs.h.html'>../algs.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>    
+    <font color='#0000FF'>typedef</font> pthread_t thread_id_type;
+
+    <font color='#0000FF'>inline</font> thread_id_type <b><a name='get_thread_id'></a>get_thread_id</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>return</font> <font color='#BB00BB'>pthread_self</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>    <font color='#009900'>// mutex object
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#009900'>// forward declaration of signaler 
+</font>    <font color='#0000FF'>class</font> signaler;
+
+    <font color='#0000FF'>class</font> <b><a name='mutex'></a>mutex</b>
+    <b>{</b>
+        <font color='#009900'>// give signaler access to hMutex
+</font>        <font color='#0000FF'>friend</font> <font color='#0000FF'>class</font> signaler;
+    <font color='#0000FF'>public</font>:
+
+        <b><a name='mutex'></a>mutex</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>
+        <b>{</b> 
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>pthread_mutex_init</font><font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>myMutex,<font color='#979000'>0</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> 
+            <b>{</b>
+                <font color='#0000FF'>throw</font> dlib::<font color='#BB00BB'>thread_error</font><font face='Lucida Console'>(</font>ECREATE_MUTEX,
+        "<font color='#CC0000'>in function mutex::mutex() an error occurred making the mutex</font>"
+                <font face='Lucida Console'>)</font>;      
+            <b>}</b>
+        <b>}</b>
+
+        ~<b><a name='mutex'></a>mutex</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <b>{</b> <font color='#BB00BB'>pthread_mutex_destroy</font><font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>myMutex<font face='Lucida Console'>)</font>; <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='lock'></a>lock</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#BB00BB'>pthread_mutex_lock</font><font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>myMutex<font face='Lucida Console'>)</font>; <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='unlock'></a>unlock</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#BB00BB'>pthread_mutex_unlock</font><font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>myMutex<font face='Lucida Console'>)</font>; <b>}</b>
+
+    <font color='#0000FF'>private</font>:
+
+        <font color='#0000FF'>mutable</font> pthread_mutex_t myMutex;
+
+        <font color='#009900'>// restricted functions
+</font>        <b><a name='mutex'></a>mutex</b><font face='Lucida Console'>(</font>mutex<font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font>;        <font color='#009900'>// copy constructor
+</font>        mutex<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>=</font><font face='Lucida Console'>(</font>mutex<font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font>;    <font color='#009900'>// assignement opertor
+</font>    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>    <font color='#009900'>// signaler object
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>class</font> <b><a name='signaler'></a>signaler</b>
+    <b>{</b>
+
+    <font color='#0000FF'>public</font>:
+
+
+        <b><a name='signaler'></a>signaler</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> mutex<font color='#5555FF'>&amp;</font> assoc_mutex
+        <font face='Lucida Console'>)</font> :
+            associated_mutex<font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>assoc_mutex.myMutex<font face='Lucida Console'>)</font>,
+            m<font face='Lucida Console'>(</font>assoc_mutex<font face='Lucida Console'>)</font>
+        <b>{</b> 
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>pthread_cond_init</font><font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>cond,<font color='#979000'>0</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>throw</font> dlib::<font color='#BB00BB'>thread_error</font><font face='Lucida Console'>(</font>ECREATE_SIGNALER,
+        "<font color='#CC0000'>in function signaler::signaler() an error occurred making the signaler</font>"
+                <font face='Lucida Console'>)</font>;      
+            <b>}</b>
+        <b>}</b>
+
+        ~<b><a name='signaler'></a>signaler</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <b>{</b> <font color='#BB00BB'>pthread_cond_destroy</font><font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>cond<font face='Lucida Console'>)</font>; <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='wait'></a>wait</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b> 
+            <font color='#BB00BB'>pthread_cond_wait</font><font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>cond,associated_mutex<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='wait_or_timeout'></a>wait_or_timeout</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> milliseconds
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b> 
+            timespec time_to_wait;
+
+            timeval curtime;
+            <font color='#BB00BB'>gettimeofday</font><font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>curtime,<font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// get the time and adjust the timespec object by the appropriate amount
+</font>            time_to_wait.tv_sec <font color='#5555FF'>=</font> milliseconds<font color='#5555FF'>/</font><font color='#979000'>1000</font> <font color='#5555FF'>+</font> curtime.tv_sec;
+            time_to_wait.tv_nsec <font color='#5555FF'>=</font> curtime.tv_usec;
+            time_to_wait.tv_nsec <font color='#5555FF'>*</font><font color='#5555FF'>=</font> <font color='#979000'>1000</font>; 
+            time_to_wait.tv_nsec <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>milliseconds<font color='#5555FF'>%</font><font color='#979000'>1000</font><font face='Lucida Console'>)</font><font color='#5555FF'>*</font><font color='#979000'>1000000</font>;
+
+            time_to_wait.tv_sec <font color='#5555FF'>+</font><font color='#5555FF'>=</font> time_to_wait.tv_nsec<font color='#5555FF'>/</font><font color='#979000'>1000000000</font>;
+            time_to_wait.tv_nsec <font color='#5555FF'>=</font> time_to_wait.tv_nsec<font color='#5555FF'>%</font><font color='#979000'>1000000000</font>;
+
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> <font color='#BB00BB'>pthread_cond_timedwait</font><font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>cond,associated_mutex,<font color='#5555FF'>&amp;</font>time_to_wait<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> ETIMEDOUT<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>return</font> <font color='#979000'>false</font>;
+            <b>}</b>
+            <font color='#0000FF'>else</font> 
+            <b>{</b>
+                <font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+            <b>}</b>
+        <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='signal'></a>signal</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#BB00BB'>pthread_cond_signal</font><font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>cond<font face='Lucida Console'>)</font>; <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='broadcast'></a>broadcast</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#BB00BB'>pthread_cond_broadcast</font><font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>cond<font face='Lucida Console'>)</font>; <b>}</b>
+
+        <font color='#0000FF'>const</font> mutex<font color='#5555FF'>&amp;</font> <b><a name='get_mutex'></a>get_mutex</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> m; <b>}</b>
+
+    <font color='#0000FF'>private</font>:
+
+        pthread_mutex_t<font color='#5555FF'>*</font> <font color='#0000FF'>const</font> associated_mutex;
+        <font color='#0000FF'>mutable</font> pthread_cond_t  cond;
+        <font color='#0000FF'>const</font> mutex<font color='#5555FF'>&amp;</font> m;
+
+        <font color='#009900'>// restricted functions
+</font>        <b><a name='signaler'></a>signaler</b><font face='Lucida Console'>(</font>signaler<font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font>;        <font color='#009900'>// copy constructor
+</font>        signaler<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>=</font><font face='Lucida Console'>(</font>signaler<font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font>;    <font color='#009900'>// assignement opertor
+</font>    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>namespace</font> threads_kernel_shared_helpers
+    <b>{</b>
+        <font color='#0000FF'><u>bool</u></font> <b><a name='spawn_thread'></a>spawn_thread</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>void</u></font> <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>funct<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font color='#5555FF'>*</font><font face='Lucida Console'>)</font>,
+            <font color='#0000FF'><u>void</u></font><font color='#5555FF'>*</font> param
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            is identical to create_new_thread() but just doesn't use any thread pooling.
+        !*/</font>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='threads_kernel_shared.h.html'>threads_kernel_shared.h</a>"
+
+<font color='#0000FF'>#ifdef</font> NO_MAKEFILE
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='threads_kernel_2.cpp.html'>threads_kernel_2.cpp</a>"
+<font color='#0000FF'>#endif</font>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_THREADS_KERNEl_2_
+</font>
+
+</pre></body></html>

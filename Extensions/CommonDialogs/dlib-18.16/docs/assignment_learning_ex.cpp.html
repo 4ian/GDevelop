@@ -1,0 +1,328 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - assignment_learning_ex.cpp</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// The contents of this file are in the public domain. See LICENSE_FOR_EXAMPLE_PROGRAMS.txt
+</font><font color='#009900'>/*
+
+    This is an example illustrating the use of the dlib machine learning tools for 
+    learning to solve the assignment problem. 
+    
+    Many tasks in computer vision or natural language processing can be thought of 
+    as assignment problems.  For example, in a computer vision application where 
+    you are trying to track objects moving around in video, you likely need to solve
+    an association problem every time you get a new video frame.  That is, each new 
+    frame will contain objects (e.g. people, cars, etc.) and you will want to 
+    determine which of these objects are actually things you have seen in previous 
+    frames.  
+   
+    The assignment problem can be optimally solved using the well known Hungarian 
+    algorithm.  However, this algorithm requires the user to supply some function 
+    which measures the "goodness" of an individual association.  In many cases the 
+    best way to measure this goodness isn't obvious and therefore machine learning 
+    methods are used.  
+    
+    The remainder of this example will show you how to learn a goodness function
+    which is optimal, in a certain sense, for use with the Hungarian algorithm.  To
+    do this, we will make a simple dataset of example associations and use them to
+    train a supervised machine learning method. 
+
+    Finally, note that there is a whole example program dedicated to assignment
+    learning problems where you are trying to make an object tracker.  So if that is
+    what you are interested in then take a look at the <a href="learning_to_track_ex.cpp.html">learning_to_track_ex.cpp</a>
+    example program.
+*/</font>
+
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>iostream<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>svm_threaded.h<font color='#5555FF'>&gt;</font>
+
+<font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> std;
+<font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> dlib;
+
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<font color='#009900'>/*
+    In an association problem, we will talk about the "Left Hand Set" (LHS) and the
+    "Right Hand Set" (RHS).  The task will be to learn to map all elements of LHS to 
+    unique elements of RHS.  If an element of LHS can't be mapped to a unique element of 
+    RHS for some reason (e.g. LHS is bigger than RHS) then it can also be mapped to the 
+    special -1 output, indicating no mapping to RHS.
+
+    So the first step is to define the type of elements in each of these sets.  In the
+    code below we will use column vectors in both LHS and RHS.  However, in general,
+    they can each contain any type you like.  LHS can even contain a different type 
+    than RHS.
+*/</font>
+
+<font color='#0000FF'>typedef</font> dlib::matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>0</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> column_vector;
+
+<font color='#009900'>// This type represents a pair of LHS and RHS.  That is, sample_type::first
+</font><font color='#009900'>// contains a left hand set and sample_type::second contains a right hand set.
+</font><font color='#0000FF'>typedef</font> std::pair<font color='#5555FF'>&lt;</font>std::vector<font color='#5555FF'>&lt;</font>column_vector<font color='#5555FF'>&gt;</font>, std::vector<font color='#5555FF'>&lt;</font>column_vector<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> sample_type;
+
+<font color='#009900'>// This type will contain the association information between LHS and RHS.  That is,
+</font><font color='#009900'>// it will determine which elements of LHS map to which elements of RHS.
+</font><font color='#0000FF'>typedef</font> std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font> label_type;
+
+<font color='#009900'>// In this example, all our LHS and RHS elements will be 3-dimensional vectors.
+</font><font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> num_dims <font color='#5555FF'>=</font> <font color='#979000'>3</font>;
+
+<font color='#0000FF'><u>void</u></font> <b><a name='make_data'></a>make_data</b> <font face='Lucida Console'>(</font>
+    std::vector<font color='#5555FF'>&lt;</font>sample_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> samples,
+    std::vector<font color='#5555FF'>&lt;</font>label_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> labels
+<font face='Lucida Console'>)</font>;
+<font color='#009900'>/*!
+    ensures
+        - This function creates a training dataset of 5 example associations.  
+        - #samples.size() == 5
+        - #labels.size() == 5
+        - for all valid i:
+            - #samples[i].first == a left hand set
+            - #samples[i].second == a right hand set
+            - #labels[i] == a set of integers indicating how to map LHS to RHS.  To be
+              precise:  
+                - #samples[i].first.size() == #labels[i].size()
+                - for all valid j:
+                    -1 &lt;= #labels[i][j] &lt; #samples[i].second.size()
+                    (A value of -1 indicates that #samples[i].first[j] isn't associated with anything.
+                    All other values indicate the associating element of #samples[i].second)
+                - All elements of #labels[i] which are not equal to -1 are unique.  That is,
+                  multiple elements of #samples[i].first can't associate to the same element
+                  in #samples[i].second.
+!*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<font color='#0000FF'>struct</font> <b><a name='feature_extractor'></a>feature_extractor</b>
+<b>{</b>
+    <font color='#009900'>/*!
+        Recall that our task is to learn the "goodness of assignment" function for
+        use with the Hungarian algorithm.  The dlib tools assume this function
+        can be written as:
+            match_score(l,r) == dot(w, PSI(l,r)) + bias
+        where l is an element of LHS, r is an element of RHS, w is a parameter vector,
+        bias is a scalar value, and PSI() is a user supplied feature extractor.
+
+        This feature_extractor is where we implement PSI().  How you implement this
+        is highly problem dependent.  
+    !*/</font>
+
+    <font color='#009900'>// The type of feature vector returned from get_features().  This must be either
+</font>    <font color='#009900'>// a dlib::matrix or a sparse vector.
+</font>    <font color='#0000FF'>typedef</font> column_vector feature_vector_type;
+
+    <font color='#009900'>// The types of elements in the LHS and RHS sets
+</font>    <font color='#0000FF'>typedef</font> column_vector lhs_element;
+    <font color='#0000FF'>typedef</font> column_vector rhs_element;
+
+
+    <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='num_features'></a>num_features</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        <font color='#009900'>// Return the dimensionality of feature vectors produced by get_features()
+</font>        <font color='#0000FF'>return</font> num_dims;
+    <b>}</b>
+
+    <font color='#0000FF'><u>void</u></font> <b><a name='get_features'></a>get_features</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> lhs_element<font color='#5555FF'>&amp;</font> left,
+        <font color='#0000FF'>const</font> rhs_element<font color='#5555FF'>&amp;</font> right,
+        feature_vector_type<font color='#5555FF'>&amp;</font> feats
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <font color='#009900'>/*!
+        ensures
+            - #feats == PSI(left,right)
+              (i.e. This function computes a feature vector which, in some sense, 
+              captures information useful for deciding if matching left to right 
+              is "good").
+    !*/</font>
+    <b>{</b>
+        <font color='#009900'>// Let's just use the squared difference between each vector as our features.
+</font>        <font color='#009900'>// However, it should be emphasized that how to compute the features here is very
+</font>        <font color='#009900'>// problem dependent.  
+</font>        feats <font color='#5555FF'>=</font> <font color='#BB00BB'>squared</font><font face='Lucida Console'>(</font>left <font color='#5555FF'>-</font> right<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<b>}</b>;
+
+<font color='#009900'>// We need to define serialize() and deserialize() for our feature extractor if we want 
+</font><font color='#009900'>// to be able to serialize and deserialize our learned models.  In this case the 
+</font><font color='#009900'>// implementation is empty since our feature_extractor doesn't have any state.  But you 
+</font><font color='#009900'>// might define more complex feature extractors which have state that needs to be saved.
+</font><font color='#0000FF'><u>void</u></font> <b><a name='serialize'></a>serialize</b>   <font face='Lucida Console'>(</font><font color='#0000FF'>const</font> feature_extractor<font color='#5555FF'>&amp;</font> , std::ostream<font color='#5555FF'>&amp;</font> <font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+<font color='#0000FF'><u>void</u></font> <b><a name='deserialize'></a>deserialize</b> <font face='Lucida Console'>(</font>feature_extractor<font color='#5555FF'>&amp;</font>       , std::istream<font color='#5555FF'>&amp;</font> <font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<font color='#0000FF'><u>int</u></font> <b><a name='main'></a>main</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+<b>{</b>
+    <font color='#0000FF'>try</font>
+    <b>{</b>
+        <font color='#009900'>// Get a small bit of training data.
+</font>        std::vector<font color='#5555FF'>&lt;</font>sample_type<font color='#5555FF'>&gt;</font> samples;
+        std::vector<font color='#5555FF'>&lt;</font>label_type<font color='#5555FF'>&gt;</font> labels;
+        <font color='#BB00BB'>make_data</font><font face='Lucida Console'>(</font>samples, labels<font face='Lucida Console'>)</font>;
+
+
+        structural_assignment_trainer<font color='#5555FF'>&lt;</font>feature_extractor<font color='#5555FF'>&gt;</font> trainer;
+        <font color='#009900'>// This is the common SVM C parameter.  Larger values encourage the
+</font>        <font color='#009900'>// trainer to attempt to fit the data exactly but might overfit. 
+</font>        <font color='#009900'>// In general, you determine this parameter by cross-validation.
+</font>        trainer.<font color='#BB00BB'>set_c</font><font face='Lucida Console'>(</font><font color='#979000'>10</font><font face='Lucida Console'>)</font>;
+        <font color='#009900'>// This trainer can use multiple CPU cores to speed up the training.  
+</font>        <font color='#009900'>// So set this to the number of available CPU cores. 
+</font>        trainer.<font color='#BB00BB'>set_num_threads</font><font face='Lucida Console'>(</font><font color='#979000'>4</font><font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// Do the training and save the results in assigner.
+</font>        assignment_function<font color='#5555FF'>&lt;</font>feature_extractor<font color='#5555FF'>&gt;</font> assigner <font color='#5555FF'>=</font> trainer.<font color='#BB00BB'>train</font><font face='Lucida Console'>(</font>samples, labels<font face='Lucida Console'>)</font>;
+
+
+        <font color='#009900'>// Test the assigner on our data.  The output will indicate that it makes the
+</font>        <font color='#009900'>// correct associations on all samples.
+</font>        cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>Test the learned assignment function: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> samples.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#009900'>// Predict the assignments for the LHS and RHS in samples[i].   
+</font>            std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font> predicted_assignments <font color='#5555FF'>=</font> <font color='#BB00BB'>assigner</font><font face='Lucida Console'>(</font>samples[i]<font face='Lucida Console'>)</font>;
+            cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>true labels:      </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>trans</font><font face='Lucida Console'>(</font><font color='#BB00BB'>mat</font><font face='Lucida Console'>(</font>labels[i]<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>predicted labels: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>trans</font><font face='Lucida Console'>(</font><font color='#BB00BB'>mat</font><font face='Lucida Console'>(</font>predicted_assignments<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+        <b>}</b>
+
+        <font color='#009900'>// We can also use this tool to compute the percentage of assignments predicted correctly.
+</font>        cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>training accuracy: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>test_assignment_function</font><font face='Lucida Console'>(</font>assigner, samples, labels<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+
+
+        <font color='#009900'>// Since testing on your training data is a really bad idea, we can also do 5-fold cross validation.
+</font>        <font color='#009900'>// Happily, this also indicates that all associations were made correctly.
+</font>        <font color='#BB00BB'>randomize_samples</font><font face='Lucida Console'>(</font>samples, labels<font face='Lucida Console'>)</font>;
+        cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>cv accuracy:       </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>cross_validate_assignment_trainer</font><font face='Lucida Console'>(</font>trainer, samples, labels, <font color='#979000'>5</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+
+
+
+        <font color='#009900'>// Finally, the assigner can be serialized to disk just like most dlib objects.
+</font>        <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>assigner.dat</font>"<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> assigner;
+
+        <font color='#009900'>// recall from disk
+</font>        <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>assigner.dat</font>"<font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font> assigner;
+    <b>}</b>
+    <font color='#0000FF'>catch</font> <font face='Lucida Console'>(</font>std::exception<font color='#5555FF'>&amp;</font> e<font face='Lucida Console'>)</font>
+    <b>{</b>
+        cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>EXCEPTION THROWN</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+        cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> e.<font color='#BB00BB'>what</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+    <b>}</b>
+<b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<font color='#0000FF'><u>void</u></font> <b><a name='make_data'></a>make_data</b> <font face='Lucida Console'>(</font>
+    std::vector<font color='#5555FF'>&lt;</font>sample_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> samples,
+    std::vector<font color='#5555FF'>&lt;</font>label_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> labels
+<font face='Lucida Console'>)</font>
+<b>{</b>
+    <font color='#009900'>// Make four different vectors.  We will use them to make example assignments.
+</font>    column_vector <font color='#BB00BB'>A</font><font face='Lucida Console'>(</font>num_dims<font face='Lucida Console'>)</font>, <font color='#BB00BB'>B</font><font face='Lucida Console'>(</font>num_dims<font face='Lucida Console'>)</font>, <font color='#BB00BB'>C</font><font face='Lucida Console'>(</font>num_dims<font face='Lucida Console'>)</font>, <font color='#BB00BB'>D</font><font face='Lucida Console'>(</font>num_dims<font face='Lucida Console'>)</font>;
+    A <font color='#5555FF'>=</font> <font color='#979000'>1</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>;
+    B <font color='#5555FF'>=</font> <font color='#979000'>0</font>,<font color='#979000'>1</font>,<font color='#979000'>0</font>;
+    C <font color='#5555FF'>=</font> <font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>1</font>;
+    D <font color='#5555FF'>=</font> <font color='#979000'>0</font>,<font color='#979000'>1</font>,<font color='#979000'>1</font>;
+
+    std::vector<font color='#5555FF'>&lt;</font>column_vector<font color='#5555FF'>&gt;</font> lhs;
+    std::vector<font color='#5555FF'>&lt;</font>column_vector<font color='#5555FF'>&gt;</font> rhs;
+    label_type mapping;
+
+    <font color='#009900'>// In all the assignments to follow, we will only say an element of the LHS 
+</font>    <font color='#009900'>// matches an element of the RHS if the two are equal.  So A matches with A, 
+</font>    <font color='#009900'>// B with B, etc.  But never A with C, for example.
+</font>    <font color='#009900'>// ------------------------
+</font>
+    lhs.<font color='#BB00BB'>resize</font><font face='Lucida Console'>(</font><font color='#979000'>3</font><font face='Lucida Console'>)</font>;
+    lhs[<font color='#979000'>0</font>] <font color='#5555FF'>=</font> A;
+    lhs[<font color='#979000'>1</font>] <font color='#5555FF'>=</font> B;
+    lhs[<font color='#979000'>2</font>] <font color='#5555FF'>=</font> C;
+
+    rhs.<font color='#BB00BB'>resize</font><font face='Lucida Console'>(</font><font color='#979000'>3</font><font face='Lucida Console'>)</font>;
+    rhs[<font color='#979000'>0</font>] <font color='#5555FF'>=</font> B;
+    rhs[<font color='#979000'>1</font>] <font color='#5555FF'>=</font> A;
+    rhs[<font color='#979000'>2</font>] <font color='#5555FF'>=</font> C;
+
+    mapping.<font color='#BB00BB'>resize</font><font face='Lucida Console'>(</font><font color='#979000'>3</font><font face='Lucida Console'>)</font>;
+    mapping[<font color='#979000'>0</font>] <font color='#5555FF'>=</font> <font color='#979000'>1</font>;  <font color='#009900'>// lhs[0] matches rhs[1]
+</font>    mapping[<font color='#979000'>1</font>] <font color='#5555FF'>=</font> <font color='#979000'>0</font>;  <font color='#009900'>// lhs[1] matches rhs[0]
+</font>    mapping[<font color='#979000'>2</font>] <font color='#5555FF'>=</font> <font color='#979000'>2</font>;  <font color='#009900'>// lhs[2] matches rhs[2]
+</font>
+    samples.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font><font color='#BB00BB'>make_pair</font><font face='Lucida Console'>(</font>lhs,rhs<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+    labels.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>mapping<font face='Lucida Console'>)</font>;
+
+    <font color='#009900'>// ------------------------
+</font>
+    lhs[<font color='#979000'>0</font>] <font color='#5555FF'>=</font> C;
+    lhs[<font color='#979000'>1</font>] <font color='#5555FF'>=</font> A;
+    lhs[<font color='#979000'>2</font>] <font color='#5555FF'>=</font> B;
+
+    rhs[<font color='#979000'>0</font>] <font color='#5555FF'>=</font> A;
+    rhs[<font color='#979000'>1</font>] <font color='#5555FF'>=</font> B;
+    rhs[<font color='#979000'>2</font>] <font color='#5555FF'>=</font> D;
+
+    mapping[<font color='#979000'>0</font>] <font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>1</font>;  <font color='#009900'>// The -1 indicates that lhs[0] doesn't match anything in rhs.
+</font>    mapping[<font color='#979000'>1</font>] <font color='#5555FF'>=</font> <font color='#979000'>0</font>;   <font color='#009900'>// lhs[1] matches rhs[0]
+</font>    mapping[<font color='#979000'>2</font>] <font color='#5555FF'>=</font> <font color='#979000'>1</font>;   <font color='#009900'>// lhs[2] matches rhs[1]
+</font>
+    samples.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font><font color='#BB00BB'>make_pair</font><font face='Lucida Console'>(</font>lhs,rhs<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+    labels.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>mapping<font face='Lucida Console'>)</font>;
+
+    <font color='#009900'>// ------------------------
+</font>
+    lhs[<font color='#979000'>0</font>] <font color='#5555FF'>=</font> A;
+    lhs[<font color='#979000'>1</font>] <font color='#5555FF'>=</font> B;
+    lhs[<font color='#979000'>2</font>] <font color='#5555FF'>=</font> C;
+
+    rhs.<font color='#BB00BB'>resize</font><font face='Lucida Console'>(</font><font color='#979000'>4</font><font face='Lucida Console'>)</font>;
+    rhs[<font color='#979000'>0</font>] <font color='#5555FF'>=</font> C;
+    rhs[<font color='#979000'>1</font>] <font color='#5555FF'>=</font> B;
+    rhs[<font color='#979000'>2</font>] <font color='#5555FF'>=</font> A;
+    rhs[<font color='#979000'>3</font>] <font color='#5555FF'>=</font> D;
+
+    mapping[<font color='#979000'>0</font>] <font color='#5555FF'>=</font> <font color='#979000'>2</font>;
+    mapping[<font color='#979000'>1</font>] <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+    mapping[<font color='#979000'>2</font>] <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+
+    samples.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font><font color='#BB00BB'>make_pair</font><font face='Lucida Console'>(</font>lhs,rhs<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+    labels.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>mapping<font face='Lucida Console'>)</font>;
+
+    <font color='#009900'>// ------------------------
+</font>
+    lhs.<font color='#BB00BB'>resize</font><font face='Lucida Console'>(</font><font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+    lhs[<font color='#979000'>0</font>] <font color='#5555FF'>=</font> B;
+    lhs[<font color='#979000'>1</font>] <font color='#5555FF'>=</font> C;
+
+    rhs.<font color='#BB00BB'>resize</font><font face='Lucida Console'>(</font><font color='#979000'>3</font><font face='Lucida Console'>)</font>;
+    rhs[<font color='#979000'>0</font>] <font color='#5555FF'>=</font> C;
+    rhs[<font color='#979000'>1</font>] <font color='#5555FF'>=</font> A;
+    rhs[<font color='#979000'>2</font>] <font color='#5555FF'>=</font> D;
+
+    mapping.<font color='#BB00BB'>resize</font><font face='Lucida Console'>(</font><font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+    mapping[<font color='#979000'>0</font>] <font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>1</font>;
+    mapping[<font color='#979000'>1</font>] <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+
+    samples.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font><font color='#BB00BB'>make_pair</font><font face='Lucida Console'>(</font>lhs,rhs<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+    labels.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>mapping<font face='Lucida Console'>)</font>;
+
+    <font color='#009900'>// ------------------------
+</font>
+    lhs.<font color='#BB00BB'>resize</font><font face='Lucida Console'>(</font><font color='#979000'>3</font><font face='Lucida Console'>)</font>;
+    lhs[<font color='#979000'>0</font>] <font color='#5555FF'>=</font> D;
+    lhs[<font color='#979000'>1</font>] <font color='#5555FF'>=</font> B;
+    lhs[<font color='#979000'>2</font>] <font color='#5555FF'>=</font> C;
+
+    <font color='#009900'>// rhs will be empty.  So none of the items in lhs can match anything.
+</font>    rhs.<font color='#BB00BB'>resize</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+
+    mapping.<font color='#BB00BB'>resize</font><font face='Lucida Console'>(</font><font color='#979000'>3</font><font face='Lucida Console'>)</font>;
+    mapping[<font color='#979000'>0</font>] <font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>1</font>;
+    mapping[<font color='#979000'>1</font>] <font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>1</font>;
+    mapping[<font color='#979000'>2</font>] <font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>1</font>;
+
+    samples.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font><font color='#BB00BB'>make_pair</font><font face='Lucida Console'>(</font>lhs,rhs<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+    labels.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>mapping<font face='Lucida Console'>)</font>;
+
+<b>}</b>
+
+
+</pre></body></html>

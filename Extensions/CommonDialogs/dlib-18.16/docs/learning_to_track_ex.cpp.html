@@ -1,0 +1,357 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - learning_to_track_ex.cpp</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// The contents of this file are in the public domain. See LICENSE_FOR_EXAMPLE_PROGRAMS.txt
+</font><font color='#009900'>/*
+    This example shows how you can use the dlib machine learning tools to make
+    an object tracker.  Depending on your tracking application there can be a
+    lot of components to a tracker.  However, a central element of many trackers
+    is the "detection to track" association step and this is the part of the
+    tracker we discuss in this example.  Therefore, in the code below we define
+    simple detection and track structures and then go through the steps needed
+    to learn, using training data, how to best associate detections to tracks.  
+
+    It should be noted that these tools are implemented essentially as wrappers
+    around the more general assignment learning tools present in dlib.  So if
+    you want to get an idea of how they work under the covers you should read
+    the <a href="assignment_learning_ex.cpp.html">assignment_learning_ex.cpp</a> example program and its supporting
+    documentation.  However, to just use the learning-to-track tools you won't
+    need to understand these implementation details.
+*/</font>
+
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>iostream<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>svm_threaded.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>rand.h<font color='#5555FF'>&gt;</font>
+
+<font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> std;
+<font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> dlib;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<font color='#0000FF'>struct</font> <b><a name='detection'></a>detection</b> 
+<b>{</b>
+    <font color='#009900'>/*
+        When you use these tools you need to define two structures.  One represents a
+        detection and another a track.  In this example we call these structures detection
+        and track but you can name them however you like.  Moreover, You can put anything
+        you want in your detection structure.  The only requirement is that detection be
+        copyable and contain a public typedef named track_type that tells us the track type
+        meant for use with this detection object.
+    */</font>
+    <font color='#0000FF'>typedef</font> <font color='#0000FF'>struct</font> track track_type;
+
+    
+    
+    <font color='#009900'>// Again, note that this field is NOT REQUIRED by the dlib tools.  You can put whatever
+</font>    <font color='#009900'>// you want in your detection object.  Here we are including a column vector of
+</font>    <font color='#009900'>// measurements from the sensor that generated the detection.  In this example we don't
+</font>    <font color='#009900'>// have a real sensor so we will simulate a very basic one using a random number
+</font>    <font color='#009900'>// generator.   But the idea is that you should be able to use the contents of your
+</font>    <font color='#009900'>// detection to somehow tell which track it goes with.  So these numbers should contain
+</font>    <font color='#009900'>// some identifying information about the real world object that caused this detection.  
+</font>    matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>0</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> measurements;
+<b>}</b>;
+
+
+<font color='#0000FF'>struct</font> <b><a name='track'></a>track</b>
+<b>{</b>
+    <font color='#009900'>/*
+        Here we define our corresponding track object.  This object has more requirements
+        than the detection.  In particular, the dlib machine learning tools require it to
+        have the following elements:
+            - A typedef named feature_vector_type
+            - It should be copyable and default constructable
+            - The three functions: get_similarity_features(), update_track(), and propagate_track()
+    
+        Just like the detection object, you can also add any additional fields you like.
+        In this example we keep it simple and say that a track maintains only a copy of the
+        most recent sensor measurements it has seen and also a number telling us how long
+        it has been since the track was updated with a detection.
+    */</font>
+
+    <font color='#009900'>// This type should be a dlib::matrix capable of storing column vectors or an
+</font>    <font color='#009900'>// unsorted sparse vector type such as std::vector&lt;std::pair&lt;unsigned long,double&gt;&gt;.
+</font>    <font color='#0000FF'>typedef</font> matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>0</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> feature_vector_type;
+
+    <b><a name='track'></a>track</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+    <b>{</b>
+        time_since_last_association <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+    <b>}</b>
+
+    <font color='#0000FF'><u>void</u></font> <b><a name='get_similarity_features'></a>get_similarity_features</b><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> detection<font color='#5555FF'>&amp;</font> det, feature_vector_type<font color='#5555FF'>&amp;</font> feats<font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        <font color='#009900'>/*
+            The get_similarity_features() function takes a detection and outputs a feature
+            vector that tells the machine learning tools how "similar" the detection is to
+            the track.  The idea here is to output a set of numbers (i.e. the contents of
+            feats) that can be used to decide if det should be associated with this track.
+            In this example we output the difference between the last sensor measurements
+            for this track and the detection's measurements.  This works since we expect
+            the sensor measurements to be relatively constant for each track because that's
+            how our simple sensor simulator in this example works.  However, in a real
+            world application it's likely to be much more complex.  But here we keep things
+            simple.
+
+            It should also be noted that get_similarity_features() must always output
+            feature vectors with the same number of dimensions.  Finally, the machine
+            learning tools are going to learn a linear function of feats and use that to
+            predict if det should associate to this track.  So try and define features that
+            you think would work in a linear function.  There are all kinds of ways to do
+            this.  If you want to get really clever about it you can even use kernel
+            methods like the empirical_kernel_map (see <a href="empirical_kernel_map_ex.cpp.html">empirical_kernel_map_ex.cpp</a>).  I
+            would start out with something simple first though.
+        */</font>
+        feats <font color='#5555FF'>=</font> <font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font>last_measurements <font color='#5555FF'>-</font> det.measurements<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+    <font color='#0000FF'><u>void</u></font> <b><a name='update_track'></a>update_track</b><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> detection<font color='#5555FF'>&amp;</font> det<font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#009900'>/*
+            This function is called when the dlib tools have decided that det should be
+            associated with this track.  So the point of update_track() is to, as the name
+            suggests, update the track with the given detection.  In general, you can do
+            whatever you want in this function.  Here we simply record the last measurement
+            state and reset the time since last association.
+        */</font>
+        last_measurements <font color='#5555FF'>=</font> det.measurements;
+        time_since_last_association <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+    <b>}</b>
+
+    <font color='#0000FF'><u>void</u></font> <b><a name='propagate_track'></a>propagate_track</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#009900'>/*
+            This function is called when the dlib tools have decided, for the current time
+            step, that none of the available detections associate with this track.  So the
+            point of this function is to perform a track update without a detection.  To
+            say that another way.  Every time you ask the dlib tools to perform detection
+            to track association they will update each track by calling either
+            update_track() or propagate_track().  Which function they call depends on
+            whether or not a detection was associated to the track.
+        */</font>
+        <font color='#5555FF'>+</font><font color='#5555FF'>+</font>time_since_last_association;
+    <b>}</b>
+
+    matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>0</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> last_measurements;
+    <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> time_since_last_association;
+<b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<font color='#009900'>/*
+    Now that we have defined our detection and track structures we are going to define our
+    sensor simulator.  In it we will imagine that there are num_objects things in the world
+    and those things generate detections from our sensor.  Moreover, each detection from
+    the sensor comes with a measurement vector with num_properties elements.  
+
+    So the first function, initialize_object_properties(), just randomly generates
+    num_objects and saves them in a global variable.  Then when we are generating
+    detections we will output copies of these objects that have been corrupted by a little
+    bit of random noise.
+*/</font>
+
+dlib::rand rnd;
+<font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> num_objects <font color='#5555FF'>=</font> <font color='#979000'>4</font>;
+<font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> num_properties <font color='#5555FF'>=</font> <font color='#979000'>6</font>;
+std::vector<font color='#5555FF'>&lt;</font>matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>0</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> <b><a name='object_properties'></a>object_properties</b><font face='Lucida Console'>(</font>num_objects<font face='Lucida Console'>)</font>;
+
+<font color='#0000FF'><u>void</u></font> <b><a name='initialize_object_properties'></a>initialize_object_properties</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+<b>{</b>
+    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> object_properties.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+        object_properties[i] <font color='#5555FF'>=</font> <font color='#BB00BB'>randm</font><font face='Lucida Console'>(</font>num_properties,<font color='#979000'>1</font>,rnd<font face='Lucida Console'>)</font>;
+<b>}</b>
+
+<font color='#009900'>// So here is our function that samples a detection from our simulated sensor.  You tell it
+</font><font color='#009900'>// what object you want to sample a detection from and it returns a detection from that
+</font><font color='#009900'>// object.
+</font>detection <b><a name='sample_detection_from_sensor'></a>sample_detection_from_sensor</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> object_id<font face='Lucida Console'>)</font>
+<b>{</b>
+    <font color='#BB00BB'>DLIB_CASSERT</font><font face='Lucida Console'>(</font>object_id <font color='#5555FF'>&lt;</font> num_objects, 
+        "<font color='#CC0000'>You can't ask to sample a detection from an object that doesn't exist.</font>"<font face='Lucida Console'>)</font>; 
+    detection temp;
+    <font color='#009900'>// Set the measurements equal to the object's true property values plus a little bit of
+</font>    <font color='#009900'>// noise.
+</font>    temp.measurements <font color='#5555FF'>=</font> object_properties[object_id] <font color='#5555FF'>+</font> <font color='#BB00BB'>randm</font><font face='Lucida Console'>(</font>num_properties,<font color='#979000'>1</font>,rnd<font face='Lucida Console'>)</font><font color='#5555FF'>*</font><font color='#979000'>0.1</font>;
+    <font color='#0000FF'>return</font> temp;
+<b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<font color='#0000FF'>typedef</font> std::vector<font color='#5555FF'>&lt;</font>labeled_detection<font color='#5555FF'>&lt;</font>detection<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> detections_at_single_time_step;
+<font color='#0000FF'>typedef</font> std::vector<font color='#5555FF'>&lt;</font>detections_at_single_time_step<font color='#5555FF'>&gt;</font> track_history;
+
+track_history <b><a name='make_random_tracking_data_for_training'></a>make_random_tracking_data_for_training</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+<b>{</b>
+    <font color='#009900'>/*
+        Since we are using machine learning we need some training data.  This function
+        samples data from our sensor and creates labeled track histories.  In these track
+        histories, each detection is labeled with its true track ID.  The goal of the
+        machine learning tools will then be to learn to associate all the detections with
+        the same ID to the same track object.
+    */</font>
+
+    track_history data;
+
+    <font color='#009900'>// At each time step we get a set of detections from the objects in the world.
+</font>    <font color='#009900'>// Simulate 100 time steps worth of data where there are 3 objects present. 
+</font>    <font color='#0000FF'>const</font> <font color='#0000FF'><u>int</u></font> num_time_steps <font color='#5555FF'>=</font> <font color='#979000'>100</font>;
+    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> num_time_steps; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+    <b>{</b>
+        detections_at_single_time_step <font color='#BB00BB'>dets</font><font face='Lucida Console'>(</font><font color='#979000'>3</font><font face='Lucida Console'>)</font>;
+        <font color='#009900'>// sample a detection from object 0
+</font>        dets[<font color='#979000'>0</font>].det <font color='#5555FF'>=</font> <font color='#BB00BB'>sample_detection_from_sensor</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+        dets[<font color='#979000'>0</font>].label <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+
+        <font color='#009900'>// sample a detection from object 1
+</font>        dets[<font color='#979000'>1</font>].det <font color='#5555FF'>=</font> <font color='#BB00BB'>sample_detection_from_sensor</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+        dets[<font color='#979000'>1</font>].label <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+
+        <font color='#009900'>// sample a detection from object 2
+</font>        dets[<font color='#979000'>2</font>].det <font color='#5555FF'>=</font> <font color='#BB00BB'>sample_detection_from_sensor</font><font face='Lucida Console'>(</font><font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+        dets[<font color='#979000'>2</font>].label <font color='#5555FF'>=</font> <font color='#979000'>2</font>;
+
+        data.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>dets<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+    <font color='#009900'>// Now let's imagine object 1 and 2 are gone but a new object, object 3 has arrived.  
+</font>    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> num_time_steps; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+    <b>{</b>
+        detections_at_single_time_step <font color='#BB00BB'>dets</font><font face='Lucida Console'>(</font><font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+        <font color='#009900'>// sample a detection from object 0
+</font>        dets[<font color='#979000'>0</font>].det <font color='#5555FF'>=</font> <font color='#BB00BB'>sample_detection_from_sensor</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+        dets[<font color='#979000'>0</font>].label <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+
+        <font color='#009900'>// sample a detection from object 3
+</font>        dets[<font color='#979000'>1</font>].det <font color='#5555FF'>=</font> <font color='#BB00BB'>sample_detection_from_sensor</font><font face='Lucida Console'>(</font><font color='#979000'>3</font><font face='Lucida Console'>)</font>;
+        dets[<font color='#979000'>1</font>].label <font color='#5555FF'>=</font> <font color='#979000'>3</font>;
+
+        data.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>dets<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+    <font color='#0000FF'>return</font> data;
+<b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+std::vector<font color='#5555FF'>&lt;</font>detection<font color='#5555FF'>&gt;</font> <b><a name='make_random_detections'></a>make_random_detections</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> num_dets<font face='Lucida Console'>)</font>
+<b>{</b>
+    <font color='#009900'>/*
+        Finally, when we test the tracker we learned we will need to sample regular old
+        unlabeled detections.  This function helps us do that.
+    */</font>
+    <font color='#BB00BB'>DLIB_CASSERT</font><font face='Lucida Console'>(</font>num_dets <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> num_objects, 
+        "<font color='#CC0000'>You can't ask for more detections than there are objects in our little simulation.</font>"<font face='Lucida Console'>)</font>; 
+
+    std::vector<font color='#5555FF'>&lt;</font>detection<font color='#5555FF'>&gt;</font> <font color='#BB00BB'>dets</font><font face='Lucida Console'>(</font>num_dets<font face='Lucida Console'>)</font>;
+    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> dets.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+    <b>{</b>
+        dets[i] <font color='#5555FF'>=</font> <font color='#BB00BB'>sample_detection_from_sensor</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>;
+    <b>}</b>
+    <font color='#0000FF'>return</font> dets;
+<b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<font color='#0000FF'><u>int</u></font> <b><a name='main'></a>main</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+<b>{</b>
+    <font color='#BB00BB'>initialize_object_properties</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+
+    <font color='#009900'>// Get some training data.  Here we sample 5 independent track histories.  In a real
+</font>    <font color='#009900'>// world problem you would get this kind of data by, for example, collecting data from
+</font>    <font color='#009900'>// your sensor on 5 separate days where you did an independent collection each day.
+</font>    <font color='#009900'>// You can train a model with just one track history but the more you have the better.
+</font>    std::vector<font color='#5555FF'>&lt;</font>track_history<font color='#5555FF'>&gt;</font> data;
+    data.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font><font color='#BB00BB'>make_random_tracking_data_for_training</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+    data.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font><font color='#BB00BB'>make_random_tracking_data_for_training</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+    data.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font><font color='#BB00BB'>make_random_tracking_data_for_training</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+    data.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font><font color='#BB00BB'>make_random_tracking_data_for_training</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+    data.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font><font color='#BB00BB'>make_random_tracking_data_for_training</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+
+    structural_track_association_trainer trainer;
+    <font color='#009900'>// Note that the machine learning tools have a parameter.  This is the usual SVM C
+</font>    <font color='#009900'>// parameter that controls the trade-off between trying to fit the training data or
+</font>    <font color='#009900'>// producing a "simpler" solution.  You need to try a few different values of this
+</font>    <font color='#009900'>// parameter to find out what setting works best for your problem (try values in the
+</font>    <font color='#009900'>// range 0.001 to 1000000).
+</font>    trainer.<font color='#BB00BB'>set_c</font><font face='Lucida Console'>(</font><font color='#979000'>100</font><font face='Lucida Console'>)</font>;
+    <font color='#009900'>// Now do the training.
+</font>    track_association_function<font color='#5555FF'>&lt;</font>detection<font color='#5555FF'>&gt;</font> assoc <font color='#5555FF'>=</font> trainer.<font color='#BB00BB'>train</font><font face='Lucida Console'>(</font>data<font face='Lucida Console'>)</font>;
+
+    <font color='#009900'>// We can test the accuracy of the learned association function on some track history
+</font>    <font color='#009900'>// data.  Here we test it on the data we trained on.  It outputs a single number that
+</font>    <font color='#009900'>// measures the fraction of detections which were correctly associated to their tracks.
+</font>    <font color='#009900'>// So a value of 1 indicates perfect tracking and a value of 0 indicates totally wrong
+</font>    <font color='#009900'>// tracking.
+</font>    cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>Association accuracy on training data: </font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>test_track_association_function</font><font face='Lucida Console'>(</font>assoc, data<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+    <font color='#009900'>// It's very important to test the output of a machine learning method on data it
+</font>    <font color='#009900'>// wasn't trained on.  You can do that by calling test_track_association_function() on
+</font>    <font color='#009900'>// held out data.  You can also use cross-validation like so:
+</font>    cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>Association accuracy from 5-fold CV:   </font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>cross_validate_track_association_trainer</font><font face='Lucida Console'>(</font>trainer, data, <font color='#979000'>5</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+    <font color='#009900'>// Unsurprisingly, the testing functions show that the assoc function we learned
+</font>    <font color='#009900'>// perfectly associates all detections to tracks in this easy data.
+</font>
+
+
+
+    <font color='#009900'>// OK.  So how do you use this assoc thing?  Let's use it to do some tracking!
+</font>
+    <font color='#009900'>// tracks contains all our current tracks.  Initially it is empty.
+</font>    std::vector<font color='#5555FF'>&lt;</font>track<font color='#5555FF'>&gt;</font> tracks;
+    cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>number of tracks: </font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> tracks.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+
+    <font color='#009900'>// Sample detections from 3 objects.
+</font>    std::vector<font color='#5555FF'>&lt;</font>detection<font color='#5555FF'>&gt;</font> dets <font color='#5555FF'>=</font> <font color='#BB00BB'>make_random_detections</font><font face='Lucida Console'>(</font><font color='#979000'>3</font><font face='Lucida Console'>)</font>;
+    <font color='#009900'>// Calling assoc(), the function we just learned, performs the detection to track
+</font>    <font color='#009900'>// association.  It will also call each track's update_track() function with the
+</font>    <font color='#009900'>// associated detection.  For tracks that don't get a detection, it calls
+</font>    <font color='#009900'>// propagate_track(). 
+</font>    <font color='#BB00BB'>assoc</font><font face='Lucida Console'>(</font>tracks, dets<font face='Lucida Console'>)</font>;
+    <font color='#009900'>// Now there are 3 things in tracks.
+</font>    cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>number of tracks: </font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> tracks.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+
+    <font color='#009900'>// Run the tracker for a few more time steps...
+</font>    dets <font color='#5555FF'>=</font> <font color='#BB00BB'>make_random_detections</font><font face='Lucida Console'>(</font><font color='#979000'>3</font><font face='Lucida Console'>)</font>;
+    <font color='#BB00BB'>assoc</font><font face='Lucida Console'>(</font>tracks, dets<font face='Lucida Console'>)</font>;
+    cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>number of tracks: </font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> tracks.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+
+    dets <font color='#5555FF'>=</font> <font color='#BB00BB'>make_random_detections</font><font face='Lucida Console'>(</font><font color='#979000'>3</font><font face='Lucida Console'>)</font>;
+    <font color='#BB00BB'>assoc</font><font face='Lucida Console'>(</font>tracks, dets<font face='Lucida Console'>)</font>;
+    cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>number of tracks: </font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> tracks.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+
+    <font color='#009900'>// Now another object has appeared!  There are 4 objects now.
+</font>    dets <font color='#5555FF'>=</font> <font color='#BB00BB'>make_random_detections</font><font face='Lucida Console'>(</font><font color='#979000'>4</font><font face='Lucida Console'>)</font>;
+    <font color='#BB00BB'>assoc</font><font face='Lucida Console'>(</font>tracks, dets<font face='Lucida Console'>)</font>;
+    <font color='#009900'>// Now there are 4 tracks instead of 3!
+</font>    cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>number of tracks: </font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> tracks.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+
+    <font color='#009900'>// That 4th object just vanished.  Let's look at the time_since_last_association values
+</font>    <font color='#009900'>// for each track.  We will see that one of the tracks isn't getting updated with
+</font>    <font color='#009900'>// detections anymore since the object it corresponds to is no longer present.
+</font>    dets <font color='#5555FF'>=</font> <font color='#BB00BB'>make_random_detections</font><font face='Lucida Console'>(</font><font color='#979000'>3</font><font face='Lucida Console'>)</font>;
+    <font color='#BB00BB'>assoc</font><font face='Lucida Console'>(</font>tracks, dets<font face='Lucida Console'>)</font>;
+    cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>number of tracks: </font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> tracks.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> tracks.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+        cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>   time since last association: </font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> tracks[i].time_since_last_association <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+
+    dets <font color='#5555FF'>=</font> <font color='#BB00BB'>make_random_detections</font><font face='Lucida Console'>(</font><font color='#979000'>3</font><font face='Lucida Console'>)</font>;
+    <font color='#BB00BB'>assoc</font><font face='Lucida Console'>(</font>tracks, dets<font face='Lucida Console'>)</font>;
+    cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>number of tracks: </font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> tracks.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> tracks.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+        cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>   time since last association: </font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> tracks[i].time_since_last_association <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+
+
+
+
+
+
+    <font color='#009900'>// Finally, you can save your track_association_function to disk like so:
+</font>    <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>track_assoc.svm</font>"<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> assoc;
+
+    <font color='#009900'>// And recall it from disk later like so:
+</font>    <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>track_assoc.svm</font>"<font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font> assoc;
+<b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+
+</pre></body></html>

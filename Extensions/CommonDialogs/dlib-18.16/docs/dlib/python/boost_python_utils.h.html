@@ -1,0 +1,86 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - boost_python_utils.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2013  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_BOOST_PYTHON_UtILS_Hh_
+<font color='#0000FF'>#define</font> DLIB_BOOST_PYTHON_UtILS_Hh_
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>boost<font color='#5555FF'>/</font>python.hpp<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>vector<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>string<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>serialize.h<font color='#5555FF'>&gt;</font>
+
+<font color='#0000FF'>inline</font> <font color='#0000FF'><u>bool</u></font> <b><a name='hasattr'></a>hasattr</b><font face='Lucida Console'>(</font>
+    boost::python::object obj, 
+    <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> attr_name
+<font face='Lucida Console'>)</font> 
+<font color='#009900'>/*!
+    ensures
+        - if (obj has an attribute named attr_name) then
+            - returns true
+        - else
+            - returns false
+!*/</font>
+<b>{</b>
+     <font color='#0000FF'>return</font> <font color='#BB00BB'>PyObject_HasAttrString</font><font face='Lucida Console'>(</font>obj.<font color='#BB00BB'>ptr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, attr_name.<font color='#BB00BB'>c_str</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+<b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+std::vector<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font> <b><a name='python_list_to_vector'></a>python_list_to_vector</b> <font face='Lucida Console'>(</font>
+    <font color='#0000FF'>const</font> boost::python::object<font color='#5555FF'>&amp;</font> obj
+<font face='Lucida Console'>)</font>
+<font color='#009900'>/*!
+    ensures
+        - converts a python object into a std::vector&lt;T&gt; and returns it.
+!*/</font>
+<b>{</b>
+    std::vector<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font> <font color='#BB00BB'>vect</font><font face='Lucida Console'>(</font><font color='#BB00BB'>len</font><font face='Lucida Console'>(</font>obj<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> vect.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+    <b>{</b>
+        vect[i] <font color='#5555FF'>=</font> boost::python::extract<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>obj[i]<font face='Lucida Console'>)</font>;
+    <b>}</b>
+    <font color='#0000FF'>return</font> vect;
+<b>}</b>
+
+<font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+boost::python::list <b><a name='vector_to_python_list'></a>vector_to_python_list</b> <font face='Lucida Console'>(</font>
+    <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> vect
+<font face='Lucida Console'>)</font>
+<font color='#009900'>/*!
+    ensures
+        - converts a std::vector&lt;T&gt; into a python list object.
+!*/</font>
+<b>{</b>
+    boost::python::list obj;
+    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> vect.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+        obj.<font color='#BB00BB'>append</font><font face='Lucida Console'>(</font>vect[i]<font face='Lucida Console'>)</font>;
+    <font color='#0000FF'>return</font> obj;
+<b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+boost::shared_ptr<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font> <b><a name='load_object_from_file'></a>load_object_from_file</b> <font face='Lucida Console'>(</font>
+    <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> filename
+<font face='Lucida Console'>)</font>
+<font color='#009900'>/*!
+    ensures
+        - deserializes an object of type T from the given file and returns it.
+!*/</font>
+<b>{</b>
+    std::ifstream <font color='#BB00BB'>fin</font><font face='Lucida Console'>(</font>filename.<font color='#BB00BB'>c_str</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, std::ios::binary<font face='Lucida Console'>)</font>;
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font>fin<font face='Lucida Console'>)</font>
+        <font color='#0000FF'>throw</font> dlib::<font color='#BB00BB'>error</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>Unable to open </font>" <font color='#5555FF'>+</font> filename<font face='Lucida Console'>)</font>;
+    boost::shared_ptr<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font> <font color='#BB00BB'>obj</font><font face='Lucida Console'>(</font><font color='#0000FF'>new</font> <font color='#BB00BB'>T</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+    <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font>obj, fin<font face='Lucida Console'>)</font>;
+    <font color='#0000FF'>return</font> obj;
+<b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_BOOST_PYTHON_UtILS_Hh_
+</font>
+
+</pre></body></html>

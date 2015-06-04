@@ -1,0 +1,60 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - std_allocator_ex.cpp</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// The contents of this file are in the public domain. See LICENSE_FOR_EXAMPLE_PROGRAMS.txt
+</font><font color='#009900'>/*
+    This is an example illustrating the use of the dlib::std_allocator object.
+
+    In this example we will create the necessary typedefs to give the
+    dlib::std_allocator object to the standard string and vector objects
+    in the STL.  Thus we will create versions of std::string and std::vector
+    that perform all their memory allocations and deallocations via one of 
+    the dlib memory manager objects.
+*/</font>
+
+
+<font color='#009900'>// include everything we need for this example
+</font><font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>vector<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>iostream<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>string<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>std_allocator.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>memory_manager.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>memory_manager_stateless.h<font color='#5555FF'>&gt;</font>
+
+<font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> std;
+<font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> dlib;
+
+
+<font color='#0000FF'><u>int</u></font> <b><a name='main'></a>main</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+<b>{</b>
+    <font color='#009900'>// Make a typedef for an allocator that uses the thread safe memory_manager_stateless object with a 
+</font>    <font color='#009900'>// global memory pool.  This version of the memory_manager_stateless object keeps everything it allocates
+</font>    <font color='#009900'>// in a global memory pool and doesn't release any memory until the program terminates.
+</font>    <font color='#0000FF'>typedef</font> std_allocator<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>char</u></font>, memory_manager_stateless<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font>::kernel_2_3a<font color='#5555FF'>&gt;</font> alloc_char_with_global_memory_pool;
+
+    <font color='#009900'>// Now make a typedef for a C++ standard string that uses our new allocator type
+</font>    <font color='#0000FF'>typedef</font> std::basic_string<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>char</u></font>, char_traits<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font>, alloc_char_with_global_memory_pool <font color='#5555FF'>&gt;</font> dstring;
+
+
+    <font color='#009900'>// typedef another allocator for dstring objects
+</font>    <font color='#0000FF'>typedef</font> std_allocator<font color='#5555FF'>&lt;</font>dstring, memory_manager_stateless<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font>::kernel_2_3a<font color='#5555FF'>&gt;</font> alloc_dstring_with_global_memory_pool;
+
+    <font color='#009900'>// Now make a typedef for a C++ standard vector that uses our new allocator type and also contains the new dstring
+</font>    <font color='#0000FF'>typedef</font> std::vector<font color='#5555FF'>&lt;</font>dstring, alloc_dstring_with_global_memory_pool <font color='#5555FF'>&gt;</font> dvector;
+
+    <font color='#009900'>// Now we can use the string and vector we have as we normally would.  So for example, I can make a
+</font>    <font color='#009900'>// dvector and add 4 strings into it like so:
+</font>    dvector v;
+    v.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>one</font>"<font face='Lucida Console'>)</font>;
+    v.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>two</font>"<font face='Lucida Console'>)</font>;
+    v.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>three</font>"<font face='Lucida Console'>)</font>;
+    v.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>four</font>"<font face='Lucida Console'>)</font>;
+
+    <font color='#009900'>// And now we print out the contents of our vector
+</font>    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> v.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+    <b>{</b>
+        cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> v[i] <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+    <b>}</b>
+
+<b>}</b>
+
+
+</pre></body></html>

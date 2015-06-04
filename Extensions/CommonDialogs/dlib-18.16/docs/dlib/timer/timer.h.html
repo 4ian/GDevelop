@@ -1,0 +1,429 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - timer.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2007  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_TIMEr_Hh_
+<font color='#0000FF'>#define</font> DLIB_TIMEr_Hh_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../threads.h.html'>../threads.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../algs.h.html'>../algs.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../misc_api.h.html'>../misc_api.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='timer_abstract.h.html'>timer_abstract.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../uintn.h.html'>../uintn.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../binary_search_tree.h.html'>../binary_search_tree.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../smart_pointers_thread_safe.h.html'>../smart_pointers_thread_safe.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='timer_heavy.h.html'>timer_heavy.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+    <font color='#0000FF'>struct</font> <b><a name='timer_base'></a>timer_base</b> : <font color='#0000FF'>public</font> threaded_object
+    <b>{</b>
+        <font color='#009900'>/*!
+            WHAT THIS OBJECT REPRESENTS
+                This object contains the base members of the timer object.
+                It exists so that we can access them from outside any templated functions.
+        !*/</font>
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> delay;
+        <font color='#009900'>// these are only modified by the global_clock
+</font>        uint64 next_time_to_run;
+        timestamper ts;
+        <font color='#0000FF'><u>bool</u></font> running;
+        <font color='#0000FF'><u>bool</u></font> in_global_clock;
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>class</font> <b><a name='timer_global_clock'></a>timer_global_clock</b> : <font color='#0000FF'>private</font> threaded_object
+    <b>{</b>
+        <font color='#009900'>/*!
+            This object sets up a timer that triggers the action function
+            for timer objects that are tracked inside this object. 
+            INITIAL VALUE
+                - shutdown == false
+                - running == false
+
+            CONVENTION
+                - if (shutdown) then
+                    - thread() should terminate
+                - else (running) then
+                    - thread() is running
+
+                - tm[time] == pointer to a timer_base object 
+        !*/</font>
+        <font color='#0000FF'>typedef</font> binary_search_tree<font color='#5555FF'>&lt;</font>uint64,timer_base<font color='#5555FF'>*</font>,memory_manager<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font>::kernel_2b<font color='#5555FF'>&gt;</font>::kernel_2a_c time_map;
+    <font color='#0000FF'>public</font>:
+
+        ~<b><a name='timer_global_clock'></a>timer_global_clock</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='add'></a>add</b> <font face='Lucida Console'>(</font>
+            timer_base<font color='#5555FF'>*</font> r
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - m is locked
+            ensures
+                - starts the thread if it isn't already started
+                - adds r to tm
+                - #r-&gt;in_global_clock == true
+                - updates r-&gt;next_time_to_run appropriately according to
+                    r-&gt;delay
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='remove'></a>remove</b> <font face='Lucida Console'>(</font>
+            timer_base<font color='#5555FF'>*</font> r
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - m is locked
+            ensures
+                - if (r is in tm) then
+                    - removes r from tm
+                - #r-&gt;in_global_clock == false
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='adjust_delay'></a>adjust_delay</b> <font face='Lucida Console'>(</font>
+            timer_base<font color='#5555FF'>*</font> r,
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> new_delay
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - m is locked
+            ensures
+                - #r-&gt;delay == new_delay
+                - if (r-&gt;in_global_clock) then
+                    - the time to the next event will have been appropriately adjusted
+        !*/</font>
+
+        mutex m;
+
+        <font color='#0000FF'>friend</font> shared_ptr_thread_safe<font color='#5555FF'>&lt;</font>timer_global_clock<font color='#5555FF'>&gt;</font> <b><a name='get_global_clock'></a>get_global_clock</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+    <font color='#0000FF'>private</font>:
+        <b><a name='timer_global_clock'></a>timer_global_clock</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+        time_map tm;  
+        signaler s;
+        <font color='#0000FF'><u>bool</u></font> shutdown;
+        <font color='#0000FF'><u>bool</u></font> running;
+        timestamper ts;
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='thread'></a>thread</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - spawns timer tasks as is appropriate
+        !*/</font>
+    <b>}</b>;
+    shared_ptr_thread_safe<font color='#5555FF'>&lt;</font>timer_global_clock<font color='#5555FF'>&gt;</font> <b><a name='get_global_clock'></a>get_global_clock</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        ensures
+            - returns the global instance of the timer_global_clock object
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>class</font> <b><a name='timer'></a>timer</b> : <font color='#0000FF'>private</font> timer_base 
+    <b>{</b>
+        <font color='#009900'>/*!
+            INITIAL VALUE
+                - running   == false
+                - delay     == 1000
+                - ao        == a pointer to the action_object()
+                - af        == a pointer to the action_function()
+                - in_global_clock == false
+                - next_time_to_run == 0
+                - gc == get_global_clock()
+
+            CONVENTION
+                - the mutex used to lock everything is gc-&gt;m
+                - running == is_running()
+                - delay == delay_time()
+                - *ao == action_object()
+                - af == action_function()    
+                - if (!running) then
+                    - in_global_clock == false
+                - else 
+                    - next_time_to_run == the next time this timer should run according
+                      to the timestamper in the global_clock
+        !*/</font>
+
+    <font color='#0000FF'>public</font>:
+
+        <font color='#009900'>// These typedefs are here for backwards compatibility with previous versions of
+</font>        <font color='#009900'>// dlib.
+</font>        <font color='#0000FF'>typedef</font> timer_heavy<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font> kernel_1a;
+        <font color='#0000FF'>typedef</font> timer kernel_2a;
+
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'><u>void</u></font> <font face='Lucida Console'>(</font>T::<font color='#5555FF'>*</font>af_type<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+        <b><a name='timer'></a>timer</b><font face='Lucida Console'>(</font>  
+            T<font color='#5555FF'>&amp;</font> ao_,
+            af_type af_
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>virtual</font> ~<b><a name='timer'></a>timer</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='clear'></a>clear</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+
+        af_type <b><a name='action_function'></a>action_function</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+        <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> <b><a name='action_object'></a>action_object</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+        T<font color='#5555FF'>&amp;</font> <b><a name='action_object'></a>action_object</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='is_running'></a>is_running</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='delay_time'></a>delay_time</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_delay_time'></a>set_delay_time</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> milliseconds
+        <font face='Lucida Console'>)</font>;
+        
+        <font color='#0000FF'><u>void</u></font> <b><a name='start'></a>start</b> <font face='Lucida Console'>(</font>            
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='stop'></a>stop</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='stop_and_wait'></a>stop_and_wait</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+
+    <font color='#0000FF'>private</font>: 
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='thread'></a>thread</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - calls the action function
+        !*/</font>
+
+        <font color='#009900'>// data members
+</font>        T<font color='#5555FF'>&amp;</font> ao;
+        <font color='#0000FF'>const</font> af_type af;
+        shared_ptr_thread_safe<font color='#5555FF'>&lt;</font>timer_global_clock<font color='#5555FF'>&gt;</font> gc;
+
+        <font color='#009900'>// restricted functions
+</font>        <b><a name='timer'></a>timer</b><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> timer<font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font>;        <font color='#009900'>// copy constructor
+</font>        timer<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>=</font><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> timer<font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font>;    <font color='#009900'>// assignment operator
+</font>
+    <b>}</b>;    
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>    <font color='#009900'>// member function definitions
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>    
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    timer<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font>::
+    <b><a name='timer'></a>timer</b><font face='Lucida Console'>(</font>  
+        T<font color='#5555FF'>&amp;</font> ao_,
+        af_type af_
+    <font face='Lucida Console'>)</font> : 
+        ao<font face='Lucida Console'>(</font>ao_<font face='Lucida Console'>)</font>,
+        af<font face='Lucida Console'>(</font>af_<font face='Lucida Console'>)</font>,
+        gc<font face='Lucida Console'>(</font>get_global_clock<font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+    <b>{</b>
+        delay <font color='#5555FF'>=</font> <font color='#979000'>1000</font>;
+        next_time_to_run <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        running <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+        in_global_clock <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    timer<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font>::
+    ~<b><a name='timer'></a>timer</b><font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>wait</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> timer<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font>::
+    <b><a name='clear'></a>clear</b><font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        auto_mutex <font color='#BB00BB'>M</font><font face='Lucida Console'>(</font>gc<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>m<font face='Lucida Console'>)</font>;
+        running <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+        gc<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>remove</font><font face='Lucida Console'>(</font><font color='#0000FF'>this</font><font face='Lucida Console'>)</font>;
+        delay <font color='#5555FF'>=</font> <font color='#979000'>1000</font>;        
+        next_time_to_run <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>typename</font> timer<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font>::af_type timer<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font>::
+    <b><a name='action_function'></a>action_function</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        <font color='#0000FF'>return</font> af;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> timer<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font>::
+    <b><a name='action_object'></a>action_object</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        <font color='#0000FF'>return</font> ao;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    T<font color='#5555FF'>&amp;</font> timer<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font>::
+    <b><a name='action_object'></a>action_object</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>return</font> ao;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>bool</u></font> timer<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font>::
+    <b><a name='is_running'></a>is_running</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        auto_mutex <font color='#BB00BB'>M</font><font face='Lucida Console'>(</font>gc<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>m<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>return</font> running;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> timer<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font>::
+    <b><a name='delay_time'></a>delay_time</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        auto_mutex <font color='#BB00BB'>M</font><font face='Lucida Console'>(</font>gc<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>m<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>return</font> delay;        
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> timer<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font>::
+    <b><a name='set_delay_time'></a>set_delay_time</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> milliseconds
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        auto_mutex <font color='#BB00BB'>M</font><font face='Lucida Console'>(</font>gc<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>m<font face='Lucida Console'>)</font>;
+        gc<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>adjust_delay</font><font face='Lucida Console'>(</font><font color='#0000FF'>this</font>,milliseconds<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> timer<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font>::
+    <b><a name='start'></a>start</b> <font face='Lucida Console'>(</font>            
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        auto_mutex <font color='#BB00BB'>M</font><font face='Lucida Console'>(</font>gc<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>m<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font>running<font face='Lucida Console'>)</font>
+        <b>{</b>
+            gc<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>add</font><font face='Lucida Console'>(</font><font color='#0000FF'>this</font><font face='Lucida Console'>)</font>;
+            running <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+        <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> timer<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font>::
+    <b><a name='stop'></a>stop</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        gc<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>m.<font color='#BB00BB'>lock</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        running <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+        gc<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>remove</font><font face='Lucida Console'>(</font><font color='#0000FF'>this</font><font face='Lucida Console'>)</font>;
+        gc<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>m.<font color='#BB00BB'>unlock</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> timer<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font>::
+    <b><a name='thread'></a>thread</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#009900'>// call the action function
+</font>        <font face='Lucida Console'>(</font>ao.<font color='#5555FF'>*</font>af<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; 
+        auto_mutex <font color='#BB00BB'>M</font><font face='Lucida Console'>(</font>gc<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>m<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>running<font face='Lucida Console'>)</font>
+        <b>{</b>
+            gc<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>remove</font><font face='Lucida Console'>(</font><font color='#0000FF'>this</font><font face='Lucida Console'>)</font>;
+            gc<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>add</font><font face='Lucida Console'>(</font><font color='#0000FF'>this</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> timer<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font>::
+    <b><a name='stop_and_wait'></a>stop_and_wait</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        gc<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>m.<font color='#BB00BB'>lock</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        running <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+        gc<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>remove</font><font face='Lucida Console'>(</font><font color='#0000FF'>this</font><font face='Lucida Console'>)</font>;
+        gc<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>m.<font color='#BB00BB'>unlock</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>wait</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#ifdef</font> NO_MAKEFILE
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='timer.cpp.html'>timer.cpp</a>"
+<font color='#0000FF'>#endif</font>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_TIMEr_Hh_
+</font>
+
+
+</pre></body></html>

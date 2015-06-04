@@ -1,0 +1,572 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - lz77_buffer.cpp</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2004  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font>
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>sstream<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>string<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>ctime<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>cstdlib<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>sliding_buffer.h<font color='#5555FF'>&gt;</font>
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>lz77_buffer.h<font color='#5555FF'>&gt;</font>
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='tester.h.html'>tester.h</a>"
+
+<font color='#0000FF'>namespace</font>  
+<b>{</b>
+    <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> test;
+    <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> std;
+    <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> dlib;
+
+    logger <b><a name='dlog'></a>dlog</b><font face='Lucida Console'>(</font>"<font color='#CC0000'>test.lz77_buffer</font>"<font face='Lucida Console'>)</font>;
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> buf
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='lz77_buffer_kernel_test'></a>lz77_buffer_kernel_test</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font>
+    <font color='#009900'>/*!
+        requires
+            - buf is an implementation of lz77_buffer/lz77_buffer_kernel_abstract.h 
+        ensures
+            - runs tests on buf for compliance with the specs 
+    !*/</font>
+    <b>{</b>        
+        <font color='#0000FF'>typedef</font> dlib::sliding_buffer<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font>::kernel_1a sbuf;
+
+        buf <font color='#BB00BB'>test</font><font face='Lucida Console'>(</font><font color='#979000'>8</font>,<font color='#979000'>20</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>srand</font><font face='Lucida Console'>(</font><font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>int</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#BB00BB'>time</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>test.<font color='#BB00BB'>get_lookahead_buffer_size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>test.<font color='#BB00BB'>get_history_buffer_size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST_MSG</font><font face='Lucida Console'>(</font>test.<font color='#BB00BB'>get_history_buffer_limit</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>256</font><font color='#5555FF'>-</font><font color='#979000'>20</font>,test.<font color='#BB00BB'>get_history_buffer_limit</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>test.<font color='#BB00BB'>get_lookahead_buffer_limit</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>20</font><font face='Lucida Console'>)</font>;
+
+
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> g <font color='#5555FF'>=</font> <font color='#979000'>0</font>; g <font color='#5555FF'>&lt;</font> <font color='#979000'>2</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>g<font face='Lucida Console'>)</font>
+        <b>{</b>
+            test.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> <font color='#979000'>1000</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                test.<font color='#BB00BB'>add</font><font face='Lucida Console'>(</font>'<font color='#FF0000'>a</font>'<font face='Lucida Console'>)</font>;
+            <b>}</b>
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>test.<font color='#BB00BB'>get_lookahead_buffer_size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>20</font><font face='Lucida Console'>)</font>;
+
+
+            test.<font color='#BB00BB'>shift_buffers</font><font face='Lucida Console'>(</font><font color='#979000'>5</font><font face='Lucida Console'>)</font>;
+
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>test.<font color='#BB00BB'>get_lookahead_buffer_size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>15</font><font face='Lucida Console'>)</font>;
+
+
+
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> index, length, temp;
+            temp <font color='#5555FF'>=</font> test.<font color='#BB00BB'>get_lookahead_buffer_size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            test.<font color='#BB00BB'>find_match</font><font face='Lucida Console'>(</font>index,length,<font color='#979000'>5</font><font face='Lucida Console'>)</font>;
+
+
+            <font color='#BB00BB'>DLIB_TEST_MSG</font><font face='Lucida Console'>(</font>length <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> temp,
+                         "<font color='#CC0000'>length: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> length <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font>
+                         "<font color='#CC0000'>\ntemp: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> temp<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>test.<font color='#BB00BB'>get_lookahead_buffer_size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#979000'>15</font><font face='Lucida Console'>)</font>;
+
+
+        <b>}</b>
+
+
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> g <font color='#5555FF'>=</font> <font color='#979000'>0</font>; g <font color='#5555FF'>&lt;</font> <font color='#979000'>2</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>g<font face='Lucida Console'>)</font>
+        <b>{</b>
+
+
+
+            test.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+
+
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>test.<font color='#BB00BB'>get_lookahead_buffer_size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>test.<font color='#BB00BB'>get_history_buffer_size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>test.<font color='#BB00BB'>get_history_buffer_limit</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>256</font><font color='#5555FF'>-</font><font color='#979000'>20</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>test.<font color='#BB00BB'>get_lookahead_buffer_limit</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>20</font><font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> a,b, temp <font color='#5555FF'>=</font> test.<font color='#BB00BB'>get_lookahead_buffer_size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            test.<font color='#BB00BB'>find_match</font><font face='Lucida Console'>(</font>a,b,<font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>b <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> temp<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>b <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+
+            test.<font color='#BB00BB'>find_match</font><font face='Lucida Console'>(</font>a,b,<font color='#979000'>5</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>b <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>test.<font color='#BB00BB'>get_lookahead_buffer_size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>test.<font color='#BB00BB'>get_history_buffer_size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>test.<font color='#BB00BB'>get_history_buffer_limit</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>256</font><font color='#5555FF'>-</font><font color='#979000'>20</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>test.<font color='#BB00BB'>get_lookahead_buffer_limit</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>20</font><font face='Lucida Console'>)</font>;
+
+
+
+            ostringstream sout;
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>DLIB_TEST_MSG(test.get_lookahead_buffer_size() == 0,);\n</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>DLIB_TEST_MSG(test.get_history_buffer_size() == 0,);\n</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>DLIB_TEST_MSG(test.get_history_buffer_limit() == 256-20,);\n</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>DLIB_TEST_MSG(test.get_lookahead_buffer_limit() == 20,);\n</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>DLIB_TEST_MSG(test.get_lookahead_buffer_size() == 0,);\n</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>DLIB_TEST_MSG(test.get_history_buffer_size() == 0,);\n</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>DLIB_TEST_MSG(test.get_history_buffer_limit() == 256-20,);\n</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>DLIB_TEST_MSG(test.get_lookahead_buffer_limit() == 20,);\n</font>";
+            istringstream <font color='#BB00BB'>sin</font><font face='Lucida Console'>(</font>sout.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+            sout.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font>"<font color='#CC0000'></font>"<font face='Lucida Console'>)</font>;
+            sout.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> ch;
+            sbuf sbuffer;
+            sbuffer.<font color='#BB00BB'>set_size</font><font face='Lucida Console'>(</font><font color='#979000'>8</font><font face='Lucida Console'>)</font>;
+
+
+            ch <font color='#5555FF'>=</font> sin.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            sbuffer[<font color='#979000'>0</font>] <font color='#5555FF'>=</font> ch; sbuffer.<font color='#BB00BB'>rotate_left</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+            test.<font color='#BB00BB'>add</font><font face='Lucida Console'>(</font>ch<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>test.<font color='#BB00BB'>lookahead_buffer</font><font face='Lucida Console'>(</font>test.<font color='#BB00BB'>get_lookahead_buffer_size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> ch<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>test.<font color='#BB00BB'>get_lookahead_buffer_size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>test.<font color='#BB00BB'>get_history_buffer_size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>test.<font color='#BB00BB'>get_lookahead_buffer_limit</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>20</font><font face='Lucida Console'>)</font>;
+
+
+
+            ch <font color='#5555FF'>=</font> sin.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            sbuffer[<font color='#979000'>0</font>] <font color='#5555FF'>=</font> ch; sbuffer.<font color='#BB00BB'>rotate_left</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+            test.<font color='#BB00BB'>add</font><font face='Lucida Console'>(</font>ch<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>test.<font color='#BB00BB'>lookahead_buffer</font><font face='Lucida Console'>(</font>test.<font color='#BB00BB'>get_lookahead_buffer_size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> ch<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>test.<font color='#BB00BB'>get_lookahead_buffer_size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>test.<font color='#BB00BB'>get_history_buffer_size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>test.<font color='#BB00BB'>get_lookahead_buffer_limit</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>20</font><font face='Lucida Console'>)</font>;
+
+
+
+            ch <font color='#5555FF'>=</font> sin.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            sbuffer[<font color='#979000'>0</font>] <font color='#5555FF'>=</font> ch; sbuffer.<font color='#BB00BB'>rotate_left</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+            test.<font color='#BB00BB'>add</font><font face='Lucida Console'>(</font>ch<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>test.<font color='#BB00BB'>lookahead_buffer</font><font face='Lucida Console'>(</font>test.<font color='#BB00BB'>get_lookahead_buffer_size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> ch<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>test.<font color='#BB00BB'>get_lookahead_buffer_size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>3</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>test.<font color='#BB00BB'>get_history_buffer_size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// add 17 chars to test so that the lookahead buffer will be full
+</font>            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> <font color='#979000'>17</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                ch <font color='#5555FF'>=</font> sin.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                sbuffer[<font color='#979000'>0</font>] <font color='#5555FF'>=</font> ch; sbuffer.<font color='#BB00BB'>rotate_left</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+                test.<font color='#BB00BB'>add</font><font face='Lucida Console'>(</font>ch<font face='Lucida Console'>)</font>;
+                <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>test.<font color='#BB00BB'>lookahead_buffer</font><font face='Lucida Console'>(</font>test.<font color='#BB00BB'>get_lookahead_buffer_size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> ch<font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>test.<font color='#BB00BB'>get_lookahead_buffer_size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>20</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>test.<font color='#BB00BB'>get_history_buffer_size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>test.<font color='#BB00BB'>lookahead_buffer</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> sbuffer[<font color='#979000'>20</font>]<font face='Lucida Console'>)</font>;
+
+
+            ch <font color='#5555FF'>=</font> sin.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            sbuffer[<font color='#979000'>0</font>] <font color='#5555FF'>=</font> ch; sbuffer.<font color='#BB00BB'>rotate_left</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+            test.<font color='#BB00BB'>add</font><font face='Lucida Console'>(</font>ch<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>test.<font color='#BB00BB'>lookahead_buffer</font><font face='Lucida Console'>(</font>test.<font color='#BB00BB'>get_lookahead_buffer_size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> ch<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>test.<font color='#BB00BB'>get_lookahead_buffer_size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>20</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>test.<font color='#BB00BB'>get_history_buffer_size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+
+
+
+
+
+
+            <font color='#009900'>// add the above text to test and make sure it gives the correct results                
+</font>            ch <font color='#5555FF'>=</font> sin.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>sin<font face='Lucida Console'>)</font>
+            <b>{</b>
+                sbuffer[<font color='#979000'>0</font>] <font color='#5555FF'>=</font> ch; sbuffer.<font color='#BB00BB'>rotate_left</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+                test.<font color='#BB00BB'>add</font><font face='Lucida Console'>(</font>ch<font face='Lucida Console'>)</font>;
+                <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>test.<font color='#BB00BB'>lookahead_buffer</font><font face='Lucida Console'>(</font>test.<font color='#BB00BB'>get_lookahead_buffer_size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> ch<font face='Lucida Console'>)</font>;                    
+                <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>test.<font color='#BB00BB'>history_buffer</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> sbuffer[<font color='#979000'>21</font>]<font face='Lucida Console'>)</font>;
+                <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>test.<font color='#BB00BB'>history_buffer</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> sbuffer[<font color='#979000'>22</font>]<font face='Lucida Console'>)</font>;
+
+                ch <font color='#5555FF'>=</font> sin.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+
+
+            <font color='#009900'>// make sure the contents of lookahead_buffer and history_buffer 
+</font>            <font color='#009900'>// match what is in sbuffer
+</font>            sbuffer.<font color='#BB00BB'>rotate_right</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>int</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> test.<font color='#BB00BB'>get_history_buffer_size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>sbuffer[test.<font color='#BB00BB'>get_lookahead_buffer_limit</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>+</font>i] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> test.<font color='#BB00BB'>history_buffer</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>int</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> test.<font color='#BB00BB'>get_lookahead_buffer_size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>sbuffer[test.<font color='#BB00BB'>get_lookahead_buffer_limit</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#979000'>1</font><font color='#5555FF'>-</font>i] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> test.<font color='#BB00BB'>lookahead_buffer</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+            sbuffer.<font color='#BB00BB'>rotate_left</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+
+
+
+
+
+
+
+
+
+
+            sbuffer.<font color='#BB00BB'>rotate_right</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;  <font color='#009900'>// do this because we never put anything in sbuffer[0]
+</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> match_index, match_length;
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> ltemp <font color='#5555FF'>=</font> test.<font color='#BB00BB'>get_lookahead_buffer_size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            test.<font color='#BB00BB'>find_match</font><font face='Lucida Console'>(</font>match_index,match_length,<font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>match_length <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> ltemp<font face='Lucida Console'>)</font>;
+
+
+            <font color='#009900'>// verify the match with sbuffer
+</font>            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>int</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> match_length; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#BB00BB'>DLIB_TEST_MSG</font><font face='Lucida Console'>(</font>sbuffer[<font color='#979000'>19</font><font color='#5555FF'>-</font>i] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> sbuffer[match_index<font color='#5555FF'>+</font><font color='#979000'>20</font><font color='#5555FF'>-</font>i],i<font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+
+            sin.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font>"<font color='#CC0000'></font>"<font face='Lucida Console'>)</font>;
+            sin.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+        <b>}</b> <font color='#009900'>// for (int g = 0; g &lt; 2; ++g)
+</font>
+
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> g <font color='#5555FF'>=</font> <font color='#979000'>0</font>; g <font color='#5555FF'>&lt;</font> <font color='#979000'>8</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>g<font face='Lucida Console'>)</font>
+        <b>{</b>
+            test.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>test.<font color='#BB00BB'>get_lookahead_buffer_size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>test.<font color='#BB00BB'>get_history_buffer_size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>test.<font color='#BB00BB'>get_history_buffer_limit</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>256</font><font color='#5555FF'>-</font><font color='#979000'>20</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>test.<font color='#BB00BB'>get_lookahead_buffer_limit</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>20</font><font face='Lucida Console'>)</font>;
+
+
+            sbuf sbuffer;
+            sbuffer.<font color='#BB00BB'>set_size</font><font face='Lucida Console'>(</font><font color='#979000'>8</font><font face='Lucida Console'>)</font>;
+
+            ostringstream sout;
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>DLIB_TEST_MSG(test.get_lookahead_buffer_size() == 0,);\n</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>DLIB_TEST_MSG(test.get_history_buffer_size() == 0,);\n</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>DLIB_TEST_MSG(test.get_history_buffer_limit() == 256-20,);\n</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>DLIB_TEST_MSG(test.get_lookahead_buffer_limit() == 20,);\n</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>DLIB_TEST_MSG(test.get_lookahead_buffer_size() == 0,);\n</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>DLIB_TEST_MSG(test.get_history_buffer_limit() == 256-20,);\n</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>DLIB_TEST_MSG(test.get_lookahead_buffer_limit() == 20,);\n</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>DLIB_TEST_MSG(test.get_history_buffer_limit() == 256-20,);\n</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>DLIB_TEST_MSG(test.get_lookahead_buffer_size() == 0,);\n</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>DLIB_TEST_MSG(test.get_history_buffer_limit() == 256-20,);\n</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>DLIB_TEST_MSG(test.get_history_buffer_limit() == 256-20,);\n</font>";
+            istringstream <font color='#BB00BB'>sin</font><font face='Lucida Console'>(</font>sout.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> ch;
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> <font color='#979000'>100</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                ch <font color='#5555FF'>=</font> sin.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                sbuffer[<font color='#979000'>0</font>] <font color='#5555FF'>=</font> ch; sbuffer.<font color='#BB00BB'>rotate_left</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+                test.<font color='#BB00BB'>add</font><font face='Lucida Console'>(</font>ch<font face='Lucida Console'>)</font>;                    
+            <b>}</b>
+
+            <font color='#009900'>// make sure the contents of lookahead_buffer and history_buffer 
+</font>            <font color='#009900'>// match what is in sbuffer
+</font>            sbuffer.<font color='#BB00BB'>rotate_right</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>int</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> test.<font color='#BB00BB'>get_history_buffer_size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>sbuffer[test.<font color='#BB00BB'>get_lookahead_buffer_limit</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>+</font>i] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> test.<font color='#BB00BB'>history_buffer</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>int</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> test.<font color='#BB00BB'>get_lookahead_buffer_size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>sbuffer[test.<font color='#BB00BB'>get_lookahead_buffer_limit</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#979000'>1</font><font color='#5555FF'>-</font>i] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> test.<font color='#BB00BB'>lookahead_buffer</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+            sbuffer.<font color='#BB00BB'>rotate_left</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+
+
+
+
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> match_index, match_length;
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> ltemp <font color='#5555FF'>=</font> test.<font color='#BB00BB'>get_lookahead_buffer_size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            test.<font color='#BB00BB'>find_match</font><font face='Lucida Console'>(</font>match_index,match_length,<font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>match_length <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> ltemp<font face='Lucida Console'>)</font>;
+
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>test.<font color='#BB00BB'>get_lookahead_buffer_size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>20</font><font color='#5555FF'>-</font>match_length<font face='Lucida Console'>)</font>;
+
+            sbuffer.<font color='#BB00BB'>rotate_right</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;  <font color='#009900'>// do this because we never put anything in sbuffer[0]
+</font>            <font color='#009900'>// verify the match with sbuffer
+</font>            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>int</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> match_length; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>sbuffer[i<font color='#5555FF'>+</font><font color='#979000'>20</font><font color='#5555FF'>-</font>match_length] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> sbuffer[i<font color='#5555FF'>+</font><font color='#979000'>1</font><font color='#5555FF'>+</font>match_index<font color='#5555FF'>+</font><font color='#979000'>20</font><font color='#5555FF'>-</font>match_length]<font face='Lucida Console'>)</font>;
+            <b>}</b>
+            sbuffer.<font color='#BB00BB'>rotate_left</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;  <font color='#009900'>// free up sbuffer[0] for new data
+</font>
+
+
+
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> <font color='#979000'>7</font><font color='#5555FF'>+</font>g<font color='#5555FF'>*</font><font color='#979000'>2</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                ch <font color='#5555FF'>=</font> sin.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                sbuffer[<font color='#979000'>0</font>] <font color='#5555FF'>=</font> ch; sbuffer.<font color='#BB00BB'>rotate_left</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+                test.<font color='#BB00BB'>add</font><font face='Lucida Console'>(</font>ch<font face='Lucida Console'>)</font>;                    
+            <b>}</b>
+
+            ch <font color='#5555FF'>=</font> '<font color='#FF0000'>?</font>';
+            sbuffer[<font color='#979000'>0</font>] <font color='#5555FF'>=</font> ch; sbuffer.<font color='#BB00BB'>rotate_left</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+            test.<font color='#BB00BB'>add</font><font face='Lucida Console'>(</font>ch<font face='Lucida Console'>)</font>;  
+            ch <font color='#5555FF'>=</font> '<font color='#FF0000'>a</font>';
+            sbuffer[<font color='#979000'>0</font>] <font color='#5555FF'>=</font> ch; sbuffer.<font color='#BB00BB'>rotate_left</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+            test.<font color='#BB00BB'>add</font><font face='Lucida Console'>(</font>ch<font face='Lucida Console'>)</font>;  
+            ch <font color='#5555FF'>=</font> '<font color='#FF0000'>v</font>';
+            sbuffer[<font color='#979000'>0</font>] <font color='#5555FF'>=</font> ch; sbuffer.<font color='#BB00BB'>rotate_left</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+            test.<font color='#BB00BB'>add</font><font face='Lucida Console'>(</font>ch<font face='Lucida Console'>)</font>;  
+            ch <font color='#5555FF'>=</font> '<font color='#FF0000'>i</font>';
+            sbuffer[<font color='#979000'>0</font>] <font color='#5555FF'>=</font> ch; sbuffer.<font color='#BB00BB'>rotate_left</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+            test.<font color='#BB00BB'>add</font><font face='Lucida Console'>(</font>ch<font face='Lucida Console'>)</font>;  
+            ch <font color='#5555FF'>=</font> '<font color='#FF0000'>s</font>';
+            sbuffer[<font color='#979000'>0</font>] <font color='#5555FF'>=</font> ch; sbuffer.<font color='#BB00BB'>rotate_left</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+            test.<font color='#BB00BB'>add</font><font face='Lucida Console'>(</font>ch<font face='Lucida Console'>)</font>;  
+
+
+            <font color='#009900'>// adjust sbuffer due to the last call to test.find_match()
+</font>            <font color='#009900'>// but only if we haven't already added enough (20 or more) chars
+</font>            <font color='#009900'>// to fill the lookahead buffer already.  
+</font>            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>match_length <font color='#5555FF'>&gt;</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>int</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#979000'>12</font><font color='#5555FF'>+</font>g<font color='#5555FF'>*</font><font color='#979000'>2</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                sbuffer.<font color='#BB00BB'>rotate_left</font><font face='Lucida Console'>(</font>match_length<font color='#5555FF'>-</font><font face='Lucida Console'>(</font><font color='#979000'>12</font><font color='#5555FF'>+</font>g<font color='#5555FF'>*</font><font color='#979000'>2</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>; 
+
+
+
+
+
+            <font color='#009900'>// make sure the contents of lookahead_buffer and history_buffer 
+</font>            <font color='#009900'>// match what is in sbuffer
+</font>            sbuffer.<font color='#BB00BB'>rotate_right</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>int</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> test.<font color='#BB00BB'>get_history_buffer_size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>sbuffer[test.<font color='#BB00BB'>get_lookahead_buffer_limit</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>+</font>i] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> test.<font color='#BB00BB'>history_buffer</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>int</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> test.<font color='#BB00BB'>get_lookahead_buffer_size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>sbuffer[test.<font color='#BB00BB'>get_lookahead_buffer_limit</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#979000'>1</font><font color='#5555FF'>-</font>i] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> test.<font color='#BB00BB'>lookahead_buffer</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+            sbuffer.<font color='#BB00BB'>rotate_left</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+
+
+
+
+            test.<font color='#BB00BB'>find_match</font><font face='Lucida Console'>(</font>match_index,match_length,<font color='#979000'>10</font><font color='#5555FF'>+</font>g<font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>match_length <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>match_length <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>int</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#979000'>10</font><font color='#5555FF'>+</font>g<font face='Lucida Console'>)</font> <font face='Lucida Console'>)</font>;
+
+
+            sbuffer.<font color='#BB00BB'>rotate_right</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;  <font color='#009900'>// do this because we never put anything in sbuffer[0]
+</font>            <font color='#009900'>// verify the match with sbuffer
+</font>            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>int</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> match_length; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>sbuffer[i<font color='#5555FF'>+</font><font color='#979000'>20</font><font color='#5555FF'>-</font>match_length] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> sbuffer[i<font color='#5555FF'>+</font><font color='#979000'>1</font><font color='#5555FF'>+</font>match_index<font color='#5555FF'>+</font><font color='#979000'>20</font><font color='#5555FF'>-</font>match_length]<font face='Lucida Console'>)</font>;
+            <b>}</b>
+            sbuffer.<font color='#BB00BB'>rotate_left</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;  <font color='#009900'>// free up sbuffer[0] for new data
+</font>
+        <b>}</b> <font color='#009900'>// for (int g = 0; g &lt; 8; ++g)
+</font>
+
+
+
+
+
+
+        <font color='#BB00BB'>srand</font><font face='Lucida Console'>(</font><font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>int</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#BB00BB'>time</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> g <font color='#5555FF'>=</font> <font color='#979000'>0</font>; g <font color='#5555FF'>&lt;</font> <font color='#979000'>200</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>g<font face='Lucida Console'>)</font>
+        <b>{</b>
+            test.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>test.<font color='#BB00BB'>get_lookahead_buffer_size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>test.<font color='#BB00BB'>get_history_buffer_size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>test.<font color='#BB00BB'>get_history_buffer_limit</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>256</font><font color='#5555FF'>-</font><font color='#979000'>20</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>test.<font color='#BB00BB'>get_lookahead_buffer_limit</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>20</font><font face='Lucida Console'>)</font>;
+
+
+            sbuf sbuffer;
+            sbuffer.<font color='#BB00BB'>set_size</font><font face='Lucida Console'>(</font><font color='#979000'>8</font><font face='Lucida Console'>)</font>;
+
+            ostringstream sout;
+            <font color='#0000FF'><u>int</u></font> l <font color='#5555FF'>=</font> ::<font color='#BB00BB'>rand</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>%</font><font color='#979000'>500</font>;
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> l; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'><u>char</u></font> temp <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>::<font color='#BB00BB'>rand</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>%</font><font color='#979000'>256</font><font face='Lucida Console'>)</font>;
+                sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> temp;
+            <b>}</b>
+            istringstream <font color='#BB00BB'>sin</font><font face='Lucida Console'>(</font>sout.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> ch;
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> l; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                ch <font color='#5555FF'>=</font> sin.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                sbuffer[<font color='#979000'>0</font>] <font color='#5555FF'>=</font> ch; sbuffer.<font color='#BB00BB'>rotate_left</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+                test.<font color='#BB00BB'>add</font><font face='Lucida Console'>(</font>ch<font face='Lucida Console'>)</font>;                    
+            <b>}</b>
+
+            <font color='#009900'>// make sure the contents of lookahead_buffer and history_buffer 
+</font>            <font color='#009900'>// match what is in sbuffer
+</font>            sbuffer.<font color='#BB00BB'>rotate_right</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// adjust so that sbuffer[19] is the same as lookahead_buffer[0]
+</font>            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>test.<font color='#BB00BB'>get_lookahead_buffer_size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> <font color='#979000'>20</font><font face='Lucida Console'>)</font>
+                sbuffer.<font color='#BB00BB'>rotate_left</font><font face='Lucida Console'>(</font><font color='#979000'>20</font><font color='#5555FF'>-</font>test.<font color='#BB00BB'>get_lookahead_buffer_size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>int</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> test.<font color='#BB00BB'>get_history_buffer_size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>sbuffer[test.<font color='#BB00BB'>get_lookahead_buffer_limit</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>+</font>i] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> test.<font color='#BB00BB'>history_buffer</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>int</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> test.<font color='#BB00BB'>get_lookahead_buffer_size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>sbuffer[test.<font color='#BB00BB'>get_lookahead_buffer_limit</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#979000'>1</font><font color='#5555FF'>-</font>i] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> test.<font color='#BB00BB'>lookahead_buffer</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+            sbuffer.<font color='#BB00BB'>rotate_left</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+
+
+
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> match_index, match_length;
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> lookahead_size_before <font color='#5555FF'>=</font> test.<font color='#BB00BB'>get_lookahead_buffer_size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            test.<font color='#BB00BB'>find_match</font><font face='Lucida Console'>(</font>match_index,match_length,<font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>match_length <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> lookahead_size_before<font face='Lucida Console'>)</font>;
+
+
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>test.<font color='#BB00BB'>get_lookahead_buffer_size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> lookahead_size_before<font color='#5555FF'>-</font>match_length<font face='Lucida Console'>)</font>;
+
+            sbuffer.<font color='#BB00BB'>rotate_right</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;  <font color='#009900'>// do this because we never put anything in sbuffer[0]
+</font>            <font color='#009900'>// verify the match with sbuffer
+</font>            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>int</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> match_length; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#BB00BB'>DLIB_TEST_MSG</font><font face='Lucida Console'>(</font>sbuffer[<font color='#979000'>19</font><font color='#5555FF'>-</font>i] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> sbuffer[match_index<font color='#5555FF'>+</font><font color='#979000'>20</font><font color='#5555FF'>-</font>i],i<font face='Lucida Console'>)</font>;
+            <b>}</b>
+            sbuffer.<font color='#BB00BB'>rotate_left</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;  <font color='#009900'>// free up sbuffer[0] for new data
+</font>
+        <b>}</b> <font color='#009900'>// for (int g = 0; g &lt; 200; ++g)
+</font>
+
+
+
+
+
+
+
+        <font color='#BB00BB'>srand</font><font face='Lucida Console'>(</font><font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>int</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#BB00BB'>time</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> g <font color='#5555FF'>=</font> <font color='#979000'>0</font>; g <font color='#5555FF'>&lt;</font> <font color='#979000'>300</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>g<font face='Lucida Console'>)</font>
+        <b>{</b>
+            test.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>test.<font color='#BB00BB'>get_lookahead_buffer_size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>test.<font color='#BB00BB'>get_history_buffer_size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>test.<font color='#BB00BB'>get_history_buffer_limit</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>256</font><font color='#5555FF'>-</font><font color='#979000'>20</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>test.<font color='#BB00BB'>get_lookahead_buffer_limit</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>20</font><font face='Lucida Console'>)</font>;
+
+
+            sbuf sbuffer;
+            sbuffer.<font color='#BB00BB'>set_size</font><font face='Lucida Console'>(</font><font color='#979000'>8</font><font face='Lucida Console'>)</font>;
+
+            ostringstream sout;
+            <font color='#0000FF'><u>int</u></font> l <font color='#5555FF'>=</font> ::<font color='#BB00BB'>rand</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>%</font><font color='#979000'>500</font>;
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> l; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'><u>char</u></font> temp <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>::<font color='#BB00BB'>rand</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>%</font><font color='#979000'>20</font><font face='Lucida Console'>)</font>;
+                sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> temp;
+                sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> temp;
+                sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> temp;
+                sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> temp;
+                sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> temp;
+                sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> temp;
+            <b>}</b>
+            istringstream <font color='#BB00BB'>sin</font><font face='Lucida Console'>(</font>sout.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> ch;
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> l; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                ch <font color='#5555FF'>=</font> sin.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                sbuffer[<font color='#979000'>0</font>] <font color='#5555FF'>=</font> ch; sbuffer.<font color='#BB00BB'>rotate_left</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+                test.<font color='#BB00BB'>add</font><font face='Lucida Console'>(</font>ch<font face='Lucida Console'>)</font>;                    
+            <b>}</b>
+
+            <font color='#009900'>// make sure the contents of lookahead_buffer and history_buffer 
+</font>            <font color='#009900'>// match what is in sbuffer
+</font>            sbuffer.<font color='#BB00BB'>rotate_right</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// adjust so that sbuffer[19] is the same as lookahead_buffer[0]
+</font>            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>test.<font color='#BB00BB'>get_lookahead_buffer_size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> <font color='#979000'>20</font><font face='Lucida Console'>)</font>
+                sbuffer.<font color='#BB00BB'>rotate_left</font><font face='Lucida Console'>(</font><font color='#979000'>20</font><font color='#5555FF'>-</font>test.<font color='#BB00BB'>get_lookahead_buffer_size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>int</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> test.<font color='#BB00BB'>get_history_buffer_size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>sbuffer[test.<font color='#BB00BB'>get_lookahead_buffer_limit</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>+</font>i] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> test.<font color='#BB00BB'>history_buffer</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>int</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> test.<font color='#BB00BB'>get_lookahead_buffer_size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>sbuffer[test.<font color='#BB00BB'>get_lookahead_buffer_limit</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#979000'>1</font><font color='#5555FF'>-</font>i] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> test.<font color='#BB00BB'>lookahead_buffer</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+            sbuffer.<font color='#BB00BB'>rotate_left</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+
+
+
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> match_index <font color='#5555FF'>=</font> <font color='#979000'>0</font>, match_length <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> lookahead_size_before <font color='#5555FF'>=</font> test.<font color='#BB00BB'>get_lookahead_buffer_size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> history_size_before <font color='#5555FF'>=</font> test.<font color='#BB00BB'>get_history_buffer_size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            test.<font color='#BB00BB'>find_match</font><font face='Lucida Console'>(</font>match_index,match_length,<font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>match_length <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#BB00BB'>DLIB_TEST_MSG</font><font face='Lucida Console'>(</font>match_index <font color='#5555FF'>&lt;</font> history_size_before,
+                             "<font color='#CC0000'>match_index: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> match_index <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font>
+                             "<font color='#CC0000'>\nhistory_size_before: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> history_size_before<font face='Lucida Console'>)</font>;
+
+            <b>}</b>
+
+
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>test.<font color='#BB00BB'>get_lookahead_buffer_size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> lookahead_size_before<font color='#5555FF'>-</font>match_length<font face='Lucida Console'>)</font>;            
+
+            sbuffer.<font color='#BB00BB'>rotate_right</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;  <font color='#009900'>// do this because we never put anything in sbuffer[0]
+</font>            <font color='#009900'>// verify the match with sbuffer
+</font>            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>int</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> match_length; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#BB00BB'>DLIB_TEST_MSG</font><font face='Lucida Console'>(</font>sbuffer[<font color='#979000'>19</font><font color='#5555FF'>-</font>i] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> sbuffer[match_index<font color='#5555FF'>+</font><font color='#979000'>20</font><font color='#5555FF'>-</font>i],i<font face='Lucida Console'>)</font>;
+            <b>}</b>
+            sbuffer.<font color='#BB00BB'>rotate_left</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;  <font color='#009900'>// free up sbuffer[0] for new data
+</font>
+
+
+        <b>}</b> <font color='#009900'>// for (int g = 0; g &lt; 300; ++g)
+</font>
+    <b>}</b>
+
+
+
+
+    <font color='#0000FF'>class</font> <b><a name='lz77_buffer_tester'></a>lz77_buffer_tester</b> : <font color='#0000FF'>public</font> tester
+    <b>{</b>
+    <font color='#0000FF'>public</font>:
+        <b><a name='lz77_buffer_tester'></a>lz77_buffer_tester</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> :
+            tester <font face='Lucida Console'>(</font>"<font color='#CC0000'>test_lz77_buffer</font>",
+                    "<font color='#CC0000'>Runs tests on the lz77_buffer component.</font>"<font face='Lucida Console'>)</font>
+        <b>{</b><b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='perform_test'></a>perform_test</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>testing kernel_1a</font>";
+            lz77_buffer_kernel_test<font color='#5555FF'>&lt;</font>lz77_buffer::kernel_1a<font color='#5555FF'>&gt;</font>  <font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>testing kernel_1a_c</font>";
+            lz77_buffer_kernel_test<font color='#5555FF'>&lt;</font>lz77_buffer::kernel_1a_c<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>testing kernel_2a</font>";
+            lz77_buffer_kernel_test<font color='#5555FF'>&lt;</font>lz77_buffer::kernel_2a<font color='#5555FF'>&gt;</font>  <font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>testing kernel_2a_c</font>";
+            lz77_buffer_kernel_test<font color='#5555FF'>&lt;</font>lz77_buffer::kernel_2a_c<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+    <b>}</b> a;
+
+<b>}</b>
+
+
+</pre></body></html>

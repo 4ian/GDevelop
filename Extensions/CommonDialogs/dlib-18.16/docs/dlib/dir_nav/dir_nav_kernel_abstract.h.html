@@ -1,0 +1,510 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - dir_nav_kernel_abstract.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2003  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#undef</font> DLIB_DIR_NAV_KERNEl_ABSTRACT_
+<font color='#0000FF'>#ifdef</font> DLIB_DIR_NAV_KERNEl_ABSTRACT_
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>string<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>vector<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../uintn.h.html'>../uintn.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../algs.h.html'>../algs.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#009900'>/*!
+        GENERAL WARNING
+            Don't call any of these functions or make any of these objects 
+            before main() has been entered.   That means no instances
+            of file or directory at the global scope.
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> queue_of_dir
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='get_filesystem_roots'></a>get_filesystem_roots</b> <font face='Lucida Console'>(</font>
+        queue_of_dir<font color='#5555FF'>&amp;</font> roots
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - queue_of_dirs == an implementation of queue/queue_kernel_abstract.h with T 
+              set to directory or a std::vector&lt;directory&gt; or dlib::std_vector_c&lt;directory&gt;.
+        ensures
+            - #roots == a queue containing directories that represent all the roots 
+              of the filesystem on this machine.   (e.g. in windows you have c:\, d:\ 
+              etc.)
+        throws
+            - std::bad_alloc
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>    <font color='#009900'>// file object    
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>    
+    <font color='#0000FF'>class</font> <b><a name='file'></a>file</b>
+    <b>{</b>
+        <font color='#009900'>/*!
+            WHAT THIS OBJECT REPRESENTS
+                This object represents a file.
+
+                Note that the size of a file is determined at the time the file
+                object is constructed.  Thus if a file changes sizes after its
+                file object has been created its file object's size() method
+                will not reflect the new file size.    
+        !*/</font>
+
+    <font color='#0000FF'>public</font>:
+
+        <font color='#0000FF'>class</font> <b><a name='file_not_found'></a>file_not_found</b> : <font color='#0000FF'>public</font> error <b>{</b><b>}</b>;
+        
+        <b><a name='file'></a>file</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #*this has been properly initialized
+                - #name() == ""
+                - #full_name() == ""
+                - #size() == 0
+                - #*this does not represent any file
+            throws  
+                - std::bad_alloc
+        !*/</font>
+
+        <b><a name='file'></a>file</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> name
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #*this has been properly initialized 
+                - #*this represents the file given by name
+                  Note that name can be a fully qualified path or just a path
+                  relative to the current working directory.  Also, any symbolic 
+                  links in name will be resolved.
+            throws  
+                - std::bad_alloc
+                - file_not_found
+                    This exception is thrown if the file can not be found or
+                    accessed.                    
+        !*/</font>
+
+        <b><a name='file'></a>file</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>*</font> name
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - this function is identical to file(const std::string&amp; name)
+        !*/</font>
+
+        <b><a name='file'></a>file</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> file<font color='#5555FF'>&amp;</font> item
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #*this == item
+            throws  
+                - std::bad_alloc
+        !*/</font>
+
+        ~<b><a name='file'></a>file</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - all resources associated with *this have been released
+        !*/</font>
+
+        <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> <b><a name='name'></a>name</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the name of the file.  This is full_name() minus 
+                  the path to the file.            
+        !*/</font>
+
+        <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> <b><a name='full_name'></a>full_name</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the fully qualified name for the file represented by *this 
+        !*/</font>
+
+        uint64 <b><a name='size'></a>size</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the size of this file in bytes.
+        !*/</font>
+
+        <b><a name='operator'></a>operator</b> std::<b><a name='string'></a>string</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>; 
+        <font color='#009900'>/*!
+            ensures
+                - returns full_name()
+                  (i.e. provides an implicit conversion to string from dlib::file)
+        !*/</font>
+
+        file<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> file<font color='#5555FF'>&amp;</font> rhs
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #*this == rhs
+        !*/</font>
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='operator'></a>operator</b> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> file<font color='#5555FF'>&amp;</font> rhs
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - if (*this and rhs represent the same file) then
+                    - returns true
+                - else
+                    - returns false
+        !*/</font>
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='operator'></a>operator</b> <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> file<font color='#5555FF'>&amp;</font> rhs
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - if (*this and rhs represent the same file) then
+                    - returns false 
+                - else
+                    - returns true 
+        !*/</font>
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='operator'></a>operator</b> <font color='#5555FF'>&lt;</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> file<font color='#5555FF'>&amp;</font> item
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - if (full_name() &lt; item.full_name()) then
+                    - returns true
+                - else
+                    - returns false
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='swap'></a>swap</b> <font face='Lucida Console'>(</font>
+            file<font color='#5555FF'>&amp;</font> item
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - swaps *this and item
+        !*/</font> 
+
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>    <font color='#009900'>// directory object    
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>    
+    <font color='#0000FF'>class</font> <b><a name='directory'></a>directory</b>
+    <b>{</b>
+        <font color='#009900'>/*!
+            WHAT THIS OBJECT REPRESENTS
+                This object represents a directory in a file system.  It gives
+                the ability to traverse a directory tree.  
+
+                Note that the directories . and .. are not returned by get_dirs() 
+        !*/</font>
+
+    <font color='#0000FF'>public</font>:
+
+        <font color='#0000FF'>class</font> <b><a name='dir_not_found'></a>dir_not_found</b> : <font color='#0000FF'>public</font> error <b>{</b><b>}</b>;
+        <font color='#0000FF'>class</font> <b><a name='listing_error'></a>listing_error</b> : <font color='#0000FF'>public</font> error <b>{</b><b>}</b>;
+        
+        <b><a name='directory'></a>directory</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #*this has been properly initialized
+                - #full_name() == ""
+                - #name() == ""
+                - #is_root() == true
+                - #*this does not represent any directory
+            throws  
+                - std::bad_alloc
+        !*/</font>
+
+        <b><a name='directory'></a>directory</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> name
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #*this has been properly initialized 
+                - #*this represents the directory given by name.
+                  Note that name can be a fully qualified path or just a path
+                  relative to the current working directory. Also, any symbolic 
+                  links in name will be resolved.
+            throws  
+                - std::bad_alloc
+                - dir_not_found
+                    This exception is thrown if the directory can not be found or
+                    accessed.    
+        !*/</font>
+
+        <b><a name='directory'></a>directory</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>*</font> name
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - this function is identical to directory(const std::string&amp; name)
+        !*/</font>
+
+        <b><a name='directory'></a>directory</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> directory<font color='#5555FF'>&amp;</font> item
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #*this == item
+            throws  
+                - std::bad_alloc
+        !*/</font>
+
+        ~<b><a name='directory'></a>directory</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - all resources associated with *this have been released
+        !*/</font>
+
+        <font color='#0000FF'>static</font> <font color='#0000FF'><u>char</u></font> <b><a name='get_separator'></a>get_separator</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the character used to separate directories and file names in a
+                  path.  (i.e.  \ on windows and / in unix)
+        !*/</font>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'>typename</font> queue_of_files
+            <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='get_files'></a>get_files</b> <font face='Lucida Console'>(</font>
+            queue_of_files<font color='#5555FF'>&amp;</font> files
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - queue_of_files == an implementation of queue/queue_kernel_abstract.h with T 
+                  set to file or a std::vector&lt;file&gt; or dlib::std_vector_c&lt;file&gt;.
+            ensures
+                - #files == A queue containing all the files present in this directory.
+                  (Note that symbolic links will not have been resolved in the names 
+                  of the returned files.)
+                - #files.size() == the number of files in this directory
+            throws 
+                - bad_alloc
+                    If this exception is thrown then the call to get_files() has
+                    no effect on *this and #files is unusable until files.clear()
+                    is called and succeeds.
+                - listing_error
+                    This exception is thrown if listing access has been denied to this
+                    directory or if some error occurred that prevented us from successfully
+                    getting the contents of this directory.       
+                    If this exception is thrown then the call to get_files() has
+                    no effect on *this and #files.size()==0.         
+        !*/</font>
+
+        std::vector<font color='#5555FF'>&lt;</font>file<font color='#5555FF'>&gt;</font> <b><a name='get_files'></a>get_files</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - This function simply calls get_files(temp_vector) and then returns temp_vector.
+        !*/</font>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'>typename</font> queue_of_dirs
+            <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='get_dirs'></a>get_dirs</b> <font face='Lucida Console'>(</font>
+            queue_of_dirs<font color='#5555FF'>&amp;</font> dirs
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - queue_of_dirs == an implementation of queue/queue_kernel_abstract.h with T 
+                  set to directory or a std::vector&lt;directory&gt; or dlib::std_vector_c&lt;directory&gt;.
+            ensures
+                - #dirs == a queue containing all the directories present in this directory.
+                  (note that symbolic links will not have been resolved in the names 
+                  of the returned directories.)
+                - #dirs.size() == the number of subdirectories in this directory
+            throws 
+                - bad_alloc
+                    If this exception is thrown then the call to get_files() has
+                    no effect on *this and #files is unusable until files.clear()
+                    is called and succeeds.
+                - listing_error
+                    This exception is thrown if listing access has been denied to this
+                    directory or if some error occurred that prevented us from successfully
+                    getting the contents of this directory.
+                    If this exception is thrown then the call to get_dirs() has
+                    no effect on *this and #dirs.size()==0.
+        !*/</font>
+
+        std::vector<font color='#5555FF'>&lt;</font>directory<font color='#5555FF'>&gt;</font> <b><a name='get_dirs'></a>get_dirs</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - This function simply calls get_dirs(temp_vector) and then returns temp_vector.
+        !*/</font>
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='is_root'></a>is_root</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - if (*this represents the root of this directory tree) then
+                    - returns true
+                - else
+                    - returns false
+        !*/</font>
+
+        <font color='#0000FF'>const</font> directory <b><a name='get_parent'></a>get_parent</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - if (is_root()) then
+                    - returns a copy of *this                    
+                - else
+                    - returns the parent directory of *this                    
+            throws
+                - bad_alloc
+                    If this exception is thrown then the call to get_parent() will
+                    have no effect.
+        !*/</font>
+
+        <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> <b><a name='name'></a>name</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - if (is_root()) then
+                    - returns ""
+                - else
+                    - returns the name of the directory.  This is full_name() minus 
+                      the path to the directory.           
+        !*/</font>
+
+        <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> <b><a name='full_name'></a>full_name</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the fully qualified directory name for *this 
+                - if (is_root()) then
+                    - the last character of #full_name() is get_separator()
+                - else
+                    - the last character of #full_name() is NOT get_separator()
+        !*/</font>
+
+        <b><a name='operator'></a>operator</b> std::<b><a name='string'></a>string</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>; 
+        <font color='#009900'>/*!
+            ensures
+                - returns full_name()
+                  (i.e. provides an implicit conversion to string from dlib::directory)
+        !*/</font>
+
+        directory<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> directory<font color='#5555FF'>&amp;</font> rhs
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #*this == rhs
+        !*/</font>
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='operator'></a>operator</b> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> directory<font color='#5555FF'>&amp;</font> rhs
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - if (*this and rhs represent the same directory) then
+                    - returns true
+                - else
+                    - returns false
+        !*/</font>
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='operator'></a>operator</b> <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> directory<font color='#5555FF'>&amp;</font> rhs
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - if (*this and rhs represent the same directory) then
+                    - returns false 
+                - else
+                    - returns true 
+        !*/</font>
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='operator'></a>operator</b> <font color='#5555FF'>&lt;</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> directory<font color='#5555FF'>&amp;</font> item
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - if (full_name() &lt; item.full_name()) then
+                    - returns true
+                - else
+                    - returns false
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='swap'></a>swap</b> <font face='Lucida Console'>(</font>
+            directory<font color='#5555FF'>&amp;</font> item
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - swaps *this and item
+        !*/</font> 
+
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>inline</font> std::ostream<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font face='Lucida Console'>(</font>
+        std::ostream<font color='#5555FF'>&amp;</font> out,
+        <font color='#0000FF'>const</font> directory<font color='#5555FF'>&amp;</font> item
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        ensures
+            - performs: out &lt;&lt; item.full_name()
+            - returns out
+    !*/</font>
+
+    <font color='#0000FF'>inline</font> std::ostream<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font face='Lucida Console'>(</font>
+        std::ostream<font color='#5555FF'>&amp;</font> out,
+        <font color='#0000FF'>const</font> file<font color='#5555FF'>&amp;</font> item
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        ensures
+            - performs: out &lt;&lt; item.full_name()
+            - returns out
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='swap'></a>swap</b> <font face='Lucida Console'>(</font>
+        file<font color='#5555FF'>&amp;</font> a, 
+        file<font color='#5555FF'>&amp;</font> b 
+    <font face='Lucida Console'>)</font> <b>{</b> a.<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>b<font face='Lucida Console'>)</font>; <b>}</b>   
+    <font color='#009900'>/*!
+        provides a global swap function for file objects
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='swap'></a>swap</b> <font face='Lucida Console'>(</font>
+        directory<font color='#5555FF'>&amp;</font> a, 
+        directory<font color='#5555FF'>&amp;</font> b 
+    <font face='Lucida Console'>)</font> <b>{</b> a.<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>b<font face='Lucida Console'>)</font>; <b>}</b>   
+    <font color='#009900'>/*!
+        provides a global swap function for directory objects
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_DIR_NAV_KERNEl_ABSTRACT_
+</font>
+
+</pre></body></html>

@@ -1,0 +1,395 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - sequence_labeler_ex.cpp</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// The contents of this file are in the public domain. See LICENSE_FOR_EXAMPLE_PROGRAMS.txt
+</font><font color='#009900'>/*
+
+    This is an example illustrating the use of the machine learning
+    tools for sequence labeling in the dlib C++ Library.  
+    
+    The general problem addressed by these tools is the following.  
+    Suppose you have a set of sequences of some kind and you want to 
+    learn to predict a label for each element of a sequence.  So for 
+    example, you might have a set of English sentences where each 
+    word is labeled with its part of speech and you want to learn a 
+    model which can predict the part of speech for each word in a new 
+    sentence.  
+    
+    Central to these tools is the sequence_labeler object.  It is the
+    object which represents the label prediction model. In particular,
+    the model used by this object is the following.  Given an input 
+    sequence x, predict an output label sequence y such that:
+        y == argmax_y dot(weight_vector, PSI(x,y))
+    where PSI() is supplied by the user and defines the form of the 
+    model.  In this example program we will define it such that we 
+    obtain a simple Hidden Markov Model.  However, it's possible to 
+    define much more sophisticated models.  You should take a look 
+    at the following papers for a few examples:
+        - Hidden Markov Support Vector Machines by 
+          Y. Altun, I. Tsochantaridis, T. Hofmann
+        - Shallow Parsing with Conditional Random Fields by 
+          Fei Sha and Fernando Pereira
+
+
+
+    In the remainder of this example program we will show how to
+    define your own PSI(), as well as how to learn the "weight_vector"
+    parameter.  Once you have these two items you will be able to
+    use the sequence_labeler to predict the labels of new sequences.
+*/</font>
+
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>iostream<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>svm_threaded.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>rand.h<font color='#5555FF'>&gt;</font>
+
+<font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> std;
+<font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> dlib;
+
+
+<font color='#009900'>/*
+    In this example we will be working with a Hidden Markov Model where
+    the hidden nodes and observation nodes both take on 3 different states. 
+    The task will be to take a sequence of observations and predict the state
+    of the corresponding hidden nodes.  
+*/</font>
+
+<font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> num_label_states <font color='#5555FF'>=</font> <font color='#979000'>3</font>; 
+<font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> num_sample_states <font color='#5555FF'>=</font> <font color='#979000'>3</font>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<font color='#0000FF'>class</font> <b><a name='feature_extractor'></a>feature_extractor</b>
+<b>{</b>
+    <font color='#009900'>/*
+        This object is where you define your PSI().  To ensure that the argmax_y
+        remains a tractable problem, the PSI(x,y) vector is actually a sum of vectors, 
+        each derived from the entire input sequence x but only part of the label
+        sequence y.  This allows the argmax_y to be efficiently solved using the 
+        well known Viterbi algorithm.  
+    */</font>
+
+<font color='#0000FF'>public</font>:
+    <font color='#009900'>// This defines the type used to represent the observed sequence.  You can use 
+</font>    <font color='#009900'>// any type here so long as it has a .size() which returns the number of things
+</font>    <font color='#009900'>// in the sequence.  
+</font>    <font color='#0000FF'>typedef</font> std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font> sequence_type; 
+
+    <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='num_features'></a>num_features</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <font color='#009900'>/*!
+        ensures
+            - returns the dimensionality of the PSI() feature vector.  
+    !*/</font>
+    <b>{</b>
+        <font color='#009900'>// Recall that we are defining a HMM.  So in this case the PSI() vector 
+</font>        <font color='#009900'>// should have the same dimensionality as the number of parameters in the HMM.  
+</font>        <font color='#0000FF'>return</font> num_label_states<font color='#5555FF'>*</font>num_label_states <font color='#5555FF'>+</font> num_label_states<font color='#5555FF'>*</font>num_sample_states;
+    <b>}</b>
+
+    <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='order'></a>order</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> 
+    <font color='#009900'>/*!
+        ensures
+            - This object represents a Markov model on the output labels.
+              This parameter defines the order of the model.  That is, this 
+              value controls how many previous label values get to be taken 
+              into consideration when performing feature extraction for a
+              particular element of the input sequence.  Note that the runtime
+              of the algorithm is exponential in the order.  So don't make order
+              very large.
+    !*/</font>
+    <b>{</b> 
+        <font color='#009900'>// In this case we are using a HMM model that only looks at the 
+</font>        <font color='#009900'>// previous label. 
+</font>        <font color='#0000FF'>return</font> <font color='#979000'>1</font>; 
+    <b>}</b>
+
+    <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='num_labels'></a>num_labels</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> 
+    <font color='#009900'>/*!
+        ensures
+            - returns the number of possible output labels.
+    !*/</font>
+    <b>{</b> 
+        <font color='#0000FF'>return</font> num_label_states; 
+    <b>}</b>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> feature_setter, <font color='#0000FF'>typename</font> EXP<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='get_features'></a>get_features</b> <font face='Lucida Console'>(</font>
+        feature_setter<font color='#5555FF'>&amp;</font> set_feature,
+        <font color='#0000FF'>const</font> sequence_type<font color='#5555FF'>&amp;</font> x,
+        <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&lt;</font>EXP<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> y,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> position
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <font color='#009900'>/*!
+        requires
+            - EXP::type == unsigned long
+              (i.e. y contains unsigned longs)
+            - position &lt; x.size()
+            - y.size() == min(position, order) + 1
+            - is_vector(y) == true
+            - max(y) &lt; num_labels() 
+            - set_feature is a function object which allows expressions of the form:
+                - set_features((unsigned long)feature_index, (double)feature_value);
+                - set_features((unsigned long)feature_index);
+        ensures
+            - for all valid i:
+                - interprets y(i) as the label corresponding to x[position-i]
+            - This function computes the part of PSI() corresponding to the x[position]
+              element of the input sequence.  Moreover, this part of PSI() is returned as 
+              a sparse vector by invoking set_feature().  For example, to set the feature 
+              with an index of 55 to the value of 1 this method would call:
+                set_feature(55);
+              Or equivalently:
+                set_feature(55,1);
+              Therefore, the first argument to set_feature is the index of the feature 
+              to be set while the second argument is the value the feature should take.
+              Additionally, note that calling set_feature() multiple times with the same 
+              feature index does NOT overwrite the old value, it adds to the previous 
+              value.  For example, if you call set_feature(55) 3 times then it will
+              result in feature 55 having a value of 3.
+            - This function only calls set_feature() with feature_index values &lt; num_features()
+    !*/</font>
+    <b>{</b>
+        <font color='#009900'>// Again, the features below only define a simple HMM.  But in general, you can 
+</font>        <font color='#009900'>// use a wide variety of sophisticated feature extraction methods here.
+</font>
+        <font color='#009900'>// Pull out an indicator feature for the type of transition between the
+</font>        <font color='#009900'>// previous label and the current label.
+</font>        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>y.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>
+            <font color='#BB00BB'>set_feature</font><font face='Lucida Console'>(</font><font color='#BB00BB'>y</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font><font color='#5555FF'>*</font>num_label_states <font color='#5555FF'>+</font> <font color='#BB00BB'>y</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// Pull out an indicator feature for the type of observed node given 
+</font>        <font color='#009900'>// the current label.
+</font>        <font color='#BB00BB'>set_feature</font><font face='Lucida Console'>(</font>num_label_states<font color='#5555FF'>*</font>num_label_states <font color='#5555FF'>+</font>
+                    <font color='#BB00BB'>y</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font><font color='#5555FF'>*</font>num_sample_states <font color='#5555FF'>+</font> x[position]<font face='Lucida Console'>)</font>;
+    <b>}</b>
+<b>}</b>;
+
+<font color='#009900'>// We need to define serialize() and deserialize() for our feature extractor if we want 
+</font><font color='#009900'>// to be able to serialize and deserialize our learned models.  In this case the 
+</font><font color='#009900'>// implementation is empty since our feature_extractor doesn't have any state.  But you 
+</font><font color='#009900'>// might define more complex feature extractors which have state that needs to be saved.
+</font><font color='#0000FF'><u>void</u></font> <b><a name='serialize'></a>serialize</b><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> feature_extractor<font color='#5555FF'>&amp;</font>, std::ostream<font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+<font color='#0000FF'><u>void</u></font> <b><a name='deserialize'></a>deserialize</b><font face='Lucida Console'>(</font>feature_extractor<font color='#5555FF'>&amp;</font>, std::istream<font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<font color='#0000FF'><u>void</u></font> <b><a name='make_dataset'></a>make_dataset</b> <font face='Lucida Console'>(</font>
+    <font color='#0000FF'>const</font> matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> transition_probabilities,
+    <font color='#0000FF'>const</font> matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> emission_probabilities,
+    std::vector<font color='#5555FF'>&lt;</font>std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> samples,
+    std::vector<font color='#5555FF'>&lt;</font>std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> labels,
+    <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> dataset_size
+<font face='Lucida Console'>)</font>;
+<font color='#009900'>/*!
+    requires
+        - transition_probabilities.nr() == transition_probabilities.nc()
+        - transition_probabilities.nr() == emission_probabilities.nr()
+        - The rows of transition_probabilities and emission_probabilities must sum to 1.
+          (i.e. sum_cols(transition_probabilities) and sum_cols(emission_probabilities)
+          must evaluate to vectors of all 1s.)
+    ensures
+        - This function randomly samples a bunch of sequences from the HMM defined by 
+          transition_probabilities and emission_probabilities. 
+        - The HMM is defined by:
+            - The probability of transitioning from hidden state H1 to H2 
+              is given by transition_probabilities(H1,H2).
+            - The probability of a hidden state H producing an observed state
+              O is given by emission_probabilities(H,O).
+        - #samples.size() == #labels.size() == dataset_size
+        - for all valid i:
+            - #labels[i] is a randomly sampled sequence of hidden states from the
+              given HMM.  #samples[i] is its corresponding randomly sampled sequence
+              of observed states.
+!*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<font color='#0000FF'><u>int</u></font> <b><a name='main'></a>main</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+<b>{</b>
+    <font color='#009900'>// We need a dataset to test the machine learning algorithms.  So we are going to 
+</font>    <font color='#009900'>// define a HMM based on the following two matrices and then randomly sample a
+</font>    <font color='#009900'>// set of data from it.  Then we will see if the machine learning method can
+</font>    <font color='#009900'>// recover the HMM model from the training data. 
+</font>
+
+    matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font> <font color='#BB00BB'>transition_probabilities</font><font face='Lucida Console'>(</font>num_label_states, num_label_states<font face='Lucida Console'>)</font>;
+    transition_probabilities <font color='#5555FF'>=</font> <font color='#979000'>0.05</font>, <font color='#979000'>0.90</font>, <font color='#979000'>0.05</font>,
+                               <font color='#979000'>0.05</font>, <font color='#979000'>0.05</font>, <font color='#979000'>0.90</font>,
+                               <font color='#979000'>0.90</font>, <font color='#979000'>0.05</font>, <font color='#979000'>0.05</font>;
+
+    matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font> <font color='#BB00BB'>emission_probabilities</font><font face='Lucida Console'>(</font>num_label_states,num_sample_states<font face='Lucida Console'>)</font>;
+    emission_probabilities <font color='#5555FF'>=</font> <font color='#979000'>0.5</font>, <font color='#979000'>0.5</font>, <font color='#979000'>0.0</font>,
+                             <font color='#979000'>0.0</font>, <font color='#979000'>0.5</font>, <font color='#979000'>0.5</font>,
+                             <font color='#979000'>0.5</font>, <font color='#979000'>0.0</font>, <font color='#979000'>0.5</font>;
+
+    std::vector<font color='#5555FF'>&lt;</font>std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> samples;
+    std::vector<font color='#5555FF'>&lt;</font>std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> labels;
+    <font color='#009900'>// sample 1000 labeled sequences from the HMM.
+</font>    <font color='#BB00BB'>make_dataset</font><font face='Lucida Console'>(</font>transition_probabilities,emission_probabilities, 
+                 samples, labels, <font color='#979000'>1000</font><font face='Lucida Console'>)</font>;
+
+    <font color='#009900'>// print out some of the randomly sampled sequences
+</font>    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> <font color='#979000'>10</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+    <b>{</b>
+        cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>hidden states:   </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>trans</font><font face='Lucida Console'>(</font><font color='#BB00BB'>mat</font><font face='Lucida Console'>(</font>labels[i]<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>observed states: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>trans</font><font face='Lucida Console'>(</font><font color='#BB00BB'>mat</font><font face='Lucida Console'>(</font>samples[i]<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>******************************</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+    <b>}</b>
+
+    <font color='#009900'>// Next we use the structural_sequence_labeling_trainer to learn our
+</font>    <font color='#009900'>// prediction model based on just the samples and labels.
+</font>    structural_sequence_labeling_trainer<font color='#5555FF'>&lt;</font>feature_extractor<font color='#5555FF'>&gt;</font> trainer;
+    <font color='#009900'>// This is the common SVM C parameter.  Larger values encourage the
+</font>    <font color='#009900'>// trainer to attempt to fit the data exactly but might overfit. 
+</font>    <font color='#009900'>// In general, you determine this parameter by cross-validation.
+</font>    trainer.<font color='#BB00BB'>set_c</font><font face='Lucida Console'>(</font><font color='#979000'>4</font><font face='Lucida Console'>)</font>;
+    <font color='#009900'>// This trainer can use multiple CPU cores to speed up the training.  
+</font>    <font color='#009900'>// So set this to the number of available CPU cores. 
+</font>    trainer.<font color='#BB00BB'>set_num_threads</font><font face='Lucida Console'>(</font><font color='#979000'>4</font><font face='Lucida Console'>)</font>;
+
+
+    <font color='#009900'>// Learn to do sequence labeling from the dataset
+</font>    sequence_labeler<font color='#5555FF'>&lt;</font>feature_extractor<font color='#5555FF'>&gt;</font> labeler <font color='#5555FF'>=</font> trainer.<font color='#BB00BB'>train</font><font face='Lucida Console'>(</font>samples, labels<font face='Lucida Console'>)</font>;
+
+    <font color='#009900'>// Test the learned labeler on one of the training samples.  In this
+</font>    <font color='#009900'>// case it will give the correct sequence of labels.
+</font>    std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font> predicted_labels <font color='#5555FF'>=</font> <font color='#BB00BB'>labeler</font><font face='Lucida Console'>(</font>samples[<font color='#979000'>0</font>]<font face='Lucida Console'>)</font>;
+    cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>true hidden states:      </font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>trans</font><font face='Lucida Console'>(</font><font color='#BB00BB'>mat</font><font face='Lucida Console'>(</font>labels[<font color='#979000'>0</font>]<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+    cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>predicted hidden states: </font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>trans</font><font face='Lucida Console'>(</font><font color='#BB00BB'>mat</font><font face='Lucida Console'>(</font>predicted_labels<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+
+
+    <font color='#009900'>// We can also do cross-validation.  The confusion_matrix is defined as:
+</font>    <font color='#009900'>//  - confusion_matrix(T,P) == the number of times a sequence element with label T 
+</font>    <font color='#009900'>//    was predicted to have a label of P.
+</font>    <font color='#009900'>// So if all predictions are perfect then only diagonal elements of this matrix will
+</font>    <font color='#009900'>// be non-zero. 
+</font>    matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font> confusion_matrix;
+    confusion_matrix <font color='#5555FF'>=</font> <font color='#BB00BB'>cross_validate_sequence_labeler</font><font face='Lucida Console'>(</font>trainer, samples, labels, <font color='#979000'>4</font><font face='Lucida Console'>)</font>;
+    cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\ncross-validation: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+    cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> confusion_matrix;
+    cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>label accuracy: </font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>sum</font><font face='Lucida Console'>(</font><font color='#BB00BB'>diag</font><font face='Lucida Console'>(</font>confusion_matrix<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font color='#5555FF'>/</font><font color='#BB00BB'>sum</font><font face='Lucida Console'>(</font>confusion_matrix<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+
+    <font color='#009900'>// In this case, the label accuracy is about 88%.  At this point, we want to know if
+</font>    <font color='#009900'>// the machine learning method was able to recover the HMM model from the data.  So
+</font>    <font color='#009900'>// to test this, we can load the true HMM model into another sequence_labeler and 
+</font>    <font color='#009900'>// test it out on the data and compare the results.  
+</font>
+    matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>0</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> true_hmm_model_weights <font color='#5555FF'>=</font> <font color='#BB00BB'>log</font><font face='Lucida Console'>(</font><font color='#BB00BB'>join_cols</font><font face='Lucida Console'>(</font><font color='#BB00BB'>reshape_to_column_vector</font><font face='Lucida Console'>(</font>transition_probabilities<font face='Lucida Console'>)</font>,
+                                                              <font color='#BB00BB'>reshape_to_column_vector</font><font face='Lucida Console'>(</font>emission_probabilities<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+    <font color='#009900'>// With this model, labeler_true will predict the most probable set of labels
+</font>    <font color='#009900'>// given an input sequence.  That is, it will predict using the equation:
+</font>    <font color='#009900'>//    y == argmax_y dot(true_hmm_model_weights, PSI(x,y))
+</font>    sequence_labeler<font color='#5555FF'>&lt;</font>feature_extractor<font color='#5555FF'>&gt;</font> <font color='#BB00BB'>labeler_true</font><font face='Lucida Console'>(</font>true_hmm_model_weights<font face='Lucida Console'>)</font>; 
+
+    confusion_matrix <font color='#5555FF'>=</font> <font color='#BB00BB'>test_sequence_labeler</font><font face='Lucida Console'>(</font>labeler_true, samples, labels<font face='Lucida Console'>)</font>;
+    cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\nTrue HMM model: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+    cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> confusion_matrix;
+    cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>label accuracy: </font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>sum</font><font face='Lucida Console'>(</font><font color='#BB00BB'>diag</font><font face='Lucida Console'>(</font>confusion_matrix<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font color='#5555FF'>/</font><font color='#BB00BB'>sum</font><font face='Lucida Console'>(</font>confusion_matrix<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+
+    <font color='#009900'>// Happily, we observe that the true model also obtains a label accuracy of 88%.
+</font>
+
+
+
+
+
+    <font color='#009900'>// Finally, the labeler can be serialized to disk just like most dlib objects.
+</font>    <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>labeler.dat</font>"<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> labeler;
+
+    <font color='#009900'>// recall from disk
+</font>    <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>labeler.dat</font>"<font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font> labeler;
+<b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>//              Code for creating a bunch of random samples from our HMM.
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<font color='#0000FF'><u>void</u></font> <b><a name='sample_hmm'></a>sample_hmm</b> <font face='Lucida Console'>(</font>
+    dlib::rand<font color='#5555FF'>&amp;</font> rnd,
+    <font color='#0000FF'>const</font> matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> transition_probabilities,
+    <font color='#0000FF'>const</font> matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> emission_probabilities,
+    <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> previous_label,
+    <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&amp;</font> next_label,
+    <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&amp;</font> next_sample
+<font face='Lucida Console'>)</font>
+<font color='#009900'>/*!
+    requires
+        - previous_label &lt; transition_probabilities.nr()
+        - transition_probabilities.nr() == transition_probabilities.nc()
+        - transition_probabilities.nr() == emission_probabilities.nr()
+        - The rows of transition_probabilities and emission_probabilities must sum to 1.
+          (i.e. sum_cols(transition_probabilities) and sum_cols(emission_probabilities)
+          must evaluate to vectors of all 1s.)
+    ensures
+        - This function randomly samples the HMM defined by transition_probabilities
+          and emission_probabilities assuming that the previous hidden state
+          was previous_label. 
+        - The HMM is defined by:
+            - P(next_label |previous_label) == transition_probabilities(previous_label, next_label)
+            - P(next_sample|next_label)     == emission_probabilities  (next_label,     next_sample)
+        - #next_label == the sampled value of the hidden state
+        - #next_sample == the sampled value of the observed state
+!*/</font>
+<b>{</b>
+    <font color='#009900'>// sample next_label
+</font>    <font color='#0000FF'><u>double</u></font> p <font color='#5555FF'>=</font> rnd.<font color='#BB00BB'>get_random_double</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> c <font color='#5555FF'>=</font> <font color='#979000'>0</font>; p <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#979000'>0</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> c <font color='#5555FF'>&lt;</font> transition_probabilities.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>c<font face='Lucida Console'>)</font>
+    <b>{</b>
+        next_label <font color='#5555FF'>=</font> c;
+        p <font color='#5555FF'>-</font><font color='#5555FF'>=</font> <font color='#BB00BB'>transition_probabilities</font><font face='Lucida Console'>(</font>previous_label, c<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+    <font color='#009900'>// now sample next_sample
+</font>    p <font color='#5555FF'>=</font> rnd.<font color='#BB00BB'>get_random_double</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> c <font color='#5555FF'>=</font> <font color='#979000'>0</font>; p <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#979000'>0</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> c <font color='#5555FF'>&lt;</font> emission_probabilities.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>c<font face='Lucida Console'>)</font>
+    <b>{</b>
+        next_sample <font color='#5555FF'>=</font> c;
+        p <font color='#5555FF'>-</font><font color='#5555FF'>=</font> <font color='#BB00BB'>emission_probabilities</font><font face='Lucida Console'>(</font>next_label, c<font face='Lucida Console'>)</font>;
+    <b>}</b>
+<b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<font color='#0000FF'><u>void</u></font> <b><a name='make_dataset'></a>make_dataset</b> <font face='Lucida Console'>(</font>
+    <font color='#0000FF'>const</font> matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> transition_probabilities,
+    <font color='#0000FF'>const</font> matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> emission_probabilities,
+    std::vector<font color='#5555FF'>&lt;</font>std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> samples,
+    std::vector<font color='#5555FF'>&lt;</font>std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> labels,
+    <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> dataset_size
+<font face='Lucida Console'>)</font>
+<b>{</b>
+    samples.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    labels.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+    dlib::rand rnd;
+
+    <font color='#009900'>// now randomly sample some labeled sequences from our Hidden Markov Model
+</font>    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> iter <font color='#5555FF'>=</font> <font color='#979000'>0</font>; iter <font color='#5555FF'>&lt;</font> dataset_size; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>iter<font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> sequence_size <font color='#5555FF'>=</font> rnd.<font color='#BB00BB'>get_random_32bit_number</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>%</font><font color='#979000'>20</font><font color='#5555FF'>+</font><font color='#979000'>3</font>;
+        std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font> <font color='#BB00BB'>sample</font><font face='Lucida Console'>(</font>sequence_size<font face='Lucida Console'>)</font>;
+        std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font> <font color='#BB00BB'>label</font><font face='Lucida Console'>(</font>sequence_size<font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> previous_label <font color='#5555FF'>=</font> rnd.<font color='#BB00BB'>get_random_32bit_number</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>%</font>num_label_states;
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> sample.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> next_label <font color='#5555FF'>=</font> <font color='#979000'>0</font>, next_sample <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            <font color='#BB00BB'>sample_hmm</font><font face='Lucida Console'>(</font>rnd, transition_probabilities, emission_probabilities, 
+                       previous_label, next_label, next_sample<font face='Lucida Console'>)</font>;
+
+            label[i] <font color='#5555FF'>=</font> next_label;
+            sample[i] <font color='#5555FF'>=</font> next_sample;
+
+            previous_label <font color='#5555FF'>=</font> next_label;
+        <b>}</b>
+
+        samples.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>sample<font face='Lucida Console'>)</font>;
+        labels.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>label<font face='Lucida Console'>)</font>;
+    <b>}</b>
+<b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+
+</pre></body></html>

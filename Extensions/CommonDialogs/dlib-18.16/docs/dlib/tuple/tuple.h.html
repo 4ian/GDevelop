@@ -1,0 +1,413 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - tuple.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2007  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_TUPLe_H_
+<font color='#0000FF'>#define</font> DLIB_TUPLe_H_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../enable_if.h.html'>../enable_if.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../algs.h.html'>../algs.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../serialize.h.html'>../serialize.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='tuple_abstract.h.html'>tuple_abstract.h</a>"
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<font color='#0000FF'>#define</font> DLIB_TUPLE_GLOBAL_HELPERS<font face='Lucida Console'>(</font>N<font face='Lucida Console'>)</font>                                                \
+    <b><a name='DLIB_TUPLE_GH'></a>DLIB_TUPLE_GH</b><font face='Lucida Console'>(</font>N##<font color='#979000'>0</font><font face='Lucida Console'>)</font> <b><a name='DLIB_TUPLE_GH'></a>DLIB_TUPLE_GH</b><font face='Lucida Console'>(</font>N##<font color='#979000'>1</font><font face='Lucida Console'>)</font> <b><a name='DLIB_TUPLE_GH'></a>DLIB_TUPLE_GH</b><font face='Lucida Console'>(</font>N##<font color='#979000'>2</font><font face='Lucida Console'>)</font> <b><a name='DLIB_TUPLE_GH'></a>DLIB_TUPLE_GH</b><font face='Lucida Console'>(</font>N##<font color='#979000'>3</font><font face='Lucida Console'>)</font> \
+    <b><a name='DLIB_TUPLE_GH'></a>DLIB_TUPLE_GH</b><font face='Lucida Console'>(</font>N##<font color='#979000'>4</font><font face='Lucida Console'>)</font> <b><a name='DLIB_TUPLE_GH'></a>DLIB_TUPLE_GH</b><font face='Lucida Console'>(</font>N##<font color='#979000'>5</font><font face='Lucida Console'>)</font> <b><a name='DLIB_TUPLE_GH'></a>DLIB_TUPLE_GH</b><font face='Lucida Console'>(</font>N##<font color='#979000'>6</font><font face='Lucida Console'>)</font> <b><a name='DLIB_TUPLE_GH'></a>DLIB_TUPLE_GH</b><font face='Lucida Console'>(</font>N##<font color='#979000'>7</font><font face='Lucida Console'>)</font> 
+
+<font color='#0000FF'>#define</font> DLIB_TUPLE_GH<font face='Lucida Console'>(</font>N<font face='Lucida Console'>)</font>  DLIB_TUPLE_GET_INDEX<font face='Lucida Console'>(</font>N<font face='Lucida Console'>)</font>  DLIB_TUPLE_GET_ITEM<font face='Lucida Console'>(</font>N<font face='Lucida Console'>)</font> DLIB_TUPLE_GET_HELPER_STRUCT<font face='Lucida Console'>(</font>N<font face='Lucida Console'>)</font>
+
+<font color='#0000FF'>#define</font> DLIB_TUPLE_MEMBER_GET<font face='Lucida Console'>(</font>N<font face='Lucida Console'>)</font>                                                    \
+    <b><a name='DLIB_TUPLE_MG'></a>DLIB_TUPLE_MG</b><font face='Lucida Console'>(</font>N##<font color='#979000'>0</font><font face='Lucida Console'>)</font> <b><a name='DLIB_TUPLE_MG'></a>DLIB_TUPLE_MG</b><font face='Lucida Console'>(</font>N##<font color='#979000'>1</font><font face='Lucida Console'>)</font> <b><a name='DLIB_TUPLE_MG'></a>DLIB_TUPLE_MG</b><font face='Lucida Console'>(</font>N##<font color='#979000'>2</font><font face='Lucida Console'>)</font> <b><a name='DLIB_TUPLE_MG'></a>DLIB_TUPLE_MG</b><font face='Lucida Console'>(</font>N##<font color='#979000'>3</font><font face='Lucida Console'>)</font> \
+    <b><a name='DLIB_TUPLE_MG'></a>DLIB_TUPLE_MG</b><font face='Lucida Console'>(</font>N##<font color='#979000'>4</font><font face='Lucida Console'>)</font> <b><a name='DLIB_TUPLE_MG'></a>DLIB_TUPLE_MG</b><font face='Lucida Console'>(</font>N##<font color='#979000'>5</font><font face='Lucida Console'>)</font> <b><a name='DLIB_TUPLE_MG'></a>DLIB_TUPLE_MG</b><font face='Lucida Console'>(</font>N##<font color='#979000'>6</font><font face='Lucida Console'>)</font> <b><a name='DLIB_TUPLE_MG'></a>DLIB_TUPLE_MG</b><font face='Lucida Console'>(</font>N##<font color='#979000'>7</font><font face='Lucida Console'>)</font> 
+
+<font color='#0000FF'>#define</font> DLIB_TUPLE_GET_INDEX<font face='Lucida Console'>(</font>N<font face='Lucida Console'>)</font> \
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>class</font> <b><a name='Q'></a>Q</b>, <font color='#0000FF'>class</font> <b><a name='T'></a>T</b><font color='#5555FF'>&gt;</font> <font color='#0000FF'>const</font> <font color='#0000FF'>typename</font> enable_if<font color='#5555FF'>&lt;</font>is_same_type<font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T::type##N,Q<font color='#5555FF'>&gt;</font>, <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font>::type <b><a name='get_index'></a>get_index</b> <font face='Lucida Console'>(</font><font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font> <b>{</b><font color='#0000FF'>return</font> N;<b>}</b>
+
+<font color='#0000FF'>#define</font> DLIB_TUPLE_GET_ITEM<font face='Lucida Console'>(</font>N<font face='Lucida Console'>)</font> \
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>class</font> <b><a name='Q'></a>Q</b>,<font color='#0000FF'>class</font> <b><a name='T'></a>T</b><font color='#5555FF'>&gt;</font> <font color='#0000FF'>const</font> <font color='#0000FF'>typename</font> enable_if<font color='#5555FF'>&lt;</font>is_same_type<font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T::type##N,Q<font color='#5555FF'>&gt;</font>,Q<font color='#5555FF'>&gt;</font>::type<font color='#5555FF'>&amp;</font> <b><a name='get_item_const'></a>get_item_const</b> <font face='Lucida Console'>(</font><font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> t<font face='Lucida Console'>)</font> <b>{</b><font color='#0000FF'>return</font> t.v##N;<b>}</b>\
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>class</font> <b><a name='Q'></a>Q</b>,<font color='#0000FF'>class</font> <b><a name='T'></a>T</b><font color='#5555FF'>&gt;</font>       <font color='#0000FF'>typename</font> enable_if<font color='#5555FF'>&lt;</font>is_same_type<font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T::type##N,Q<font color='#5555FF'>&gt;</font>,Q<font color='#5555FF'>&gt;</font>::type<font color='#5555FF'>&amp;</font> <b><a name='get_item'></a>get_item</b> <font face='Lucida Console'>(</font>      T<font color='#5555FF'>&amp;</font> t<font face='Lucida Console'>)</font> <b>{</b><font color='#0000FF'>return</font> t.v##N;<b>}</b>
+
+
+<font color='#0000FF'>#define</font> DLIB_TUPLE_GET_HELPER_STRUCT<font face='Lucida Console'>(</font>N<font face='Lucida Console'>)</font>                         \
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>class</font> <b><a name='T'></a>T</b><font color='#5555FF'>&gt;</font> <font color='#0000FF'>struct</font> <b><a name='get_helper'></a>get_helper</b><font color='#5555FF'>&lt;</font>N,T<font color='#5555FF'>&gt;</font>                   \
+    <b>{</b>                                                           \
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> T::type##N type;                       \
+        <font color='#0000FF'>static</font> <font color='#0000FF'>const</font> type<font color='#5555FF'>&amp;</font> <b><a name='get'></a>get</b><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> t<font face='Lucida Console'>)</font> <b>{</b> <font color='#0000FF'>return</font> t.v##N; <b>}</b>   \
+        <font color='#0000FF'>static</font>       type<font color='#5555FF'>&amp;</font> <b><a name='get'></a>get</b><font face='Lucida Console'>(</font> T<font color='#5555FF'>&amp;</font> t<font face='Lucida Console'>)</font> <b>{</b> <font color='#0000FF'>return</font> t.v##N; <b>}</b>        \
+    <b>}</b>;  
+
+<font color='#0000FF'>#define</font> DLIB_TUPLE_TEMPLATE_LIST<font face='Lucida Console'>(</font>N<font face='Lucida Console'>)</font> \
+    <font color='#0000FF'>class</font> <b><a name='T'></a>T</b>##N##<font color='#979000'>0</font> <font color='#5555FF'>=</font> null_type, <font color='#0000FF'>class</font> <b><a name='T'></a>T</b>##N##<font color='#979000'>1</font> <font color='#5555FF'>=</font> null_type, <font color='#0000FF'>class</font> <b><a name='T'></a>T</b>##N##<font color='#979000'>2</font> <font color='#5555FF'>=</font> null_type, <font color='#0000FF'>class</font> <b><a name='T'></a>T</b>##N##<font color='#979000'>3</font> <font color='#5555FF'>=</font> null_type, \
+    <font color='#0000FF'>class</font> <b><a name='T'></a>T</b>##N##<font color='#979000'>4</font> <font color='#5555FF'>=</font> null_type, <font color='#0000FF'>class</font> <b><a name='T'></a>T</b>##N##<font color='#979000'>5</font> <font color='#5555FF'>=</font> null_type, <font color='#0000FF'>class</font> <b><a name='T'></a>T</b>##N##<font color='#979000'>6</font> <font color='#5555FF'>=</font> null_type, <font color='#0000FF'>class</font> <b><a name='T'></a>T</b>##N##<font color='#979000'>7</font> <font color='#5555FF'>=</font> null_type
+
+<font color='#0000FF'>#define</font> DLIB_TUPLE_VARIABLE_LIST<font face='Lucida Console'>(</font>N<font face='Lucida Console'>)</font> \
+    T##N##<font color='#979000'>0</font> v##N##<font color='#979000'>0</font>; T##N##<font color='#979000'>1</font> v##N##<font color='#979000'>1</font>; T##N##<font color='#979000'>2</font> v##N##<font color='#979000'>2</font>; T##N##<font color='#979000'>3</font> v##N##<font color='#979000'>3</font>; \
+    T##N##<font color='#979000'>4</font> v##N##<font color='#979000'>4</font>; T##N##<font color='#979000'>5</font> v##N##<font color='#979000'>5</font>; T##N##<font color='#979000'>6</font> v##N##<font color='#979000'>6</font>; T##N##<font color='#979000'>7</font> v##N##<font color='#979000'>7</font>;  \
+    <font color='#0000FF'>typedef</font> T##N##<font color='#979000'>0</font> type##N##<font color='#979000'>0</font>; <font color='#0000FF'>typedef</font> T##N##<font color='#979000'>1</font> type##N##<font color='#979000'>1</font>; <font color='#0000FF'>typedef</font> T##N##<font color='#979000'>2</font> type##N##<font color='#979000'>2</font>;  \
+    <font color='#0000FF'>typedef</font> T##N##<font color='#979000'>3</font> type##N##<font color='#979000'>3</font>; <font color='#0000FF'>typedef</font> T##N##<font color='#979000'>4</font> type##N##<font color='#979000'>4</font>; <font color='#0000FF'>typedef</font> T##N##<font color='#979000'>5</font> type##N##<font color='#979000'>5</font>;  \
+    <font color='#0000FF'>typedef</font> T##N##<font color='#979000'>6</font> type##N##<font color='#979000'>6</font>; <font color='#0000FF'>typedef</font> T##N##<font color='#979000'>7</font> type##N##<font color='#979000'>7</font>; 
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+    <font color='#0000FF'>struct</font> <b><a name='null_type'></a>null_type</b><b>{</b><b>}</b>;
+
+    <font color='#009900'>// provide default serialization for the null_type
+</font>    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='serialize'></a>serialize</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> null_type<font color='#5555FF'>&amp;</font> ,
+        std::ostream<font color='#5555FF'>&amp;</font>
+    <font face='Lucida Console'>)</font><b>{</b><b>}</b>
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='deserialize'></a>deserialize</b> <font face='Lucida Console'>(</font>
+        null_type<font color='#5555FF'>&amp;</font> ,
+        std::istream<font color='#5555FF'>&amp;</font>
+    <font face='Lucida Console'>)</font><b>{</b><b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>namespace</font> tuple_helpers
+    <b>{</b>
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'><u>long</u></font> idx, <font color='#0000FF'>class</font> <b><a name='T'></a>T</b><font color='#5555FF'>&gt;</font> <font color='#0000FF'>struct</font> get_helper;
+
+        <font color='#009900'>// use these preprocessor macros to declare all the global stuff used by the
+</font>        <font color='#009900'>// tuple member functions.
+</font>        <b><a name='DLIB_TUPLE_GLOBAL_HELPERS'></a>DLIB_TUPLE_GLOBAL_HELPERS</b><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>
+        <b><a name='DLIB_TUPLE_GLOBAL_HELPERS'></a>DLIB_TUPLE_GLOBAL_HELPERS</b><font face='Lucida Console'>(</font><font color='#979000'>01</font><font face='Lucida Console'>)</font>
+        <b><a name='DLIB_TUPLE_GLOBAL_HELPERS'></a>DLIB_TUPLE_GLOBAL_HELPERS</b><font face='Lucida Console'>(</font><font color='#979000'>02</font><font face='Lucida Console'>)</font>
+        <b><a name='DLIB_TUPLE_GLOBAL_HELPERS'></a>DLIB_TUPLE_GLOBAL_HELPERS</b><font face='Lucida Console'>(</font><font color='#979000'>03</font><font face='Lucida Console'>)</font>
+
+    <font color='#009900'>// ------------------------------------------------------------------------------------
+</font>
+    <font color='#009900'>// use templates to recursively enumerate everything in the tuple that isn't a null_type
+</font>        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'>typename</font> T,
+            <font color='#0000FF'>typename</font> F,
+            <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>,
+            <font color='#0000FF'>typename</font> enabled <font color='#5555FF'>=</font> <font color='#0000FF'><u>void</u></font> 
+            <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>struct</font> <b><a name='for_each'></a>for_each</b> 
+        <b>{</b>
+            <font color='#0000FF'>static</font> <font color='#0000FF'><u>void</u></font> <b><a name='go'></a>go</b><font face='Lucida Console'>(</font>
+                T<font color='#5555FF'>&amp;</font> a, 
+                F<font color='#5555FF'>&amp;</font> funct
+            <font face='Lucida Console'>)</font> 
+            <b>{</b>
+                <font color='#BB00BB'>funct</font><font face='Lucida Console'>(</font>a.<font color='#0000FF'>template</font> get<font color='#5555FF'>&lt;</font>i<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                for_each<font color='#5555FF'>&lt;</font>T,F,i<font color='#5555FF'>+</font><font color='#979000'>1</font><font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>go</font><font face='Lucida Console'>(</font>a,funct<font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+            <font color='#0000FF'>static</font> <font color='#0000FF'><u>bool</u></font> <b><a name='go'></a>go</b><font face='Lucida Console'>(</font>
+                T<font color='#5555FF'>&amp;</font> a, 
+                F<font color='#5555FF'>&amp;</font> funct,
+                <font color='#0000FF'><u>long</u></font> idx
+            <font face='Lucida Console'>)</font> 
+            <font color='#009900'>/*!
+                ensures
+                    - returns true if the function was applied to the given index
+                    - returns false if the index is invalid so the function wasn't 
+                      applied to anything
+            !*/</font>
+            <b>{</b>
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>idx <font color='#5555FF'>=</font><font color='#5555FF'>=</font> i<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#BB00BB'>funct</font><font face='Lucida Console'>(</font>a.<font color='#0000FF'>template</font> get<font color='#5555FF'>&lt;</font>i<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                    <font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+                <b>}</b>
+                <font color='#0000FF'>else</font>
+                <b>{</b>
+                    <font color='#0000FF'>return</font> for_each<font color='#5555FF'>&lt;</font>T,F,i<font color='#5555FF'>+</font><font color='#979000'>1</font><font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>go</font><font face='Lucida Console'>(</font>a,funct,idx<font face='Lucida Console'>)</font>;
+                <b>}</b>
+            <b>}</b>
+        <b>}</b>;
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'><u>bool</u></font> v1, <font color='#0000FF'><u>bool</u></font> v2<font color='#5555FF'>&gt;</font> <font color='#0000FF'>struct</font> <b><a name='template_or'></a>template_or</b> <b>{</b> <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>bool</u></font> value <font color='#5555FF'>=</font> <font color='#979000'>true</font>; <b>}</b>;
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&gt;</font> <font color='#0000FF'>struct</font> <b><a name='template_or'></a>template_or</b><font color='#5555FF'>&lt;</font><font color='#979000'>false</font>,<font color='#979000'>false</font><font color='#5555FF'>&gt;</font> <b>{</b> <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>bool</u></font> value <font color='#5555FF'>=</font> <font color='#979000'>false</font>; <b>}</b>;
+
+        <font color='#009900'>// the base case of the recursion
+</font>        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'>typename</font> T,
+            <font color='#0000FF'>typename</font> F,
+            <font color='#0000FF'><u>long</u></font> i
+            <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>struct</font> <b><a name='for_each'></a>for_each</b><font color='#5555FF'>&lt;</font>T,F,i,<font color='#0000FF'>typename</font> enable_if<font color='#5555FF'>&lt;</font>template_or<font color='#5555FF'>&lt;</font>i <font color='#5555FF'>=</font><font color='#5555FF'>=</font> T::max_fields , is_same_type<font color='#5555FF'>&lt;</font>null_type,<font color='#0000FF'>typename</font> T::<font color='#0000FF'>template</font> get_type<font color='#5555FF'>&lt;</font>i<font color='#5555FF'>&gt;</font>::type <font color='#5555FF'>&gt;</font>::value<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font>::type <font color='#5555FF'>&gt;</font>
+        <b>{</b> 
+            <font color='#0000FF'>static</font> <font color='#0000FF'><u>void</u></font> <b><a name='go'></a>go</b><font face='Lucida Console'>(</font> T<font color='#5555FF'>&amp;</font>, F<font color='#5555FF'>&amp;</font> <font face='Lucida Console'>)</font> <b>{</b> <b>}</b> 
+            <font color='#0000FF'>static</font> <font color='#0000FF'><u>bool</u></font> <b><a name='go'></a>go</b><font face='Lucida Console'>(</font> T<font color='#5555FF'>&amp;</font>, F<font color='#5555FF'>&amp;</font>, <font color='#0000FF'><u>long</u></font> <font face='Lucida Console'>)</font> <b>{</b> <font color='#0000FF'>return</font> <font color='#979000'>false</font>; <b>}</b> 
+        <b>}</b>;
+
+    <font color='#009900'>// ------------------------------------------------------------------------------------
+</font>
+    <font color='#009900'>// use templates to recursively enumerate everything in the tuple that isn't a null_type
+</font>        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'>typename</font> T,
+            <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>,
+            <font color='#0000FF'>typename</font> enabled <font color='#5555FF'>=</font> <font color='#0000FF'><u>void</u></font> 
+            <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>struct</font> <b><a name='tuple_swap'></a>tuple_swap</b> 
+        <b>{</b>
+            <font color='#0000FF'>static</font> <font color='#0000FF'><u>void</u></font> <b><a name='go'></a>go</b><font face='Lucida Console'>(</font>
+                T<font color='#5555FF'>&amp;</font> a,
+                T<font color='#5555FF'>&amp;</font> b 
+            <font face='Lucida Console'>)</font> 
+            <b>{</b>
+                <font color='#BB00BB'>exchange</font><font face='Lucida Console'>(</font>a.<font color='#0000FF'>template</font> get<font color='#5555FF'>&lt;</font>i<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, b.<font color='#0000FF'>template</font> get<font color='#5555FF'>&lt;</font>i<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                tuple_swap<font color='#5555FF'>&lt;</font>T,i<font color='#5555FF'>+</font><font color='#979000'>1</font><font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>go</font><font face='Lucida Console'>(</font>a,b<font face='Lucida Console'>)</font>;
+            <b>}</b>
+        <b>}</b>;
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T, <font color='#0000FF'><u>long</u></font> i<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>struct</font> <b><a name='at_base_case'></a>at_base_case</b>
+        <b>{</b>
+
+        <b>}</b>;
+
+        <font color='#009900'>// the base case of the recursion
+</font>        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'>typename</font> T,
+            <font color='#0000FF'><u>long</u></font> i
+            <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>struct</font> <b><a name='tuple_swap'></a>tuple_swap</b><font color='#5555FF'>&lt;</font>T,i,<font color='#0000FF'>typename</font> enable_if<font color='#5555FF'>&lt;</font>template_or<font color='#5555FF'>&lt;</font>i <font color='#5555FF'>=</font><font color='#5555FF'>=</font> T::max_fields, is_same_type<font color='#5555FF'>&lt;</font>null_type,<font color='#0000FF'>typename</font> T::<font color='#0000FF'>template</font> get_type<font color='#5555FF'>&lt;</font>i<font color='#5555FF'>&gt;</font>::type <font color='#5555FF'>&gt;</font>::value <font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font>::type <font color='#5555FF'>&gt;</font>
+        <b>{</b> <font color='#0000FF'>static</font> <font color='#0000FF'><u>void</u></font> <b><a name='go'></a>go</b><font face='Lucida Console'>(</font> T<font color='#5555FF'>&amp;</font>, T<font color='#5555FF'>&amp;</font> <font face='Lucida Console'>)</font> <b>{</b> <b>}</b> <b>}</b>;
+
+    <font color='#009900'>// ------------------------------------------------------------------------------------
+</font>
+        <font color='#0000FF'>struct</font> <b><a name='tuple_serialize'></a>tuple_serialize</b>
+        <b>{</b>
+            <b><a name='tuple_serialize'></a>tuple_serialize</b> <font face='Lucida Console'>(</font>std::ostream<font color='#5555FF'>&amp;</font> out_<font face='Lucida Console'>)</font> : out<font face='Lucida Console'>(</font>out_<font face='Lucida Console'>)</font><b>{</b><b>}</b>
+            std::ostream<font color='#5555FF'>&amp;</font> out;
+
+            <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+            <font color='#0000FF'><u>void</u></font> <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>
+                T<font color='#5555FF'>&amp;</font> a
+            <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>a,out<font face='Lucida Console'>)</font>; <b>}</b>
+        <b>}</b>;
+
+    <font color='#009900'>// ------------------------------------------------------------------------------------
+</font>
+        <font color='#0000FF'>struct</font> <b><a name='tuple_deserialize'></a>tuple_deserialize</b>
+        <b>{</b>
+            <b><a name='tuple_deserialize'></a>tuple_deserialize</b> <font face='Lucida Console'>(</font>std::istream<font color='#5555FF'>&amp;</font> in_<font face='Lucida Console'>)</font> : in<font face='Lucida Console'>(</font>in_<font face='Lucida Console'>)</font><b>{</b><b>}</b>
+            std::istream<font color='#5555FF'>&amp;</font> in; 
+            <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+            <font color='#0000FF'><u>void</u></font> <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>
+                T<font color='#5555FF'>&amp;</font> a
+            <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>a,in<font face='Lucida Console'>)</font>; <b>}</b>
+        <b>}</b>;
+
+
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#009900'>// use these preprocessor macros to declare 4*8 template arguments (below we count them in octal)
+</font>    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font> 
+        <b><a name='DLIB_TUPLE_TEMPLATE_LIST'></a>DLIB_TUPLE_TEMPLATE_LIST</b><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>,  <font color='#009900'>// args 00-07
+</font>        <b><a name='DLIB_TUPLE_TEMPLATE_LIST'></a>DLIB_TUPLE_TEMPLATE_LIST</b><font face='Lucida Console'>(</font><font color='#979000'>01</font><font face='Lucida Console'>)</font>, <font color='#009900'>// args 010-017 
+</font>        <b><a name='DLIB_TUPLE_TEMPLATE_LIST'></a>DLIB_TUPLE_TEMPLATE_LIST</b><font face='Lucida Console'>(</font><font color='#979000'>02</font><font face='Lucida Console'>)</font>, <font color='#009900'>// args 020-027
+</font>        <b><a name='DLIB_TUPLE_TEMPLATE_LIST'></a>DLIB_TUPLE_TEMPLATE_LIST</b><font face='Lucida Console'>(</font><font color='#979000'>03</font><font face='Lucida Console'>)</font>  <font color='#009900'>// args 030-037
+</font>        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>class</font> <b><a name='tuple'></a>tuple</b>
+    <b>{</b>
+    <font color='#0000FF'>public</font>:
+
+        <font color='#009900'>// use these macros to declare 8*4 member variables
+</font>        <b><a name='DLIB_TUPLE_VARIABLE_LIST'></a>DLIB_TUPLE_VARIABLE_LIST</b><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>
+        <b><a name='DLIB_TUPLE_VARIABLE_LIST'></a>DLIB_TUPLE_VARIABLE_LIST</b><font face='Lucida Console'>(</font><font color='#979000'>01</font><font face='Lucida Console'>)</font>
+        <b><a name='DLIB_TUPLE_VARIABLE_LIST'></a>DLIB_TUPLE_VARIABLE_LIST</b><font face='Lucida Console'>(</font><font color='#979000'>02</font><font face='Lucida Console'>)</font>
+        <b><a name='DLIB_TUPLE_VARIABLE_LIST'></a>DLIB_TUPLE_VARIABLE_LIST</b><font face='Lucida Console'>(</font><font color='#979000'>03</font><font face='Lucida Console'>)</font>
+
+        <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>long</u></font> max_fields <font color='#5555FF'>=</font> <font color='#979000'>4</font><font color='#5555FF'>*</font><font color='#979000'>8</font>;
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font> <font color='#0000FF'><u>long</u></font> idx <font color='#5555FF'>&gt;</font> 
+        <font color='#0000FF'>struct</font> <b><a name='get_type'></a>get_type</b> 
+        <b>{</b> 
+            <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> tuple_helpers::get_helper<font color='#5555FF'>&lt;</font>idx,tuple<font color='#5555FF'>&gt;</font>::type type; 
+        <b>}</b>;
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font> <font color='#0000FF'><u>long</u></font> idx <font color='#5555FF'>&gt;</font> 
+        <font color='#0000FF'>const</font> <font color='#0000FF'>typename</font> tuple_helpers::get_helper<font color='#5555FF'>&lt;</font>idx,tuple<font color='#5555FF'>&gt;</font>::type<font color='#5555FF'>&amp;</font> <b><a name='get'></a>get</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> tuple_helpers::get_helper<font color='#5555FF'>&lt;</font>idx,tuple<font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font><font face='Lucida Console'>)</font>; <b>}</b>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font> <font color='#0000FF'><u>long</u></font> idx <font color='#5555FF'>&gt;</font>       
+        <font color='#0000FF'>typename</font> tuple_helpers::get_helper<font color='#5555FF'>&lt;</font>idx,tuple<font color='#5555FF'>&gt;</font>::type<font color='#5555FF'>&amp;</font> <b><a name='get'></a>get</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <b>{</b> <font color='#0000FF'>return</font> tuple_helpers::get_helper<font color='#5555FF'>&lt;</font>idx,tuple<font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font><font face='Lucida Console'>)</font>; <b>}</b>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font> <font color='#0000FF'>class</font> <b><a name='Q'></a>Q</b><font color='#5555FF'>&gt;</font>  
+        <font color='#0000FF'><u>long</u></font> <b><a name='index'></a>index</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> tuple_helpers::get_index<font color='#5555FF'>&lt;</font>Q<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font><font face='Lucida Console'>)</font>; <b>}</b>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>class</font> <b><a name='Q'></a>Q</b><font color='#5555FF'>&gt;</font>  
+        <font color='#0000FF'>const</font> Q<font color='#5555FF'>&amp;</font> <b><a name='get'></a>get</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b><font color='#0000FF'>return</font> tuple_helpers::get_item_const<font color='#5555FF'>&lt;</font>Q<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font><font face='Lucida Console'>)</font>;<b>}</b>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>class</font> <b><a name='Q'></a>Q</b><font color='#5555FF'>&gt;</font> 
+        Q<font color='#5555FF'>&amp;</font> <b><a name='get'></a>get</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <b>{</b><font color='#0000FF'>return</font> tuple_helpers::get_item<font color='#5555FF'>&lt;</font>Q<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font><font face='Lucida Console'>)</font>;<b>}</b>
+
+
+
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> F<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='for_index'></a>for_index</b> <font face='Lucida Console'>(</font>
+            F<font color='#5555FF'>&amp;</font> funct,
+            <font color='#0000FF'><u>long</u></font> idx
+        <font face='Lucida Console'>)</font> 
+        <b>{</b> 
+            <font color='#009900'>// do this #ifdef stuff to avoid getting a warning about valid_idx not being
+</font>            <font color='#009900'>// used when ENABLE_ASSERTS isn't defined.
+</font><font color='#0000FF'>#ifdef</font> ENABLE_ASSERTS
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>bool</u></font> valid_idx <font color='#5555FF'>=</font> tuple_helpers::for_each<font color='#5555FF'>&lt;</font>tuple,F<font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>go</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font>,funct,idx<font face='Lucida Console'>)</font>; 
+<font color='#0000FF'>#else</font>
+            tuple_helpers::for_each<font color='#5555FF'>&lt;</font>tuple,F<font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>go</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font>,funct,idx<font face='Lucida Console'>)</font>; 
+<font color='#0000FF'>#endif</font>
+            <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font>valid_idx,
+                "<font color='#CC0000'>\tvoid tuple::for_index()</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tYou have attempted to call for_index() with an index out of the valid range</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tidx:  </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> idx 
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tthis: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font>
+                <font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> F<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='for_index'></a>for_index</b> <font face='Lucida Console'>(</font>
+            F<font color='#5555FF'>&amp;</font> funct,
+            <font color='#0000FF'><u>long</u></font> idx
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> 
+        <b>{</b> 
+            <font color='#009900'>// do this #ifdef stuff to avoid getting a warning about valid_idx not being
+</font>            <font color='#009900'>// used when ENABLE_ASSERTS isn't defined.
+</font><font color='#0000FF'>#ifdef</font> ENABLE_ASSERTS
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>bool</u></font> valid_idx <font color='#5555FF'>=</font> tuple_helpers::for_each<font color='#5555FF'>&lt;</font><font color='#0000FF'>const</font> tuple,F<font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>go</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font>,funct,idx<font face='Lucida Console'>)</font>; 
+<font color='#0000FF'>#else</font>
+            tuple_helpers::for_each<font color='#5555FF'>&lt;</font><font color='#0000FF'>const</font> tuple,F<font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>go</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font>,funct,idx<font face='Lucida Console'>)</font>; 
+<font color='#0000FF'>#endif</font>
+            <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font>valid_idx,
+                "<font color='#CC0000'>\tvoid tuple::for_index()</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tYou have attempted to call for_index() with an index out of the valid range</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tidx:  </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> idx 
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tthis: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font>
+                <font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> F<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='for_index'></a>for_index</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> F<font color='#5555FF'>&amp;</font> funct,
+            <font color='#0000FF'><u>long</u></font> idx
+        <font face='Lucida Console'>)</font> 
+        <b>{</b> 
+            <font color='#009900'>// do this #ifdef stuff to avoid getting a warning about valid_idx not being
+</font>            <font color='#009900'>// used when ENABLE_ASSERTS isn't defined.
+</font><font color='#0000FF'>#ifdef</font> ENABLE_ASSERTS
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>bool</u></font> valid_idx <font color='#5555FF'>=</font> tuple_helpers::for_each<font color='#5555FF'>&lt;</font>tuple,<font color='#0000FF'>const</font> F<font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>go</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font>,funct,idx<font face='Lucida Console'>)</font>; 
+<font color='#0000FF'>#else</font>
+            tuple_helpers::for_each<font color='#5555FF'>&lt;</font>tuple,<font color='#0000FF'>const</font> F<font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>go</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font>,funct,idx<font face='Lucida Console'>)</font>; 
+<font color='#0000FF'>#endif</font>
+            <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font>valid_idx,
+                "<font color='#CC0000'>\tvoid tuple::for_index()</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tYou have attempted to call for_index() with an index out of the valid range</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tidx:  </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> idx 
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tthis: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font>
+                <font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> F<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='for_index'></a>for_index</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> F<font color='#5555FF'>&amp;</font> funct,
+            <font color='#0000FF'><u>long</u></font> idx
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b> 
+            <font color='#009900'>// do this #ifdef stuff to avoid getting a warning about valid_idx not being
+</font>            <font color='#009900'>// used when ENABLE_ASSERTS isn't defined.
+</font><font color='#0000FF'>#ifdef</font> ENABLE_ASSERTS
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>bool</u></font> valid_idx <font color='#5555FF'>=</font> tuple_helpers::for_each<font color='#5555FF'>&lt;</font><font color='#0000FF'>const</font> tuple,<font color='#0000FF'>const</font> F<font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>go</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font>,funct,idx<font face='Lucida Console'>)</font>; 
+<font color='#0000FF'>#else</font>
+            tuple_helpers::for_each<font color='#5555FF'>&lt;</font><font color='#0000FF'>const</font> tuple,<font color='#0000FF'>const</font> F<font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>go</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font>,funct,idx<font face='Lucida Console'>)</font>; 
+<font color='#0000FF'>#endif</font>
+            <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font>valid_idx,
+                "<font color='#CC0000'>\tvoid tuple::for_index()</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tYou have attempted to call for_index() with an index out of the valid range</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tidx:  </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> idx 
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tthis: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font>
+                <font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+
+
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> F<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='for_each'></a>for_each</b> <font face='Lucida Console'>(</font>
+            F<font color='#5555FF'>&amp;</font> funct
+        <font face='Lucida Console'>)</font> <b>{</b> tuple_helpers::for_each<font color='#5555FF'>&lt;</font>tuple,F<font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>go</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font>,funct<font face='Lucida Console'>)</font>; <b>}</b>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> F<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='for_each'></a>for_each</b> <font face='Lucida Console'>(</font>
+            F<font color='#5555FF'>&amp;</font> funct
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> tuple_helpers::for_each<font color='#5555FF'>&lt;</font><font color='#0000FF'>const</font> tuple,F<font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>go</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font>,funct<font face='Lucida Console'>)</font>; <b>}</b>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> F<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='for_each'></a>for_each</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> F<font color='#5555FF'>&amp;</font> funct
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> tuple_helpers::for_each<font color='#5555FF'>&lt;</font><font color='#0000FF'>const</font> tuple,<font color='#0000FF'>const</font> F<font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>go</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font>,funct<font face='Lucida Console'>)</font>; <b>}</b>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> F<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='for_each'></a>for_each</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> F<font color='#5555FF'>&amp;</font> funct
+        <font face='Lucida Console'>)</font> <b>{</b> tuple_helpers::for_each<font color='#5555FF'>&lt;</font>tuple,<font color='#0000FF'>const</font> F<font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>go</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font>,funct<font face='Lucida Console'>)</font>; <b>}</b>
+
+
+
+
+        <font color='#0000FF'>inline</font> <font color='#0000FF'>friend</font> <font color='#0000FF'><u>void</u></font> <b><a name='serialize'></a>serialize</b> <font face='Lucida Console'>(</font>
+            tuple<font color='#5555FF'>&amp;</font> item,
+            std::ostream<font color='#5555FF'>&amp;</font> out
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>try</font>
+            <b>{</b>
+                item.<font color='#BB00BB'>for_each</font><font face='Lucida Console'>(</font>tuple_helpers::<font color='#BB00BB'>tuple_serialize</font><font face='Lucida Console'>(</font>out<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+            <font color='#0000FF'>catch</font> <font face='Lucida Console'>(</font>serialization_error<font color='#5555FF'>&amp;</font> e<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>throw</font> <font color='#BB00BB'>serialization_error</font><font face='Lucida Console'>(</font>e.info <font color='#5555FF'>+</font> "<font color='#CC0000'>\n   while serializing an object of type dlib::tuple&lt;&gt;</font>"<font face='Lucida Console'>)</font>;
+            <b>}</b>
+        <b>}</b>
+
+        <font color='#0000FF'>inline</font> <font color='#0000FF'>friend</font> <font color='#0000FF'><u>void</u></font> <b><a name='deserialize'></a>deserialize</b> <font face='Lucida Console'>(</font>
+            tuple<font color='#5555FF'>&amp;</font> item,
+            std::istream<font color='#5555FF'>&amp;</font> in 
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>try</font>
+            <b>{</b>
+                item.<font color='#BB00BB'>for_each</font><font face='Lucida Console'>(</font>tuple_helpers::<font color='#BB00BB'>tuple_deserialize</font><font face='Lucida Console'>(</font>in<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+            <font color='#0000FF'>catch</font> <font face='Lucida Console'>(</font>serialization_error<font color='#5555FF'>&amp;</font> e<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>throw</font> <font color='#BB00BB'>serialization_error</font><font face='Lucida Console'>(</font>e.info <font color='#5555FF'>+</font> "<font color='#CC0000'>\n   while deserializing an object of type dlib::tuple&lt;&gt;</font>"<font face='Lucida Console'>)</font>;
+            <b>}</b>
+        <b>}</b>
+
+        <font color='#0000FF'>inline</font> <font color='#0000FF'>friend</font> <font color='#0000FF'><u>void</u></font> <b><a name='swap'></a>swap</b> <font face='Lucida Console'>(</font>
+            tuple<font color='#5555FF'>&amp;</font> a,
+            tuple<font color='#5555FF'>&amp;</font> b
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            tuple_helpers::tuple_swap<font color='#5555FF'>&lt;</font>tuple<font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>go</font><font face='Lucida Console'>(</font>a,b<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='swap'></a>swap</b><font face='Lucida Console'>(</font>
+            tuple<font color='#5555FF'>&amp;</font> item
+        <font face='Lucida Console'>)</font> <b>{</b> tuple_helpers::tuple_swap<font color='#5555FF'>&lt;</font>tuple<font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>go</font><font face='Lucida Console'>(</font>item,<font color='#5555FF'>*</font><font color='#0000FF'>this</font><font face='Lucida Console'>)</font>; <b>}</b>
+
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_TUPLe_H_
+</font>
+
+</pre></body></html>

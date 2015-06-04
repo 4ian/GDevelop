@@ -1,0 +1,151 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - misc_api_kernel_1.cpp</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2004  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_MISC_API_KERNEL_1_CPp_
+<font color='#0000FF'>#define</font> DLIB_MISC_API_KERNEL_1_CPp_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../platform.h.html'>../platform.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../threads.h.html'>../threads.h</a>"
+
+<font color='#0000FF'>#ifdef</font> WIN32
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='misc_api_kernel_1.h.html'>misc_api_kernel_1.h</a>"
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../windows_magic.h.html'>../windows_magic.h</a>"
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>windows.h<font color='#5555FF'>&gt;</font>
+
+<font color='#009900'>// tell visual studio to link to the library needed to call timeGetTime() 
+</font><font color='#0000FF'>#ifdef</font> _MSC_VER
+<font color='#0000FF'>#pragma</font> comment <font face='Lucida Console'>(</font>lib, "<font color='#CC0000'>winmm.lib</font>"<font face='Lucida Console'>)</font>
+<font color='#0000FF'>#endif</font>
+
+<font color='#0000FF'>#ifdef</font> __BORLANDC__
+<font color='#009900'>// Apparently the borland compiler doesn't define this.
+</font><font color='#0000FF'>#define</font> INVALID_FILE_ATTRIBUTES <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>DWORD<font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>
+<font color='#0000FF'>#endif</font>
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='sleep'></a>sleep</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> milliseconds
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        ::<font color='#BB00BB'>Sleep</font><font face='Lucida Console'>(</font>milliseconds<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>namespace</font>
+    <b>{</b>
+        mutex<font color='#5555FF'>&amp;</font> <b><a name='cwd_mutex'></a>cwd_mutex</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>static</font> mutex m;
+            <font color='#0000FF'>return</font> m;
+        <b>}</b>
+        <font color='#009900'>// Make sure the above mutex gets constructed before main() 
+</font>        <font color='#009900'>// starts.  This way we can be pretty sure it will be constructed
+</font>        <font color='#009900'>// before any threads could possibly call set_current_dir() or
+</font>        <font color='#009900'>// get_current_dir() simultaneously.
+</font>        <font color='#0000FF'>struct</font> <b><a name='construct_cwd_mutex'></a>construct_cwd_mutex</b>
+        <b>{</b>
+            <b><a name='construct_cwd_mutex'></a>construct_cwd_mutex</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#BB00BB'>cwd_mutex</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+        <b>}</b> oaimvweoinvwe;
+    <b>}</b>
+
+    std::string <b><a name='get_current_dir'></a>get_current_dir</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#009900'>// need to lock a mutex here because getting and setting the
+</font>        <font color='#009900'>// current working directory is not thread safe on windows.
+</font>        auto_mutex <font color='#BB00BB'>lock</font><font face='Lucida Console'>(</font><font color='#BB00BB'>cwd_mutex</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'><u>char</u></font> buf[<font color='#979000'>1024</font>];
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>GetCurrentDirectoryA</font><font face='Lucida Console'>(</font><font color='#0000FF'>sizeof</font><font face='Lucida Console'>(</font>buf<font face='Lucida Console'>)</font>,buf<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>return</font> std::<font color='#BB00BB'>string</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+        <font color='#0000FF'>else</font>
+        <b>{</b>
+            <font color='#0000FF'>return</font> std::<font color='#BB00BB'>string</font><font face='Lucida Console'>(</font>buf<font face='Lucida Console'>)</font>;
+        <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='set_current_dir'></a>set_current_dir</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> new_dir
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#009900'>// need to lock a mutex here because getting and setting the
+</font>        <font color='#009900'>// current working directory is not thread safe on windows.
+</font>        auto_mutex <font color='#BB00BB'>lock</font><font face='Lucida Console'>(</font><font color='#BB00BB'>cwd_mutex</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>SetCurrentDirectoryA</font><font face='Lucida Console'>(</font>new_dir.<font color='#BB00BB'>c_str</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>throw</font> <font color='#BB00BB'>set_current_dir_error</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>Error changing current dir to '</font>" <font color='#5555FF'>+</font> new_dir <font color='#5555FF'>+</font> "<font color='#CC0000'>'</font>"<font face='Lucida Console'>)</font>;
+        <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    uint64 timestamper::
+    <b><a name='get_timestamp'></a>get_timestamp</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> temp <font color='#5555FF'>=</font> <font color='#BB00BB'>timeGetTime</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>temp <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> last_time<font face='Lucida Console'>)</font>
+        <b>{</b>            
+            last_time <font color='#5555FF'>=</font> temp;
+            <font color='#0000FF'>return</font> <font face='Lucida Console'>(</font>offset <font color='#5555FF'>+</font> temp<font face='Lucida Console'>)</font><font color='#5555FF'>*</font><font color='#979000'>1000</font>;
+        <b>}</b>
+        <font color='#0000FF'>else</font>
+        <b>{</b>
+            last_time <font color='#5555FF'>=</font> temp;
+
+            <font color='#009900'>// there was overflow since the last call so we need to make the offset
+</font>            <font color='#009900'>// bigger to account for that
+</font>            offset <font color='#5555FF'>+</font><font color='#5555FF'>=</font> dword_max;
+            <font color='#0000FF'>return</font> <font face='Lucida Console'>(</font>offset <font color='#5555FF'>+</font> temp<font face='Lucida Console'>)</font><font color='#5555FF'>*</font><font color='#979000'>1000</font>;
+        <b>}</b>        
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='create_directory'></a>create_directory</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> dir
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>CreateDirectoryA</font><font face='Lucida Console'>(</font>dir.<font color='#BB00BB'>c_str</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#009900'>// an error has occurred
+</font>            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>GetLastError</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> ERROR_ALREADY_EXISTS<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#009900'>// make sure this is actually a directory
+</font>                DWORD attribs <font color='#5555FF'>=</font> <font color='#BB00BB'>GetFileAttributesA</font><font face='Lucida Console'>(</font>dir.<font color='#BB00BB'>c_str</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>attribs <font color='#5555FF'>=</font><font color='#5555FF'>=</font> INVALID_FILE_ATTRIBUTES <font color='#5555FF'>|</font><font color='#5555FF'>|</font>
+                    <font face='Lucida Console'>(</font>attribs<font color='#5555FF'>&amp;</font>FILE_ATTRIBUTE_DIRECTORY<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#009900'>// it isn't a directory
+</font>                    <font color='#0000FF'>throw</font> <font color='#BB00BB'>dir_create_error</font><font face='Lucida Console'>(</font>dir<font face='Lucida Console'>)</font>;
+                <b>}</b>
+            <b>}</b>
+            <font color='#0000FF'>else</font>
+            <b>{</b>
+                <font color='#0000FF'>throw</font> <font color='#BB00BB'>dir_create_error</font><font face='Lucida Console'>(</font>dir<font face='Lucida Console'>)</font>;
+            <b>}</b>
+        <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>    
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// WIN32
+</font>
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_MISC_API_KERNEL_1_CPp_
+</font>
+
+</pre></body></html>

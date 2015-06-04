@@ -1,0 +1,866 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - image_loader.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2006  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_IMAGE_LOADEr_
+<font color='#0000FF'>#define</font> DLIB_IMAGE_LOADEr_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='image_loader_abstract.h.html'>image_loader_abstract.h</a>"
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>iostream<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>sstream<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../algs.h.html'>../algs.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../pixel.h.html'>../pixel.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../image_saver/dng_shared.h.html'>../image_saver/dng_shared.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../entropy_decoder_model.h.html'>../entropy_decoder_model.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../entropy_decoder.h.html'>../entropy_decoder.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../uintn.h.html'>../uintn.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../image_transforms/assign_image.h.html'>../image_transforms/assign_image.h</a>"
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>algorithm<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../vectorstream.h.html'>../vectorstream.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>class</font> <b><a name='image_load_error'></a>image_load_error</b> : <font color='#0000FF'>public</font> dlib::error <b>{</b> 
+    <font color='#0000FF'>public</font>: <b><a name='image_load_error'></a>image_load_error</b><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> str<font face='Lucida Console'>)</font> : error<font face='Lucida Console'>(</font>EIMAGE_LOAD,str<font face='Lucida Console'>)</font><b>{</b><b>}</b>
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> image_type 
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='load_bmp'></a>load_bmp</b> <font face='Lucida Console'>(</font>
+        image_type<font color='#5555FF'>&amp;</font> image_,
+        std::istream<font color='#5555FF'>&amp;</font> in_
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        image_view<font color='#5555FF'>&lt;</font>image_type<font color='#5555FF'>&gt;</font> <font color='#BB00BB'>image</font><font face='Lucida Console'>(</font>image_<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>try</font>
+        <b>{</b>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> bytes_read_so_far <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> bfSize;
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> bfOffBits;
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> bfReserved;
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> biSize;
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> biWidth;
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> biHeight;
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>short</u></font> biBitCount;
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> biCompression;
+            <font color='#009900'>/*
+            unsigned long biSizeImage;
+            unsigned long biClrUsed;
+            unsigned long biClrImportant;
+            */</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> a, b, c, d, i;
+
+            <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> std;
+
+            streambuf<font color='#5555FF'>&amp;</font> in <font color='#5555FF'>=</font> <font color='#5555FF'>*</font>in_.<font color='#BB00BB'>rdbuf</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    <font color='#009900'>//        streamsize num;
+</font>            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> buf[<font color='#979000'>100</font>];
+
+
+            <font color='#009900'>// first make sure the BMP starts with BM
+</font>            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>in.<font color='#BB00BB'>sgetn</font><font face='Lucida Console'>(</font><font color='#0000FF'>reinterpret_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>char</u></font><font color='#5555FF'>*</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>buf<font face='Lucida Console'>)</font>,<font color='#979000'>2</font><font face='Lucida Console'>)</font> <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>2</font><font face='Lucida Console'>)</font>
+                <font color='#0000FF'>throw</font> <font color='#BB00BB'>image_load_error</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>bmp load error 1: header error</font>"<font face='Lucida Console'>)</font>;
+            bytes_read_so_far <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#979000'>2</font>;
+
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>buf[<font color='#979000'>0</font>] <font color='#5555FF'>!</font><font color='#5555FF'>=</font> '<font color='#FF0000'>B</font>' <font color='#5555FF'>|</font><font color='#5555FF'>|</font> buf[<font color='#979000'>1</font>] <font color='#5555FF'>!</font><font color='#5555FF'>=</font> '<font color='#FF0000'>M</font>'<font face='Lucida Console'>)</font>
+                <font color='#0000FF'>throw</font> <font color='#BB00BB'>image_load_error</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>bmp load error 2: header error</font>"<font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// now read the BITMAPFILEHEADER
+</font>            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>in.<font color='#BB00BB'>sgetn</font><font face='Lucida Console'>(</font><font color='#0000FF'>reinterpret_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>char</u></font><font color='#5555FF'>*</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>buf<font face='Lucida Console'>)</font>,<font color='#979000'>12</font><font face='Lucida Console'>)</font> <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>12</font><font face='Lucida Console'>)</font>
+                <font color='#0000FF'>throw</font> <font color='#BB00BB'>image_load_error</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>bmp load error 3: header error</font>"<font face='Lucida Console'>)</font>;
+
+            bytes_read_so_far <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#979000'>12</font>;
+
+            i <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            a <font color='#5555FF'>=</font> buf[i]; b <font color='#5555FF'>=</font> buf[i<font color='#5555FF'>+</font><font color='#979000'>1</font>]; c <font color='#5555FF'>=</font> buf[i<font color='#5555FF'>+</font><font color='#979000'>2</font>]; d <font color='#5555FF'>=</font> buf[i<font color='#5555FF'>+</font><font color='#979000'>3</font>];
+            bfSize <font color='#5555FF'>=</font> a <font color='#5555FF'>|</font> <font face='Lucida Console'>(</font>b<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font><font color='#979000'>8</font><font face='Lucida Console'>)</font> <font color='#5555FF'>|</font> <font face='Lucida Console'>(</font>c<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font><font color='#979000'>16</font><font face='Lucida Console'>)</font> <font color='#5555FF'>|</font> <font face='Lucida Console'>(</font>d<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font><font color='#979000'>24</font><font face='Lucida Console'>)</font>;
+
+            i <font color='#5555FF'>=</font> <font color='#979000'>4</font>;
+            a <font color='#5555FF'>=</font> buf[i]; b <font color='#5555FF'>=</font> buf[i<font color='#5555FF'>+</font><font color='#979000'>1</font>]; c <font color='#5555FF'>=</font> buf[i<font color='#5555FF'>+</font><font color='#979000'>2</font>]; d <font color='#5555FF'>=</font> buf[i<font color='#5555FF'>+</font><font color='#979000'>3</font>];
+            bfReserved <font color='#5555FF'>=</font> a <font color='#5555FF'>|</font> <font face='Lucida Console'>(</font>b<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font><font color='#979000'>8</font><font face='Lucida Console'>)</font> <font color='#5555FF'>|</font> <font face='Lucida Console'>(</font>c<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font><font color='#979000'>16</font><font face='Lucida Console'>)</font> <font color='#5555FF'>|</font> <font face='Lucida Console'>(</font>d<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font><font color='#979000'>24</font><font face='Lucida Console'>)</font>;
+
+            i <font color='#5555FF'>=</font> <font color='#979000'>8</font>;
+            a <font color='#5555FF'>=</font> buf[i]; b <font color='#5555FF'>=</font> buf[i<font color='#5555FF'>+</font><font color='#979000'>1</font>]; c <font color='#5555FF'>=</font> buf[i<font color='#5555FF'>+</font><font color='#979000'>2</font>]; d <font color='#5555FF'>=</font> buf[i<font color='#5555FF'>+</font><font color='#979000'>3</font>];
+            bfOffBits <font color='#5555FF'>=</font> a <font color='#5555FF'>|</font> <font face='Lucida Console'>(</font>b<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font><font color='#979000'>8</font><font face='Lucida Console'>)</font> <font color='#5555FF'>|</font> <font face='Lucida Console'>(</font>c<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font><font color='#979000'>16</font><font face='Lucida Console'>)</font> <font color='#5555FF'>|</font> <font face='Lucida Console'>(</font>d<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font><font color='#979000'>24</font><font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// if this value isn't zero then there is something wrong
+</font>            <font color='#009900'>// with this bitmap.
+</font>            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>bfReserved <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                <font color='#0000FF'>throw</font> <font color='#BB00BB'>image_load_error</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>bmp load error 4: reserved area not zero</font>"<font face='Lucida Console'>)</font>;
+
+
+            <font color='#009900'>// load the BITMAPINFOHEADER
+</font>            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>in.<font color='#BB00BB'>sgetn</font><font face='Lucida Console'>(</font><font color='#0000FF'>reinterpret_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>char</u></font><font color='#5555FF'>*</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>buf<font face='Lucida Console'>)</font>,<font color='#979000'>40</font><font face='Lucida Console'>)</font> <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>40</font><font face='Lucida Console'>)</font>
+                <font color='#0000FF'>throw</font> <font color='#BB00BB'>image_load_error</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>bmp load error 5: file too short</font>"<font face='Lucida Console'>)</font>;
+            bytes_read_so_far <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#979000'>40</font>;
+
+
+            i <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            a <font color='#5555FF'>=</font> buf[i]; b <font color='#5555FF'>=</font> buf[i<font color='#5555FF'>+</font><font color='#979000'>1</font>]; c <font color='#5555FF'>=</font> buf[i<font color='#5555FF'>+</font><font color='#979000'>2</font>]; d <font color='#5555FF'>=</font> buf[i<font color='#5555FF'>+</font><font color='#979000'>3</font>];
+            biSize <font color='#5555FF'>=</font> a <font color='#5555FF'>|</font> <font face='Lucida Console'>(</font>b<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font><font color='#979000'>8</font><font face='Lucida Console'>)</font> <font color='#5555FF'>|</font> <font face='Lucida Console'>(</font>c<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font><font color='#979000'>16</font><font face='Lucida Console'>)</font> <font color='#5555FF'>|</font> <font face='Lucida Console'>(</font>d<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font><font color='#979000'>24</font><font face='Lucida Console'>)</font>;
+
+            i <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#979000'>4</font>;
+            a <font color='#5555FF'>=</font> buf[i]; b <font color='#5555FF'>=</font> buf[i<font color='#5555FF'>+</font><font color='#979000'>1</font>]; c <font color='#5555FF'>=</font> buf[i<font color='#5555FF'>+</font><font color='#979000'>2</font>]; d <font color='#5555FF'>=</font> buf[i<font color='#5555FF'>+</font><font color='#979000'>3</font>];
+            biWidth <font color='#5555FF'>=</font> a <font color='#5555FF'>|</font> <font face='Lucida Console'>(</font>b<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font><font color='#979000'>8</font><font face='Lucida Console'>)</font> <font color='#5555FF'>|</font> <font face='Lucida Console'>(</font>c<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font><font color='#979000'>16</font><font face='Lucida Console'>)</font> <font color='#5555FF'>|</font> <font face='Lucida Console'>(</font>d<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font><font color='#979000'>24</font><font face='Lucida Console'>)</font>;
+
+            i <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#979000'>4</font>;
+            a <font color='#5555FF'>=</font> buf[i]; b <font color='#5555FF'>=</font> buf[i<font color='#5555FF'>+</font><font color='#979000'>1</font>]; c <font color='#5555FF'>=</font> buf[i<font color='#5555FF'>+</font><font color='#979000'>2</font>]; d <font color='#5555FF'>=</font> buf[i<font color='#5555FF'>+</font><font color='#979000'>3</font>];
+            biHeight <font color='#5555FF'>=</font> a <font color='#5555FF'>|</font> <font face='Lucida Console'>(</font>b<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font><font color='#979000'>8</font><font face='Lucida Console'>)</font> <font color='#5555FF'>|</font> <font face='Lucida Console'>(</font>c<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font><font color='#979000'>16</font><font face='Lucida Console'>)</font> <font color='#5555FF'>|</font> <font face='Lucida Console'>(</font>d<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font><font color='#979000'>24</font><font face='Lucida Console'>)</font>;
+
+            i <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#979000'>4</font><font color='#5555FF'>+</font><font color='#979000'>2</font>;
+            a <font color='#5555FF'>=</font> buf[i]; b <font color='#5555FF'>=</font> buf[i<font color='#5555FF'>+</font><font color='#979000'>1</font>];
+            biBitCount <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>short</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>a <font color='#5555FF'>|</font> <font face='Lucida Console'>(</font>b<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font><font color='#979000'>8</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+            i <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#979000'>2</font>;
+            a <font color='#5555FF'>=</font> buf[i]; b <font color='#5555FF'>=</font> buf[i<font color='#5555FF'>+</font><font color='#979000'>1</font>]; c <font color='#5555FF'>=</font> buf[i<font color='#5555FF'>+</font><font color='#979000'>2</font>]; d <font color='#5555FF'>=</font> buf[i<font color='#5555FF'>+</font><font color='#979000'>3</font>];
+            biCompression <font color='#5555FF'>=</font> a <font color='#5555FF'>|</font> <font face='Lucida Console'>(</font>b<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font><font color='#979000'>8</font><font face='Lucida Console'>)</font> <font color='#5555FF'>|</font> <font face='Lucida Console'>(</font>c<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font><font color='#979000'>16</font><font face='Lucida Console'>)</font> <font color='#5555FF'>|</font> <font face='Lucida Console'>(</font>d<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font><font color='#979000'>24</font><font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>/*
+            i += 4;
+            a = buf[i]; b = buf[i+1]; c = buf[i+2]; d = buf[i+3];
+            biSizeImage = a | (b&lt;&lt;8) | (c&lt;&lt;16) | (d&lt;&lt;24);
+
+            i += 4+4+4;
+            a = buf[i]; b = buf[i+1]; c = buf[i+2]; d = buf[i+3];
+            biClrUsed = a | (b&lt;&lt;8) | (c&lt;&lt;16) | (d&lt;&lt;24);
+
+            i += 4;
+            a = buf[i]; b = buf[i+1]; c = buf[i+2]; d = buf[i+3];
+            biClrImportant = a | (b&lt;&lt;8) | (c&lt;&lt;16) | (d&lt;&lt;24);
+            */</font>
+
+
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>biSize <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>40</font><font face='Lucida Console'>)</font>
+                <font color='#0000FF'>throw</font> <font color='#BB00BB'>image_load_error</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>bmp load error 6: header too small</font>"<font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// read and discard any extra bytes that are part of the header
+</font>            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>biSize <font color='#5555FF'>&gt;</font> <font color='#979000'>40</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>in.<font color='#BB00BB'>sgetn</font><font face='Lucida Console'>(</font><font color='#0000FF'>reinterpret_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>char</u></font><font color='#5555FF'>*</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>buf<font face='Lucida Console'>)</font>,biSize<font color='#5555FF'>-</font><font color='#979000'>40</font><font face='Lucida Console'>)</font> <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>biSize <font color='#5555FF'>-</font> <font color='#979000'>40</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#0000FF'>throw</font> <font color='#BB00BB'>image_load_error</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>bmp load error 7: header too small</font>"<font face='Lucida Console'>)</font>;
+                <b>}</b>
+                bytes_read_so_far <font color='#5555FF'>+</font><font color='#5555FF'>=</font> biSize<font color='#5555FF'>-</font><font color='#979000'>40</font>;
+            <b>}</b>
+
+            image.<font color='#BB00BB'>set_size</font><font face='Lucida Console'>(</font>biHeight, biWidth<font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>switch</font> <font face='Lucida Console'>(</font>biBitCount<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>case</font> <font color='#979000'>1</font>:
+                    <b>{</b>
+                        <font color='#009900'>// figure out how the pixels are packed
+</font>                        <font color='#0000FF'><u>long</u></font> padding;
+                        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>bfSize <font color='#5555FF'>-</font> bfOffBits <font color='#5555FF'>=</font><font color='#5555FF'>=</font> biWidth<font color='#5555FF'>*</font>biHeight<font color='#5555FF'>/</font><font color='#979000'>8</font><font face='Lucida Console'>)</font>
+                            padding <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                        <font color='#0000FF'>else</font>
+                            padding <font color='#5555FF'>=</font> <font color='#979000'>4</font> <font color='#5555FF'>-</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>biWidth<font color='#5555FF'>+</font><font color='#979000'>7</font><font face='Lucida Console'>)</font><font color='#5555FF'>/</font><font color='#979000'>8</font><font face='Lucida Console'>)</font><font color='#5555FF'>%</font><font color='#979000'>4</font>;
+
+                        <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>int</u></font> palette_size <font color='#5555FF'>=</font> <font color='#979000'>2</font>;
+                        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> red[palette_size];
+                        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> green[palette_size];
+                        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> blue[palette_size];
+
+                        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>int</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> palette_size; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                        <b>{</b>
+                            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>in.<font color='#BB00BB'>sgetn</font><font face='Lucida Console'>(</font><font color='#0000FF'>reinterpret_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>char</u></font><font color='#5555FF'>*</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>buf<font face='Lucida Console'>)</font>,<font color='#979000'>4</font><font face='Lucida Console'>)</font> <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>4</font><font face='Lucida Console'>)</font>
+                            <b>{</b>
+                                <font color='#0000FF'>throw</font> <font color='#BB00BB'>image_load_error</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>bmp load error 20: color palette missing</font>"<font face='Lucida Console'>)</font>;
+                            <b>}</b>
+                            bytes_read_so_far <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#979000'>4</font>;
+                            blue[i] <font color='#5555FF'>=</font> buf[<font color='#979000'>0</font>];
+                            green[i] <font color='#5555FF'>=</font> buf[<font color='#979000'>1</font>];
+                            red[i] <font color='#5555FF'>=</font> buf[<font color='#979000'>2</font>];
+                        <b>}</b>
+
+
+                        <font color='#009900'>// seek to the start of the pixel data
+</font>                        <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>bytes_read_so_far <font color='#5555FF'>!</font><font color='#5555FF'>=</font> bfOffBits<font face='Lucida Console'>)</font>
+                        <b>{</b>
+                            <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> to_read <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font>std::<font color='#BB00BB'>min</font><font face='Lucida Console'>(</font>bfOffBits <font color='#5555FF'>-</font> bytes_read_so_far, <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font><font color='#0000FF'>sizeof</font><font face='Lucida Console'>(</font>buf<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>in.<font color='#BB00BB'>sgetn</font><font face='Lucida Console'>(</font><font color='#0000FF'>reinterpret_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>char</u></font><font color='#5555FF'>*</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>buf<font face='Lucida Console'>)</font>, to_read<font face='Lucida Console'>)</font> <font color='#5555FF'>!</font><font color='#5555FF'>=</font> to_read<font face='Lucida Console'>)</font>
+                            <b>{</b>
+                                <font color='#0000FF'>throw</font> <font color='#BB00BB'>image_load_error</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>bmp load error: missing data</font>"<font face='Lucida Console'>)</font>;
+                            <b>}</b>
+                            bytes_read_so_far <font color='#5555FF'>+</font><font color='#5555FF'>=</font> to_read;
+                        <b>}</b>
+
+                        <font color='#009900'>// load the image data
+</font>                        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> row <font color='#5555FF'>=</font> biHeight<font color='#5555FF'>-</font><font color='#979000'>1</font>; row <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#979000'>0</font>; <font color='#5555FF'>-</font><font color='#5555FF'>-</font>row<font face='Lucida Console'>)</font>
+                        <b>{</b>
+                            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> col <font color='#5555FF'>=</font> <font color='#979000'>0</font>; col <font color='#5555FF'>&lt;</font> biWidth; col<font color='#5555FF'>+</font><font color='#5555FF'>=</font><font color='#979000'>8</font><font face='Lucida Console'>)</font>
+                            <b>{</b>
+                                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>in.<font color='#BB00BB'>sgetn</font><font face='Lucida Console'>(</font><font color='#0000FF'>reinterpret_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>char</u></font><font color='#5555FF'>*</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>buf<font face='Lucida Console'>)</font>,<font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>
+                                <b>{</b>
+                                    <font color='#0000FF'>throw</font> <font color='#BB00BB'>image_load_error</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>bmp load error 21.6: file too short</font>"<font face='Lucida Console'>)</font>;
+                                <b>}</b>
+
+                                <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> pixels[<font color='#979000'>8</font>];
+
+                                pixels[<font color='#979000'>0</font>] <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>buf[<font color='#979000'>0</font>]<font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font><font color='#979000'>7</font><font face='Lucida Console'>)</font>;
+                                pixels[<font color='#979000'>1</font>] <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>buf[<font color='#979000'>0</font>]<font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font><font color='#979000'>6</font><font face='Lucida Console'>)</font><font color='#5555FF'>&amp;</font><font color='#979000'>0x01</font><font face='Lucida Console'>)</font>;
+                                pixels[<font color='#979000'>2</font>] <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>buf[<font color='#979000'>0</font>]<font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font><font color='#979000'>5</font><font face='Lucida Console'>)</font><font color='#5555FF'>&amp;</font><font color='#979000'>0x01</font><font face='Lucida Console'>)</font>;
+                                pixels[<font color='#979000'>3</font>] <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>buf[<font color='#979000'>0</font>]<font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font><font color='#979000'>4</font><font face='Lucida Console'>)</font><font color='#5555FF'>&amp;</font><font color='#979000'>0x01</font><font face='Lucida Console'>)</font>;
+                                pixels[<font color='#979000'>4</font>] <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>buf[<font color='#979000'>0</font>]<font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font><font color='#979000'>3</font><font face='Lucida Console'>)</font><font color='#5555FF'>&amp;</font><font color='#979000'>0x01</font><font face='Lucida Console'>)</font>;
+                                pixels[<font color='#979000'>5</font>] <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>buf[<font color='#979000'>0</font>]<font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font><font color='#979000'>2</font><font face='Lucida Console'>)</font><font color='#5555FF'>&amp;</font><font color='#979000'>0x01</font><font face='Lucida Console'>)</font>;
+                                pixels[<font color='#979000'>6</font>] <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>buf[<font color='#979000'>0</font>]<font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font><font color='#979000'>1</font><font face='Lucida Console'>)</font><font color='#5555FF'>&amp;</font><font color='#979000'>0x01</font><font face='Lucida Console'>)</font>;
+                                pixels[<font color='#979000'>7</font>] <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>buf[<font color='#979000'>0</font>]<font face='Lucida Console'>)</font><font color='#5555FF'>&amp;</font><font color='#979000'>0x01</font><font face='Lucida Console'>)</font>;
+
+                                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> <font color='#979000'>8</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> col<font color='#5555FF'>+</font>i <font color='#5555FF'>&lt;</font> biWidth; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                                <b>{</b>
+                                    rgb_pixel p;
+                                    p.red   <font color='#5555FF'>=</font> red[pixels[i]];
+                                    p.green <font color='#5555FF'>=</font> green[pixels[i]];
+                                    p.blue  <font color='#5555FF'>=</font> blue[pixels[i]];
+                                    <font color='#BB00BB'>assign_pixel</font><font face='Lucida Console'>(</font>image[row][col<font color='#5555FF'>+</font>i],p<font face='Lucida Console'>)</font>;
+                                <b>}</b>
+                            <b>}</b>
+                            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>in.<font color='#BB00BB'>sgetn</font><font face='Lucida Console'>(</font><font color='#0000FF'>reinterpret_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>char</u></font><font color='#5555FF'>*</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>buf<font face='Lucida Console'>)</font>,padding<font face='Lucida Console'>)</font> <font color='#5555FF'>!</font><font color='#5555FF'>=</font> padding<font face='Lucida Console'>)</font>
+                                <font color='#0000FF'>throw</font> <font color='#BB00BB'>image_load_error</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>bmp load error 9: file too short</font>"<font face='Lucida Console'>)</font>;
+                        <b>}</b>
+
+
+
+                    <b>}</b> <font color='#0000FF'>break</font>;
+                <font color='#0000FF'>case</font> <font color='#979000'>4</font>:
+                    <b>{</b>
+                        <font color='#009900'>// figure out how the pixels are packed
+</font>                        <font color='#0000FF'><u>long</u></font> padding;
+                        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>bfSize <font color='#5555FF'>-</font> bfOffBits <font color='#5555FF'>=</font><font color='#5555FF'>=</font> biWidth<font color='#5555FF'>*</font>biHeight<font color='#5555FF'>/</font><font color='#979000'>2</font><font face='Lucida Console'>)</font>
+                            padding <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                        <font color='#0000FF'>else</font>
+                            padding <font color='#5555FF'>=</font> <font color='#979000'>4</font> <font color='#5555FF'>-</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>biWidth<font color='#5555FF'>+</font><font color='#979000'>1</font><font face='Lucida Console'>)</font><font color='#5555FF'>/</font><font color='#979000'>2</font><font face='Lucida Console'>)</font><font color='#5555FF'>%</font><font color='#979000'>4</font>;
+
+                        <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>int</u></font> palette_size <font color='#5555FF'>=</font> <font color='#979000'>16</font>;
+                        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> red[palette_size];
+                        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> green[palette_size];
+                        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> blue[palette_size];
+
+                        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>int</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> palette_size; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                        <b>{</b>
+                            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>in.<font color='#BB00BB'>sgetn</font><font face='Lucida Console'>(</font><font color='#0000FF'>reinterpret_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>char</u></font><font color='#5555FF'>*</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>buf<font face='Lucida Console'>)</font>,<font color='#979000'>4</font><font face='Lucida Console'>)</font> <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>4</font><font face='Lucida Console'>)</font>
+                            <b>{</b>
+                                <font color='#0000FF'>throw</font> <font color='#BB00BB'>image_load_error</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>bmp load error 20: color palette missing</font>"<font face='Lucida Console'>)</font>;
+                            <b>}</b>
+                            bytes_read_so_far <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#979000'>4</font>;
+                            blue[i] <font color='#5555FF'>=</font> buf[<font color='#979000'>0</font>];
+                            green[i] <font color='#5555FF'>=</font> buf[<font color='#979000'>1</font>];
+                            red[i] <font color='#5555FF'>=</font> buf[<font color='#979000'>2</font>];
+                        <b>}</b>
+
+
+                        <font color='#009900'>// seek to the start of the pixel data
+</font>                        <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>bytes_read_so_far <font color='#5555FF'>!</font><font color='#5555FF'>=</font> bfOffBits<font face='Lucida Console'>)</font>
+                        <b>{</b>
+                            <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> to_read <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font>std::<font color='#BB00BB'>min</font><font face='Lucida Console'>(</font>bfOffBits <font color='#5555FF'>-</font> bytes_read_so_far, <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font><font color='#0000FF'>sizeof</font><font face='Lucida Console'>(</font>buf<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>in.<font color='#BB00BB'>sgetn</font><font face='Lucida Console'>(</font><font color='#0000FF'>reinterpret_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>char</u></font><font color='#5555FF'>*</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>buf<font face='Lucida Console'>)</font>, to_read<font face='Lucida Console'>)</font> <font color='#5555FF'>!</font><font color='#5555FF'>=</font> to_read<font face='Lucida Console'>)</font>
+                            <b>{</b>
+                                <font color='#0000FF'>throw</font> <font color='#BB00BB'>image_load_error</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>bmp load error: missing data</font>"<font face='Lucida Console'>)</font>;
+                            <b>}</b>
+                            bytes_read_so_far <font color='#5555FF'>+</font><font color='#5555FF'>=</font> to_read;
+                        <b>}</b>
+
+                        <font color='#009900'>// load the image data
+</font>                        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> row <font color='#5555FF'>=</font> biHeight<font color='#5555FF'>-</font><font color='#979000'>1</font>; row <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#979000'>0</font>; <font color='#5555FF'>-</font><font color='#5555FF'>-</font>row<font face='Lucida Console'>)</font>
+                        <b>{</b>
+                            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> col <font color='#5555FF'>=</font> <font color='#979000'>0</font>; col <font color='#5555FF'>&lt;</font> biWidth; col<font color='#5555FF'>+</font><font color='#5555FF'>=</font><font color='#979000'>2</font><font face='Lucida Console'>)</font>
+                            <b>{</b>
+                                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>in.<font color='#BB00BB'>sgetn</font><font face='Lucida Console'>(</font><font color='#0000FF'>reinterpret_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>char</u></font><font color='#5555FF'>*</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>buf<font face='Lucida Console'>)</font>,<font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>
+                                <b>{</b>
+                                    <font color='#0000FF'>throw</font> <font color='#BB00BB'>image_load_error</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>bmp load error 21.7: file too short</font>"<font face='Lucida Console'>)</font>;
+                                <b>}</b>
+
+                                <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> pixel1 <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>buf[<font color='#979000'>0</font>]<font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font><font color='#979000'>4</font><font face='Lucida Console'>)</font>;
+                                <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> pixel2 <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>buf[<font color='#979000'>0</font>]<font color='#5555FF'>&amp;</font><font color='#979000'>0x0F</font><font face='Lucida Console'>)</font>;
+
+                                rgb_pixel p;
+                                p.red <font color='#5555FF'>=</font> red[pixel1];
+                                p.green <font color='#5555FF'>=</font> green[pixel1];
+                                p.blue <font color='#5555FF'>=</font> blue[pixel1];
+                                <font color='#BB00BB'>assign_pixel</font><font face='Lucida Console'>(</font>image[row][col], p<font face='Lucida Console'>)</font>;
+
+                                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>col<font color='#5555FF'>+</font><font color='#979000'>1</font> <font color='#5555FF'>&lt;</font> biWidth<font face='Lucida Console'>)</font>
+                                <b>{</b>
+                                    p.red   <font color='#5555FF'>=</font> red[pixel2];
+                                    p.green <font color='#5555FF'>=</font> green[pixel2];
+                                    p.blue  <font color='#5555FF'>=</font> blue[pixel2];
+                                    <font color='#BB00BB'>assign_pixel</font><font face='Lucida Console'>(</font>image[row][col<font color='#5555FF'>+</font><font color='#979000'>1</font>], p<font face='Lucida Console'>)</font>;
+                                <b>}</b>
+                            <b>}</b>
+                            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>in.<font color='#BB00BB'>sgetn</font><font face='Lucida Console'>(</font><font color='#0000FF'>reinterpret_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>char</u></font><font color='#5555FF'>*</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>buf<font face='Lucida Console'>)</font>,padding<font face='Lucida Console'>)</font> <font color='#5555FF'>!</font><font color='#5555FF'>=</font> padding<font face='Lucida Console'>)</font>
+                                <font color='#0000FF'>throw</font> <font color='#BB00BB'>image_load_error</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>bmp load error 9: file too short</font>"<font face='Lucida Console'>)</font>;
+                        <b>}</b>
+
+
+
+                    <b>}</b> <font color='#0000FF'>break</font>;
+                <font color='#0000FF'>case</font> <font color='#979000'>8</font>:
+                    <b>{</b>
+                        <font color='#009900'>// figure out how the pixels are packed
+</font>                        <font color='#0000FF'><u>long</u></font> padding;
+                        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>bfSize <font color='#5555FF'>-</font> bfOffBits <font color='#5555FF'>=</font><font color='#5555FF'>=</font> biWidth<font color='#5555FF'>*</font>biHeight<font face='Lucida Console'>)</font>
+                            padding <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                        <font color='#0000FF'>else</font>
+                            padding <font color='#5555FF'>=</font> <font color='#979000'>4</font> <font color='#5555FF'>-</font> biWidth<font color='#5555FF'>%</font><font color='#979000'>4</font>;
+
+                        <font color='#009900'>// check for this case.  It shouldn't happen but some BMP writers screw up the files
+</font>                        <font color='#009900'>// so we have to do this.
+</font>                        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>biHeight<font color='#5555FF'>*</font><font face='Lucida Console'>(</font>biWidth<font color='#5555FF'>+</font>padding<font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> bfSize <font color='#5555FF'>-</font> bfOffBits<font face='Lucida Console'>)</font>
+                            padding <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+
+                        <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>int</u></font> palette_size <font color='#5555FF'>=</font> <font color='#979000'>256</font>;
+                        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> red[palette_size];
+                        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> green[palette_size];
+                        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> blue[palette_size];
+
+                        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>int</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> palette_size; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                        <b>{</b>
+                            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>in.<font color='#BB00BB'>sgetn</font><font face='Lucida Console'>(</font><font color='#0000FF'>reinterpret_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>char</u></font><font color='#5555FF'>*</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>buf<font face='Lucida Console'>)</font>,<font color='#979000'>4</font><font face='Lucida Console'>)</font> <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>4</font><font face='Lucida Console'>)</font>
+                            <b>{</b>
+                                <font color='#0000FF'>throw</font> <font color='#BB00BB'>image_load_error</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>bmp load error 20: color palette missing</font>"<font face='Lucida Console'>)</font>;
+                            <b>}</b>
+                            bytes_read_so_far <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#979000'>4</font>;
+                            blue[i] <font color='#5555FF'>=</font> buf[<font color='#979000'>0</font>];
+                            green[i] <font color='#5555FF'>=</font> buf[<font color='#979000'>1</font>];
+                            red[i] <font color='#5555FF'>=</font> buf[<font color='#979000'>2</font>];
+                        <b>}</b>
+
+
+                        <font color='#009900'>// seek to the start of the pixel data
+</font>                        <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>bytes_read_so_far <font color='#5555FF'>!</font><font color='#5555FF'>=</font> bfOffBits<font face='Lucida Console'>)</font>
+                        <b>{</b>
+                            <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> to_read <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font>std::<font color='#BB00BB'>min</font><font face='Lucida Console'>(</font>bfOffBits <font color='#5555FF'>-</font> bytes_read_so_far, <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font><font color='#0000FF'>sizeof</font><font face='Lucida Console'>(</font>buf<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>in.<font color='#BB00BB'>sgetn</font><font face='Lucida Console'>(</font><font color='#0000FF'>reinterpret_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>char</u></font><font color='#5555FF'>*</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>buf<font face='Lucida Console'>)</font>, to_read<font face='Lucida Console'>)</font> <font color='#5555FF'>!</font><font color='#5555FF'>=</font> to_read<font face='Lucida Console'>)</font>
+                            <b>{</b>
+                                <font color='#0000FF'>throw</font> <font color='#BB00BB'>image_load_error</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>bmp load error: missing data</font>"<font face='Lucida Console'>)</font>;
+                            <b>}</b>
+                            bytes_read_so_far <font color='#5555FF'>+</font><font color='#5555FF'>=</font> to_read;
+                        <b>}</b>
+
+                        <font color='#009900'>// Next we load the image data.
+</font>
+                        <font color='#009900'>// if there is no RLE compression
+</font>                        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>biCompression <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                        <b>{</b>
+                            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> row <font color='#5555FF'>=</font> biHeight<font color='#5555FF'>-</font><font color='#979000'>1</font>; row <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#979000'>0</font>; <font color='#5555FF'>-</font><font color='#5555FF'>-</font>row<font face='Lucida Console'>)</font>
+                            <b>{</b>
+                                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> col <font color='#5555FF'>=</font> <font color='#979000'>0</font>; col <font color='#5555FF'>&lt;</font> biWidth; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>col<font face='Lucida Console'>)</font>
+                                <b>{</b>
+                                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>in.<font color='#BB00BB'>sgetn</font><font face='Lucida Console'>(</font><font color='#0000FF'>reinterpret_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>char</u></font><font color='#5555FF'>*</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>buf<font face='Lucida Console'>)</font>,<font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>
+                                    <b>{</b>
+                                        <font color='#0000FF'>throw</font> <font color='#BB00BB'>image_load_error</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>bmp load error 21.8: file too short</font>"<font face='Lucida Console'>)</font>;
+                                    <b>}</b>
+
+                                    rgb_pixel p;
+                                    p.red   <font color='#5555FF'>=</font> red[buf[<font color='#979000'>0</font>]];
+                                    p.green <font color='#5555FF'>=</font> green[buf[<font color='#979000'>0</font>]];
+                                    p.blue  <font color='#5555FF'>=</font> blue[buf[<font color='#979000'>0</font>]];
+                                    <font color='#BB00BB'>assign_pixel</font><font face='Lucida Console'>(</font>image[row][col],p<font face='Lucida Console'>)</font>;
+                                <b>}</b>
+                                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>in.<font color='#BB00BB'>sgetn</font><font face='Lucida Console'>(</font><font color='#0000FF'>reinterpret_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>char</u></font><font color='#5555FF'>*</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>buf<font face='Lucida Console'>)</font>,padding<font face='Lucida Console'>)</font> <font color='#5555FF'>!</font><font color='#5555FF'>=</font> padding<font face='Lucida Console'>)</font>
+                                    <font color='#0000FF'>throw</font> <font color='#BB00BB'>image_load_error</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>bmp load error 9: file too short</font>"<font face='Lucida Console'>)</font>;
+                            <b>}</b>
+                        <b>}</b>
+                        <font color='#0000FF'>else</font>
+                        <b>{</b>
+                            <font color='#009900'>// Here we deal with the psychotic RLE used by BMP files.
+</font>
+                            <font color='#009900'>// First zero the image since the RLE sometimes jumps over
+</font>                            <font color='#009900'>// pixels and assumes the image has been zero initialized.
+</font>                            <font color='#BB00BB'>assign_all_pixels</font><font face='Lucida Console'>(</font>image, <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+
+                            <font color='#0000FF'><u>long</u></font> row <font color='#5555FF'>=</font> biHeight<font color='#5555FF'>-</font><font color='#979000'>1</font>;
+                            <font color='#0000FF'><u>long</u></font> col <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                            <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font><font color='#979000'>true</font><font face='Lucida Console'>)</font>
+                            <b>{</b>
+                                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>in.<font color='#BB00BB'>sgetn</font><font face='Lucida Console'>(</font><font color='#0000FF'>reinterpret_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>char</u></font><font color='#5555FF'>*</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>buf<font face='Lucida Console'>)</font>,<font color='#979000'>2</font><font face='Lucida Console'>)</font> <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>2</font><font face='Lucida Console'>)</font>
+                                <b>{</b>
+                                    <font color='#0000FF'>throw</font> <font color='#BB00BB'>image_load_error</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>bmp load error 21.9: file too short</font>"<font face='Lucida Console'>)</font>;
+                                <b>}</b>
+
+                                <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> count <font color='#5555FF'>=</font> buf[<font color='#979000'>0</font>];
+                                <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> command <font color='#5555FF'>=</font> buf[<font color='#979000'>1</font>];
+
+                                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>count <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> command <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                                <b>{</b>
+                                    <font color='#009900'>// This is an escape code that means go to the next row
+</font>                                    <font color='#009900'>// of the image
+</font>                                    <font color='#5555FF'>-</font><font color='#5555FF'>-</font>row;
+                                    col <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                                    <font color='#0000FF'>continue</font>;
+                                <b>}</b>
+                                <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>count <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> command <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>
+                                <b>{</b>
+                                    <font color='#009900'>// This is the end of the image.  So quit this loop.
+</font>                                    <font color='#0000FF'>break</font>;
+                                <b>}</b>
+                                <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>count <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> command <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>2</font><font face='Lucida Console'>)</font>
+                                <b>{</b>
+                                    <font color='#009900'>// This is the escape code for the command to jump to
+</font>                                    <font color='#009900'>// a new part of the image relative to where we are now.
+</font>                                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>in.<font color='#BB00BB'>sgetn</font><font face='Lucida Console'>(</font><font color='#0000FF'>reinterpret_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>char</u></font><font color='#5555FF'>*</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>buf<font face='Lucida Console'>)</font>,<font color='#979000'>2</font><font face='Lucida Console'>)</font> <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>2</font><font face='Lucida Console'>)</font>
+                                    <b>{</b>
+                                        <font color='#0000FF'>throw</font> <font color='#BB00BB'>image_load_error</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>bmp load error 21.1: file too short</font>"<font face='Lucida Console'>)</font>;
+                                    <b>}</b>
+                                    col <font color='#5555FF'>+</font><font color='#5555FF'>=</font> buf[<font color='#979000'>0</font>];
+                                    row <font color='#5555FF'>-</font><font color='#5555FF'>=</font> buf[<font color='#979000'>1</font>];
+                                    <font color='#0000FF'>continue</font>;
+                                <b>}</b>
+                                <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>count <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                                <b>{</b>
+                                    <font color='#009900'>// This is the escape code for a run of uncompressed bytes
+</font>
+                                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>row <font color='#5555FF'>&lt;</font> <font color='#979000'>0</font> <font color='#5555FF'>|</font><font color='#5555FF'>|</font> col <font color='#5555FF'>+</font> command <font color='#5555FF'>&gt;</font> image.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                                    <b>{</b>
+                                        <font color='#009900'>// If this is just some padding bytes at the end then ignore them
+</font>                                        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>row <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#979000'>0</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> col <font color='#5555FF'>+</font> count <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> image.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> padding<font face='Lucida Console'>)</font>
+                                            <font color='#0000FF'>continue</font>;
+
+                                        <font color='#0000FF'>throw</font> <font color='#BB00BB'>image_load_error</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>bmp load error 21.2: file data corrupt</font>"<font face='Lucida Console'>)</font>;
+                                    <b>}</b>
+
+                                    <font color='#009900'>// put the bytes into the image
+</font>                                    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>int</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> command; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                                    <b>{</b>
+                                        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>in.<font color='#BB00BB'>sgetn</font><font face='Lucida Console'>(</font><font color='#0000FF'>reinterpret_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>char</u></font><font color='#5555FF'>*</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>buf<font face='Lucida Console'>)</font>,<font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>
+                                        <b>{</b>
+                                            <font color='#0000FF'>throw</font> <font color='#BB00BB'>image_load_error</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>bmp load error 21.3: file too short</font>"<font face='Lucida Console'>)</font>;
+                                        <b>}</b>
+                                        rgb_pixel p;
+                                        p.red   <font color='#5555FF'>=</font> red[buf[<font color='#979000'>0</font>]];
+                                        p.green <font color='#5555FF'>=</font> green[buf[<font color='#979000'>0</font>]];
+                                        p.blue  <font color='#5555FF'>=</font> blue[buf[<font color='#979000'>0</font>]];
+                                        <font color='#BB00BB'>assign_pixel</font><font face='Lucida Console'>(</font>image[row][col],p<font face='Lucida Console'>)</font>;
+
+                                        <font color='#5555FF'>+</font><font color='#5555FF'>+</font>col;
+                                    <b>}</b>
+
+                                    <font color='#009900'>// if we read an uneven number of bytes then we need to read and
+</font>                                    <font color='#009900'>// discard the next byte.
+</font>                                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>command<font color='#5555FF'>&amp;</font><font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>
+                                    <b>{</b>
+                                        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>in.<font color='#BB00BB'>sgetn</font><font face='Lucida Console'>(</font><font color='#0000FF'>reinterpret_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>char</u></font><font color='#5555FF'>*</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>buf<font face='Lucida Console'>)</font>,<font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>
+                                        <b>{</b>
+                                            <font color='#0000FF'>throw</font> <font color='#BB00BB'>image_load_error</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>bmp load error 21.4: file too short</font>"<font face='Lucida Console'>)</font>;
+                                        <b>}</b>
+                                    <b>}</b>
+
+                                    <font color='#0000FF'>continue</font>;
+                                <b>}</b>
+
+                                rgb_pixel p;
+
+                                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>row <font color='#5555FF'>&lt;</font> <font color='#979000'>0</font> <font color='#5555FF'>|</font><font color='#5555FF'>|</font> col <font color='#5555FF'>+</font> count <font color='#5555FF'>&gt;</font> image.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                                <b>{</b>
+                                    <font color='#009900'>// If this is just some padding bytes at the end then ignore them
+</font>                                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>row <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#979000'>0</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> col <font color='#5555FF'>+</font> count <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> image.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> padding<font face='Lucida Console'>)</font>
+                                        <font color='#0000FF'>continue</font>;
+
+                                    <font color='#0000FF'>throw</font> <font color='#BB00BB'>image_load_error</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>bmp load error 21.5: file data corrupt</font>"<font face='Lucida Console'>)</font>;
+                                <b>}</b>
+
+                                <font color='#009900'>// put the bytes into the image
+</font>                                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>int</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> count; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                                <b>{</b>
+                                    p.red   <font color='#5555FF'>=</font> red[command];
+                                    p.green <font color='#5555FF'>=</font> green[command];
+                                    p.blue  <font color='#5555FF'>=</font> blue[command];
+                                    <font color='#BB00BB'>assign_pixel</font><font face='Lucida Console'>(</font>image[row][col],p<font face='Lucida Console'>)</font>;
+
+                                    <font color='#5555FF'>+</font><font color='#5555FF'>+</font>col;
+                                <b>}</b>
+                            <b>}</b>
+                        <b>}</b>
+
+
+
+                    <b>}</b>
+                    <font color='#0000FF'>break</font>;
+                <font color='#0000FF'>case</font> <font color='#979000'>16</font>:
+                    <font color='#0000FF'>throw</font> <font color='#BB00BB'>image_load_error</font> <font face='Lucida Console'>(</font>"<font color='#CC0000'>16 bit BMP images not supported</font>"<font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>case</font> <font color='#979000'>24</font>:
+                    <b>{</b>
+                        <font color='#009900'>// figure out how the pixels are packed
+</font>                        <font color='#0000FF'><u>long</u></font> padding;
+                        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>bfSize <font color='#5555FF'>-</font> bfOffBits <font color='#5555FF'>=</font><font color='#5555FF'>=</font> biWidth<font color='#5555FF'>*</font>biHeight<font color='#5555FF'>*</font><font color='#979000'>3</font><font face='Lucida Console'>)</font>
+                            padding <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                        <font color='#0000FF'>else</font>
+                            padding <font color='#5555FF'>=</font> <font color='#979000'>4</font> <font color='#5555FF'>-</font> <font face='Lucida Console'>(</font>biWidth<font color='#5555FF'>*</font><font color='#979000'>3</font><font face='Lucida Console'>)</font><font color='#5555FF'>%</font><font color='#979000'>4</font>;
+
+                        <font color='#009900'>// check for this case.  It shouldn't happen but some BMP writers screw up the files
+</font>                        <font color='#009900'>// so we have to do this.
+</font>                        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>biHeight<font color='#5555FF'>*</font><font face='Lucida Console'>(</font>biWidth<font color='#5555FF'>*</font><font color='#979000'>3</font><font color='#5555FF'>+</font>padding<font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> bfSize <font color='#5555FF'>-</font> bfOffBits<font face='Lucida Console'>)</font>
+                            padding <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                        
+                        <font color='#009900'>// seek to the start of the pixel data
+</font>                        <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>bytes_read_so_far <font color='#5555FF'>!</font><font color='#5555FF'>=</font> bfOffBits<font face='Lucida Console'>)</font>
+                        <b>{</b>
+                            <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> to_read <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font>std::<font color='#BB00BB'>min</font><font face='Lucida Console'>(</font>bfOffBits <font color='#5555FF'>-</font> bytes_read_so_far, <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font><font color='#0000FF'>sizeof</font><font face='Lucida Console'>(</font>buf<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>in.<font color='#BB00BB'>sgetn</font><font face='Lucida Console'>(</font><font color='#0000FF'>reinterpret_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>char</u></font><font color='#5555FF'>*</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>buf<font face='Lucida Console'>)</font>, to_read<font face='Lucida Console'>)</font> <font color='#5555FF'>!</font><font color='#5555FF'>=</font> to_read<font face='Lucida Console'>)</font>
+                            <b>{</b>
+                                <font color='#0000FF'>throw</font> <font color='#BB00BB'>image_load_error</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>bmp load error: missing data</font>"<font face='Lucida Console'>)</font>;
+                            <b>}</b>
+                            bytes_read_so_far <font color='#5555FF'>+</font><font color='#5555FF'>=</font> to_read;
+                        <b>}</b>
+
+                        <font color='#009900'>// load the image data
+</font>                        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> row <font color='#5555FF'>=</font> biHeight<font color='#5555FF'>-</font><font color='#979000'>1</font>; row <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#979000'>0</font>; <font color='#5555FF'>-</font><font color='#5555FF'>-</font>row<font face='Lucida Console'>)</font>
+                        <b>{</b>
+                            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> col <font color='#5555FF'>=</font> <font color='#979000'>0</font>; col <font color='#5555FF'>&lt;</font> biWidth; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>col<font face='Lucida Console'>)</font>
+                            <b>{</b>
+                                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>in.<font color='#BB00BB'>sgetn</font><font face='Lucida Console'>(</font><font color='#0000FF'>reinterpret_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>char</u></font><font color='#5555FF'>*</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>buf<font face='Lucida Console'>)</font>,<font color='#979000'>3</font><font face='Lucida Console'>)</font> <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>3</font><font face='Lucida Console'>)</font>
+                                <b>{</b>
+                                    <font color='#0000FF'>throw</font> <font color='#BB00BB'>image_load_error</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>bmp load error 8: file too short</font>"<font face='Lucida Console'>)</font>;
+                                <b>}</b>
+
+                                rgb_pixel p;
+                                p.red <font color='#5555FF'>=</font> buf[<font color='#979000'>2</font>];
+                                p.green <font color='#5555FF'>=</font> buf[<font color='#979000'>1</font>];
+                                p.blue <font color='#5555FF'>=</font> buf[<font color='#979000'>0</font>];
+                                <font color='#BB00BB'>assign_pixel</font><font face='Lucida Console'>(</font>image[row][col], p<font face='Lucida Console'>)</font>;
+
+                            <b>}</b>
+                            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>in.<font color='#BB00BB'>sgetn</font><font face='Lucida Console'>(</font><font color='#0000FF'>reinterpret_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>char</u></font><font color='#5555FF'>*</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>buf<font face='Lucida Console'>)</font>,padding<font face='Lucida Console'>)</font> <font color='#5555FF'>!</font><font color='#5555FF'>=</font> padding<font face='Lucida Console'>)</font>
+                                <font color='#0000FF'>throw</font> <font color='#BB00BB'>image_load_error</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>bmp load error 9: file too short</font>"<font face='Lucida Console'>)</font>;
+                        <b>}</b>
+
+                        <font color='#0000FF'>break</font>;
+                    <b>}</b>
+                <font color='#0000FF'>case</font> <font color='#979000'>32</font>:
+                    <font color='#0000FF'>throw</font> <font color='#BB00BB'>image_load_error</font> <font face='Lucida Console'>(</font>"<font color='#CC0000'>32 bit BMP images not supported</font>"<font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>default</font>:
+                    <font color='#0000FF'>throw</font> <font color='#BB00BB'>image_load_error</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>bmp load error 10: unknown color depth</font>"<font face='Lucida Console'>)</font>;
+
+            <b>}</b>
+        <b>}</b>
+        <font color='#0000FF'>catch</font> <font face='Lucida Console'>(</font>...<font face='Lucida Console'>)</font>
+        <b>{</b>
+            image.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>throw</font>;
+        <b>}</b>
+
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> image_type 
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='load_dng'></a>load_dng</b> <font face='Lucida Console'>(</font>
+        image_type<font color='#5555FF'>&amp;</font> image_,
+        std::istream<font color='#5555FF'>&amp;</font> in
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        image_view<font color='#5555FF'>&lt;</font>image_type<font color='#5555FF'>&gt;</font> <font color='#BB00BB'>image</font><font face='Lucida Console'>(</font>image_<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> dng_helpers_namespace;
+        <font color='#0000FF'>try</font>
+        <b>{</b>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>in.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>!</font><font color='#5555FF'>=</font> '<font color='#FF0000'>D</font>' <font color='#5555FF'>|</font><font color='#5555FF'>|</font> in.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>!</font><font color='#5555FF'>=</font> '<font color='#FF0000'>N</font>' <font color='#5555FF'>|</font><font color='#5555FF'>|</font> in.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>!</font><font color='#5555FF'>=</font> '<font color='#FF0000'>G</font>'<font face='Lucida Console'>)</font>
+                <font color='#0000FF'>throw</font> <font color='#BB00BB'>image_load_error</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>the stream does not contain a dng image file</font>"<font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> version;
+            <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>version,in<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>version <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>
+                <font color='#0000FF'>throw</font> <font color='#BB00BB'>image_load_error</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>You need the new version of the dlib library to read this dng file</font>"<font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> type;
+            <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>type,in<font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'><u>long</u></font> width, height;
+            <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>width,in<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>height,in<font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>width <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> height <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                image.<font color='#BB00BB'>set_size</font><font face='Lucida Console'>(</font>height,width<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>else</font>
+                image.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>type <font color='#5555FF'>!</font><font color='#5555FF'>=</font> grayscale_float<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>typedef</font> entropy_decoder::kernel_2a decoder_type;
+                decoder_type decoder;
+                decoder.<font color='#BB00BB'>set_stream</font><font face='Lucida Console'>(</font>in<font face='Lucida Console'>)</font>;
+
+                entropy_decoder_model<font color='#5555FF'>&lt;</font><font color='#979000'>256</font>,decoder_type<font color='#5555FF'>&gt;</font>::kernel_5a <font color='#BB00BB'>edm</font><font face='Lucida Console'>(</font>decoder<font face='Lucida Console'>)</font>;
+                <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> symbol;
+                rgb_pixel p_rgb;
+                rgb_alpha_pixel p_rgba;
+                hsi_pixel p_hsi;
+                <font color='#0000FF'>switch</font> <font face='Lucida Console'>(</font>type<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#0000FF'>case</font> rgb_alpha_paeth:
+
+                        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> r <font color='#5555FF'>=</font> <font color='#979000'>0</font>; r <font color='#5555FF'>&lt;</font> image.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>r<font face='Lucida Console'>)</font>
+                        <b>{</b>
+                            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> c <font color='#5555FF'>=</font> <font color='#979000'>0</font>; c <font color='#5555FF'>&lt;</font> image.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>c<font face='Lucida Console'>)</font>
+                            <b>{</b>
+                                p_rgba <font color='#5555FF'>=</font> <font color='#BB00BB'>predictor_rgb_alpha_paeth</font><font face='Lucida Console'>(</font>image,r,c<font face='Lucida Console'>)</font>;
+                                edm.<font color='#BB00BB'>decode</font><font face='Lucida Console'>(</font>symbol<font face='Lucida Console'>)</font>;
+                                p_rgba.red <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>symbol<font face='Lucida Console'>)</font>;
+
+                                edm.<font color='#BB00BB'>decode</font><font face='Lucida Console'>(</font>symbol<font face='Lucida Console'>)</font>;
+                                p_rgba.green <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>symbol<font face='Lucida Console'>)</font>;
+
+                                edm.<font color='#BB00BB'>decode</font><font face='Lucida Console'>(</font>symbol<font face='Lucida Console'>)</font>;
+                                p_rgba.blue <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>symbol<font face='Lucida Console'>)</font>;
+
+                                edm.<font color='#BB00BB'>decode</font><font face='Lucida Console'>(</font>symbol<font face='Lucida Console'>)</font>;
+                                p_rgba.alpha <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>symbol<font face='Lucida Console'>)</font>;
+
+                                <font color='#BB00BB'>assign_pixel</font><font face='Lucida Console'>(</font>image[r][c],p_rgba<font face='Lucida Console'>)</font>;
+                            <b>}</b>
+                        <b>}</b>
+                        <font color='#0000FF'>break</font>;
+
+                    <font color='#0000FF'>case</font> rgb_alpha:
+
+                        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> r <font color='#5555FF'>=</font> <font color='#979000'>0</font>; r <font color='#5555FF'>&lt;</font> image.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>r<font face='Lucida Console'>)</font>
+                        <b>{</b>
+                            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> c <font color='#5555FF'>=</font> <font color='#979000'>0</font>; c <font color='#5555FF'>&lt;</font> image.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>c<font face='Lucida Console'>)</font>
+                            <b>{</b>
+                                p_rgba <font color='#5555FF'>=</font> <font color='#BB00BB'>predictor_rgb_alpha</font><font face='Lucida Console'>(</font>image,r,c<font face='Lucida Console'>)</font>;
+                                edm.<font color='#BB00BB'>decode</font><font face='Lucida Console'>(</font>symbol<font face='Lucida Console'>)</font>;
+                                p_rgba.red <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>symbol<font face='Lucida Console'>)</font>;
+
+                                edm.<font color='#BB00BB'>decode</font><font face='Lucida Console'>(</font>symbol<font face='Lucida Console'>)</font>;
+                                p_rgba.green <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>symbol<font face='Lucida Console'>)</font>;
+
+                                edm.<font color='#BB00BB'>decode</font><font face='Lucida Console'>(</font>symbol<font face='Lucida Console'>)</font>;
+                                p_rgba.blue <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>symbol<font face='Lucida Console'>)</font>;
+
+                                edm.<font color='#BB00BB'>decode</font><font face='Lucida Console'>(</font>symbol<font face='Lucida Console'>)</font>;
+                                p_rgba.alpha <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>symbol<font face='Lucida Console'>)</font>;
+
+                                <font color='#BB00BB'>assign_pixel</font><font face='Lucida Console'>(</font>image[r][c],p_rgba<font face='Lucida Console'>)</font>;
+                            <b>}</b>
+                        <b>}</b>
+                        <font color='#0000FF'>break</font>;
+
+                    <font color='#0000FF'>case</font> rgb_paeth:
+
+                        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> r <font color='#5555FF'>=</font> <font color='#979000'>0</font>; r <font color='#5555FF'>&lt;</font> image.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>r<font face='Lucida Console'>)</font>
+                        <b>{</b>
+                            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> c <font color='#5555FF'>=</font> <font color='#979000'>0</font>; c <font color='#5555FF'>&lt;</font> image.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>c<font face='Lucida Console'>)</font>
+                            <b>{</b>
+                                p_rgb <font color='#5555FF'>=</font> <font color='#BB00BB'>predictor_rgb_paeth</font><font face='Lucida Console'>(</font>image,r,c<font face='Lucida Console'>)</font>;
+                                edm.<font color='#BB00BB'>decode</font><font face='Lucida Console'>(</font>symbol<font face='Lucida Console'>)</font>;
+                                p_rgb.red <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>symbol<font face='Lucida Console'>)</font>;
+
+                                edm.<font color='#BB00BB'>decode</font><font face='Lucida Console'>(</font>symbol<font face='Lucida Console'>)</font>;
+                                p_rgb.green <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>symbol<font face='Lucida Console'>)</font>;
+
+                                edm.<font color='#BB00BB'>decode</font><font face='Lucida Console'>(</font>symbol<font face='Lucida Console'>)</font>;
+                                p_rgb.blue <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>symbol<font face='Lucida Console'>)</font>;
+
+                                <font color='#BB00BB'>assign_pixel</font><font face='Lucida Console'>(</font>image[r][c],p_rgb<font face='Lucida Console'>)</font>;
+                            <b>}</b>
+                        <b>}</b>
+                        <font color='#0000FF'>break</font>;
+
+                    <font color='#0000FF'>case</font> rgb:
+
+                        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> r <font color='#5555FF'>=</font> <font color='#979000'>0</font>; r <font color='#5555FF'>&lt;</font> image.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>r<font face='Lucida Console'>)</font>
+                        <b>{</b>
+                            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> c <font color='#5555FF'>=</font> <font color='#979000'>0</font>; c <font color='#5555FF'>&lt;</font> image.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>c<font face='Lucida Console'>)</font>
+                            <b>{</b>
+                                p_rgb <font color='#5555FF'>=</font> <font color='#BB00BB'>predictor_rgb</font><font face='Lucida Console'>(</font>image,r,c<font face='Lucida Console'>)</font>;
+                                edm.<font color='#BB00BB'>decode</font><font face='Lucida Console'>(</font>symbol<font face='Lucida Console'>)</font>;
+                                p_rgb.red <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>symbol<font face='Lucida Console'>)</font>;
+
+                                edm.<font color='#BB00BB'>decode</font><font face='Lucida Console'>(</font>symbol<font face='Lucida Console'>)</font>;
+                                p_rgb.green <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>symbol<font face='Lucida Console'>)</font>;
+
+                                edm.<font color='#BB00BB'>decode</font><font face='Lucida Console'>(</font>symbol<font face='Lucida Console'>)</font>;
+                                p_rgb.blue <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>symbol<font face='Lucida Console'>)</font>;
+
+                                <font color='#BB00BB'>assign_pixel</font><font face='Lucida Console'>(</font>image[r][c],p_rgb<font face='Lucida Console'>)</font>;
+                            <b>}</b>
+                        <b>}</b>
+                        <font color='#0000FF'>break</font>;
+
+                    <font color='#0000FF'>case</font> hsi:
+
+                        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> r <font color='#5555FF'>=</font> <font color='#979000'>0</font>; r <font color='#5555FF'>&lt;</font> image.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>r<font face='Lucida Console'>)</font>
+                        <b>{</b>
+                            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> c <font color='#5555FF'>=</font> <font color='#979000'>0</font>; c <font color='#5555FF'>&lt;</font> image.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>c<font face='Lucida Console'>)</font>
+                            <b>{</b>
+                                p_hsi <font color='#5555FF'>=</font> <font color='#BB00BB'>predictor_hsi</font><font face='Lucida Console'>(</font>image,r,c<font face='Lucida Console'>)</font>;
+                                edm.<font color='#BB00BB'>decode</font><font face='Lucida Console'>(</font>symbol<font face='Lucida Console'>)</font>;
+                                p_hsi.h <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>symbol<font face='Lucida Console'>)</font>;
+
+                                edm.<font color='#BB00BB'>decode</font><font face='Lucida Console'>(</font>symbol<font face='Lucida Console'>)</font>;
+                                p_hsi.s <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>symbol<font face='Lucida Console'>)</font>;
+
+                                edm.<font color='#BB00BB'>decode</font><font face='Lucida Console'>(</font>symbol<font face='Lucida Console'>)</font>;
+                                p_hsi.i <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>symbol<font face='Lucida Console'>)</font>;
+
+                                <font color='#BB00BB'>assign_pixel</font><font face='Lucida Console'>(</font>image[r][c],p_hsi<font face='Lucida Console'>)</font>;
+                            <b>}</b>
+                        <b>}</b>
+                        <font color='#0000FF'>break</font>;
+
+                    <font color='#0000FF'>case</font> grayscale:
+                        <b>{</b>
+                            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> p;
+                            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> r <font color='#5555FF'>=</font> <font color='#979000'>0</font>; r <font color='#5555FF'>&lt;</font> image.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>r<font face='Lucida Console'>)</font>
+                            <b>{</b>
+                                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> c <font color='#5555FF'>=</font> <font color='#979000'>0</font>; c <font color='#5555FF'>&lt;</font> image.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>c<font face='Lucida Console'>)</font>
+                                <b>{</b>
+                                    edm.<font color='#BB00BB'>decode</font><font face='Lucida Console'>(</font>symbol<font face='Lucida Console'>)</font>;
+                                    p <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>symbol<font face='Lucida Console'>)</font>;
+                                    p <font color='#5555FF'>+</font><font color='#5555FF'>=</font>  <font color='#BB00BB'>predictor_grayscale</font><font face='Lucida Console'>(</font>image,r,c<font face='Lucida Console'>)</font>;
+                                    <font color='#BB00BB'>assign_pixel</font><font face='Lucida Console'>(</font>image[r][c],p<font face='Lucida Console'>)</font>;
+                                <b>}</b>
+                            <b>}</b>
+                        <b>}</b>
+                        <font color='#0000FF'>break</font>;
+
+                    <font color='#0000FF'>case</font> grayscale_16bit:
+                        <b>{</b>
+                            uint16 p;
+                            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> r <font color='#5555FF'>=</font> <font color='#979000'>0</font>; r <font color='#5555FF'>&lt;</font> image.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>r<font face='Lucida Console'>)</font>
+                            <b>{</b>
+                                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> c <font color='#5555FF'>=</font> <font color='#979000'>0</font>; c <font color='#5555FF'>&lt;</font> image.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>c<font face='Lucida Console'>)</font>
+                                <b>{</b>
+                                    edm.<font color='#BB00BB'>decode</font><font face='Lucida Console'>(</font>symbol<font face='Lucida Console'>)</font>;
+                                    p <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font>uint16<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>symbol<font face='Lucida Console'>)</font>;
+                                    p <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#979000'>8</font>;
+                                    edm.<font color='#BB00BB'>decode</font><font face='Lucida Console'>(</font>symbol<font face='Lucida Console'>)</font>;
+                                    p <font color='#5555FF'>|</font><font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font>uint16<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>symbol<font face='Lucida Console'>)</font>;
+
+                                    p <font color='#5555FF'>+</font><font color='#5555FF'>=</font>  <font color='#BB00BB'>predictor_grayscale_16</font><font face='Lucida Console'>(</font>image,r,c<font face='Lucida Console'>)</font>;
+                                    <font color='#BB00BB'>assign_pixel</font><font face='Lucida Console'>(</font>image[r][c],p<font face='Lucida Console'>)</font>;
+                                <b>}</b>
+                            <b>}</b>
+                        <b>}</b>
+                        <font color='#0000FF'>break</font>;
+
+                    <font color='#0000FF'>default</font>:
+                        <font color='#0000FF'>throw</font> <font color='#BB00BB'>image_load_error</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>corruption detected in the dng file</font>"<font face='Lucida Console'>)</font>;
+                <b>}</b> <font color='#009900'>// switch (type)
+</font>
+                edm.<font color='#BB00BB'>decode</font><font face='Lucida Console'>(</font>symbol<font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>symbol <font color='#5555FF'>!</font><font color='#5555FF'>=</font> dng_magic_byte<font face='Lucida Console'>)</font>
+                    <font color='#0000FF'>throw</font> <font color='#BB00BB'>image_load_error</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>corruption detected in the dng file</font>"<font face='Lucida Console'>)</font>;
+                edm.<font color='#BB00BB'>decode</font><font face='Lucida Console'>(</font>symbol<font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>symbol <font color='#5555FF'>!</font><font color='#5555FF'>=</font> dng_magic_byte<font face='Lucida Console'>)</font>
+                    <font color='#0000FF'>throw</font> <font color='#BB00BB'>image_load_error</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>corruption detected in the dng file</font>"<font face='Lucida Console'>)</font>;
+                edm.<font color='#BB00BB'>decode</font><font face='Lucida Console'>(</font>symbol<font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>symbol <font color='#5555FF'>!</font><font color='#5555FF'>=</font> dng_magic_byte<font face='Lucida Console'>)</font>
+                    <font color='#0000FF'>throw</font> <font color='#BB00BB'>image_load_error</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>corruption detected in the dng file</font>"<font face='Lucida Console'>)</font>;
+                edm.<font color='#BB00BB'>decode</font><font face='Lucida Console'>(</font>symbol<font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>symbol <font color='#5555FF'>!</font><font color='#5555FF'>=</font> dng_magic_byte<font face='Lucida Console'>)</font>
+                    <font color='#0000FF'>throw</font> <font color='#BB00BB'>image_load_error</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>corruption detected in the dng file</font>"<font face='Lucida Console'>)</font>;
+            <b>}</b>
+            <font color='#0000FF'>else</font> <font color='#009900'>// if this is a grayscale_float type image
+</font>            <b>{</b>
+                std::vector<font color='#5555FF'>&lt;</font>int64<font color='#5555FF'>&gt;</font> <font color='#BB00BB'>man</font><font face='Lucida Console'>(</font>image.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font> expbuf;
+                <font color='#009900'>// get the mantissa data
+</font>                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> j <font color='#5555FF'>=</font> <font color='#979000'>0</font>; j <font color='#5555FF'>&lt;</font> man.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>j<font face='Lucida Console'>)</font>
+                    <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>man[j], in<font face='Lucida Console'>)</font>;
+                <font color='#009900'>// get the compressed exponent data
+</font>                <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>expbuf, in<font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>typedef</font> entropy_decoder::kernel_2a decoder_type;
+                <font color='#0000FF'>typedef</font> entropy_decoder_model<font color='#5555FF'>&lt;</font><font color='#979000'>256</font>,decoder_type<font color='#5555FF'>&gt;</font>::kernel_4a edm_exp_type; 
+                vectorstream <font color='#BB00BB'>inexp</font><font face='Lucida Console'>(</font>expbuf<font face='Lucida Console'>)</font>;
+                decoder_type decoder;
+                decoder.<font color='#BB00BB'>set_stream</font><font face='Lucida Console'>(</font>inexp<font face='Lucida Console'>)</font>;
+
+                edm_exp_type <font color='#BB00BB'>edm_exp</font><font face='Lucida Console'>(</font>decoder<font face='Lucida Console'>)</font>;
+                float_details prev;
+                <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                <font color='#009900'>// fill out the image 
+</font>                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> r <font color='#5555FF'>=</font> <font color='#979000'>0</font>; r <font color='#5555FF'>&lt;</font> image.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>r<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> c <font color='#5555FF'>=</font> <font color='#979000'>0</font>; c <font color='#5555FF'>&lt;</font> image.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>c<font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> exp1, exp2;
+                        edm_exp.<font color='#BB00BB'>decode</font><font face='Lucida Console'>(</font>exp1<font face='Lucida Console'>)</font>;
+                        edm_exp.<font color='#BB00BB'>decode</font><font face='Lucida Console'>(</font>exp2<font face='Lucida Console'>)</font>;
+
+                        float_details <font color='#BB00BB'>cur</font><font face='Lucida Console'>(</font>man[i<font color='#5555FF'>+</font><font color='#5555FF'>+</font>],<font face='Lucida Console'>(</font>exp2<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font><font color='#979000'>8</font><font face='Lucida Console'>)</font> <font color='#5555FF'>|</font> exp1<font face='Lucida Console'>)</font>;
+                        cur.exponent <font color='#5555FF'>+</font><font color='#5555FF'>=</font> prev.exponent;
+                        cur.mantissa <font color='#5555FF'>+</font><font color='#5555FF'>=</font> prev.mantissa;
+                        prev <font color='#5555FF'>=</font> cur;
+                        
+                        <font color='#009900'>// Only use long double precision if the target image contains long
+</font>                        <font color='#009900'>// doubles because it's slower to use those.
+</font>                        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font>is_same_type<font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> image_traits<font color='#5555FF'>&lt;</font>image_type<font color='#5555FF'>&gt;</font>::pixel_type,<font color='#0000FF'><u>long</u></font> <font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font>::value<font face='Lucida Console'>)</font>
+                        <b>{</b>
+                            <font color='#0000FF'><u>double</u></font> temp <font color='#5555FF'>=</font> cur;
+                            <font color='#BB00BB'>assign_pixel</font><font face='Lucida Console'>(</font>image[r][c],temp<font face='Lucida Console'>)</font>;
+                        <b>}</b>
+                        <font color='#0000FF'>else</font>
+                        <b>{</b>
+                            <font color='#0000FF'><u>long</u></font> <font color='#0000FF'><u>double</u></font> temp <font color='#5555FF'>=</font> cur;
+                            <font color='#BB00BB'>assign_pixel</font><font face='Lucida Console'>(</font>image[r][c],temp<font face='Lucida Console'>)</font>;
+                        <b>}</b>
+                    <b>}</b>
+                <b>}</b>
+                <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> symbol;
+                edm_exp.<font color='#BB00BB'>decode</font><font face='Lucida Console'>(</font>symbol<font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>symbol <font color='#5555FF'>!</font><font color='#5555FF'>=</font> dng_magic_byte<font face='Lucida Console'>)</font>
+                    <font color='#0000FF'>throw</font> <font color='#BB00BB'>image_load_error</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>corruption detected in the dng file</font>"<font face='Lucida Console'>)</font>;
+                edm_exp.<font color='#BB00BB'>decode</font><font face='Lucida Console'>(</font>symbol<font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>symbol <font color='#5555FF'>!</font><font color='#5555FF'>=</font> dng_magic_byte<font face='Lucida Console'>)</font>
+                    <font color='#0000FF'>throw</font> <font color='#BB00BB'>image_load_error</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>corruption detected in the dng file</font>"<font face='Lucida Console'>)</font>;
+                edm_exp.<font color='#BB00BB'>decode</font><font face='Lucida Console'>(</font>symbol<font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>symbol <font color='#5555FF'>!</font><font color='#5555FF'>=</font> dng_magic_byte<font face='Lucida Console'>)</font>
+                    <font color='#0000FF'>throw</font> <font color='#BB00BB'>image_load_error</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>corruption detected in the dng file</font>"<font face='Lucida Console'>)</font>;
+                edm_exp.<font color='#BB00BB'>decode</font><font face='Lucida Console'>(</font>symbol<font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>symbol <font color='#5555FF'>!</font><font color='#5555FF'>=</font> dng_magic_byte<font face='Lucida Console'>)</font>
+                    <font color='#0000FF'>throw</font> <font color='#BB00BB'>image_load_error</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>corruption detected in the dng file</font>"<font face='Lucida Console'>)</font>;
+            <b>}</b>
+        <b>}</b>
+        <font color='#0000FF'>catch</font> <font face='Lucida Console'>(</font>...<font face='Lucida Console'>)</font>
+        <b>{</b>
+            image.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>throw</font>;
+        <b>}</b>
+
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> image_type<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='load_bmp'></a>load_bmp</b> <font face='Lucida Console'>(</font>
+        image_type<font color='#5555FF'>&amp;</font> image,
+        <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> file_name
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        std::ifstream <font color='#BB00BB'>fin</font><font face='Lucida Console'>(</font>file_name.<font color='#BB00BB'>c_str</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, std::ios::binary<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font>fin<font face='Lucida Console'>)</font>
+            <font color='#0000FF'>throw</font> <font color='#BB00BB'>image_load_error</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>Unable to open </font>" <font color='#5555FF'>+</font> file_name <font color='#5555FF'>+</font> "<font color='#CC0000'> for reading.</font>"<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>load_bmp</font><font face='Lucida Console'>(</font>image, fin<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> image_type<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='load_dng'></a>load_dng</b> <font face='Lucida Console'>(</font>
+        image_type<font color='#5555FF'>&amp;</font> image,
+        <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> file_name
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        std::ifstream <font color='#BB00BB'>fin</font><font face='Lucida Console'>(</font>file_name.<font color='#BB00BB'>c_str</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, std::ios::binary<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font>fin<font face='Lucida Console'>)</font>
+            <font color='#0000FF'>throw</font> <font color='#BB00BB'>image_load_error</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>Unable to open </font>" <font color='#5555FF'>+</font> file_name <font color='#5555FF'>+</font> "<font color='#CC0000'> for reading.</font>"<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>load_dng</font><font face='Lucida Console'>(</font>image, fin<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_IMAGE_LOADEr_
+</font>
+
+
+
+</pre></body></html>

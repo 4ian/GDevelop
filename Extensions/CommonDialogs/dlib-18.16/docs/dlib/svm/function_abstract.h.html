@@ -1,0 +1,1000 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - function_abstract.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2007  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#undef</font> DLIB_SVm_FUNCTION_ABSTRACT_
+<font color='#0000FF'>#ifdef</font> DLIB_SVm_FUNCTION_ABSTRACT_
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>cmath<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>limits<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>sstream<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../matrix/matrix_abstract.h.html'>../matrix/matrix_abstract.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../algs.h.html'>../algs.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../serialize.h.html'>../serialize.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../statistics/statistics_abstract.h.html'>../statistics/statistics_abstract.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> K
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>struct</font> <b><a name='decision_function'></a>decision_function</b> 
+    <b>{</b>
+        <font color='#009900'>/*!
+            REQUIREMENTS ON K
+                K must be a kernel function object type as defined at the
+                top of dlib/svm/kernel_abstract.h
+
+            WHAT THIS OBJECT REPRESENTS 
+                This object represents a classification or regression function that was 
+                learned by a kernel based learning algorithm.   Therefore, it is a function 
+                object that takes a sample object and returns a scalar value.
+
+            THREAD SAFETY
+                It is always safe to use distinct instances of this object in different
+                threads.  However, when a single instance is shared between threads then
+                the following rules apply:
+                    It is safe to call operator() on this object from multiple threads so
+                    long as the kernel, K, is also threadsafe.  This is because operator()
+                    is a read-only operation.  However, any operation that modifies a
+                    decision_function is not threadsafe.
+        !*/</font>
+
+        <font color='#0000FF'>typedef</font> K kernel_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> K::scalar_type scalar_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> K::scalar_type result_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> K::sample_type sample_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> K::mem_manager_type mem_manager_type;
+
+        <font color='#0000FF'>typedef</font> matrix<font color='#5555FF'>&lt;</font>scalar_type,<font color='#979000'>0</font>,<font color='#979000'>1</font>,mem_manager_type<font color='#5555FF'>&gt;</font> scalar_vector_type;
+        <font color='#0000FF'>typedef</font> matrix<font color='#5555FF'>&lt;</font>sample_type,<font color='#979000'>0</font>,<font color='#979000'>1</font>,mem_manager_type<font color='#5555FF'>&gt;</font> sample_vector_type;
+
+        scalar_vector_type alpha;
+        scalar_type        b;
+        K                  kernel_function;
+        sample_vector_type basis_vectors;
+
+        <b><a name='decision_function'></a>decision_function</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #b == 0
+                - #alpha.nr() == 0
+                - #basis_vectors.nr() == 0
+        !*/</font>
+
+        <b><a name='decision_function'></a>decision_function</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> decision_function<font color='#5555FF'>&amp;</font> f
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #*this is a copy of f
+        !*/</font>
+
+        <b><a name='decision_function'></a>decision_function</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> scalar_vector_type<font color='#5555FF'>&amp;</font> alpha_,
+            <font color='#0000FF'>const</font> scalar_type<font color='#5555FF'>&amp;</font> b_,
+            <font color='#0000FF'>const</font> K<font color='#5555FF'>&amp;</font> kernel_function_,
+            <font color='#0000FF'>const</font> sample_vector_type<font color='#5555FF'>&amp;</font> basis_vectors_
+        <font face='Lucida Console'>)</font> : alpha<font face='Lucida Console'>(</font>alpha_<font face='Lucida Console'>)</font>, b<font face='Lucida Console'>(</font>b_<font face='Lucida Console'>)</font>, kernel_function<font face='Lucida Console'>(</font>kernel_function_<font face='Lucida Console'>)</font>, basis_vectors<font face='Lucida Console'>(</font>basis_vectors_<font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+        <font color='#009900'>/*!
+            ensures
+                - populates the decision function with the given basis vectors, weights(i.e. alphas),
+                  b term, and kernel function.
+        !*/</font>
+
+        result_type <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> sample_type<font color='#5555FF'>&amp;</font> x
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <font color='#009900'>/*!
+            ensures
+                - evaluates this sample according to the decision
+                  function contained in this object.
+        !*/</font>
+        <b>{</b>
+            result_type temp <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> alpha.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                temp <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#BB00BB'>alpha</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font> <font color='#5555FF'>*</font> <font color='#BB00BB'>kernel_function</font><font face='Lucida Console'>(</font>x,<font color='#BB00BB'>basis_vectors</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>return</font> temp <font color='#5555FF'>-</font> b;
+        <b>}</b>
+    <b>}</b>;
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> K
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='serialize'></a>serialize</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> decision_function<font color='#5555FF'>&lt;</font>K<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> item,
+        std::ostream<font color='#5555FF'>&amp;</font> out
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        provides serialization support for decision_function
+    !*/</font>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> K
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='deserialize'></a>deserialize</b> <font face='Lucida Console'>(</font>
+        decision_function<font color='#5555FF'>&lt;</font>K<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> item,
+        std::istream<font color='#5555FF'>&amp;</font> in 
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        provides serialization support for decision_function
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> function_type 
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>struct</font> <b><a name='probabilistic_function'></a>probabilistic_function</b> 
+    <b>{</b>
+        <font color='#009900'>/*!
+            REQUIREMENTS ON function_type 
+                - function_type must be a function object with an overloaded
+                  operator() similar to the other function objects defined in
+                  this file.  The operator() should return a scalar type such as
+                  double or float.
+
+            WHAT THIS OBJECT REPRESENTS 
+                This object represents a binary decision function that returns an 
+                estimate of the probability that a given sample is in the +1 class.
+
+            THREAD SAFETY
+                It is always safe to use distinct instances of this object in different
+                threads.  However, when a single instance is shared between threads then
+                the following rules apply:
+                    It is safe to call operator() on this object from multiple threads so
+                    long as decision_funct is also threadsafe.  This is because operator()
+                    is a read-only operation.  However, any operation that modifies a
+                    probabilistic_function is not threadsafe.
+        !*/</font>
+
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> function_type::scalar_type scalar_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> function_type::result_type result_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> function_type::sample_type sample_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> function_type::mem_manager_type mem_manager_type;
+
+        scalar_type alpha;
+        scalar_type beta;
+        function_type decision_funct;
+
+        <b><a name='probabilistic_function'></a>probabilistic_function</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #alpha == 0
+                - #beta == 0
+                - #decision_funct has its initial value
+        !*/</font>
+
+        <b><a name='probabilistic_function'></a>probabilistic_function</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> probabilistic_function<font color='#5555FF'>&amp;</font> f
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #*this is a copy of f
+        !*/</font>
+
+        <b><a name='probabilistic_function'></a>probabilistic_function</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> scalar_type a,
+            <font color='#0000FF'>const</font> scalar_type b,
+            <font color='#0000FF'>const</font> function_type<font color='#5555FF'>&amp;</font> decision_funct_ 
+        <font face='Lucida Console'>)</font> : alpha<font face='Lucida Console'>(</font>a<font face='Lucida Console'>)</font>, beta<font face='Lucida Console'>(</font>b<font face='Lucida Console'>)</font>, decision_funct<font face='Lucida Console'>(</font>decision_funct_<font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+        <font color='#009900'>/*!
+            ensures
+                - populates the probabilistic decision function with the given alpha, beta, 
+                  and decision function.
+        !*/</font>
+
+        result_type <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> sample_type<font color='#5555FF'>&amp;</font> x
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <font color='#009900'>/*!
+            ensures
+                - returns a number P such that:
+                    - 0 &lt;= P &lt;= 1
+                    - P represents the probability that sample x is from 
+                      the class +1
+        !*/</font>
+        <b>{</b>
+            <font color='#009900'>// Evaluate the normal decision function
+</font>            result_type f <font color='#5555FF'>=</font> <font color='#BB00BB'>decision_funct</font><font face='Lucida Console'>(</font>x<font face='Lucida Console'>)</font>;
+            <font color='#009900'>// Now basically normalize the output so that it is a properly
+</font>            <font color='#009900'>// conditioned probability of x being in the +1 class given
+</font>            <font color='#009900'>// the output of the decision function.
+</font>            <font color='#0000FF'>return</font> <font color='#979000'>1</font><font color='#5555FF'>/</font><font face='Lucida Console'>(</font><font color='#979000'>1</font> <font color='#5555FF'>+</font> std::<font color='#BB00BB'>exp</font><font face='Lucida Console'>(</font>alpha<font color='#5555FF'>*</font>f <font color='#5555FF'>+</font> beta<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+    <b>}</b>;
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> function_type
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='serialize'></a>serialize</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> probabilistic_function<font color='#5555FF'>&lt;</font>function_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> item,
+        std::ostream<font color='#5555FF'>&amp;</font> out
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        provides serialization support for probabilistic_function
+    !*/</font>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> function_type
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='deserialize'></a>deserialize</b> <font face='Lucida Console'>(</font>
+        probabilistic_function<font color='#5555FF'>&lt;</font>function_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> item,
+        std::istream<font color='#5555FF'>&amp;</font> in 
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        provides serialization support for probabilistic_function
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> K
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>struct</font> <b><a name='probabilistic_decision_function'></a>probabilistic_decision_function</b> 
+    <b>{</b>
+        <font color='#009900'>/*!
+            REQUIREMENTS ON K
+                K must be a kernel function object type as defined at the
+                top of dlib/svm/kernel_abstract.h
+
+            WHAT THIS OBJECT REPRESENTS 
+                This object represents a binary decision function that returns an 
+                estimate of the probability that a given sample is in the +1 class.
+
+                Note that this object is essentially just a copy of 
+                probabilistic_function but with the template argument 
+                changed from being a function type to a kernel type.  Therefore, this
+                type is just a convenient version of probabilistic_function
+                for the case where the decision function is a dlib::decision_function&lt;K&gt;.
+
+            THREAD SAFETY
+                It is always safe to use distinct instances of this object in different
+                threads.  However, when a single instance is shared between threads then
+                the following rules apply:
+                    It is safe to call operator() on this object from multiple threads so
+                    long as the kernel, K, is also threadsafe.  This is because operator()
+                    is a read-only operation.  However, any operation that modifies a
+                    probabilistic_decision_function is not threadsafe.
+        !*/</font>
+
+        <font color='#0000FF'>typedef</font> K kernel_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> K::scalar_type scalar_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> K::scalar_type result_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> K::sample_type sample_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> K::mem_manager_type mem_manager_type;
+
+        scalar_type alpha;
+        scalar_type beta;
+        decision_function<font color='#5555FF'>&lt;</font>K<font color='#5555FF'>&gt;</font> decision_funct;
+
+        <b><a name='probabilistic_decision_function'></a>probabilistic_decision_function</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #alpha == 0
+                - #beta == 0
+                - #decision_funct has its initial value
+        !*/</font>
+
+        <b><a name='probabilistic_decision_function'></a>probabilistic_decision_function</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> probabilistic_decision_function<font color='#5555FF'>&amp;</font> f
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #*this is a copy of f
+        !*/</font>
+
+        <b><a name='probabilistic_decision_function'></a>probabilistic_decision_function</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> probabilistic_function<font color='#5555FF'>&lt;</font>decision_function<font color='#5555FF'>&lt;</font>K<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> d
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #*this is a copy of f
+        !*/</font>
+
+        <b><a name='probabilistic_decision_function'></a>probabilistic_decision_function</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> scalar_type a,
+            <font color='#0000FF'>const</font> scalar_type b,
+            <font color='#0000FF'>const</font> decision_function<font color='#5555FF'>&lt;</font>K<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> decision_funct_ 
+        <font face='Lucida Console'>)</font> : alpha<font face='Lucida Console'>(</font>a<font face='Lucida Console'>)</font>, beta<font face='Lucida Console'>(</font>b<font face='Lucida Console'>)</font>, decision_funct<font face='Lucida Console'>(</font>decision_funct_<font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+        <font color='#009900'>/*!
+            ensures
+                - populates the probabilistic decision function with the given alpha, beta, 
+                  and decision_function.
+        !*/</font>
+
+        result_type <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> sample_type<font color='#5555FF'>&amp;</font> x
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <font color='#009900'>/*!
+            ensures
+                - returns a number P such that:
+                    - 0 &lt;= P &lt;= 1
+                    - P represents the probability that sample x is from 
+                      the class +1
+        !*/</font>
+        <b>{</b>
+            <font color='#009900'>// Evaluate the normal decision function
+</font>            result_type f <font color='#5555FF'>=</font> <font color='#BB00BB'>decision_funct</font><font face='Lucida Console'>(</font>x<font face='Lucida Console'>)</font>;
+            <font color='#009900'>// Now basically normalize the output so that it is a properly
+</font>            <font color='#009900'>// conditioned probability of x being in the +1 class given
+</font>            <font color='#009900'>// the output of the decision function.
+</font>            <font color='#0000FF'>return</font> <font color='#979000'>1</font><font color='#5555FF'>/</font><font face='Lucida Console'>(</font><font color='#979000'>1</font> <font color='#5555FF'>+</font> std::<font color='#BB00BB'>exp</font><font face='Lucida Console'>(</font>alpha<font color='#5555FF'>*</font>f <font color='#5555FF'>+</font> beta<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+    <b>}</b>;
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> K
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='serialize'></a>serialize</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> probabilistic_decision_function<font color='#5555FF'>&lt;</font>K<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> item,
+        std::ostream<font color='#5555FF'>&amp;</font> out
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        provides serialization support for probabilistic_decision_function
+    !*/</font>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> K
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='deserialize'></a>deserialize</b> <font face='Lucida Console'>(</font>
+        probabilistic_decision_function<font color='#5555FF'>&lt;</font>K<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> item,
+        std::istream<font color='#5555FF'>&amp;</font> in 
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        provides serialization support for probabilistic_decision_function
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> K
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>class</font> <b><a name='distance_function'></a>distance_function</b> 
+    <b>{</b>
+        <font color='#009900'>/*!
+            REQUIREMENTS ON K
+                K must be a kernel function object type as defined at the
+                top of dlib/svm/kernel_abstract.h
+
+            WHAT THIS OBJECT REPRESENTS 
+                This object represents a point in kernel induced feature space. 
+                You may use this object to find the distance from the point it 
+                represents to points in input space as well as other points
+                represented by distance_functions.
+
+                Specifically, if O() is the feature mapping associated with
+                the kernel used by this object.  Then this object represents
+                the point:  
+                    sum alpha(i)*O(basis_vectors(i))
+
+                I.e.  It represents a linear combination of the basis vectors where 
+                the weights of the linear combination are stored in the alpha vector.
+
+            THREAD SAFETY
+                It is always safe to use distinct instances of this object in different
+                threads.  However, when a single instance is shared between threads then
+                the following rules apply:
+                    It is safe to call the const members of this object from multiple
+                    threads so long as the kernel, K, is also threadsafe.  This is because
+                    the const members are purely read-only operations.  However, any
+                    operation that modifies a distance_function is not threadsafe.
+        !*/</font>
+
+    <font color='#0000FF'>public</font>:
+        <font color='#0000FF'>typedef</font> K kernel_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> K::scalar_type scalar_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> K::scalar_type result_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> K::sample_type sample_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> K::mem_manager_type mem_manager_type;
+
+        <font color='#0000FF'>typedef</font> matrix<font color='#5555FF'>&lt;</font>scalar_type,<font color='#979000'>0</font>,<font color='#979000'>1</font>,mem_manager_type<font color='#5555FF'>&gt;</font> scalar_vector_type;
+        <font color='#0000FF'>typedef</font> matrix<font color='#5555FF'>&lt;</font>sample_type,<font color='#979000'>0</font>,<font color='#979000'>1</font>,mem_manager_type<font color='#5555FF'>&gt;</font> sample_vector_type;
+
+        <b><a name='distance_function'></a>distance_function</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #get_squared_norm() == 0
+                - #get_alpha().size() == 0
+                - #get_basis_vectors().size() == 0
+                - #get_kernel() == K() (i.e. the default value of the kernel)
+        !*/</font>
+
+        <font color='#0000FF'>explicit</font> <b><a name='distance_function'></a>distance_function</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> kernel_type<font color='#5555FF'>&amp;</font> kern
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #get_squared_norm() == 0
+                - #get_alpha().size() == 0
+                - #get_basis_vectors().size() == 0
+                - #get_kernel() == kern 
+        !*/</font>
+
+        <b><a name='distance_function'></a>distance_function</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> kernel_type<font color='#5555FF'>&amp;</font> kern,
+            <font color='#0000FF'>const</font> sample_type<font color='#5555FF'>&amp;</font> samp
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - This object represents the point in kernel feature space which
+                  corresponds directly to the given sample.  In particular this means
+                  that:
+                    - #get_kernel() == kern
+                    - #get_alpha() == a vector of length 1 which contains the value 1 
+                    - #get_basis_vectors() == a vector of length 1 which contains samp
+        !*/</font>
+
+        <b><a name='distance_function'></a>distance_function</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> decision_function<font color='#5555FF'>&lt;</font>K<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> f
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - Every decision_function represents a point in kernel feature space along
+                  with a bias value.  This constructor discards the bias value and creates 
+                  a distance_function which represents the point associated with the given 
+                  decision_function f.  In particular, this means:
+                    - #get_alpha() == f.alpha
+                    - #get_kernel() == f.kernel_function
+                    - #get_basis_vectors() == f.basis_vectors
+        !*/</font>
+
+        <b><a name='distance_function'></a>distance_function</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> distance_function<font color='#5555FF'>&amp;</font> f
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - f is a valid distance_function.  In particular, this means that
+                  f.alpha.size() == f.basis_vectors.size()
+            ensures
+                - #*this is a copy of f
+        !*/</font>
+
+        <b><a name='distance_function'></a>distance_function</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> scalar_vector_type<font color='#5555FF'>&amp;</font> alpha,
+            <font color='#0000FF'>const</font> scalar_type<font color='#5555FF'>&amp;</font> squared_norm,
+            <font color='#0000FF'>const</font> K<font color='#5555FF'>&amp;</font> kernel_function,
+            <font color='#0000FF'>const</font> sample_vector_type<font color='#5555FF'>&amp;</font> basis_vectors
+        <font face='Lucida Console'>)</font>; 
+        <font color='#009900'>/*!
+            requires
+                - alpha.size() == basis_vectors.size()
+                - squared_norm == trans(alpha)*kernel_matrix(kernel_function,basis_vectors)*alpha
+                  (Basically, squared_norm needs to be set properly for this object to make sense.  
+                  You should prefer to use the following constructor which computes squared_norm for 
+                  you.  This version is provided just in case you already know squared_norm and 
+                  don't want to spend CPU cycles to recompute it.)
+            ensures
+                - populates the distance function with the given basis vectors, weights(i.e. alphas),
+                  squared_norm value, and kernel function. I.e.
+                    - #get_alpha() == alpha
+                    - #get_squared_norm() == squared_norm 
+                    - #get_kernel() == kernel_function
+                    - #get_basis_vectors() == basis_vectors
+        !*/</font>
+
+        <b><a name='distance_function'></a>distance_function</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> scalar_vector_type<font color='#5555FF'>&amp;</font> alpha,
+            <font color='#0000FF'>const</font> K<font color='#5555FF'>&amp;</font> kernel_function,
+            <font color='#0000FF'>const</font> sample_vector_type<font color='#5555FF'>&amp;</font> basis_vectors
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - alpha.size() == basis_vectors.size()
+            ensures
+                - populates the distance function with the given basis vectors, weights(i.e. alphas), 
+                  and kernel function.  The correct b value is computed automatically.  I.e.
+                    - #get_alpha() == alpha
+                    - #get_squared_norm() == trans(alpha)*kernel_matrix(kernel_function,basis_vectors)*alpha
+                      (i.e. get_squared_norm() will be automatically set to the correct value)
+                    - #get_kernel() == kernel_function
+                    - #get_basis_vectors() == basis_vectors
+        !*/</font>
+
+        <font color='#0000FF'>const</font> scalar_vector_type<font color='#5555FF'>&amp;</font> <b><a name='get_alpha'></a>get_alpha</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>; 
+        <font color='#009900'>/*!
+            ensures
+                - returns the set of weights on each basis vector in this object
+        !*/</font>
+
+        <font color='#0000FF'>const</font> scalar_type<font color='#5555FF'>&amp;</font> <b><a name='get_squared_norm'></a>get_squared_norm</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the squared norm of the point represented by this object.  This value is
+                  equal to the following expression:
+                    trans(get_alpha()) * kernel_matrix(get_kernel(),get_basis_vectors()) * get_alpha()
+        !*/</font>
+
+        <font color='#0000FF'>const</font> K<font color='#5555FF'>&amp;</font> <b><a name='get_kernel'></a>get_kernel</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the kernel used by this object.
+        !*/</font>
+
+        <font color='#0000FF'>const</font> sample_vector_type<font color='#5555FF'>&amp;</font> <b><a name='get_basis_vectors'></a>get_basis_vectors</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the set of basis vectors contained in this object
+        !*/</font>
+
+        result_type <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> sample_type<font color='#5555FF'>&amp;</font> x
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - Let O(x) represent the point x projected into kernel induced feature space.
+                - let c == sum_over_i get_alpha()(i)*O(get_basis_vectors()(i)) == the point in kernel space that
+                  this object represents.  That is, c is the weighted sum of basis vectors.
+                - Then this object returns the distance between the point O(x) and c in kernel
+                  space. 
+        !*/</font>
+
+        result_type <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> distance_function<font color='#5555FF'>&amp;</font> x
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - kernel_function == x.kernel_function
+            ensures
+                - returns the distance between the points in kernel space represented by *this and x.
+        !*/</font>
+
+        distance_function <b><a name='operator'></a>operator</b><font color='#5555FF'>*</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> scalar_type<font color='#5555FF'>&amp;</font> val
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - multiplies the point represented by *this by val and returns the result.  In
+                  particular, this function returns a decision_function DF such that:
+                    - DF.get_basis_vectors() == get_basis_vectors()
+                    - DF.get_kernel() == get_kernel() 
+                    - DF.get_alpha() == get_alpha() * val
+        !*/</font>
+
+        distance_function <b><a name='operator'></a>operator</b><font color='#5555FF'>/</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> scalar_type<font color='#5555FF'>&amp;</font> val
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - divides the point represented by *this by val and returns the result.  In
+                  particular, this function returns a decision_function DF such that:
+                    - DF.get_basis_vectors() == get_basis_vectors()
+                    - DF.get_kernel() == get_kernel() 
+                    - DF.get_alpha() == get_alpha() / val
+        !*/</font>
+
+        distance_function <b><a name='operator'></a>operator</b><font color='#5555FF'>+</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> distance_function<font color='#5555FF'>&amp;</font> rhs
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - get_kernel() == rhs.get_kernel()
+            ensures
+                - returns a distance function DF such that:
+                    - DF represents the sum of the point represented by *this and rhs
+                    - DF.get_basis_vectors().size() == get_basis_vectors().size() + rhs.get_basis_vectors().size()
+                    - DF.get_basis_vectors() contains all the basis vectors in both *this and rhs.
+                    - DF.get_kernel() == get_kernel() 
+                    - DF.alpha == join_cols(get_alpha(), rhs.get_alpha())
+        !*/</font>
+
+        distance_function <b><a name='operator'></a>operator</b><font color='#5555FF'>-</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> distance_function<font color='#5555FF'>&amp;</font> rhs
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - get_kernel() == rhs.get_kernel()
+            ensures
+                - returns a distance function DF such that:
+                    - DF represents the difference of the point represented by *this and rhs (i.e. *this - rhs)
+                    - DF.get_basis_vectors().size() == get_basis_vectors().size() + rhs.get_basis_vectors().size()
+                    - DF.get_basis_vectors() contains all the basis vectors in both *this and rhs.
+                    - DF.get_kernel() == get_kernel() 
+                    - DF.alpha == join_cols(get_alpha(), -1 * rhs.get_alpha())
+        !*/</font>
+    <b>}</b>;
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> K
+        <font color='#5555FF'>&gt;</font>
+    distance_function<font color='#5555FF'>&lt;</font>K<font color='#5555FF'>&gt;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>*</font> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> <font color='#0000FF'>typename</font> K::scalar_type<font color='#5555FF'>&amp;</font> val,
+        <font color='#0000FF'>const</font> distance_function<font color='#5555FF'>&lt;</font>K<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> df
+    <font face='Lucida Console'>)</font> <b>{</b> <font color='#0000FF'>return</font> df<font color='#5555FF'>*</font>val; <b>}</b>
+    <font color='#009900'>/*!
+        ensures
+            - multiplies the point represented by *this by val and returns the result.   This
+              function just allows multiplication syntax of the form val*df.
+    !*/</font>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> K
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='serialize'></a>serialize</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> distance_function<font color='#5555FF'>&lt;</font>K<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> item,
+        std::ostream<font color='#5555FF'>&amp;</font> out
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        provides serialization support for distance_function
+    !*/</font>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> K
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='deserialize'></a>deserialize</b> <font face='Lucida Console'>(</font>
+        distance_function<font color='#5555FF'>&lt;</font>K<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> item,
+        std::istream<font color='#5555FF'>&amp;</font> in 
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        provides serialization support for distance_function
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> function_type,
+        <font color='#0000FF'>typename</font> normalizer_type <font color='#5555FF'>=</font> vector_normalizer<font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> function_type::sample_type<font color='#5555FF'>&gt;</font>
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>struct</font> <b><a name='normalized_function'></a>normalized_function</b> 
+    <b>{</b>
+        <font color='#009900'>/*!
+            REQUIREMENTS ON function_type 
+                - function_type must be a function object with an overloaded
+                  operator() similar to the other function objects defined in
+                  this file.
+
+            REQUIREMENTS ON normalizer_type
+                - normalizer_type must be a function object with an overloaded
+                  operator() that takes a sample_type and returns a sample_type.
+
+            WHAT THIS OBJECT REPRESENTS 
+                This object represents a container for another function
+                object and an instance of a normalizer function.  
+
+                It automatically normalizes all inputs before passing them
+                off to the contained function object.
+        !*/</font>
+
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> function_type::result_type result_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> function_type::sample_type sample_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> function_type::mem_manager_type mem_manager_type;
+
+        normalizer_type normalizer;
+        function_type function;
+
+        <b><a name='normalized_function'></a>normalized_function</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - the members of this object have their default values
+        !*/</font>
+
+        <b><a name='normalized_function'></a>normalized_function</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> normalized_function<font color='#5555FF'>&amp;</font> f
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #*this is a copy of f
+        !*/</font>
+
+        <b><a name='normalized_function'></a>normalized_function</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> vector_normalizer<font color='#5555FF'>&lt;</font>sample_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> normalizer_,
+            <font color='#0000FF'>const</font> function_type<font color='#5555FF'>&amp;</font> funct 
+        <font face='Lucida Console'>)</font> : normalizer<font face='Lucida Console'>(</font>normalizer_<font face='Lucida Console'>)</font>, function<font face='Lucida Console'>(</font>funct<font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+        <font color='#009900'>/*!
+            ensures
+                - populates this object with the vector_normalizer and function object 
+        !*/</font>
+
+        <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>result_type<font color='#5555FF'>&gt;</font> <b><a name='get_labels'></a>get_labels</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns function.get_labels()
+        !*/</font>
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='number_of_classes'></a>number_of_classes</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns function.number_of_classes()
+        !*/</font>
+
+        result_type <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> sample_type<font color='#5555FF'>&amp;</font> x
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <font color='#009900'>/*!
+            ensures
+                - returns function(normalizer(x))
+        !*/</font>
+    <b>}</b>;
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> function_type,
+        <font color='#0000FF'>typename</font> normalizer_type 
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='serialize'></a>serialize</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> normalized_function<font color='#5555FF'>&lt;</font>function_type, normalizer_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> item,
+        std::ostream<font color='#5555FF'>&amp;</font> out
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        provides serialization support for normalized_function
+    !*/</font>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> function_type,
+        <font color='#0000FF'>typename</font> normalizer_type 
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='deserialize'></a>deserialize</b> <font face='Lucida Console'>(</font>
+        normalized_function<font color='#5555FF'>&lt;</font>function_type, normalizer_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> item,
+        std::istream<font color='#5555FF'>&amp;</font> in 
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        provides serialization support for normalized_function
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> K
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>struct</font> <b><a name='projection_function'></a>projection_function</b> 
+    <b>{</b>
+        <font color='#009900'>/*!
+            REQUIREMENTS ON K
+                K must be a kernel function object type as defined at the
+                top of dlib/svm/kernel_abstract.h
+
+            WHAT THIS OBJECT REPRESENTS 
+                This object represents a function that takes a data sample and projects
+                it into kernel feature space.  The result is a real valued column vector that 
+                represents a point in a kernel feature space.
+
+            THREAD SAFETY
+                It is always safe to use distinct instances of this object in different
+                threads.  However, when a single instance is shared between threads then
+                the following rules apply:
+                    Instances of this object have a mutable cache which is used by const
+                    member functions.  Therefore, it is not safe to use one instance of
+                    this object from multiple threads (unless protected by a mutex).
+        !*/</font>
+
+        <font color='#0000FF'>typedef</font> K kernel_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> K::scalar_type scalar_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> K::sample_type sample_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> K::mem_manager_type mem_manager_type;
+
+        <font color='#0000FF'>typedef</font> matrix<font color='#5555FF'>&lt;</font>scalar_type,<font color='#979000'>0</font>,<font color='#979000'>1</font>,mem_manager_type<font color='#5555FF'>&gt;</font> scalar_vector_type;
+        <font color='#0000FF'>typedef</font> matrix<font color='#5555FF'>&lt;</font>scalar_type,<font color='#979000'>0</font>,<font color='#979000'>0</font>,mem_manager_type<font color='#5555FF'>&gt;</font> scalar_matrix_type;
+        <font color='#0000FF'>typedef</font> matrix<font color='#5555FF'>&lt;</font>sample_type,<font color='#979000'>0</font>,<font color='#979000'>1</font>,mem_manager_type<font color='#5555FF'>&gt;</font> sample_vector_type;
+        <font color='#0000FF'>typedef</font> scalar_vector_type result_type;
+
+        scalar_matrix_type weights;
+        K                  kernel_function;
+        sample_vector_type basis_vectors;
+
+        <b><a name='projection_function'></a>projection_function</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #weights.size() == 0
+                - #basis_vectors.size() == 0
+        !*/</font>
+
+        <b><a name='projection_function'></a>projection_function</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> projection_function<font color='#5555FF'>&amp;</font> f
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #*this is a copy of f
+        !*/</font>
+
+        <b><a name='projection_function'></a>projection_function</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> scalar_matrix_type<font color='#5555FF'>&amp;</font> weights_,
+            <font color='#0000FF'>const</font> K<font color='#5555FF'>&amp;</font> kernel_function_,
+            <font color='#0000FF'>const</font> sample_vector_type<font color='#5555FF'>&amp;</font> basis_vectors_
+        <font face='Lucida Console'>)</font> : weights<font face='Lucida Console'>(</font>weights_<font face='Lucida Console'>)</font>, kernel_function<font face='Lucida Console'>(</font>kernel_function_<font face='Lucida Console'>)</font>, basis_vectors<font face='Lucida Console'>(</font>basis_vectors_<font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+        <font color='#009900'>/*!
+            ensures
+                - populates the projection function with the given basis vectors, weights,
+                  and kernel function.
+        !*/</font>
+
+        <font color='#0000FF'><u>long</u></font> <b><a name='out_vector_size'></a>out_vector_size</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns weights.nr()
+                  (i.e. returns the dimensionality of the vectors output by this projection_function.)
+        !*/</font>
+
+        <font color='#0000FF'>const</font> result_type<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> sample_type<font color='#5555FF'>&amp;</font> x
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <font color='#009900'>/*!
+            requires
+                - weights.nc() == basis_vectors.size()
+                - out_vector_size() &gt; 0
+            ensures
+                - Takes the given x sample and projects it onto part of the kernel feature 
+                  space spanned by the basis_vectors.  The exact projection arithmetic is 
+                  defined below.
+        !*/</font>
+        <b>{</b>
+            <font color='#009900'>// Run the x sample through all the basis functions we have and then
+</font>            <font color='#009900'>// multiply it by the weights matrix and return the result.  Note that
+</font>            <font color='#009900'>// the temp vectors are here to avoid reallocating their memory every
+</font>            <font color='#009900'>// time this function is called.
+</font>            temp1 <font color='#5555FF'>=</font> <font color='#BB00BB'>kernel_matrix</font><font face='Lucida Console'>(</font>kernel_function, basis_vectors, x<font face='Lucida Console'>)</font>;
+            temp2 <font color='#5555FF'>=</font> weights<font color='#5555FF'>*</font>temp1;
+            <font color='#0000FF'>return</font> temp2;
+        <b>}</b>
+
+    <font color='#0000FF'>private</font>:
+        <font color='#0000FF'>mutable</font> result_type temp1, temp2;
+    <b>}</b>;
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> K
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='serialize'></a>serialize</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> projection_function<font color='#5555FF'>&lt;</font>K<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> item,
+        std::ostream<font color='#5555FF'>&amp;</font> out
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        provides serialization support for projection_function
+    !*/</font>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> K
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='deserialize'></a>deserialize</b> <font face='Lucida Console'>(</font>
+        projection_function<font color='#5555FF'>&lt;</font>K<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> item,
+        std::istream<font color='#5555FF'>&amp;</font> in 
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        provides serialization support for projection_function
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> K,
+        <font color='#0000FF'>typename</font> result_type_ <font color='#5555FF'>=</font> <font color='#0000FF'>typename</font> K::scalar_type 
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>struct</font> <b><a name='multiclass_linear_decision_function'></a>multiclass_linear_decision_function</b>
+    <b>{</b>
+        <font color='#009900'>/*!
+            REQUIREMENTS ON K
+                K must be either linear_kernel or sparse_linear_kernel.  
+
+            WHAT THIS OBJECT REPRESENTS 
+                This object represents a multiclass classifier built out of a set of 
+                binary classifiers.  Each binary classifier is used to vote for the 
+                correct multiclass label using a one vs. all strategy.  Therefore, 
+                if you have N classes then there will be N binary classifiers inside 
+                this object.  Additionally, this object is linear in the sense that
+                each of these binary classifiers is a simple linear plane.
+
+            THREAD SAFETY
+                It is always safe to use distinct instances of this object in different
+                threads.  However, when a single instance is shared between threads then
+                the following rules apply:
+                    It is safe to call the const member functions of this object from
+                    multiple threads.  This is because the const members are purely
+                    read-only operations.  However, any operation that modifies a
+                    multiclass_linear_decision_function is not threadsafe.
+        !*/</font>
+
+        <font color='#0000FF'>typedef</font> result_type_ result_type;
+
+        <font color='#0000FF'>typedef</font> K kernel_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> K::scalar_type scalar_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> K::sample_type sample_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> K::mem_manager_type mem_manager_type;
+
+        <font color='#0000FF'>typedef</font> matrix<font color='#5555FF'>&lt;</font>scalar_type,<font color='#979000'>0</font>,<font color='#979000'>1</font>,mem_manager_type<font color='#5555FF'>&gt;</font> scalar_vector_type;
+        <font color='#0000FF'>typedef</font> matrix<font color='#5555FF'>&lt;</font>scalar_type,<font color='#979000'>0</font>,<font color='#979000'>0</font>,mem_manager_type<font color='#5555FF'>&gt;</font> scalar_matrix_type;
+
+        scalar_matrix_type       weights;
+        scalar_vector_type       b;
+        std::vector<font color='#5555FF'>&lt;</font>result_type<font color='#5555FF'>&gt;</font> labels; 
+
+        <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>result_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> <b><a name='get_labels'></a>get_labels</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> labels; <b>}</b>
+        <font color='#009900'>/*!
+            ensures
+                - returns a vector containing all the labels which can be
+                  predicted by this object.
+        !*/</font>
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='number_of_classes'></a>number_of_classes</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns get_labels().size()
+                  (i.e. returns the number of different labels/classes predicted by
+                  this object)
+        !*/</font>
+
+        std::pair<font color='#5555FF'>&lt;</font>result_type, scalar_type<font color='#5555FF'>&gt;</font> <b><a name='predict'></a>predict</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> sample_type<font color='#5555FF'>&amp;</font> x
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - weights.size() &gt; 0
+                - weights.nr() == number_of_classes() == b.size()
+                - if (x is a dense vector, i.e. a dlib::matrix) then
+                    - is_vector(x) == true
+                    - x.size() == weights.nc()
+                      (i.e. it must be legal to multiply weights with x)
+            ensures
+                - Returns the predicted label for the x sample and also it's score.  
+                  In particular, it returns the following:
+                    std::make_pair(labels[index_of_max(weights*x-b)],  max(weights*x-b))
+        !*/</font>
+
+        result_type <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> sample_type<font color='#5555FF'>&amp;</font> x
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - weights.size() &gt; 0
+                - weights.nr() == number_of_classes() == b.size()
+                - if (x is a dense vector, i.e. a dlib::matrix) then
+                    - is_vector(x) == true
+                    - x.size() == weights.nc()
+                      (i.e. it must be legal to multiply weights with x)
+            ensures
+                - Returns the predicted label for the x sample.  In particular, it returns
+                  the following:
+                    labels[index_of_max(weights*x-b)]
+                  Or in other words, this function returns predict(x).first
+        !*/</font>
+    <b>}</b>;
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> K,
+        <font color='#0000FF'>typename</font> result_type_
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='serialize'></a>serialize</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> multiclass_linear_decision_function<font color='#5555FF'>&lt;</font>K,result_type_<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> item,
+        std::ostream<font color='#5555FF'>&amp;</font> out
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        provides serialization support for multiclass_linear_decision_function
+    !*/</font>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> K,
+        <font color='#0000FF'>typename</font> result_type_
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='deserialize'></a>deserialize</b> <font face='Lucida Console'>(</font>
+        multiclass_linear_decision_function<font color='#5555FF'>&lt;</font>K,result_type_<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> item,
+        std::istream<font color='#5555FF'>&amp;</font> in 
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        provides serialization support for multiclass_linear_decision_function
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_SVm_FUNCTION_ABSTRACT_
+</font>
+
+
+
+</pre></body></html>

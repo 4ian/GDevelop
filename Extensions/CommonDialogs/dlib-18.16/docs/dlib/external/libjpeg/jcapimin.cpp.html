@@ -1,0 +1,283 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - jcapimin.cpp</title></head><body bgcolor='white'><pre>
+<font color='#009900'>/*
+ * jcapimin.c
+ *
+ * Copyright (C) 1994-1998, Thomas G. Lane.
+ * This file is part of the Independent JPEG Group's software.
+ * For conditions of distribution and use, see the accompanying README file.
+ *
+ * This file contains application interface code for the compression half
+ * of the JPEG library.  These are the "minimum" API routines that may be
+ * needed in either the normal full-compression case or the transcoding-only
+ * case.
+ *
+ * Most of the routines intended to be called directly by an application
+ * are in this file or in jcapistd.c.  But also see jcparam.c for
+ * parameter-setup helper routines, jcomapi.c for routines shared by
+ * compression and decompression, and jctrans.c for the transcoding case.
+ */</font>
+
+<font color='#0000FF'>#define</font> JPEG_INTERNALS
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='jinclude.h.html'>jinclude.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='jpeglib.h.html'>jpeglib.h</a>"
+
+
+<font color='#009900'>/*
+ * Initialization of a JPEG compression object.
+ * The error manager must already be set up (in case memory manager fails).
+ */</font>
+
+<b><a name='GLOBAL'></a>GLOBAL</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font>
+<b><a name='jpeg_CreateCompress'></a>jpeg_CreateCompress</b> <font face='Lucida Console'>(</font>j_compress_ptr cinfo, <font color='#0000FF'><u>int</u></font> version, <font color='#0000FF'><u>size_t</u></font> structsize<font face='Lucida Console'>)</font>
+<b>{</b>
+  <font color='#0000FF'><u>int</u></font> i;
+
+  <font color='#009900'>/* Guard against version mismatches between library and caller. */</font>
+  cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>mem <font color='#5555FF'>=</font> NULL;		<font color='#009900'>/* so jpeg_destroy knows mem mgr not called */</font>
+  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>version <font color='#5555FF'>!</font><font color='#5555FF'>=</font> JPEG_LIB_VERSION<font face='Lucida Console'>)</font>
+    <font color='#BB00BB'>ERREXIT2</font><font face='Lucida Console'>(</font>cinfo, JERR_BAD_LIB_VERSION, JPEG_LIB_VERSION, version<font face='Lucida Console'>)</font>;
+  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>structsize <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#BB00BB'>SIZEOF</font><font face='Lucida Console'>(</font><font color='#0000FF'>struct</font> <b><a name='jpeg_compress_struct'></a>jpeg_compress_struct</b><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+    <font color='#BB00BB'>ERREXIT2</font><font face='Lucida Console'>(</font>cinfo, JERR_BAD_STRUCT_SIZE, 
+	     <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font> <font color='#BB00BB'>SIZEOF</font><font face='Lucida Console'>(</font><font color='#0000FF'>struct</font> <b><a name='jpeg_compress_struct'></a>jpeg_compress_struct</b><font face='Lucida Console'>)</font>, <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font> structsize<font face='Lucida Console'>)</font>;
+
+  <font color='#009900'>/* For debugging purposes, we zero the whole master structure.
+   * But the application has already set the err pointer, and may have set
+   * client_data, so we have to save and restore those fields.
+   * Note: if application hasn't set client_data, tools like Purify may
+   * complain here.
+   */</font>
+  <b>{</b>
+    <font color='#0000FF'>struct</font> jpeg_error_mgr <font color='#5555FF'>*</font> err <font color='#5555FF'>=</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>err;
+    <font color='#0000FF'><u>void</u></font> <font color='#5555FF'>*</font> client_data <font color='#5555FF'>=</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>client_data; <font color='#009900'>/* ignore Purify complaint here */</font>
+    <font color='#BB00BB'>MEMZERO</font><font face='Lucida Console'>(</font>cinfo, <font color='#BB00BB'>SIZEOF</font><font face='Lucida Console'>(</font><font color='#0000FF'>struct</font> <b><a name='jpeg_compress_struct'></a>jpeg_compress_struct</b><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+    cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>err <font color='#5555FF'>=</font> err;
+    cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>client_data <font color='#5555FF'>=</font> client_data;
+  <b>}</b>
+  cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>is_decompressor <font color='#5555FF'>=</font> FALSE;
+
+  <font color='#009900'>/* Initialize a memory manager instance for this object */</font>
+  <font color='#BB00BB'>jinit_memory_mgr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>j_common_ptr<font face='Lucida Console'>)</font> cinfo<font face='Lucida Console'>)</font>;
+
+  <font color='#009900'>/* Zero out pointers to permanent structures. */</font>
+  cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>progress <font color='#5555FF'>=</font> NULL;
+  cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>dest <font color='#5555FF'>=</font> NULL;
+
+  cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>comp_info <font color='#5555FF'>=</font> NULL;
+
+  <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> NUM_QUANT_TBLS; i<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font>
+    cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>quant_tbl_ptrs[i] <font color='#5555FF'>=</font> NULL;
+
+  <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> NUM_HUFF_TBLS; i<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> <b>{</b>
+    cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>dc_huff_tbl_ptrs[i] <font color='#5555FF'>=</font> NULL;
+    cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>ac_huff_tbl_ptrs[i] <font color='#5555FF'>=</font> NULL;
+  <b>}</b>
+
+  cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>script_space <font color='#5555FF'>=</font> NULL;
+
+  cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>input_gamma <font color='#5555FF'>=</font> <font color='#979000'>1.0</font>;	<font color='#009900'>/* in case application forgets */</font>
+
+  <font color='#009900'>/* OK, I'm ready */</font>
+  cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>global_state <font color='#5555FF'>=</font> CSTATE_START;
+<b>}</b>
+
+
+<font color='#009900'>/*
+ * Destruction of a JPEG compression object
+ */</font>
+
+<b><a name='GLOBAL'></a>GLOBAL</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font>
+<b><a name='jpeg_destroy_compress'></a>jpeg_destroy_compress</b> <font face='Lucida Console'>(</font>j_compress_ptr cinfo<font face='Lucida Console'>)</font>
+<b>{</b>
+  <font color='#BB00BB'>jpeg_destroy</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>j_common_ptr<font face='Lucida Console'>)</font> cinfo<font face='Lucida Console'>)</font>; <font color='#009900'>/* use common routine */</font>
+<b>}</b>
+
+
+<font color='#009900'>/*
+ * Abort processing of a JPEG compression operation,
+ * but don't destroy the object itself.
+ */</font>
+
+<b><a name='GLOBAL'></a>GLOBAL</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font>
+<b><a name='jpeg_abort_compress'></a>jpeg_abort_compress</b> <font face='Lucida Console'>(</font>j_compress_ptr cinfo<font face='Lucida Console'>)</font>
+<b>{</b>
+  <font color='#BB00BB'>jpeg_abort</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>j_common_ptr<font face='Lucida Console'>)</font> cinfo<font face='Lucida Console'>)</font>; <font color='#009900'>/* use common routine */</font>
+<b>}</b>
+
+
+<font color='#009900'>/*
+ * Forcibly suppress or un-suppress all quantization and Huffman tables.
+ * Marks all currently defined tables as already written (if suppress)
+ * or not written (if !suppress).  This will control whether they get emitted
+ * by a subsequent jpeg_start_compress call.
+ *
+ * This routine is exported for use by applications that want to produce
+ * abbreviated JPEG datastreams.  It logically belongs in jcparam.c, but
+ * since it is called by jpeg_start_compress, we put it here --- otherwise
+ * jcparam.o would be linked whether the application used it or not.
+ */</font>
+
+<b><a name='GLOBAL'></a>GLOBAL</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font>
+<b><a name='jpeg_suppress_tables'></a>jpeg_suppress_tables</b> <font face='Lucida Console'>(</font>j_compress_ptr cinfo, <font color='#0000FF'><u>int</u></font> suppress<font face='Lucida Console'>)</font>
+<b>{</b>
+  <font color='#0000FF'><u>int</u></font> i;
+  JQUANT_TBL <font color='#5555FF'>*</font> qtbl;
+  JHUFF_TBL <font color='#5555FF'>*</font> htbl;
+
+  <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> NUM_QUANT_TBLS; i<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> <b>{</b>
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>qtbl <font color='#5555FF'>=</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>quant_tbl_ptrs[i]<font face='Lucida Console'>)</font> <font color='#5555FF'>!</font><font color='#5555FF'>=</font> NULL<font face='Lucida Console'>)</font>
+      qtbl<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>sent_table <font color='#5555FF'>=</font> suppress;
+  <b>}</b>
+
+  <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> NUM_HUFF_TBLS; i<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> <b>{</b>
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>htbl <font color='#5555FF'>=</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>dc_huff_tbl_ptrs[i]<font face='Lucida Console'>)</font> <font color='#5555FF'>!</font><font color='#5555FF'>=</font> NULL<font face='Lucida Console'>)</font>
+      htbl<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>sent_table <font color='#5555FF'>=</font> suppress;
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>htbl <font color='#5555FF'>=</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>ac_huff_tbl_ptrs[i]<font face='Lucida Console'>)</font> <font color='#5555FF'>!</font><font color='#5555FF'>=</font> NULL<font face='Lucida Console'>)</font>
+      htbl<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>sent_table <font color='#5555FF'>=</font> suppress;
+  <b>}</b>
+<b>}</b>
+
+
+<font color='#009900'>/*
+ * Finish JPEG compression.
+ *
+ * If a multipass operating mode was selected, this may do a great deal of
+ * work including most of the actual output.
+ */</font>
+
+<b><a name='GLOBAL'></a>GLOBAL</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font>
+<b><a name='jpeg_finish_compress'></a>jpeg_finish_compress</b> <font face='Lucida Console'>(</font>j_compress_ptr cinfo<font face='Lucida Console'>)</font>
+<b>{</b>
+  JDIMENSION iMCU_row;
+
+  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>global_state <font color='#5555FF'>=</font><font color='#5555FF'>=</font> CSTATE_SCANNING <font color='#5555FF'>|</font><font color='#5555FF'>|</font>
+      cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>global_state <font color='#5555FF'>=</font><font color='#5555FF'>=</font> CSTATE_RAW_OK<font face='Lucida Console'>)</font> <b>{</b>
+    <font color='#009900'>/* Terminate first pass */</font>
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>next_scanline <font color='#5555FF'>&lt;</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>image_height<font face='Lucida Console'>)</font>
+      <font color='#BB00BB'>ERREXIT</font><font face='Lucida Console'>(</font>cinfo, JERR_TOO_LITTLE_DATA<font face='Lucida Console'>)</font>;
+    <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>master<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>finish_pass<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>cinfo<font face='Lucida Console'>)</font>;
+  <b>}</b> <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>global_state <font color='#5555FF'>!</font><font color='#5555FF'>=</font> CSTATE_WRCOEFS<font face='Lucida Console'>)</font>
+    <font color='#BB00BB'>ERREXIT1</font><font face='Lucida Console'>(</font>cinfo, JERR_BAD_STATE, cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>global_state<font face='Lucida Console'>)</font>;
+  <font color='#009900'>/* Perform any remaining passes */</font>
+  <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>master<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>is_last_pass<font face='Lucida Console'>)</font> <b>{</b>
+    <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>master<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>prepare_for_pass<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>cinfo<font face='Lucida Console'>)</font>;
+    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>iMCU_row <font color='#5555FF'>=</font> <font color='#979000'>0</font>; iMCU_row <font color='#5555FF'>&lt;</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>total_iMCU_rows; iMCU_row<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> <b>{</b>
+      <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>progress <font color='#5555FF'>!</font><font color='#5555FF'>=</font> NULL<font face='Lucida Console'>)</font> <b>{</b>
+	cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>progress<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>pass_counter <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font> iMCU_row;
+	cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>progress<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>pass_limit <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>total_iMCU_rows;
+	<font face='Lucida Console'>(</font><font color='#5555FF'>*</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>progress<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>progress_monitor<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>j_common_ptr<font face='Lucida Console'>)</font> cinfo<font face='Lucida Console'>)</font>;
+      <b>}</b>
+      <font color='#009900'>/* We bypass the main controller and invoke coef controller directly;
+       * all work is being done from the coefficient buffer.
+       */</font>
+      <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font> <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>coef<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>compress_data<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>cinfo, <font face='Lucida Console'>(</font>JSAMPIMAGE<font face='Lucida Console'>)</font> NULL<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+	<font color='#BB00BB'>ERREXIT</font><font face='Lucida Console'>(</font>cinfo, JERR_CANT_SUSPEND<font face='Lucida Console'>)</font>;
+    <b>}</b>
+    <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>master<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>finish_pass<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>cinfo<font face='Lucida Console'>)</font>;
+  <b>}</b>
+  <font color='#009900'>/* Write EOI, do final cleanup */</font>
+  <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>marker<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>write_file_trailer<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>cinfo<font face='Lucida Console'>)</font>;
+  <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>dest<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>term_destination<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>cinfo<font face='Lucida Console'>)</font>;
+  <font color='#009900'>/* We can use jpeg_abort to release memory and reset global_state */</font>
+  <font color='#BB00BB'>jpeg_abort</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>j_common_ptr<font face='Lucida Console'>)</font> cinfo<font face='Lucida Console'>)</font>;
+<b>}</b>
+
+
+<font color='#009900'>/*
+ * Write a special marker.
+ * This is only recommended for writing COM or APPn markers.
+ * Must be called after jpeg_start_compress() and before
+ * first call to jpeg_write_scanlines() or jpeg_write_raw_data().
+ */</font>
+
+<b><a name='GLOBAL'></a>GLOBAL</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font>
+<b><a name='jpeg_write_marker'></a>jpeg_write_marker</b> <font face='Lucida Console'>(</font>j_compress_ptr cinfo, <font color='#0000FF'><u>int</u></font> marker,
+		   <font color='#0000FF'>const</font> JOCTET <font color='#5555FF'>*</font>dataptr, <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>int</u></font> datalen<font face='Lucida Console'>)</font>
+<b>{</b>
+  <font color='#BB00BB'>JMETHOD</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font>, write_marker_byte, <font face='Lucida Console'>(</font>j_compress_ptr info, <font color='#0000FF'><u>int</u></font> val<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>next_scanline <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font> <font color='#5555FF'>|</font><font color='#5555FF'>|</font>
+      <font face='Lucida Console'>(</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>global_state <font color='#5555FF'>!</font><font color='#5555FF'>=</font> CSTATE_SCANNING <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font>
+       cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>global_state <font color='#5555FF'>!</font><font color='#5555FF'>=</font> CSTATE_RAW_OK <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font>
+       cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>global_state <font color='#5555FF'>!</font><font color='#5555FF'>=</font> CSTATE_WRCOEFS<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+    <font color='#BB00BB'>ERREXIT1</font><font face='Lucida Console'>(</font>cinfo, JERR_BAD_STATE, cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>global_state<font face='Lucida Console'>)</font>;
+
+  <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>marker<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>write_marker_header<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>cinfo, marker, datalen<font face='Lucida Console'>)</font>;
+  write_marker_byte <font color='#5555FF'>=</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>marker<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>write_marker_byte;	<font color='#009900'>/* copy for speed */</font>
+  <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>datalen<font color='#5555FF'>-</font><font color='#5555FF'>-</font><font face='Lucida Console'>)</font> <b>{</b>
+    <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>write_marker_byte<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>cinfo, <font color='#5555FF'>*</font>dataptr<font face='Lucida Console'>)</font>;
+    dataptr<font color='#5555FF'>+</font><font color='#5555FF'>+</font>;
+  <b>}</b>
+<b>}</b>
+
+<font color='#009900'>/* Same, but piecemeal. */</font>
+
+<b><a name='GLOBAL'></a>GLOBAL</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font>
+<b><a name='jpeg_write_m_header'></a>jpeg_write_m_header</b> <font face='Lucida Console'>(</font>j_compress_ptr cinfo, <font color='#0000FF'><u>int</u></font> marker, <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>int</u></font> datalen<font face='Lucida Console'>)</font>
+<b>{</b>
+  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>next_scanline <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font> <font color='#5555FF'>|</font><font color='#5555FF'>|</font>
+      <font face='Lucida Console'>(</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>global_state <font color='#5555FF'>!</font><font color='#5555FF'>=</font> CSTATE_SCANNING <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font>
+       cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>global_state <font color='#5555FF'>!</font><font color='#5555FF'>=</font> CSTATE_RAW_OK <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font>
+       cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>global_state <font color='#5555FF'>!</font><font color='#5555FF'>=</font> CSTATE_WRCOEFS<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+    <font color='#BB00BB'>ERREXIT1</font><font face='Lucida Console'>(</font>cinfo, JERR_BAD_STATE, cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>global_state<font face='Lucida Console'>)</font>;
+
+  <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>marker<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>write_marker_header<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>cinfo, marker, datalen<font face='Lucida Console'>)</font>;
+<b>}</b>
+
+<b><a name='GLOBAL'></a>GLOBAL</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font>
+<b><a name='jpeg_write_m_byte'></a>jpeg_write_m_byte</b> <font face='Lucida Console'>(</font>j_compress_ptr cinfo, <font color='#0000FF'><u>int</u></font> val<font face='Lucida Console'>)</font>
+<b>{</b>
+  <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>marker<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>write_marker_byte<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>cinfo, val<font face='Lucida Console'>)</font>;
+<b>}</b>
+
+
+<font color='#009900'>/*
+ * Alternate compression function: just write an abbreviated table file.
+ * Before calling this, all parameters and a data destination must be set up.
+ *
+ * To produce a pair of files containing abbreviated tables and abbreviated
+ * image data, one would proceed as follows:
+ *
+ *		initialize JPEG object
+ *		set JPEG parameters
+ *		set destination to table file
+ *		jpeg_write_tables(cinfo);
+ *		set destination to image file
+ *		jpeg_start_compress(cinfo, FALSE);
+ *		write data...
+ *		jpeg_finish_compress(cinfo);
+ *
+ * jpeg_write_tables has the side effect of marking all tables written
+ * (same as jpeg_suppress_tables(..., TRUE)).  Thus a subsequent start_compress
+ * will not re-emit the tables unless it is passed write_all_tables=TRUE.
+ */</font>
+
+<b><a name='GLOBAL'></a>GLOBAL</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font>
+<b><a name='jpeg_write_tables'></a>jpeg_write_tables</b> <font face='Lucida Console'>(</font>j_compress_ptr cinfo<font face='Lucida Console'>)</font>
+<b>{</b>
+  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>global_state <font color='#5555FF'>!</font><font color='#5555FF'>=</font> CSTATE_START<font face='Lucida Console'>)</font>
+    <font color='#BB00BB'>ERREXIT1</font><font face='Lucida Console'>(</font>cinfo, JERR_BAD_STATE, cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>global_state<font face='Lucida Console'>)</font>;
+
+  <font color='#009900'>/* (Re)initialize error mgr and destination modules */</font>
+  <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>err<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>reset_error_mgr<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>j_common_ptr<font face='Lucida Console'>)</font> cinfo<font face='Lucida Console'>)</font>;
+  <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>dest<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>init_destination<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>cinfo<font face='Lucida Console'>)</font>;
+  <font color='#009900'>/* Initialize the marker writer ... bit of a crock to do it here. */</font>
+  <font color='#BB00BB'>jinit_marker_writer</font><font face='Lucida Console'>(</font>cinfo<font face='Lucida Console'>)</font>;
+  <font color='#009900'>/* Write them tables! */</font>
+  <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>marker<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>write_tables_only<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>cinfo<font face='Lucida Console'>)</font>;
+  <font color='#009900'>/* And clean up. */</font>
+  <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>dest<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>term_destination<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>cinfo<font face='Lucida Console'>)</font>;
+  <font color='#009900'>/*
+   * In library releases up through v6a, we called jpeg_abort() here to free
+   * any working memory allocated by the destination manager and marker
+   * writer.  Some applications had a problem with that: they allocated space
+   * of their own from the library memory manager, and didn't want it to go
+   * away during write_tables.  So now we do nothing.  This will cause a
+   * memory leak if an app calls write_tables repeatedly without doing a full
+   * compression cycle or otherwise resetting the JPEG object.  However, that
+   * seems less bad than unexpectedly freeing memory in the normal case.
+   * An app that prefers the old behavior can call jpeg_abort for itself after
+   * each call to jpeg_write_tables().
+   */</font>
+<b>}</b>
+
+</pre></body></html>

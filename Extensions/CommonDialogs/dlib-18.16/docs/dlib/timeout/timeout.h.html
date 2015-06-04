@@ -1,0 +1,203 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - timeout.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2007  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_TIMEOUT_KERNEl_1_
+<font color='#0000FF'>#define</font> DLIB_TIMEOUT_KERNEl_1_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../threads.h.html'>../threads.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../algs.h.html'>../algs.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../misc_api.h.html'>../misc_api.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='timeout_abstract.h.html'>timeout_abstract.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../uintn.h.html'>../uintn.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../timer.h.html'>../timer.h</a>"
+
+<font color='#0000FF'>#ifdef</font> _MSC_VER
+<font color='#009900'>// this is to disable the "'this' : used in base member initializer list"
+</font><font color='#009900'>// warning you get from some of the GUI objects since all the objects
+</font><font color='#009900'>// require that their parent class be passed into their constructor. 
+</font><font color='#009900'>// In this case though it is totally safe so it is ok to disable this warning.
+</font><font color='#0000FF'>#pragma</font> warning<font face='Lucida Console'>(</font>disable : <font color='#979000'>4355</font><font face='Lucida Console'>)</font>
+<font color='#0000FF'>#endif</font> <font color='#009900'>// _MSC_VER
+</font>
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>class</font> <b><a name='timeout'></a>timeout</b> 
+    <b>{</b>
+        <font color='#009900'>/*!
+            INITIAL VALUE
+                - b == a pointer to some kind of bind object
+
+            CONVENTION
+                - b == a pointer to some kind of bind object
+        !*/</font>
+
+        <font color='#0000FF'>class</font> <b><a name='bind'></a>bind</b>
+        <b>{</b>
+        <font color='#0000FF'>public</font>:
+            <font color='#0000FF'>virtual</font> <font color='#0000FF'><u>void</u></font> <b><a name='go'></a>go</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            <font color='#0000FF'>virtual</font> ~<b><a name='bind'></a>bind</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+        <b>}</b>;
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>class</font> <b><a name='functor'></a>functor</b> : <font color='#0000FF'>public</font> bind
+        <b>{</b>
+        <font color='#0000FF'>public</font>:
+            <b><a name='functor'></a>functor</b><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> f<font face='Lucida Console'>)</font> : function<font face='Lucida Console'>(</font>f<font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+            T function;
+            <font color='#0000FF'><u>void</u></font> <b><a name='go'></a>go</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <b>{</b> <font color='#BB00BB'>function</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <b>}</b>
+        <b>}</b>;
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> R<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>class</font> <b><a name='zero'></a>zero</b> : <font color='#0000FF'>public</font> bind
+        <b>{</b>
+        <font color='#0000FF'>public</font>:
+            T<font color='#5555FF'>*</font> object;
+            <b><a name='R'></a>R</b> <font face='Lucida Console'>(</font>T::<font color='#5555FF'>*</font>callback_function<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'><u>void</u></font> <b><a name='go'></a>go</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <b>{</b> <font face='Lucida Console'>(</font>object<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>*</font>callback_function<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <b>}</b>
+
+        <b>}</b>;
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> R, <font color='#0000FF'>typename</font> U<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>class</font> <b><a name='one'></a>one</b> : <font color='#0000FF'>public</font> bind
+        <b>{</b>
+        <font color='#0000FF'>public</font>:
+            T<font color='#5555FF'>*</font> object;
+            <b><a name='R'></a>R</b> <font face='Lucida Console'>(</font>T::<font color='#5555FF'>*</font>callback_function<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>U<font face='Lucida Console'>)</font>;
+            U val;
+            <font color='#0000FF'><u>void</u></font> <b><a name='go'></a>go</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <b>{</b> <font face='Lucida Console'>(</font>object<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>*</font>callback_function<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>val<font face='Lucida Console'>)</font>; <b>}</b>
+        <b>}</b>;
+
+    <font color='#0000FF'>public</font>:
+
+        <font color='#009900'>// This typedef is here for backwards compatibility with previous versions of dlib.
+</font>        <font color='#0000FF'>typedef</font> timeout kernel_1a;
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'>typename</font> T
+            <font color='#5555FF'>&gt;</font>
+        <b><a name='timeout'></a>timeout</b> <font face='Lucida Console'>(</font>
+            T callback_function,
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> ms_to_timeout
+        <font face='Lucida Console'>)</font> :
+            t<font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font>,<font color='#5555FF'>&amp;</font>timeout::trigger_timeout<font face='Lucida Console'>)</font>
+        <b>{</b>
+            b <font color='#5555FF'>=</font> <font color='#0000FF'>new</font> functor<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>callback_function<font face='Lucida Console'>)</font>;
+            t.<font color='#BB00BB'>set_delay_time</font><font face='Lucida Console'>(</font>ms_to_timeout<font face='Lucida Console'>)</font>;
+            t.<font color='#BB00BB'>start</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'>typename</font> T
+            <font color='#5555FF'>&gt;</font>
+        <b><a name='timeout'></a>timeout</b> <font face='Lucida Console'>(</font>  
+            T<font color='#5555FF'>&amp;</font> object,
+            <font color='#0000FF'><u>void</u></font> <font face='Lucida Console'>(</font>T::<font color='#5555FF'>*</font>callback_function<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> ms_to_timeout
+        <font face='Lucida Console'>)</font>: 
+            t<font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font>,<font color='#5555FF'>&amp;</font>timeout::trigger_timeout<font face='Lucida Console'>)</font>
+        <b>{</b>
+            zero<font color='#5555FF'>&lt;</font>T,<font color='#0000FF'><u>void</u></font><font color='#5555FF'>&gt;</font><font color='#5555FF'>*</font> B <font color='#5555FF'>=</font> <font color='#0000FF'>new</font> zero<font color='#5555FF'>&lt;</font>T,<font color='#0000FF'><u>void</u></font><font color='#5555FF'>&gt;</font>;
+            b <font color='#5555FF'>=</font> B;
+            B<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>object <font color='#5555FF'>=</font> <font color='#5555FF'>&amp;</font>object;
+            B<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>callback_function <font color='#5555FF'>=</font> callback_function;
+            t.<font color='#BB00BB'>set_delay_time</font><font face='Lucida Console'>(</font>ms_to_timeout<font face='Lucida Console'>)</font>;
+            t.<font color='#BB00BB'>start</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'>typename</font> T,
+            <font color='#0000FF'>typename</font> U
+            <font color='#5555FF'>&gt;</font>
+        <b><a name='timeout'></a>timeout</b> <font face='Lucida Console'>(</font>  
+            T<font color='#5555FF'>&amp;</font> object,
+            <font color='#0000FF'><u>void</u></font> <font face='Lucida Console'>(</font>T::<font color='#5555FF'>*</font>callback_function<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>U callback_function_argument<font face='Lucida Console'>)</font>,
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> ms_to_timeout,
+            U callback_function_argument
+        <font face='Lucida Console'>)</font>: 
+            t<font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font>,<font color='#5555FF'>&amp;</font>timeout::trigger_timeout<font face='Lucida Console'>)</font>
+        <b>{</b>
+            one<font color='#5555FF'>&lt;</font>T,<font color='#0000FF'><u>void</u></font>,U<font color='#5555FF'>&gt;</font><font color='#5555FF'>*</font> B <font color='#5555FF'>=</font> <font color='#0000FF'>new</font> one<font color='#5555FF'>&lt;</font>T,<font color='#0000FF'><u>void</u></font>,U<font color='#5555FF'>&gt;</font>;
+            b <font color='#5555FF'>=</font> B;
+            B<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>object <font color='#5555FF'>=</font> <font color='#5555FF'>&amp;</font>object; 
+            B<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>callback_function <font color='#5555FF'>=</font> callback_function;
+            B<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>val <font color='#5555FF'>=</font> callback_function_argument;
+            t.<font color='#BB00BB'>set_delay_time</font><font face='Lucida Console'>(</font>ms_to_timeout<font face='Lucida Console'>)</font>;
+            t.<font color='#BB00BB'>start</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'>typename</font> T
+            <font color='#5555FF'>&gt;</font>
+        <b><a name='timeout'></a>timeout</b> <font face='Lucida Console'>(</font>  
+            T<font color='#5555FF'>&amp;</font> object,
+            <font color='#0000FF'><u>int</u></font> <font face='Lucida Console'>(</font>T::<font color='#5555FF'>*</font>callback_function<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> ms_to_timeout
+        <font face='Lucida Console'>)</font>: 
+            t<font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font>,<font color='#5555FF'>&amp;</font>timeout::trigger_timeout<font face='Lucida Console'>)</font>
+        <b>{</b>
+            zero<font color='#5555FF'>&lt;</font>T,<font color='#0000FF'><u>int</u></font><font color='#5555FF'>&gt;</font><font color='#5555FF'>*</font> B <font color='#5555FF'>=</font> <font color='#0000FF'>new</font> zero<font color='#5555FF'>&lt;</font>T,<font color='#0000FF'><u>int</u></font><font color='#5555FF'>&gt;</font>;
+            b <font color='#5555FF'>=</font> B;
+            B<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>object <font color='#5555FF'>=</font> <font color='#5555FF'>&amp;</font>object;
+            B<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>callback_function <font color='#5555FF'>=</font> callback_function;
+            t.<font color='#BB00BB'>set_delay_time</font><font face='Lucida Console'>(</font>ms_to_timeout<font face='Lucida Console'>)</font>;
+            t.<font color='#BB00BB'>start</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'>typename</font> T,
+            <font color='#0000FF'>typename</font> U
+            <font color='#5555FF'>&gt;</font>
+        <b><a name='timeout'></a>timeout</b> <font face='Lucida Console'>(</font>  
+            T<font color='#5555FF'>&amp;</font> object,
+            <font color='#0000FF'><u>int</u></font> <font face='Lucida Console'>(</font>T::<font color='#5555FF'>*</font>callback_function<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>U callback_function_argument<font face='Lucida Console'>)</font>,
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> ms_to_timeout,
+            U callback_function_argument
+        <font face='Lucida Console'>)</font>: 
+            t<font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font>,<font color='#5555FF'>&amp;</font>timeout::trigger_timeout<font face='Lucida Console'>)</font>
+        <b>{</b>
+            one<font color='#5555FF'>&lt;</font>T,<font color='#0000FF'><u>int</u></font>,U<font color='#5555FF'>&gt;</font><font color='#5555FF'>*</font> B <font color='#5555FF'>=</font> <font color='#0000FF'>new</font> one<font color='#5555FF'>&lt;</font>T,<font color='#0000FF'><u>int</u></font>,U<font color='#5555FF'>&gt;</font>;
+            b <font color='#5555FF'>=</font> B;
+            B<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>object <font color='#5555FF'>=</font> <font color='#5555FF'>&amp;</font>object; 
+            B<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>callback_function <font color='#5555FF'>=</font> callback_function;
+            B<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>val <font color='#5555FF'>=</font> callback_function_argument;
+            t.<font color='#BB00BB'>set_delay_time</font><font face='Lucida Console'>(</font>ms_to_timeout<font face='Lucida Console'>)</font>;
+            t.<font color='#BB00BB'>start</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>virtual</font> ~<b><a name='timeout'></a>timeout</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            t.<font color='#BB00BB'>stop_and_wait</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>delete</font> b;
+        <b>}</b>
+
+    <font color='#0000FF'>private</font>:
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='trigger_timeout'></a>trigger_timeout</b> <font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            b<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>go</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            t.<font color='#BB00BB'>stop</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        dlib::timer<font color='#5555FF'>&lt;</font>timeout<font color='#5555FF'>&gt;</font> t;
+        bind<font color='#5555FF'>*</font> b;
+
+        <font color='#009900'>// restricted functions
+</font>        <b><a name='timeout'></a>timeout</b><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> timeout<font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font>;        <font color='#009900'>// copy constructor
+</font>        timeout<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>=</font><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> timeout<font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font>;    <font color='#009900'>// assignment operator
+</font>
+    <b>}</b>;    
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_TIMEOUT_KERNEl_1_
+</font>
+
+
+
+</pre></body></html>

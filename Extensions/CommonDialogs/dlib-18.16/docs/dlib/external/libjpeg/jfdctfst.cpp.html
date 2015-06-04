@@ -1,0 +1,227 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - jfdctfst.cpp</title></head><body bgcolor='white'><pre>
+<font color='#009900'>/*
+ * jfdctfst.c
+ *
+ * Copyright (C) 1994-1996, Thomas G. Lane.
+ * This file is part of the Independent JPEG Group's software.
+ * For conditions of distribution and use, see the accompanying README file.
+ *
+ * This file contains a fast, not so accurate integer implementation of the
+ * forward DCT (Discrete Cosine Transform).
+ *
+ * A 2-D DCT can be done by 1-D DCT on each row followed by 1-D DCT
+ * on each column.  Direct algorithms are also available, but they are
+ * much more complex and seem not to be any faster when reduced to code.
+ *
+ * This implementation is based on Arai, Agui, and Nakajima's algorithm for
+ * scaled DCT.  Their original paper (Trans. IEICE E-71(11):1095) is in
+ * Japanese, but the algorithm is described in the Pennebaker &amp; Mitchell
+ * JPEG textbook (see REFERENCES section in file README).  The following code
+ * is based directly on figure 4-8 in P&amp;M.
+ * While an 8-point DCT cannot be done in less than 11 multiplies, it is
+ * possible to arrange the computation so that many of the multiplies are
+ * simple scalings of the final outputs.  These multiplies can then be
+ * folded into the multiplications or divisions by the JPEG quantization
+ * table entries.  The AA&amp;N method leaves only 5 multiplies and 29 adds
+ * to be done in the DCT itself.
+ * The primary disadvantage of this method is that with fixed-point math,
+ * accuracy is lost due to imprecise representation of the scaled
+ * quantization values.  The smaller the quantization table entry, the less
+ * precise the scaled value, so this implementation does worse with high-
+ * quality-setting files than with low-quality ones.
+ */</font>
+
+<font color='#0000FF'>#define</font> JPEG_INTERNALS
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='jinclude.h.html'>jinclude.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='jpeglib.h.html'>jpeglib.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='jdct.h.html'>jdct.h</a>"		<font color='#009900'>/* Private declarations for DCT subsystem */</font>
+
+<font color='#0000FF'>#ifdef</font> DCT_IFAST_SUPPORTED
+
+
+<font color='#009900'>/*
+ * This module is specialized to the case DCTSIZE = 8.
+ */</font>
+
+<font color='#0000FF'>#if</font> DCTSIZE <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>8</font>
+  Sorry, <font color='#0000FF'>this</font> code only copes with <font color='#979000'>8</font>x8 DCTs. <font color='#009900'>/* deliberate syntax err */</font>
+<font color='#0000FF'>#endif</font>
+
+
+<font color='#009900'>/* Scaling decisions are generally the same as in the LL&amp;M algorithm;
+ * see jfdctint.c for more details.  However, we choose to descale
+ * (right shift) multiplication products as soon as they are formed,
+ * rather than carrying additional fractional bits into subsequent additions.
+ * This compromises accuracy slightly, but it lets us save a few shifts.
+ * More importantly, 16-bit arithmetic is then adequate (for 8-bit samples)
+ * everywhere except in the multiplications proper; this saves a good deal
+ * of work on 16-bit-int machines.
+ *
+ * Again to save a few shifts, the intermediate results between pass 1 and
+ * pass 2 are not upscaled, but are represented only to integral precision.
+ *
+ * A final compromise is to represent the multiplicative constants to only
+ * 8 fractional bits, rather than 13.  This saves some shifting work on some
+ * machines, and may also reduce the cost of multiplication (since there
+ * are fewer one-bits in the constants).
+ */</font>
+
+<font color='#0000FF'>#define</font> CONST_BITS  <font color='#979000'>8</font>
+
+
+<font color='#009900'>/* Some C compilers fail to reduce "FIX(constant)" at compile time, thus
+ * causing a lot of useless floating-point operations at run time.
+ * To get around this we use the following pre-calculated constants.
+ * If you change CONST_BITS you may want to add appropriate values.
+ * (With a reasonable C compiler, you can just rely on the FIX() macro...)
+ */</font>
+
+<font color='#0000FF'>#if</font> CONST_BITS <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>8</font>
+<font color='#0000FF'>#define</font> FIX_0_382683433  <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font>   <font color='#979000'>98</font><font face='Lucida Console'>)</font>		<font color='#009900'>/* FIX(0.382683433) */</font>
+<font color='#0000FF'>#define</font> FIX_0_541196100  <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font>  <font color='#979000'>139</font><font face='Lucida Console'>)</font>		<font color='#009900'>/* FIX(0.541196100) */</font>
+<font color='#0000FF'>#define</font> FIX_0_707106781  <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font>  <font color='#979000'>181</font><font face='Lucida Console'>)</font>		<font color='#009900'>/* FIX(0.707106781) */</font>
+<font color='#0000FF'>#define</font> FIX_1_306562965  <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font>  <font color='#979000'>334</font><font face='Lucida Console'>)</font>		<font color='#009900'>/* FIX(1.306562965) */</font>
+<font color='#0000FF'>#else</font>
+<font color='#0000FF'>#define</font> FIX_0_382683433  FIX<font face='Lucida Console'>(</font><font color='#979000'>0.382683433</font><font face='Lucida Console'>)</font>
+<font color='#0000FF'>#define</font> FIX_0_541196100  FIX<font face='Lucida Console'>(</font><font color='#979000'>0.541196100</font><font face='Lucida Console'>)</font>
+<font color='#0000FF'>#define</font> FIX_0_707106781  FIX<font face='Lucida Console'>(</font><font color='#979000'>0.707106781</font><font face='Lucida Console'>)</font>
+<font color='#0000FF'>#define</font> FIX_1_306562965  FIX<font face='Lucida Console'>(</font><font color='#979000'>1.306562965</font><font face='Lucida Console'>)</font>
+<font color='#0000FF'>#endif</font>
+
+
+<font color='#009900'>/* We can gain a little more speed, with a further compromise in accuracy,
+ * by omitting the addition in a descaling shift.  This yields an incorrectly
+ * rounded result half the time...
+ */</font>
+
+<font color='#0000FF'>#ifndef</font> USE_ACCURATE_ROUNDING
+<font color='#0000FF'>#undef</font> DESCALE
+<font color='#0000FF'>#define</font> DESCALE<font face='Lucida Console'>(</font>x,n<font face='Lucida Console'>)</font>  RIGHT_SHIFT<font face='Lucida Console'>(</font>x, n<font face='Lucida Console'>)</font>
+<font color='#0000FF'>#endif</font>
+
+
+<font color='#009900'>/* Multiply a DCTELEM variable by an long constant, and immediately
+ * descale to yield a DCTELEM result.
+ */</font>
+
+<font color='#0000FF'>#define</font> MULTIPLY<font face='Lucida Console'>(</font>var,<font color='#0000FF'>const</font><font face='Lucida Console'>)</font>  <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>DCTELEM<font face='Lucida Console'>)</font> DESCALE<font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>var<font face='Lucida Console'>)</font> <font color='#5555FF'>*</font> <font face='Lucida Console'>(</font><font color='#0000FF'>const</font><font face='Lucida Console'>)</font>, CONST_BITS<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+
+
+<font color='#009900'>/*
+ * Perform the forward DCT on one block of samples.
+ */</font>
+
+<b><a name='GLOBAL'></a>GLOBAL</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font>
+<b><a name='jpeg_fdct_ifast'></a>jpeg_fdct_ifast</b> <font face='Lucida Console'>(</font>DCTELEM <font color='#5555FF'>*</font> data<font face='Lucida Console'>)</font>
+<b>{</b>
+  DCTELEM tmp0, tmp1, tmp2, tmp3, tmp4, tmp5, tmp6, tmp7;
+  DCTELEM tmp10, tmp11, tmp12, tmp13;
+  DCTELEM z1, z2, z3, z4, z5, z11, z13;
+  DCTELEM <font color='#5555FF'>*</font>dataptr;
+  <font color='#0000FF'><u>int</u></font> ctr;
+  SHIFT_TEMPS
+
+  <font color='#009900'>/* Pass 1: process rows. */</font>
+
+  dataptr <font color='#5555FF'>=</font> data;
+  <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>ctr <font color='#5555FF'>=</font> DCTSIZE<font color='#5555FF'>-</font><font color='#979000'>1</font>; ctr <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#979000'>0</font>; ctr<font color='#5555FF'>-</font><font color='#5555FF'>-</font><font face='Lucida Console'>)</font> <b>{</b>
+    tmp0 <font color='#5555FF'>=</font> dataptr[<font color='#979000'>0</font>] <font color='#5555FF'>+</font> dataptr[<font color='#979000'>7</font>];
+    tmp7 <font color='#5555FF'>=</font> dataptr[<font color='#979000'>0</font>] <font color='#5555FF'>-</font> dataptr[<font color='#979000'>7</font>];
+    tmp1 <font color='#5555FF'>=</font> dataptr[<font color='#979000'>1</font>] <font color='#5555FF'>+</font> dataptr[<font color='#979000'>6</font>];
+    tmp6 <font color='#5555FF'>=</font> dataptr[<font color='#979000'>1</font>] <font color='#5555FF'>-</font> dataptr[<font color='#979000'>6</font>];
+    tmp2 <font color='#5555FF'>=</font> dataptr[<font color='#979000'>2</font>] <font color='#5555FF'>+</font> dataptr[<font color='#979000'>5</font>];
+    tmp5 <font color='#5555FF'>=</font> dataptr[<font color='#979000'>2</font>] <font color='#5555FF'>-</font> dataptr[<font color='#979000'>5</font>];
+    tmp3 <font color='#5555FF'>=</font> dataptr[<font color='#979000'>3</font>] <font color='#5555FF'>+</font> dataptr[<font color='#979000'>4</font>];
+    tmp4 <font color='#5555FF'>=</font> dataptr[<font color='#979000'>3</font>] <font color='#5555FF'>-</font> dataptr[<font color='#979000'>4</font>];
+    
+    <font color='#009900'>/* Even part */</font>
+    
+    tmp10 <font color='#5555FF'>=</font> tmp0 <font color='#5555FF'>+</font> tmp3;	<font color='#009900'>/* phase 2 */</font>
+    tmp13 <font color='#5555FF'>=</font> tmp0 <font color='#5555FF'>-</font> tmp3;
+    tmp11 <font color='#5555FF'>=</font> tmp1 <font color='#5555FF'>+</font> tmp2;
+    tmp12 <font color='#5555FF'>=</font> tmp1 <font color='#5555FF'>-</font> tmp2;
+    
+    dataptr[<font color='#979000'>0</font>] <font color='#5555FF'>=</font> tmp10 <font color='#5555FF'>+</font> tmp11; <font color='#009900'>/* phase 3 */</font>
+    dataptr[<font color='#979000'>4</font>] <font color='#5555FF'>=</font> tmp10 <font color='#5555FF'>-</font> tmp11;
+    
+    z1 <font color='#5555FF'>=</font> <font color='#BB00BB'>MULTIPLY</font><font face='Lucida Console'>(</font>tmp12 <font color='#5555FF'>+</font> tmp13, FIX_0_707106781<font face='Lucida Console'>)</font>; <font color='#009900'>/* c4 */</font>
+    dataptr[<font color='#979000'>2</font>] <font color='#5555FF'>=</font> tmp13 <font color='#5555FF'>+</font> z1;	<font color='#009900'>/* phase 5 */</font>
+    dataptr[<font color='#979000'>6</font>] <font color='#5555FF'>=</font> tmp13 <font color='#5555FF'>-</font> z1;
+    
+    <font color='#009900'>/* Odd part */</font>
+
+    tmp10 <font color='#5555FF'>=</font> tmp4 <font color='#5555FF'>+</font> tmp5;	<font color='#009900'>/* phase 2 */</font>
+    tmp11 <font color='#5555FF'>=</font> tmp5 <font color='#5555FF'>+</font> tmp6;
+    tmp12 <font color='#5555FF'>=</font> tmp6 <font color='#5555FF'>+</font> tmp7;
+
+    <font color='#009900'>/* The rotator is modified from fig 4-8 to avoid extra negations. */</font>
+    z5 <font color='#5555FF'>=</font> <font color='#BB00BB'>MULTIPLY</font><font face='Lucida Console'>(</font>tmp10 <font color='#5555FF'>-</font> tmp12, FIX_0_382683433<font face='Lucida Console'>)</font>; <font color='#009900'>/* c6 */</font>
+    z2 <font color='#5555FF'>=</font> <font color='#BB00BB'>MULTIPLY</font><font face='Lucida Console'>(</font>tmp10, FIX_0_541196100<font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> z5; <font color='#009900'>/* c2-c6 */</font>
+    z4 <font color='#5555FF'>=</font> <font color='#BB00BB'>MULTIPLY</font><font face='Lucida Console'>(</font>tmp12, FIX_1_306562965<font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> z5; <font color='#009900'>/* c2+c6 */</font>
+    z3 <font color='#5555FF'>=</font> <font color='#BB00BB'>MULTIPLY</font><font face='Lucida Console'>(</font>tmp11, FIX_0_707106781<font face='Lucida Console'>)</font>; <font color='#009900'>/* c4 */</font>
+
+    z11 <font color='#5555FF'>=</font> tmp7 <font color='#5555FF'>+</font> z3;		<font color='#009900'>/* phase 5 */</font>
+    z13 <font color='#5555FF'>=</font> tmp7 <font color='#5555FF'>-</font> z3;
+
+    dataptr[<font color='#979000'>5</font>] <font color='#5555FF'>=</font> z13 <font color='#5555FF'>+</font> z2;	<font color='#009900'>/* phase 6 */</font>
+    dataptr[<font color='#979000'>3</font>] <font color='#5555FF'>=</font> z13 <font color='#5555FF'>-</font> z2;
+    dataptr[<font color='#979000'>1</font>] <font color='#5555FF'>=</font> z11 <font color='#5555FF'>+</font> z4;
+    dataptr[<font color='#979000'>7</font>] <font color='#5555FF'>=</font> z11 <font color='#5555FF'>-</font> z4;
+
+    dataptr <font color='#5555FF'>+</font><font color='#5555FF'>=</font> DCTSIZE;		<font color='#009900'>/* advance pointer to next row */</font>
+  <b>}</b>
+
+  <font color='#009900'>/* Pass 2: process columns. */</font>
+
+  dataptr <font color='#5555FF'>=</font> data;
+  <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>ctr <font color='#5555FF'>=</font> DCTSIZE<font color='#5555FF'>-</font><font color='#979000'>1</font>; ctr <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#979000'>0</font>; ctr<font color='#5555FF'>-</font><font color='#5555FF'>-</font><font face='Lucida Console'>)</font> <b>{</b>
+    tmp0 <font color='#5555FF'>=</font> dataptr[DCTSIZE<font color='#5555FF'>*</font><font color='#979000'>0</font>] <font color='#5555FF'>+</font> dataptr[DCTSIZE<font color='#5555FF'>*</font><font color='#979000'>7</font>];
+    tmp7 <font color='#5555FF'>=</font> dataptr[DCTSIZE<font color='#5555FF'>*</font><font color='#979000'>0</font>] <font color='#5555FF'>-</font> dataptr[DCTSIZE<font color='#5555FF'>*</font><font color='#979000'>7</font>];
+    tmp1 <font color='#5555FF'>=</font> dataptr[DCTSIZE<font color='#5555FF'>*</font><font color='#979000'>1</font>] <font color='#5555FF'>+</font> dataptr[DCTSIZE<font color='#5555FF'>*</font><font color='#979000'>6</font>];
+    tmp6 <font color='#5555FF'>=</font> dataptr[DCTSIZE<font color='#5555FF'>*</font><font color='#979000'>1</font>] <font color='#5555FF'>-</font> dataptr[DCTSIZE<font color='#5555FF'>*</font><font color='#979000'>6</font>];
+    tmp2 <font color='#5555FF'>=</font> dataptr[DCTSIZE<font color='#5555FF'>*</font><font color='#979000'>2</font>] <font color='#5555FF'>+</font> dataptr[DCTSIZE<font color='#5555FF'>*</font><font color='#979000'>5</font>];
+    tmp5 <font color='#5555FF'>=</font> dataptr[DCTSIZE<font color='#5555FF'>*</font><font color='#979000'>2</font>] <font color='#5555FF'>-</font> dataptr[DCTSIZE<font color='#5555FF'>*</font><font color='#979000'>5</font>];
+    tmp3 <font color='#5555FF'>=</font> dataptr[DCTSIZE<font color='#5555FF'>*</font><font color='#979000'>3</font>] <font color='#5555FF'>+</font> dataptr[DCTSIZE<font color='#5555FF'>*</font><font color='#979000'>4</font>];
+    tmp4 <font color='#5555FF'>=</font> dataptr[DCTSIZE<font color='#5555FF'>*</font><font color='#979000'>3</font>] <font color='#5555FF'>-</font> dataptr[DCTSIZE<font color='#5555FF'>*</font><font color='#979000'>4</font>];
+    
+    <font color='#009900'>/* Even part */</font>
+    
+    tmp10 <font color='#5555FF'>=</font> tmp0 <font color='#5555FF'>+</font> tmp3;	<font color='#009900'>/* phase 2 */</font>
+    tmp13 <font color='#5555FF'>=</font> tmp0 <font color='#5555FF'>-</font> tmp3;
+    tmp11 <font color='#5555FF'>=</font> tmp1 <font color='#5555FF'>+</font> tmp2;
+    tmp12 <font color='#5555FF'>=</font> tmp1 <font color='#5555FF'>-</font> tmp2;
+    
+    dataptr[DCTSIZE<font color='#5555FF'>*</font><font color='#979000'>0</font>] <font color='#5555FF'>=</font> tmp10 <font color='#5555FF'>+</font> tmp11; <font color='#009900'>/* phase 3 */</font>
+    dataptr[DCTSIZE<font color='#5555FF'>*</font><font color='#979000'>4</font>] <font color='#5555FF'>=</font> tmp10 <font color='#5555FF'>-</font> tmp11;
+    
+    z1 <font color='#5555FF'>=</font> <font color='#BB00BB'>MULTIPLY</font><font face='Lucida Console'>(</font>tmp12 <font color='#5555FF'>+</font> tmp13, FIX_0_707106781<font face='Lucida Console'>)</font>; <font color='#009900'>/* c4 */</font>
+    dataptr[DCTSIZE<font color='#5555FF'>*</font><font color='#979000'>2</font>] <font color='#5555FF'>=</font> tmp13 <font color='#5555FF'>+</font> z1; <font color='#009900'>/* phase 5 */</font>
+    dataptr[DCTSIZE<font color='#5555FF'>*</font><font color='#979000'>6</font>] <font color='#5555FF'>=</font> tmp13 <font color='#5555FF'>-</font> z1;
+    
+    <font color='#009900'>/* Odd part */</font>
+
+    tmp10 <font color='#5555FF'>=</font> tmp4 <font color='#5555FF'>+</font> tmp5;	<font color='#009900'>/* phase 2 */</font>
+    tmp11 <font color='#5555FF'>=</font> tmp5 <font color='#5555FF'>+</font> tmp6;
+    tmp12 <font color='#5555FF'>=</font> tmp6 <font color='#5555FF'>+</font> tmp7;
+
+    <font color='#009900'>/* The rotator is modified from fig 4-8 to avoid extra negations. */</font>
+    z5 <font color='#5555FF'>=</font> <font color='#BB00BB'>MULTIPLY</font><font face='Lucida Console'>(</font>tmp10 <font color='#5555FF'>-</font> tmp12, FIX_0_382683433<font face='Lucida Console'>)</font>; <font color='#009900'>/* c6 */</font>
+    z2 <font color='#5555FF'>=</font> <font color='#BB00BB'>MULTIPLY</font><font face='Lucida Console'>(</font>tmp10, FIX_0_541196100<font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> z5; <font color='#009900'>/* c2-c6 */</font>
+    z4 <font color='#5555FF'>=</font> <font color='#BB00BB'>MULTIPLY</font><font face='Lucida Console'>(</font>tmp12, FIX_1_306562965<font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> z5; <font color='#009900'>/* c2+c6 */</font>
+    z3 <font color='#5555FF'>=</font> <font color='#BB00BB'>MULTIPLY</font><font face='Lucida Console'>(</font>tmp11, FIX_0_707106781<font face='Lucida Console'>)</font>; <font color='#009900'>/* c4 */</font>
+
+    z11 <font color='#5555FF'>=</font> tmp7 <font color='#5555FF'>+</font> z3;		<font color='#009900'>/* phase 5 */</font>
+    z13 <font color='#5555FF'>=</font> tmp7 <font color='#5555FF'>-</font> z3;
+
+    dataptr[DCTSIZE<font color='#5555FF'>*</font><font color='#979000'>5</font>] <font color='#5555FF'>=</font> z13 <font color='#5555FF'>+</font> z2; <font color='#009900'>/* phase 6 */</font>
+    dataptr[DCTSIZE<font color='#5555FF'>*</font><font color='#979000'>3</font>] <font color='#5555FF'>=</font> z13 <font color='#5555FF'>-</font> z2;
+    dataptr[DCTSIZE<font color='#5555FF'>*</font><font color='#979000'>1</font>] <font color='#5555FF'>=</font> z11 <font color='#5555FF'>+</font> z4;
+    dataptr[DCTSIZE<font color='#5555FF'>*</font><font color='#979000'>7</font>] <font color='#5555FF'>=</font> z11 <font color='#5555FF'>-</font> z4;
+
+    dataptr<font color='#5555FF'>+</font><font color='#5555FF'>+</font>;			<font color='#009900'>/* advance pointer to next column */</font>
+  <b>}</b>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>/* DCT_IFAST_SUPPORTED */</font>
+
+</pre></body></html>

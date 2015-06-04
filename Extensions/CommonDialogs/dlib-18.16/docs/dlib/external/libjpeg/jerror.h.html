@@ -1,0 +1,294 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - jerror.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>/*
+ * jerror.h
+ *
+ * Copyright (C) 1994-1997, Thomas G. Lane.
+ * This file is part of the Independent JPEG Group's software.
+ * For conditions of distribution and use, see the accompanying README file.
+ *
+ * This file defines the error and message codes for the JPEG library.
+ * Edit this file to add new codes, or to translate the message strings to
+ * some other language.
+ * A set of error-reporting macros are defined too.  Some applications using
+ * the JPEG library may wish to include this file to get the error codes
+ * and/or the macros.
+ */</font>
+
+<font color='#009900'>/*
+ * To define the enum list of message codes, include this file without
+ * defining macro JMESSAGE.  To create a message string table, include it
+ * again with a suitable JMESSAGE definition (see jerror.c for an example).
+ */</font>
+<font color='#0000FF'>#ifndef</font> JMESSAGE
+<font color='#0000FF'>#ifndef</font> JERROR_H
+<font color='#009900'>/* First time through, define the enum list */</font>
+<font color='#0000FF'>#define</font> JMAKE_ENUM_LIST
+<font color='#0000FF'>#else</font>
+<font color='#009900'>/* Repeated inclusions of this file are no-ops unless JMESSAGE is defined */</font>
+<font color='#0000FF'>#define</font> JMESSAGE<font face='Lucida Console'>(</font>code,string<font face='Lucida Console'>)</font>
+<font color='#0000FF'>#endif</font> <font color='#009900'>/* JERROR_H */</font>
+<font color='#0000FF'>#endif</font> <font color='#009900'>/* JMESSAGE */</font>
+
+<font color='#0000FF'>#ifdef</font> JMAKE_ENUM_LIST
+
+<font color='#0000FF'>typedef</font> <font color='#0000FF'>enum</font> <b>{</b>
+
+<font color='#0000FF'>#define</font> JMESSAGE<font face='Lucida Console'>(</font>code,string<font face='Lucida Console'>)</font>	code ,
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>/* JMAKE_ENUM_LIST */</font>
+
+<font color='#BB00BB'>JMESSAGE</font><font face='Lucida Console'>(</font>JMSG_NOMESSAGE, "<font color='#CC0000'>Bogus message code %d</font>"<font face='Lucida Console'>)</font> <font color='#009900'>/* Must be first entry! */</font>
+
+<font color='#009900'>/* For maintenance convenience, list is alphabetical by message code name */</font>
+<font color='#BB00BB'>JMESSAGE</font><font face='Lucida Console'>(</font>JERR_ARITH_NOTIMPL,
+	 "<font color='#CC0000'>Sorry, there are legal restrictions on arithmetic coding</font>"<font face='Lucida Console'>)</font>
+<font color='#BB00BB'>JMESSAGE</font><font face='Lucida Console'>(</font>JERR_BAD_ALIGN_TYPE, "<font color='#CC0000'>ALIGN_TYPE is wrong, please fix</font>"<font face='Lucida Console'>)</font>
+<font color='#BB00BB'>JMESSAGE</font><font face='Lucida Console'>(</font>JERR_BAD_ALLOC_CHUNK, "<font color='#CC0000'>MAX_ALLOC_CHUNK is wrong, please fix</font>"<font face='Lucida Console'>)</font>
+<font color='#BB00BB'>JMESSAGE</font><font face='Lucida Console'>(</font>JERR_BAD_BUFFER_MODE, "<font color='#CC0000'>Bogus buffer control mode</font>"<font face='Lucida Console'>)</font>
+<font color='#BB00BB'>JMESSAGE</font><font face='Lucida Console'>(</font>JERR_BAD_COMPONENT_ID, "<font color='#CC0000'>Invalid component ID %d in SOS</font>"<font face='Lucida Console'>)</font>
+<font color='#BB00BB'>JMESSAGE</font><font face='Lucida Console'>(</font>JERR_BAD_DCT_COEF, "<font color='#CC0000'>DCT coefficient out of range</font>"<font face='Lucida Console'>)</font>
+<font color='#BB00BB'>JMESSAGE</font><font face='Lucida Console'>(</font>JERR_BAD_DCTSIZE, "<font color='#CC0000'>IDCT output block size %d not supported</font>"<font face='Lucida Console'>)</font>
+<font color='#BB00BB'>JMESSAGE</font><font face='Lucida Console'>(</font>JERR_BAD_HUFF_TABLE, "<font color='#CC0000'>Bogus Huffman table definition</font>"<font face='Lucida Console'>)</font>
+<font color='#BB00BB'>JMESSAGE</font><font face='Lucida Console'>(</font>JERR_BAD_IN_COLORSPACE, "<font color='#CC0000'>Bogus input colorspace</font>"<font face='Lucida Console'>)</font>
+<font color='#BB00BB'>JMESSAGE</font><font face='Lucida Console'>(</font>JERR_BAD_J_COLORSPACE, "<font color='#CC0000'>Bogus JPEG colorspace</font>"<font face='Lucida Console'>)</font>
+<font color='#BB00BB'>JMESSAGE</font><font face='Lucida Console'>(</font>JERR_BAD_LENGTH, "<font color='#CC0000'>Bogus marker length</font>"<font face='Lucida Console'>)</font>
+<font color='#BB00BB'>JMESSAGE</font><font face='Lucida Console'>(</font>JERR_BAD_LIB_VERSION,
+	 "<font color='#CC0000'>Wrong JPEG library version: library is %d, caller expects %d</font>"<font face='Lucida Console'>)</font>
+<font color='#BB00BB'>JMESSAGE</font><font face='Lucida Console'>(</font>JERR_BAD_MCU_SIZE, "<font color='#CC0000'>Sampling factors too large for interleaved scan</font>"<font face='Lucida Console'>)</font>
+<font color='#BB00BB'>JMESSAGE</font><font face='Lucida Console'>(</font>JERR_BAD_POOL_ID, "<font color='#CC0000'>Invalid memory pool code %d</font>"<font face='Lucida Console'>)</font>
+<font color='#BB00BB'>JMESSAGE</font><font face='Lucida Console'>(</font>JERR_BAD_PRECISION, "<font color='#CC0000'>Unsupported JPEG data precision %d</font>"<font face='Lucida Console'>)</font>
+<font color='#BB00BB'>JMESSAGE</font><font face='Lucida Console'>(</font>JERR_BAD_PROGRESSION,
+	 "<font color='#CC0000'>Invalid progressive parameters Ss=%d Se=%d Ah=%d Al=%d</font>"<font face='Lucida Console'>)</font>
+<font color='#BB00BB'>JMESSAGE</font><font face='Lucida Console'>(</font>JERR_BAD_PROG_SCRIPT,
+	 "<font color='#CC0000'>Invalid progressive parameters at scan script entry %d</font>"<font face='Lucida Console'>)</font>
+<font color='#BB00BB'>JMESSAGE</font><font face='Lucida Console'>(</font>JERR_BAD_SAMPLING, "<font color='#CC0000'>Bogus sampling factors</font>"<font face='Lucida Console'>)</font>
+<font color='#BB00BB'>JMESSAGE</font><font face='Lucida Console'>(</font>JERR_BAD_SCAN_SCRIPT, "<font color='#CC0000'>Invalid scan script at entry %d</font>"<font face='Lucida Console'>)</font>
+<font color='#BB00BB'>JMESSAGE</font><font face='Lucida Console'>(</font>JERR_BAD_STATE, "<font color='#CC0000'>Improper call to JPEG library in state %d</font>"<font face='Lucida Console'>)</font>
+<font color='#BB00BB'>JMESSAGE</font><font face='Lucida Console'>(</font>JERR_BAD_STRUCT_SIZE,
+	 "<font color='#CC0000'>JPEG parameter struct mismatch: library thinks size is %u, caller expects %u</font>"<font face='Lucida Console'>)</font>
+<font color='#BB00BB'>JMESSAGE</font><font face='Lucida Console'>(</font>JERR_BAD_VIRTUAL_ACCESS, "<font color='#CC0000'>Bogus virtual array access</font>"<font face='Lucida Console'>)</font>
+<font color='#BB00BB'>JMESSAGE</font><font face='Lucida Console'>(</font>JERR_BUFFER_SIZE, "<font color='#CC0000'>Buffer passed to JPEG library is too small</font>"<font face='Lucida Console'>)</font>
+<font color='#BB00BB'>JMESSAGE</font><font face='Lucida Console'>(</font>JERR_CANT_SUSPEND, "<font color='#CC0000'>Suspension not allowed here</font>"<font face='Lucida Console'>)</font>
+<font color='#BB00BB'>JMESSAGE</font><font face='Lucida Console'>(</font>JERR_CCIR601_NOTIMPL, "<font color='#CC0000'>CCIR601 sampling not implemented yet</font>"<font face='Lucida Console'>)</font>
+<font color='#BB00BB'>JMESSAGE</font><font face='Lucida Console'>(</font>JERR_COMPONENT_COUNT, "<font color='#CC0000'>Too many color components: %d, max %d</font>"<font face='Lucida Console'>)</font>
+<font color='#BB00BB'>JMESSAGE</font><font face='Lucida Console'>(</font>JERR_CONVERSION_NOTIMPL, "<font color='#CC0000'>Unsupported color conversion request</font>"<font face='Lucida Console'>)</font>
+<font color='#BB00BB'>JMESSAGE</font><font face='Lucida Console'>(</font>JERR_DAC_INDEX, "<font color='#CC0000'>Bogus DAC index %d</font>"<font face='Lucida Console'>)</font>
+<font color='#BB00BB'>JMESSAGE</font><font face='Lucida Console'>(</font>JERR_DAC_VALUE, "<font color='#CC0000'>Bogus DAC value 0x%x</font>"<font face='Lucida Console'>)</font>
+<font color='#BB00BB'>JMESSAGE</font><font face='Lucida Console'>(</font>JERR_DHT_INDEX, "<font color='#CC0000'>Bogus DHT index %d</font>"<font face='Lucida Console'>)</font>
+<font color='#BB00BB'>JMESSAGE</font><font face='Lucida Console'>(</font>JERR_DQT_INDEX, "<font color='#CC0000'>Bogus DQT index %d</font>"<font face='Lucida Console'>)</font>
+<font color='#BB00BB'>JMESSAGE</font><font face='Lucida Console'>(</font>JERR_EMPTY_IMAGE, "<font color='#CC0000'>Empty JPEG image (DNL not supported)</font>"<font face='Lucida Console'>)</font>
+<font color='#BB00BB'>JMESSAGE</font><font face='Lucida Console'>(</font>JERR_EMS_READ, "<font color='#CC0000'>Read from EMS failed</font>"<font face='Lucida Console'>)</font>
+<font color='#BB00BB'>JMESSAGE</font><font face='Lucida Console'>(</font>JERR_EMS_WRITE, "<font color='#CC0000'>Write to EMS failed</font>"<font face='Lucida Console'>)</font>
+<font color='#BB00BB'>JMESSAGE</font><font face='Lucida Console'>(</font>JERR_EOI_EXPECTED, "<font color='#CC0000'>Didn't expect more than one scan</font>"<font face='Lucida Console'>)</font>
+<font color='#BB00BB'>JMESSAGE</font><font face='Lucida Console'>(</font>JERR_FILE_READ, "<font color='#CC0000'>Input file read error</font>"<font face='Lucida Console'>)</font>
+<font color='#BB00BB'>JMESSAGE</font><font face='Lucida Console'>(</font>JERR_FILE_WRITE, "<font color='#CC0000'>Output file write error --- out of disk space?</font>"<font face='Lucida Console'>)</font>
+<font color='#BB00BB'>JMESSAGE</font><font face='Lucida Console'>(</font>JERR_FRACT_SAMPLE_NOTIMPL, "<font color='#CC0000'>Fractional sampling not implemented yet</font>"<font face='Lucida Console'>)</font>
+<font color='#BB00BB'>JMESSAGE</font><font face='Lucida Console'>(</font>JERR_HUFF_CLEN_OVERFLOW, "<font color='#CC0000'>Huffman code size table overflow</font>"<font face='Lucida Console'>)</font>
+<font color='#BB00BB'>JMESSAGE</font><font face='Lucida Console'>(</font>JERR_HUFF_MISSING_CODE, "<font color='#CC0000'>Missing Huffman code table entry</font>"<font face='Lucida Console'>)</font>
+<font color='#BB00BB'>JMESSAGE</font><font face='Lucida Console'>(</font>JERR_IMAGE_TOO_BIG, "<font color='#CC0000'>Maximum supported image dimension is %u pixels</font>"<font face='Lucida Console'>)</font>
+<font color='#BB00BB'>JMESSAGE</font><font face='Lucida Console'>(</font>JERR_INPUT_EMPTY, "<font color='#CC0000'>Empty input file</font>"<font face='Lucida Console'>)</font>
+<font color='#BB00BB'>JMESSAGE</font><font face='Lucida Console'>(</font>JERR_INPUT_EOF, "<font color='#CC0000'>Premature end of input file</font>"<font face='Lucida Console'>)</font>
+<font color='#BB00BB'>JMESSAGE</font><font face='Lucida Console'>(</font>JERR_MISMATCHED_QUANT_TABLE,
+	 "<font color='#CC0000'>Cannot transcode due to multiple use of quantization table %d</font>"<font face='Lucida Console'>)</font>
+<font color='#BB00BB'>JMESSAGE</font><font face='Lucida Console'>(</font>JERR_MISSING_DATA, "<font color='#CC0000'>Scan script does not transmit all data</font>"<font face='Lucida Console'>)</font>
+<font color='#BB00BB'>JMESSAGE</font><font face='Lucida Console'>(</font>JERR_MODE_CHANGE, "<font color='#CC0000'>Invalid color quantization mode change</font>"<font face='Lucida Console'>)</font>
+<font color='#BB00BB'>JMESSAGE</font><font face='Lucida Console'>(</font>JERR_NOTIMPL, "<font color='#CC0000'>Not implemented yet</font>"<font face='Lucida Console'>)</font>
+<font color='#BB00BB'>JMESSAGE</font><font face='Lucida Console'>(</font>JERR_NOT_COMPILED, "<font color='#CC0000'>Requested feature was omitted at compile time</font>"<font face='Lucida Console'>)</font>
+<font color='#BB00BB'>JMESSAGE</font><font face='Lucida Console'>(</font>JERR_NO_BACKING_STORE, "<font color='#CC0000'>Backing store not supported</font>"<font face='Lucida Console'>)</font>
+<font color='#BB00BB'>JMESSAGE</font><font face='Lucida Console'>(</font>JERR_NO_HUFF_TABLE, "<font color='#CC0000'>Huffman table 0x%02x was not defined</font>"<font face='Lucida Console'>)</font>
+<font color='#BB00BB'>JMESSAGE</font><font face='Lucida Console'>(</font>JERR_NO_IMAGE, "<font color='#CC0000'>JPEG datastream contains no image</font>"<font face='Lucida Console'>)</font>
+<font color='#BB00BB'>JMESSAGE</font><font face='Lucida Console'>(</font>JERR_NO_QUANT_TABLE, "<font color='#CC0000'>Quantization table 0x%02x was not defined</font>"<font face='Lucida Console'>)</font>
+<font color='#BB00BB'>JMESSAGE</font><font face='Lucida Console'>(</font>JERR_NO_SOI, "<font color='#CC0000'>Not a JPEG file: starts with 0x%02x 0x%02x</font>"<font face='Lucida Console'>)</font>
+<font color='#BB00BB'>JMESSAGE</font><font face='Lucida Console'>(</font>JERR_OUT_OF_MEMORY, "<font color='#CC0000'>Insufficient memory (case %d)</font>"<font face='Lucida Console'>)</font>
+<font color='#BB00BB'>JMESSAGE</font><font face='Lucida Console'>(</font>JERR_QUANT_COMPONENTS,
+	 "<font color='#CC0000'>Cannot quantize more than %d color components</font>"<font face='Lucida Console'>)</font>
+<font color='#BB00BB'>JMESSAGE</font><font face='Lucida Console'>(</font>JERR_QUANT_FEW_COLORS, "<font color='#CC0000'>Cannot quantize to fewer than %d colors</font>"<font face='Lucida Console'>)</font>
+<font color='#BB00BB'>JMESSAGE</font><font face='Lucida Console'>(</font>JERR_QUANT_MANY_COLORS, "<font color='#CC0000'>Cannot quantize to more than %d colors</font>"<font face='Lucida Console'>)</font>
+<font color='#BB00BB'>JMESSAGE</font><font face='Lucida Console'>(</font>JERR_SOF_DUPLICATE, "<font color='#CC0000'>Invalid JPEG file structure: two SOF markers</font>"<font face='Lucida Console'>)</font>
+<font color='#BB00BB'>JMESSAGE</font><font face='Lucida Console'>(</font>JERR_SOF_NO_SOS, "<font color='#CC0000'>Invalid JPEG file structure: missing SOS marker</font>"<font face='Lucida Console'>)</font>
+<font color='#BB00BB'>JMESSAGE</font><font face='Lucida Console'>(</font>JERR_SOF_UNSUPPORTED, "<font color='#CC0000'>Unsupported JPEG process: SOF type 0x%02x</font>"<font face='Lucida Console'>)</font>
+<font color='#BB00BB'>JMESSAGE</font><font face='Lucida Console'>(</font>JERR_SOI_DUPLICATE, "<font color='#CC0000'>Invalid JPEG file structure: two SOI markers</font>"<font face='Lucida Console'>)</font>
+<font color='#BB00BB'>JMESSAGE</font><font face='Lucida Console'>(</font>JERR_SOS_NO_SOF, "<font color='#CC0000'>Invalid JPEG file structure: SOS before SOF</font>"<font face='Lucida Console'>)</font>
+<font color='#BB00BB'>JMESSAGE</font><font face='Lucida Console'>(</font>JERR_TFILE_CREATE, "<font color='#CC0000'>Failed to create temporary file %s</font>"<font face='Lucida Console'>)</font>
+<font color='#BB00BB'>JMESSAGE</font><font face='Lucida Console'>(</font>JERR_TFILE_READ, "<font color='#CC0000'>Read failed on temporary file</font>"<font face='Lucida Console'>)</font>
+<font color='#BB00BB'>JMESSAGE</font><font face='Lucida Console'>(</font>JERR_TFILE_SEEK, "<font color='#CC0000'>Seek failed on temporary file</font>"<font face='Lucida Console'>)</font>
+<font color='#BB00BB'>JMESSAGE</font><font face='Lucida Console'>(</font>JERR_TFILE_WRITE,
+	 "<font color='#CC0000'>Write failed on temporary file --- out of disk space?</font>"<font face='Lucida Console'>)</font>
+<font color='#BB00BB'>JMESSAGE</font><font face='Lucida Console'>(</font>JERR_TOO_LITTLE_DATA, "<font color='#CC0000'>Application transferred too few scanlines</font>"<font face='Lucida Console'>)</font>
+<font color='#BB00BB'>JMESSAGE</font><font face='Lucida Console'>(</font>JERR_UNKNOWN_MARKER, "<font color='#CC0000'>Unsupported marker type 0x%02x</font>"<font face='Lucida Console'>)</font>
+<font color='#BB00BB'>JMESSAGE</font><font face='Lucida Console'>(</font>JERR_VIRTUAL_BUG, "<font color='#CC0000'>Virtual array controller messed up</font>"<font face='Lucida Console'>)</font>
+<font color='#BB00BB'>JMESSAGE</font><font face='Lucida Console'>(</font>JERR_WIDTH_OVERFLOW, "<font color='#CC0000'>Image too wide for this implementation</font>"<font face='Lucida Console'>)</font>
+<font color='#BB00BB'>JMESSAGE</font><font face='Lucida Console'>(</font>JERR_XMS_READ, "<font color='#CC0000'>Read from XMS failed</font>"<font face='Lucida Console'>)</font>
+<font color='#BB00BB'>JMESSAGE</font><font face='Lucida Console'>(</font>JERR_XMS_WRITE, "<font color='#CC0000'>Write to XMS failed</font>"<font face='Lucida Console'>)</font>
+<font color='#BB00BB'>JMESSAGE</font><font face='Lucida Console'>(</font>JMSG_COPYRIGHT, JCOPYRIGHT<font face='Lucida Console'>)</font>
+<font color='#BB00BB'>JMESSAGE</font><font face='Lucida Console'>(</font>JMSG_VERSION, JVERSION<font face='Lucida Console'>)</font>
+<font color='#BB00BB'>JMESSAGE</font><font face='Lucida Console'>(</font>JTRC_16BIT_TABLES,
+	 "<font color='#CC0000'>Caution: quantization tables are too coarse for baseline JPEG</font>"<font face='Lucida Console'>)</font>
+<font color='#BB00BB'>JMESSAGE</font><font face='Lucida Console'>(</font>JTRC_ADOBE,
+	 "<font color='#CC0000'>Adobe APP14 marker: version %d, flags 0x%04x 0x%04x, transform %d</font>"<font face='Lucida Console'>)</font>
+<font color='#BB00BB'>JMESSAGE</font><font face='Lucida Console'>(</font>JTRC_APP0, "<font color='#CC0000'>Unknown APP0 marker (not JFIF), length %u</font>"<font face='Lucida Console'>)</font>
+<font color='#BB00BB'>JMESSAGE</font><font face='Lucida Console'>(</font>JTRC_APP14, "<font color='#CC0000'>Unknown APP14 marker (not Adobe), length %u</font>"<font face='Lucida Console'>)</font>
+<font color='#BB00BB'>JMESSAGE</font><font face='Lucida Console'>(</font>JTRC_DAC, "<font color='#CC0000'>Define Arithmetic Table 0x%02x: 0x%02x</font>"<font face='Lucida Console'>)</font>
+<font color='#BB00BB'>JMESSAGE</font><font face='Lucida Console'>(</font>JTRC_DHT, "<font color='#CC0000'>Define Huffman Table 0x%02x</font>"<font face='Lucida Console'>)</font>
+<font color='#BB00BB'>JMESSAGE</font><font face='Lucida Console'>(</font>JTRC_DQT, "<font color='#CC0000'>Define Quantization Table %d  precision %d</font>"<font face='Lucida Console'>)</font>
+<font color='#BB00BB'>JMESSAGE</font><font face='Lucida Console'>(</font>JTRC_DRI, "<font color='#CC0000'>Define Restart Interval %u</font>"<font face='Lucida Console'>)</font>
+<font color='#BB00BB'>JMESSAGE</font><font face='Lucida Console'>(</font>JTRC_EMS_CLOSE, "<font color='#CC0000'>Freed EMS handle %u</font>"<font face='Lucida Console'>)</font>
+<font color='#BB00BB'>JMESSAGE</font><font face='Lucida Console'>(</font>JTRC_EMS_OPEN, "<font color='#CC0000'>Obtained EMS handle %u</font>"<font face='Lucida Console'>)</font>
+<font color='#BB00BB'>JMESSAGE</font><font face='Lucida Console'>(</font>JTRC_EOI, "<font color='#CC0000'>End Of Image</font>"<font face='Lucida Console'>)</font>
+<font color='#BB00BB'>JMESSAGE</font><font face='Lucida Console'>(</font>JTRC_HUFFBITS, "<font color='#CC0000'>        %3d %3d %3d %3d %3d %3d %3d %3d</font>"<font face='Lucida Console'>)</font>
+<font color='#BB00BB'>JMESSAGE</font><font face='Lucida Console'>(</font>JTRC_JFIF, "<font color='#CC0000'>JFIF APP0 marker: version %d.%02d, density %dx%d  %d</font>"<font face='Lucida Console'>)</font>
+<font color='#BB00BB'>JMESSAGE</font><font face='Lucida Console'>(</font>JTRC_JFIF_BADTHUMBNAILSIZE,
+	 "<font color='#CC0000'>Warning: thumbnail image size does not match data length %u</font>"<font face='Lucida Console'>)</font>
+<font color='#BB00BB'>JMESSAGE</font><font face='Lucida Console'>(</font>JTRC_JFIF_EXTENSION,
+	 "<font color='#CC0000'>JFIF extension marker: type 0x%02x, length %u</font>"<font face='Lucida Console'>)</font>
+<font color='#BB00BB'>JMESSAGE</font><font face='Lucida Console'>(</font>JTRC_JFIF_THUMBNAIL, "<font color='#CC0000'>    with %d x %d thumbnail image</font>"<font face='Lucida Console'>)</font>
+<font color='#BB00BB'>JMESSAGE</font><font face='Lucida Console'>(</font>JTRC_MISC_MARKER, "<font color='#CC0000'>Miscellaneous marker 0x%02x, length %u</font>"<font face='Lucida Console'>)</font>
+<font color='#BB00BB'>JMESSAGE</font><font face='Lucida Console'>(</font>JTRC_PARMLESS_MARKER, "<font color='#CC0000'>Unexpected marker 0x%02x</font>"<font face='Lucida Console'>)</font>
+<font color='#BB00BB'>JMESSAGE</font><font face='Lucida Console'>(</font>JTRC_QUANTVALS, "<font color='#CC0000'>        %4u %4u %4u %4u %4u %4u %4u %4u</font>"<font face='Lucida Console'>)</font>
+<font color='#BB00BB'>JMESSAGE</font><font face='Lucida Console'>(</font>JTRC_QUANT_3_NCOLORS, "<font color='#CC0000'>Quantizing to %d = %d*%d*%d colors</font>"<font face='Lucida Console'>)</font>
+<font color='#BB00BB'>JMESSAGE</font><font face='Lucida Console'>(</font>JTRC_QUANT_NCOLORS, "<font color='#CC0000'>Quantizing to %d colors</font>"<font face='Lucida Console'>)</font>
+<font color='#BB00BB'>JMESSAGE</font><font face='Lucida Console'>(</font>JTRC_QUANT_SELECTED, "<font color='#CC0000'>Selected %d colors for quantization</font>"<font face='Lucida Console'>)</font>
+<font color='#BB00BB'>JMESSAGE</font><font face='Lucida Console'>(</font>JTRC_RECOVERY_ACTION, "<font color='#CC0000'>At marker 0x%02x, recovery action %d</font>"<font face='Lucida Console'>)</font>
+<font color='#BB00BB'>JMESSAGE</font><font face='Lucida Console'>(</font>JTRC_RST, "<font color='#CC0000'>RST%d</font>"<font face='Lucida Console'>)</font>
+<font color='#BB00BB'>JMESSAGE</font><font face='Lucida Console'>(</font>JTRC_SMOOTH_NOTIMPL,
+	 "<font color='#CC0000'>Smoothing not supported with nonstandard sampling ratios</font>"<font face='Lucida Console'>)</font>
+<font color='#BB00BB'>JMESSAGE</font><font face='Lucida Console'>(</font>JTRC_SOF, "<font color='#CC0000'>Start Of Frame 0x%02x: width=%u, height=%u, components=%d</font>"<font face='Lucida Console'>)</font>
+<font color='#BB00BB'>JMESSAGE</font><font face='Lucida Console'>(</font>JTRC_SOF_COMPONENT, "<font color='#CC0000'>    Component %d: %dhx%dv q=%d</font>"<font face='Lucida Console'>)</font>
+<font color='#BB00BB'>JMESSAGE</font><font face='Lucida Console'>(</font>JTRC_SOI, "<font color='#CC0000'>Start of Image</font>"<font face='Lucida Console'>)</font>
+<font color='#BB00BB'>JMESSAGE</font><font face='Lucida Console'>(</font>JTRC_SOS, "<font color='#CC0000'>Start Of Scan: %d components</font>"<font face='Lucida Console'>)</font>
+<font color='#BB00BB'>JMESSAGE</font><font face='Lucida Console'>(</font>JTRC_SOS_COMPONENT, "<font color='#CC0000'>    Component %d: dc=%d ac=%d</font>"<font face='Lucida Console'>)</font>
+<font color='#BB00BB'>JMESSAGE</font><font face='Lucida Console'>(</font>JTRC_SOS_PARAMS, "<font color='#CC0000'>  Ss=%d, Se=%d, Ah=%d, Al=%d</font>"<font face='Lucida Console'>)</font>
+<font color='#BB00BB'>JMESSAGE</font><font face='Lucida Console'>(</font>JTRC_TFILE_CLOSE, "<font color='#CC0000'>Closed temporary file %s</font>"<font face='Lucida Console'>)</font>
+<font color='#BB00BB'>JMESSAGE</font><font face='Lucida Console'>(</font>JTRC_TFILE_OPEN, "<font color='#CC0000'>Opened temporary file %s</font>"<font face='Lucida Console'>)</font>
+<font color='#BB00BB'>JMESSAGE</font><font face='Lucida Console'>(</font>JTRC_THUMB_JPEG,
+	 "<font color='#CC0000'>JFIF extension marker: JPEG-compressed thumbnail image, length %u</font>"<font face='Lucida Console'>)</font>
+<font color='#BB00BB'>JMESSAGE</font><font face='Lucida Console'>(</font>JTRC_THUMB_PALETTE,
+	 "<font color='#CC0000'>JFIF extension marker: palette thumbnail image, length %u</font>"<font face='Lucida Console'>)</font>
+<font color='#BB00BB'>JMESSAGE</font><font face='Lucida Console'>(</font>JTRC_THUMB_RGB,
+	 "<font color='#CC0000'>JFIF extension marker: RGB thumbnail image, length %u</font>"<font face='Lucida Console'>)</font>
+<font color='#BB00BB'>JMESSAGE</font><font face='Lucida Console'>(</font>JTRC_UNKNOWN_IDS,
+	 "<font color='#CC0000'>Unrecognized component IDs %d %d %d, assuming YCbCr</font>"<font face='Lucida Console'>)</font>
+<font color='#BB00BB'>JMESSAGE</font><font face='Lucida Console'>(</font>JTRC_XMS_CLOSE, "<font color='#CC0000'>Freed XMS handle %u</font>"<font face='Lucida Console'>)</font>
+<font color='#BB00BB'>JMESSAGE</font><font face='Lucida Console'>(</font>JTRC_XMS_OPEN, "<font color='#CC0000'>Obtained XMS handle %u</font>"<font face='Lucida Console'>)</font>
+<font color='#BB00BB'>JMESSAGE</font><font face='Lucida Console'>(</font>JWRN_ADOBE_XFORM, "<font color='#CC0000'>Unknown Adobe color transform code %d</font>"<font face='Lucida Console'>)</font>
+<font color='#BB00BB'>JMESSAGE</font><font face='Lucida Console'>(</font>JWRN_BOGUS_PROGRESSION,
+	 "<font color='#CC0000'>Inconsistent progression sequence for component %d coefficient %d</font>"<font face='Lucida Console'>)</font>
+<font color='#BB00BB'>JMESSAGE</font><font face='Lucida Console'>(</font>JWRN_EXTRANEOUS_DATA,
+	 "<font color='#CC0000'>Corrupt JPEG data: %u extraneous bytes before marker 0x%02x</font>"<font face='Lucida Console'>)</font>
+<font color='#BB00BB'>JMESSAGE</font><font face='Lucida Console'>(</font>JWRN_HIT_MARKER, "<font color='#CC0000'>Corrupt JPEG data: premature end of data segment</font>"<font face='Lucida Console'>)</font>
+<font color='#BB00BB'>JMESSAGE</font><font face='Lucida Console'>(</font>JWRN_HUFF_BAD_CODE, "<font color='#CC0000'>Corrupt JPEG data: bad Huffman code</font>"<font face='Lucida Console'>)</font>
+<font color='#BB00BB'>JMESSAGE</font><font face='Lucida Console'>(</font>JWRN_JFIF_MAJOR, "<font color='#CC0000'>Warning: unknown JFIF revision number %d.%02d</font>"<font face='Lucida Console'>)</font>
+<font color='#BB00BB'>JMESSAGE</font><font face='Lucida Console'>(</font>JWRN_JPEG_EOF, "<font color='#CC0000'>Premature end of JPEG file</font>"<font face='Lucida Console'>)</font>
+<font color='#BB00BB'>JMESSAGE</font><font face='Lucida Console'>(</font>JWRN_MUST_RESYNC,
+	 "<font color='#CC0000'>Corrupt JPEG data: found marker 0x%02x instead of RST%d</font>"<font face='Lucida Console'>)</font>
+<font color='#BB00BB'>JMESSAGE</font><font face='Lucida Console'>(</font>JWRN_NOT_SEQUENTIAL, "<font color='#CC0000'>Invalid SOS parameters for sequential JPEG</font>"<font face='Lucida Console'>)</font>
+<font color='#BB00BB'>JMESSAGE</font><font face='Lucida Console'>(</font>JWRN_TOO_MUCH_DATA, "<font color='#CC0000'>Application transferred too many scanlines</font>"<font face='Lucida Console'>)</font>
+
+<font color='#0000FF'>#ifdef</font> JMAKE_ENUM_LIST
+
+  JMSG_LASTMSGCODE
+<b>}</b> J_MESSAGE_CODE;
+
+<font color='#0000FF'>#undef</font> JMAKE_ENUM_LIST
+<font color='#0000FF'>#endif</font> <font color='#009900'>/* JMAKE_ENUM_LIST */</font>
+
+<font color='#009900'>/* Zap JMESSAGE macro so that future re-inclusions do nothing by default */</font>
+<font color='#0000FF'>#undef</font> JMESSAGE
+
+
+<font color='#0000FF'>#ifndef</font> JERROR_H
+<font color='#0000FF'>#define</font> JERROR_H
+
+<font color='#009900'>/* Macros to simplify using the error and trace message stuff */</font>
+<font color='#009900'>/* The first parameter is either type of cinfo pointer */</font>
+
+<font color='#009900'>/* Fatal errors (print message and exit) */</font>
+<font color='#0000FF'>#define</font> ERREXIT<font face='Lucida Console'>(</font>cinfo,code<font face='Lucida Console'>)</font>  \
+  <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>cinfo<font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>err<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>msg_code <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>code<font face='Lucida Console'>)</font>, \
+   <font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font face='Lucida Console'>(</font>cinfo<font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>err<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>error_exit<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>j_common_ptr<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>cinfo<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+<font color='#0000FF'>#define</font> ERREXIT1<font face='Lucida Console'>(</font>cinfo,code,p1<font face='Lucida Console'>)</font>  \
+  <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>cinfo<font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>err<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>msg_code <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>code<font face='Lucida Console'>)</font>, \
+   <font face='Lucida Console'>(</font>cinfo<font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>err<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>msg_parm.i[<font color='#979000'>0</font>] <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>p1<font face='Lucida Console'>)</font>, \
+   <font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font face='Lucida Console'>(</font>cinfo<font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>err<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>error_exit<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>j_common_ptr<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>cinfo<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+<font color='#0000FF'>#define</font> ERREXIT2<font face='Lucida Console'>(</font>cinfo,code,p1,p2<font face='Lucida Console'>)</font>  \
+  <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>cinfo<font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>err<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>msg_code <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>code<font face='Lucida Console'>)</font>, \
+   <font face='Lucida Console'>(</font>cinfo<font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>err<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>msg_parm.i[<font color='#979000'>0</font>] <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>p1<font face='Lucida Console'>)</font>, \
+   <font face='Lucida Console'>(</font>cinfo<font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>err<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>msg_parm.i[<font color='#979000'>1</font>] <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>p2<font face='Lucida Console'>)</font>, \
+   <font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font face='Lucida Console'>(</font>cinfo<font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>err<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>error_exit<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>j_common_ptr<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>cinfo<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+<font color='#0000FF'>#define</font> ERREXIT3<font face='Lucida Console'>(</font>cinfo,code,p1,p2,p3<font face='Lucida Console'>)</font>  \
+  <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>cinfo<font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>err<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>msg_code <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>code<font face='Lucida Console'>)</font>, \
+   <font face='Lucida Console'>(</font>cinfo<font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>err<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>msg_parm.i[<font color='#979000'>0</font>] <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>p1<font face='Lucida Console'>)</font>, \
+   <font face='Lucida Console'>(</font>cinfo<font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>err<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>msg_parm.i[<font color='#979000'>1</font>] <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>p2<font face='Lucida Console'>)</font>, \
+   <font face='Lucida Console'>(</font>cinfo<font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>err<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>msg_parm.i[<font color='#979000'>2</font>] <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>p3<font face='Lucida Console'>)</font>, \
+   <font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font face='Lucida Console'>(</font>cinfo<font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>err<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>error_exit<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>j_common_ptr<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>cinfo<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+<font color='#0000FF'>#define</font> ERREXIT4<font face='Lucida Console'>(</font>cinfo,code,p1,p2,p3,p4<font face='Lucida Console'>)</font>  \
+  <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>cinfo<font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>err<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>msg_code <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>code<font face='Lucida Console'>)</font>, \
+   <font face='Lucida Console'>(</font>cinfo<font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>err<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>msg_parm.i[<font color='#979000'>0</font>] <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>p1<font face='Lucida Console'>)</font>, \
+   <font face='Lucida Console'>(</font>cinfo<font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>err<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>msg_parm.i[<font color='#979000'>1</font>] <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>p2<font face='Lucida Console'>)</font>, \
+   <font face='Lucida Console'>(</font>cinfo<font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>err<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>msg_parm.i[<font color='#979000'>2</font>] <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>p3<font face='Lucida Console'>)</font>, \
+   <font face='Lucida Console'>(</font>cinfo<font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>err<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>msg_parm.i[<font color='#979000'>3</font>] <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>p4<font face='Lucida Console'>)</font>, \
+   <font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font face='Lucida Console'>(</font>cinfo<font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>err<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>error_exit<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>j_common_ptr<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>cinfo<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+<font color='#0000FF'>#define</font> ERREXITS<font face='Lucida Console'>(</font>cinfo,code,str<font face='Lucida Console'>)</font>  \
+  <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>cinfo<font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>err<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>msg_code <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>code<font face='Lucida Console'>)</font>, \
+   <font color='#BB00BB'>strncpy</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>cinfo<font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>err<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>msg_parm.s, <font face='Lucida Console'>(</font>str<font face='Lucida Console'>)</font>, JMSG_STR_PARM_MAX<font face='Lucida Console'>)</font>, \
+   <font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font face='Lucida Console'>(</font>cinfo<font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>err<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>error_exit<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>j_common_ptr<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>cinfo<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+
+<font color='#0000FF'>#define</font> MAKESTMT<font face='Lucida Console'>(</font>stuff<font face='Lucida Console'>)</font>		<font color='#0000FF'>do</font> <b>{</b> stuff <b>}</b> <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>
+
+<font color='#009900'>/* Nonfatal errors (we can keep going, but the data is probably corrupt) */</font>
+<font color='#0000FF'>#define</font> WARNMS<font face='Lucida Console'>(</font>cinfo,code<font face='Lucida Console'>)</font>  \
+  <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>cinfo<font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>err<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>msg_code <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>code<font face='Lucida Console'>)</font>, \
+   <font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font face='Lucida Console'>(</font>cinfo<font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>err<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>emit_message<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>j_common_ptr<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>cinfo<font face='Lucida Console'>)</font>, <font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+<font color='#0000FF'>#define</font> WARNMS1<font face='Lucida Console'>(</font>cinfo,code,p1<font face='Lucida Console'>)</font>  \
+  <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>cinfo<font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>err<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>msg_code <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>code<font face='Lucida Console'>)</font>, \
+   <font face='Lucida Console'>(</font>cinfo<font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>err<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>msg_parm.i[<font color='#979000'>0</font>] <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>p1<font face='Lucida Console'>)</font>, \
+   <font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font face='Lucida Console'>(</font>cinfo<font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>err<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>emit_message<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>j_common_ptr<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>cinfo<font face='Lucida Console'>)</font>, <font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+<font color='#0000FF'>#define</font> WARNMS2<font face='Lucida Console'>(</font>cinfo,code,p1,p2<font face='Lucida Console'>)</font>  \
+  <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>cinfo<font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>err<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>msg_code <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>code<font face='Lucida Console'>)</font>, \
+   <font face='Lucida Console'>(</font>cinfo<font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>err<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>msg_parm.i[<font color='#979000'>0</font>] <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>p1<font face='Lucida Console'>)</font>, \
+   <font face='Lucida Console'>(</font>cinfo<font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>err<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>msg_parm.i[<font color='#979000'>1</font>] <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>p2<font face='Lucida Console'>)</font>, \
+   <font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font face='Lucida Console'>(</font>cinfo<font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>err<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>emit_message<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>j_common_ptr<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>cinfo<font face='Lucida Console'>)</font>, <font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+
+<font color='#009900'>/* Informational/debugging messages */</font>
+<font color='#0000FF'>#define</font> TRACEMS<font face='Lucida Console'>(</font>cinfo,lvl,code<font face='Lucida Console'>)</font>  \
+  <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>cinfo<font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>err<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>msg_code <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>code<font face='Lucida Console'>)</font>, \
+   <font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font face='Lucida Console'>(</font>cinfo<font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>err<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>emit_message<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>j_common_ptr<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>cinfo<font face='Lucida Console'>)</font>, <font face='Lucida Console'>(</font>lvl<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+<font color='#0000FF'>#define</font> TRACEMS1<font face='Lucida Console'>(</font>cinfo,lvl,code,p1<font face='Lucida Console'>)</font>  \
+  <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>cinfo<font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>err<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>msg_code <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>code<font face='Lucida Console'>)</font>, \
+   <font face='Lucida Console'>(</font>cinfo<font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>err<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>msg_parm.i[<font color='#979000'>0</font>] <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>p1<font face='Lucida Console'>)</font>, \
+   <font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font face='Lucida Console'>(</font>cinfo<font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>err<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>emit_message<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>j_common_ptr<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>cinfo<font face='Lucida Console'>)</font>, <font face='Lucida Console'>(</font>lvl<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+<font color='#0000FF'>#define</font> TRACEMS2<font face='Lucida Console'>(</font>cinfo,lvl,code,p1,p2<font face='Lucida Console'>)</font>  \
+  <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>cinfo<font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>err<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>msg_code <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>code<font face='Lucida Console'>)</font>, \
+   <font face='Lucida Console'>(</font>cinfo<font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>err<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>msg_parm.i[<font color='#979000'>0</font>] <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>p1<font face='Lucida Console'>)</font>, \
+   <font face='Lucida Console'>(</font>cinfo<font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>err<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>msg_parm.i[<font color='#979000'>1</font>] <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>p2<font face='Lucida Console'>)</font>, \
+   <font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font face='Lucida Console'>(</font>cinfo<font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>err<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>emit_message<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>j_common_ptr<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>cinfo<font face='Lucida Console'>)</font>, <font face='Lucida Console'>(</font>lvl<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+<font color='#0000FF'>#define</font> TRACEMS3<font face='Lucida Console'>(</font>cinfo,lvl,code,p1,p2,p3<font face='Lucida Console'>)</font>  \
+  <b><a name='MAKESTMT'></a>MAKESTMT</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> <font color='#5555FF'>*</font> _mp <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>cinfo<font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>err<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>msg_parm.i; \
+	   _mp[<font color='#979000'>0</font>] <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>p1<font face='Lucida Console'>)</font>; _mp[<font color='#979000'>1</font>] <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>p2<font face='Lucida Console'>)</font>; _mp[<font color='#979000'>2</font>] <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>p3<font face='Lucida Console'>)</font>; \
+	   <font face='Lucida Console'>(</font>cinfo<font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>err<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>msg_code <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>code<font face='Lucida Console'>)</font>; \
+	   <font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font face='Lucida Console'>(</font>cinfo<font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>err<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>emit_message<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>j_common_ptr<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>cinfo<font face='Lucida Console'>)</font>, <font face='Lucida Console'>(</font>lvl<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>; <font face='Lucida Console'>)</font>
+<font color='#0000FF'>#define</font> TRACEMS4<font face='Lucida Console'>(</font>cinfo,lvl,code,p1,p2,p3,p4<font face='Lucida Console'>)</font>  \
+  <b><a name='MAKESTMT'></a>MAKESTMT</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> <font color='#5555FF'>*</font> _mp <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>cinfo<font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>err<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>msg_parm.i; \
+	   _mp[<font color='#979000'>0</font>] <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>p1<font face='Lucida Console'>)</font>; _mp[<font color='#979000'>1</font>] <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>p2<font face='Lucida Console'>)</font>; _mp[<font color='#979000'>2</font>] <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>p3<font face='Lucida Console'>)</font>; _mp[<font color='#979000'>3</font>] <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>p4<font face='Lucida Console'>)</font>; \
+	   <font face='Lucida Console'>(</font>cinfo<font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>err<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>msg_code <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>code<font face='Lucida Console'>)</font>; \
+	   <font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font face='Lucida Console'>(</font>cinfo<font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>err<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>emit_message<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>j_common_ptr<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>cinfo<font face='Lucida Console'>)</font>, <font face='Lucida Console'>(</font>lvl<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>; <font face='Lucida Console'>)</font>
+<font color='#0000FF'>#define</font> TRACEMS5<font face='Lucida Console'>(</font>cinfo,lvl,code,p1,p2,p3,p4,p5<font face='Lucida Console'>)</font>  \
+  <b><a name='MAKESTMT'></a>MAKESTMT</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> <font color='#5555FF'>*</font> _mp <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>cinfo<font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>err<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>msg_parm.i; \
+	   _mp[<font color='#979000'>0</font>] <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>p1<font face='Lucida Console'>)</font>; _mp[<font color='#979000'>1</font>] <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>p2<font face='Lucida Console'>)</font>; _mp[<font color='#979000'>2</font>] <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>p3<font face='Lucida Console'>)</font>; _mp[<font color='#979000'>3</font>] <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>p4<font face='Lucida Console'>)</font>; \
+	   _mp[<font color='#979000'>4</font>] <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>p5<font face='Lucida Console'>)</font>; \
+	   <font face='Lucida Console'>(</font>cinfo<font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>err<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>msg_code <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>code<font face='Lucida Console'>)</font>; \
+	   <font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font face='Lucida Console'>(</font>cinfo<font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>err<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>emit_message<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>j_common_ptr<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>cinfo<font face='Lucida Console'>)</font>, <font face='Lucida Console'>(</font>lvl<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>; <font face='Lucida Console'>)</font>
+<font color='#0000FF'>#define</font> TRACEMS8<font face='Lucida Console'>(</font>cinfo,lvl,code,p1,p2,p3,p4,p5,p6,p7,p8<font face='Lucida Console'>)</font>  \
+  <b><a name='MAKESTMT'></a>MAKESTMT</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> <font color='#5555FF'>*</font> _mp <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>cinfo<font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>err<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>msg_parm.i; \
+	   _mp[<font color='#979000'>0</font>] <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>p1<font face='Lucida Console'>)</font>; _mp[<font color='#979000'>1</font>] <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>p2<font face='Lucida Console'>)</font>; _mp[<font color='#979000'>2</font>] <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>p3<font face='Lucida Console'>)</font>; _mp[<font color='#979000'>3</font>] <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>p4<font face='Lucida Console'>)</font>; \
+	   _mp[<font color='#979000'>4</font>] <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>p5<font face='Lucida Console'>)</font>; _mp[<font color='#979000'>5</font>] <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>p6<font face='Lucida Console'>)</font>; _mp[<font color='#979000'>6</font>] <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>p7<font face='Lucida Console'>)</font>; _mp[<font color='#979000'>7</font>] <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>p8<font face='Lucida Console'>)</font>; \
+	   <font face='Lucida Console'>(</font>cinfo<font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>err<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>msg_code <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>code<font face='Lucida Console'>)</font>; \
+	   <font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font face='Lucida Console'>(</font>cinfo<font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>err<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>emit_message<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>j_common_ptr<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>cinfo<font face='Lucida Console'>)</font>, <font face='Lucida Console'>(</font>lvl<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>; <font face='Lucida Console'>)</font>
+<font color='#0000FF'>#define</font> TRACEMSS<font face='Lucida Console'>(</font>cinfo,lvl,code,str<font face='Lucida Console'>)</font>  \
+  <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>cinfo<font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>err<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>msg_code <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>code<font face='Lucida Console'>)</font>, \
+   <font color='#BB00BB'>strncpy</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>cinfo<font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>err<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>msg_parm.s, <font face='Lucida Console'>(</font>str<font face='Lucida Console'>)</font>, JMSG_STR_PARM_MAX<font face='Lucida Console'>)</font>, \
+   <font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font face='Lucida Console'>(</font>cinfo<font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>err<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>emit_message<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>j_common_ptr<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>cinfo<font face='Lucida Console'>)</font>, <font face='Lucida Console'>(</font>lvl<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>/* JERROR_H */</font>
+
+</pre></body></html>

@@ -1,0 +1,183 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - scan_image_pyramid_tools.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2011  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_SCAN_IMaGE_PYRAMID_TOOLS_Hh_
+<font color='#0000FF'>#define</font> DLIB_SCAN_IMaGE_PYRAMID_TOOLS_Hh_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='scan_image_pyramid_tools_abstract.h.html'>scan_image_pyramid_tools_abstract.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../statistics.h.html'>../statistics.h</a>"
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>list<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../geometry.h.html'>../geometry.h</a>"
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>iostream<font color='#5555FF'>&gt;</font>
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>namespace</font> impl
+    <b>{</b>
+        <font color='#0000FF'>inline</font> <font color='#0000FF'><u>bool</u></font> <b><a name='compare_first'></a>compare_first</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> std::pair<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font>,rectangle<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> a,
+            <font color='#0000FF'>const</font> std::pair<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font>,rectangle<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> b
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>return</font> a.first <font color='#5555FF'>&lt;</font> b.first;
+        <b>}</b>
+    <b>}</b>
+
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> image_scanner_type<font color='#5555FF'>&gt;</font>
+    std::vector<font color='#5555FF'>&lt;</font>rectangle<font color='#5555FF'>&gt;</font> <b><a name='determine_object_boxes'></a>determine_object_boxes</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> image_scanner_type<font color='#5555FF'>&amp;</font> scanner,
+        <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>rectangle<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> rects,
+        <font color='#0000FF'><u>double</u></font> min_match_score
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#009900'>// make sure requires clause is not broken
+</font>        <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font><font color='#979000'>0</font> <font color='#5555FF'>&lt;</font> min_match_score <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> min_match_score <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#979000'>1</font>,
+            "<font color='#CC0000'>\t std::vector&lt;rectangle&gt; determine_object_boxes()</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t Invalid inputs were given to this function. </font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t min_match_score: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> min_match_score 
+            <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>typename</font> image_scanner_type::pyramid_type pyr;
+
+        <font color='#0000FF'>typedef</font> std::list<font color='#5555FF'>&lt;</font>std::pair<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font>, rectangle<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> list_type;
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> max_area <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+
+        <font color='#009900'>// Copy rects into sorted_rects and sort them in order of increasing area.  But
+</font>        <font color='#009900'>// only include the rectangles that aren't already obtainable by the scanner.
+</font>        list_type sorted_rects;
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> rects.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>scanner.<font color='#BB00BB'>get_num_detection_templates</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                rectangle temp <font color='#5555FF'>=</font> scanner.<font color='#BB00BB'>get_best_matching_rect</font><font face='Lucida Console'>(</font>rects[i]<font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> match_score <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>rects[i].<font color='#BB00BB'>intersect</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font>.<font color='#BB00BB'>area</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font color='#5555FF'>/</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>double</u></font><font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>rects[i] <font color='#5555FF'>+</font> temp<font face='Lucida Console'>)</font>.<font color='#BB00BB'>area</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                <font color='#009900'>// skip this rectangle if it's already matched well enough.
+</font>                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>match_score <font color='#5555FF'>&gt;</font> min_match_score<font face='Lucida Console'>)</font>
+                    <font color='#0000FF'>continue</font>;
+            <b>}</b>
+            max_area <font color='#5555FF'>=</font> std::<font color='#BB00BB'>max</font><font face='Lucida Console'>(</font>rects[i].<font color='#BB00BB'>area</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, max_area<font face='Lucida Console'>)</font>;
+            sorted_rects.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>std::<font color='#BB00BB'>make_pair</font><font face='Lucida Console'>(</font>rects[i].<font color='#BB00BB'>area</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, rects[i]<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+        sorted_rects.<font color='#BB00BB'>sort</font><font face='Lucida Console'>(</font>dlib::impl::compare_first<font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// Make sure this area value is comfortably larger than all the 
+</font>        <font color='#009900'>// rectangles' areas.
+</font>        max_area <font color='#5555FF'>=</font> <font color='#979000'>3</font><font color='#5555FF'>*</font>max_area <font color='#5555FF'>+</font> <font color='#979000'>100</font>;
+
+        std::vector<font color='#5555FF'>&lt;</font>rectangle<font color='#5555FF'>&gt;</font> object_boxes;
+
+        <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>sorted_rects.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            rectangle cur <font color='#5555FF'>=</font> sorted_rects.<font color='#BB00BB'>front</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.second;
+            sorted_rects.<font color='#BB00BB'>pop_front</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            object_boxes.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font><font color='#BB00BB'>centered_rect</font><font face='Lucida Console'>(</font><font color='#BB00BB'>point</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font>, cur.<font color='#BB00BB'>width</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, cur.<font color='#BB00BB'>height</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// Scale cur up the image pyramid and remove any rectangles which match.
+</font>            <font color='#009900'>// But also stop when cur gets large enough to not match anything.
+</font>            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> itr <font color='#5555FF'>=</font> <font color='#979000'>0</font>; 
+                 itr <font color='#5555FF'>&lt;</font> scanner.<font color='#BB00BB'>get_max_pyramid_levels</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> cur.<font color='#BB00BB'>area</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> max_area; 
+                 <font color='#5555FF'>+</font><font color='#5555FF'>+</font>itr<font face='Lucida Console'>)</font>
+            <b>{</b>
+                list_type::iterator i <font color='#5555FF'>=</font> sorted_rects.<font color='#BB00BB'>begin</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>i <font color='#5555FF'>!</font><font color='#5555FF'>=</font> sorted_rects.<font color='#BB00BB'>end</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#0000FF'>const</font> rectangle temp <font color='#5555FF'>=</font> <font color='#BB00BB'>move_rect</font><font face='Lucida Console'>(</font>i<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>second, cur.<font color='#BB00BB'>tl_corner</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                    <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> match_score <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>cur.<font color='#BB00BB'>intersect</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font>.<font color='#BB00BB'>area</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font color='#5555FF'>/</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>double</u></font><font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>cur <font color='#5555FF'>+</font> temp<font face='Lucida Console'>)</font>.<font color='#BB00BB'>area</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>match_score <font color='#5555FF'>&gt;</font> min_match_score<font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        i <font color='#5555FF'>=</font> sorted_rects.<font color='#BB00BB'>erase</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>;
+                    <b>}</b>
+                    <font color='#0000FF'>else</font>
+                    <b>{</b>
+                        <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i;
+                    <b>}</b>
+                <b>}</b>
+
+                cur <font color='#5555FF'>=</font> pyr.<font color='#BB00BB'>rect_up</font><font face='Lucida Console'>(</font>cur<font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+        <b>}</b>
+
+        <font color='#0000FF'>return</font> object_boxes;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> image_scanner_type<font color='#5555FF'>&gt;</font>
+    std::vector<font color='#5555FF'>&lt;</font>rectangle<font color='#5555FF'>&gt;</font> <b><a name='determine_object_boxes'></a>determine_object_boxes</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> image_scanner_type<font color='#5555FF'>&amp;</font> scanner,
+        <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>std::vector<font color='#5555FF'>&lt;</font>rectangle<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> rects,
+        <font color='#0000FF'><u>double</u></font> min_match_score
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#009900'>// make sure requires clause is not broken
+</font>        <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font><font color='#979000'>0</font> <font color='#5555FF'>&lt;</font> min_match_score <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> min_match_score <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#979000'>1</font>,
+            "<font color='#CC0000'>\t std::vector&lt;rectangle&gt; determine_object_boxes()</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t Invalid inputs were given to this function. </font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t min_match_score: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> min_match_score 
+            <font face='Lucida Console'>)</font>;
+
+        std::vector<font color='#5555FF'>&lt;</font>rectangle<font color='#5555FF'>&gt;</font> temp;
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> rects.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> j <font color='#5555FF'>=</font> <font color='#979000'>0</font>; j <font color='#5555FF'>&lt;</font> rects[i].<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>j<font face='Lucida Console'>)</font>
+            <b>{</b>
+                temp.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>rects[i][j]<font face='Lucida Console'>)</font>;
+            <b>}</b>
+        <b>}</b>
+
+        <font color='#0000FF'>return</font> <font color='#BB00BB'>determine_object_boxes</font><font face='Lucida Console'>(</font>scanner, temp, min_match_score<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> image_scanner_type<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='setup_grid_detection_templates'></a>setup_grid_detection_templates</b> <font face='Lucida Console'>(</font>
+        image_scanner_type<font color='#5555FF'>&amp;</font> scanner,
+        <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>std::vector<font color='#5555FF'>&lt;</font>rectangle<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> rects,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>int</u></font> cells_x,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>int</u></font> cells_y,
+        <font color='#0000FF'><u>double</u></font> min_match_score <font color='#5555FF'>=</font> <font color='#979000'>0.75</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>rectangle<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> object_boxes <font color='#5555FF'>=</font> <font color='#BB00BB'>determine_object_boxes</font><font face='Lucida Console'>(</font>scanner, rects, min_match_score<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> object_boxes.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+        <b>{</b>
+            scanner.<font color='#BB00BB'>add_detection_template</font><font face='Lucida Console'>(</font>object_boxes[i], <font color='#BB00BB'>create_grid_detection_template</font><font face='Lucida Console'>(</font>object_boxes[i], cells_x, cells_y<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> image_scanner_type<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='setup_grid_detection_templates_verbose'></a>setup_grid_detection_templates_verbose</b> <font face='Lucida Console'>(</font>
+        image_scanner_type<font color='#5555FF'>&amp;</font> scanner,
+        <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>std::vector<font color='#5555FF'>&lt;</font>rectangle<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> rects,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>int</u></font> cells_x,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>int</u></font> cells_y,
+        <font color='#0000FF'><u>double</u></font> min_match_score <font color='#5555FF'>=</font> <font color='#979000'>0.75</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>rectangle<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> object_boxes <font color='#5555FF'>=</font> <font color='#BB00BB'>determine_object_boxes</font><font face='Lucida Console'>(</font>scanner, rects, min_match_score<font face='Lucida Console'>)</font>;
+        std::cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>number of detection templates: </font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> object_boxes.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> std::endl;
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> object_boxes.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+        <b>{</b>
+            std::cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>  object box </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> i <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>:  width: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> object_boxes[i].<font color='#BB00BB'>width</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> 
+                      <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>  height: </font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> object_boxes[i].<font color='#BB00BB'>height</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> std::endl;
+            scanner.<font color='#BB00BB'>add_detection_template</font><font face='Lucida Console'>(</font>object_boxes[i], <font color='#BB00BB'>create_grid_detection_template</font><font face='Lucida Console'>(</font>object_boxes[i], cells_x, cells_y<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_SCAN_IMaGE_PYRAMID_TOOLS_Hh_
+</font>
+
+</pre></body></html>

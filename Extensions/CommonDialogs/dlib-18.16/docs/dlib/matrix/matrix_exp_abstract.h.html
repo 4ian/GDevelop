@@ -1,0 +1,213 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - matrix_exp_abstract.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2006  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#undef</font> DLIB_MATRIx_EXP_ABSTRACT_
+<font color='#0000FF'>#ifdef</font> DLIB_MATRIx_EXP_ABSTRACT_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='matrix_fwd.h.html'>matrix_fwd.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> EXP
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>class</font> <b><a name='matrix_exp'></a>matrix_exp</b>
+    <b>{</b>
+        <font color='#009900'>/*!
+            REQUIREMENTS ON EXP
+                - must be an object that inherits publicly from matrix_exp (this class).
+
+            WHAT THIS OBJECT REPRESENTS
+                This object represents an expression that evaluates to a matrix 
+                of nr() rows and nc() columns.  
+                
+                The reason for having an object that represents an expression is that it 
+                allows us to use the "expression templates" technique to eliminate the 
+                temporary matrix objects that would normally be returned from expressions 
+                such as M = A+B+C+D;  Normally each invocation of the + operator would
+                construct and return a temporary matrix object but using this technique we 
+                can avoid creating all of these temporary objects and receive a large 
+                speed boost.
+
+                Note that every time you invoke operator() on this object it recomputes 
+                its result which may not be what you want to do.  For example, if you 
+                are going to be accessing the same element over and over it might 
+                be faster to assign the matrix_exp to a temporary matrix and then 
+                use that temporary.
+
+
+                const_ret_type typedef (defined below)
+                    The purpose of the const_ret_type typedef is to allow matrix expressions
+                    to return their elements by reference when appropriate.  So const_ret_type 
+                    should be one of the following types:
+                        - const type
+                        - const type&amp; 
+        !*/</font>
+
+    <font color='#0000FF'>public</font>:
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> EXP::type type;
+        <font color='#0000FF'>typedef</font> type value_type; <font color='#009900'>// Redefined for compatibility with the STL
+</font>        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> EXP::const_ret_type const_ret_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> EXP::mem_manager_type mem_manager_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> EXP::layout_type layout_type;
+        <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>long</u></font> cost <font color='#5555FF'>=</font> EXP::cost;
+        <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>long</u></font> NR <font color='#5555FF'>=</font> EXP::NR;
+        <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>long</u></font> NC <font color='#5555FF'>=</font> EXP::NC;
+        <font color='#0000FF'>typedef</font> matrix<font color='#5555FF'>&lt;</font>type,NR,NC, mem_manager_type,layout_type<font color='#5555FF'>&gt;</font> matrix_type;
+        <font color='#0000FF'>typedef</font> EXP exp_type;
+        <font color='#0000FF'>typedef</font> matrix_exp_iterator<font color='#5555FF'>&lt;</font>EXP<font color='#5555FF'>&gt;</font> iterator;
+        <font color='#0000FF'>typedef</font> matrix_exp_iterator<font color='#5555FF'>&lt;</font>EXP<font color='#5555FF'>&gt;</font> const_iterator;
+
+        const_ret_type <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>long</u></font> r,
+            <font color='#0000FF'><u>long</u></font> c
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - 0 &lt;= r &lt; nr()
+                - 0 &lt;= c &lt; nc()
+            ensures
+                - returns ref()(r,c)
+                  (i.e. returns the value at the given row and column that would be in
+                  the matrix represented by this matrix expression)
+        !*/</font>
+
+        const_ret_type <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>long</u></font> i
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - nc() == 1 || nr() == 1 (i.e. this must be a column or row vector)
+                - if (nc() == 1) then
+                    - 0 &lt;= i &lt; nr()
+                - else
+                    - 0 &lt;= i &lt; nc()
+            ensures
+                - if (nc() == 1) then
+                    - returns (*this)(i,0)
+                - else
+                    - returns (*this)(0,i)
+        !*/</font>
+
+        <b><a name='operator'></a>operator</b> <font color='#0000FF'>const</font> <b><a name='type'></a>type</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - nr() == 1
+                - nc() == 1
+            ensures
+                - returns (*this)(0,0)
+        !*/</font>
+
+        <font color='#0000FF'><u>long</u></font> <b><a name='nr'></a>nr</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the number of rows in this matrix expression. 
+        !*/</font>
+
+        <font color='#0000FF'><u>long</u></font> <b><a name='nc'></a>nc</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>; 
+        <font color='#009900'>/*!
+            ensures
+                - returns the number of columns in this matrix expression.
+        !*/</font>
+
+        <font color='#0000FF'><u>long</u></font> <b><a name='size'></a>size</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns nr()*nc()
+        !*/</font>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> U<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>bool</u></font> <b><a name='aliases'></a>aliases</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&lt;</font>U<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> item
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - if (A change to the state of item could cause a change to the state of *this
+                      matrix_exp object.  ) then
+                    - returns true
+                    - This happens when this matrix_exp contains item in some way. 
+                - else
+                    - returns false
+        !*/</font>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> U<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>bool</u></font> <b><a name='destructively_aliases'></a>destructively_aliases</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&lt;</font>U<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> item
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>; 
+        <font color='#009900'>/*!
+            ensures
+                - if (aliases(item)) then 
+                    - if (nr() != item.nr() || nc() != item.nc()
+                        - returns true
+                          (i.e. if this expression has different dimensions than item then
+                          we have destructive aliasing)
+
+                    - returns true if the following assignment would evaluate incorrectly:
+                      for (long r = 0; r &lt; nr(); ++r)
+                        for (long c = 0; c &lt; nc(); ++c)
+                          item(r,c) = (*this)(r,c)
+                    - That is, if this matrix expression aliases item in such a way that a modification
+                      to element item(r,c) causes a change in the value of something other than
+                      (*this)(r,c) then this function returns true.  
+
+                    - returns false if none of the above conditions say we should return true
+                - else
+                    - returns false
+        !*/</font>
+
+        <font color='#0000FF'>inline</font> <font color='#0000FF'>const</font> exp_type<font color='#5555FF'>&amp;</font> <b><a name='ref'></a>ref</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>; 
+        <font color='#009900'>/*!
+            ensures
+                - returns a reference to the expression contained in *this.
+                  (i.e. returns *static_cast&lt;const exp_type*&gt;(this) )
+        !*/</font>
+
+        const_iterator <b><a name='begin'></a>begin</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns a forward access iterator pointing to the first element in this
+                  matrix expression.
+                - Since matrix_exp objects represent immutable views of a matrix, the
+                  returned iterator does not allow the user to modify the matrix
+                  expression's elements.
+                - The iterator will iterate over the elements of the matrix in row major
+                  order.
+        !*/</font>
+
+        const_iterator <b><a name='end'></a>end</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns a forward access iterator pointing to one past the end of the
+                  last element in this matrix expression.
+        !*/</font>
+
+    <font color='#0000FF'>protected</font>:
+
+        <font color='#009900'>// Only derived classes of matrix_exp may call the matrix_exp constructors.
+</font>        <b><a name='matrix_exp'></a>matrix_exp</b><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font>; 
+        <b><a name='matrix_exp'></a>matrix_exp</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+    <font color='#0000FF'>private</font>:
+        <font color='#009900'>// no one may ever use the assignment operator on a matrix_exp
+</font>        matrix_exp<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font>;
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_MATRIx_EXP_ABSTRACT_
+</font>
+
+
+</pre></body></html>

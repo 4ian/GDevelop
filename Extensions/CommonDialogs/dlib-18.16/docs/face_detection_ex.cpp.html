@@ -1,0 +1,106 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - face_detection_ex.cpp</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// The contents of this file are in the public domain. See LICENSE_FOR_EXAMPLE_PROGRAMS.txt
+</font><font color='#009900'>/*
+
+    This example program shows how to find frontal human faces in an image.  In
+    particular, this program shows how you can take a list of images from the
+    command line and display each on the screen with red boxes overlaid on each
+    human face.
+
+    The examples/faces folder contains some jpg images of people.  You can run
+    this program on them and see the detections by executing the following command:
+        ./face_detection_ex faces/*.jpg
+
+    
+    This face detector is made using the now classic Histogram of Oriented
+    Gradients (HOG) feature combined with a linear classifier, an image pyramid,
+    and sliding window detection scheme.  This type of object detector is fairly
+    general and capable of detecting many types of semi-rigid objects in
+    addition to human faces.  Therefore, if you are interested in making your
+    own object detectors then read the <a href="fhog_object_detector_ex.cpp.html">fhog_object_detector_ex.cpp</a> example
+    program.  It shows how to use the machine learning tools which were used to
+    create dlib's face detector. 
+
+
+    Finally, note that the face detector is fastest when compiled with at least
+    SSE2 instructions enabled.  So if you are using a PC with an Intel or AMD
+    chip then you should enable at least SSE2 instructions.  If you are using
+    cmake to compile this program you can enable them by using one of the
+    following commands when you create the build project:
+        cmake path_to_dlib_root/examples -DUSE_SSE2_INSTRUCTIONS=ON
+        cmake path_to_dlib_root/examples -DUSE_SSE4_INSTRUCTIONS=ON
+        cmake path_to_dlib_root/examples -DUSE_AVX_INSTRUCTIONS=ON
+    This will set the appropriate compiler options for GCC, clang, Visual
+    Studio, or the Intel compiler.  If you are using another compiler then you
+    need to consult your compiler's manual to determine how to enable these
+    instructions.  Note that AVX is the fastest but requires a CPU from at least
+    2011.  SSE4 is the next fastest and is supported by most current machines.  
+*/</font>
+
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>image_processing<font color='#5555FF'>/</font>frontal_face_detector.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>gui_widgets.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>image_io.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>iostream<font color='#5555FF'>&gt;</font>
+
+<font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> dlib;
+<font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> std;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<font color='#0000FF'><u>int</u></font> <b><a name='main'></a>main</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> argc, <font color='#0000FF'><u>char</u></font><font color='#5555FF'>*</font><font color='#5555FF'>*</font> argv<font face='Lucida Console'>)</font>
+<b>{</b>  
+    <font color='#0000FF'>try</font>
+    <b>{</b>
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>argc <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>Give some image files as arguments to this program.</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+            <font color='#0000FF'>return</font> <font color='#979000'>0</font>;
+        <b>}</b>
+
+        frontal_face_detector detector <font color='#5555FF'>=</font> <font color='#BB00BB'>get_frontal_face_detector</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        image_window win;
+
+        <font color='#009900'>// Loop over all the images provided on the command line.
+</font>        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>1</font>; i <font color='#5555FF'>&lt;</font> argc; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+        <b>{</b>
+            cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>processing image </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> argv[i] <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+            array2d<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font> img;
+            <font color='#BB00BB'>load_image</font><font face='Lucida Console'>(</font>img, argv[i]<font face='Lucida Console'>)</font>;
+            <font color='#009900'>// Make the image bigger by a factor of two.  This is useful since
+</font>            <font color='#009900'>// the face detector looks for faces that are about 80 by 80 pixels
+</font>            <font color='#009900'>// or larger.  Therefore, if you want to find faces that are smaller
+</font>            <font color='#009900'>// than that then you need to upsample the image as we do here by
+</font>            <font color='#009900'>// calling pyramid_up().  So this will allow it to detect faces that
+</font>            <font color='#009900'>// are at least 40 by 40 pixels in size.  We could call pyramid_up()
+</font>            <font color='#009900'>// again to find even smaller faces, but note that every time we
+</font>            <font color='#009900'>// upsample the image we make the detector run slower since it must
+</font>            <font color='#009900'>// process a larger image.
+</font>            <font color='#BB00BB'>pyramid_up</font><font face='Lucida Console'>(</font>img<font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// Now tell the face detector to give us a list of bounding boxes
+</font>            <font color='#009900'>// around all the faces it can find in the image.
+</font>            std::vector<font color='#5555FF'>&lt;</font>rectangle<font color='#5555FF'>&gt;</font> dets <font color='#5555FF'>=</font> <font color='#BB00BB'>detector</font><font face='Lucida Console'>(</font>img<font face='Lucida Console'>)</font>;
+
+            cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>Number of faces detected: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> dets.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+            <font color='#009900'>// Now we show the image on the screen and the face detections as
+</font>            <font color='#009900'>// red overlay boxes.
+</font>            win.<font color='#BB00BB'>clear_overlay</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            win.<font color='#BB00BB'>set_image</font><font face='Lucida Console'>(</font>img<font face='Lucida Console'>)</font>;
+            win.<font color='#BB00BB'>add_overlay</font><font face='Lucida Console'>(</font>dets, <font color='#BB00BB'>rgb_pixel</font><font face='Lucida Console'>(</font><font color='#979000'>255</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+            cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>Hit enter to process the next image...</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+            cin.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+    <b>}</b>
+    <font color='#0000FF'>catch</font> <font face='Lucida Console'>(</font>exception<font color='#5555FF'>&amp;</font> e<font face='Lucida Console'>)</font>
+    <b>{</b>
+        cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\nexception thrown!</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+        cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> e.<font color='#BB00BB'>what</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+    <b>}</b>
+<b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+
+</pre></body></html>

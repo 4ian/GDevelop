@@ -1,0 +1,2067 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - binary_search_tree_kernel_1.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2003  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_BINARY_SEARCH_TREE_KERNEl_1_
+<font color='#0000FF'>#define</font> DLIB_BINARY_SEARCH_TREE_KERNEl_1_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='binary_search_tree_kernel_abstract.h.html'>binary_search_tree_kernel_abstract.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../algs.h.html'>../algs.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../interfaces/map_pair.h.html'>../interfaces/map_pair.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../interfaces/enumerable.h.html'>../interfaces/enumerable.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../interfaces/remover.h.html'>../interfaces/remover.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../serialize.h.html'>../serialize.h</a>"
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>cstdlib<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>functional<font color='#5555FF'>&gt;</font>
+
+<font color='#0000FF'>namespace</font> dlib 
+<b>{</b>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> domain,
+        <font color='#0000FF'>typename</font> range,
+        <font color='#0000FF'>typename</font> mem_manager,
+        <font color='#0000FF'>typename</font> compare <font color='#5555FF'>=</font> std::less<font color='#5555FF'>&lt;</font>domain<font color='#5555FF'>&gt;</font>
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>class</font> <b><a name='binary_search_tree_kernel_1'></a>binary_search_tree_kernel_1</b> : <font color='#0000FF'>public</font> enumerable<font color='#5555FF'>&lt;</font>map_pair<font color='#5555FF'>&lt;</font>domain,range<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font>,
+                                        <font color='#0000FF'>public</font> asc_pair_remover<font color='#5555FF'>&lt;</font>domain,range,compare<font color='#5555FF'>&gt;</font>
+    <b>{</b>
+
+        <font color='#009900'>/*!
+            INITIAL VALUE
+                tree_size == 0
+                tree_root == 0
+                tree_height == 0
+                at_start_ == true
+                current_element == 0
+                stack == array of 50 node pointers
+                stack_pos == 0
+
+
+            CONVENTION
+                tree_size   == size()
+                tree_height == height()
+
+                stack[stack_pos-1] == pop()
+
+                current_element_valid() == (current_element != 0)
+                if (current_element_valid()) then
+                    element() == current_element-&gt;d and current_element-&gt;r
+                at_start_ == at_start()
+                if (current_element != 0 &amp;&amp; current_element != tree_root) then
+                    stack[stack_pos-1] == the parent of the node pointed to by current_element
+
+                if (tree_size != 0)
+                    tree_root == pointer to the root node of the binary search tree
+                else
+                    tree_root == 0
+
+
+                for all nodes:
+                {
+                    left points to the left subtree or 0 if there is no left subtree and
+                    right points to the right subtree or 0 if there is no right subtree and
+                    all elements in a left subtree are &lt;= the root and
+                    all elements in a right subtree are &gt;= the root and
+                    d is the item in the domain of *this contained in the node
+                    r is the item in the range of *this contained in the node
+                    balance:
+                        balance == 0 if both subtrees have the same height
+                        balance == -1 if the left subtree has a height that is greater 
+                                   than the height of the right subtree by 1
+                        balance == 1 if the right subtree has a height that is greater 
+                                   than the height of the left subtree by 1
+                    for all trees:
+                        the height of the left and right subtrees differ by at most one
+                }
+
+        !*/</font>
+    
+        <font color='#0000FF'>class</font> <b><a name='node'></a>node</b>
+        <b>{</b>
+        <font color='#0000FF'>public</font>:
+            node<font color='#5555FF'>*</font> left;
+            node<font color='#5555FF'>*</font> right;
+            domain d;
+            range r;
+            <font color='#0000FF'><u>signed</u></font> <font color='#0000FF'><u>char</u></font> balance;
+        <b>}</b>;
+
+        <font color='#0000FF'>class</font> <b><a name='mpair'></a>mpair</b> : <font color='#0000FF'>public</font> map_pair<font color='#5555FF'>&lt;</font>domain,range<font color='#5555FF'>&gt;</font>
+        <b>{</b>
+        <font color='#0000FF'>public</font>:
+            <font color='#0000FF'>const</font> domain<font color='#5555FF'>*</font> d;
+            range<font color='#5555FF'>*</font> r;
+
+            <font color='#0000FF'>const</font> domain<font color='#5555FF'>&amp;</font> <b><a name='key'></a>key</b><font face='Lucida Console'>(</font> 
+            <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> <font color='#5555FF'>*</font>d; <b>}</b>
+
+            <font color='#0000FF'>const</font> range<font color='#5555FF'>&amp;</font> <b><a name='value'></a>value</b><font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> <font color='#5555FF'>*</font>r; <b>}</b>
+
+            range<font color='#5555FF'>&amp;</font> <b><a name='value'></a>value</b><font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font> <b>{</b> <font color='#0000FF'>return</font> <font color='#5555FF'>*</font>r; <b>}</b>
+        <b>}</b>;
+
+   
+        <font color='#0000FF'>public</font>:
+
+            <font color='#0000FF'>typedef</font> domain domain_type;
+            <font color='#0000FF'>typedef</font> range range_type;
+            <font color='#0000FF'>typedef</font> compare compare_type;
+            <font color='#0000FF'>typedef</font> mem_manager mem_manager_type;
+
+            <b><a name='binary_search_tree_kernel_1'></a>binary_search_tree_kernel_1</b><font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font> :
+                tree_size<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>,
+                tree_root<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>,
+                current_element<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>,
+                tree_height<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>,
+                at_start_<font face='Lucida Console'>(</font><font color='#979000'>true</font><font face='Lucida Console'>)</font>,
+                stack_pos<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>,
+                stack<font face='Lucida Console'>(</font>ppool.allocate_array<font face='Lucida Console'>(</font><font color='#979000'>50</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+            <b>}</b>
+
+            <font color='#0000FF'>virtual</font> ~<b><a name='binary_search_tree_kernel_1'></a>binary_search_tree_kernel_1</b><font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font>; 
+    
+            <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='clear'></a>clear</b><font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>inline</font> <font color='#0000FF'><u>short</u></font> <b><a name='height'></a>height</b> <font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+            <font color='#0000FF'>inline</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='count'></a>count</b> <font face='Lucida Console'>(</font>
+                <font color='#0000FF'>const</font> domain<font color='#5555FF'>&amp;</font> item
+            <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+            <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='add'></a>add</b> <font face='Lucida Console'>(</font>
+                domain<font color='#5555FF'>&amp;</font> d,
+                range<font color='#5555FF'>&amp;</font> r
+            <font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'><u>void</u></font> <b><a name='remove'></a>remove</b> <font face='Lucida Console'>(</font>
+                <font color='#0000FF'>const</font> domain<font color='#5555FF'>&amp;</font> d,
+                domain<font color='#5555FF'>&amp;</font> d_copy,
+                range<font color='#5555FF'>&amp;</font> r
+            <font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'><u>void</u></font> <b><a name='destroy'></a>destroy</b> <font face='Lucida Console'>(</font>
+                <font color='#0000FF'>const</font> domain<font color='#5555FF'>&amp;</font> item
+            <font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>inline</font> <font color='#0000FF'>const</font> range<font color='#5555FF'>*</font> <b><a name='operator'></a>operator</b>[] <font face='Lucida Console'>(</font>
+                <font color='#0000FF'>const</font> domain<font color='#5555FF'>&amp;</font> item
+            <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+            <font color='#0000FF'>inline</font> range<font color='#5555FF'>*</font> <b><a name='operator'></a>operator</b>[] <font face='Lucida Console'>(</font>
+                <font color='#0000FF'>const</font> domain<font color='#5555FF'>&amp;</font> item
+            <font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='swap'></a>swap</b> <font face='Lucida Console'>(</font>
+                binary_search_tree_kernel_1<font color='#5555FF'>&amp;</font> item
+            <font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// function from the asc_pair_remover interface
+</font>            <font color='#0000FF'><u>void</u></font> <b><a name='remove_any'></a>remove_any</b> <font face='Lucida Console'>(</font>
+                domain<font color='#5555FF'>&amp;</font> d,
+                range<font color='#5555FF'>&amp;</font> r
+            <font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// functions from the enumerable interface
+</font>            <font color='#0000FF'>inline</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='size'></a>size</b> <font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+            <font color='#0000FF'><u>bool</u></font> <b><a name='at_start'></a>at_start</b> <font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+            <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='reset'></a>reset</b> <font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+            <font color='#0000FF'><u>bool</u></font> <b><a name='current_element_valid'></a>current_element_valid</b> <font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+            <font color='#0000FF'>const</font> map_pair<font color='#5555FF'>&lt;</font>domain,range<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> <b><a name='element'></a>element</b> <font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+            map_pair<font color='#5555FF'>&lt;</font>domain,range<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> <b><a name='element'></a>element</b> <font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'><u>bool</u></font> <b><a name='move_next'></a>move_next</b> <font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+            <font color='#0000FF'><u>void</u></font> <b><a name='remove_last_in_order'></a>remove_last_in_order</b> <font face='Lucida Console'>(</font>
+                domain<font color='#5555FF'>&amp;</font> d,
+                range<font color='#5555FF'>&amp;</font> r
+            <font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'><u>void</u></font> <b><a name='remove_current_element'></a>remove_current_element</b> <font face='Lucida Console'>(</font>
+                domain<font color='#5555FF'>&amp;</font> d,
+                range<font color='#5555FF'>&amp;</font> r
+            <font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'><u>void</u></font> <b><a name='position_enumerator'></a>position_enumerator</b> <font face='Lucida Console'>(</font>
+                <font color='#0000FF'>const</font> domain<font color='#5555FF'>&amp;</font> d
+            <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+        <font color='#0000FF'>private</font>:
+
+
+            <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='rotate_left'></a>rotate_left</b> <font face='Lucida Console'>(</font>
+                node<font color='#5555FF'>*</font><font color='#5555FF'>&amp;</font> t
+            <font face='Lucida Console'>)</font>;
+            <font color='#009900'>/*!
+                requires
+                    - t-&gt;balance == 2 
+                    - t-&gt;right-&gt;balance == 0 or 1 
+                    - t == reference to the pointer in t's parent node that points to t
+                ensures
+                    - #t is still a binary search tree 
+                    - #t-&gt;balance is between 1 and -1 
+                    - #t now has a height smaller by 1 if #t-&gt;balance == 0
+            !*/</font>
+
+            <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='rotate_right'></a>rotate_right</b> <font face='Lucida Console'>(</font>
+                node<font color='#5555FF'>*</font><font color='#5555FF'>&amp;</font> t
+            <font face='Lucida Console'>)</font>;
+            <font color='#009900'>/*!
+                requires
+                    - t-&gt;balance == -2 
+                    - t-&gt;left-&gt;balance == 0 or -1 
+                    - t == reference to the pointer in t's parent node that points to t
+                ensures
+                    - #t is still a binary search tree 
+                    - #t-&gt;balance is between 1 and -1 
+                    - #t now has a height smaller by 1 if #t-&gt;balance == 0
+
+            !*/</font>
+
+            <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='double_rotate_right'></a>double_rotate_right</b> <font face='Lucida Console'>(</font>
+                node<font color='#5555FF'>*</font><font color='#5555FF'>&amp;</font> t
+            <font face='Lucida Console'>)</font>;
+            <font color='#009900'>/*!
+                requires
+                    - t-&gt;balance == -2 
+                    - t-&gt;left-&gt;balance == 1 
+                    - t == reference to the pointer in t's parent node that points to t
+                ensures
+                    - #t is still a binary search tree 
+                    - #t now has a balance of 0 
+                    - #t now has a height smaller by 1             
+            !*/</font>
+
+            <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='double_rotate_left'></a>double_rotate_left</b> <font face='Lucida Console'>(</font>
+                node<font color='#5555FF'>*</font><font color='#5555FF'>&amp;</font> t
+            <font face='Lucida Console'>)</font>;
+            <font color='#009900'>/*!
+                requires
+                    - t-&gt;balance == 2 
+                    - t-&gt;right-&gt;balance == -1 
+                    - t == reference to the pointer in t's parent node that points to t
+                ensures
+                    - #t is still a binary search tree 
+                    - #t now has a balance of 0 
+                    - #t now has a height smaller by 1
+            !*/</font>
+
+            <font color='#0000FF'><u>bool</u></font> <b><a name='remove_biggest_element_in_tree'></a>remove_biggest_element_in_tree</b> <font face='Lucida Console'>(</font>
+                node<font color='#5555FF'>*</font><font color='#5555FF'>&amp;</font> t,
+                domain<font color='#5555FF'>&amp;</font> d,
+                range<font color='#5555FF'>&amp;</font> r
+            <font face='Lucida Console'>)</font>;
+            <font color='#009900'>/*!
+                requires
+                    - t != 0  (i.e. there must be something in the tree to remove) 
+                    - t == reference to the pointer in t's parent node that points to t
+                ensures
+                    - the biggest node in t has been removed 
+                    - the biggest node domain element in t has been put into #d 
+                    - the biggest node range element in t has been put into #r
+                    - #t is still a binary search tree 
+                    - returns false if the height of the tree has not changed 
+                    - returns true if the height of the tree has shrunk by one
+            !*/</font>
+
+            <font color='#0000FF'><u>bool</u></font> <b><a name='remove_least_element_in_tree'></a>remove_least_element_in_tree</b> <font face='Lucida Console'>(</font>
+                node<font color='#5555FF'>*</font><font color='#5555FF'>&amp;</font> t,
+                domain<font color='#5555FF'>&amp;</font> d,
+                range<font color='#5555FF'>&amp;</font> r
+            <font face='Lucida Console'>)</font>;
+            <font color='#009900'>/*!
+                requires
+                    - t != 0  (i.e. there must be something in the tree to remove) 
+                    - t == reference to the pointer in t's parent node that points to t
+                ensures
+                    - the least node in t has been removed 
+                    - the least node domain element in t has been put into #d 
+                    - the least node range element in t has been put into #r
+                    - #t is still a binary search tree 
+                    - returns false if the height of the tree has not changed 
+                    - returns true if the height of the tree has shrunk by one
+            !*/</font>
+
+            <font color='#0000FF'><u>bool</u></font> <b><a name='add_to_tree'></a>add_to_tree</b> <font face='Lucida Console'>(</font>
+                node<font color='#5555FF'>*</font><font color='#5555FF'>&amp;</font> t,
+                domain<font color='#5555FF'>&amp;</font> d,
+                range<font color='#5555FF'>&amp;</font> r
+            <font face='Lucida Console'>)</font>;
+            <font color='#009900'>/*!
+                requires
+                    - t == reference to the pointer in t's parent node that points to t
+                ensures
+                    - the mapping (d --&gt; r) has been added to #t 
+                    - #d and #r have initial values for their types
+                    - #t is still a binary search tree 
+                    - returns false if the height of the tree has not changed 
+                    - returns true if the height of the tree has grown by one
+            !*/</font>
+
+            <font color='#0000FF'><u>bool</u></font> <b><a name='remove_from_tree'></a>remove_from_tree</b> <font face='Lucida Console'>(</font>
+                node<font color='#5555FF'>*</font><font color='#5555FF'>&amp;</font> t,
+                <font color='#0000FF'>const</font> domain<font color='#5555FF'>&amp;</font> d,
+                domain<font color='#5555FF'>&amp;</font> d_copy,
+                range<font color='#5555FF'>&amp;</font> r
+            <font face='Lucida Console'>)</font>;
+            <font color='#009900'>/*!
+                requires
+                    - return_reference(t,d) != 0
+                    - t == reference to the pointer in t's parent node that points to t
+                ensures
+                    - #d_copy is equivalent to d                                    
+                    - an element in t equivalent to d has been removed and swapped 
+                      into #d_copy and its associated range object has been 
+                      swapped into #r
+                    - #t is still a binary search tree                                     
+                    - returns false if the height of the tree has not changed 
+                    - returns true if the height of the tree has shrunk by one
+            !*/</font>
+
+            <font color='#0000FF'><u>bool</u></font> <b><a name='remove_from_tree'></a>remove_from_tree</b> <font face='Lucida Console'>(</font>
+                node<font color='#5555FF'>*</font><font color='#5555FF'>&amp;</font> t,
+                <font color='#0000FF'>const</font> domain<font color='#5555FF'>&amp;</font> item
+            <font face='Lucida Console'>)</font>;
+            <font color='#009900'>/*!
+                requires
+                    - return_reference(t,item) != 0
+                    - t == reference to the pointer in t's parent node that points to t
+                ensures
+                    - an element in t equivalent to item has been removed                      
+                    - #t is still a binary search tree                                     
+                    - returns false if the height of the tree has not changed 
+                    - returns true if the height of the tree has shrunk by one
+            !*/</font>
+
+            <font color='#0000FF'>const</font> range<font color='#5555FF'>*</font> <b><a name='return_reference'></a>return_reference</b> <font face='Lucida Console'>(</font>
+                <font color='#0000FF'>const</font> node<font color='#5555FF'>*</font> t,
+                <font color='#0000FF'>const</font> domain<font color='#5555FF'>&amp;</font> d
+            <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+            <font color='#009900'>/*!
+                ensures
+                    - if (there is a domain element equivalent to d in t) then
+                        - returns a pointer to the element in the range equivalent to d
+                    - else
+                        - returns 0
+            !*/</font>
+
+            range<font color='#5555FF'>*</font> <b><a name='return_reference'></a>return_reference</b> <font face='Lucida Console'>(</font>
+                node<font color='#5555FF'>*</font> t,
+                <font color='#0000FF'>const</font> domain<font color='#5555FF'>&amp;</font> d
+            <font face='Lucida Console'>)</font>;
+            <font color='#009900'>/*!
+                ensures
+                    - if (there is a domain element equivalent to d in t) then
+                        - returns a pointer to the element in the range equivalent to d
+                    - else
+                        - returns 0
+            !*/</font>
+
+
+            <font color='#0000FF'>inline</font> <font color='#0000FF'><u>bool</u></font> <b><a name='keep_node_balanced'></a>keep_node_balanced</b> <font face='Lucida Console'>(</font>
+                node<font color='#5555FF'>*</font><font color='#5555FF'>&amp;</font> t
+            <font face='Lucida Console'>)</font>;
+            <font color='#009900'>/*!
+                requires
+                    - t != 0 
+                    - t == reference to the pointer in t's parent node that points to t
+                ensures
+                    - if (t-&gt;balance is &lt; 1 or &gt; 1) then 
+                        - keep_node_balanced() will ensure that #t-&gt;balance == 0, -1, or 1
+                    - #t is still a binary search tree
+                    - returns true if it made the tree one height shorter 
+                    - returns false if it didn't change the height
+            !*/</font>
+
+
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='get_count'></a>get_count</b> <font face='Lucida Console'>(</font>
+                <font color='#0000FF'>const</font> domain<font color='#5555FF'>&amp;</font> item,
+                node<font color='#5555FF'>*</font> tree_root
+            <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+            <font color='#009900'>/*!
+                requires
+                    - tree_root == the root of a binary search tree or 0
+                ensures
+                    - if (tree_root == 0) then
+                        - returns 0
+                    - else
+                        - returns the number of elements in tree_root that are 
+                          equivalent to item
+            !*/</font>
+
+
+            <font color='#0000FF'><u>void</u></font> <b><a name='delete_tree'></a>delete_tree</b> <font face='Lucida Console'>(</font>
+                node<font color='#5555FF'>*</font> t
+            <font face='Lucida Console'>)</font>;
+            <font color='#009900'>/*!
+                requires
+                    - t != 0
+                ensures
+                    - deallocates the node pointed to by t and all of t's left and right children
+            !*/</font>
+
+
+            <font color='#0000FF'><u>void</u></font> <b><a name='push'></a>push</b> <font face='Lucida Console'>(</font>
+                node<font color='#5555FF'>*</font> n
+            <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> stack[stack_pos] <font color='#5555FF'>=</font> n; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>stack_pos; <b>}</b>
+            <font color='#009900'>/*!
+                ensures
+                    - pushes n onto the stack
+            !*/</font>
+            
+
+            node<font color='#5555FF'>*</font> <b><a name='pop'></a>pop</b> <font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#5555FF'>-</font><font color='#5555FF'>-</font>stack_pos; <font color='#0000FF'>return</font> stack[stack_pos]; <b>}</b>
+            <font color='#009900'>/*!
+                ensures
+                    - pops the top of the stack and returns it
+            !*/</font>
+
+
+
+            <font color='#0000FF'><u>bool</u></font> <b><a name='fix_stack'></a>fix_stack</b> <font face='Lucida Console'>(</font>
+                node<font color='#5555FF'>*</font> t,
+                <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> depth <font color='#5555FF'>=</font> <font color='#979000'>0</font>
+            <font face='Lucida Console'>)</font>;
+            <font color='#009900'>/*!
+                requires
+                    - current_element != 0
+                    - depth == 0
+                    - t == tree_root
+                ensures
+                    - makes the stack contain the correct set of parent pointers.
+                      also adjusts stack_pos so it is correct.
+                    - #t is still a binary search tree                                     
+            !*/</font>
+
+            <font color='#0000FF'><u>bool</u></font> <b><a name='remove_current_element_from_tree'></a>remove_current_element_from_tree</b> <font face='Lucida Console'>(</font>
+                node<font color='#5555FF'>*</font><font color='#5555FF'>&amp;</font> t,
+                domain<font color='#5555FF'>&amp;</font> d,
+                range<font color='#5555FF'>&amp;</font> r,
+                <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> cur_stack_pos <font color='#5555FF'>=</font> <font color='#979000'>1</font>
+            <font face='Lucida Console'>)</font>; 
+            <font color='#009900'>/*!
+                requires
+                    - t == tree_root
+                    - cur_stack_pos == 1
+                    - current_element != 0
+                ensures
+                    - removes the data in the node given by current_element and swaps it into 
+                      #d and #r.  
+                    - #t is still a binary search tree                                     
+                    - the enumerator is advances on to the next element but its stack is 
+                      potentially corrupted.  so you must call fix_stack(tree_root) to fix
+                      it.
+                    - returns false if the height of the tree has not changed 
+                    - returns true if the height of the tree has shrunk by one
+            !*/</font>
+
+
+            <font color='#009900'>// data members
+</font>
+            <font color='#0000FF'>mutable</font> mpair p;
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> tree_size;            
+            node<font color='#5555FF'>*</font> tree_root;
+            <font color='#0000FF'>mutable</font> node<font color='#5555FF'>*</font> current_element;            
+            <font color='#0000FF'>typename</font> mem_manager::<font color='#0000FF'>template</font> rebind<font color='#5555FF'>&lt;</font>node<font color='#5555FF'>&gt;</font>::other pool;
+            <font color='#0000FF'>typename</font> mem_manager::<font color='#0000FF'>template</font> rebind<font color='#5555FF'>&lt;</font>node<font color='#5555FF'>*</font><font color='#5555FF'>&gt;</font>::other ppool;
+            <font color='#0000FF'><u>short</u></font> tree_height;
+            <font color='#0000FF'>mutable</font> <font color='#0000FF'><u>bool</u></font> at_start_;
+            <font color='#0000FF'>mutable</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> stack_pos;
+            <font color='#0000FF'>mutable</font> node<font color='#5555FF'>*</font><font color='#5555FF'>*</font> stack;
+            compare comp; 
+
+            <font color='#009900'>// restricted functions
+</font>            <b><a name='binary_search_tree_kernel_1'></a>binary_search_tree_kernel_1</b><font face='Lucida Console'>(</font>binary_search_tree_kernel_1<font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font>;        
+            binary_search_tree_kernel_1<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>=</font><font face='Lucida Console'>(</font>binary_search_tree_kernel_1<font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font>; 
+
+
+    <b>}</b>;
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> domain,
+        <font color='#0000FF'>typename</font> range,
+        <font color='#0000FF'>typename</font> mem_manager,
+        <font color='#0000FF'>typename</font> compare
+        <font color='#5555FF'>&gt;</font>   
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='swap'></a>swap</b> <font face='Lucida Console'>(</font>
+        binary_search_tree_kernel_1<font color='#5555FF'>&lt;</font>domain,range,mem_manager,compare<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> a, 
+        binary_search_tree_kernel_1<font color='#5555FF'>&lt;</font>domain,range,mem_manager,compare<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> b 
+    <font face='Lucida Console'>)</font> <b>{</b> a.<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>b<font face='Lucida Console'>)</font>; <b>}</b>
+
+
+
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> domain,
+        <font color='#0000FF'>typename</font> range,
+        <font color='#0000FF'>typename</font> mem_manager,
+        <font color='#0000FF'>typename</font> compare
+        <font color='#5555FF'>&gt;</font>   
+    <font color='#0000FF'><u>void</u></font> <b><a name='deserialize'></a>deserialize</b> <font face='Lucida Console'>(</font>
+        binary_search_tree_kernel_1<font color='#5555FF'>&lt;</font>domain,range,mem_manager,compare<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> item, 
+        std::istream<font color='#5555FF'>&amp;</font> in
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>try</font>
+        <b>{</b>
+            item.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> size;
+            <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>size,in<font face='Lucida Console'>)</font>;
+            domain d;
+            range r;
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> size; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>d,in<font face='Lucida Console'>)</font>;
+                <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>r,in<font face='Lucida Console'>)</font>;
+                item.<font color='#BB00BB'>add</font><font face='Lucida Console'>(</font>d,r<font face='Lucida Console'>)</font>;
+            <b>}</b>
+        <b>}</b>
+        <font color='#0000FF'>catch</font> <font face='Lucida Console'>(</font>serialization_error e<font face='Lucida Console'>)</font>
+        <b>{</b> 
+            item.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>throw</font> <font color='#BB00BB'>serialization_error</font><font face='Lucida Console'>(</font>e.info <font color='#5555FF'>+</font> "<font color='#CC0000'>\n   while deserializing object of type binary_search_tree_kernel_1</font>"<font face='Lucida Console'>)</font>; 
+        <b>}</b>
+    <b>}</b>
+
+
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>    <font color='#009900'>// member function definitions
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> domain,
+        <font color='#0000FF'>typename</font> range,
+        <font color='#0000FF'>typename</font> mem_manager,
+        <font color='#0000FF'>typename</font> compare
+        <font color='#5555FF'>&gt;</font>   
+    binary_search_tree_kernel_1<font color='#5555FF'>&lt;</font>domain,range,mem_manager,compare<font color='#5555FF'>&gt;</font>::
+    ~<b><a name='binary_search_tree_kernel_1'></a>binary_search_tree_kernel_1</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        ppool.<font color='#BB00BB'>deallocate_array</font><font face='Lucida Console'>(</font>stack<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>tree_size <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#BB00BB'>delete_tree</font><font face='Lucida Console'>(</font>tree_root<font face='Lucida Console'>)</font>;
+        <b>}</b>        
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> domain,
+        <font color='#0000FF'>typename</font> range,
+        <font color='#0000FF'>typename</font> mem_manager,
+        <font color='#0000FF'>typename</font> compare
+        <font color='#5555FF'>&gt;</font>   
+    <font color='#0000FF'><u>void</u></font> binary_search_tree_kernel_1<font color='#5555FF'>&lt;</font>domain,range,mem_manager,compare<font color='#5555FF'>&gt;</font>::
+    <b><a name='clear'></a>clear</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>tree_size <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#BB00BB'>delete_tree</font><font face='Lucida Console'>(</font>tree_root<font face='Lucida Console'>)</font>;
+            tree_root <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            tree_size <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            tree_height <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <b>}</b>
+        <font color='#009900'>// reset the enumerator
+</font>        <font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> domain,
+        <font color='#0000FF'>typename</font> range,
+        <font color='#0000FF'>typename</font> mem_manager,
+        <font color='#0000FF'>typename</font> compare
+        <font color='#5555FF'>&gt;</font>   
+    <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> binary_search_tree_kernel_1<font color='#5555FF'>&lt;</font>domain,range,mem_manager,compare<font color='#5555FF'>&gt;</font>::
+    <b><a name='size'></a>size</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        <font color='#0000FF'>return</font> tree_size;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> domain,
+        <font color='#0000FF'>typename</font> range,
+        <font color='#0000FF'>typename</font> mem_manager,
+        <font color='#0000FF'>typename</font> compare
+        <font color='#5555FF'>&gt;</font>   
+    <font color='#0000FF'><u>short</u></font> binary_search_tree_kernel_1<font color='#5555FF'>&lt;</font>domain,range,mem_manager,compare<font color='#5555FF'>&gt;</font>::
+    <b><a name='height'></a>height</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        <font color='#0000FF'>return</font> tree_height;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> domain,
+        <font color='#0000FF'>typename</font> range,
+        <font color='#0000FF'>typename</font> mem_manager,
+        <font color='#0000FF'>typename</font> compare
+        <font color='#5555FF'>&gt;</font>   
+    <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> binary_search_tree_kernel_1<font color='#5555FF'>&lt;</font>domain,range,mem_manager,compare<font color='#5555FF'>&gt;</font>::
+    <b><a name='count'></a>count</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> domain<font color='#5555FF'>&amp;</font> item
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        <font color='#0000FF'>return</font> <font color='#BB00BB'>get_count</font><font face='Lucida Console'>(</font>item,tree_root<font face='Lucida Console'>)</font>;        
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> domain,
+        <font color='#0000FF'>typename</font> range,
+        <font color='#0000FF'>typename</font> mem_manager,
+        <font color='#0000FF'>typename</font> compare
+        <font color='#5555FF'>&gt;</font>   
+    <font color='#0000FF'><u>void</u></font> binary_search_tree_kernel_1<font color='#5555FF'>&lt;</font>domain,range,mem_manager,compare<font color='#5555FF'>&gt;</font>::
+    <b><a name='add'></a>add</b> <font face='Lucida Console'>(</font>
+        domain<font color='#5555FF'>&amp;</font> d,
+        range<font color='#5555FF'>&amp;</font> r
+    <font face='Lucida Console'>)</font> 
+    <b>{</b>
+        tree_height <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#BB00BB'>add_to_tree</font><font face='Lucida Console'>(</font>tree_root,d,r<font face='Lucida Console'>)</font>;
+        <font color='#5555FF'>+</font><font color='#5555FF'>+</font>tree_size;
+        <font color='#009900'>// reset the enumerator
+</font>        <font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> domain,
+        <font color='#0000FF'>typename</font> range,
+        <font color='#0000FF'>typename</font> mem_manager,
+        <font color='#0000FF'>typename</font> compare
+        <font color='#5555FF'>&gt;</font>   
+    <font color='#0000FF'><u>void</u></font> binary_search_tree_kernel_1<font color='#5555FF'>&lt;</font>domain,range,mem_manager,compare<font color='#5555FF'>&gt;</font>::
+    <b><a name='remove'></a>remove</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> domain<font color='#5555FF'>&amp;</font> d,
+        domain<font color='#5555FF'>&amp;</font> d_copy,
+        range<font color='#5555FF'>&amp;</font> r
+    <font face='Lucida Console'>)</font> 
+    <b>{</b>
+        tree_height <font color='#5555FF'>-</font><font color='#5555FF'>=</font> <font color='#BB00BB'>remove_from_tree</font><font face='Lucida Console'>(</font>tree_root,d,d_copy,r<font face='Lucida Console'>)</font>;
+        <font color='#5555FF'>-</font><font color='#5555FF'>-</font>tree_size;
+        <font color='#009900'>// reset the enumerator
+</font>        <font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> domain,
+        <font color='#0000FF'>typename</font> range,
+        <font color='#0000FF'>typename</font> mem_manager,
+        <font color='#0000FF'>typename</font> compare
+        <font color='#5555FF'>&gt;</font>   
+    <font color='#0000FF'><u>void</u></font> binary_search_tree_kernel_1<font color='#5555FF'>&lt;</font>domain,range,mem_manager,compare<font color='#5555FF'>&gt;</font>::
+    <b><a name='destroy'></a>destroy</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> domain<font color='#5555FF'>&amp;</font> item
+    <font face='Lucida Console'>)</font> 
+    <b>{</b>
+        tree_height <font color='#5555FF'>-</font><font color='#5555FF'>=</font> <font color='#BB00BB'>remove_from_tree</font><font face='Lucida Console'>(</font>tree_root,item<font face='Lucida Console'>)</font>;
+        <font color='#5555FF'>-</font><font color='#5555FF'>-</font>tree_size;
+        <font color='#009900'>// reset the enumerator
+</font>        <font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> domain,
+        <font color='#0000FF'>typename</font> range,
+        <font color='#0000FF'>typename</font> mem_manager,
+        <font color='#0000FF'>typename</font> compare
+        <font color='#5555FF'>&gt;</font>   
+    <font color='#0000FF'><u>void</u></font> binary_search_tree_kernel_1<font color='#5555FF'>&lt;</font>domain,range,mem_manager,compare<font color='#5555FF'>&gt;</font>::
+    <b><a name='remove_any'></a>remove_any</b> <font face='Lucida Console'>(</font>
+        domain<font color='#5555FF'>&amp;</font> d,
+        range<font color='#5555FF'>&amp;</font> r
+    <font face='Lucida Console'>)</font> 
+    <b>{</b>
+        tree_height <font color='#5555FF'>-</font><font color='#5555FF'>=</font> <font color='#BB00BB'>remove_least_element_in_tree</font><font face='Lucida Console'>(</font>tree_root,d,r<font face='Lucida Console'>)</font>;
+        <font color='#5555FF'>-</font><font color='#5555FF'>-</font>tree_size;
+        <font color='#009900'>// reset the enumerator
+</font>        <font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> domain,
+        <font color='#0000FF'>typename</font> range,
+        <font color='#0000FF'>typename</font> mem_manager,
+        <font color='#0000FF'>typename</font> compare
+        <font color='#5555FF'>&gt;</font>   
+    range<font color='#5555FF'>*</font> binary_search_tree_kernel_1<font color='#5555FF'>&lt;</font>domain,range,mem_manager,compare<font color='#5555FF'>&gt;</font>::
+    <b><a name='operator'></a>operator</b>[] <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> domain<font color='#5555FF'>&amp;</font> item
+    <font face='Lucida Console'>)</font> 
+    <b>{</b>
+        <font color='#0000FF'>return</font> <font color='#BB00BB'>return_reference</font><font face='Lucida Console'>(</font>tree_root,item<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> domain,
+        <font color='#0000FF'>typename</font> range,
+        <font color='#0000FF'>typename</font> mem_manager,
+        <font color='#0000FF'>typename</font> compare
+        <font color='#5555FF'>&gt;</font>   
+    <font color='#0000FF'>const</font> range<font color='#5555FF'>*</font> binary_search_tree_kernel_1<font color='#5555FF'>&lt;</font>domain,range,mem_manager,compare<font color='#5555FF'>&gt;</font>::
+    <b><a name='operator'></a>operator</b>[] <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> domain<font color='#5555FF'>&amp;</font> item
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        <font color='#0000FF'>return</font> <font color='#BB00BB'>return_reference</font><font face='Lucida Console'>(</font>tree_root,item<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> domain,
+        <font color='#0000FF'>typename</font> range,
+        <font color='#0000FF'>typename</font> mem_manager,
+        <font color='#0000FF'>typename</font> compare
+        <font color='#5555FF'>&gt;</font>   
+    <font color='#0000FF'><u>void</u></font> binary_search_tree_kernel_1<font color='#5555FF'>&lt;</font>domain,range,mem_manager,compare<font color='#5555FF'>&gt;</font>::
+    <b><a name='swap'></a>swap</b> <font face='Lucida Console'>(</font>
+        binary_search_tree_kernel_1<font color='#5555FF'>&lt;</font>domain,range,mem_manager,compare<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> item
+    <font face='Lucida Console'>)</font> 
+    <b>{</b>
+        pool.<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>item.pool<font face='Lucida Console'>)</font>;
+        ppool.<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>item.ppool<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>exchange</font><font face='Lucida Console'>(</font>p,item.p<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>exchange</font><font face='Lucida Console'>(</font>stack,item.stack<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>exchange</font><font face='Lucida Console'>(</font>stack_pos,item.stack_pos<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>exchange</font><font face='Lucida Console'>(</font>comp,item.comp<font face='Lucida Console'>)</font>;
+        
+
+        node<font color='#5555FF'>*</font> tree_root_temp            <font color='#5555FF'>=</font> item.tree_root;
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> tree_size_temp    <font color='#5555FF'>=</font> item.tree_size;
+        <font color='#0000FF'><u>short</u></font> tree_height_temp          <font color='#5555FF'>=</font> item.tree_height;
+        node<font color='#5555FF'>*</font> current_element_temp      <font color='#5555FF'>=</font> item.current_element;
+        <font color='#0000FF'><u>bool</u></font> at_start_temp              <font color='#5555FF'>=</font> item.at_start_;
+
+        item.tree_root   <font color='#5555FF'>=</font> tree_root;
+        item.tree_size   <font color='#5555FF'>=</font> tree_size;
+        item.tree_height <font color='#5555FF'>=</font> tree_height;
+        item.current_element <font color='#5555FF'>=</font> current_element;
+        item.at_start_   <font color='#5555FF'>=</font> at_start_;
+
+        tree_root   <font color='#5555FF'>=</font> tree_root_temp;
+        tree_size   <font color='#5555FF'>=</font> tree_size_temp;
+        tree_height <font color='#5555FF'>=</font> tree_height_temp;
+        current_element <font color='#5555FF'>=</font> current_element_temp;
+        at_start_   <font color='#5555FF'>=</font> at_start_temp;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> domain,
+        <font color='#0000FF'>typename</font> range,
+        <font color='#0000FF'>typename</font> mem_manager,
+        <font color='#0000FF'>typename</font> compare
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> binary_search_tree_kernel_1<font color='#5555FF'>&lt;</font>domain,range,mem_manager,compare<font color='#5555FF'>&gt;</font>::
+    <b><a name='remove_last_in_order'></a>remove_last_in_order</b> <font face='Lucida Console'>(</font>
+        domain<font color='#5555FF'>&amp;</font> d,
+        range<font color='#5555FF'>&amp;</font> r
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        tree_height <font color='#5555FF'>-</font><font color='#5555FF'>=</font> <font color='#BB00BB'>remove_biggest_element_in_tree</font><font face='Lucida Console'>(</font>tree_root,d,r<font face='Lucida Console'>)</font>;
+        <font color='#5555FF'>-</font><font color='#5555FF'>-</font>tree_size;
+        <font color='#009900'>// reset the enumerator
+</font>        <font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> domain,
+        <font color='#0000FF'>typename</font> range,
+        <font color='#0000FF'>typename</font> mem_manager,
+        <font color='#0000FF'>typename</font> compare
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> binary_search_tree_kernel_1<font color='#5555FF'>&lt;</font>domain,range,mem_manager,compare<font color='#5555FF'>&gt;</font>::
+    <b><a name='remove_current_element'></a>remove_current_element</b> <font face='Lucida Console'>(</font>
+        domain<font color='#5555FF'>&amp;</font> d,
+        range<font color='#5555FF'>&amp;</font> r
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        tree_height <font color='#5555FF'>-</font><font color='#5555FF'>=</font> <font color='#BB00BB'>remove_current_element_from_tree</font><font face='Lucida Console'>(</font>tree_root,d,r<font face='Lucida Console'>)</font>;
+        <font color='#5555FF'>-</font><font color='#5555FF'>-</font>tree_size;
+
+        <font color='#009900'>// fix the enumerator stack if we need to
+</font>        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>current_element<font face='Lucida Console'>)</font>
+            <font color='#BB00BB'>fix_stack</font><font face='Lucida Console'>(</font>tree_root<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> domain,
+        <font color='#0000FF'>typename</font> range,
+        <font color='#0000FF'>typename</font> mem_manager,
+        <font color='#0000FF'>typename</font> compare
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> binary_search_tree_kernel_1<font color='#5555FF'>&lt;</font>domain,range,mem_manager,compare<font color='#5555FF'>&gt;</font>::
+    <b><a name='position_enumerator'></a>position_enumerator</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> domain<font color='#5555FF'>&amp;</font> d
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        <font color='#009900'>// clear the enumerator state and make sure the stack is empty
+</font>        <font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        at_start_ <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+        node<font color='#5555FF'>*</font> t <font color='#5555FF'>=</font> tree_root;
+        <font color='#0000FF'><u>bool</u></font> went_left <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+        <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>t <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> <font color='#BB00BB'>comp</font><font face='Lucida Console'>(</font>d , t<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>d<font face='Lucida Console'>)</font> <font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#BB00BB'>push</font><font face='Lucida Console'>(</font>t<font face='Lucida Console'>)</font>;
+                <font color='#009900'>// if item is on the left then look in left
+</font>                t <font color='#5555FF'>=</font> t<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>left;
+                went_left <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+            <b>}</b>
+            <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>comp</font><font face='Lucida Console'>(</font>t<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>d , d<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#BB00BB'>push</font><font face='Lucida Console'>(</font>t<font face='Lucida Console'>)</font>;
+                <font color='#009900'>// if item is on the right then look in right
+</font>                t <font color='#5555FF'>=</font> t<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>right;
+                went_left <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+            <b>}</b>
+            <font color='#0000FF'>else</font>
+            <b>{</b>
+                current_element <font color='#5555FF'>=</font> t;
+                <font color='#0000FF'>return</font>;
+            <b>}</b>
+        <b>}</b>
+
+        <font color='#009900'>// if we didn't find any matches but there might be something after the
+</font>        <font color='#009900'>// d in this tree.
+</font>        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>stack_pos <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            current_element <font color='#5555FF'>=</font> <font color='#BB00BB'>pop</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#009900'>// if we went left from this node then this node is the next
+</font>            <font color='#009900'>// biggest.
+</font>            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>went_left<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>return</font>;
+            <b>}</b>
+            <font color='#0000FF'>else</font>
+            <b>{</b>
+                <font color='#BB00BB'>move_next</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+        <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>    <font color='#009900'>// enumerable function definitions
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> domain,
+        <font color='#0000FF'>typename</font> range,
+        <font color='#0000FF'>typename</font> mem_manager,
+        <font color='#0000FF'>typename</font> compare
+        <font color='#5555FF'>&gt;</font>   
+    <font color='#0000FF'><u>bool</u></font> binary_search_tree_kernel_1<font color='#5555FF'>&lt;</font>domain,range,mem_manager,compare<font color='#5555FF'>&gt;</font>::
+    <b><a name='at_start'></a>at_start</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        <font color='#0000FF'>return</font> at_start_;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> domain,
+        <font color='#0000FF'>typename</font> range,
+        <font color='#0000FF'>typename</font> mem_manager,
+        <font color='#0000FF'>typename</font> compare
+        <font color='#5555FF'>&gt;</font>   
+    <font color='#0000FF'><u>void</u></font> binary_search_tree_kernel_1<font color='#5555FF'>&lt;</font>domain,range,mem_manager,compare<font color='#5555FF'>&gt;</font>::
+    <b><a name='reset'></a>reset</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        at_start_ <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+        current_element <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        stack_pos <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> domain,
+        <font color='#0000FF'>typename</font> range,
+        <font color='#0000FF'>typename</font> mem_manager,
+        <font color='#0000FF'>typename</font> compare
+        <font color='#5555FF'>&gt;</font>   
+    <font color='#0000FF'><u>bool</u></font> binary_search_tree_kernel_1<font color='#5555FF'>&lt;</font>domain,range,mem_manager,compare<font color='#5555FF'>&gt;</font>::
+    <b><a name='current_element_valid'></a>current_element_valid</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        <font color='#0000FF'>return</font> <font face='Lucida Console'>(</font>current_element <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> domain,
+        <font color='#0000FF'>typename</font> range,
+        <font color='#0000FF'>typename</font> mem_manager,
+        <font color='#0000FF'>typename</font> compare
+        <font color='#5555FF'>&gt;</font>   
+    <font color='#0000FF'>const</font> map_pair<font color='#5555FF'>&lt;</font>domain,range<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> binary_search_tree_kernel_1<font color='#5555FF'>&lt;</font>domain,range,mem_manager,compare<font color='#5555FF'>&gt;</font>::
+    <b><a name='element'></a>element</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        p.d <font color='#5555FF'>=</font> <font color='#5555FF'>&amp;</font><font face='Lucida Console'>(</font>current_element<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>d<font face='Lucida Console'>)</font>;
+        p.r <font color='#5555FF'>=</font> <font color='#5555FF'>&amp;</font><font face='Lucida Console'>(</font>current_element<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>r<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>return</font> p;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> domain,
+        <font color='#0000FF'>typename</font> range,
+        <font color='#0000FF'>typename</font> mem_manager,
+        <font color='#0000FF'>typename</font> compare
+        <font color='#5555FF'>&gt;</font>   
+    map_pair<font color='#5555FF'>&lt;</font>domain,range<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> binary_search_tree_kernel_1<font color='#5555FF'>&lt;</font>domain,range,mem_manager,compare<font color='#5555FF'>&gt;</font>::
+    <b><a name='element'></a>element</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        p.d <font color='#5555FF'>=</font> <font color='#5555FF'>&amp;</font><font face='Lucida Console'>(</font>current_element<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>d<font face='Lucida Console'>)</font>;
+        p.r <font color='#5555FF'>=</font> <font color='#5555FF'>&amp;</font><font face='Lucida Console'>(</font>current_element<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>r<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>return</font> p;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> domain,
+        <font color='#0000FF'>typename</font> range,
+        <font color='#0000FF'>typename</font> mem_manager,
+        <font color='#0000FF'>typename</font> compare
+        <font color='#5555FF'>&gt;</font>   
+    <font color='#0000FF'><u>bool</u></font> binary_search_tree_kernel_1<font color='#5555FF'>&lt;</font>domain,range,mem_manager,compare<font color='#5555FF'>&gt;</font>::
+    <b><a name='move_next'></a>move_next</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        <font color='#009900'>// if we haven't started iterating yet
+</font>        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>at_start_<font face='Lucida Console'>)</font>
+        <b>{</b>
+            at_start_ <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>tree_size <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>return</font> <font color='#979000'>false</font>;
+            <b>}</b>
+            <font color='#0000FF'>else</font>
+            <b>{</b>                    
+                <font color='#009900'>// find the first element in the tree
+</font>                current_element <font color='#5555FF'>=</font> tree_root;
+                node<font color='#5555FF'>*</font> temp <font color='#5555FF'>=</font> current_element<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>left;
+                <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>temp <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#BB00BB'>push</font><font face='Lucida Console'>(</font>current_element<font face='Lucida Console'>)</font>;
+                    current_element <font color='#5555FF'>=</font> temp;
+                    temp <font color='#5555FF'>=</font> current_element<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>left;
+                <b>}</b>
+                <font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+            <b>}</b>
+        <b>}</b>
+        <font color='#0000FF'>else</font>
+        <b>{</b>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>current_element <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>return</font> <font color='#979000'>false</font>;
+            <b>}</b>
+            <font color='#0000FF'>else</font>
+            <b>{</b>
+                node<font color='#5555FF'>*</font> temp;
+                <font color='#0000FF'><u>bool</u></font> went_up;  <font color='#009900'>// true if we went up the tree from a child node to parent
+</font>                <font color='#0000FF'><u>bool</u></font> from_left <font color='#5555FF'>=</font> <font color='#979000'>false</font>; <font color='#009900'>// true if we went up and were coming from a left child node
+</font>                <font color='#009900'>// find the next element in the tree
+</font>                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>current_element<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>right <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#009900'>// go right and down    
+</font>                    temp <font color='#5555FF'>=</font> current_element;
+                    <font color='#BB00BB'>push</font><font face='Lucida Console'>(</font>current_element<font face='Lucida Console'>)</font>;
+                    current_element <font color='#5555FF'>=</font> temp<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>right;
+                    went_up <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+                <b>}</b>
+                <font color='#0000FF'>else</font>
+                <b>{</b>
+                    <font color='#009900'>// go up to the parent if we can
+</font>                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>current_element <font color='#5555FF'>=</font><font color='#5555FF'>=</font> tree_root<font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        <font color='#009900'>// in this case we have iterated over all the element of the tree
+</font>                        current_element <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                        <font color='#0000FF'>return</font> <font color='#979000'>false</font>;
+                    <b>}</b>
+                    went_up <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+                    node<font color='#5555FF'>*</font> parent <font color='#5555FF'>=</font> <font color='#BB00BB'>pop</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+
+                    from_left <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>parent<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>left <font color='#5555FF'>=</font><font color='#5555FF'>=</font> current_element<font face='Lucida Console'>)</font>;
+                    <font color='#009900'>// go up to parent
+</font>                    current_element <font color='#5555FF'>=</font> parent;
+                <b>}</b>
+
+
+                <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font><font color='#979000'>true</font><font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>went_up<font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>from_left<font face='Lucida Console'>)</font>
+                        <b>{</b>
+                            <font color='#009900'>// in this case we have found the next node
+</font>                            <font color='#0000FF'>break</font>;
+                        <b>}</b>
+                        <font color='#0000FF'>else</font>
+                        <b>{</b>
+                            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>current_element <font color='#5555FF'>=</font><font color='#5555FF'>=</font> tree_root<font face='Lucida Console'>)</font>
+                            <b>{</b>
+                                <font color='#009900'>// in this case we have iterated over all the elements
+</font>                                <font color='#009900'>// in the tree
+</font>                                current_element <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                                <font color='#0000FF'>return</font> <font color='#979000'>false</font>;
+                            <b>}</b>
+                            <font color='#009900'>// we should go up
+</font>                            node<font color='#5555FF'>*</font> parent <font color='#5555FF'>=</font> <font color='#BB00BB'>pop</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                            from_left <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>parent<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>left <font color='#5555FF'>=</font><font color='#5555FF'>=</font> current_element<font face='Lucida Console'>)</font>;                            
+                            current_element <font color='#5555FF'>=</font> parent;
+                        <b>}</b>
+                    <b>}</b>
+                    <font color='#0000FF'>else</font>
+                    <b>{</b>
+                        <font color='#009900'>// we just went down to a child node
+</font>                        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>current_element<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>left <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                        <b>{</b>
+                            <font color='#009900'>// go left
+</font>                            went_up <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+                            temp <font color='#5555FF'>=</font> current_element;
+                            <font color='#BB00BB'>push</font><font face='Lucida Console'>(</font>current_element<font face='Lucida Console'>)</font>;
+                            current_element <font color='#5555FF'>=</font> temp<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>left;
+                        <b>}</b>
+                        <font color='#0000FF'>else</font>
+                        <b>{</b>
+                            <font color='#009900'>// if there is no left child then we have found the next node
+</font>                            <font color='#0000FF'>break</font>;
+                        <b>}</b>
+                    <b>}</b>
+                <b>}</b>
+
+                <font color='#0000FF'>return</font> <font color='#979000'>true</font>;               
+            <b>}</b>
+        <b>}</b>
+
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>    <font color='#009900'>// private member function definitions
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> domain,
+        <font color='#0000FF'>typename</font> range,
+        <font color='#0000FF'>typename</font> mem_manager,
+        <font color='#0000FF'>typename</font> compare
+        <font color='#5555FF'>&gt;</font>   
+    <font color='#0000FF'><u>void</u></font> binary_search_tree_kernel_1<font color='#5555FF'>&lt;</font>domain,range,mem_manager,compare<font color='#5555FF'>&gt;</font>::
+    <b><a name='delete_tree'></a>delete_tree</b> <font face='Lucida Console'>(</font>
+        node<font color='#5555FF'>*</font> t
+    <font face='Lucida Console'>)</font> 
+    <b>{</b>
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>t<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>left <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+            <font color='#BB00BB'>delete_tree</font><font face='Lucida Console'>(</font>t<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>left<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>t<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>right <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+            <font color='#BB00BB'>delete_tree</font><font face='Lucida Console'>(</font>t<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>right<font face='Lucida Console'>)</font>;
+        pool.<font color='#BB00BB'>deallocate</font><font face='Lucida Console'>(</font>t<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> domain,
+        <font color='#0000FF'>typename</font> range,
+        <font color='#0000FF'>typename</font> mem_manager,
+        <font color='#0000FF'>typename</font> compare
+        <font color='#5555FF'>&gt;</font>   
+    <font color='#0000FF'><u>void</u></font> binary_search_tree_kernel_1<font color='#5555FF'>&lt;</font>domain,range,mem_manager,compare<font color='#5555FF'>&gt;</font>::
+    <b><a name='rotate_left'></a>rotate_left</b> <font face='Lucida Console'>(</font>
+        node<font color='#5555FF'>*</font><font color='#5555FF'>&amp;</font> t
+    <font face='Lucida Console'>)</font> 
+    <b>{</b>
+
+        <font color='#009900'>// set the new balance numbers
+</font>        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>t<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>right<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>balance <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            t<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>balance <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            t<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>right<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>balance <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <b>}</b>
+        <font color='#0000FF'>else</font>
+        <b>{</b>
+            t<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>balance <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+            t<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>right<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>balance <font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>1</font>;            
+        <b>}</b>
+
+        <font color='#009900'>// perform the rotation
+</font>        node<font color='#5555FF'>*</font> temp <font color='#5555FF'>=</font> t<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>right;
+        t<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>right <font color='#5555FF'>=</font> temp<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>left;
+        temp<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>left <font color='#5555FF'>=</font> t;
+        t <font color='#5555FF'>=</font> temp;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> domain,
+        <font color='#0000FF'>typename</font> range,
+        <font color='#0000FF'>typename</font> mem_manager,
+        <font color='#0000FF'>typename</font> compare
+        <font color='#5555FF'>&gt;</font>   
+    <font color='#0000FF'><u>void</u></font> binary_search_tree_kernel_1<font color='#5555FF'>&lt;</font>domain,range,mem_manager,compare<font color='#5555FF'>&gt;</font>::
+    <b><a name='rotate_right'></a>rotate_right</b> <font face='Lucida Console'>(</font>
+        node<font color='#5555FF'>*</font><font color='#5555FF'>&amp;</font> t
+    <font face='Lucida Console'>)</font> 
+    <b>{</b>
+        <font color='#009900'>// set the new balance numbers
+</font>        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>t<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>left<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>balance <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            t<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>balance <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            t<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>left<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>balance <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <b>}</b>
+        <font color='#0000FF'>else</font>
+        <b>{</b>
+            t<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>balance <font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>1</font>;
+            t<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>left<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>balance <font color='#5555FF'>=</font> <font color='#979000'>1</font>;            
+        <b>}</b>
+
+        <font color='#009900'>// preform the rotation
+</font>        node<font color='#5555FF'>*</font> temp <font color='#5555FF'>=</font> t<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>left;
+        t<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>left <font color='#5555FF'>=</font> temp<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>right;
+        temp<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>right <font color='#5555FF'>=</font> t;
+        t <font color='#5555FF'>=</font> temp;    
+
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> domain,
+        <font color='#0000FF'>typename</font> range,
+        <font color='#0000FF'>typename</font> mem_manager,
+        <font color='#0000FF'>typename</font> compare
+        <font color='#5555FF'>&gt;</font>   
+    <font color='#0000FF'><u>void</u></font> binary_search_tree_kernel_1<font color='#5555FF'>&lt;</font>domain,range,mem_manager,compare<font color='#5555FF'>&gt;</font>::
+    <b><a name='double_rotate_right'></a>double_rotate_right</b> <font face='Lucida Console'>(</font>
+        node<font color='#5555FF'>*</font><font color='#5555FF'>&amp;</font> t
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+
+        node<font color='#5555FF'>*</font> temp <font color='#5555FF'>=</font> t;
+        t <font color='#5555FF'>=</font> t<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>left<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>right;
+        
+        temp<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>left<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>right <font color='#5555FF'>=</font> t<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>left;
+        t<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>left <font color='#5555FF'>=</font> temp<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>left;
+
+        temp<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>left <font color='#5555FF'>=</font> t<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>right;
+        t<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>right <font color='#5555FF'>=</font> temp;
+
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>t<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>balance <font color='#5555FF'>&lt;</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+        <b>{</b>  
+            t<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>left<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>balance <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            t<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>right<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>balance <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+        <b>}</b>
+        <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>t<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>balance <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            t<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>left<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>balance <font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>1</font>;
+            t<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>right<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>balance <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <b>}</b>
+        <font color='#0000FF'>else</font> 
+        <b>{</b>
+            t<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>left<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>balance <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            t<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>right<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>balance <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <b>}</b>
+        t<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>balance <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> domain,
+        <font color='#0000FF'>typename</font> range,
+        <font color='#0000FF'>typename</font> mem_manager,
+        <font color='#0000FF'>typename</font> compare
+        <font color='#5555FF'>&gt;</font>   
+    <font color='#0000FF'><u>void</u></font> binary_search_tree_kernel_1<font color='#5555FF'>&lt;</font>domain,range,mem_manager,compare<font color='#5555FF'>&gt;</font>::
+    <b><a name='double_rotate_left'></a>double_rotate_left</b> <font face='Lucida Console'>(</font>
+        node<font color='#5555FF'>*</font><font color='#5555FF'>&amp;</font> t
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        node<font color='#5555FF'>*</font> temp <font color='#5555FF'>=</font> t;
+        t <font color='#5555FF'>=</font> t<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>right<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>left;
+        
+        temp<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>right<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>left <font color='#5555FF'>=</font> t<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>right;
+        t<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>right <font color='#5555FF'>=</font> temp<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>right;
+
+        temp<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>right <font color='#5555FF'>=</font> t<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>left;
+        t<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>left <font color='#5555FF'>=</font> temp;
+
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>t<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>balance <font color='#5555FF'>&lt;</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+        <b>{</b>  
+            t<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>left<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>balance <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            t<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>right<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>balance <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+        <b>}</b>
+        <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>t<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>balance <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            t<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>left<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>balance <font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>1</font>;
+            t<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>right<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>balance <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <b>}</b>
+        <font color='#0000FF'>else</font> 
+        <b>{</b>
+            t<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>left<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>balance <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            t<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>right<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>balance <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <b>}</b>
+
+        t<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>balance <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> domain,
+        <font color='#0000FF'>typename</font> range,
+        <font color='#0000FF'>typename</font> mem_manager,
+        <font color='#0000FF'>typename</font> compare
+        <font color='#5555FF'>&gt;</font>   
+    <font color='#0000FF'><u>bool</u></font> binary_search_tree_kernel_1<font color='#5555FF'>&lt;</font>domain,range,mem_manager,compare<font color='#5555FF'>&gt;</font>::
+    <b><a name='remove_biggest_element_in_tree'></a>remove_biggest_element_in_tree</b> <font face='Lucida Console'>(</font>
+        node<font color='#5555FF'>*</font><font color='#5555FF'>&amp;</font> t,
+        domain<font color='#5555FF'>&amp;</font> d,
+        range<font color='#5555FF'>&amp;</font> r
+    <font face='Lucida Console'>)</font> 
+    <b>{</b>
+        <font color='#009900'>// make a reference to the current node so we don't have to dereference a 
+</font>        <font color='#009900'>// pointer a bunch of times
+</font>        node<font color='#5555FF'>&amp;</font> tree <font color='#5555FF'>=</font> <font color='#5555FF'>*</font>t;
+
+        <font color='#009900'>// if the right tree is an empty tree
+</font>        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> tree.right <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#009900'>// swap nodes domain and range elements into d and r
+</font>            <font color='#BB00BB'>exchange</font><font face='Lucida Console'>(</font>d,tree.d<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>exchange</font><font face='Lucida Console'>(</font>r,tree.r<font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// plug hole left by removing this node
+</font>            t <font color='#5555FF'>=</font> tree.left;
+
+            <font color='#009900'>// delete the node that was just removed
+</font>            pool.<font color='#BB00BB'>deallocate</font><font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>tree<font face='Lucida Console'>)</font>;    
+
+            <font color='#009900'>// return that the height of this part of the tree has decreased
+</font>            <font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+        <b>}</b>
+        <font color='#0000FF'>else</font>
+        <b>{</b>
+
+            <font color='#009900'>// keep going right
+</font>
+            <font color='#009900'>// if remove made the tree one height shorter
+</font>            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> <font color='#BB00BB'>remove_biggest_element_in_tree</font><font face='Lucida Console'>(</font>tree.right,d,r<font face='Lucida Console'>)</font> <font face='Lucida Console'>)</font> 
+            <b>{</b>
+                <font color='#009900'>// if this caused the current tree to strink then report that
+</font>                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> tree.balance <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#5555FF'>-</font><font color='#5555FF'>-</font>tree.balance;
+                    <font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+                <b>}</b>
+                <font color='#0000FF'>else</font>
+                <b>{</b>
+                    <font color='#5555FF'>-</font><font color='#5555FF'>-</font>tree.balance;
+                    <font color='#0000FF'>return</font> <font color='#BB00BB'>keep_node_balanced</font><font face='Lucida Console'>(</font>t<font face='Lucida Console'>)</font>;
+                <b>}</b>                
+            <b>}</b>
+
+            <font color='#0000FF'>return</font> <font color='#979000'>false</font>;            
+        <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> domain,
+        <font color='#0000FF'>typename</font> range,
+        <font color='#0000FF'>typename</font> mem_manager,
+        <font color='#0000FF'>typename</font> compare
+        <font color='#5555FF'>&gt;</font>   
+    <font color='#0000FF'><u>bool</u></font> binary_search_tree_kernel_1<font color='#5555FF'>&lt;</font>domain,range,mem_manager,compare<font color='#5555FF'>&gt;</font>::
+    <b><a name='remove_least_element_in_tree'></a>remove_least_element_in_tree</b> <font face='Lucida Console'>(</font>
+        node<font color='#5555FF'>*</font><font color='#5555FF'>&amp;</font> t,
+        domain<font color='#5555FF'>&amp;</font> d,
+        range<font color='#5555FF'>&amp;</font> r
+    <font face='Lucida Console'>)</font> 
+    <b>{</b>
+        <font color='#009900'>// make a reference to the current node so we don't have to dereference a 
+</font>        <font color='#009900'>// pointer a bunch of times
+</font>        node<font color='#5555FF'>&amp;</font> tree <font color='#5555FF'>=</font> <font color='#5555FF'>*</font>t;
+
+        <font color='#009900'>// if the left tree is an empty tree
+</font>        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> tree.left <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#009900'>// swap nodes domain and range elements into d and r
+</font>            <font color='#BB00BB'>exchange</font><font face='Lucida Console'>(</font>d,tree.d<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>exchange</font><font face='Lucida Console'>(</font>r,tree.r<font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// plug hole left by removing this node
+</font>            t <font color='#5555FF'>=</font> tree.right;
+
+            <font color='#009900'>// delete the node that was just removed
+</font>            pool.<font color='#BB00BB'>deallocate</font><font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>tree<font face='Lucida Console'>)</font>;    
+
+            <font color='#009900'>// return that the height of this part of the tree has decreased
+</font>            <font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+        <b>}</b>
+        <font color='#0000FF'>else</font>
+        <b>{</b>
+
+            <font color='#009900'>// keep going left
+</font>
+            <font color='#009900'>// if remove made the tree one height shorter
+</font>            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> <font color='#BB00BB'>remove_least_element_in_tree</font><font face='Lucida Console'>(</font>tree.left,d,r<font face='Lucida Console'>)</font> <font face='Lucida Console'>)</font> 
+            <b>{</b>
+                <font color='#009900'>// if this caused the current tree to strink then report that
+</font>                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> tree.balance <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#5555FF'>+</font><font color='#5555FF'>+</font>tree.balance;
+                    <font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+                <b>}</b>
+                <font color='#0000FF'>else</font>
+                <b>{</b>
+                    <font color='#5555FF'>+</font><font color='#5555FF'>+</font>tree.balance;
+                    <font color='#0000FF'>return</font> <font color='#BB00BB'>keep_node_balanced</font><font face='Lucida Console'>(</font>t<font face='Lucida Console'>)</font>;
+                <b>}</b>                
+            <b>}</b>
+
+            <font color='#0000FF'>return</font> <font color='#979000'>false</font>;            
+        <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> domain,
+        <font color='#0000FF'>typename</font> range,
+        <font color='#0000FF'>typename</font> mem_manager,
+        <font color='#0000FF'>typename</font> compare
+        <font color='#5555FF'>&gt;</font>   
+    <font color='#0000FF'><u>bool</u></font> binary_search_tree_kernel_1<font color='#5555FF'>&lt;</font>domain,range,mem_manager,compare<font color='#5555FF'>&gt;</font>::
+    <b><a name='add_to_tree'></a>add_to_tree</b> <font face='Lucida Console'>(</font>
+        node<font color='#5555FF'>*</font><font color='#5555FF'>&amp;</font> t,
+        domain<font color='#5555FF'>&amp;</font> d,
+        range<font color='#5555FF'>&amp;</font> r
+    <font face='Lucida Console'>)</font> 
+    <b>{</b>
+
+        <font color='#009900'>// if found place to add
+</font>        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>t <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#009900'>// create a node to add new item into
+</font>            t <font color='#5555FF'>=</font> pool.<font color='#BB00BB'>allocate</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; 
+
+            <font color='#009900'>// make a reference to the current node so we don't have to dereference a 
+</font>            <font color='#009900'>// pointer a bunch of times
+</font>            node<font color='#5555FF'>&amp;</font> tree <font color='#5555FF'>=</font> <font color='#5555FF'>*</font>t;
+
+
+            <font color='#009900'>// set left and right pointers to NULL to indicate that there are no 
+</font>            <font color='#009900'>// left or right subtrees
+</font>            tree.left <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            tree.right <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            tree.balance <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+
+            <font color='#009900'>// put d and r into t
+</font>            <font color='#BB00BB'>exchange</font><font face='Lucida Console'>(</font>tree.d,d<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>exchange</font><font face='Lucida Console'>(</font>tree.r,r<font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// indicate that the height of this tree has increased
+</font>            <font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+        <b>}</b>
+        <font color='#0000FF'>else</font>  <font color='#009900'>// keep looking for a place to add the new item
+</font>        <b>{</b>
+            <font color='#009900'>// make a reference to the current node so we don't have to dereference 
+</font>            <font color='#009900'>// a pointer a bunch of times
+</font>            node<font color='#5555FF'>&amp;</font> tree <font color='#5555FF'>=</font> <font color='#5555FF'>*</font>t;
+            <font color='#0000FF'><u>signed</u></font> <font color='#0000FF'><u>char</u></font> old_balance <font color='#5555FF'>=</font> tree.balance;
+
+            <font color='#009900'>// add the new item to whatever subtree it should go into
+</font>            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>comp</font><font face='Lucida Console'>(</font> d , tree.d<font face='Lucida Console'>)</font> <font face='Lucida Console'>)</font>
+                tree.balance <font color='#5555FF'>-</font><font color='#5555FF'>=</font> <font color='#BB00BB'>add_to_tree</font><font face='Lucida Console'>(</font>tree.left,d,r<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>else</font>
+                tree.balance <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#BB00BB'>add_to_tree</font><font face='Lucida Console'>(</font>tree.right,d,r<font face='Lucida Console'>)</font>;
+
+
+            <font color='#009900'>// if the tree was balanced to start with
+</font>            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>old_balance <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#009900'>// if its not balanced anymore then it grew in height
+</font>                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>tree.balance <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                    <font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+                <font color='#0000FF'>else</font>
+                    <font color='#0000FF'>return</font> <font color='#979000'>false</font>;
+            <b>}</b>
+            <font color='#0000FF'>else</font>
+            <b>{</b>
+                <font color='#009900'>// if the tree is now balanced then it didn't grow
+</font>                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>tree.balance <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#0000FF'>return</font> <font color='#979000'>false</font>;
+                <b>}</b>
+                <font color='#0000FF'>else</font>
+                <b>{</b>
+                    <font color='#009900'>// if the tree needs to be balanced
+</font>                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>tree.balance <font color='#5555FF'>!</font><font color='#5555FF'>=</font> old_balance<font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        <font color='#0000FF'>return</font> <font color='#5555FF'>!</font><font color='#BB00BB'>keep_node_balanced</font><font face='Lucida Console'>(</font>t<font face='Lucida Console'>)</font>;
+                    <b>}</b>
+                    <font color='#009900'>// if there has been no change in the heights
+</font>                    <font color='#0000FF'>else</font>
+                    <b>{</b>
+                        <font color='#0000FF'>return</font> <font color='#979000'>false</font>;
+                    <b>}</b>
+                <b>}</b>
+            <b>}</b>
+        <b>}</b>
+    <b>}</b> 
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> domain,
+        <font color='#0000FF'>typename</font> range,
+        <font color='#0000FF'>typename</font> mem_manager,
+        <font color='#0000FF'>typename</font> compare
+        <font color='#5555FF'>&gt;</font>   
+    <font color='#0000FF'><u>bool</u></font> binary_search_tree_kernel_1<font color='#5555FF'>&lt;</font>domain,range,mem_manager,compare<font color='#5555FF'>&gt;</font>::
+    <b><a name='fix_stack'></a>fix_stack</b> <font face='Lucida Console'>(</font>
+        node<font color='#5555FF'>*</font> t,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> depth 
+    <font face='Lucida Console'>)</font> 
+    <b>{</b>
+        <font color='#009900'>// if we found the node we were looking for
+</font>        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>t <font color='#5555FF'>=</font><font color='#5555FF'>=</font> current_element<font face='Lucida Console'>)</font>
+        <b>{</b>
+            stack_pos <font color='#5555FF'>=</font> depth;
+            <font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+        <b>}</b>
+        <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>t <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>return</font> <font color='#979000'>false</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font><font face='Lucida Console'>(</font> <font color='#BB00BB'>comp</font><font face='Lucida Console'>(</font>t<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>d , current_element<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>d<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#009900'>// go left
+</font>            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>fix_stack</font><font face='Lucida Console'>(</font>t<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>left,depth<font color='#5555FF'>+</font><font color='#979000'>1</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                stack[depth] <font color='#5555FF'>=</font> t;
+                <font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+            <b>}</b>            
+        <b>}</b>
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font><font face='Lucida Console'>(</font><font color='#BB00BB'>comp</font><font face='Lucida Console'>(</font>current_element<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>d , t<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>d<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#009900'>// go right
+</font>            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>fix_stack</font><font face='Lucida Console'>(</font>t<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>right,depth<font color='#5555FF'>+</font><font color='#979000'>1</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                stack[depth] <font color='#5555FF'>=</font> t;
+                <font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+            <b>}</b>            
+        <b>}</b>
+        <font color='#0000FF'>return</font> <font color='#979000'>false</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> domain,
+        <font color='#0000FF'>typename</font> range,
+        <font color='#0000FF'>typename</font> mem_manager,
+        <font color='#0000FF'>typename</font> compare
+        <font color='#5555FF'>&gt;</font>   
+    <font color='#0000FF'><u>bool</u></font> binary_search_tree_kernel_1<font color='#5555FF'>&lt;</font>domain,range,mem_manager,compare<font color='#5555FF'>&gt;</font>::
+    <b><a name='remove_current_element_from_tree'></a>remove_current_element_from_tree</b> <font face='Lucida Console'>(</font>
+        node<font color='#5555FF'>*</font><font color='#5555FF'>&amp;</font> t,
+        domain<font color='#5555FF'>&amp;</font> d,
+        range<font color='#5555FF'>&amp;</font> r,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> cur_stack_pos 
+    <font face='Lucida Console'>)</font> 
+    <b>{</b>
+        <font color='#009900'>// make a reference to the current node so we don't have to dereference 
+</font>        <font color='#009900'>// a pointer a bunch of times
+</font>        node<font color='#5555FF'>&amp;</font> tree <font color='#5555FF'>=</font> <font color='#5555FF'>*</font>t;
+
+        <font color='#009900'>// if we found the node we were looking for
+</font>        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>t <font color='#5555FF'>=</font><font color='#5555FF'>=</font> current_element<font face='Lucida Console'>)</font>
+        <b>{</b>
+
+            <font color='#009900'>// swap nodes domain and range elements into d_copy and r
+</font>            <font color='#BB00BB'>exchange</font><font face='Lucida Console'>(</font>d,tree.d<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>exchange</font><font face='Lucida Console'>(</font>r,tree.r<font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// if there is no left node
+</font>            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>tree.left <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#009900'>// move the enumerator on to the next element before we mess with the 
+</font>                <font color='#009900'>// tree
+</font>                <font color='#BB00BB'>move_next</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+                <font color='#009900'>// plug hole left by removing this node and free memory
+</font>                t <font color='#5555FF'>=</font> tree.right;  <font color='#009900'>// plug hole with right subtree
+</font>                
+                <font color='#009900'>// delete old node
+</font>                pool.<font color='#BB00BB'>deallocate</font><font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>tree<font face='Lucida Console'>)</font>;  
+
+                <font color='#009900'>// indicate that the height has changed
+</font>                <font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+            <b>}</b>
+            <font color='#009900'>// if there is no right node
+</font>            <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>tree.right <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#009900'>// move the enumerator on to the next element before we mess with the 
+</font>                <font color='#009900'>// tree
+</font>                <font color='#BB00BB'>move_next</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+                <font color='#009900'>// plug hole left by removing this node and free memory
+</font>                t <font color='#5555FF'>=</font> tree.left;  <font color='#009900'>// plug hole with left subtree
+</font>
+                <font color='#009900'>// delete old node
+</font>                pool.<font color='#BB00BB'>deallocate</font><font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>tree<font face='Lucida Console'>)</font>;  
+
+                <font color='#009900'>// indicate that the height of this tree has changed
+</font>                <font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+            <b>}</b>
+            <font color='#009900'>// if there are both a left and right sub node
+</font>            <font color='#0000FF'>else</font>
+            <b>{</b>
+
+                <font color='#009900'>// in this case the next current element is going to get swapped back
+</font>                <font color='#009900'>// into this t node.
+</font>                current_element <font color='#5555FF'>=</font> t;
+
+                <font color='#009900'>// get an element that can replace the one being removed and do this 
+</font>                <font color='#009900'>// if it made the right subtree shrink by one
+</font>                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>remove_least_element_in_tree</font><font face='Lucida Console'>(</font>tree.right,tree.d,tree.r<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#009900'>// adjust the tree height
+</font>                    <font color='#5555FF'>-</font><font color='#5555FF'>-</font>tree.balance;
+
+                    <font color='#009900'>// if the height of the current tree has dropped by one
+</font>                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>tree.balance <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        <font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+                    <b>}</b>
+                    <font color='#0000FF'>else</font>
+                    <b>{</b>
+                        <font color='#0000FF'>return</font> <font color='#BB00BB'>keep_node_balanced</font><font face='Lucida Console'>(</font>t<font face='Lucida Console'>)</font>;
+                    <b>}</b>
+                <b>}</b>
+                <font color='#009900'>// else this remove did not effect the height of this tree
+</font>                <font color='#0000FF'>else</font>
+                <b>{</b>
+                    <font color='#0000FF'>return</font> <font color='#979000'>false</font>;
+                <b>}</b>
+
+            <b>}</b>
+
+        <b>}</b>
+        <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>  <font face='Lucida Console'>(</font>cur_stack_pos <font color='#5555FF'>&lt;</font> stack_pos <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> stack[cur_stack_pos] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> tree.left<font face='Lucida Console'>)</font> <font color='#5555FF'>|</font><font color='#5555FF'>|</font> 
+                    tree.left <font color='#5555FF'>=</font><font color='#5555FF'>=</font> current_element <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#009900'>// go left
+</font>            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>tree.balance <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'><u>int</u></font> balance <font color='#5555FF'>=</font> tree.balance;
+                balance <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#BB00BB'>remove_current_element_from_tree</font><font face='Lucida Console'>(</font>tree.left,d,r,cur_stack_pos<font color='#5555FF'>+</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+                tree.balance <font color='#5555FF'>=</font> balance;
+                <font color='#0000FF'>return</font> <font color='#5555FF'>!</font>tree.balance;
+            <b>}</b>
+            <font color='#0000FF'>else</font>
+            <b>{</b>
+                <font color='#0000FF'><u>int</u></font> balance <font color='#5555FF'>=</font> tree.balance;
+                balance <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#BB00BB'>remove_current_element_from_tree</font><font face='Lucida Console'>(</font>tree.left,d,r,cur_stack_pos<font color='#5555FF'>+</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+                tree.balance <font color='#5555FF'>=</font> balance;
+                <font color='#0000FF'>return</font> <font color='#BB00BB'>keep_node_balanced</font><font face='Lucida Console'>(</font>t<font face='Lucida Console'>)</font>;
+            <b>}</b>
+        <b>}</b>
+        <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>  <font face='Lucida Console'>(</font>cur_stack_pos <font color='#5555FF'>&lt;</font> stack_pos <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> stack[cur_stack_pos] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> tree.right<font face='Lucida Console'>)</font> <font color='#5555FF'>|</font><font color='#5555FF'>|</font> 
+                    tree.right <font color='#5555FF'>=</font><font color='#5555FF'>=</font> current_element <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#009900'>// go right
+</font>            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>tree.balance <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'><u>int</u></font> balance <font color='#5555FF'>=</font> tree.balance;
+                balance <font color='#5555FF'>-</font><font color='#5555FF'>=</font> <font color='#BB00BB'>remove_current_element_from_tree</font><font face='Lucida Console'>(</font>tree.right,d,r,cur_stack_pos<font color='#5555FF'>+</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+                tree.balance <font color='#5555FF'>=</font> balance;
+                <font color='#0000FF'>return</font> <font color='#5555FF'>!</font>tree.balance;
+            <b>}</b>
+            <font color='#0000FF'>else</font>
+            <b>{</b>
+                <font color='#0000FF'><u>int</u></font> balance <font color='#5555FF'>=</font> tree.balance;
+                balance <font color='#5555FF'>-</font><font color='#5555FF'>=</font> <font color='#BB00BB'>remove_current_element_from_tree</font><font face='Lucida Console'>(</font>tree.right,d,r,cur_stack_pos<font color='#5555FF'>+</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+                tree.balance <font color='#5555FF'>=</font> balance;
+                <font color='#0000FF'>return</font> <font color='#BB00BB'>keep_node_balanced</font><font face='Lucida Console'>(</font>t<font face='Lucida Console'>)</font>;
+            <b>}</b>
+        <b>}</b>
+        
+        <font color='#009900'>// this return should never happen but do it anyway to suppress compiler warnings
+</font>        <font color='#0000FF'>return</font> <font color='#979000'>false</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> domain,
+        <font color='#0000FF'>typename</font> range,
+        <font color='#0000FF'>typename</font> mem_manager,
+        <font color='#0000FF'>typename</font> compare
+        <font color='#5555FF'>&gt;</font>   
+    <font color='#0000FF'><u>bool</u></font> binary_search_tree_kernel_1<font color='#5555FF'>&lt;</font>domain,range,mem_manager,compare<font color='#5555FF'>&gt;</font>::
+    <b><a name='remove_from_tree'></a>remove_from_tree</b> <font face='Lucida Console'>(</font>
+        node<font color='#5555FF'>*</font><font color='#5555FF'>&amp;</font> t,
+        <font color='#0000FF'>const</font> domain<font color='#5555FF'>&amp;</font> d,
+        domain<font color='#5555FF'>&amp;</font> d_copy,
+        range<font color='#5555FF'>&amp;</font> r
+    <font face='Lucida Console'>)</font> 
+    <b>{</b>
+        <font color='#009900'>// make a reference to the current node so we don't have to dereference 
+</font>        <font color='#009900'>// a pointer a bunch of times
+</font>        node<font color='#5555FF'>&amp;</font> tree <font color='#5555FF'>=</font> <font color='#5555FF'>*</font>t;
+
+        <font color='#009900'>// if item is on the left
+</font>        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>comp</font><font face='Lucida Console'>(</font>d , tree.d<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#009900'>// if the left side of the tree has the greatest height
+</font>            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>tree.balance <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'><u>int</u></font> balance <font color='#5555FF'>=</font> tree.balance;
+                balance <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#BB00BB'>remove_from_tree</font><font face='Lucida Console'>(</font>tree.left,d,d_copy,r<font face='Lucida Console'>)</font>;
+                tree.balance <font color='#5555FF'>=</font> balance;
+                <font color='#0000FF'>return</font> <font color='#5555FF'>!</font>tree.balance;
+            <b>}</b>
+            <font color='#0000FF'>else</font>
+            <b>{</b>
+                <font color='#0000FF'><u>int</u></font> balance <font color='#5555FF'>=</font> tree.balance;
+                balance <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#BB00BB'>remove_from_tree</font><font face='Lucida Console'>(</font>tree.left,d,d_copy,r<font face='Lucida Console'>)</font>;
+                tree.balance <font color='#5555FF'>=</font> balance;
+                <font color='#0000FF'>return</font> <font color='#BB00BB'>keep_node_balanced</font><font face='Lucida Console'>(</font>t<font face='Lucida Console'>)</font>;
+            <b>}</b>
+             
+        <b>}</b>
+        <font color='#009900'>// if item is on the right
+</font>        <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>comp</font><font face='Lucida Console'>(</font>tree.d , d<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+
+            <font color='#009900'>// if the right side of the tree has the greatest height
+</font>            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>tree.balance <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'><u>int</u></font> balance <font color='#5555FF'>=</font> tree.balance;
+                balance <font color='#5555FF'>-</font><font color='#5555FF'>=</font> <font color='#BB00BB'>remove_from_tree</font><font face='Lucida Console'>(</font>tree.right,d,d_copy,r<font face='Lucida Console'>)</font>;
+                tree.balance <font color='#5555FF'>=</font> balance;
+                <font color='#0000FF'>return</font> <font color='#5555FF'>!</font>tree.balance;
+            <b>}</b>
+            <font color='#0000FF'>else</font>
+            <b>{</b>
+                <font color='#0000FF'><u>int</u></font> balance <font color='#5555FF'>=</font> tree.balance;
+                balance <font color='#5555FF'>-</font><font color='#5555FF'>=</font> <font color='#BB00BB'>remove_from_tree</font><font face='Lucida Console'>(</font>tree.right,d,d_copy,r<font face='Lucida Console'>)</font>;
+                tree.balance <font color='#5555FF'>=</font> balance;
+                <font color='#0000FF'>return</font> <font color='#BB00BB'>keep_node_balanced</font><font face='Lucida Console'>(</font>t<font face='Lucida Console'>)</font>;
+            <b>}</b>
+        <b>}</b>
+        <font color='#009900'>// if item is found
+</font>        <font color='#0000FF'>else</font> 
+        <b>{</b>
+
+            <font color='#009900'>// swap nodes domain and range elements into d_copy and r
+</font>            <font color='#BB00BB'>exchange</font><font face='Lucida Console'>(</font>d_copy,tree.d<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>exchange</font><font face='Lucida Console'>(</font>r,tree.r<font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// if there is no left node
+</font>            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>tree.left <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+
+                <font color='#009900'>// plug hole left by removing this node and free memory
+</font>                t <font color='#5555FF'>=</font> tree.right;  <font color='#009900'>// plug hole with right subtree
+</font>                
+                <font color='#009900'>// delete old node
+</font>                pool.<font color='#BB00BB'>deallocate</font><font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>tree<font face='Lucida Console'>)</font>;  
+
+                <font color='#009900'>// indicate that the height has changed
+</font>                <font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+            <b>}</b>
+            <font color='#009900'>// if there is no right node
+</font>            <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>tree.right <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+
+                <font color='#009900'>// plug hole left by removing this node and free memory
+</font>                t <font color='#5555FF'>=</font> tree.left;  <font color='#009900'>// plug hole with left subtree
+</font>
+                <font color='#009900'>// delete old node
+</font>                pool.<font color='#BB00BB'>deallocate</font><font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>tree<font face='Lucida Console'>)</font>;  
+
+                <font color='#009900'>// indicate that the height of this tree has changed
+</font>                <font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+            <b>}</b>
+            <font color='#009900'>// if there are both a left and right sub node
+</font>            <font color='#0000FF'>else</font>
+            <b>{</b>
+
+                <font color='#009900'>// get an element that can replace the one being removed and do this 
+</font>                <font color='#009900'>// if it made the right subtree shrink by one
+</font>                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>remove_least_element_in_tree</font><font face='Lucida Console'>(</font>tree.right,tree.d,tree.r<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#009900'>// adjust the tree height
+</font>                    <font color='#5555FF'>-</font><font color='#5555FF'>-</font>tree.balance;
+
+                    <font color='#009900'>// if the height of the current tree has dropped by one
+</font>                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>tree.balance <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        <font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+                    <b>}</b>
+                    <font color='#0000FF'>else</font>
+                    <b>{</b>
+                        <font color='#0000FF'>return</font> <font color='#BB00BB'>keep_node_balanced</font><font face='Lucida Console'>(</font>t<font face='Lucida Console'>)</font>;
+                    <b>}</b>
+                <b>}</b>
+                <font color='#009900'>// else this remove did not effect the height of this tree
+</font>                <font color='#0000FF'>else</font>
+                <b>{</b>
+                    <font color='#0000FF'>return</font> <font color='#979000'>false</font>;
+                <b>}</b>
+
+            <b>}</b>
+        <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> domain,
+        <font color='#0000FF'>typename</font> range,
+        <font color='#0000FF'>typename</font> mem_manager,
+        <font color='#0000FF'>typename</font> compare
+        <font color='#5555FF'>&gt;</font>   
+    <font color='#0000FF'><u>bool</u></font> binary_search_tree_kernel_1<font color='#5555FF'>&lt;</font>domain,range,mem_manager,compare<font color='#5555FF'>&gt;</font>::
+    <b><a name='remove_from_tree'></a>remove_from_tree</b> <font face='Lucida Console'>(</font>
+        node<font color='#5555FF'>*</font><font color='#5555FF'>&amp;</font> t,
+        <font color='#0000FF'>const</font> domain<font color='#5555FF'>&amp;</font> d
+    <font face='Lucida Console'>)</font> 
+    <b>{</b>
+        <font color='#009900'>// make a reference to the current node so we don't have to dereference 
+</font>        <font color='#009900'>// a pointer a bunch of times
+</font>        node<font color='#5555FF'>&amp;</font> tree <font color='#5555FF'>=</font> <font color='#5555FF'>*</font>t;
+
+        <font color='#009900'>// if item is on the left
+</font>        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>comp</font><font face='Lucida Console'>(</font>d , tree.d<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#009900'>// if the left side of the tree has the greatest height
+</font>            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>tree.balance <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'><u>int</u></font> balance <font color='#5555FF'>=</font> tree.balance;
+                balance <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#BB00BB'>remove_from_tree</font><font face='Lucida Console'>(</font>tree.left,d<font face='Lucida Console'>)</font>;
+                tree.balance <font color='#5555FF'>=</font> balance;
+                <font color='#0000FF'>return</font> <font color='#5555FF'>!</font>tree.balance;
+            <b>}</b>
+            <font color='#0000FF'>else</font>
+            <b>{</b>
+                <font color='#0000FF'><u>int</u></font> balance <font color='#5555FF'>=</font> tree.balance;
+                balance <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#BB00BB'>remove_from_tree</font><font face='Lucida Console'>(</font>tree.left,d<font face='Lucida Console'>)</font>;
+                tree.balance <font color='#5555FF'>=</font> balance;
+                <font color='#0000FF'>return</font> <font color='#BB00BB'>keep_node_balanced</font><font face='Lucida Console'>(</font>t<font face='Lucida Console'>)</font>;
+            <b>}</b>
+             
+        <b>}</b>
+        <font color='#009900'>// if item is on the right
+</font>        <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>comp</font><font face='Lucida Console'>(</font>tree.d , d<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+
+            <font color='#009900'>// if the right side of the tree has the greatest height
+</font>            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>tree.balance <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'><u>int</u></font> balance <font color='#5555FF'>=</font> tree.balance;
+                balance <font color='#5555FF'>-</font><font color='#5555FF'>=</font> <font color='#BB00BB'>remove_from_tree</font><font face='Lucida Console'>(</font>tree.right,d<font face='Lucida Console'>)</font>;
+                tree.balance <font color='#5555FF'>=</font> balance;
+                <font color='#0000FF'>return</font> <font color='#5555FF'>!</font>tree.balance;
+            <b>}</b>
+            <font color='#0000FF'>else</font>
+            <b>{</b>
+                <font color='#0000FF'><u>int</u></font> balance <font color='#5555FF'>=</font> tree.balance;
+                balance <font color='#5555FF'>-</font><font color='#5555FF'>=</font> <font color='#BB00BB'>remove_from_tree</font><font face='Lucida Console'>(</font>tree.right,d<font face='Lucida Console'>)</font>;
+                tree.balance <font color='#5555FF'>=</font> balance;
+                <font color='#0000FF'>return</font> <font color='#BB00BB'>keep_node_balanced</font><font face='Lucida Console'>(</font>t<font face='Lucida Console'>)</font>;
+            <b>}</b>
+        <b>}</b>
+        <font color='#009900'>// if item is found
+</font>        <font color='#0000FF'>else</font> 
+        <b>{</b>
+
+            <font color='#009900'>// if there is no left node
+</font>            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>tree.left <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+
+                <font color='#009900'>// plug hole left by removing this node and free memory
+</font>                t <font color='#5555FF'>=</font> tree.right;  <font color='#009900'>// plug hole with right subtree
+</font>                
+                <font color='#009900'>// delete old node
+</font>                pool.<font color='#BB00BB'>deallocate</font><font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>tree<font face='Lucida Console'>)</font>;  
+
+                <font color='#009900'>// indicate that the height has changed
+</font>                <font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+            <b>}</b>
+            <font color='#009900'>// if there is no right node
+</font>            <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>tree.right <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+
+                <font color='#009900'>// plug hole left by removing this node and free memory
+</font>                t <font color='#5555FF'>=</font> tree.left;  <font color='#009900'>// plug hole with left subtree
+</font>
+                <font color='#009900'>// delete old node
+</font>                pool.<font color='#BB00BB'>deallocate</font><font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>tree<font face='Lucida Console'>)</font>;  
+
+                <font color='#009900'>// indicate that the height of this tree has changed
+</font>                <font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+            <b>}</b>
+            <font color='#009900'>// if there are both a left and right sub node
+</font>            <font color='#0000FF'>else</font>
+            <b>{</b>
+
+                <font color='#009900'>// get an element that can replace the one being removed and do this 
+</font>                <font color='#009900'>// if it made the right subtree shrink by one
+</font>                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>remove_least_element_in_tree</font><font face='Lucida Console'>(</font>tree.right,tree.d,tree.r<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#009900'>// adjust the tree height
+</font>                    <font color='#5555FF'>-</font><font color='#5555FF'>-</font>tree.balance;
+
+                    <font color='#009900'>// if the height of the current tree has dropped by one
+</font>                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>tree.balance <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        <font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+                    <b>}</b>
+                    <font color='#0000FF'>else</font>
+                    <b>{</b>
+                        <font color='#0000FF'>return</font> <font color='#BB00BB'>keep_node_balanced</font><font face='Lucida Console'>(</font>t<font face='Lucida Console'>)</font>;
+                    <b>}</b>
+                <b>}</b>
+                <font color='#009900'>// else this remove did not effect the height of this tree
+</font>                <font color='#0000FF'>else</font>
+                <b>{</b>
+                    <font color='#0000FF'>return</font> <font color='#979000'>false</font>;
+                <b>}</b>
+
+            <b>}</b>
+        <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> domain,
+        <font color='#0000FF'>typename</font> range,
+        <font color='#0000FF'>typename</font> mem_manager,
+        <font color='#0000FF'>typename</font> compare
+        <font color='#5555FF'>&gt;</font>   
+    range<font color='#5555FF'>*</font> binary_search_tree_kernel_1<font color='#5555FF'>&lt;</font>domain,range,mem_manager,compare<font color='#5555FF'>&gt;</font>::
+    <b><a name='return_reference'></a>return_reference</b> <font face='Lucida Console'>(</font>
+        node<font color='#5555FF'>*</font> t,
+        <font color='#0000FF'>const</font> domain<font color='#5555FF'>&amp;</font> d
+    <font face='Lucida Console'>)</font> 
+    <b>{</b>
+        <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>t <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> <font color='#BB00BB'>comp</font><font face='Lucida Console'>(</font>d , t<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>d <font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#009900'>// if item is on the left then look in left
+</font>                t <font color='#5555FF'>=</font> t<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>left;
+            <b>}</b>
+            <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>comp</font><font face='Lucida Console'>(</font>t<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>d , d<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#009900'>// if item is on the right then look in right
+</font>                t <font color='#5555FF'>=</font> t<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>right;
+            <b>}</b>
+            <font color='#0000FF'>else</font>
+            <b>{</b>
+                <font color='#009900'>// if it's found then return a reference to it
+</font>                <font color='#0000FF'>return</font> <font color='#5555FF'>&amp;</font><font face='Lucida Console'>(</font>t<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>r<font face='Lucida Console'>)</font>;
+            <b>}</b>
+        <b>}</b>
+        <font color='#0000FF'>return</font> <font color='#979000'>0</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> domain,
+        <font color='#0000FF'>typename</font> range,
+        <font color='#0000FF'>typename</font> mem_manager,
+        <font color='#0000FF'>typename</font> compare
+        <font color='#5555FF'>&gt;</font>   
+    <font color='#0000FF'>const</font> range<font color='#5555FF'>*</font> binary_search_tree_kernel_1<font color='#5555FF'>&lt;</font>domain,range,mem_manager,compare<font color='#5555FF'>&gt;</font>::
+    <b><a name='return_reference'></a>return_reference</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> node<font color='#5555FF'>*</font> t,
+        <font color='#0000FF'>const</font> domain<font color='#5555FF'>&amp;</font> d
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>t <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font> <font color='#BB00BB'>comp</font><font face='Lucida Console'>(</font>d , t<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>d<font face='Lucida Console'>)</font> <font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#009900'>// if item is on the left then look in left
+</font>                t <font color='#5555FF'>=</font> t<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>left;
+            <b>}</b>
+            <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>comp</font><font face='Lucida Console'>(</font>t<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>d , d<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#009900'>// if item is on the right then look in right
+</font>                t <font color='#5555FF'>=</font> t<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>right;
+            <b>}</b>
+            <font color='#0000FF'>else</font>
+            <b>{</b>
+                <font color='#009900'>// if it's found then return a reference to it
+</font>                <font color='#0000FF'>return</font> <font color='#5555FF'>&amp;</font><font face='Lucida Console'>(</font>t<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>r<font face='Lucida Console'>)</font>;
+            <b>}</b>
+        <b>}</b>
+        <font color='#0000FF'>return</font> <font color='#979000'>0</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> domain,
+        <font color='#0000FF'>typename</font> range,
+        <font color='#0000FF'>typename</font> mem_manager,
+        <font color='#0000FF'>typename</font> compare
+        <font color='#5555FF'>&gt;</font>   
+    <font color='#0000FF'><u>bool</u></font> binary_search_tree_kernel_1<font color='#5555FF'>&lt;</font>domain,range,mem_manager,compare<font color='#5555FF'>&gt;</font>::
+    <b><a name='keep_node_balanced'></a>keep_node_balanced</b> <font face='Lucida Console'>(</font>
+        node<font color='#5555FF'>*</font><font color='#5555FF'>&amp;</font> t
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#009900'>// make a reference to the current node so we don't have to dereference 
+</font>        <font color='#009900'>// a pointer a bunch of times
+</font>        node<font color='#5555FF'>&amp;</font> tree <font color='#5555FF'>=</font> <font color='#5555FF'>*</font>t;
+ 
+        <font color='#009900'>// if tree does not need to be balanced then return false
+</font>        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>tree.balance <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+            <font color='#0000FF'>return</font> <font color='#979000'>false</font>;
+
+
+        <font color='#009900'>// if tree needs to be rotated left
+</font>        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>tree.balance <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>2</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>tree.right<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>balance <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                <font color='#BB00BB'>rotate_left</font><font face='Lucida Console'>(</font>t<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>else</font>
+                <font color='#BB00BB'>double_rotate_left</font><font face='Lucida Console'>(</font>t<font face='Lucida Console'>)</font>;
+        <b>}</b>
+        <font color='#009900'>// else if the tree needs to be rotated right
+</font>        <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>tree.balance <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>2</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>tree.left<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>balance <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                <font color='#BB00BB'>rotate_right</font><font face='Lucida Console'>(</font>t<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>else</font>
+                <font color='#BB00BB'>double_rotate_right</font><font face='Lucida Console'>(</font>t<font face='Lucida Console'>)</font>;
+        <b>}</b>
+   
+
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>t<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>balance <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+            <font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+        <font color='#0000FF'>else</font>
+            <font color='#0000FF'>return</font> <font color='#979000'>false</font>; 
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> domain,
+        <font color='#0000FF'>typename</font> range,
+        <font color='#0000FF'>typename</font> mem_manager,
+        <font color='#0000FF'>typename</font> compare
+        <font color='#5555FF'>&gt;</font>   
+    <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> binary_search_tree_kernel_1<font color='#5555FF'>&lt;</font>domain,range,mem_manager,compare<font color='#5555FF'>&gt;</font>::
+    <b><a name='get_count'></a>get_count</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> domain<font color='#5555FF'>&amp;</font> d,
+        node<font color='#5555FF'>*</font> tree_root
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>tree_root <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>comp</font><font face='Lucida Console'>(</font>d , tree_root<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>d<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#009900'>// go left
+</font>                <font color='#0000FF'>return</font> <font color='#BB00BB'>get_count</font><font face='Lucida Console'>(</font>d,tree_root<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>left<font face='Lucida Console'>)</font>;                
+            <b>}</b>
+            <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>comp</font><font face='Lucida Console'>(</font>tree_root<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>d , d<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#009900'>// go right
+</font>                <font color='#0000FF'>return</font> <font color='#BB00BB'>get_count</font><font face='Lucida Console'>(</font>d,tree_root<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>right<font face='Lucida Console'>)</font>;
+            <b>}</b>
+            <font color='#0000FF'>else</font>
+            <b>{</b>
+                <font color='#009900'>// go left and right to look for more matches
+</font>                <font color='#0000FF'>return</font>   <font color='#BB00BB'>get_count</font><font face='Lucida Console'>(</font>d,tree_root<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>left<font face='Lucida Console'>)</font> 
+                       <font color='#5555FF'>+</font> <font color='#BB00BB'>get_count</font><font face='Lucida Console'>(</font>d,tree_root<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>right<font face='Lucida Console'>)</font> 
+                       <font color='#5555FF'>+</font> <font color='#979000'>1</font>;
+            <b>}</b>
+        <b>}</b>
+        <font color='#0000FF'>return</font> <font color='#979000'>0</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_BINARY_SEARCH_TREE_KERNEl_1_
+</font>
+
+</pre></body></html>

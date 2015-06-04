@@ -1,0 +1,188 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - bit_stream_kernel_abstract.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2003  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#undef</font> DLIB_BIT_STREAM_KERNEl_ABSTRACT_
+<font color='#0000FF'>#ifdef</font> DLIB_BIT_STREAM_KERNEl_ABSTRACT_
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>iosfwd<font color='#5555FF'>&gt;</font>
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+    <font color='#0000FF'>class</font> <b><a name='bit_stream'></a>bit_stream</b>
+    <b>{</b>
+
+        <font color='#009900'>/*!
+            INITIAL VALUE
+                is_in_write_mode()  == false
+                is_in_read_mode()   == false
+
+            WHAT THIS OBJECT REPRESENTS
+                this object is a middle man between a user and the iostream classes.
+                it allows single bits to be read/written easily to/from 
+                the iostream classes  
+
+            BUFFERING:
+                This object will only read/write single bytes at a time from/to the 
+                iostream objects. Any buffered bits still in the bit_stream object 
+                when it is closed or destructed are lost if it is in read mode.  If 
+                it is in write mode then any remaining bits are guaranteed to be 
+                written to the output stream by the time it is closed or destructed.
+        !*/</font>
+
+
+    <font color='#0000FF'>public</font>:
+
+        <b><a name='bit_stream'></a>bit_stream</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures 
+                - #*this is properly initialized
+            throws
+                - std::bad_alloc
+        !*/</font>
+
+        <font color='#0000FF'>virtual</font> ~<b><a name='bit_stream'></a>bit_stream</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - all memory associated with *this has been released
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='clear'></a>clear</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #*this has its initial value
+            throws
+                - std::bad_alloc
+                    if this exception is thrown then *this is unusable 
+                    until clear() is called and succeeds
+        !*/</font>
+
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_input_stream'></a>set_input_stream</b> <font face='Lucida Console'>(</font>
+            std::istream<font color='#5555FF'>&amp;</font> is
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - is_in_write_mode() == false                 
+                - is_in_read_mode() == false                  
+                - is is ready to give input
+            ensures 
+                - #is_in_write_mode() == false                 
+                - #is_in_read_mode() == true                   
+                - #*this will now be reading from is
+            throws
+                - std::bad_alloc
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_output_stream'></a>set_output_stream</b> <font face='Lucida Console'>(</font>
+            std::ostream<font color='#5555FF'>&amp;</font> os
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - is_in_write_mode() == false         
+                - is_in_read_mode() == false          
+                - os is ready to take output
+            ensures 
+                - #is_in_write_mode() == true          
+                - #is_in_read_mode() == false          
+                - #*this will now write to os
+            throws
+                - std::bad_alloc
+        !*/</font>
+        
+
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='close'></a>close</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - is_in_write_mode() == true || is_in_read_mode() == true
+            ensures
+                - #is_in_write_mode() == false 
+                - #is_in_read_mode()  == false 
+        !*/</font>
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='is_in_write_mode'></a>is_in_write_mode</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns true if *this is associated with an output stream object
+                - returns false otherwise
+        !*/</font>
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='is_in_read_mode'></a>is_in_read_mode</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns true if *this is associated with an input stream object
+                - returns false otherwise
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='write'></a>write</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>int</u></font> bit
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - is_in_write_mode() == true 
+                - bit == 0 || bit == 1
+            ensures
+                - bit will be written to the ostream object associated with *this
+            throws
+                - std::ios_base::failure
+                    if (there was a problem writing to the output stream) then
+                    this exception will be thrown.  #*this will be unusable until
+                    clear() is called and succeeds
+                - any other exception
+                    if this exception is thrown then #*this is unusable 
+                    until clear() is called and succeeds
+        !*/</font>
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='read'></a>read</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>int</u></font><font color='#5555FF'>&amp;</font> bit
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - is_in_read_mode() == true 
+            ensures
+                - the next bit has been read and placed into #bit 
+                - returns true if the read was successful, else false 
+                  (ex. false if EOF has been reached)
+            throws
+                - any exception
+                    if this exception is thrown then #*this is unusable 
+                    until clear() is called and succeeds
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='swap'></a>swap</b> <font face='Lucida Console'>(</font>
+            bit_stream<font color='#5555FF'>&amp;</font> item
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - swaps *this and item
+        !*/</font> 
+
+        <font color='#0000FF'>private</font>:
+
+            <font color='#009900'>// restricted functions
+</font>            <b><a name='bit_stream'></a>bit_stream</b><font face='Lucida Console'>(</font>bit_stream<font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font>;        <font color='#009900'>// copy constructor
+</font>            bit_stream<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>=</font><font face='Lucida Console'>(</font>bit_stream<font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font>;    <font color='#009900'>// assignment operator
+</font>
+    <b>}</b>;
+
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='swap'></a>swap</b> <font face='Lucida Console'>(</font>
+        bit_stream<font color='#5555FF'>&amp;</font> a, 
+        bit_stream<font color='#5555FF'>&amp;</font> b
+    <font face='Lucida Console'>)</font> <b>{</b> a.<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>b<font face='Lucida Console'>)</font>; <b>}</b>
+    <font color='#009900'>/*!
+        provides a global swap function
+    !*/</font>
+
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_BIT_STREAM_KERNEl_ABSTRACT_
+</font>
+
+</pre></body></html>

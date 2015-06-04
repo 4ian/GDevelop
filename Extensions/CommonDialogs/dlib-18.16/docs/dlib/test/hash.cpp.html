@@ -1,0 +1,372 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - hash.cpp</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2011  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>sstream<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>string<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>cstdlib<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>ctime<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>hash.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>rand.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>matrix.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>byte_orderer.h<font color='#5555FF'>&gt;</font>
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='tester.h.html'>tester.h</a>"
+
+<font color='#0000FF'>namespace</font>  
+<b>{</b>
+    <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> test;
+    <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> dlib;
+    <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> std;
+
+    logger <b><a name='dlog'></a>dlog</b><font face='Lucida Console'>(</font>"<font color='#CC0000'>test.hash</font>"<font face='Lucida Console'>)</font>;
+
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='to_little'></a>to_little</b> <font face='Lucida Console'>(</font>
+        std::vector<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> item
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        byte_orderer bo;
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> item.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            bo.<font color='#BB00BB'>host_to_little</font><font face='Lucida Console'>(</font>item[i]<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='to_little'></a>to_little</b> <font face='Lucida Console'>(</font>
+        matrix<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> item
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        byte_orderer bo;
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> r <font color='#5555FF'>=</font> <font color='#979000'>0</font>; r <font color='#5555FF'>&lt;</font> item.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>r<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> c <font color='#5555FF'>=</font> <font color='#979000'>0</font>; c <font color='#5555FF'>&lt;</font> item.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>c<font face='Lucida Console'>)</font>
+            <b>{</b>
+                bo.<font color='#BB00BB'>host_to_little</font><font face='Lucida Console'>(</font><font color='#BB00BB'>item</font><font face='Lucida Console'>(</font>r,c<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+        <b>}</b>
+    <b>}</b>
+
+    <font color='#009900'>// Run the official test for MurmurHash3
+</font>    <font color='#0000FF'><u>void</u></font> <b><a name='murmur_hash_test'></a>murmur_hash_test</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+    <b>{</b>
+        uint8 key[<font color='#979000'>256</font>];
+        uint32 hashes[<font color='#979000'>256</font>];
+        uint32 final <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+
+        <font color='#BB00BB'>memset</font><font face='Lucida Console'>(</font>key,<font color='#979000'>0</font>,<font color='#0000FF'>sizeof</font><font face='Lucida Console'>(</font>key<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>memset</font><font face='Lucida Console'>(</font>hashes,<font color='#979000'>0</font>,<font color='#0000FF'>sizeof</font><font face='Lucida Console'>(</font>hashes<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// Hash keys of the form {0}, {0,1}, {0,1,2}... up to N=255,using 256-N as
+</font>        <font color='#009900'>// the seed.
+</font>        <font color='#0000FF'>for</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> <font color='#979000'>256</font>; i<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            key[i] <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>uint8<font face='Lucida Console'>)</font>i;
+
+            hashes[i] <font color='#5555FF'>=</font> <font color='#BB00BB'>murmur_hash3</font><font face='Lucida Console'>(</font>key,i,<font color='#979000'>256</font><font color='#5555FF'>-</font>i<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        byte_orderer bo;
+        bo.<font color='#BB00BB'>host_to_little</font><font face='Lucida Console'>(</font>hashes<font face='Lucida Console'>)</font>;
+        final <font color='#5555FF'>=</font> <font color='#BB00BB'>murmur_hash3</font><font face='Lucida Console'>(</font>hashes,<font color='#0000FF'>sizeof</font><font face='Lucida Console'>(</font>hashes<font face='Lucida Console'>)</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// using ostringstream to avoid compiler error in visual studio 2005
+</font>        ostringstream sout;
+        sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> hex <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> final;
+        dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>final: </font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> sout.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>final <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0xB0F57EE3</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+    <font color='#0000FF'><u>void</u></font> <b><a name='murmur_hash_128_test'></a>murmur_hash_128_test</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+    <b>{</b>
+        uint8 key[<font color='#979000'>256</font>];
+        uint64 hashes[<font color='#979000'>256</font><font color='#5555FF'>*</font><font color='#979000'>2</font>];
+        uint32 final <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+
+        <font color='#BB00BB'>memset</font><font face='Lucida Console'>(</font>key,<font color='#979000'>0</font>,<font color='#0000FF'>sizeof</font><font face='Lucida Console'>(</font>key<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>memset</font><font face='Lucida Console'>(</font>hashes,<font color='#979000'>0</font>,<font color='#0000FF'>sizeof</font><font face='Lucida Console'>(</font>hashes<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// Hash keys of the form {0}, {0,1}, {0,1,2}... up to N=255,using 256-N as
+</font>        <font color='#009900'>// the seed.
+</font>        <font color='#0000FF'>for</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> <font color='#979000'>256</font>; i<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            key[i] <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>uint8<font face='Lucida Console'>)</font>i;
+
+            <font color='#0000FF'>const</font> std::pair<font color='#5555FF'>&lt;</font>uint64,uint64<font color='#5555FF'>&gt;</font> temp <font color='#5555FF'>=</font> <font color='#BB00BB'>murmur_hash3_128bit</font><font face='Lucida Console'>(</font>key,i,<font color='#979000'>256</font><font color='#5555FF'>-</font>i<font face='Lucida Console'>)</font>;
+            hashes[<font color='#979000'>2</font><font color='#5555FF'>*</font>i]   <font color='#5555FF'>=</font> temp.first;
+            hashes[<font color='#979000'>2</font><font color='#5555FF'>*</font>i<font color='#5555FF'>+</font><font color='#979000'>1</font>] <font color='#5555FF'>=</font> temp.second;
+        <b>}</b>
+
+        byte_orderer bo;
+        bo.<font color='#BB00BB'>host_to_little</font><font face='Lucida Console'>(</font>hashes<font face='Lucida Console'>)</font>;
+        final <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font>uint32<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#BB00BB'>murmur_hash3_128bit</font><font face='Lucida Console'>(</font>hashes,<font color='#0000FF'>sizeof</font><font face='Lucida Console'>(</font>hashes<font face='Lucida Console'>)</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font>.first<font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// using ostringstream to avoid compiler error in visual studio 2005
+</font>        ostringstream sout;
+        sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> hex <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> final;
+        dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>final 64: </font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> sout.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>final <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0x6384BA69</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+    <font color='#0000FF'><u>void</u></font> <b><a name='test_murmur_hash_128_4'></a>test_murmur_hash_128_4</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+    <b>{</b>
+        byte_orderer bo;
+        dlib::rand rnd;
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> <font color='#979000'>100</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+        <b>{</b>
+            uint32 buf[<font color='#979000'>4</font>] <font color='#5555FF'>=</font> <b>{</b> rnd.<font color='#BB00BB'>get_random_32bit_number</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, 
+                rnd.<font color='#BB00BB'>get_random_32bit_number</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,
+                rnd.<font color='#BB00BB'>get_random_32bit_number</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,
+                rnd.<font color='#BB00BB'>get_random_32bit_number</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+            <b>}</b>;
+
+            bo.<font color='#BB00BB'>host_to_little</font><font face='Lucida Console'>(</font>buf<font face='Lucida Console'>)</font>;
+
+            std::pair<font color='#5555FF'>&lt;</font>uint64,uint64<font color='#5555FF'>&gt;</font> temp1, temp2;
+
+            <font color='#009900'>// Make sure the 4 integer version of murmur hash does the same thing 
+</font>            <font color='#009900'>// as the memory block version.
+</font>            temp1 <font color='#5555FF'>=</font> <font color='#BB00BB'>murmur_hash3_128bit</font><font face='Lucida Console'>(</font>buf, <font color='#0000FF'>sizeof</font><font face='Lucida Console'>(</font>buf<font face='Lucida Console'>)</font>, <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+            temp2 <font color='#5555FF'>=</font> <font color='#BB00BB'>murmur_hash3_128bit</font><font face='Lucida Console'>(</font>buf[<font color='#979000'>0</font>], buf[<font color='#979000'>1</font>], buf[<font color='#979000'>2</font>], buf[<font color='#979000'>3</font>]<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font> temp1.first <font color='#5555FF'>=</font><font color='#5555FF'>=</font> temp2.first<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font> temp1.second <font color='#5555FF'>=</font><font color='#5555FF'>=</font> temp2.second<font face='Lucida Console'>)</font>;
+        <b>}</b>
+    <b>}</b>
+
+    <font color='#0000FF'><u>void</u></font> <b><a name='test_murmur_hash_128_3'></a>test_murmur_hash_128_3</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+    <b>{</b>
+        byte_orderer bo;
+        dlib::rand rnd;
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> <font color='#979000'>100</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+        <b>{</b>
+            uint64 buf[<font color='#979000'>2</font>] <font color='#5555FF'>=</font> <b>{</b> rnd.<font color='#BB00BB'>get_random_64bit_number</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, 
+                rnd.<font color='#BB00BB'>get_random_64bit_number</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,
+            <b>}</b>;
+
+            <font color='#0000FF'>const</font> uint32 seed <font color='#5555FF'>=</font> rnd.<font color='#BB00BB'>get_random_32bit_number</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+            bo.<font color='#BB00BB'>host_to_little</font><font face='Lucida Console'>(</font>buf<font face='Lucida Console'>)</font>;
+            std::pair<font color='#5555FF'>&lt;</font>uint64,uint64<font color='#5555FF'>&gt;</font> temp1, temp2;
+
+            <font color='#009900'>// Make sure the 3 integer version of murmur hash does the same thing 
+</font>            <font color='#009900'>// as the memory block version.
+</font>            temp1 <font color='#5555FF'>=</font> <font color='#BB00BB'>murmur_hash3_128bit</font><font face='Lucida Console'>(</font>buf, <font color='#0000FF'>sizeof</font><font face='Lucida Console'>(</font>buf<font face='Lucida Console'>)</font>, seed<font face='Lucida Console'>)</font>;
+            temp2 <font color='#5555FF'>=</font> <font color='#BB00BB'>murmur_hash3_128bit_3</font><font face='Lucida Console'>(</font>buf[<font color='#979000'>0</font>], buf[<font color='#979000'>1</font>], seed<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font> temp1.first <font color='#5555FF'>=</font><font color='#5555FF'>=</font> temp2.first<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font> temp1.second <font color='#5555FF'>=</font><font color='#5555FF'>=</font> temp2.second<font face='Lucida Console'>)</font>;
+        <b>}</b>
+    <b>}</b>
+
+    <font color='#0000FF'><u>void</u></font> <b><a name='test_murmur_hash_64_2'></a>test_murmur_hash_64_2</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+    <b>{</b>
+        byte_orderer bo;
+        dlib::rand rnd;
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> <font color='#979000'>100</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+        <b>{</b>
+            uint32 val <font color='#5555FF'>=</font> rnd.<font color='#BB00BB'>get_random_32bit_number</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>const</font> uint32 seed <font color='#5555FF'>=</font> rnd.<font color='#BB00BB'>get_random_32bit_number</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+
+            bo.<font color='#BB00BB'>host_to_little</font><font face='Lucida Console'>(</font>val<font face='Lucida Console'>)</font>;
+            uint32 temp1, temp2;
+
+            <font color='#009900'>// Make sure the 2 integer version of murmur hash does the same thing 
+</font>            <font color='#009900'>// as the memory block version.
+</font>            temp1 <font color='#5555FF'>=</font> <font color='#BB00BB'>murmur_hash3</font><font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>val, <font color='#0000FF'>sizeof</font><font face='Lucida Console'>(</font>val<font face='Lucida Console'>)</font>, seed<font face='Lucida Console'>)</font>;
+            temp2 <font color='#5555FF'>=</font> <font color='#BB00BB'>murmur_hash3_2</font><font face='Lucida Console'>(</font>val, seed<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>temp1 <font color='#5555FF'>=</font><font color='#5555FF'>=</font> temp2<font face='Lucida Console'>)</font>;
+        <b>}</b>
+    <b>}</b>
+
+    <font color='#0000FF'><u>void</u></font> <b><a name='test_murmur_hash_64_3'></a>test_murmur_hash_64_3</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+    <b>{</b>
+        byte_orderer bo;
+        dlib::rand rnd;
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> <font color='#979000'>100</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+        <b>{</b>
+            uint32 buf[<font color='#979000'>2</font>] <font color='#5555FF'>=</font> <b>{</b>rnd.<font color='#BB00BB'>get_random_32bit_number</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, 
+                             rnd.<font color='#BB00BB'>get_random_32bit_number</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><b>}</b>;
+            <font color='#0000FF'>const</font> uint32 seed <font color='#5555FF'>=</font> rnd.<font color='#BB00BB'>get_random_32bit_number</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+
+            bo.<font color='#BB00BB'>host_to_little</font><font face='Lucida Console'>(</font>buf<font face='Lucida Console'>)</font>;
+            uint32 temp1, temp2;
+
+            <font color='#009900'>// Make sure the 2 integer version of murmur hash does the same thing 
+</font>            <font color='#009900'>// as the memory block version.
+</font>            temp1 <font color='#5555FF'>=</font> <font color='#BB00BB'>murmur_hash3</font><font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>buf, <font color='#0000FF'>sizeof</font><font face='Lucida Console'>(</font>buf<font face='Lucida Console'>)</font>, seed<font face='Lucida Console'>)</font>;
+            temp2 <font color='#5555FF'>=</font> <font color='#BB00BB'>murmur_hash3_3</font><font face='Lucida Console'>(</font>buf[<font color='#979000'>0</font>], buf[<font color='#979000'>1</font>], seed<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>temp1 <font color='#5555FF'>=</font><font color='#5555FF'>=</font> temp2<font face='Lucida Console'>)</font>;
+        <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    uint64  <b><a name='slow_count_bits'></a>slow_count_bits</b> <font face='Lucida Console'>(</font> uint64 v<font face='Lucida Console'>)</font>
+    <b>{</b>
+        uint64 count <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> <font color='#979000'>64</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>v<font color='#5555FF'>&amp;</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>
+                <font color='#5555FF'>+</font><font color='#5555FF'>+</font>count;
+            v <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+        <b>}</b>
+        <font color='#0000FF'>return</font> count;
+    <b>}</b>
+
+
+    uint32  <b><a name='slow_count_bits'></a>slow_count_bits</b> <font face='Lucida Console'>(</font> uint32 v<font face='Lucida Console'>)</font>
+    <b>{</b>
+        uint32 count <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> <font color='#979000'>32</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>v<font color='#5555FF'>&amp;</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>
+                <font color='#5555FF'>+</font><font color='#5555FF'>+</font>count;
+            v <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+        <b>}</b>
+        <font color='#0000FF'>return</font> count;
+    <b>}</b>
+
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='test_hamming_stuff'></a>test_hamming_stuff</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+    <b>{</b>
+        dlib::rand rnd;
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> <font color='#979000'>10000</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+        <b>{</b>
+            uint32 v <font color='#5555FF'>=</font> rnd.<font color='#BB00BB'>get_random_32bit_number</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            uint64 v2 <font color='#5555FF'>=</font> rnd.<font color='#BB00BB'>get_random_64bit_number</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>slow_count_bits</font><font face='Lucida Console'>(</font>v<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#BB00BB'>count_bits</font><font face='Lucida Console'>(</font>v<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>slow_count_bits</font><font face='Lucida Console'>(</font>v2<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#BB00BB'>count_bits</font><font face='Lucida Console'>(</font>v2<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>hamming_distance</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>uint32<font face='Lucida Console'>)</font><font color='#979000'>0x1F</font>, <font face='Lucida Console'>(</font>uint32<font face='Lucida Console'>)</font><font color='#979000'>0x0F</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>hamming_distance</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>uint32<font face='Lucida Console'>)</font><font color='#979000'>0x1F</font>, <font face='Lucida Console'>(</font>uint32<font face='Lucida Console'>)</font><font color='#979000'>0x1F</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>hamming_distance</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>uint32<font face='Lucida Console'>)</font><font color='#979000'>0x1F</font>, <font face='Lucida Console'>(</font>uint32<font face='Lucida Console'>)</font><font color='#979000'>0x19</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>hamming_distance</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>uint32<font face='Lucida Console'>)</font><font color='#979000'>0x2F</font>, <font face='Lucida Console'>(</font>uint32<font face='Lucida Console'>)</font><font color='#979000'>0x19</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>4</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>class</font> <b><a name='test_hash'></a>test_hash</b> : <font color='#0000FF'>public</font> tester
+    <b>{</b>
+    <font color='#0000FF'>public</font>:
+        <b><a name='test_hash'></a>test_hash</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> :
+            tester <font face='Lucida Console'>(</font>"<font color='#CC0000'>test_hash</font>",
+                    "<font color='#CC0000'>Runs tests on the hash routines.</font>"<font face='Lucida Console'>)</font>
+        <b>{</b><b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='perform_test'></a>perform_test</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#BB00BB'>print_spinner</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+            <font color='#BB00BB'>test_hamming_stuff</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+            <font color='#BB00BB'>murmur_hash_test</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>murmur_hash_128_test</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+            std::string str1 <font color='#5555FF'>=</font> "<font color='#CC0000'>some random string</font>";
+            matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font> <font color='#BB00BB'>mat</font><font face='Lucida Console'>(</font><font color='#979000'>2</font>,<font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+
+            mat <font color='#5555FF'>=</font> <font color='#979000'>1</font>,<font color='#979000'>2</font>,<font color='#979000'>3</font>,<font color='#979000'>4</font>;
+
+            matrix<font color='#5555FF'>&lt;</font>uint64<font color='#5555FF'>&gt;</font> <font color='#BB00BB'>mat2</font><font face='Lucida Console'>(</font><font color='#979000'>2</font>,<font color='#979000'>3</font><font face='Lucida Console'>)</font>;
+
+            mat2 <font color='#5555FF'>=</font> <font color='#979000'>1</font>,<font color='#979000'>2</font>,<font color='#979000'>3</font>,<font color='#979000'>4</font>,<font color='#979000'>5</font>,<font color='#979000'>6</font>;
+
+            <font color='#BB00BB'>to_little</font><font face='Lucida Console'>(</font>mat2<font face='Lucida Console'>)</font>;
+
+            std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font> <font color='#BB00BB'>v</font><font face='Lucida Console'>(</font><font color='#979000'>4</font><font face='Lucida Console'>)</font>;
+            v[<font color='#979000'>0</font>] <font color='#5555FF'>=</font> '<font color='#FF0000'>c</font>';
+            v[<font color='#979000'>1</font>] <font color='#5555FF'>=</font> '<font color='#FF0000'>a</font>';
+            v[<font color='#979000'>2</font>] <font color='#5555FF'>=</font> '<font color='#FF0000'>t</font>';
+            v[<font color='#979000'>3</font>] <font color='#5555FF'>=</font> '<font color='#FF0000'>!</font>';
+
+            std::vector<font color='#5555FF'>&lt;</font>uint16<font color='#5555FF'>&gt;</font> <font color='#BB00BB'>v2</font><font face='Lucida Console'>(</font><font color='#979000'>4</font><font face='Lucida Console'>)</font>;
+            v[<font color='#979000'>0</font>] <font color='#5555FF'>=</font> '<font color='#FF0000'>c</font>';
+            v[<font color='#979000'>1</font>] <font color='#5555FF'>=</font> '<font color='#FF0000'>a</font>';
+            v[<font color='#979000'>2</font>] <font color='#5555FF'>=</font> '<font color='#FF0000'>t</font>';
+            v[<font color='#979000'>3</font>] <font color='#5555FF'>=</font> '<font color='#FF0000'>!</font>';
+            <font color='#BB00BB'>to_little</font><font face='Lucida Console'>(</font>v2<font face='Lucida Console'>)</font>;
+
+            std::map<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font>, <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font> m;
+            m['<font color='#FF0000'>c</font>'] <font color='#5555FF'>=</font> '<font color='#FF0000'>C</font>';
+            m['<font color='#FF0000'>a</font>'] <font color='#5555FF'>=</font> '<font color='#FF0000'>A</font>';
+            m['<font color='#FF0000'>t</font>'] <font color='#5555FF'>=</font> '<font color='#FF0000'>T</font>';
+
+            dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>hash(str1): </font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> dlib::<font color='#BB00BB'>hash</font><font face='Lucida Console'>(</font>str1<font face='Lucida Console'>)</font>;
+            dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>hash(v):    </font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> dlib::<font color='#BB00BB'>hash</font><font face='Lucida Console'>(</font>v<font face='Lucida Console'>)</font>;
+            dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>hash(v2):   </font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> dlib::<font color='#BB00BB'>hash</font><font face='Lucida Console'>(</font>v2<font face='Lucida Console'>)</font>;
+            dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>hash(m):    </font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> dlib::<font color='#BB00BB'>hash</font><font face='Lucida Console'>(</font>m<font face='Lucida Console'>)</font>;
+            dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>hash(mat):  </font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> dlib::<font color='#BB00BB'>hash</font><font face='Lucida Console'>(</font>mat<font face='Lucida Console'>)</font>;
+            dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>hash(mat2): </font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> dlib::<font color='#BB00BB'>hash</font><font face='Lucida Console'>(</font>mat2<font face='Lucida Console'>)</font>;
+
+            uint32 ui1 <font color='#5555FF'>=</font> <font color='#979000'>123485393</font>;
+            uint64 ui2 <font color='#5555FF'>=</font> ui1;
+            ui2 <font color='#5555FF'>*</font><font color='#5555FF'>=</font> ui2;
+            ui2 <font color='#5555FF'>*</font><font color='#5555FF'>=</font> ui2;
+            dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>hash(ui1):                  </font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> dlib::<font color='#BB00BB'>hash</font><font face='Lucida Console'>(</font>ui1<font face='Lucida Console'>)</font>;
+            dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>hash(ui2):                  </font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> dlib::<font color='#BB00BB'>hash</font><font face='Lucida Console'>(</font>ui2<font face='Lucida Console'>)</font>;
+            dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>hash(make_pair(ui2,ui1)):   </font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> dlib::<font color='#BB00BB'>hash</font><font face='Lucida Console'>(</font><font color='#BB00BB'>make_pair</font><font face='Lucida Console'>(</font>ui2,ui1<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>hash(make_pair(ui2,ui2)):   </font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> dlib::<font color='#BB00BB'>hash</font><font face='Lucida Console'>(</font><font color='#BB00BB'>make_pair</font><font face='Lucida Console'>(</font>ui2,ui2<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>hash(make_pair(ui1,ui1)):   </font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> dlib::<font color='#BB00BB'>hash</font><font face='Lucida Console'>(</font><font color='#BB00BB'>make_pair</font><font face='Lucida Console'>(</font>ui1,ui1<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>hash(ui1,3):                </font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> dlib::<font color='#BB00BB'>hash</font><font face='Lucida Console'>(</font>ui1,<font color='#979000'>3</font><font face='Lucida Console'>)</font>;
+            dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>hash(ui2,3):                </font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> dlib::<font color='#BB00BB'>hash</font><font face='Lucida Console'>(</font>ui2,<font color='#979000'>3</font><font face='Lucida Console'>)</font>;
+            dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>hash(make_pair(ui2,ui1),3): </font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> dlib::<font color='#BB00BB'>hash</font><font face='Lucida Console'>(</font><font color='#BB00BB'>make_pair</font><font face='Lucida Console'>(</font>ui2,ui1<font face='Lucida Console'>)</font>,<font color='#979000'>3</font><font face='Lucida Console'>)</font>;
+            dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>hash(make_pair(ui2,ui2),3): </font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> dlib::<font color='#BB00BB'>hash</font><font face='Lucida Console'>(</font><font color='#BB00BB'>make_pair</font><font face='Lucida Console'>(</font>ui2,ui2<font face='Lucida Console'>)</font>,<font color='#979000'>3</font><font face='Lucida Console'>)</font>;
+            dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>hash(make_pair(ui1,ui1),3): </font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> dlib::<font color='#BB00BB'>hash</font><font face='Lucida Console'>(</font><font color='#BB00BB'>make_pair</font><font face='Lucida Console'>(</font>ui1,ui1<font face='Lucida Console'>)</font>,<font color='#979000'>3</font><font face='Lucida Console'>)</font>;
+
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>dlib::<font color='#BB00BB'>hash</font><font face='Lucida Console'>(</font>ui1<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0x63e272e4</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>dlib::<font color='#BB00BB'>hash</font><font face='Lucida Console'>(</font>ui2<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0xaf55561a</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>dlib::<font color='#BB00BB'>hash</font><font face='Lucida Console'>(</font><font color='#BB00BB'>make_pair</font><font face='Lucida Console'>(</font>ui2,ui1<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0x52685376</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>dlib::<font color='#BB00BB'>hash</font><font face='Lucida Console'>(</font><font color='#BB00BB'>make_pair</font><font face='Lucida Console'>(</font>ui2,ui2<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0xd25d6929</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>dlib::<font color='#BB00BB'>hash</font><font face='Lucida Console'>(</font><font color='#BB00BB'>make_pair</font><font face='Lucida Console'>(</font>ui1,ui1<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0xeea3b63e</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>dlib::<font color='#BB00BB'>hash</font><font face='Lucida Console'>(</font>ui1,<font color='#979000'>3</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0x95d1c4c0</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>dlib::<font color='#BB00BB'>hash</font><font face='Lucida Console'>(</font>ui2,<font color='#979000'>3</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0x6ada728d</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>dlib::<font color='#BB00BB'>hash</font><font face='Lucida Console'>(</font><font color='#BB00BB'>make_pair</font><font face='Lucida Console'>(</font>ui2,ui1<font face='Lucida Console'>)</font>,<font color='#979000'>3</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0x2f72a0ff</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>dlib::<font color='#BB00BB'>hash</font><font face='Lucida Console'>(</font><font color='#BB00BB'>make_pair</font><font face='Lucida Console'>(</font>ui2,ui2<font face='Lucida Console'>)</font>,<font color='#979000'>3</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0xac1407f0</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>dlib::<font color='#BB00BB'>hash</font><font face='Lucida Console'>(</font><font color='#BB00BB'>make_pair</font><font face='Lucida Console'>(</font>ui1,ui1<font face='Lucida Console'>)</font>,<font color='#979000'>3</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0x39ad637a</font><font face='Lucida Console'>)</font>;
+
+
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>dlib::<font color='#BB00BB'>hash</font><font face='Lucida Console'>(</font>str1<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0x3ffe6bf6</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>dlib::<font color='#BB00BB'>hash</font><font face='Lucida Console'>(</font>v<font face='Lucida Console'>)</font>    <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0xf1af2ca6</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>dlib::<font color='#BB00BB'>hash</font><font face='Lucida Console'>(</font>v2<font face='Lucida Console'>)</font>   <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0x63852afc</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>dlib::<font color='#BB00BB'>hash</font><font face='Lucida Console'>(</font>m<font face='Lucida Console'>)</font>    <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0xaacc3f6f</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>dlib::<font color='#BB00BB'>hash</font><font face='Lucida Console'>(</font>mat<font face='Lucida Console'>)</font>  <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0x3e349da5</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>dlib::<font color='#BB00BB'>hash</font><font face='Lucida Console'>(</font>mat2<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0x3a95dc52</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>murmur_hash3</font><font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>str1[<font color='#979000'>0</font>], str1.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, <font color='#979000'>0</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0x3ffe6bf6</font><font face='Lucida Console'>)</font>;
+
+            dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>hash(str1,1): </font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> dlib::<font color='#BB00BB'>hash</font><font face='Lucida Console'>(</font>str1,<font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+            dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>hash(v,3):    </font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> dlib::<font color='#BB00BB'>hash</font><font face='Lucida Console'>(</font>v,<font color='#979000'>3</font><font face='Lucida Console'>)</font>;
+            dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>hash(v2,3):   </font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> dlib::<font color='#BB00BB'>hash</font><font face='Lucida Console'>(</font>v2,<font color='#979000'>3</font><font face='Lucida Console'>)</font>;
+            dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>hash(m,4):    </font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> dlib::<font color='#BB00BB'>hash</font><font face='Lucida Console'>(</font>m,<font color='#979000'>4</font><font face='Lucida Console'>)</font>;
+            dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>hash(mat,5):  </font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> dlib::<font color='#BB00BB'>hash</font><font face='Lucida Console'>(</font>mat,<font color='#979000'>5</font><font face='Lucida Console'>)</font>;
+            dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>hash(mat2,6): </font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> dlib::<font color='#BB00BB'>hash</font><font face='Lucida Console'>(</font>mat2,<font color='#979000'>6</font><font face='Lucida Console'>)</font>;
+
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>dlib::<font color='#BB00BB'>hash</font><font face='Lucida Console'>(</font>str1,<font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0xb17cea93</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>dlib::<font color='#BB00BB'>hash</font><font face='Lucida Console'>(</font>v,<font color='#979000'>3</font><font face='Lucida Console'>)</font>    <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0x7ec9284c</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>dlib::<font color='#BB00BB'>hash</font><font face='Lucida Console'>(</font>v2,<font color='#979000'>3</font><font face='Lucida Console'>)</font>   <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0xb2ce147f</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>dlib::<font color='#BB00BB'>hash</font><font face='Lucida Console'>(</font>m,<font color='#979000'>4</font><font face='Lucida Console'>)</font>    <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0xfa5e7ac2</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>dlib::<font color='#BB00BB'>hash</font><font face='Lucida Console'>(</font>mat,<font color='#979000'>5</font><font face='Lucida Console'>)</font>  <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0x8de27259</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>dlib::<font color='#BB00BB'>hash</font><font face='Lucida Console'>(</font>mat2,<font color='#979000'>6</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0xb8aa7714</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>murmur_hash3</font><font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>str1[<font color='#979000'>0</font>], str1.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, <font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0xb17cea93</font><font face='Lucida Console'>)</font>;
+
+            <font color='#BB00BB'>test_murmur_hash_128_4</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>test_murmur_hash_128_3</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>test_murmur_hash_64_2</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>test_murmur_hash_64_3</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+    <b>}</b> a;
+
+
+
+<b>}</b>
+
+
+
+
+</pre></body></html>

@@ -1,0 +1,398 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - jdapimin.cpp</title></head><body bgcolor='white'><pre>
+<font color='#009900'>/*
+ * jdapimin.c
+ *
+ * Copyright (C) 1994-1998, Thomas G. Lane.
+ * This file is part of the Independent JPEG Group's software.
+ * For conditions of distribution and use, see the accompanying README file.
+ *
+ * This file contains application interface code for the decompression half
+ * of the JPEG library.  These are the "minimum" API routines that may be
+ * needed in either the normal full-decompression case or the
+ * transcoding-only case.
+ *
+ * Most of the routines intended to be called directly by an application
+ * are in this file or in jdapistd.c.  But also see jcomapi.c for routines
+ * shared by compression and decompression, and jdtrans.c for the transcoding
+ * case.
+ */</font>
+
+<font color='#0000FF'>#define</font> JPEG_INTERNALS
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='jinclude.h.html'>jinclude.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='jpeglib.h.html'>jpeglib.h</a>"
+
+
+<font color='#009900'>/*
+ * Initialization of a JPEG decompression object.
+ * The error manager must already be set up (in case memory manager fails).
+ */</font>
+
+<b><a name='GLOBAL'></a>GLOBAL</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font>
+<b><a name='jpeg_CreateDecompress'></a>jpeg_CreateDecompress</b> <font face='Lucida Console'>(</font>j_decompress_ptr cinfo, <font color='#0000FF'><u>int</u></font> version, <font color='#0000FF'><u>size_t</u></font> structsize<font face='Lucida Console'>)</font>
+<b>{</b>
+  <font color='#0000FF'><u>int</u></font> i;
+
+  <font color='#009900'>/* Guard against version mismatches between library and caller. */</font>
+  cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>mem <font color='#5555FF'>=</font> NULL;		<font color='#009900'>/* so jpeg_destroy knows mem mgr not called */</font>
+  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>version <font color='#5555FF'>!</font><font color='#5555FF'>=</font> JPEG_LIB_VERSION<font face='Lucida Console'>)</font>
+    <font color='#BB00BB'>ERREXIT2</font><font face='Lucida Console'>(</font>cinfo, JERR_BAD_LIB_VERSION, JPEG_LIB_VERSION, version<font face='Lucida Console'>)</font>;
+  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>structsize <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#BB00BB'>SIZEOF</font><font face='Lucida Console'>(</font><font color='#0000FF'>struct</font> <b><a name='jpeg_decompress_struct'></a>jpeg_decompress_struct</b><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+    <font color='#BB00BB'>ERREXIT2</font><font face='Lucida Console'>(</font>cinfo, JERR_BAD_STRUCT_SIZE, 
+	     <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font> <font color='#BB00BB'>SIZEOF</font><font face='Lucida Console'>(</font><font color='#0000FF'>struct</font> <b><a name='jpeg_decompress_struct'></a>jpeg_decompress_struct</b><font face='Lucida Console'>)</font>, <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font> structsize<font face='Lucida Console'>)</font>;
+
+  <font color='#009900'>/* For debugging purposes, we zero the whole master structure.
+   * But the application has already set the err pointer, and may have set
+   * client_data, so we have to save and restore those fields.
+   * Note: if application hasn't set client_data, tools like Purify may
+   * complain here.
+   */</font>
+  <b>{</b>
+    <font color='#0000FF'>struct</font> jpeg_error_mgr <font color='#5555FF'>*</font> err <font color='#5555FF'>=</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>err;
+    <font color='#0000FF'><u>void</u></font> <font color='#5555FF'>*</font> client_data <font color='#5555FF'>=</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>client_data; <font color='#009900'>/* ignore Purify complaint here */</font>
+    <font color='#BB00BB'>MEMZERO</font><font face='Lucida Console'>(</font>cinfo, <font color='#BB00BB'>SIZEOF</font><font face='Lucida Console'>(</font><font color='#0000FF'>struct</font> <b><a name='jpeg_decompress_struct'></a>jpeg_decompress_struct</b><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+    cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>err <font color='#5555FF'>=</font> err;
+    cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>client_data <font color='#5555FF'>=</font> client_data;
+  <b>}</b>
+  cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>is_decompressor <font color='#5555FF'>=</font> TRUE;
+
+  <font color='#009900'>/* Initialize a memory manager instance for this object */</font>
+  <font color='#BB00BB'>jinit_memory_mgr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>j_common_ptr<font face='Lucida Console'>)</font> cinfo<font face='Lucida Console'>)</font>;
+
+  <font color='#009900'>/* Zero out pointers to permanent structures. */</font>
+  cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>progress <font color='#5555FF'>=</font> NULL;
+  cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>src <font color='#5555FF'>=</font> NULL;
+
+  <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> NUM_QUANT_TBLS; i<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font>
+    cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>quant_tbl_ptrs[i] <font color='#5555FF'>=</font> NULL;
+
+  <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> NUM_HUFF_TBLS; i<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> <b>{</b>
+    cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>dc_huff_tbl_ptrs[i] <font color='#5555FF'>=</font> NULL;
+    cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>ac_huff_tbl_ptrs[i] <font color='#5555FF'>=</font> NULL;
+  <b>}</b>
+
+  <font color='#009900'>/* Initialize marker processor so application can override methods
+   * for COM, APPn markers before calling jpeg_read_header.
+   */</font>
+  cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>marker_list <font color='#5555FF'>=</font> NULL;
+  <font color='#BB00BB'>jinit_marker_reader</font><font face='Lucida Console'>(</font>cinfo<font face='Lucida Console'>)</font>;
+
+  <font color='#009900'>/* And initialize the overall input controller. */</font>
+  <font color='#BB00BB'>jinit_input_controller</font><font face='Lucida Console'>(</font>cinfo<font face='Lucida Console'>)</font>;
+
+  <font color='#009900'>/* OK, I'm ready */</font>
+  cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>global_state <font color='#5555FF'>=</font> DSTATE_START;
+<b>}</b>
+
+
+<font color='#009900'>/*
+ * Destruction of a JPEG decompression object
+ */</font>
+
+<b><a name='GLOBAL'></a>GLOBAL</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font>
+<b><a name='jpeg_destroy_decompress'></a>jpeg_destroy_decompress</b> <font face='Lucida Console'>(</font>j_decompress_ptr cinfo<font face='Lucida Console'>)</font>
+<b>{</b>
+  <font color='#BB00BB'>jpeg_destroy</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>j_common_ptr<font face='Lucida Console'>)</font> cinfo<font face='Lucida Console'>)</font>; <font color='#009900'>/* use common routine */</font>
+<b>}</b>
+
+
+<font color='#009900'>/*
+ * Abort processing of a JPEG decompression operation,
+ * but don't destroy the object itself.
+ */</font>
+
+<b><a name='GLOBAL'></a>GLOBAL</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font>
+<b><a name='jpeg_abort_decompress'></a>jpeg_abort_decompress</b> <font face='Lucida Console'>(</font>j_decompress_ptr cinfo<font face='Lucida Console'>)</font>
+<b>{</b>
+  <font color='#BB00BB'>jpeg_abort</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>j_common_ptr<font face='Lucida Console'>)</font> cinfo<font face='Lucida Console'>)</font>; <font color='#009900'>/* use common routine */</font>
+<b>}</b>
+
+
+<font color='#009900'>/*
+ * Set default decompression parameters.
+ */</font>
+
+<b><a name='LOCAL'></a>LOCAL</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font>
+<b><a name='default_decompress_parms'></a>default_decompress_parms</b> <font face='Lucida Console'>(</font>j_decompress_ptr cinfo<font face='Lucida Console'>)</font>
+<b>{</b>
+  <font color='#009900'>/* Guess the input colorspace, and set output colorspace accordingly. */</font>
+  <font color='#009900'>/* (Wish JPEG committee had provided a real way to specify this...) */</font>
+  <font color='#009900'>/* Note application may override our guesses. */</font>
+  <font color='#0000FF'>switch</font> <font face='Lucida Console'>(</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>num_components<font face='Lucida Console'>)</font> <b>{</b>
+  <font color='#0000FF'>case</font> <font color='#979000'>1</font>:
+    cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>jpeg_color_space <font color='#5555FF'>=</font> JCS_GRAYSCALE;
+    cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>out_color_space <font color='#5555FF'>=</font> JCS_GRAYSCALE;
+    <font color='#0000FF'>break</font>;
+    
+  <font color='#0000FF'>case</font> <font color='#979000'>3</font>:
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>saw_JFIF_marker<font face='Lucida Console'>)</font> <b>{</b>
+      cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>jpeg_color_space <font color='#5555FF'>=</font> JCS_YCbCr; <font color='#009900'>/* JFIF implies YCbCr */</font>
+    <b>}</b> <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>saw_Adobe_marker<font face='Lucida Console'>)</font> <b>{</b>
+      <font color='#0000FF'>switch</font> <font face='Lucida Console'>(</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>Adobe_transform<font face='Lucida Console'>)</font> <b>{</b>
+      <font color='#0000FF'>case</font> <font color='#979000'>0</font>:
+	cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>jpeg_color_space <font color='#5555FF'>=</font> JCS_RGB;
+	<font color='#0000FF'>break</font>;
+      <font color='#0000FF'>case</font> <font color='#979000'>1</font>:
+	cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>jpeg_color_space <font color='#5555FF'>=</font> JCS_YCbCr;
+	<font color='#0000FF'>break</font>;
+      <font color='#0000FF'>default</font>:
+	<font color='#BB00BB'>WARNMS1</font><font face='Lucida Console'>(</font>cinfo, JWRN_ADOBE_XFORM, cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>Adobe_transform<font face='Lucida Console'>)</font>;
+	cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>jpeg_color_space <font color='#5555FF'>=</font> JCS_YCbCr; <font color='#009900'>/* assume it's YCbCr */</font>
+	<font color='#0000FF'>break</font>;
+      <b>}</b>
+    <b>}</b> <font color='#0000FF'>else</font> <b>{</b>
+      <font color='#009900'>/* Saw no special markers, try to guess from the component IDs */</font>
+      <font color='#0000FF'><u>int</u></font> cid0 <font color='#5555FF'>=</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>comp_info[<font color='#979000'>0</font>].component_id;
+      <font color='#0000FF'><u>int</u></font> cid1 <font color='#5555FF'>=</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>comp_info[<font color='#979000'>1</font>].component_id;
+      <font color='#0000FF'><u>int</u></font> cid2 <font color='#5555FF'>=</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>comp_info[<font color='#979000'>2</font>].component_id;
+
+      <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>cid0 <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>1</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> cid1 <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>2</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> cid2 <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>3</font><font face='Lucida Console'>)</font>
+	cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>jpeg_color_space <font color='#5555FF'>=</font> JCS_YCbCr; <font color='#009900'>/* assume JFIF w/out marker */</font>
+      <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>cid0 <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>82</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> cid1 <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>71</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> cid2 <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>66</font><font face='Lucida Console'>)</font>
+	cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>jpeg_color_space <font color='#5555FF'>=</font> JCS_RGB; <font color='#009900'>/* ASCII 'R', 'G', 'B' */</font>
+      <font color='#0000FF'>else</font> <b>{</b>
+	<font color='#BB00BB'>TRACEMS3</font><font face='Lucida Console'>(</font>cinfo, <font color='#979000'>1</font>, JTRC_UNKNOWN_IDS, cid0, cid1, cid2<font face='Lucida Console'>)</font>;
+	cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>jpeg_color_space <font color='#5555FF'>=</font> JCS_YCbCr; <font color='#009900'>/* assume it's YCbCr */</font>
+      <b>}</b>
+    <b>}</b>
+    <font color='#009900'>/* Always guess RGB is proper output colorspace. */</font>
+    cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>out_color_space <font color='#5555FF'>=</font> JCS_RGB;
+    <font color='#0000FF'>break</font>;
+    
+  <font color='#0000FF'>case</font> <font color='#979000'>4</font>:
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>saw_Adobe_marker<font face='Lucida Console'>)</font> <b>{</b>
+      <font color='#0000FF'>switch</font> <font face='Lucida Console'>(</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>Adobe_transform<font face='Lucida Console'>)</font> <b>{</b>
+      <font color='#0000FF'>case</font> <font color='#979000'>0</font>:
+	cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>jpeg_color_space <font color='#5555FF'>=</font> JCS_CMYK;
+	<font color='#0000FF'>break</font>;
+      <font color='#0000FF'>case</font> <font color='#979000'>2</font>:
+	cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>jpeg_color_space <font color='#5555FF'>=</font> JCS_YCCK;
+	<font color='#0000FF'>break</font>;
+      <font color='#0000FF'>default</font>:
+	<font color='#BB00BB'>WARNMS1</font><font face='Lucida Console'>(</font>cinfo, JWRN_ADOBE_XFORM, cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>Adobe_transform<font face='Lucida Console'>)</font>;
+	cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>jpeg_color_space <font color='#5555FF'>=</font> JCS_YCCK; <font color='#009900'>/* assume it's YCCK */</font>
+	<font color='#0000FF'>break</font>;
+      <b>}</b>
+    <b>}</b> <font color='#0000FF'>else</font> <b>{</b>
+      <font color='#009900'>/* No special markers, assume straight CMYK. */</font>
+      cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>jpeg_color_space <font color='#5555FF'>=</font> JCS_CMYK;
+    <b>}</b>
+    cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>out_color_space <font color='#5555FF'>=</font> JCS_CMYK;
+    <font color='#0000FF'>break</font>;
+    
+  <font color='#0000FF'>default</font>:
+    cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>jpeg_color_space <font color='#5555FF'>=</font> JCS_UNKNOWN;
+    cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>out_color_space <font color='#5555FF'>=</font> JCS_UNKNOWN;
+    <font color='#0000FF'>break</font>;
+  <b>}</b>
+
+  <font color='#009900'>/* Set defaults for other decompression parameters. */</font>
+  cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>scale_num <font color='#5555FF'>=</font> <font color='#979000'>1</font>;		<font color='#009900'>/* 1:1 scaling */</font>
+  cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>scale_denom <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+  cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>output_gamma <font color='#5555FF'>=</font> <font color='#979000'>1.0</font>;
+  cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>buffered_image <font color='#5555FF'>=</font> FALSE;
+  cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>raw_data_out <font color='#5555FF'>=</font> FALSE;
+  cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>dct_method <font color='#5555FF'>=</font> JDCT_DEFAULT;
+  cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>do_fancy_upsampling <font color='#5555FF'>=</font> TRUE;
+  cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>do_block_smoothing <font color='#5555FF'>=</font> TRUE;
+  cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>quantize_colors <font color='#5555FF'>=</font> FALSE;
+  <font color='#009900'>/* We set these in case application only sets quantize_colors. */</font>
+  cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>dither_mode <font color='#5555FF'>=</font> JDITHER_FS;
+<font color='#0000FF'>#ifdef</font> QUANT_2PASS_SUPPORTED
+  cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>two_pass_quantize <font color='#5555FF'>=</font> TRUE;
+<font color='#0000FF'>#else</font>
+  cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>two_pass_quantize <font color='#5555FF'>=</font> FALSE;
+<font color='#0000FF'>#endif</font>
+  cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>desired_number_of_colors <font color='#5555FF'>=</font> <font color='#979000'>256</font>;
+  cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>colormap <font color='#5555FF'>=</font> NULL;
+  <font color='#009900'>/* Initialize for no mode change in buffered-image mode. */</font>
+  cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>enable_1pass_quant <font color='#5555FF'>=</font> FALSE;
+  cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>enable_external_quant <font color='#5555FF'>=</font> FALSE;
+  cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>enable_2pass_quant <font color='#5555FF'>=</font> FALSE;
+<b>}</b>
+
+
+<font color='#009900'>/*
+ * Decompression startup: read start of JPEG datastream to see what's there.
+ * Need only initialize JPEG object and supply a data source before calling.
+ *
+ * This routine will read as far as the first SOS marker (ie, actual start of
+ * compressed data), and will save all tables and parameters in the JPEG
+ * object.  It will also initialize the decompression parameters to default
+ * values, and finally return JPEG_HEADER_OK.  On return, the application may
+ * adjust the decompression parameters and then call jpeg_start_decompress.
+ * (Or, if the application only wanted to determine the image parameters,
+ * the data need not be decompressed.  In that case, call jpeg_abort or
+ * jpeg_destroy to release any temporary space.)
+ * If an abbreviated (tables only) datastream is presented, the routine will
+ * return JPEG_HEADER_TABLES_ONLY upon reaching EOI.  The application may then
+ * re-use the JPEG object to read the abbreviated image datastream(s).
+ * It is unnecessary (but OK) to call jpeg_abort in this case.
+ * The JPEG_SUSPENDED return code only occurs if the data source module
+ * requests suspension of the decompressor.  In this case the application
+ * should load more source data and then re-call jpeg_read_header to resume
+ * processing.
+ * If a non-suspending data source is used and require_image is TRUE, then the
+ * return code need not be inspected since only JPEG_HEADER_OK is possible.
+ *
+ * This routine is now just a front end to jpeg_consume_input, with some
+ * extra error checking.
+ */</font>
+
+<b><a name='GLOBAL'></a>GLOBAL</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font>
+<b><a name='jpeg_read_header'></a>jpeg_read_header</b> <font face='Lucida Console'>(</font>j_decompress_ptr cinfo, <font color='#0000FF'><u>int</u></font> require_image<font face='Lucida Console'>)</font>
+<b>{</b>
+  <font color='#0000FF'><u>int</u></font> retcode;
+
+  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>global_state <font color='#5555FF'>!</font><font color='#5555FF'>=</font> DSTATE_START <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font>
+      cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>global_state <font color='#5555FF'>!</font><font color='#5555FF'>=</font> DSTATE_INHEADER<font face='Lucida Console'>)</font>
+    <font color='#BB00BB'>ERREXIT1</font><font face='Lucida Console'>(</font>cinfo, JERR_BAD_STATE, cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>global_state<font face='Lucida Console'>)</font>;
+
+  retcode <font color='#5555FF'>=</font> <font color='#BB00BB'>jpeg_consume_input</font><font face='Lucida Console'>(</font>cinfo<font face='Lucida Console'>)</font>;
+
+  <font color='#0000FF'>switch</font> <font face='Lucida Console'>(</font>retcode<font face='Lucida Console'>)</font> <b>{</b>
+  <font color='#0000FF'>case</font> JPEG_REACHED_SOS:
+    retcode <font color='#5555FF'>=</font> JPEG_HEADER_OK;
+    <font color='#0000FF'>break</font>;
+  <font color='#0000FF'>case</font> JPEG_REACHED_EOI:
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>require_image<font face='Lucida Console'>)</font>		<font color='#009900'>/* Complain if application wanted an image */</font>
+      <font color='#BB00BB'>ERREXIT</font><font face='Lucida Console'>(</font>cinfo, JERR_NO_IMAGE<font face='Lucida Console'>)</font>;
+    <font color='#009900'>/* Reset to start state; it would be safer to require the application to
+     * call jpeg_abort, but we can't change it now for compatibility reasons.
+     * A side effect is to free any temporary memory (there shouldn't be any).
+     */</font>
+    <font color='#BB00BB'>jpeg_abort</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>j_common_ptr<font face='Lucida Console'>)</font> cinfo<font face='Lucida Console'>)</font>; <font color='#009900'>/* sets state = DSTATE_START */</font>
+    retcode <font color='#5555FF'>=</font> JPEG_HEADER_TABLES_ONLY;
+    <font color='#0000FF'>break</font>;
+  <font color='#0000FF'>case</font> JPEG_SUSPENDED:
+    <font color='#009900'>/* no work */</font>
+    <font color='#0000FF'>break</font>;
+  <b>}</b>
+
+  <font color='#0000FF'>return</font> retcode;
+<b>}</b>
+
+
+<font color='#009900'>/*
+ * Consume data in advance of what the decompressor requires.
+ * This can be called at any time once the decompressor object has
+ * been created and a data source has been set up.
+ *
+ * This routine is essentially a state machine that handles a couple
+ * of critical state-transition actions, namely initial setup and
+ * transition from header scanning to ready-for-start_decompress.
+ * All the actual input is done via the input controller's consume_input
+ * method.
+ */</font>
+
+<b><a name='GLOBAL'></a>GLOBAL</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font>
+<b><a name='jpeg_consume_input'></a>jpeg_consume_input</b> <font face='Lucida Console'>(</font>j_decompress_ptr cinfo<font face='Lucida Console'>)</font>
+<b>{</b>
+  <font color='#0000FF'><u>int</u></font> retcode <font color='#5555FF'>=</font> JPEG_SUSPENDED;
+
+  <font color='#009900'>/* NB: every possible DSTATE value should be listed in this switch */</font>
+  <font color='#0000FF'>switch</font> <font face='Lucida Console'>(</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>global_state<font face='Lucida Console'>)</font> <b>{</b>
+  <font color='#0000FF'>case</font> DSTATE_START:
+    <font color='#009900'>/* Start-of-datastream actions: reset appropriate modules */</font>
+    <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>inputctl<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>reset_input_controller<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>cinfo<font face='Lucida Console'>)</font>;
+    <font color='#009900'>/* Initialize application's data source module */</font>
+    <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>src<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>init_source<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>cinfo<font face='Lucida Console'>)</font>;
+    cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>global_state <font color='#5555FF'>=</font> DSTATE_INHEADER;
+    <font color='#009900'>/*FALLTHROUGH*/</font>
+  <font color='#0000FF'>case</font> DSTATE_INHEADER:
+    retcode <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>inputctl<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>consume_input<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>cinfo<font face='Lucida Console'>)</font>;
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>retcode <font color='#5555FF'>=</font><font color='#5555FF'>=</font> JPEG_REACHED_SOS<font face='Lucida Console'>)</font> <b>{</b> <font color='#009900'>/* Found SOS, prepare to decompress */</font>
+      <font color='#009900'>/* Set up default parameters based on header data */</font>
+      <font color='#BB00BB'>default_decompress_parms</font><font face='Lucida Console'>(</font>cinfo<font face='Lucida Console'>)</font>;
+      <font color='#009900'>/* Set global state: ready for start_decompress */</font>
+      cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>global_state <font color='#5555FF'>=</font> DSTATE_READY;
+    <b>}</b>
+    <font color='#0000FF'>break</font>;
+  <font color='#0000FF'>case</font> DSTATE_READY:
+    <font color='#009900'>/* Can't advance past first SOS until start_decompress is called */</font>
+    retcode <font color='#5555FF'>=</font> JPEG_REACHED_SOS;
+    <font color='#0000FF'>break</font>;
+  <font color='#0000FF'>case</font> DSTATE_PRELOAD:
+  <font color='#0000FF'>case</font> DSTATE_PRESCAN:
+  <font color='#0000FF'>case</font> DSTATE_SCANNING:
+  <font color='#0000FF'>case</font> DSTATE_RAW_OK:
+  <font color='#0000FF'>case</font> DSTATE_BUFIMAGE:
+  <font color='#0000FF'>case</font> DSTATE_BUFPOST:
+  <font color='#0000FF'>case</font> DSTATE_STOPPING:
+    retcode <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>inputctl<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>consume_input<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>cinfo<font face='Lucida Console'>)</font>;
+    <font color='#0000FF'>break</font>;
+  <font color='#0000FF'>default</font>:
+    <font color='#BB00BB'>ERREXIT1</font><font face='Lucida Console'>(</font>cinfo, JERR_BAD_STATE, cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>global_state<font face='Lucida Console'>)</font>;
+  <b>}</b>
+  <font color='#0000FF'>return</font> retcode;
+<b>}</b>
+
+
+<font color='#009900'>/*
+ * Have we finished reading the input file?
+ */</font>
+
+<b><a name='GLOBAL'></a>GLOBAL</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font>
+<b><a name='jpeg_input_complete'></a>jpeg_input_complete</b> <font face='Lucida Console'>(</font>j_decompress_ptr cinfo<font face='Lucida Console'>)</font>
+<b>{</b>
+  <font color='#009900'>/* Check for valid jpeg object */</font>
+  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>global_state <font color='#5555FF'>&lt;</font> DSTATE_START <font color='#5555FF'>|</font><font color='#5555FF'>|</font>
+      cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>global_state <font color='#5555FF'>&gt;</font> DSTATE_STOPPING<font face='Lucida Console'>)</font>
+    <font color='#BB00BB'>ERREXIT1</font><font face='Lucida Console'>(</font>cinfo, JERR_BAD_STATE, cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>global_state<font face='Lucida Console'>)</font>;
+  <font color='#0000FF'>return</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>inputctl<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>eoi_reached;
+<b>}</b>
+
+
+<font color='#009900'>/*
+ * Is there more than one scan?
+ */</font>
+
+<b><a name='GLOBAL'></a>GLOBAL</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font>
+<b><a name='jpeg_has_multiple_scans'></a>jpeg_has_multiple_scans</b> <font face='Lucida Console'>(</font>j_decompress_ptr cinfo<font face='Lucida Console'>)</font>
+<b>{</b>
+  <font color='#009900'>/* Only valid after jpeg_read_header completes */</font>
+  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>global_state <font color='#5555FF'>&lt;</font> DSTATE_READY <font color='#5555FF'>|</font><font color='#5555FF'>|</font>
+      cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>global_state <font color='#5555FF'>&gt;</font> DSTATE_STOPPING<font face='Lucida Console'>)</font>
+    <font color='#BB00BB'>ERREXIT1</font><font face='Lucida Console'>(</font>cinfo, JERR_BAD_STATE, cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>global_state<font face='Lucida Console'>)</font>;
+  <font color='#0000FF'>return</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>inputctl<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>has_multiple_scans;
+<b>}</b>
+
+
+<font color='#009900'>/*
+ * Finish JPEG decompression.
+ *
+ * This will normally just verify the file trailer and release temp storage.
+ *
+ * Returns FALSE if suspended.  The return value need be inspected only if
+ * a suspending data source is used.
+ */</font>
+
+<b><a name='GLOBAL'></a>GLOBAL</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font>
+<b><a name='jpeg_finish_decompress'></a>jpeg_finish_decompress</b> <font face='Lucida Console'>(</font>j_decompress_ptr cinfo<font face='Lucida Console'>)</font>
+<b>{</b>
+  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>global_state <font color='#5555FF'>=</font><font color='#5555FF'>=</font> DSTATE_SCANNING <font color='#5555FF'>|</font><font color='#5555FF'>|</font>
+       cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>global_state <font color='#5555FF'>=</font><font color='#5555FF'>=</font> DSTATE_RAW_OK<font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> <font color='#5555FF'>!</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>buffered_image<font face='Lucida Console'>)</font> <b>{</b>
+    <font color='#009900'>/* Terminate final pass of non-buffered mode */</font>
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>output_scanline <font color='#5555FF'>&lt;</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>output_height<font face='Lucida Console'>)</font>
+      <font color='#BB00BB'>ERREXIT</font><font face='Lucida Console'>(</font>cinfo, JERR_TOO_LITTLE_DATA<font face='Lucida Console'>)</font>;
+    <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>master<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>finish_output_pass<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>cinfo<font face='Lucida Console'>)</font>;
+    cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>global_state <font color='#5555FF'>=</font> DSTATE_STOPPING;
+  <b>}</b> <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>global_state <font color='#5555FF'>=</font><font color='#5555FF'>=</font> DSTATE_BUFIMAGE<font face='Lucida Console'>)</font> <b>{</b>
+    <font color='#009900'>/* Finishing after a buffered-image operation */</font>
+    cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>global_state <font color='#5555FF'>=</font> DSTATE_STOPPING;
+  <b>}</b> <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>global_state <font color='#5555FF'>!</font><font color='#5555FF'>=</font> DSTATE_STOPPING<font face='Lucida Console'>)</font> <b>{</b>
+    <font color='#009900'>/* STOPPING = repeat call after a suspension, anything else is error */</font>
+    <font color='#BB00BB'>ERREXIT1</font><font face='Lucida Console'>(</font>cinfo, JERR_BAD_STATE, cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>global_state<font face='Lucida Console'>)</font>;
+  <b>}</b>
+  <font color='#009900'>/* Read until EOI */</font>
+  <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>inputctl<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>eoi_reached<font face='Lucida Console'>)</font> <b>{</b>
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>inputctl<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>consume_input<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>cinfo<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> JPEG_SUSPENDED<font face='Lucida Console'>)</font>
+      <font color='#0000FF'>return</font> FALSE;		<font color='#009900'>/* Suspend, come back later */</font>
+  <b>}</b>
+  <font color='#009900'>/* Do final cleanup */</font>
+  <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>src<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>term_source<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>cinfo<font face='Lucida Console'>)</font>;
+  <font color='#009900'>/* We can use jpeg_abort to release memory and reset global_state */</font>
+  <font color='#BB00BB'>jpeg_abort</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>j_common_ptr<font face='Lucida Console'>)</font> cinfo<font face='Lucida Console'>)</font>;
+  <font color='#0000FF'>return</font> TRUE;
+<b>}</b>
+
+</pre></body></html>

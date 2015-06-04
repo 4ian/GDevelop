@@ -1,0 +1,262 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - graph_labeling_ex.cpp</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// The contents of this file are in the public domain. See LICENSE_FOR_EXAMPLE_PROGRAMS.txt
+</font><font color='#009900'>/*
+
+    This is an example illustrating the use of the graph_labeler and
+    structural_graph_labeling_trainer objects.
+
+    Suppose you have a bunch of objects and you need to label each of them as true or
+    false.  Suppose further that knowing the labels of some of these objects tells you
+    something about the likely label of the others.  This is common in a number of domains.
+    For example, in image segmentation problems you need to label each pixel, and knowing
+    the labels of neighboring pixels gives you information about the likely label since
+    neighboring pixels will often have the same label.
+    
+    We can generalize this problem by saying that we have a graph and our task is to label
+    each node in the graph as true or false.  Additionally, the edges in the graph connect
+    nodes which are likely to share the same label.  In this example program, each node
+    will have a feature vector which contains information which helps tell if the node
+    should be labeled as true or false.  The edges also contain feature vectors which give
+    information indicating how strong the edge's labeling consistency constraint should be.
+    This is useful since some nodes will have uninformative feature vectors and the only
+    way to tell how they should be labeled is by looking at their neighbor's labels.
+
+    Therefore, this program will show you how to learn two things using machine learning.
+    The first is a linear classifier which operates on each node and predicts if it should
+    be labeled as true or false.  The second thing is a linear function of the edge
+    vectors.  This function outputs a penalty for giving two nodes connected by an edge
+    differing labels.  The graph_labeler object puts these two things together and uses
+    them to compute a labeling which takes both into account.  In what follows, we will use
+    a structural SVM method to find the parameters of these linear functions which minimize
+    the number of mistakes made by a graph_labeler.
+
+
+    Finally, you might also consider reading the book Structured Prediction and Learning in
+    Computer Vision by Sebastian Nowozin and Christoph H. Lampert since it contains a good
+    introduction to machine learning methods such as the algorithm implemented by the
+    structural_graph_labeling_trainer.
+*/</font>
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>svm_threaded.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>iostream<font color='#5555FF'>&gt;</font>
+
+<font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> std;
+<font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> dlib;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<font color='#009900'>// The first thing we do is define the kind of graph object we will be using.
+</font><font color='#009900'>// Here we are saying there will be 2-D vectors at each node and 1-D vectors at
+</font><font color='#009900'>// each edge.  (You should read the <a href="matrix_ex.cpp.html">matrix_ex.cpp</a> example program for an introduction
+</font><font color='#009900'>// to the matrix object.)
+</font><font color='#0000FF'>typedef</font> matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>2</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> node_vector_type;
+<font color='#0000FF'>typedef</font> matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>1</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> edge_vector_type;
+<font color='#0000FF'>typedef</font> graph<font color='#5555FF'>&lt;</font>node_vector_type, edge_vector_type<font color='#5555FF'>&gt;</font>::kernel_1a_c graph_type;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+    <font color='#0000FF'>typename</font> graph_type,
+    <font color='#0000FF'>typename</font> labels_type
+    <font color='#5555FF'>&gt;</font>
+<font color='#0000FF'><u>void</u></font> <b><a name='make_training_examples'></a>make_training_examples</b><font face='Lucida Console'>(</font>
+    dlib::array<font color='#5555FF'>&lt;</font>graph_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> samples,
+    labels_type<font color='#5555FF'>&amp;</font> labels
+<font face='Lucida Console'>)</font>
+<b>{</b>
+    <font color='#009900'>/*
+        This function makes 3 graphs we will use for training.   All of them
+        will contain 4 nodes and have the structure shown below:
+
+          (0)-----(1)
+           |       |
+           |       |
+           |       |
+          (3)-----(2)
+
+        In this example, each node has a 2-D vector.  The first element of this vector
+        is 1 when the node should have a label of false while the second element has
+        a value of 1 when the node should have a label of true.  Additionally, the 
+        edge vectors will contain a value of 1 when the nodes connected by the edge
+        should share the same label and a value of 0 otherwise.  
+        
+        We want to see that the machine learning method is able to figure out how 
+        these features relate to the labels.  If it is successful it will create a 
+        graph_labeler which can predict the correct labels for these and other 
+        similarly constructed graphs.
+
+        Finally, note that these tools require all values in the edge vectors to be &gt;= 0.
+        However, the node vectors may contain both positive and negative values. 
+    */</font>
+
+    samples.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    labels.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+    std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>bool</u></font><font color='#5555FF'>&gt;</font> label;
+    graph_type g;
+
+    <font color='#009900'>// ---------------------------
+</font>    g.<font color='#BB00BB'>set_number_of_nodes</font><font face='Lucida Console'>(</font><font color='#979000'>4</font><font face='Lucida Console'>)</font>;
+    label.<font color='#BB00BB'>resize</font><font face='Lucida Console'>(</font>g.<font color='#BB00BB'>number_of_nodes</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+    <font color='#009900'>// store the vector [0,1] into node 0.  Also label it as true.
+</font>    g.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>.data <font color='#5555FF'>=</font> <font color='#979000'>0</font>, <font color='#979000'>1</font>; label[<font color='#979000'>0</font>] <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+    <font color='#009900'>// store the vector [0,0] into node 1.
+</font>    g.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>.data <font color='#5555FF'>=</font> <font color='#979000'>0</font>, <font color='#979000'>0</font>; label[<font color='#979000'>1</font>] <font color='#5555FF'>=</font> <font color='#979000'>true</font>;  <font color='#009900'>// Note that this node's vector doesn't tell us how to label it.
+</font>                                             <font color='#009900'>// We need to take the edges into account to get it right.
+</font>    <font color='#009900'>// store the vector [1,0] into node 2.
+</font>    g.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font><font color='#979000'>2</font><font face='Lucida Console'>)</font>.data <font color='#5555FF'>=</font> <font color='#979000'>1</font>, <font color='#979000'>0</font>; label[<font color='#979000'>2</font>] <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+    <font color='#009900'>// store the vector [0,0] into node 3.
+</font>    g.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font><font color='#979000'>3</font><font face='Lucida Console'>)</font>.data <font color='#5555FF'>=</font> <font color='#979000'>0</font>, <font color='#979000'>0</font>; label[<font color='#979000'>3</font>] <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+
+    <font color='#009900'>// Add the 4 edges as shown in the ASCII art above.
+</font>    g.<font color='#BB00BB'>add_edge</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>,<font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+    g.<font color='#BB00BB'>add_edge</font><font face='Lucida Console'>(</font><font color='#979000'>1</font>,<font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+    g.<font color='#BB00BB'>add_edge</font><font face='Lucida Console'>(</font><font color='#979000'>2</font>,<font color='#979000'>3</font><font face='Lucida Console'>)</font>;
+    g.<font color='#BB00BB'>add_edge</font><font face='Lucida Console'>(</font><font color='#979000'>3</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+
+    <font color='#009900'>// set the 1-D vector for the edge between node 0 and 1 to the value of 1.
+</font>    <font color='#BB00BB'>edge</font><font face='Lucida Console'>(</font>g,<font color='#979000'>0</font>,<font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>1</font>; 
+    <font color='#009900'>// set the 1-D vector for the edge between node 1 and 2 to the value of 0.
+</font>    <font color='#BB00BB'>edge</font><font face='Lucida Console'>(</font>g,<font color='#979000'>1</font>,<font color='#979000'>2</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+    <font color='#BB00BB'>edge</font><font face='Lucida Console'>(</font>g,<font color='#979000'>2</font>,<font color='#979000'>3</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+    <font color='#BB00BB'>edge</font><font face='Lucida Console'>(</font>g,<font color='#979000'>3</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+    <font color='#009900'>// output the graph and its label.
+</font>    samples.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>g<font face='Lucida Console'>)</font>;
+    labels.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>label<font face='Lucida Console'>)</font>;
+
+    <font color='#009900'>// ---------------------------
+</font>    g.<font color='#BB00BB'>set_number_of_nodes</font><font face='Lucida Console'>(</font><font color='#979000'>4</font><font face='Lucida Console'>)</font>;
+    label.<font color='#BB00BB'>resize</font><font face='Lucida Console'>(</font>g.<font color='#BB00BB'>number_of_nodes</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+    g.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>.data <font color='#5555FF'>=</font> <font color='#979000'>0</font>, <font color='#979000'>1</font>; label[<font color='#979000'>0</font>] <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+    g.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>.data <font color='#5555FF'>=</font> <font color='#979000'>0</font>, <font color='#979000'>1</font>; label[<font color='#979000'>1</font>] <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+    g.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font><font color='#979000'>2</font><font face='Lucida Console'>)</font>.data <font color='#5555FF'>=</font> <font color='#979000'>1</font>, <font color='#979000'>0</font>; label[<font color='#979000'>2</font>] <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+    g.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font><font color='#979000'>3</font><font face='Lucida Console'>)</font>.data <font color='#5555FF'>=</font> <font color='#979000'>1</font>, <font color='#979000'>0</font>; label[<font color='#979000'>3</font>] <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+
+    g.<font color='#BB00BB'>add_edge</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>,<font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+    g.<font color='#BB00BB'>add_edge</font><font face='Lucida Console'>(</font><font color='#979000'>1</font>,<font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+    g.<font color='#BB00BB'>add_edge</font><font face='Lucida Console'>(</font><font color='#979000'>2</font>,<font color='#979000'>3</font><font face='Lucida Console'>)</font>;
+    g.<font color='#BB00BB'>add_edge</font><font face='Lucida Console'>(</font><font color='#979000'>3</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+
+    <font color='#009900'>// This time, we have strong edges between all the nodes.  The machine learning 
+</font>    <font color='#009900'>// tools will have to learn that when the node information conflicts with the 
+</font>    <font color='#009900'>// edge constraints that the node information should dominate.
+</font>    <font color='#BB00BB'>edge</font><font face='Lucida Console'>(</font>g,<font color='#979000'>0</font>,<font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+    <font color='#BB00BB'>edge</font><font face='Lucida Console'>(</font>g,<font color='#979000'>1</font>,<font color='#979000'>2</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>1</font>; 
+    <font color='#BB00BB'>edge</font><font face='Lucida Console'>(</font>g,<font color='#979000'>2</font>,<font color='#979000'>3</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+    <font color='#BB00BB'>edge</font><font face='Lucida Console'>(</font>g,<font color='#979000'>3</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+    samples.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>g<font face='Lucida Console'>)</font>;
+    labels.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>label<font face='Lucida Console'>)</font>;
+    <font color='#009900'>// ---------------------------
+</font>
+    g.<font color='#BB00BB'>set_number_of_nodes</font><font face='Lucida Console'>(</font><font color='#979000'>4</font><font face='Lucida Console'>)</font>;
+    label.<font color='#BB00BB'>resize</font><font face='Lucida Console'>(</font>g.<font color='#BB00BB'>number_of_nodes</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+    g.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>.data <font color='#5555FF'>=</font> <font color='#979000'>1</font>, <font color='#979000'>0</font>; label[<font color='#979000'>0</font>] <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+    g.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>.data <font color='#5555FF'>=</font> <font color='#979000'>1</font>, <font color='#979000'>0</font>; label[<font color='#979000'>1</font>] <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+    g.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font><font color='#979000'>2</font><font face='Lucida Console'>)</font>.data <font color='#5555FF'>=</font> <font color='#979000'>1</font>, <font color='#979000'>0</font>; label[<font color='#979000'>2</font>] <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+    g.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font><font color='#979000'>3</font><font face='Lucida Console'>)</font>.data <font color='#5555FF'>=</font> <font color='#979000'>0</font>, <font color='#979000'>0</font>; label[<font color='#979000'>3</font>] <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+
+    g.<font color='#BB00BB'>add_edge</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>,<font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+    g.<font color='#BB00BB'>add_edge</font><font face='Lucida Console'>(</font><font color='#979000'>1</font>,<font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+    g.<font color='#BB00BB'>add_edge</font><font face='Lucida Console'>(</font><font color='#979000'>2</font>,<font color='#979000'>3</font><font face='Lucida Console'>)</font>;
+    g.<font color='#BB00BB'>add_edge</font><font face='Lucida Console'>(</font><font color='#979000'>3</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+
+    <font color='#BB00BB'>edge</font><font face='Lucida Console'>(</font>g,<font color='#979000'>0</font>,<font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+    <font color='#BB00BB'>edge</font><font face='Lucida Console'>(</font>g,<font color='#979000'>1</font>,<font color='#979000'>2</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+    <font color='#BB00BB'>edge</font><font face='Lucida Console'>(</font>g,<font color='#979000'>2</font>,<font color='#979000'>3</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+    <font color='#BB00BB'>edge</font><font face='Lucida Console'>(</font>g,<font color='#979000'>3</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+    samples.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>g<font face='Lucida Console'>)</font>;
+    labels.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>label<font face='Lucida Console'>)</font>;
+    <font color='#009900'>// ---------------------------
+</font>
+<b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<font color='#0000FF'><u>int</u></font> <b><a name='main'></a>main</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+<b>{</b>
+    <font color='#0000FF'>try</font>
+    <b>{</b>
+        <font color='#009900'>// Get the training samples we defined above.
+</font>        dlib::array<font color='#5555FF'>&lt;</font>graph_type<font color='#5555FF'>&gt;</font> samples;
+        std::vector<font color='#5555FF'>&lt;</font>std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>bool</u></font><font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> labels;
+        <font color='#BB00BB'>make_training_examples</font><font face='Lucida Console'>(</font>samples, labels<font face='Lucida Console'>)</font>;
+
+
+        <font color='#009900'>// Create a structural SVM trainer for graph labeling problems.  The vector_type
+</font>        <font color='#009900'>// needs to be set to a type capable of holding node or edge vectors.
+</font>        <font color='#0000FF'>typedef</font> matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>0</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> vector_type;
+        structural_graph_labeling_trainer<font color='#5555FF'>&lt;</font>vector_type<font color='#5555FF'>&gt;</font> trainer;
+        <font color='#009900'>// This is the usual SVM C parameter.  Larger values make the trainer try 
+</font>        <font color='#009900'>// harder to fit the training data but might result in overfitting.  You 
+</font>        <font color='#009900'>// should set this value to whatever gives the best cross-validation results.
+</font>        trainer.<font color='#BB00BB'>set_c</font><font face='Lucida Console'>(</font><font color='#979000'>10</font><font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// Do 3-fold cross-validation and print the results.  In this case it will
+</font>        <font color='#009900'>// indicate that all nodes were correctly classified.  
+</font>        cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>3-fold cross-validation: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>cross_validate_graph_labeling_trainer</font><font face='Lucida Console'>(</font>trainer, samples, labels, <font color='#979000'>3</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+
+        <font color='#009900'>// Since the trainer is working well.  Let's have it make a graph_labeler 
+</font>        <font color='#009900'>// based on the training data.
+</font>        graph_labeler<font color='#5555FF'>&lt;</font>vector_type<font color='#5555FF'>&gt;</font> labeler <font color='#5555FF'>=</font> trainer.<font color='#BB00BB'>train</font><font face='Lucida Console'>(</font>samples, labels<font face='Lucida Console'>)</font>;
+
+
+        <font color='#009900'>/*
+            Let's try the graph_labeler on a new test graph.  In particular, let's
+            use one with 5 nodes as shown below:
+
+            (0 F)-----(1 T)
+              |         |
+              |         |
+              |         |
+            (3 T)-----(2 T)------(4 T)
+
+            I have annotated each node with either T or F to indicate the correct 
+            output (true or false).  
+        */</font>
+        graph_type g;
+        g.<font color='#BB00BB'>set_number_of_nodes</font><font face='Lucida Console'>(</font><font color='#979000'>5</font><font face='Lucida Console'>)</font>;
+        g.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>.data <font color='#5555FF'>=</font> <font color='#979000'>1</font>, <font color='#979000'>0</font>;  <font color='#009900'>// Node data indicates a false node.
+</font>        g.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>.data <font color='#5555FF'>=</font> <font color='#979000'>0</font>, <font color='#979000'>1</font>;  <font color='#009900'>// Node data indicates a true node.
+</font>        g.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font><font color='#979000'>2</font><font face='Lucida Console'>)</font>.data <font color='#5555FF'>=</font> <font color='#979000'>0</font>, <font color='#979000'>0</font>;  <font color='#009900'>// Node data is ambiguous.
+</font>        g.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font><font color='#979000'>3</font><font face='Lucida Console'>)</font>.data <font color='#5555FF'>=</font> <font color='#979000'>0</font>, <font color='#979000'>0</font>;  <font color='#009900'>// Node data is ambiguous.
+</font>        g.<font color='#BB00BB'>node</font><font face='Lucida Console'>(</font><font color='#979000'>4</font><font face='Lucida Console'>)</font>.data <font color='#5555FF'>=</font> <font color='#979000'>0.1</font>, <font color='#979000'>0</font>; <font color='#009900'>// Node data slightly indicates a false node.
+</font>
+        g.<font color='#BB00BB'>add_edge</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>,<font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+        g.<font color='#BB00BB'>add_edge</font><font face='Lucida Console'>(</font><font color='#979000'>1</font>,<font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+        g.<font color='#BB00BB'>add_edge</font><font face='Lucida Console'>(</font><font color='#979000'>2</font>,<font color='#979000'>3</font><font face='Lucida Console'>)</font>;
+        g.<font color='#BB00BB'>add_edge</font><font face='Lucida Console'>(</font><font color='#979000'>3</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+        g.<font color='#BB00BB'>add_edge</font><font face='Lucida Console'>(</font><font color='#979000'>2</font>,<font color='#979000'>4</font><font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// Set the edges up so nodes 1, 2, 3, and 4 are all strongly connected.
+</font>        <font color='#BB00BB'>edge</font><font face='Lucida Console'>(</font>g,<font color='#979000'>0</font>,<font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <font color='#BB00BB'>edge</font><font face='Lucida Console'>(</font>g,<font color='#979000'>1</font>,<font color='#979000'>2</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+        <font color='#BB00BB'>edge</font><font face='Lucida Console'>(</font>g,<font color='#979000'>2</font>,<font color='#979000'>3</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+        <font color='#BB00BB'>edge</font><font face='Lucida Console'>(</font>g,<font color='#979000'>3</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <font color='#BB00BB'>edge</font><font face='Lucida Console'>(</font>g,<font color='#979000'>2</font>,<font color='#979000'>4</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+
+        <font color='#009900'>// The output of this shows all the nodes are correctly labeled.
+</font>        cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>Predicted labels: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+        std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>bool</u></font><font color='#5555FF'>&gt;</font> temp <font color='#5555FF'>=</font> <font color='#BB00BB'>labeler</font><font face='Lucida Console'>(</font>g<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> temp.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'> </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> i <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> temp[i] <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+
+
+
+        <font color='#009900'>// Breaking the strong labeling consistency link between node 1 and 2 causes
+</font>        <font color='#009900'>// nodes 2, 3, and 4 to flip to false.  This is because of their connection
+</font>        <font color='#009900'>// to node 4 which has a small preference for false.
+</font>        <font color='#BB00BB'>edge</font><font face='Lucida Console'>(</font>g,<font color='#979000'>1</font>,<font color='#979000'>2</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>Predicted labels: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+        temp <font color='#5555FF'>=</font> <font color='#BB00BB'>labeler</font><font face='Lucida Console'>(</font>g<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> temp.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'> </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> i <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> temp[i] <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+    <b>}</b>
+    <font color='#0000FF'>catch</font> <font face='Lucida Console'>(</font>std::exception<font color='#5555FF'>&amp;</font> e<font face='Lucida Console'>)</font>
+    <b>{</b>
+        cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>Error, an exception was thrown!</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+        cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> e.<font color='#BB00BB'>what</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+    <b>}</b>
+<b>}</b>
+
+
+</pre></body></html>

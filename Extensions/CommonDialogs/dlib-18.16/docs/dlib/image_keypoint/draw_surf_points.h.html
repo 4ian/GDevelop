@@ -1,0 +1,43 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - draw_surf_points.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2013  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_DRAW_SURf_POINTS_H_
+<font color='#0000FF'>#define</font> DLIB_DRAW_SURf_POINTS_H_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='surf.h.html'>surf.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../gui_widgets.h.html'>../gui_widgets.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='draw_surf_points_abstract.h.html'>draw_surf_points_abstract.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='draw_surf_points'></a>draw_surf_points</b> <font face='Lucida Console'>(</font>
+        image_window<font color='#5555FF'>&amp;</font> win,
+        <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>surf_point<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> sp
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> sp.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> radius <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>sp[i].p.scale<font color='#5555FF'>*</font><font color='#979000'>3</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>const</font> point <font color='#BB00BB'>center</font><font face='Lucida Console'>(</font>sp[i].p.center<font face='Lucida Console'>)</font>;
+            point direction <font color='#5555FF'>=</font> center <font color='#5555FF'>+</font> <font color='#BB00BB'>point</font><font face='Lucida Console'>(</font>radius,<font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+            <font color='#009900'>// SURF descriptors are rotated by sp[i].angle.  So we want to include a visual
+</font>            <font color='#009900'>// indication of this rotation on our overlay.
+</font>            direction <font color='#5555FF'>=</font> <font color='#BB00BB'>rotate_point</font><font face='Lucida Console'>(</font>center, direction, sp[i].angle<font face='Lucida Console'>)</font>;
+
+            win.<font color='#BB00BB'>add_overlay</font><font face='Lucida Console'>(</font>image_display::<font color='#BB00BB'>overlay_circle</font><font face='Lucida Console'>(</font>center, radius, <font color='#BB00BB'>rgb_pixel</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>,<font color='#979000'>255</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <font color='#009900'>// Draw a line showing the orientation of the SURF descriptor.
+</font>            win.<font color='#BB00BB'>add_overlay</font><font face='Lucida Console'>(</font>center, direction, <font color='#BB00BB'>rgb_pixel</font><font face='Lucida Console'>(</font><font color='#979000'>255</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_DRAW_SURf_POINTS_H_
+</font>
+
+
+</pre></body></html>

@@ -1,0 +1,403 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - optimization_trust_region.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2010  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_OPTIMIZATION_TRUST_REGIoN_Hh_
+<font color='#0000FF'>#define</font> DLIB_OPTIMIZATION_TRUST_REGIoN_Hh_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../matrix.h.html'>../matrix.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='optimization_trust_region_abstract.h.html'>optimization_trust_region_abstract.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> EXP1,
+        <font color='#0000FF'>typename</font> EXP2,
+        <font color='#0000FF'>typename</font> T, <font color='#0000FF'><u>long</u></font> NR, <font color='#0000FF'><u>long</u></font> NC, <font color='#0000FF'>typename</font> MM, <font color='#0000FF'>typename</font> L
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='solve_trust_region_subproblem'></a>solve_trust_region_subproblem</b> <font face='Lucida Console'>(</font> 
+        <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&lt;</font>EXP1<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> B,
+        <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&lt;</font>EXP2<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> g,
+        <font color='#0000FF'>const</font> <font color='#0000FF'>typename</font> EXP1::type radius,
+        matrix<font color='#5555FF'>&lt;</font>T,NR,NC,MM,L<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> p,
+        <font color='#0000FF'><u>double</u></font> eps,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> max_iter
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#009900'>/*
+            This is an implementation of algorithm 4.3(Trust Region Subproblem)
+            from the book Numerical Optimization by Nocedal and Wright.  Some of
+            the details are also from Practical Methods of Optimization by Fletcher.
+        */</font>
+
+        <font color='#009900'>// make sure requires clause is not broken
+</font>        <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font>B.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> B.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> <font color='#BB00BB'>is_col_vector</font><font face='Lucida Console'>(</font>g<font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> g.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> B.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,
+            "<font color='#CC0000'>\t unsigned long solve_trust_region_subproblem()</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t invalid arguments were given to this function</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t B.nr():            </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> B.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t B.nc():            </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> B.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t is_col_vector(g):  </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>is_col_vector</font><font face='Lucida Console'>(</font>g<font face='Lucida Console'>)</font> 
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t g.size():          </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> g.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> 
+            <font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font>radius <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> eps <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> max_iter <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font>,
+            "<font color='#CC0000'>\t unsigned long solve_trust_region_subproblem()</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t invalid arguments were given to this function</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t radius:   </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> radius
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t eps:      </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> eps 
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t max_iter: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> max_iter 
+            <font face='Lucida Console'>)</font>;
+
+
+        const_temp_matrix<font color='#5555FF'>&lt;</font>EXP1<font color='#5555FF'>&gt;</font> <font color='#BB00BB'>BB</font><font face='Lucida Console'>(</font>B<font face='Lucida Console'>)</font>;
+        const_temp_matrix<font color='#5555FF'>&lt;</font>EXP2<font color='#5555FF'>&gt;</font> <font color='#BB00BB'>gg</font><font face='Lucida Console'>(</font>g<font face='Lucida Console'>)</font>;
+
+        p.<font color='#BB00BB'>set_size</font><font face='Lucida Console'>(</font>g.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,g.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        p <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+
+
+        <font color='#0000FF'>const</font> T numeric_eps <font color='#5555FF'>=</font> <font color='#BB00BB'>max</font><font face='Lucida Console'>(</font><font color='#BB00BB'>diag</font><font face='Lucida Console'>(</font><font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font>BB<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font color='#5555FF'>*</font>std::numeric_limits<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>epsilon</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+        matrix<font color='#5555FF'>&lt;</font>T,EXP1::NR,EXP2::NR,MM,L<font color='#5555FF'>&gt;</font> R;
+
+        T lambda <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+
+        <font color='#009900'>// We need to put a bracket around lambda.  It can't go below 0.  We
+</font>        <font color='#009900'>// can get an upper bound using Gershgorin disks.  
+</font>        <font color='#009900'>// This number is a lower bound on the eigenvalues in BB
+</font>        <font color='#0000FF'>const</font> T BB_min_eigenvalue <font color='#5555FF'>=</font> <font color='#BB00BB'>min</font><font face='Lucida Console'>(</font><font color='#BB00BB'>diag</font><font face='Lucida Console'>(</font>BB<font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>sum_cols</font><font face='Lucida Console'>(</font><font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font>BB<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> <font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font><font color='#BB00BB'>diag</font><font face='Lucida Console'>(</font>BB<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>const</font> T g_norm <font color='#5555FF'>=</font> <font color='#BB00BB'>length</font><font face='Lucida Console'>(</font>gg<font face='Lucida Console'>)</font>;
+
+        T lambda_min <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        T lambda_max <font color='#5555FF'>=</font> <font color='#BB00BB'>put_in_range</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>, 
+                                    std::numeric_limits<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>max</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, 
+                                    g_norm<font color='#5555FF'>/</font>radius <font color='#5555FF'>-</font> BB_min_eigenvalue<font face='Lucida Console'>)</font>;
+
+
+        <font color='#009900'>// If we can tell that the minimum is at 0 then don't do anything.  Just return the answer. 
+</font>        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>g_norm <font color='#5555FF'>&lt;</font> numeric_eps <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> BB_min_eigenvalue <font color='#5555FF'>&gt;</font> numeric_eps<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>return</font> <font color='#979000'>0</font>;
+        <b>}</b>
+
+
+        <font color='#009900'>// how much lambda has changed recently
+</font>        T lambda_delta <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> max_iter; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+        <b>{</b>
+            R <font color='#5555FF'>=</font> <font color='#BB00BB'>chol</font><font face='Lucida Console'>(</font>BB <font color='#5555FF'>+</font> lambda<font color='#5555FF'>*</font>identity_matrix<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>BB.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// if the cholesky decomposition doesn't exist. 
+</font>            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>R</font><font face='Lucida Console'>(</font>R.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#979000'>1</font>, R.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#009900'>// If B is indefinite and g is equal to 0 then we should
+</font>                <font color='#009900'>// quit this loop and go right to the eigenvalue decomposition method.
+</font>                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>g_norm <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> numeric_eps<font face='Lucida Console'>)</font>
+                    <font color='#0000FF'>break</font>;
+
+                <font color='#009900'>// narrow the bracket on lambda.  Obviously the current lambda is
+</font>                <font color='#009900'>// too small.
+</font>                lambda_min <font color='#5555FF'>=</font> lambda;
+
+                <font color='#009900'>// jump towards the max value.  Eventually there will
+</font>                <font color='#009900'>// be a lambda that results in a cholesky decomposition.
+</font>                <font color='#0000FF'>const</font> T alpha <font color='#5555FF'>=</font> <font color='#979000'>0.10</font>;
+                lambda <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#979000'>1</font><font color='#5555FF'>-</font>alpha<font face='Lucida Console'>)</font><font color='#5555FF'>*</font>lambda <font color='#5555FF'>+</font> alpha<font color='#5555FF'>*</font>lambda_max;
+                <font color='#0000FF'>continue</font>;
+            <b>}</b>
+
+            <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> blas_bindings;
+
+            p <font color='#5555FF'>=</font> <font color='#5555FF'>-</font>gg;
+            <font color='#009900'>// Solve RR'*p = -g for p.
+</font>            <font color='#009900'>// Solve R*q = -g for q where q = R'*p.
+</font>            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>R.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>2</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#BB00BB'>p</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#BB00BB'>p</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font><font color='#5555FF'>/</font><font color='#BB00BB'>R</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+                <font color='#BB00BB'>p</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>p</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#BB00BB'>R</font><font face='Lucida Console'>(</font><font color='#979000'>1</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font><font color='#5555FF'>*</font><font color='#BB00BB'>p</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font color='#5555FF'>/</font><font color='#BB00BB'>R</font><font face='Lucida Console'>(</font><font color='#979000'>1</font>,<font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+            <font color='#0000FF'>else</font>
+            <b>{</b>
+                <font color='#BB00BB'>triangular_solver</font><font face='Lucida Console'>(</font>CblasLeft, CblasLower, CblasNoTrans, CblasNonUnit, R, p<font face='Lucida Console'>)</font>;
+            <b>}</b>
+            <font color='#0000FF'>const</font> T q_norm <font color='#5555FF'>=</font> <font color='#BB00BB'>length</font><font face='Lucida Console'>(</font>p<font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// Solve R'*p = q for p.
+</font>            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>R.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>2</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#BB00BB'>p</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#BB00BB'>p</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font><font color='#5555FF'>/</font><font color='#BB00BB'>R</font><font face='Lucida Console'>(</font><font color='#979000'>1</font>,<font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+                <font color='#BB00BB'>p</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>p</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#BB00BB'>R</font><font face='Lucida Console'>(</font><font color='#979000'>1</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font><font color='#5555FF'>*</font><font color='#BB00BB'>p</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font color='#5555FF'>/</font><font color='#BB00BB'>R</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+            <font color='#0000FF'>else</font>
+            <b>{</b>
+                <font color='#BB00BB'>triangular_solver</font><font face='Lucida Console'>(</font>CblasLeft, CblasLower, CblasTrans, CblasNonUnit, R, p<font face='Lucida Console'>)</font>;
+            <b>}</b>
+            <font color='#0000FF'>const</font> T p_norm <font color='#5555FF'>=</font> <font color='#BB00BB'>length</font><font face='Lucida Console'>(</font>p<font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// check if we are done.  
+</font>            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>lambda <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>p_norm <font color='#5555FF'>&lt;</font> radius<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#009900'>// i will always be 0 in this case.  So we return 1.
+</font>                    <font color='#0000FF'>return</font> i<font color='#5555FF'>+</font><font color='#979000'>1</font>;
+                <b>}</b>
+            <b>}</b>
+            <font color='#0000FF'>else</font>
+            <b>{</b>
+                <font color='#009900'>// if we are close enough to the solution then terminate
+</font>                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>std::<font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font>p_norm <font color='#5555FF'>-</font> radius<font face='Lucida Console'>)</font><font color='#5555FF'>/</font>radius <font color='#5555FF'>&lt;</font> eps<font face='Lucida Console'>)</font>
+                    <font color='#0000FF'>return</font> i<font color='#5555FF'>+</font><font color='#979000'>1</font>;
+            <b>}</b>
+
+            <font color='#009900'>// shrink our bracket on lambda
+</font>            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>p_norm <font color='#5555FF'>&lt;</font> radius<font face='Lucida Console'>)</font>
+                lambda_max <font color='#5555FF'>=</font> lambda;
+            <font color='#0000FF'>else</font>
+                lambda_min <font color='#5555FF'>=</font> lambda;
+
+
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>p_norm <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> radius<font color='#5555FF'>*</font>std::numeric_limits<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>epsilon</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>const</font> T alpha <font color='#5555FF'>=</font> <font color='#979000'>0.01</font>;
+                lambda <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#979000'>1</font><font color='#5555FF'>-</font>alpha<font face='Lucida Console'>)</font><font color='#5555FF'>*</font>lambda_min <font color='#5555FF'>+</font> alpha<font color='#5555FF'>*</font>lambda_max;
+                <font color='#0000FF'>continue</font>;
+            <b>}</b>
+
+            <font color='#0000FF'>const</font> T old_lambda <font color='#5555FF'>=</font> lambda;
+
+            <font color='#009900'>// figure out which lambda to try next
+</font>            lambda <font color='#5555FF'>=</font> lambda <font color='#5555FF'>+</font> std::<font color='#BB00BB'>pow</font><font face='Lucida Console'>(</font>q_norm<font color='#5555FF'>/</font>p_norm,<font color='#979000'>2</font><font face='Lucida Console'>)</font><font color='#5555FF'>*</font><font face='Lucida Console'>(</font>p_norm <font color='#5555FF'>-</font> radius<font face='Lucida Console'>)</font><font color='#5555FF'>/</font>radius;
+
+            <font color='#009900'>// make sure the chosen lambda is within our bracket (but not exactly at either end).
+</font>            <font color='#0000FF'>const</font> T gap <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>lambda_max<font color='#5555FF'>-</font>lambda_min<font face='Lucida Console'>)</font><font color='#5555FF'>*</font><font color='#979000'>0.01</font>;
+            lambda <font color='#5555FF'>=</font> <font color='#BB00BB'>put_in_range</font><font face='Lucida Console'>(</font>lambda_min<font color='#5555FF'>+</font>gap, lambda_max<font color='#5555FF'>-</font>gap, lambda<font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// Keep track of how much lambda is thrashing around inside the search bracket.  If it
+</font>            <font color='#009900'>// keeps moving around a whole lot then cut the search bracket in half.
+</font>            lambda_delta <font color='#5555FF'>+</font><font color='#5555FF'>=</font> std::<font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font>lambda <font color='#5555FF'>-</font> old_lambda<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>lambda_delta <font color='#5555FF'>&gt;</font> <font color='#979000'>3</font><font color='#5555FF'>*</font><font face='Lucida Console'>(</font>lambda_max<font color='#5555FF'>-</font>lambda_min<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                lambda <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>lambda_min<font color='#5555FF'>+</font>lambda_max<font face='Lucida Console'>)</font><font color='#5555FF'>/</font><font color='#979000'>2</font>;
+                lambda_delta <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            <b>}</b>
+        <b>}</b> <font color='#009900'>// end for loop
+</font>
+
+        <font color='#009900'>// We are probably in the "hard case".   Use an eigenvalue decomposition to sort things out.
+</font>        <font color='#009900'>// Either that or the eps was just set too tight and really we are already done.
+</font>        eigenvalue_decomposition<font color='#5555FF'>&lt;</font>EXP1<font color='#5555FF'>&gt;</font> <font color='#BB00BB'>ed</font><font face='Lucida Console'>(</font><font color='#BB00BB'>make_symmetric</font><font face='Lucida Console'>(</font>BB<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+        matrix<font color='#5555FF'>&lt;</font>T,NR,NC,MM,L<font color='#5555FF'>&gt;</font> ev <font color='#5555FF'>=</font> ed.<font color='#BB00BB'>get_real_eigenvalues</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> min_eig_idx <font color='#5555FF'>=</font> <font color='#BB00BB'>index_of_min</font><font face='Lucida Console'>(</font>ev<font face='Lucida Console'>)</font>;
+
+
+        ev <font color='#5555FF'>-</font><font color='#5555FF'>=</font> <font color='#BB00BB'>min</font><font face='Lucida Console'>(</font>ev<font face='Lucida Console'>)</font>;
+        <font color='#009900'>// zero out any values which are basically zero
+</font>        ev <font color='#5555FF'>=</font> <font color='#BB00BB'>pointwise_multiply</font><font face='Lucida Console'>(</font>ev, ev <font color='#5555FF'>&gt;</font> <font color='#BB00BB'>max</font><font face='Lucida Console'>(</font><font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font>ev<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font color='#5555FF'>*</font>std::numeric_limits<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>epsilon</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        ev <font color='#5555FF'>=</font> <font color='#BB00BB'>reciprocal</font><font face='Lucida Console'>(</font>ev<font face='Lucida Console'>)</font>;
+
+
+        <font color='#009900'>// figure out part of what p should be assuming we are in the hard case.
+</font>        matrix<font color='#5555FF'>&lt;</font>T,NR,NC,MM,L<font color='#5555FF'>&gt;</font> p_hard;
+        p_hard <font color='#5555FF'>=</font> <font color='#BB00BB'>trans</font><font face='Lucida Console'>(</font>ed.<font color='#BB00BB'>get_pseudo_v</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font color='#5555FF'>*</font>gg;
+        p_hard <font color='#5555FF'>=</font> <font color='#BB00BB'>diagm</font><font face='Lucida Console'>(</font>ev<font face='Lucida Console'>)</font><font color='#5555FF'>*</font>p_hard;
+        p_hard <font color='#5555FF'>=</font> ed.<font color='#BB00BB'>get_pseudo_v</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>*</font>p_hard;
+
+
+        <font color='#009900'>// If we really are in the hard case then this if will be true.  Otherwise, the p
+</font>        <font color='#009900'>// we found in the "easy case" loop up top is the best answer.
+</font>        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>length</font><font face='Lucida Console'>(</font>p_hard<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> radius <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> <font color='#BB00BB'>length</font><font face='Lucida Console'>(</font>p_hard<font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#BB00BB'>length</font><font face='Lucida Console'>(</font>p<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#009900'>// adjust the length of p_hard by adding a component along the eigenvector associated with
+</font>            <font color='#009900'>// the smallest eigenvalue.  We want to make it the case that length(p) == radius.
+</font>            <font color='#0000FF'>const</font> T tau <font color='#5555FF'>=</font> std::<font color='#BB00BB'>sqrt</font><font face='Lucida Console'>(</font>radius<font color='#5555FF'>*</font>radius <font color='#5555FF'>-</font> <font color='#BB00BB'>length_squared</font><font face='Lucida Console'>(</font>p_hard<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            p <font color='#5555FF'>=</font> p_hard <font color='#5555FF'>+</font> tau<font color='#5555FF'>*</font><font color='#BB00BB'>colm</font><font face='Lucida Console'>(</font>ed.<font color='#BB00BB'>get_pseudo_v</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,min_eig_idx<font face='Lucida Console'>)</font>;
+
+
+            <font color='#009900'>// if we have to do an eigenvalue decomposition then say we did all the iterations
+</font>            <font color='#0000FF'>return</font> max_iter;
+        <b>}</b>
+
+        <font color='#009900'>// if we get this far it means we didn't converge to eps accuracy. 
+</font>        <font color='#0000FF'>return</font> max_iter<font color='#5555FF'>+</font><font color='#979000'>1</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> stop_strategy_type,
+        <font color='#0000FF'>typename</font> funct_model
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>double</u></font> <b><a name='find_min_trust_region'></a>find_min_trust_region</b> <font face='Lucida Console'>(</font>
+        stop_strategy_type stop_strategy,
+        <font color='#0000FF'>const</font> funct_model<font color='#5555FF'>&amp;</font> model, 
+        <font color='#0000FF'>typename</font> funct_model::column_vector<font color='#5555FF'>&amp;</font> x, 
+        <font color='#0000FF'><u>double</u></font> radius <font color='#5555FF'>=</font> <font color='#979000'>1</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#009900'>/*
+            This is an implementation of algorithm 4.1(Trust Region)
+            from the book Numerical Optimization by Nocedal and Wright.  
+        */</font>
+
+        <font color='#009900'>// make sure requires clause is not broken
+</font>        <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font><font color='#BB00BB'>is_col_vector</font><font face='Lucida Console'>(</font>x<font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> radius <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font>,
+            "<font color='#CC0000'>\t double find_min_trust_region()</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t invalid arguments were given to this function</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t is_col_vector(x): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>is_col_vector</font><font face='Lucida Console'>(</font>x<font face='Lucida Console'>)</font> 
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t radius:           </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> radius
+            <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> initial_radius <font color='#5555FF'>=</font> radius;
+
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> funct_model::column_vector T;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> T::type type;
+
+        <font color='#0000FF'>typename</font> funct_model::general_matrix h;
+        <font color='#0000FF'>typename</font> funct_model::column_vector g, p, d;
+        type f_value <font color='#5555FF'>=</font> <font color='#BB00BB'>model</font><font face='Lucida Console'>(</font>x<font face='Lucida Console'>)</font>;
+
+        model.<font color='#BB00BB'>get_derivative_and_hessian</font><font face='Lucida Console'>(</font>x,g,h<font face='Lucida Console'>)</font>;
+
+        <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font><font color='#BB00BB'>is_finite</font><font face='Lucida Console'>(</font>x<font face='Lucida Console'>)</font>, "<font color='#CC0000'>The objective function generated non-finite outputs</font>"<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font><font color='#BB00BB'>is_finite</font><font face='Lucida Console'>(</font>g<font face='Lucida Console'>)</font>, "<font color='#CC0000'>The objective function generated non-finite outputs</font>"<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font><font color='#BB00BB'>is_finite</font><font face='Lucida Console'>(</font>h<font face='Lucida Console'>)</font>, "<font color='#CC0000'>The objective function generated non-finite outputs</font>"<font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// Sometimes the loop below won't modify x because the trust region step failed.
+</font>        <font color='#009900'>// This bool tells us when we are in that case.
+</font>        <font color='#0000FF'><u>bool</u></font> stale_x <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+
+        <font color='#0000FF'>while</font><font face='Lucida Console'>(</font>stale_x <font color='#5555FF'>|</font><font color='#5555FF'>|</font> stop_strategy.<font color='#BB00BB'>should_continue_search</font><font face='Lucida Console'>(</font>x, f_value, g<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> iter <font color='#5555FF'>=</font> <font color='#BB00BB'>solve_trust_region_subproblem</font><font face='Lucida Console'>(</font>h,
+                                                                     g,
+                                                                     radius,
+                                                                     p, 
+                                                                     <font color='#979000'>0.1</font>, 
+                                                                     <font color='#979000'>20</font><font face='Lucida Console'>)</font>;
+
+
+            <font color='#0000FF'>const</font> type new_f_value <font color='#5555FF'>=</font> <font color='#BB00BB'>model</font><font face='Lucida Console'>(</font>x<font color='#5555FF'>+</font>p<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>const</font> type predicted_improvement <font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>0.5</font><font color='#5555FF'>*</font><font color='#BB00BB'>trans</font><font face='Lucida Console'>(</font>p<font face='Lucida Console'>)</font><font color='#5555FF'>*</font>h<font color='#5555FF'>*</font>p <font color='#5555FF'>-</font> <font color='#BB00BB'>trans</font><font face='Lucida Console'>(</font>g<font face='Lucida Console'>)</font><font color='#5555FF'>*</font>p;
+            <font color='#0000FF'>const</font> type measured_improvement <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>f_value <font color='#5555FF'>-</font> new_f_value<font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// If the sub-problem can't find a way to improve then stop.  This only happens when p is essentially 0.
+</font>            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>std::<font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font>predicted_improvement<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> std::<font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font>measured_improvement<font face='Lucida Console'>)</font><font color='#5555FF'>*</font>std::numeric_limits<font color='#5555FF'>&lt;</font>type<font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>epsilon</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                <font color='#0000FF'>break</font>;
+
+            <font color='#009900'>// predicted_improvement shouldn't be negative but it might be if something went
+</font>            <font color='#009900'>// wrong in the trust region solver.  So put abs() here to guard against that.  This
+</font>            <font color='#009900'>// way the sign of rho is determined only by the sign of measured_improvement.
+</font>            <font color='#0000FF'>const</font> type rho <font color='#5555FF'>=</font> measured_improvement<font color='#5555FF'>/</font>std::<font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font>predicted_improvement<font face='Lucida Console'>)</font>;
+
+
+            
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>rho <font color='#5555FF'>&lt;</font> <font color='#979000'>0.25</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                radius <font color='#5555FF'>*</font><font color='#5555FF'>=</font> <font color='#979000'>0.25</font>;
+
+                <font color='#009900'>// something has gone horribly wrong if the radius has shrunk to zero.  So just
+</font>                <font color='#009900'>// give up if that happens.
+</font>                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>radius <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> initial_radius<font color='#5555FF'>*</font>std::numeric_limits<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>epsilon</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                    <font color='#0000FF'>break</font>;
+            <b>}</b>
+            <font color='#0000FF'>else</font>
+            <b>{</b>
+                <font color='#009900'>// if rho &gt; 0.75 and we are being checked by the radius 
+</font>                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>rho <font color='#5555FF'>&gt;</font> <font color='#979000'>0.75</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> iter <font color='#5555FF'>&gt;</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>
+                <b>{</b>
+                    radius <font color='#5555FF'>=</font> std::min<font color='#5555FF'>&lt;</font>type<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#979000'>1000</font>,  <font color='#979000'>2</font><font color='#5555FF'>*</font>radius<font face='Lucida Console'>)</font>;
+                <b>}</b>
+            <b>}</b>
+
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>rho <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                x <font color='#5555FF'>=</font> x <font color='#5555FF'>+</font> p;
+                f_value <font color='#5555FF'>=</font> new_f_value;
+                model.<font color='#BB00BB'>get_derivative_and_hessian</font><font face='Lucida Console'>(</font>x,g,h<font face='Lucida Console'>)</font>;
+                stale_x <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+            <b>}</b>
+            <font color='#0000FF'>else</font>
+            <b>{</b>
+                stale_x <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+            <b>}</b>
+
+            <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font><font color='#BB00BB'>is_finite</font><font face='Lucida Console'>(</font>x<font face='Lucida Console'>)</font>, "<font color='#CC0000'>The objective function generated non-finite outputs</font>"<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font><font color='#BB00BB'>is_finite</font><font face='Lucida Console'>(</font>g<font face='Lucida Console'>)</font>, "<font color='#CC0000'>The objective function generated non-finite outputs</font>"<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font><font color='#BB00BB'>is_finite</font><font face='Lucida Console'>(</font>h<font face='Lucida Console'>)</font>, "<font color='#CC0000'>The objective function generated non-finite outputs</font>"<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>return</font> f_value;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> funct_model<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>struct</font> <b><a name='negate_tr_model'></a>negate_tr_model</b> 
+    <b>{</b>
+        <b><a name='negate_tr_model'></a>negate_tr_model</b><font face='Lucida Console'>(</font> <font color='#0000FF'>const</font> funct_model<font color='#5555FF'>&amp;</font> m<font face='Lucida Console'>)</font> : model<font face='Lucida Console'>(</font>m<font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+
+        <font color='#0000FF'>const</font> funct_model<font color='#5555FF'>&amp;</font> model;
+
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> funct_model::column_vector column_vector;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> funct_model::general_matrix general_matrix;
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>typename</font> T::type <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font><font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> x<font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#0000FF'>return</font> <font color='#5555FF'>-</font><font color='#BB00BB'>model</font><font face='Lucida Console'>(</font>x<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> U<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='get_derivative_and_hessian'></a>get_derivative_and_hessian</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> x,
+            T<font color='#5555FF'>&amp;</font> d,
+            U<font color='#5555FF'>&amp;</font> h
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> 
+        <b>{</b>
+            model.<font color='#BB00BB'>get_derivative_and_hessian</font><font face='Lucida Console'>(</font>x,d,h<font face='Lucida Console'>)</font>;
+            d <font color='#5555FF'>=</font> <font color='#5555FF'>-</font>d;
+            h <font color='#5555FF'>=</font> <font color='#5555FF'>-</font>h;
+        <b>}</b>
+
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> stop_strategy_type,
+        <font color='#0000FF'>typename</font> funct_model
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>double</u></font> <b><a name='find_max_trust_region'></a>find_max_trust_region</b> <font face='Lucida Console'>(</font>
+        stop_strategy_type stop_strategy,
+        <font color='#0000FF'>const</font> funct_model<font color='#5555FF'>&amp;</font> model, 
+        <font color='#0000FF'>typename</font> funct_model::column_vector<font color='#5555FF'>&amp;</font> x, 
+        <font color='#0000FF'><u>double</u></font> radius <font color='#5555FF'>=</font> <font color='#979000'>1</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#009900'>// make sure requires clause is not broken
+</font>        <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font><font color='#BB00BB'>is_col_vector</font><font face='Lucida Console'>(</font>x<font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> radius <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font>,
+            "<font color='#CC0000'>\t double find_max_trust_region()</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t invalid arguments were given to this function</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t is_col_vector(x): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>is_col_vector</font><font face='Lucida Console'>(</font>x<font face='Lucida Console'>)</font> 
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t radius:           </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> radius
+            <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>return</font> <font color='#5555FF'>-</font><font color='#BB00BB'>find_min_trust_region</font><font face='Lucida Console'>(</font>stop_strategy,
+                                      negate_tr_model<font color='#5555FF'>&lt;</font>funct_model<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>model<font face='Lucida Console'>)</font>,
+                                      x,
+                                      radius<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_OPTIMIZATION_TRUST_REGIoN_Hh_
+</font>
+
+</pre></body></html>

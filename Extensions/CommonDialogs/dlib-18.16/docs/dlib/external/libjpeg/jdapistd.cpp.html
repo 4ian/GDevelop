@@ -1,0 +1,278 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - jdapistd.cpp</title></head><body bgcolor='white'><pre>
+<font color='#009900'>/*
+ * jdapistd.c
+ *
+ * Copyright (C) 1994-1996, Thomas G. Lane.
+ * This file is part of the Independent JPEG Group's software.
+ * For conditions of distribution and use, see the accompanying README file.
+ *
+ * This file contains application interface code for the decompression half
+ * of the JPEG library.  These are the "standard" API routines that are
+ * used in the normal full-decompression case.  They are not used by a
+ * transcoding-only application.  Note that if an application links in
+ * jpeg_start_decompress, it will end up linking in the entire decompressor.
+ * We thus must separate this file from jdapimin.c to avoid linking the
+ * whole decompression library into a transcoder.
+ */</font>
+
+<font color='#0000FF'>#define</font> JPEG_INTERNALS
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='jinclude.h.html'>jinclude.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='jpeglib.h.html'>jpeglib.h</a>"
+
+
+<font color='#009900'>/* Forward declarations */</font>
+<b><a name='LOCAL'></a>LOCAL</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font> output_pass_setup <b><a name='JPP'></a>JPP</b><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>j_decompress_ptr cinfo<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+
+<font color='#009900'>/*
+ * Decompression initialization.
+ * jpeg_read_header must be completed before calling this.
+ *
+ * If a multipass operating mode was selected, this will do all but the
+ * last pass, and thus may take a great deal of time.
+ *
+ * Returns FALSE if suspended.  The return value need be inspected only if
+ * a suspending data source is used.
+ */</font>
+
+<b><a name='GLOBAL'></a>GLOBAL</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font>
+<b><a name='jpeg_start_decompress'></a>jpeg_start_decompress</b> <font face='Lucida Console'>(</font>j_decompress_ptr cinfo<font face='Lucida Console'>)</font>
+<b>{</b>
+  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>global_state <font color='#5555FF'>=</font><font color='#5555FF'>=</font> DSTATE_READY<font face='Lucida Console'>)</font> <b>{</b>
+    <font color='#009900'>/* First call: initialize master control, select active modules */</font>
+    <font color='#BB00BB'>jinit_master_decompress</font><font face='Lucida Console'>(</font>cinfo<font face='Lucida Console'>)</font>;
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>buffered_image<font face='Lucida Console'>)</font> <b>{</b>
+      <font color='#009900'>/* No more work here; expecting jpeg_start_output next */</font>
+      cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>global_state <font color='#5555FF'>=</font> DSTATE_BUFIMAGE;
+      <font color='#0000FF'>return</font> TRUE;
+    <b>}</b>
+    cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>global_state <font color='#5555FF'>=</font> DSTATE_PRELOAD;
+  <b>}</b>
+  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>global_state <font color='#5555FF'>=</font><font color='#5555FF'>=</font> DSTATE_PRELOAD<font face='Lucida Console'>)</font> <b>{</b>
+    <font color='#009900'>/* If file has multiple scans, absorb them all into the coef buffer */</font>
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>inputctl<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>has_multiple_scans<font face='Lucida Console'>)</font> <b>{</b>
+<font color='#0000FF'>#ifdef</font> D_MULTISCAN_FILES_SUPPORTED
+      <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>;;<font face='Lucida Console'>)</font> <b>{</b>
+	<font color='#0000FF'><u>int</u></font> retcode;
+	<font color='#009900'>/* Call progress monitor hook if present */</font>
+	<font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>progress <font color='#5555FF'>!</font><font color='#5555FF'>=</font> NULL<font face='Lucida Console'>)</font>
+	  <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>progress<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>progress_monitor<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>j_common_ptr<font face='Lucida Console'>)</font> cinfo<font face='Lucida Console'>)</font>;
+	<font color='#009900'>/* Absorb some more input */</font>
+	retcode <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>inputctl<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>consume_input<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>cinfo<font face='Lucida Console'>)</font>;
+	<font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>retcode <font color='#5555FF'>=</font><font color='#5555FF'>=</font> JPEG_SUSPENDED<font face='Lucida Console'>)</font>
+	  <font color='#0000FF'>return</font> FALSE;
+	<font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>retcode <font color='#5555FF'>=</font><font color='#5555FF'>=</font> JPEG_REACHED_EOI<font face='Lucida Console'>)</font>
+	  <font color='#0000FF'>break</font>;
+	<font color='#009900'>/* Advance progress counter if appropriate */</font>
+	<font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>progress <font color='#5555FF'>!</font><font color='#5555FF'>=</font> NULL <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font>
+	    <font face='Lucida Console'>(</font>retcode <font color='#5555FF'>=</font><font color='#5555FF'>=</font> JPEG_ROW_COMPLETED <font color='#5555FF'>|</font><font color='#5555FF'>|</font> retcode <font color='#5555FF'>=</font><font color='#5555FF'>=</font> JPEG_REACHED_SOS<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <b>{</b>
+	  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>+</font><font color='#5555FF'>+</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>progress<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>pass_counter <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>progress<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>pass_limit<font face='Lucida Console'>)</font> <b>{</b>
+	    <font color='#009900'>/* jdmaster underestimated number of scans; ratchet up one scan */</font>
+	    cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>progress<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>pass_limit <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>total_iMCU_rows;
+	  <b>}</b>
+	<b>}</b>
+      <b>}</b>
+<font color='#0000FF'>#else</font>
+      <font color='#BB00BB'>ERREXIT</font><font face='Lucida Console'>(</font>cinfo, JERR_NOT_COMPILED<font face='Lucida Console'>)</font>;
+<font color='#0000FF'>#endif</font> <font color='#009900'>/* D_MULTISCAN_FILES_SUPPORTED */</font>
+    <b>}</b>
+    cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>output_scan_number <font color='#5555FF'>=</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>input_scan_number;
+  <b>}</b> <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>global_state <font color='#5555FF'>!</font><font color='#5555FF'>=</font> DSTATE_PRESCAN<font face='Lucida Console'>)</font>
+    <font color='#BB00BB'>ERREXIT1</font><font face='Lucida Console'>(</font>cinfo, JERR_BAD_STATE, cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>global_state<font face='Lucida Console'>)</font>;
+  <font color='#009900'>/* Perform any dummy output passes, and set up for the final pass */</font>
+  <font color='#0000FF'>return</font> <font color='#BB00BB'>output_pass_setup</font><font face='Lucida Console'>(</font>cinfo<font face='Lucida Console'>)</font>;
+<b>}</b>
+
+
+<font color='#009900'>/*
+ * Set up for an output pass, and perform any dummy pass(es) needed.
+ * Common subroutine for jpeg_start_decompress and jpeg_start_output.
+ * Entry: global_state = DSTATE_PRESCAN only if previously suspended.
+ * Exit: If done, returns TRUE and sets global_state for proper output mode.
+ *       If suspended, returns FALSE and sets global_state = DSTATE_PRESCAN.
+ */</font>
+
+<b><a name='LOCAL'></a>LOCAL</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font>
+<b><a name='output_pass_setup'></a>output_pass_setup</b> <font face='Lucida Console'>(</font>j_decompress_ptr cinfo<font face='Lucida Console'>)</font>
+<b>{</b>
+  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>global_state <font color='#5555FF'>!</font><font color='#5555FF'>=</font> DSTATE_PRESCAN<font face='Lucida Console'>)</font> <b>{</b>
+    <font color='#009900'>/* First call: do pass setup */</font>
+    <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>master<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>prepare_for_output_pass<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>cinfo<font face='Lucida Console'>)</font>;
+    cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>output_scanline <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+    cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>global_state <font color='#5555FF'>=</font> DSTATE_PRESCAN;
+  <b>}</b>
+  <font color='#009900'>/* Loop over any required dummy passes */</font>
+  <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>master<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>is_dummy_pass<font face='Lucida Console'>)</font> <b>{</b>
+<font color='#0000FF'>#ifdef</font> QUANT_2PASS_SUPPORTED
+    <font color='#009900'>/* Crank through the dummy pass */</font>
+    <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>output_scanline <font color='#5555FF'>&lt;</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>output_height<font face='Lucida Console'>)</font> <b>{</b>
+      JDIMENSION last_scanline;
+      <font color='#009900'>/* Call progress monitor hook if present */</font>
+      <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>progress <font color='#5555FF'>!</font><font color='#5555FF'>=</font> NULL<font face='Lucida Console'>)</font> <b>{</b>
+	cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>progress<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>pass_counter <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>output_scanline;
+	cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>progress<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>pass_limit <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>output_height;
+	<font face='Lucida Console'>(</font><font color='#5555FF'>*</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>progress<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>progress_monitor<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>j_common_ptr<font face='Lucida Console'>)</font> cinfo<font face='Lucida Console'>)</font>;
+      <b>}</b>
+      <font color='#009900'>/* Process some data */</font>
+      last_scanline <font color='#5555FF'>=</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>output_scanline;
+      <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>main<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>process_data<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>cinfo, <font face='Lucida Console'>(</font>JSAMPARRAY<font face='Lucida Console'>)</font> NULL,
+				    <font color='#5555FF'>&amp;</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>output_scanline, <font face='Lucida Console'>(</font>JDIMENSION<font face='Lucida Console'>)</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+      <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>output_scanline <font color='#5555FF'>=</font><font color='#5555FF'>=</font> last_scanline<font face='Lucida Console'>)</font>
+	<font color='#0000FF'>return</font> FALSE;		<font color='#009900'>/* No progress made, must suspend */</font>
+    <b>}</b>
+    <font color='#009900'>/* Finish up dummy pass, and set up for another one */</font>
+    <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>master<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>finish_output_pass<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>cinfo<font face='Lucida Console'>)</font>;
+    <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>master<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>prepare_for_output_pass<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>cinfo<font face='Lucida Console'>)</font>;
+    cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>output_scanline <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+<font color='#0000FF'>#else</font>
+    <font color='#BB00BB'>ERREXIT</font><font face='Lucida Console'>(</font>cinfo, JERR_NOT_COMPILED<font face='Lucida Console'>)</font>;
+<font color='#0000FF'>#endif</font> <font color='#009900'>/* QUANT_2PASS_SUPPORTED */</font>
+  <b>}</b>
+  <font color='#009900'>/* Ready for application to drive output pass through
+   * jpeg_read_scanlines or jpeg_read_raw_data.
+   */</font>
+  cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>global_state <font color='#5555FF'>=</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>raw_data_out ? DSTATE_RAW_OK : DSTATE_SCANNING;
+  <font color='#0000FF'>return</font> TRUE;
+<b>}</b>
+
+
+<font color='#009900'>/*
+ * Read some scanlines of data from the JPEG decompressor.
+ *
+ * The return value will be the number of lines actually read.
+ * This may be less than the number requested in several cases,
+ * including bottom of image, data source suspension, and operating
+ * modes that emit multiple scanlines at a time.
+ *
+ * Note: we warn about excess calls to jpeg_read_scanlines() since
+ * this likely signals an application programmer error.  However,
+ * an oversize buffer (max_lines &gt; scanlines remaining) is not an error.
+ */</font>
+
+<b><a name='GLOBAL'></a>GLOBAL</b><font face='Lucida Console'>(</font>JDIMENSION<font face='Lucida Console'>)</font>
+<b><a name='jpeg_read_scanlines'></a>jpeg_read_scanlines</b> <font face='Lucida Console'>(</font>j_decompress_ptr cinfo, JSAMPARRAY scanlines,
+		     JDIMENSION max_lines<font face='Lucida Console'>)</font>
+<b>{</b>
+  JDIMENSION row_ctr;
+
+  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>global_state <font color='#5555FF'>!</font><font color='#5555FF'>=</font> DSTATE_SCANNING<font face='Lucida Console'>)</font>
+    <font color='#BB00BB'>ERREXIT1</font><font face='Lucida Console'>(</font>cinfo, JERR_BAD_STATE, cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>global_state<font face='Lucida Console'>)</font>;
+  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>output_scanline <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>output_height<font face='Lucida Console'>)</font> <b>{</b>
+    <font color='#BB00BB'>WARNMS</font><font face='Lucida Console'>(</font>cinfo, JWRN_TOO_MUCH_DATA<font face='Lucida Console'>)</font>;
+    <font color='#0000FF'>return</font> <font color='#979000'>0</font>;
+  <b>}</b>
+
+  <font color='#009900'>/* Call progress monitor hook if present */</font>
+  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>progress <font color='#5555FF'>!</font><font color='#5555FF'>=</font> NULL<font face='Lucida Console'>)</font> <b>{</b>
+    cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>progress<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>pass_counter <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>output_scanline;
+    cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>progress<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>pass_limit <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>output_height;
+    <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>progress<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>progress_monitor<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>j_common_ptr<font face='Lucida Console'>)</font> cinfo<font face='Lucida Console'>)</font>;
+  <b>}</b>
+
+  <font color='#009900'>/* Process some data */</font>
+  row_ctr <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+  <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>main<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>process_data<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>cinfo, scanlines, <font color='#5555FF'>&amp;</font>row_ctr, max_lines<font face='Lucida Console'>)</font>;
+  cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>output_scanline <font color='#5555FF'>+</font><font color='#5555FF'>=</font> row_ctr;
+  <font color='#0000FF'>return</font> row_ctr;
+<b>}</b>
+
+
+<font color='#009900'>/*
+ * Alternate entry point to read raw data.
+ * Processes exactly one iMCU row per call, unless suspended.
+ */</font>
+
+<b><a name='GLOBAL'></a>GLOBAL</b><font face='Lucida Console'>(</font>JDIMENSION<font face='Lucida Console'>)</font>
+<b><a name='jpeg_read_raw_data'></a>jpeg_read_raw_data</b> <font face='Lucida Console'>(</font>j_decompress_ptr cinfo, JSAMPIMAGE data,
+		    JDIMENSION max_lines<font face='Lucida Console'>)</font>
+<b>{</b>
+  JDIMENSION lines_per_iMCU_row;
+
+  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>global_state <font color='#5555FF'>!</font><font color='#5555FF'>=</font> DSTATE_RAW_OK<font face='Lucida Console'>)</font>
+    <font color='#BB00BB'>ERREXIT1</font><font face='Lucida Console'>(</font>cinfo, JERR_BAD_STATE, cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>global_state<font face='Lucida Console'>)</font>;
+  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>output_scanline <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>output_height<font face='Lucida Console'>)</font> <b>{</b>
+    <font color='#BB00BB'>WARNMS</font><font face='Lucida Console'>(</font>cinfo, JWRN_TOO_MUCH_DATA<font face='Lucida Console'>)</font>;
+    <font color='#0000FF'>return</font> <font color='#979000'>0</font>;
+  <b>}</b>
+
+  <font color='#009900'>/* Call progress monitor hook if present */</font>
+  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>progress <font color='#5555FF'>!</font><font color='#5555FF'>=</font> NULL<font face='Lucida Console'>)</font> <b>{</b>
+    cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>progress<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>pass_counter <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>output_scanline;
+    cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>progress<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>pass_limit <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>output_height;
+    <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>progress<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>progress_monitor<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>j_common_ptr<font face='Lucida Console'>)</font> cinfo<font face='Lucida Console'>)</font>;
+  <b>}</b>
+
+  <font color='#009900'>/* Verify that at least one iMCU row can be returned. */</font>
+  lines_per_iMCU_row <font color='#5555FF'>=</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>max_v_samp_factor <font color='#5555FF'>*</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>min_DCT_scaled_size;
+  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>max_lines <font color='#5555FF'>&lt;</font> lines_per_iMCU_row<font face='Lucida Console'>)</font>
+    <font color='#BB00BB'>ERREXIT</font><font face='Lucida Console'>(</font>cinfo, JERR_BUFFER_SIZE<font face='Lucida Console'>)</font>;
+
+  <font color='#009900'>/* Decompress directly into user's buffer. */</font>
+  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font> <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>coef<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>decompress_data<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>cinfo, data<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+    <font color='#0000FF'>return</font> <font color='#979000'>0</font>;			<font color='#009900'>/* suspension forced, can do nothing more */</font>
+
+  <font color='#009900'>/* OK, we processed one iMCU row. */</font>
+  cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>output_scanline <font color='#5555FF'>+</font><font color='#5555FF'>=</font> lines_per_iMCU_row;
+  <font color='#0000FF'>return</font> lines_per_iMCU_row;
+<b>}</b>
+
+
+<font color='#009900'>/* Additional entry points for buffered-image mode. */</font>
+
+<font color='#0000FF'>#ifdef</font> D_MULTISCAN_FILES_SUPPORTED
+
+<font color='#009900'>/*
+ * Initialize for an output pass in buffered-image mode.
+ */</font>
+
+<b><a name='GLOBAL'></a>GLOBAL</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font>
+<b><a name='jpeg_start_output'></a>jpeg_start_output</b> <font face='Lucida Console'>(</font>j_decompress_ptr cinfo, <font color='#0000FF'><u>int</u></font> scan_number<font face='Lucida Console'>)</font>
+<b>{</b>
+  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>global_state <font color='#5555FF'>!</font><font color='#5555FF'>=</font> DSTATE_BUFIMAGE <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font>
+      cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>global_state <font color='#5555FF'>!</font><font color='#5555FF'>=</font> DSTATE_PRESCAN<font face='Lucida Console'>)</font>
+    <font color='#BB00BB'>ERREXIT1</font><font face='Lucida Console'>(</font>cinfo, JERR_BAD_STATE, cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>global_state<font face='Lucida Console'>)</font>;
+  <font color='#009900'>/* Limit scan number to valid range */</font>
+  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>scan_number <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+    scan_number <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>inputctl<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>eoi_reached <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font>
+      scan_number <font color='#5555FF'>&gt;</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>input_scan_number<font face='Lucida Console'>)</font>
+    scan_number <font color='#5555FF'>=</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>input_scan_number;
+  cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>output_scan_number <font color='#5555FF'>=</font> scan_number;
+  <font color='#009900'>/* Perform any dummy output passes, and set up for the real pass */</font>
+  <font color='#0000FF'>return</font> <font color='#BB00BB'>output_pass_setup</font><font face='Lucida Console'>(</font>cinfo<font face='Lucida Console'>)</font>;
+<b>}</b>
+
+
+<font color='#009900'>/*
+ * Finish up after an output pass in buffered-image mode.
+ *
+ * Returns FALSE if suspended.  The return value need be inspected only if
+ * a suspending data source is used.
+ */</font>
+
+<b><a name='GLOBAL'></a>GLOBAL</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font>
+<b><a name='jpeg_finish_output'></a>jpeg_finish_output</b> <font face='Lucida Console'>(</font>j_decompress_ptr cinfo<font face='Lucida Console'>)</font>
+<b>{</b>
+  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>global_state <font color='#5555FF'>=</font><font color='#5555FF'>=</font> DSTATE_SCANNING <font color='#5555FF'>|</font><font color='#5555FF'>|</font>
+       cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>global_state <font color='#5555FF'>=</font><font color='#5555FF'>=</font> DSTATE_RAW_OK<font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>buffered_image<font face='Lucida Console'>)</font> <b>{</b>
+    <font color='#009900'>/* Terminate this pass. */</font>
+    <font color='#009900'>/* We do not require the whole pass to have been completed. */</font>
+    <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>master<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>finish_output_pass<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>cinfo<font face='Lucida Console'>)</font>;
+    cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>global_state <font color='#5555FF'>=</font> DSTATE_BUFPOST;
+  <b>}</b> <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>global_state <font color='#5555FF'>!</font><font color='#5555FF'>=</font> DSTATE_BUFPOST<font face='Lucida Console'>)</font> <b>{</b>
+    <font color='#009900'>/* BUFPOST = repeat call after a suspension, anything else is error */</font>
+    <font color='#BB00BB'>ERREXIT1</font><font face='Lucida Console'>(</font>cinfo, JERR_BAD_STATE, cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>global_state<font face='Lucida Console'>)</font>;
+  <b>}</b>
+  <font color='#009900'>/* Read markers looking for SOS or EOI */</font>
+  <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>input_scan_number <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>output_scan_number <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font>
+	 <font color='#5555FF'>!</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>inputctl<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>eoi_reached<font face='Lucida Console'>)</font> <b>{</b>
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>inputctl<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>consume_input<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>cinfo<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> JPEG_SUSPENDED<font face='Lucida Console'>)</font>
+      <font color='#0000FF'>return</font> FALSE;		<font color='#009900'>/* Suspend, come back later */</font>
+  <b>}</b>
+  cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>global_state <font color='#5555FF'>=</font> DSTATE_BUFIMAGE;
+  <font color='#0000FF'>return</font> TRUE;
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>/* D_MULTISCAN_FILES_SUPPORTED */</font>
+
+</pre></body></html>

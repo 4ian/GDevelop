@@ -1,0 +1,922 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - point_transforms.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2003  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_POINT_TrANSFORMS_H_
+<font color='#0000FF'>#define</font> DLIB_POINT_TrANSFORMS_H_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='point_transforms_abstract.h.html'>point_transforms_abstract.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../algs.h.html'>../algs.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='vector.h.html'>vector.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../matrix.h.html'>../matrix.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../matrix/matrix_la.h.html'>../matrix/matrix_la.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../optimization/optimization.h.html'>../optimization/optimization.h</a>"
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>vector<font color='#5555FF'>&gt;</font>
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>class</font> <b><a name='point_rotator'></a>point_rotator</b>
+    <b>{</b>
+    <font color='#0000FF'>public</font>:
+        <b><a name='point_rotator'></a>point_rotator</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            sin_angle <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            cos_angle <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+        <b>}</b>
+
+        <b><a name='point_rotator'></a>point_rotator</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font><font color='#5555FF'>&amp;</font> angle
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            sin_angle <font color='#5555FF'>=</font> std::<font color='#BB00BB'>sin</font><font face='Lucida Console'>(</font>angle<font face='Lucida Console'>)</font>;
+            cos_angle <font color='#5555FF'>=</font> std::<font color='#BB00BB'>cos</font><font face='Lucida Console'>(</font>angle<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>const</font> dlib::vector<font color='#5555FF'>&lt;</font>T,<font color='#979000'>2</font><font color='#5555FF'>&gt;</font> <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> dlib::vector<font color='#5555FF'>&lt;</font>T,<font color='#979000'>2</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> p
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#0000FF'><u>double</u></font> x <font color='#5555FF'>=</font> cos_angle<font color='#5555FF'>*</font>p.<font color='#BB00BB'>x</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> sin_angle<font color='#5555FF'>*</font>p.<font color='#BB00BB'>y</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'><u>double</u></font> y <font color='#5555FF'>=</font> sin_angle<font color='#5555FF'>*</font>p.<font color='#BB00BB'>x</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> cos_angle<font color='#5555FF'>*</font>p.<font color='#BB00BB'>y</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>return</font> dlib::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>2</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>x,y<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>const</font> matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>2</font>,<font color='#979000'>2</font><font color='#5555FF'>&gt;</font> <b><a name='get_m'></a>get_m</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> 
+        <b>{</b> 
+            matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>2</font>,<font color='#979000'>2</font><font color='#5555FF'>&gt;</font> temp;
+            temp <font color='#5555FF'>=</font> cos_angle, <font color='#5555FF'>-</font>sin_angle,
+                   sin_angle, cos_angle;
+            <font color='#0000FF'>return</font> temp; 
+        <b>}</b>
+
+        <font color='#0000FF'>inline</font> <font color='#0000FF'>friend</font> <font color='#0000FF'><u>void</u></font> <b><a name='serialize'></a>serialize</b> <font face='Lucida Console'>(</font><font color='#0000FF'>const</font> point_rotator<font color='#5555FF'>&amp;</font> item, std::ostream<font color='#5555FF'>&amp;</font> out<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item.sin_angle, out<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item.cos_angle, out<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>inline</font> <font color='#0000FF'>friend</font> <font color='#0000FF'><u>void</u></font> <b><a name='deserialize'></a>deserialize</b> <font face='Lucida Console'>(</font>point_rotator<font color='#5555FF'>&amp;</font> item, std::istream<font color='#5555FF'>&amp;</font> in<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item.sin_angle, in<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item.cos_angle, in<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+    <font color='#0000FF'>private</font>:
+        <font color='#0000FF'><u>double</u></font> sin_angle;
+        <font color='#0000FF'><u>double</u></font> cos_angle;
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>class</font> <b><a name='point_transform'></a>point_transform</b>
+    <b>{</b>
+    <font color='#0000FF'>public</font>:
+
+        <b><a name='point_transform'></a>point_transform</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            sin_angle <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            cos_angle <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+            translate.<font color='#BB00BB'>x</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            translate.<font color='#BB00BB'>y</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <b>}</b>
+
+        <b><a name='point_transform'></a>point_transform</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font><font color='#5555FF'>&amp;</font> angle,
+            <font color='#0000FF'>const</font> dlib::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>2</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> translate_
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            sin_angle <font color='#5555FF'>=</font> std::<font color='#BB00BB'>sin</font><font face='Lucida Console'>(</font>angle<font face='Lucida Console'>)</font>;
+            cos_angle <font color='#5555FF'>=</font> std::<font color='#BB00BB'>cos</font><font face='Lucida Console'>(</font>angle<font face='Lucida Console'>)</font>;
+            translate <font color='#5555FF'>=</font> translate_;
+        <b>}</b>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>const</font> dlib::vector<font color='#5555FF'>&lt;</font>T,<font color='#979000'>2</font><font color='#5555FF'>&gt;</font> <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> dlib::vector<font color='#5555FF'>&lt;</font>T,<font color='#979000'>2</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> p
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#0000FF'><u>double</u></font> x <font color='#5555FF'>=</font> cos_angle<font color='#5555FF'>*</font>p.<font color='#BB00BB'>x</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> sin_angle<font color='#5555FF'>*</font>p.<font color='#BB00BB'>y</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'><u>double</u></font> y <font color='#5555FF'>=</font> sin_angle<font color='#5555FF'>*</font>p.<font color='#BB00BB'>x</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> cos_angle<font color='#5555FF'>*</font>p.<font color='#BB00BB'>y</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>return</font> dlib::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>2</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>x,y<font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> translate;
+        <b>}</b>
+
+        <font color='#0000FF'>const</font> matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>2</font>,<font color='#979000'>2</font><font color='#5555FF'>&gt;</font> <b><a name='get_m'></a>get_m</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> 
+        <b>{</b> 
+            matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>2</font>,<font color='#979000'>2</font><font color='#5555FF'>&gt;</font> temp;
+            temp <font color='#5555FF'>=</font> cos_angle, <font color='#5555FF'>-</font>sin_angle,
+                   sin_angle, cos_angle;
+            <font color='#0000FF'>return</font> temp; 
+        <b>}</b>
+
+        <font color='#0000FF'>const</font> dlib::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>2</font><font color='#5555FF'>&gt;</font> <b><a name='get_b'></a>get_b</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> translate; <b>}</b>
+
+        <font color='#0000FF'>inline</font> <font color='#0000FF'>friend</font> <font color='#0000FF'><u>void</u></font> <b><a name='serialize'></a>serialize</b> <font face='Lucida Console'>(</font><font color='#0000FF'>const</font> point_transform<font color='#5555FF'>&amp;</font> item, std::ostream<font color='#5555FF'>&amp;</font> out<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item.sin_angle, out<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item.cos_angle, out<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item.translate, out<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>inline</font> <font color='#0000FF'>friend</font> <font color='#0000FF'><u>void</u></font> <b><a name='deserialize'></a>deserialize</b> <font face='Lucida Console'>(</font>point_transform<font color='#5555FF'>&amp;</font> item, std::istream<font color='#5555FF'>&amp;</font> in<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item.sin_angle, in<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item.cos_angle, in<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item.translate, in<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+    <font color='#0000FF'>private</font>:
+        <font color='#0000FF'><u>double</u></font> sin_angle;
+        <font color='#0000FF'><u>double</u></font> cos_angle;
+        dlib::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>2</font><font color='#5555FF'>&gt;</font> translate;
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>class</font> <b><a name='point_transform_affine'></a>point_transform_affine</b>
+    <b>{</b>
+    <font color='#0000FF'>public</font>:
+
+        <b><a name='point_transform_affine'></a>point_transform_affine</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            m <font color='#5555FF'>=</font> identity_matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+            b.<font color='#BB00BB'>x</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            b.<font color='#BB00BB'>y</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <b>}</b>
+
+        <b><a name='point_transform_affine'></a>point_transform_affine</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>2</font>,<font color='#979000'>2</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> m_,
+            <font color='#0000FF'>const</font> dlib::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>2</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> b_
+        <font face='Lucida Console'>)</font> :m<font face='Lucida Console'>(</font>m_<font face='Lucida Console'>)</font>, b<font face='Lucida Console'>(</font>b_<font face='Lucida Console'>)</font>
+        <b>{</b>
+        <b>}</b>
+
+        <font color='#0000FF'>const</font> dlib::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>2</font><font color='#5555FF'>&gt;</font> <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> dlib::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>2</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> p
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#0000FF'>return</font> m<font color='#5555FF'>*</font>p <font color='#5555FF'>+</font> b;
+        <b>}</b>
+
+        <font color='#0000FF'>const</font> matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>2</font>,<font color='#979000'>2</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> <b><a name='get_m'></a>get_m</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> m; <b>}</b>
+
+        <font color='#0000FF'>const</font> dlib::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>2</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> <b><a name='get_b'></a>get_b</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> b; <b>}</b>
+
+        <font color='#0000FF'>inline</font> <font color='#0000FF'>friend</font> <font color='#0000FF'><u>void</u></font> <b><a name='serialize'></a>serialize</b> <font face='Lucida Console'>(</font><font color='#0000FF'>const</font> point_transform_affine<font color='#5555FF'>&amp;</font> item, std::ostream<font color='#5555FF'>&amp;</font> out<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item.m, out<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item.b, out<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>inline</font> <font color='#0000FF'>friend</font> <font color='#0000FF'><u>void</u></font> <b><a name='deserialize'></a>deserialize</b> <font face='Lucida Console'>(</font>point_transform_affine<font color='#5555FF'>&amp;</font> item, std::istream<font color='#5555FF'>&amp;</font> in<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item.m, in<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item.b, in<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+    <font color='#0000FF'>private</font>:
+        matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>2</font>,<font color='#979000'>2</font><font color='#5555FF'>&gt;</font> m;
+        dlib::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>2</font><font color='#5555FF'>&gt;</font> b;
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>inline</font> point_transform_affine <b><a name='operator'></a>operator</b><font color='#5555FF'>*</font> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> point_transform_affine<font color='#5555FF'>&amp;</font> lhs,
+        <font color='#0000FF'>const</font> point_transform_affine<font color='#5555FF'>&amp;</font> rhs
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>return</font> <font color='#BB00BB'>point_transform_affine</font><font face='Lucida Console'>(</font>lhs.<font color='#BB00BB'>get_m</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>*</font>rhs.<font color='#BB00BB'>get_m</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, lhs.<font color='#BB00BB'>get_m</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>*</font>rhs.<font color='#BB00BB'>get_b</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>+</font>lhs.<font color='#BB00BB'>get_b</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>inline</font> point_transform_affine <b><a name='inv'></a>inv</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> point_transform_affine<font color='#5555FF'>&amp;</font> trans
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>2</font>,<font color='#979000'>2</font><font color='#5555FF'>&gt;</font> im <font color='#5555FF'>=</font> <font color='#BB00BB'>inv</font><font face='Lucida Console'>(</font>trans.<font color='#BB00BB'>get_m</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>return</font> <font color='#BB00BB'>point_transform_affine</font><font face='Lucida Console'>(</font>im, <font color='#5555FF'>-</font>im<font color='#5555FF'>*</font>trans.<font color='#BB00BB'>get_b</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+    point_transform_affine <b><a name='find_affine_transform'></a>find_affine_transform</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>dlib::vector<font color='#5555FF'>&lt;</font>T,<font color='#979000'>2</font><font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> from_points,
+        <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>dlib::vector<font color='#5555FF'>&lt;</font>T,<font color='#979000'>2</font><font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> to_points
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#009900'>// make sure requires clause is not broken
+</font>        <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font>from_points.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> to_points.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font>
+                    from_points.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#979000'>3</font>,
+            "<font color='#CC0000'>\t point_transform_affine find_affine_transform(from_points, to_points)</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t Invalid inputs were given to this function.</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t from_points.size(): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> from_points.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t to_points.size():   </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> to_points.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+            <font face='Lucida Console'>)</font>;
+
+        matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>3</font>,<font color='#979000'>0</font><font color='#5555FF'>&gt;</font> <font color='#BB00BB'>P</font><font face='Lucida Console'>(</font><font color='#979000'>3</font>, from_points.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>2</font>,<font color='#979000'>0</font><font color='#5555FF'>&gt;</font> <font color='#BB00BB'>Q</font><font face='Lucida Console'>(</font><font color='#979000'>2</font>, from_points.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> from_points.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#BB00BB'>P</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>,i<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> from_points[i].<font color='#BB00BB'>x</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>P</font><font face='Lucida Console'>(</font><font color='#979000'>1</font>,i<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> from_points[i].<font color='#BB00BB'>y</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>P</font><font face='Lucida Console'>(</font><font color='#979000'>2</font>,i<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+
+            <font color='#BB00BB'>Q</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>,i<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> to_points[i].<font color='#BB00BB'>x</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>Q</font><font face='Lucida Console'>(</font><font color='#979000'>1</font>,i<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> to_points[i].<font color='#BB00BB'>y</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>const</font> matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>2</font>,<font color='#979000'>3</font><font color='#5555FF'>&gt;</font> m <font color='#5555FF'>=</font> Q<font color='#5555FF'>*</font><font color='#BB00BB'>pinv</font><font face='Lucida Console'>(</font>P<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>return</font> <font color='#BB00BB'>point_transform_affine</font><font face='Lucida Console'>(</font><font color='#BB00BB'>subm</font><font face='Lucida Console'>(</font>m,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>2</font>,<font color='#979000'>2</font><font face='Lucida Console'>)</font>, <font color='#BB00BB'>colm</font><font face='Lucida Console'>(</font>m,<font color='#979000'>2</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+    point_transform_affine <b><a name='find_similarity_transform'></a>find_similarity_transform</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>dlib::vector<font color='#5555FF'>&lt;</font>T,<font color='#979000'>2</font><font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> from_points,
+        <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>dlib::vector<font color='#5555FF'>&lt;</font>T,<font color='#979000'>2</font><font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> to_points
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#009900'>// make sure requires clause is not broken
+</font>        <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font>from_points.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> to_points.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font>
+                    from_points.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#979000'>2</font>,
+            "<font color='#CC0000'>\t point_transform_affine find_similarity_transform(from_points, to_points)</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t Invalid inputs were given to this function.</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t from_points.size(): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> from_points.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t to_points.size():   </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> to_points.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+            <font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// We use the formulas from the paper: Least-squares estimation of transformation
+</font>        <font color='#009900'>// parameters between two point patterns by Umeyama.  They are equations 34 through
+</font>        <font color='#009900'>// 43.
+</font>
+        dlib::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>2</font><font color='#5555FF'>&gt;</font> mean_from, mean_to;
+        <font color='#0000FF'><u>double</u></font> sigma_from <font color='#5555FF'>=</font> <font color='#979000'>0</font>, sigma_to <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>2</font>,<font color='#979000'>2</font><font color='#5555FF'>&gt;</font> cov;
+        cov <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> from_points.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+        <b>{</b>
+            mean_from <font color='#5555FF'>+</font><font color='#5555FF'>=</font> from_points[i];
+            mean_to <font color='#5555FF'>+</font><font color='#5555FF'>=</font> to_points[i];
+        <b>}</b>
+        mean_from <font color='#5555FF'>/</font><font color='#5555FF'>=</font> from_points.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        mean_to   <font color='#5555FF'>/</font><font color='#5555FF'>=</font> from_points.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> from_points.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+        <b>{</b>
+            sigma_from <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#BB00BB'>length_squared</font><font face='Lucida Console'>(</font>from_points[i] <font color='#5555FF'>-</font> mean_from<font face='Lucida Console'>)</font>;
+            sigma_to <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#BB00BB'>length_squared</font><font face='Lucida Console'>(</font>to_points[i] <font color='#5555FF'>-</font> mean_to<font face='Lucida Console'>)</font>;
+            cov <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>to_points[i] <font color='#5555FF'>-</font> mean_to<font face='Lucida Console'>)</font><font color='#5555FF'>*</font><font color='#BB00BB'>trans</font><font face='Lucida Console'>(</font>from_points[i] <font color='#5555FF'>-</font> mean_from<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        sigma_from <font color='#5555FF'>/</font><font color='#5555FF'>=</font> from_points.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        sigma_to   <font color='#5555FF'>/</font><font color='#5555FF'>=</font> from_points.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        cov        <font color='#5555FF'>/</font><font color='#5555FF'>=</font> from_points.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+        matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>2</font>,<font color='#979000'>2</font><font color='#5555FF'>&gt;</font> u, v, s, d;
+        <font color='#BB00BB'>svd</font><font face='Lucida Console'>(</font>cov, u,d,v<font face='Lucida Console'>)</font>;
+        s <font color='#5555FF'>=</font> <font color='#BB00BB'>identity_matrix</font><font face='Lucida Console'>(</font>cov<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>det</font><font face='Lucida Console'>(</font>cov<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> <font color='#979000'>0</font> <font color='#5555FF'>|</font><font color='#5555FF'>|</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>det</font><font face='Lucida Console'>(</font>cov<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> <font color='#BB00BB'>det</font><font face='Lucida Console'>(</font>u<font face='Lucida Console'>)</font><font color='#5555FF'>*</font><font color='#BB00BB'>det</font><font face='Lucida Console'>(</font>v<font face='Lucida Console'>)</font><font color='#5555FF'>&lt;</font><font color='#979000'>0</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>d</font><font face='Lucida Console'>(</font><font color='#979000'>1</font>,<font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> <font color='#BB00BB'>d</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                <font color='#BB00BB'>s</font><font face='Lucida Console'>(</font><font color='#979000'>1</font>,<font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>1</font>;
+            <font color='#0000FF'>else</font>
+                <font color='#BB00BB'>s</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>1</font>;
+        <b>}</b>
+
+        matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>2</font>,<font color='#979000'>2</font><font color='#5555FF'>&gt;</font> r <font color='#5555FF'>=</font> u<font color='#5555FF'>*</font>s<font color='#5555FF'>*</font><font color='#BB00BB'>trans</font><font face='Lucida Console'>(</font>v<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'><u>double</u></font> c <font color='#5555FF'>=</font> <font color='#979000'>1</font>; 
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>sigma_from <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+            c <font color='#5555FF'>=</font> <font color='#979000'>1.0</font><font color='#5555FF'>/</font>sigma_from <font color='#5555FF'>*</font> <font color='#BB00BB'>trace</font><font face='Lucida Console'>(</font>d<font color='#5555FF'>*</font>s<font face='Lucida Console'>)</font>;
+        vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>2</font><font color='#5555FF'>&gt;</font> t <font color='#5555FF'>=</font> mean_to <font color='#5555FF'>-</font> c<font color='#5555FF'>*</font>r<font color='#5555FF'>*</font>mean_from;
+
+        <font color='#0000FF'>return</font> <font color='#BB00BB'>point_transform_affine</font><font face='Lucida Console'>(</font>c<font color='#5555FF'>*</font>r, t<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>class</font> <b><a name='point_transform_projective'></a>point_transform_projective</b>
+    <b>{</b>
+    <font color='#0000FF'>public</font>:
+
+        <b><a name='point_transform_projective'></a>point_transform_projective</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            m <font color='#5555FF'>=</font> identity_matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#979000'>3</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <b><a name='point_transform_projective'></a>point_transform_projective</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>3</font>,<font color='#979000'>3</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> m_
+        <font face='Lucida Console'>)</font> :m<font face='Lucida Console'>(</font>m_<font face='Lucida Console'>)</font>
+        <b>{</b>
+        <b>}</b>
+        
+        <b><a name='point_transform_projective'></a>point_transform_projective</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> point_transform_affine<font color='#5555FF'>&amp;</font> tran
+        <font face='Lucida Console'>)</font> 
+        <b>{</b>
+            <font color='#BB00BB'>set_subm</font><font face='Lucida Console'>(</font>m, <font color='#979000'>0</font>,<font color='#979000'>0</font>, <font color='#979000'>2</font>,<font color='#979000'>2</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> tran.<font color='#BB00BB'>get_m</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>set_subm</font><font face='Lucida Console'>(</font>m, <font color='#979000'>0</font>,<font color='#979000'>2</font>, <font color='#979000'>2</font>,<font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> tran.<font color='#BB00BB'>get_b</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>m</font><font face='Lucida Console'>(</font><font color='#979000'>2</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            <font color='#BB00BB'>m</font><font face='Lucida Console'>(</font><font color='#979000'>2</font>,<font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            <font color='#BB00BB'>m</font><font face='Lucida Console'>(</font><font color='#979000'>2</font>,<font color='#979000'>2</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+        <b>}</b>
+        
+
+        <font color='#0000FF'>const</font> dlib::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>2</font><font color='#5555FF'>&gt;</font> <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> dlib::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>2</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> p
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            dlib::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>3</font><font color='#5555FF'>&gt;</font> <font color='#BB00BB'>temp</font><font face='Lucida Console'>(</font>p<font face='Lucida Console'>)</font>;
+            temp.<font color='#BB00BB'>z</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+            temp <font color='#5555FF'>=</font> m<font color='#5555FF'>*</font>temp;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>temp.<font color='#BB00BB'>z</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                temp <font color='#5555FF'>=</font> temp<font color='#5555FF'>/</font>temp.<font color='#BB00BB'>z</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>return</font> temp;
+        <b>}</b>
+
+        <font color='#0000FF'>const</font> matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>3</font>,<font color='#979000'>3</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> <b><a name='get_m'></a>get_m</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> m; <b>}</b>
+
+        <font color='#0000FF'>inline</font> <font color='#0000FF'>friend</font> <font color='#0000FF'><u>void</u></font> <b><a name='serialize'></a>serialize</b> <font face='Lucida Console'>(</font><font color='#0000FF'>const</font> point_transform_projective<font color='#5555FF'>&amp;</font> item, std::ostream<font color='#5555FF'>&amp;</font> out<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item.m, out<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>inline</font> <font color='#0000FF'>friend</font> <font color='#0000FF'><u>void</u></font> <b><a name='deserialize'></a>deserialize</b> <font face='Lucida Console'>(</font>point_transform_projective<font color='#5555FF'>&amp;</font> item, std::istream<font color='#5555FF'>&amp;</font> in<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item.m, in<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+    <font color='#0000FF'>private</font>:
+        matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>3</font>,<font color='#979000'>3</font><font color='#5555FF'>&gt;</font> m;
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>inline</font> point_transform_projective <b><a name='operator'></a>operator</b><font color='#5555FF'>*</font> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> point_transform_projective<font color='#5555FF'>&amp;</font> lhs,
+        <font color='#0000FF'>const</font> point_transform_projective<font color='#5555FF'>&amp;</font> rhs
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>return</font> <font color='#BB00BB'>point_transform_projective</font><font face='Lucida Console'>(</font>lhs.<font color='#BB00BB'>get_m</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>*</font>rhs.<font color='#BB00BB'>get_m</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>inline</font> point_transform_projective <b><a name='inv'></a>inv</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> point_transform_projective<font color='#5555FF'>&amp;</font> trans
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>return</font> <font color='#BB00BB'>point_transform_projective</font><font face='Lucida Console'>(</font><font color='#BB00BB'>inv</font><font face='Lucida Console'>(</font>trans.<font color='#BB00BB'>get_m</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>namespace</font> impl_proj
+    <b>{</b>
+
+        <font color='#0000FF'>inline</font> point_transform_projective <b><a name='find_projective_transform_basic'></a>find_projective_transform_basic</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>dlib::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>2</font><font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> from_points,
+            <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>dlib::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>2</font><font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> to_points
+        <font face='Lucida Console'>)</font>
+        <font color='#009900'>/*!
+            ensures
+                - Uses the system of equations approach to finding a projective transform.
+                  This is "Method 3" from Estimating Projective Transformation Matrix by
+                  Zhengyou Zhang. 
+                - It should be emphasized that the find_projective_transform_basic()
+                  routine, which uses the most popular method for finding projective
+                  transformations, doesn't really work well when the minimum error solution
+                  doesn't have zero error.  In this case, it can deviate by a large amount
+                  from the proper minimum mean squared error transformation.  Therefore,
+                  our overall strategy will be to use the solution from
+                  find_projective_transform_basic() as a starting point for a BFGS based
+                  non-linear optimizer which will optimize the correct mean squared error
+                  criterion.
+
+                  A great essay on this subject is Homography Estimation by Elan Dubrofsky.
+        !*/</font>
+        <b>{</b>
+            <font color='#009900'>// make sure requires clause is not broken
+</font>            <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font>from_points.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> to_points.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font>
+                from_points.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#979000'>4</font>,
+                "<font color='#CC0000'>\t point_transform_projective find_projective_transform_basic(from_points, to_points)</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t Invalid inputs were given to this function.</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t from_points.size(): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> from_points.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t to_points.size():   </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> to_points.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+            <font face='Lucida Console'>)</font>;
+
+            matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>9</font>,<font color='#979000'>9</font><font color='#5555FF'>&gt;</font> accum, u, v;
+            matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>9</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> w;
+            matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>2</font>,<font color='#979000'>9</font><font color='#5555FF'>&gt;</font> B;
+            accum <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            B <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> from_points.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                dlib::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>3</font><font color='#5555FF'>&gt;</font> f <font color='#5555FF'>=</font> from_points[i];
+                f.<font color='#BB00BB'>z</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+                dlib::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>3</font><font color='#5555FF'>&gt;</font> t <font color='#5555FF'>=</font> to_points[i];
+                t.<font color='#BB00BB'>z</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+
+                <font color='#BB00BB'>set_subm</font><font face='Lucida Console'>(</font>B,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>1</font>,<font color='#979000'>3</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> t.<font color='#BB00BB'>y</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>*</font><font color='#BB00BB'>trans</font><font face='Lucida Console'>(</font>f<font face='Lucida Console'>)</font>;
+                <font color='#BB00BB'>set_subm</font><font face='Lucida Console'>(</font>B,<font color='#979000'>1</font>,<font color='#979000'>0</font>,<font color='#979000'>1</font>,<font color='#979000'>3</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font>       <font color='#BB00BB'>trans</font><font face='Lucida Console'>(</font>f<font face='Lucida Console'>)</font>;
+
+                <font color='#BB00BB'>set_subm</font><font face='Lucida Console'>(</font>B,<font color='#979000'>0</font>,<font color='#979000'>3</font>,<font color='#979000'>1</font>,<font color='#979000'>3</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#5555FF'>-</font>t.<font color='#BB00BB'>x</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>*</font><font color='#BB00BB'>trans</font><font face='Lucida Console'>(</font>f<font face='Lucida Console'>)</font>;
+                <font color='#BB00BB'>set_subm</font><font face='Lucida Console'>(</font>B,<font color='#979000'>1</font>,<font color='#979000'>6</font>,<font color='#979000'>1</font>,<font color='#979000'>3</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#5555FF'>-</font>t.<font color='#BB00BB'>x</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>*</font><font color='#BB00BB'>trans</font><font face='Lucida Console'>(</font>f<font face='Lucida Console'>)</font>;
+
+                accum <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#BB00BB'>trans</font><font face='Lucida Console'>(</font>B<font face='Lucida Console'>)</font><font color='#5555FF'>*</font>B;
+            <b>}</b>
+
+            <font color='#BB00BB'>svd2</font><font face='Lucida Console'>(</font><font color='#979000'>true</font>, <font color='#979000'>false</font>, accum, u, w, v<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'><u>long</u></font> j <font color='#5555FF'>=</font> <font color='#BB00BB'>index_of_min</font><font face='Lucida Console'>(</font>w<font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>return</font> <font color='#BB00BB'>point_transform_projective</font><font face='Lucida Console'>(</font><font color='#BB00BB'>reshape</font><font face='Lucida Console'>(</font><font color='#BB00BB'>colm</font><font face='Lucida Console'>(</font>u,j<font face='Lucida Console'>)</font>,<font color='#979000'>3</font>,<font color='#979000'>3</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>; 
+        <b>}</b>
+
+    <font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+        <font color='#0000FF'>struct</font> <b><a name='obj'></a>obj</b>
+        <b>{</b>
+            <font color='#009900'>/*!
+                WHAT THIS OBJECT REPRESENTS
+                    This is the objective function we really want to minimize when looking
+                    for a transformation matrix.  That is, we would like the transformed
+                    points to be as close as possible to their "to" points.  Here,
+                    closeness is measured using Euclidean distance.
+
+            !*/</font>
+            <b><a name='obj'></a>obj</b><font face='Lucida Console'>(</font>
+                <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>dlib::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>2</font><font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> from_points_,
+                <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>dlib::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>2</font><font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> to_points_
+            <font face='Lucida Console'>)</font> : 
+                from_points<font face='Lucida Console'>(</font>from_points_<font face='Lucida Console'>)</font> ,
+                to_points<font face='Lucida Console'>(</font>to_points_<font face='Lucida Console'>)</font>
+            <b>{</b><b>}</b>
+            <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>dlib::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>2</font><font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> from_points;
+            <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>dlib::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>2</font><font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> to_points;
+
+            <font color='#0000FF'><u>double</u></font> <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>
+                <font color='#0000FF'>const</font> matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>9</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> p
+            <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+            <b>{</b>
+                point_transform_projective <font color='#BB00BB'>tran</font><font face='Lucida Console'>(</font><font color='#BB00BB'>reshape</font><font face='Lucida Console'>(</font>p,<font color='#979000'>3</font>,<font color='#979000'>3</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+                <font color='#0000FF'><u>double</u></font> sum <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> from_points.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    sum <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#BB00BB'>length_squared</font><font face='Lucida Console'>(</font><font color='#BB00BB'>tran</font><font face='Lucida Console'>(</font>from_points[i]<font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> to_points[i]<font face='Lucida Console'>)</font>;
+                <b>}</b>
+                <font color='#0000FF'>return</font> sum;
+            <b>}</b>
+        <b>}</b>;
+
+        <font color='#0000FF'>struct</font> <b><a name='obj_der'></a>obj_der</b>
+        <b>{</b>
+            <font color='#009900'>/*!
+                WHAT THIS OBJECT REPRESENTS
+                    This is the derivative of obj.
+            !*/</font>
+
+            <b><a name='obj_der'></a>obj_der</b><font face='Lucida Console'>(</font>
+                <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>dlib::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>2</font><font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> from_points_,
+                <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>dlib::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>2</font><font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> to_points_
+            <font face='Lucida Console'>)</font> : 
+                from_points<font face='Lucida Console'>(</font>from_points_<font face='Lucida Console'>)</font> ,
+                to_points<font face='Lucida Console'>(</font>to_points_<font face='Lucida Console'>)</font>
+            <b>{</b><b>}</b>
+            <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>dlib::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>2</font><font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> from_points;
+            <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>dlib::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>2</font><font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> to_points;
+
+            matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>9</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>
+                <font color='#0000FF'>const</font> matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>9</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> p
+            <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+            <b>{</b>
+                <font color='#0000FF'>const</font> matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>3</font>,<font color='#979000'>3</font><font color='#5555FF'>&gt;</font> H <font color='#5555FF'>=</font> <font color='#BB00BB'>reshape</font><font face='Lucida Console'>(</font>p,<font color='#979000'>3</font>,<font color='#979000'>3</font><font face='Lucida Console'>)</font>;
+
+                matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>3</font>,<font color='#979000'>3</font><font color='#5555FF'>&gt;</font> grad;
+                grad <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> from_points.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    dlib::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>3</font><font color='#5555FF'>&gt;</font> from, to;
+                    from <font color='#5555FF'>=</font> from_points[i];
+                    from.<font color='#BB00BB'>z</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+                    to <font color='#5555FF'>=</font> to_points[i];
+                    to.<font color='#BB00BB'>z</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+
+                    matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>3</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> w <font color='#5555FF'>=</font> H<font color='#5555FF'>*</font>from;
+                    <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> scale <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>w</font><font face='Lucida Console'>(</font><font color='#979000'>2</font><font face='Lucida Console'>)</font> <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font> ? <font face='Lucida Console'>(</font><font color='#979000'>1.0</font><font color='#5555FF'>/</font><font color='#BB00BB'>w</font><font face='Lucida Console'>(</font><font color='#979000'>2</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> : <font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+                    w <font color='#5555FF'>*</font><font color='#5555FF'>=</font> scale;
+                    matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>3</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> residual <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>w<font color='#5555FF'>-</font>to<font face='Lucida Console'>)</font><font color='#5555FF'>*</font><font color='#979000'>2</font><font color='#5555FF'>*</font>scale;
+
+                    <font color='#BB00BB'>grad</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font><font color='#5555FF'>=</font> from.<font color='#BB00BB'>x</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>*</font><font color='#BB00BB'>residual</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+                    <font color='#BB00BB'>grad</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>,<font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font><font color='#5555FF'>=</font> from.<font color='#BB00BB'>y</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>*</font><font color='#BB00BB'>residual</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+                    <font color='#BB00BB'>grad</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>,<font color='#979000'>2</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font><font color='#5555FF'>=</font>          <font color='#BB00BB'>residual</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+
+                    <font color='#BB00BB'>grad</font><font face='Lucida Console'>(</font><font color='#979000'>1</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font><font color='#5555FF'>=</font> from.<font color='#BB00BB'>x</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>*</font><font color='#BB00BB'>residual</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+                    <font color='#BB00BB'>grad</font><font face='Lucida Console'>(</font><font color='#979000'>1</font>,<font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font><font color='#5555FF'>=</font> from.<font color='#BB00BB'>y</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>*</font><font color='#BB00BB'>residual</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+                    <font color='#BB00BB'>grad</font><font face='Lucida Console'>(</font><font color='#979000'>1</font>,<font color='#979000'>2</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font><font color='#5555FF'>=</font>          <font color='#BB00BB'>residual</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+
+                    <font color='#BB00BB'>grad</font><font face='Lucida Console'>(</font><font color='#979000'>2</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font face='Lucida Console'>(</font>from.<font color='#BB00BB'>x</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>*</font><font color='#BB00BB'>w</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font><font color='#5555FF'>*</font><font color='#BB00BB'>residual</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> from.<font color='#BB00BB'>x</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>*</font><font color='#BB00BB'>w</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font><font color='#5555FF'>*</font><font color='#BB00BB'>residual</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                    <font color='#BB00BB'>grad</font><font face='Lucida Console'>(</font><font color='#979000'>2</font>,<font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font face='Lucida Console'>(</font>from.<font color='#BB00BB'>y</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>*</font><font color='#BB00BB'>w</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font><font color='#5555FF'>*</font><font color='#BB00BB'>residual</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> from.<font color='#BB00BB'>y</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>*</font><font color='#BB00BB'>w</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font><font color='#5555FF'>*</font><font color='#BB00BB'>residual</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                    <font color='#BB00BB'>grad</font><font face='Lucida Console'>(</font><font color='#979000'>2</font>,<font color='#979000'>2</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font face='Lucida Console'>(</font>         <font color='#BB00BB'>w</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font><font color='#5555FF'>*</font><font color='#BB00BB'>residual</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font>          <font color='#BB00BB'>w</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font><font color='#5555FF'>*</font><font color='#BB00BB'>residual</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+                <b>}</b>
+                <font color='#0000FF'>return</font> <font color='#BB00BB'>reshape_to_column_vector</font><font face='Lucida Console'>(</font>grad<font face='Lucida Console'>)</font>;
+            <b>}</b>
+        <b>}</b>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>inline</font> point_transform_projective <b><a name='find_projective_transform'></a>find_projective_transform</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>dlib::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>2</font><font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> from_points,
+        <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>dlib::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>2</font><font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> to_points
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> impl_proj;
+        <font color='#009900'>// make sure requires clause is not broken
+</font>        <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font>from_points.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> to_points.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font>
+                    from_points.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#979000'>4</font>,
+            "<font color='#CC0000'>\t point_transform_projective find_projective_transform(from_points, to_points)</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t Invalid inputs were given to this function.</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t from_points.size(): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> from_points.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t to_points.size():   </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> to_points.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+            <font face='Lucida Console'>)</font>;
+
+
+        <font color='#009900'>// Find a candidate projective transformation.  Also, find the best affine
+</font>        <font color='#009900'>// transform and then compare it with the projective transform estimated using the
+</font>        <font color='#009900'>// direct SVD method.  Use whichever one works better as the starting point for a
+</font>        <font color='#009900'>// BFGS based optimizer.  If the best solution has large mean squared error and is
+</font>        <font color='#009900'>// also close to affine then find_projective_transform_basic() might give a very
+</font>        <font color='#009900'>// bad initial guess.  So also checking for a good affine transformation can
+</font>        <font color='#009900'>// produce a much better final result in many cases.
+</font>        point_transform_projective tran1 <font color='#5555FF'>=</font> <font color='#BB00BB'>find_projective_transform_basic</font><font face='Lucida Console'>(</font>from_points, to_points<font face='Lucida Console'>)</font>;
+        point_transform_affine tran2 <font color='#5555FF'>=</font> <font color='#BB00BB'>find_affine_transform</font><font face='Lucida Console'>(</font>from_points, to_points<font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// check which is best
+</font>        <font color='#0000FF'><u>double</u></font> error1 <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <font color='#0000FF'><u>double</u></font> error2 <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> from_points.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+        <b>{</b>
+            error1 <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#BB00BB'>length_squared</font><font face='Lucida Console'>(</font><font color='#BB00BB'>tran1</font><font face='Lucida Console'>(</font>from_points[i]<font face='Lucida Console'>)</font><font color='#5555FF'>-</font>to_points[i]<font face='Lucida Console'>)</font>;
+            error2 <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#BB00BB'>length_squared</font><font face='Lucida Console'>(</font><font color='#BB00BB'>tran2</font><font face='Lucida Console'>(</font>from_points[i]<font face='Lucida Console'>)</font><font color='#5555FF'>-</font>to_points[i]<font face='Lucida Console'>)</font>;
+        <b>}</b>
+        matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>9</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> params; 
+        <font color='#009900'>// Pick the minimum error solution among the two so far.
+</font>        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>error1 <font color='#5555FF'>&lt;</font> error2<font face='Lucida Console'>)</font>
+            params <font color='#5555FF'>=</font> <font color='#BB00BB'>reshape_to_column_vector</font><font face='Lucida Console'>(</font>tran1.<font color='#BB00BB'>get_m</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>else</font>
+            params <font color='#5555FF'>=</font> <font color='#BB00BB'>reshape_to_column_vector</font><font face='Lucida Console'>(</font><font color='#BB00BB'>point_transform_projective</font><font face='Lucida Console'>(</font>tran2<font face='Lucida Console'>)</font>.<font color='#BB00BB'>get_m</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+
+        <font color='#009900'>// Now refine the transformation matrix so that we can be sure we have
+</font>        <font color='#009900'>// at least a local minimizer.
+</font>        obj <font color='#BB00BB'>o</font><font face='Lucida Console'>(</font>from_points, to_points<font face='Lucida Console'>)</font>;
+        obj_der <font color='#BB00BB'>der</font><font face='Lucida Console'>(</font>from_points, to_points<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>find_min</font><font face='Lucida Console'>(</font><font color='#BB00BB'>bfgs_search_strategy</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,
+                <font color='#BB00BB'>objective_delta_stop_strategy</font><font face='Lucida Console'>(</font><font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>6</font>,<font color='#979000'>100</font><font face='Lucida Console'>)</font>,
+                o,
+                der,
+                params,
+                <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>return</font> <font color='#BB00BB'>point_transform_projective</font><font face='Lucida Console'>(</font><font color='#BB00BB'>reshape</font><font face='Lucida Console'>(</font>params,<font color='#979000'>3</font>,<font color='#979000'>3</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>; 
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>const</font> dlib::vector<font color='#5555FF'>&lt;</font>T,<font color='#979000'>2</font><font color='#5555FF'>&gt;</font> <b><a name='rotate_point'></a>rotate_point</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> dlib::vector<font color='#5555FF'>&lt;</font>T,<font color='#979000'>2</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> center,
+        <font color='#0000FF'>const</font> dlib::vector<font color='#5555FF'>&lt;</font>T,<font color='#979000'>2</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> p,
+        <font color='#0000FF'><u>double</u></font> angle
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        point_rotator <font color='#BB00BB'>rot</font><font face='Lucida Console'>(</font>angle<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>return</font> <font color='#BB00BB'>rot</font><font face='Lucida Console'>(</font>p<font color='#5555FF'>-</font>center<font face='Lucida Console'>)</font><font color='#5555FF'>+</font>center;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>inline</font> matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>2</font>,<font color='#979000'>2</font><font color='#5555FF'>&gt;</font> <b><a name='rotation_matrix'></a>rotation_matrix</b> <font face='Lucida Console'>(</font>
+         <font color='#0000FF'><u>double</u></font> angle
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> ca <font color='#5555FF'>=</font> std::<font color='#BB00BB'>cos</font><font face='Lucida Console'>(</font>angle<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> sa <font color='#5555FF'>=</font> std::<font color='#BB00BB'>sin</font><font face='Lucida Console'>(</font>angle<font face='Lucida Console'>)</font>;
+
+        matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>2</font>,<font color='#979000'>2</font><font color='#5555FF'>&gt;</font> m;
+        m <font color='#5555FF'>=</font> ca, <font color='#5555FF'>-</font>sa,
+            sa, ca;
+        <font color='#0000FF'>return</font> m;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>class</font> <b><a name='point_transform_affine3d'></a>point_transform_affine3d</b>
+    <b>{</b>
+    <font color='#0000FF'>public</font>:
+
+        <b><a name='point_transform_affine3d'></a>point_transform_affine3d</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            m <font color='#5555FF'>=</font> identity_matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#979000'>3</font><font face='Lucida Console'>)</font>;
+            b.<font color='#BB00BB'>x</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            b.<font color='#BB00BB'>y</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <b>}</b>
+
+        <b><a name='point_transform_affine3d'></a>point_transform_affine3d</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>3</font>,<font color='#979000'>3</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> m_,
+            <font color='#0000FF'>const</font> dlib::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>3</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> b_
+        <font face='Lucida Console'>)</font> :m<font face='Lucida Console'>(</font>m_<font face='Lucida Console'>)</font>, b<font face='Lucida Console'>(</font>b_<font face='Lucida Console'>)</font>
+        <b>{</b>
+        <b>}</b>
+
+        <font color='#0000FF'>const</font> dlib::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>3</font><font color='#5555FF'>&gt;</font> <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> dlib::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>3</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> p
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#0000FF'>return</font> m<font color='#5555FF'>*</font>p <font color='#5555FF'>+</font> b;
+        <b>}</b>
+
+        <font color='#0000FF'>const</font> matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>3</font>,<font color='#979000'>3</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> <b><a name='get_m'></a>get_m</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> m; <b>}</b>
+
+        <font color='#0000FF'>const</font> dlib::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>3</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> <b><a name='get_b'></a>get_b</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> b; <b>}</b>
+
+        <font color='#0000FF'>inline</font> <font color='#0000FF'>friend</font> <font color='#0000FF'><u>void</u></font> <b><a name='serialize'></a>serialize</b> <font face='Lucida Console'>(</font><font color='#0000FF'>const</font> point_transform_affine3d<font color='#5555FF'>&amp;</font> item, std::ostream<font color='#5555FF'>&amp;</font> out<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item.m, out<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item.b, out<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>inline</font> <font color='#0000FF'>friend</font> <font color='#0000FF'><u>void</u></font> <b><a name='deserialize'></a>deserialize</b> <font face='Lucida Console'>(</font>point_transform_affine3d<font color='#5555FF'>&amp;</font> item, std::istream<font color='#5555FF'>&amp;</font> in<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item.m, in<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item.b, in<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+    <font color='#0000FF'>private</font>:
+        matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>3</font>,<font color='#979000'>3</font><font color='#5555FF'>&gt;</font> m;
+        dlib::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>3</font><font color='#5555FF'>&gt;</font> b;
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>inline</font> point_transform_affine3d <b><a name='operator'></a>operator</b><font color='#5555FF'>*</font> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> point_transform_affine3d<font color='#5555FF'>&amp;</font> lhs,
+        <font color='#0000FF'>const</font> point_transform_affine<font color='#5555FF'>&amp;</font> rhs
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>3</font>,<font color='#979000'>3</font><font color='#5555FF'>&gt;</font> m;
+        m <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <font color='#BB00BB'>set_subm</font><font face='Lucida Console'>(</font>m, <font color='#BB00BB'>get_rect</font><font face='Lucida Console'>(</font>rhs.<font color='#BB00BB'>get_m</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> rhs.<font color='#BB00BB'>get_m</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>3</font><font color='#5555FF'>&gt;</font> b <font color='#5555FF'>=</font> rhs.<font color='#BB00BB'>get_b</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>return</font> <font color='#BB00BB'>point_transform_affine3d</font><font face='Lucida Console'>(</font>lhs.<font color='#BB00BB'>get_m</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>*</font>m, lhs.<font color='#BB00BB'>get_m</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>*</font>b<font color='#5555FF'>+</font>lhs.<font color='#BB00BB'>get_b</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>inline</font> point_transform_affine3d <b><a name='operator'></a>operator</b><font color='#5555FF'>*</font> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> point_transform_affine3d<font color='#5555FF'>&amp;</font> lhs,
+        <font color='#0000FF'>const</font> point_transform_affine3d<font color='#5555FF'>&amp;</font> rhs
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>return</font> <font color='#BB00BB'>point_transform_affine3d</font><font face='Lucida Console'>(</font>lhs.<font color='#BB00BB'>get_m</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>*</font>rhs.<font color='#BB00BB'>get_m</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, lhs.<font color='#BB00BB'>get_m</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>*</font>rhs.<font color='#BB00BB'>get_b</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>+</font>lhs.<font color='#BB00BB'>get_b</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>inline</font> point_transform_affine3d <b><a name='inv'></a>inv</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> point_transform_affine3d<font color='#5555FF'>&amp;</font> trans
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>3</font>,<font color='#979000'>3</font><font color='#5555FF'>&gt;</font> im <font color='#5555FF'>=</font> <font color='#BB00BB'>inv</font><font face='Lucida Console'>(</font>trans.<font color='#BB00BB'>get_m</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>return</font> <font color='#BB00BB'>point_transform_affine3d</font><font face='Lucida Console'>(</font>im, <font color='#5555FF'>-</font>im<font color='#5555FF'>*</font>trans.<font color='#BB00BB'>get_b</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>inline</font> point_transform_affine3d <b><a name='rotate_around_x'></a>rotate_around_x</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'><u>double</u></font> angle
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> ca <font color='#5555FF'>=</font> std::<font color='#BB00BB'>cos</font><font face='Lucida Console'>(</font>angle<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> sa <font color='#5555FF'>=</font> std::<font color='#BB00BB'>sin</font><font face='Lucida Console'>(</font>angle<font face='Lucida Console'>)</font>;
+
+        matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>3</font>,<font color='#979000'>3</font><font color='#5555FF'>&gt;</font> m;
+        m <font color='#5555FF'>=</font> <font color='#979000'>1</font>,  <font color='#979000'>0</font>,  <font color='#979000'>0</font>,
+            <font color='#979000'>0</font>, ca, <font color='#5555FF'>-</font>sa,
+            <font color='#979000'>0</font>, sa, ca;
+
+        vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>3</font><font color='#5555FF'>&gt;</font> b;
+
+        <font color='#0000FF'>return</font> <font color='#BB00BB'>point_transform_affine3d</font><font face='Lucida Console'>(</font>m,b<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>inline</font> point_transform_affine3d <b><a name='rotate_around_y'></a>rotate_around_y</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'><u>double</u></font> angle
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> ca <font color='#5555FF'>=</font> std::<font color='#BB00BB'>cos</font><font face='Lucida Console'>(</font>angle<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> sa <font color='#5555FF'>=</font> std::<font color='#BB00BB'>sin</font><font face='Lucida Console'>(</font>angle<font face='Lucida Console'>)</font>;
+
+        matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>3</font>,<font color='#979000'>3</font><font color='#5555FF'>&gt;</font> m;
+        m <font color='#5555FF'>=</font> ca,  <font color='#979000'>0</font>, sa,
+             <font color='#979000'>0</font>,  <font color='#979000'>1</font>, <font color='#979000'>0</font>,
+            <font color='#5555FF'>-</font>sa, <font color='#979000'>0</font>, ca;
+
+        vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>3</font><font color='#5555FF'>&gt;</font> b;
+
+        <font color='#0000FF'>return</font> <font color='#BB00BB'>point_transform_affine3d</font><font face='Lucida Console'>(</font>m,b<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>inline</font> point_transform_affine3d <b><a name='rotate_around_z'></a>rotate_around_z</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'><u>double</u></font> angle
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> ca <font color='#5555FF'>=</font> std::<font color='#BB00BB'>cos</font><font face='Lucida Console'>(</font>angle<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> sa <font color='#5555FF'>=</font> std::<font color='#BB00BB'>sin</font><font face='Lucida Console'>(</font>angle<font face='Lucida Console'>)</font>;
+
+        matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>3</font>,<font color='#979000'>3</font><font color='#5555FF'>&gt;</font> m;
+        m <font color='#5555FF'>=</font> ca, <font color='#5555FF'>-</font>sa, <font color='#979000'>0</font>,
+            sa, ca,  <font color='#979000'>0</font>,
+            <font color='#979000'>0</font>,   <font color='#979000'>0</font>,  <font color='#979000'>1</font>;
+
+        vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>3</font><font color='#5555FF'>&gt;</font> b;
+
+        <font color='#0000FF'>return</font> <font color='#BB00BB'>point_transform_affine3d</font><font face='Lucida Console'>(</font>m,b<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>inline</font> point_transform_affine3d <b><a name='translate_point'></a>translate_point</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>3</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> delta
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>return</font> <font color='#BB00BB'>point_transform_affine3d</font><font face='Lucida Console'>(</font>identity_matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#979000'>3</font><font face='Lucida Console'>)</font>,delta<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+    <font color='#0000FF'>inline</font> point_transform_affine3d <b><a name='translate_point'></a>translate_point</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'><u>double</u></font> x,
+        <font color='#0000FF'><u>double</u></font> y,
+        <font color='#0000FF'><u>double</u></font> z
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>return</font> <font color='#BB00BB'>translate_point</font><font face='Lucida Console'>(</font>vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>x,y,z<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>class</font> <b><a name='camera_transform'></a>camera_transform</b>
+    <b>{</b>
+
+    <font color='#0000FF'>public</font>:
+
+        <b><a name='camera_transform'></a>camera_transform</b>  <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#5555FF'>*</font><font color='#0000FF'>this</font> <font color='#5555FF'>=</font> <font color='#BB00BB'>camera_transform</font><font face='Lucida Console'>(</font>vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#979000'>1</font>,<font color='#979000'>1</font>,<font color='#979000'>1</font><font face='Lucida Console'>)</font>, 
+                                     vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font>,
+                                     vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>1</font><font face='Lucida Console'>)</font>,
+                                     <font color='#979000'>90</font>,
+                                     <font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <b><a name='camera_transform'></a>camera_transform</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> camera_pos_,
+            <font color='#0000FF'>const</font> vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> camera_looking_at_,
+            <font color='#0000FF'>const</font> vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> camera_up_direction_,
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> camera_field_of_view_, 
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> num_pixels_
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#009900'>// make sure requires clause is not broken
+</font>            <font color='#BB00BB'>DLIB_CASSERT</font><font face='Lucida Console'>(</font><font color='#979000'>0</font> <font color='#5555FF'>&lt;</font> camera_field_of_view_ <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> camera_field_of_view_ <font color='#5555FF'>&lt;</font> <font color='#979000'>180</font>,
+                "<font color='#CC0000'>\t camera_transform::camera_transform()</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t Invalid inputs were given to this function.</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t camera_field_of_view_: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> camera_field_of_view_
+                <font face='Lucida Console'>)</font>;
+
+            camera_pos <font color='#5555FF'>=</font> camera_pos_;
+            camera_looking_at <font color='#5555FF'>=</font> camera_looking_at_;
+            camera_up_direction <font color='#5555FF'>=</font> camera_up_direction_;
+            camera_field_of_view <font color='#5555FF'>=</font> camera_field_of_view_;
+            num_pixels <font color='#5555FF'>=</font> num_pixels_;
+
+            dlib::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font> X,Y,Z;
+            Z <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>camera_looking_at <font color='#5555FF'>-</font> camera_pos<font face='Lucida Console'>)</font>.<font color='#BB00BB'>normalize</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            Y <font color='#5555FF'>=</font> camera_up_direction <font color='#5555FF'>-</font> <font color='#BB00BB'>dot</font><font face='Lucida Console'>(</font>camera_up_direction,Z<font face='Lucida Console'>)</font><font color='#5555FF'>*</font>Z; 
+            Y <font color='#5555FF'>=</font> Y.<font color='#BB00BB'>normalize</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            X <font color='#5555FF'>=</font> Z.<font color='#BB00BB'>cross</font><font face='Lucida Console'>(</font>Y<font face='Lucida Console'>)</font>;
+
+            <font color='#BB00BB'>set_rowm</font><font face='Lucida Console'>(</font>proj,<font color='#979000'>0</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#BB00BB'>trans</font><font face='Lucida Console'>(</font>X<font face='Lucida Console'>)</font>;
+            <font color='#009900'>// Minus because images have y axis going down but we want the 3d projection to appear using a normal coordinate system with y going up.
+</font>            <font color='#BB00BB'>set_rowm</font><font face='Lucida Console'>(</font>proj,<font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#BB00BB'>trans</font><font face='Lucida Console'>(</font>Y<font face='Lucida Console'>)</font>; 
+            <font color='#BB00BB'>set_rowm</font><font face='Lucida Console'>(</font>proj,<font color='#979000'>2</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#BB00BB'>trans</font><font face='Lucida Console'>(</font>Z<font face='Lucida Console'>)</font>;
+
+            width <font color='#5555FF'>=</font> num_pixels<font color='#5555FF'>/</font><font color='#979000'>2.0</font>;
+            dist_scale <font color='#5555FF'>=</font> width<font color='#5555FF'>/</font>std::<font color='#BB00BB'>tan</font><font face='Lucida Console'>(</font>pi<font color='#5555FF'>/</font><font color='#979000'>180</font><font color='#5555FF'>*</font>camera_field_of_view<font color='#5555FF'>/</font><font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font> <b><a name='get_camera_pos'></a>get_camera_pos</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>         <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> camera_pos; <b>}</b>
+        vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font> <b><a name='get_camera_looking_at'></a>get_camera_looking_at</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>  <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> camera_looking_at; <b>}</b>
+        vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font> <b><a name='get_camera_up_direction'></a>get_camera_up_direction</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> camera_up_direction; <b>}</b>
+        <font color='#0000FF'><u>double</u></font> <b><a name='get_camera_field_of_view'></a>get_camera_field_of_view</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>       <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> camera_field_of_view; <b>}</b>
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='get_num_pixels'></a>get_num_pixels</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>                   <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> num_pixels; <b>}</b>
+
+        <font color='#0000FF'>inline</font> dpoint <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> p,
+            <font color='#0000FF'><u>double</u></font><font color='#5555FF'>&amp;</font> scale,
+            <font color='#0000FF'><u>double</u></font><font color='#5555FF'>&amp;</font> distance
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font> temp <font color='#5555FF'>=</font> p<font color='#5555FF'>-</font>camera_pos;
+            temp <font color='#5555FF'>=</font> proj<font color='#5555FF'>*</font>temp;
+            distance <font color='#5555FF'>=</font> temp.<font color='#BB00BB'>z</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            scale <font color='#5555FF'>=</font> dist_scale<font color='#5555FF'>/</font><font face='Lucida Console'>(</font>temp.<font color='#BB00BB'>z</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>&gt;</font><font color='#979000'>0</font> ? temp.<font color='#BB00BB'>z</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> : <font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>9</font><font face='Lucida Console'>)</font>;
+            temp.<font color='#BB00BB'>x</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> temp.<font color='#BB00BB'>x</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>*</font>scale <font color='#5555FF'>+</font> width;
+            temp.<font color='#BB00BB'>y</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> temp.<font color='#BB00BB'>y</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>*</font>scale <font color='#5555FF'>+</font> width;
+            <font color='#0000FF'>return</font> temp;
+        <b>}</b>
+
+        dpoint <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> p
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#0000FF'><u>double</u></font> scale, distance;
+            <font color='#0000FF'>return</font> <font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font><font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>p,scale,distance<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>inline</font> <font color='#0000FF'>friend</font> <font color='#0000FF'><u>void</u></font> <b><a name='serialize'></a>serialize</b> <font face='Lucida Console'>(</font><font color='#0000FF'>const</font> camera_transform<font color='#5555FF'>&amp;</font> item, std::ostream<font color='#5555FF'>&amp;</font> out<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item.camera_pos, out<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item.camera_looking_at, out<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item.camera_up_direction, out<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item.camera_field_of_view, out<font face='Lucida Console'>)</font>; 
+            <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item.num_pixels, out<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item.proj, out<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item.dist_scale, out<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item.width, out<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>inline</font> <font color='#0000FF'>friend</font> <font color='#0000FF'><u>void</u></font> <b><a name='deserialize'></a>deserialize</b> <font face='Lucida Console'>(</font>camera_transform<font color='#5555FF'>&amp;</font> item, std::istream<font color='#5555FF'>&amp;</font> in<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item.camera_pos, in<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item.camera_looking_at, in<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item.camera_up_direction, in<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item.camera_field_of_view, in<font face='Lucida Console'>)</font>; 
+            <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item.num_pixels, in<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item.proj, in<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item.dist_scale, in<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item.width, in<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+    <font color='#0000FF'>private</font>:
+
+        vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font> camera_pos;
+        vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font> camera_looking_at;
+        vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font> camera_up_direction;
+        <font color='#0000FF'><u>double</u></font> camera_field_of_view; 
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> num_pixels;
+        matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>3</font>,<font color='#979000'>3</font><font color='#5555FF'>&gt;</font> proj;
+        <font color='#0000FF'><u>double</u></font> dist_scale;
+        <font color='#0000FF'><u>double</u></font> width;
+
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_POINT_TrANSFORMS_H_
+</font>
+
+</pre></body></html>

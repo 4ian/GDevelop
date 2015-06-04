@@ -1,0 +1,429 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html xmlns:gcse="googleCustomSearch"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><link rel="shortcut icon" href="dlib-icon.ico"><meta name="verify-v1" content="02MiiaFNVzS5/u0eQhsy3/knioFHsia1X3DXRpHkE6I="><meta name="google-site-verification" content="DGSSJMKDomaDaDTIRJ8jDkv0YMx9Cz7OESbXHjjr6Jw"><title>dlib C++ Library
+   - Linear Algebra</title><script language="JavaScript">
+
+// ---------------------------------------------
+// --- Name:    Easy DHTML Treeview           --
+// --- Author:  D.D. de Kerf                  --
+// --- Version: 0.2          Date: 13-6-2001  --
+// ---------------------------------------------
+function Toggle(node)
+{
+   // Unfold the branch if it isn't visible
+   var next_node = node.nextSibling;
+   if (next_node.style.display == 'none')
+   {
+      // Change the image (if there is an image)
+      if (node.childNodes.length > 0)
+      {
+         if (node.childNodes.length > 0)
+         { 
+            if (node.childNodes.item(0).nodeName == "IMG")
+            {
+               node.childNodes.item(0).src = "minus.gif";
+            }
+         }
+      }
+
+      next_node.style.display = 'block';
+   }
+   // Collapse the branch if it IS visible
+   else
+   {
+      // Change the image (if there is an image)
+      if (node.childNodes.length > 0)
+      {
+         if (node.childNodes.length > 0)
+         { 
+            if (node.childNodes.item(0).nodeName == "IMG")
+            {
+               node.childNodes.item(0).src = "plus.gif";
+            }
+         }
+      }
+
+      next_node.style.display = 'none';
+   }
+
+}
+function BigToggle(node)
+{
+   // Unfold the branch if it isn't visible
+   var next_node = node.nextSibling;
+   if (next_node.style.display == 'none')
+   {
+      // Change the image (if there is an image)
+      if (node.childNodes.length > 0)
+      {
+         if (node.childNodes.length > 0)
+         { 
+            if (node.childNodes.item(0).nodeName == "IMG")
+            {
+               node.childNodes.item(0).src = "bigminus.gif";
+            }
+         }
+      }
+
+      next_node.style.display = 'block';
+   }
+   // Collapse the branch if it IS visible
+   else
+   {
+      // Change the image (if there is an image)
+      if (node.childNodes.length > 0)
+      {
+         if (node.childNodes.length > 0)
+         { 
+            if (node.childNodes.item(0).nodeName == "IMG")
+            {
+               node.childNodes.item(0).src = "bigplus.gif";
+            }
+         }
+      }
+
+      next_node.style.display = 'none';
+   }
+
+}
+</script><style type="text/css">
+   body {margin:0px;}
+   pre {margin:0px;}
+
+   ul.tree  li { list-style: none;  margin-left:10px;} 
+   ul.tree  { margin:0px; padding:0px; margin-left:5px; font-size:0.95em; }
+   ul.tree  li ul { margin-left:10px; padding:0px; }
+
+   li#term { list-style: none; }
+
+   div.component {
+      background-color:white; 
+      border: 2px solid rgb(102,102,102); 
+      text-align:left;
+      margin-top: 1.5em;
+      padding: 0.7em;
+   }
+
+   div.question {
+      background-color:white; 
+      border: 2px solid rgb(102,102,102); 
+      text-align:left;
+      margin-top: 1.5em;
+      margin-bottom: 90%;
+      padding: 0.7em;
+   }
+
+   div.function {
+      background-color:white; 
+      border: 2px solid rgb(102,102,255); 
+      text-align:left;
+      margin-top: 0.3em;
+      padding: 0.3em;
+   }
+
+   div.class {
+      background-color:white; 
+      border: 2px solid rgb(255,102,102); 
+      text-align:left;
+      margin-top: 0.3em;
+      padding: 0.3em;
+   }
+
+   div.extension {
+      background-color:#FDFDFD; 
+      border: 1px solid rgb(102,102,102); 
+      text-align:left;
+      margin-top: 1.0em;
+      padding: 0.7em;
+   }
+
+   div.logb {
+      text-align:left;
+      padding: 0.0em;
+      float: left;
+      background-color:#c0c0c0; 
+      border: double ; 
+      margin: 0.5em;
+   }
+
+   div.name {
+      float: left;
+   }
+   div.line1 {
+      float:left;
+      width:100%;
+      background-color:#dfdfdf; 
+   }
+   div.line2 {
+      float:left;
+      width:100%;
+   }
+   div.inc {
+      float: right;
+   }
+
+
+   .code_box
+   {
+      color: black;
+      margin: 1em 0.25in;
+      padding: 0.5em;
+      background: rgb(240,240,240);
+      border-top: black dotted 1px;
+      border-left: black dotted 1px;
+      border-right: black solid 2px;
+      border-bottom: black solid 2px;
+   }
+
+
+
+   .bdotted {border-bottom: 1px dotted}
+   .bdashed {border-bottom: 1px dashed}
+   .bsolid {border-bottom: 1px solid}
+   .bdouble {border-bottom: 1px double}
+   .bgroove {border-bottom: 1px groove}
+   .bridge {border-bottom: 1px ridge}
+   .binset {border-bottom: 1px inset}
+   .boutset {border-bottom: 1px outset}
+
+   div.row1 {
+      background-color:#dfdfdf; 
+   }
+   div.row2 {
+      background-color:#f2f2f2; 
+   }
+
+   div.typedefs {
+      margin-left: 1.5em;
+      margin-top: 0.2em;
+      border: 1px dotted;
+      width: 52em;
+   }
+
+   div.tdn {
+      width: 10em;
+   }
+
+   .fullhr {
+      clear: both;
+   }
+
+   body {
+      text-align: center;
+   }
+
+   div.entire_page_header {
+      width:62.5em;  
+      text-align: left;
+      margin-top: 0.4em;
+      margin-left: auto;
+      margin-right: auto;
+   }
+   div.entire_page {
+      width:62.5em;  
+      text-align: left;
+      margin-left: auto;
+      margin-right: auto;
+      clear:both;
+   }
+</style></head><body bgcolor="#EDF3EE"><a name="top"></a><div class="entire_page_header"><a href="http://dlib.net"><img src="dlib-logo.png"></a></div><div class="entire_page"><table bgcolor="white" height="100%" bordercolor="#EDF3EE" CELLSPACING="0" CELLPADDING="10" style="border:0px;margin-top:2px"><tr height="100%"><td BGCOLOR="#F5F5F5" style="padding:7px; border: 1px solid rgb(102,102,102);" VALIGN="TOP" height="100%"><br><table WIDTH="145" height="100%"><tr><td VALIGN="TOP"><b>The Library</b><ul class="tree"><li><a href="algorithms.html">Algorithms</a></li><li><a href="api.html">API Wrappers</a></li><li><a href="bayes.html">Bayesian Nets</a></li><li><a href="compression.html">Compression</a></li><li><a href="containers.html">Containers</a></li><li><a href="graph_tools.html">Graph Tools</a></li><li><a href="imaging.html">Image Processing</a></li><li><a href="linear_algebra.html">Linear Algebra</a></li><li><a href="ml.html">Machine Learning</a></li><li><a href="metaprogramming.html">Metaprogramming</a></li><li><a href="other.html">Miscellaneous</a></li><li><a href="network.html">Networking</a></li><li><a href="optimization.html">Optimization</a></li><li><a href="parsing.html">Parsing</a></li></ul><br><b>Help/Info</b><ul class="tree"><li><a onclick="Toggle(this)" style="cursor: pointer;margin-left:-9px"><img src="plus.gif"><font color="green"><u>Examples: C++</u></font></a><ul style="display:none;"><li><a href="3d_point_cloud_ex.cpp.html">3D_Point_Cloud</a></li><li><a href="assignment_learning_ex.cpp.html">Assignment_Learning</a></li><li><a href="file_to_code_ex.cpp.html">Base64_Encoder</a></li><li><a href="bayes_net_ex.cpp.html">Bayesian_Network</a></li><li><a href="bayes_net_from_disk_ex.cpp.html">Bayesian_Network_From_Disk</a></li><li><a href="bayes_net_gui_ex.cpp.html">Bayesian_Network_GUI</a></li><li><a href="bridge_ex.cpp.html">Bridge</a></li><li><a href="bsp_ex.cpp.html">BSP</a></li><li><a href="svm_c_ex.cpp.html">C-Support_Vector_Machine</a></li><li><a href="compress_stream_ex.cpp.html#_top">Cmd_Line_Parser</a></li><li><a href="compress_stream_ex.cpp.html">Compress_Stream</a></li><li><a href="config_reader_ex.cpp.html">Config_File_Reader</a></li><li><a href="custom_trainer_ex.cpp.html">Custom_Trainers</a></li><li><a href="dir_nav_ex.cpp.html">Directory_Navigation</a></li><li><a href="empirical_kernel_map_ex.cpp.html">Empirical_Kernel_Map</a></li><li><a href="face_detection_ex.cpp.html">Face_Detection</a></li><li><a href="face_landmark_detection_ex.cpp.html">Face_Landmark_Detection</a></li><li><a href="fhog_ex.cpp.html">FHOG_Feature_Extraction</a></li><li><a href="fhog_object_detector_ex.cpp.html">FHOG_Object_Detection</a></li><li><a href="graph_labeling_ex.cpp.html">Graph_Labeling</a></li><li><a href="gui_api_ex.cpp.html">GUI</a></li><li><a href="hough_transform_ex.cpp.html">Hough_Transform</a></li><li><a href="server_http_ex.cpp.html">HTTP_Server</a></li><li><a href="image_ex.cpp.html">Image</a></li><li><a href="iosockstream_ex.cpp.html">IO Socket Streams</a></li><li><a href="server_iostream_ex.cpp.html">IO Streams Server</a></li><li><a href="kcentroid_ex.cpp.html">Kernel_Centroid</a></li><li><a href="kkmeans_ex.cpp.html">Kernel_K-Means_Clustering</a></li><li><a href="krr_regression_ex.cpp.html">Kernel_Ridge_Regression</a></li><li><a href="krls_filter_ex.cpp.html">Kernel_RLS_Filtering</a></li><li><a href="krls_ex.cpp.html">Kernel_RLS_Regression</a></li><li><a href="krr_classification_ex.cpp.html">KRR_Classification</a></li><li><a href="learning_to_track_ex.cpp.html">Learning_to_Track</a></li><li><a href="max_cost_assignment_ex.cpp.html">Linear_Assignment_Problems</a></li><li><a href="linear_manifold_regularizer_ex.cpp.html">Linear_Manifold_Regularizer</a></li><li><a href="mpc_ex.cpp.html">Linear_Model_Predictive_Control</a></li><li><a href="logger_ex.cpp.html">Logger</a></li><li><a href="logger_ex_2.cpp.html">Logger_Advanced</a></li><li><a href="logger_custom_output_ex.cpp.html">Logger_Custom_Output</a></li><li><a href="matrix_ex.cpp.html">Matrix</a></li><li><a href="matrix_expressions_ex.cpp.html">Matrix_Expressions</a></li><li><a href="member_function_pointer_ex.cpp.html">Member_Function_Pointer</a></li><li><a href="model_selection_ex.cpp.html">Model_Selection</a></li><li><a href="multiclass_classification_ex.cpp.html">Multiclass_Classification</a></li><li><a href="multithreaded_object_ex.cpp.html">Multithreaded_Object</a></li><li><a href="mlp_ex.cpp.html">Neural_Network</a></li><li><a href="least_squares_ex.cpp.html">Non-Linear Least Squares</a></li><li><a href="svm_ex.cpp.html">Nu-Support_Vector_Machine</a></li><li><a href="integrate_function_adapt_simp_ex.cpp.html">Numerical_Integration</a></li><li><a href="object_detector_ex.cpp.html">Object_Detector</a></li><li><a href="object_detector_advanced_ex.cpp.html">Object_Detector_Advanced</a></li><li><a href="one_class_classifiers_ex.cpp.html">One_Class_Classifiers</a></li><li><a href="svm_pegasos_ex.cpp.html">Online_SVM</a></li><li><a href="optimization_ex.cpp.html">Optimization</a></li><li><a href="parallel_for_ex.cpp.html">Parallel_For_Loops</a></li><li><a href="pipe_ex.cpp.html">Pipe</a></li><li><a href="pipe_ex_2.cpp.html">Pipe_2</a></li><li><a href="quantum_computing_ex.cpp.html">Quantum_Computing</a></li><li><a href="queue_ex.cpp.html">Queue</a></li><li><a href="rank_features_ex.cpp.html">Rank_Features</a></li><li><a href="rvm_ex.cpp.html">Relevance_Vector_Classification</a></li><li><a href="rvm_regression_ex.cpp.html">Relevance_Vector_Regression</a></li><li><a href="running_stats_ex.cpp.html">Running_Stats</a></li><li><a href="sequence_labeler_ex.cpp.html">Sequence_Labeling</a></li><li><a href="sequence_segmenter_ex.cpp.html">Sequence_Segmentation</a></li><li><a href="sockets_ex.cpp.html">Sockets</a></li><li><a href="sockstreambuf_ex.cpp.html">Sockstreambuf</a></li><li><a href="svm_sparse_ex.cpp.html">Sparse_Vectors</a></li><li><a href="sqlite_ex.cpp.html">SQLite</a></li><li><a href="std_allocator_ex.cpp.html">Std_C++_Allocator</a></li><li><a href="svm_struct_ex.cpp.html">Structural_Support_Vector_Machines</a></li><li><a href="svr_ex.cpp.html">Support_Vector_Regression</a></li><li><a href="surf_ex.cpp.html">SURF</a></li><li><a href="svm_rank_ex.cpp.html">SVM-Rank</a></li><li><a href="threaded_object_ex.cpp.html">Threaded_Object</a></li><li><a href="threads_ex.cpp.html">Threads</a></li><li><a href="thread_function_ex.cpp.html">Thread_Function</a></li><li><a href="thread_pool_ex.cpp.html">Thread_Pool</a></li><li><a href="timer_ex.cpp.html">Timer</a></li><li><a href="train_object_detector.cpp.html">Train_Object_Detector</a></li><li><a href="train_shape_predictor_ex.cpp.html">Train_Shape_Predictor</a></li><li><a href="using_custom_kernels_ex.cpp.html">Using_Custom_Kernels</a></li><li><a href="video_tracking_ex.cpp.html">Video_Object_Tracking</a></li><li><a href="webcam_face_pose_ex.cpp.html">Webcam_Face_Pose_Estimation</a></li><li><a href="xml_parser_ex.cpp.html">XML_Parser</a></li></ul></li><li><a onclick="Toggle(this)" style="cursor: pointer;margin-left:-9px"><img src="plus.gif"><font color="green"><u>Examples: Python</u></font></a><ul style="display:none;"><li><a href="face_detector.py.html">Face_Detector</a></li><li><a href="face_landmark_detection.py.html">Face_Landmark_Detection</a></li><li><a href="find_candidate_object_locations.py.html">find_candidate_object_locations</a></li><li><a href="max_cost_assignment.py.html">Linear_Assignment_Problems</a></li><li><a href="sequence_segmenter.py.html">Sequence_Segmenter</a></li><li><a href="svm_struct.py.html">Structural_Support_Vector_Machines</a></li><li><a href="svm_rank.py.html">SVM-Rank</a></li><li><a href="train_object_detector.py.html">Train_Object_Detector</a></li><li><a href="train_shape_predictor.py.html">Train_Shape_Predictor</a></li><li><a href="correlation_tracker.py.html">Video_Object_Tracking</a></li></ul></li><li><a href="faq.html">FAQ</a></li><li><a href="index.html">Home</a></li><li><a href="compile.html">How to compile</a></li><li><a href="howto_contribute.html">How to contribute</a></li><li><a href="term_index.html">Index</a></li><li><a href="intro.html">Introduction</a></li><li><a href="license.html">License</a></li><li><a href="python/index.html">Python API</a></li><li><a href="books.html">Suggested Books</a></li></ul><br><b>Current Release</b><ul class="tree"><li><a href="change_log.html">Change Log</a></li><li><a href="release_notes.html">Release Notes</a></li><li>Version: 18.16</li></ul><br></td><td width="1"></td></tr><tr><td valign="bottom"><br><br><br><br><br><br><br><br><br>
+      Last Modified:<br>Mar 21, 2015<br><br></td></tr></table></td><td VALIGN="TOP" width="100%" style="border: 1px solid rgb(102,102,102);"><center><h1>Linear Algebra</h1></center><br><br><p>
+            This page documents the core linear algebra tools included in dlib.
+            In particular, the three most important objects in this part of the library are the
+            <a href="#matrix">matrix</a>, <a href="#vector">vector</a>, and 
+            <a href="#rectangle">rectangle</a>.  All the other tools on this page
+            are functions for manipulating these three objects.  A good example and introduction 
+            can be found in
+            the <a href="matrix_ex.cpp.html">matrix example program</a>.
+         </p><p>
+            Most of the linear algebra tools deal with dense matrices.  However, there is also
+            a limited amount of support for working with sparse matrices and vectors.
+            In particular, the dlib tools represent sparse vectors using the containers 
+            in the C++ STL.  For details, see the notes at the top of 
+            <a href="dlib/svm/sparse_vector_abstract.h.html#sparse_vectors">dlib/svm/sparse_vector_abstract.h</a>.
+         </p><p>
+            Finally, note that all the dense matrix tools can be obtained by #including <tt>&lt;dlib/matrix.h&gt;</tt>
+            while the sparse vector tools can be obtained by #including <tt>&lt;dlib/sparse_vector.h&gt;</tt>.  The 
+            geometry tools can be used by #including <tt>&lt;dlib/geometry.h&gt;</tt>.
+         </p></td><td BGCOLOR="#F5F5F5" style="padding:7px; border: 1px solid rgb(102,102,102);" VALIGN="TOP" height="100%"><br><table WIDTH="150" height="100%"><tr><td VALIGN="TOP"><b>Dense Matrix Tools</b><ul class="tree"><li><a onclick="Toggle(this)" style="cursor: pointer;margin-left:-9px"><img src="plus.gif"><font color="green"><u>Basic_Math_Operators</u></font></a><ul style="display:none;"><li><a href="dlib/matrix/matrix_math_functions_abstract.h.html#abs">abs</a></li><li><a href="dlib/matrix/matrix_math_functions_abstract.h.html#acos">acos</a></li><li><a href="dlib/matrix/matrix_math_functions_abstract.h.html#asin">asin</a></li><li><a href="dlib/matrix/matrix_math_functions_abstract.h.html#atan">atan</a></li><li><a href="dlib/matrix/matrix_math_functions_abstract.h.html#ceil">ceil</a></li><li><a href="dlib/matrix/matrix_math_functions_abstract.h.html#complex_matrix">complex_matrix</a></li><li><a href="dlib/matrix/matrix_math_functions_abstract.h.html#conj">conj</a></li><li><a href="dlib/matrix/matrix_math_functions_abstract.h.html#cos">cos</a></li><li><a href="dlib/matrix/matrix_math_functions_abstract.h.html#cosh">cosh</a></li><li><a href="dlib/matrix/matrix_math_functions_abstract.h.html#cubed">cubed</a></li><li><a href="dlib/matrix/matrix_math_functions_abstract.h.html#exp">exp</a></li><li><a href="dlib/matrix/matrix_math_functions_abstract.h.html#floor">floor</a></li><li><a href="dlib/matrix/matrix_math_functions_abstract.h.html#imag">imag</a></li><li><a href="dlib/matrix/matrix_math_functions_abstract.h.html#log10">log10</a></li><li><a href="dlib/matrix/matrix_math_functions_abstract.h.html#log">log</a></li><li><a href="dlib/matrix/matrix_math_functions_abstract.h.html#normalize">normalize</a></li><li><a href="dlib/matrix/matrix_math_functions_abstract.h.html#norm">norm</a></li><li><a href="dlib/matrix/matrix_math_functions_abstract.h.html#pow">pow</a></li><li><a href="dlib/matrix/matrix_math_functions_abstract.h.html#real">real</a></li><li><a href="dlib/matrix/matrix_math_functions_abstract.h.html#reciprocal">reciprocal</a></li><li><a href="dlib/matrix/matrix_math_functions_abstract.h.html#reciprocal_max">reciprocal_max</a></li><li><a href="dlib/matrix/matrix_math_functions_abstract.h.html#round">round</a></li><li><a href="dlib/matrix/matrix_math_functions_abstract.h.html#round_zeros">round_zeros</a></li><li><a href="dlib/matrix/matrix_math_functions_abstract.h.html#sigmoid">sigmoid</a></li><li><a href="dlib/matrix/matrix_math_functions_abstract.h.html#sinh">sinh</a></li><li><a href="dlib/matrix/matrix_math_functions_abstract.h.html#sin">sin</a></li><li><a href="dlib/matrix/matrix_math_functions_abstract.h.html#sqrt">sqrt</a></li><li><a href="dlib/matrix/matrix_math_functions_abstract.h.html#squared">squared</a></li><li><a href="dlib/matrix/matrix_math_functions_abstract.h.html#tanh">tanh</a></li><li><a href="dlib/matrix/matrix_math_functions_abstract.h.html#tan">tan</a></li></ul></li><li><a onclick="Toggle(this)" style="cursor: pointer;margin-left:-9px"><img src="plus.gif"><font color="green"><u>Conversions</u></font></a><ul style="display:none;"><li><a href="#mat">mat</a></li><li><a href="dlib/matrix/matrix_utilities_abstract.h.html#matrix_cast">matrix_cast</a></li><li><a href="dlib/matrix/matrix_utilities_abstract.h.html#pixel_to_vector">pixel_to_vector</a></li><li><a href="dlib/matrix/matrix_utilities_abstract.h.html#vector_to_pixel">vector_to_pixel</a></li></ul></li><li><a onclick="Toggle(this)" style="cursor: pointer;margin-left:-9px"><img src="plus.gif"><font color="green"><u>Linear_Algebra</u></font></a><ul style="display:none;"><li><a href="dlib/matrix/matrix_la_abstract.h.html#chol">chol</a></li><li><a href="dlib/matrix/matrix_la_abstract.h.html#cholesky_decomposition">cholesky_decomposition</a></li><li><a href="dlib/matrix/matrix_la_abstract.h.html#det">det</a></li><li><a href="dlib/matrix/matrix_utilities_abstract.h.html#diag">diag</a></li><li><a href="dlib/matrix/matrix_utilities_abstract.h.html#diagm">diagm</a></li><li><a href="dlib/matrix/matrix_utilities_abstract.h.html#dot">dot</a></li><li><a href="dlib/matrix/matrix_la_abstract.h.html#eigenvalue_decomposition">eigenvalue_decomposition</a></li><li><a href="dlib/matrix/matrix_la_abstract.h.html#inv">inv</a></li><li><a href="dlib/matrix/matrix_la_abstract.h.html#inv_lower_triangular">inv_lower_triangular</a></li><li><a href="dlib/matrix/matrix_la_abstract.h.html#inv_upper_triangular">inv_upper_triangular</a></li><li><a href="dlib/matrix/matrix_utilities_abstract.h.html#length">length</a></li><li><a href="dlib/matrix/matrix_utilities_abstract.h.html#length_squared">length_squared</a></li><li><a href="dlib/matrix/matrix_utilities_abstract.h.html#lowerm">lowerm</a></li><li><a href="dlib/matrix/matrix_la_abstract.h.html#lu_decomposition">lu_decomposition</a></li><li><a href="dlib/matrix/matrix_la_abstract.h.html#orthogonalize">orthogonalize</a></li><li><a href="dlib/matrix/matrix_la_abstract.h.html#pinv">pinv</a></li><li><a href="dlib/matrix/matrix_la_abstract.h.html#qr_decomposition">qr_decomposition</a></li><li><a href="dlib/matrix/matrix_la_abstract.h.html#real_eigenvalues">real_eigenvalues</a></li><li><a href="dlib/matrix/matrix_la_abstract.h.html#svd2">svd2</a></li><li><a href="dlib/matrix/matrix_la_abstract.h.html#svd3">svd3</a></li><li><a href="dlib/matrix/matrix_la_abstract.h.html#svd">svd</a></li><li><a href="dlib/matrix/matrix_la_abstract.h.html#svd_fast">svd_fast</a></li><li><a href="dlib/matrix/matrix_la_abstract.h.html#trace">trace</a></li><li><a href="dlib/matrix/matrix_utilities_abstract.h.html#trans">trans</a></li><li><a href="dlib/matrix/matrix_utilities_abstract.h.html#upperm">upperm</a></li></ul></li><li><a href="#matrix">matrix</a></li><li><a onclick="Toggle(this)" style="cursor: pointer;margin-left:-9px"><img src="plus.gif"><font color="green"><u>Other_Utilities</u></font></a><ul style="display:none;"><li><a href="dlib/matrix/matrix_utilities_abstract.h.html#cartesian_product">cartesian_product</a></li><li><a href="dlib/matrix/matrix_utilities_abstract.h.html#clamp">clamp</a></li><li><a href="dlib/matrix/matrix_abstract.h.html#const_temp_matrix">const_temp_matrix</a></li><li><a href="dlib/matrix/matrix_conv_abstract.h.html#conv">conv</a></li><li><a href="dlib/matrix/matrix_conv_abstract.h.html#conv_same">conv_same</a></li><li><a href="dlib/matrix/matrix_conv_abstract.h.html#conv_valid">conv_valid</a></li><li><a href="dlib/matrix/matrix_utilities_abstract.h.html#equal">equal</a></li><li><a href="dlib/matrix/matrix_fft_abstract.h.html#fft">fft</a></li><li><a href="dlib/matrix/matrix_utilities_abstract.h.html#flip">flip</a></li><li><a href="dlib/matrix/matrix_utilities_abstract.h.html#fliplr">fliplr</a></li><li><a href="dlib/matrix/matrix_utilities_abstract.h.html#flipud">flipud</a></li><li><a href="dlib/matrix/matrix_utilities_abstract.h.html#hash">hash</a></li><li><a href="dlib/matrix/matrix_utilities_abstract.h.html#identity_matrix">identity_matrix</a></li><li><a href="dlib/matrix/matrix_fft_abstract.h.html#ifft">ifft</a></li><li><a href="dlib/matrix/matrix_utilities_abstract.h.html#is_col_vector">is_col_vector</a></li><li><a href="dlib/matrix/matrix_utilities_abstract.h.html#is_finite">is_finite</a></li><li><a href="dlib/matrix/matrix_utilities_abstract.h.html#is_row_vector">is_row_vector</a></li><li><a href="dlib/matrix/matrix_utilities_abstract.h.html#is_vector">is_vector</a></li><li><a href="dlib/matrix/matrix_utilities_abstract.h.html#join_cols">join_cols</a></li><li><a href="dlib/matrix/matrix_utilities_abstract.h.html#join_rows">join_rows</a></li><li><a href="dlib/matrix/matrix_utilities_abstract.h.html#linpiece">linpiece</a></li><li><a href="dlib/matrix/matrix_utilities_abstract.h.html#linspace">linspace</a></li><li><a href="dlib/matrix/matrix_utilities_abstract.h.html#logspace">logspace</a></li><li><a href="dlib/matrix/matrix_utilities_abstract.h.html#lowerbound">lowerbound</a></li><li><a href="dlib/matrix/matrix_utilities_abstract.h.html#make_symmetric">make_symmetric</a></li><li><a href="dlib/matrix/matrix_utilities_abstract.h.html#ones_matrix">ones_matrix</a></li><li><a href="dlib/matrix/matrix_utilities_abstract.h.html#pointwise_multiply">pointwise_multiply</a></li><li><a href="dlib/matrix/matrix_utilities_abstract.h.html#removerc">removerc</a></li><li><a href="dlib/matrix/matrix_utilities_abstract.h.html#remove_col">remove_col</a></li><li><a href="dlib/matrix/matrix_utilities_abstract.h.html#remove_row">remove_row</a></li><li><a href="dlib/matrix/matrix_utilities_abstract.h.html#reshape">reshape</a></li><li><a href="dlib/matrix/matrix_utilities_abstract.h.html#reshape_to_column_vector">reshape_to_column_vector</a></li><li><a href="dlib/matrix/matrix_utilities_abstract.h.html#rotate">rotate</a></li><li><a href="dlib/matrix/matrix_utilities_abstract.h.html#rsort_columns">rsort_columns</a></li><li><a href="dlib/matrix/matrix_utilities_abstract.h.html#scale_columns">scale_columns</a></li><li><a href="dlib/matrix/matrix_utilities_abstract.h.html#scale_rows">scale_rows</a></li><li><a href="dlib/matrix/matrix_utilities_abstract.h.html#set_all_elements">set_all_elements</a></li><li><a href="dlib/matrix/matrix_utilities_abstract.h.html#sort_columns">sort_columns</a></li><li><a href="dlib/matrix/symmetric_matrix_cache_abstract.h.html">symmetric_matrix_cache</a></li><li><a href="dlib/matrix/matrix_utilities_abstract.h.html#tensor_product">tensor_product</a></li><li><a href="dlib/matrix/matrix_utilities_abstract.h.html#tmp">tmp</a></li><li><a href="dlib/matrix/matrix_utilities_abstract.h.html#uniform_matrix">uniform_matrix</a></li><li><a href="dlib/matrix/matrix_utilities_abstract.h.html#upperbound">upperbound</a></li><li><a href="dlib/matrix/matrix_conv_abstract.h.html#xcorr">xcorr</a></li><li><a href="dlib/matrix/matrix_conv_abstract.h.html#xcorr_same">xcorr_same</a></li><li><a href="dlib/matrix/matrix_conv_abstract.h.html#xcorr_valid">xcorr_valid</a></li><li><a href="dlib/matrix/matrix_utilities_abstract.h.html#zeros_matrix">zeros_matrix</a></li></ul></li><li><a onclick="Toggle(this)" style="cursor: pointer;margin-left:-9px"><img src="plus.gif"><font color="green"><u>Statistics</u></font></a><ul style="display:none;"><li><a href="dlib/matrix/matrix_utilities_abstract.h.html#covariance">covariance</a></li><li><a href="dlib/matrix/matrix_utilities_abstract.h.html#find_min_and_max">find_min_and_max</a></li><li><a href="dlib/matrix/matrix_utilities_abstract.h.html#gaussian_randm">gaussian_randm</a></li><li><a href="dlib/matrix/matrix_utilities_abstract.h.html#index_of_max">index_of_max</a></li><li><a href="dlib/matrix/matrix_utilities_abstract.h.html#index_of_min">index_of_min</a></li><li><a href="dlib/matrix/matrix_utilities_abstract.h.html#max">max</a></li><li><a href="dlib/matrix/matrix_utilities_abstract.h.html#max_point">max_point</a></li><li><a href="dlib/matrix/matrix_utilities_abstract.h.html#max_point_interpolated">max_point_interpolated</a></li><li><a href="dlib/matrix/matrix_utilities_abstract.h.html#mean">mean</a></li><li><a href="dlib/matrix/matrix_utilities_abstract.h.html#min">min</a></li><li><a href="dlib/matrix/matrix_utilities_abstract.h.html#min_point">min_point</a></li><li><a href="dlib/matrix/matrix_utilities_abstract.h.html#prod">prod</a></li><li><a href="dlib/matrix/matrix_utilities_abstract.h.html#randm">randm</a></li><li><a href="dlib/matrix/matrix_utilities_abstract.h.html#stddev">stddev</a></li><li><a href="dlib/matrix/matrix_utilities_abstract.h.html#sum">sum</a></li><li><a href="dlib/matrix/matrix_utilities_abstract.h.html#sum_cols">sum_cols</a></li><li><a href="dlib/matrix/matrix_utilities_abstract.h.html#sum_rows">sum_rows</a></li><li><a href="dlib/matrix/matrix_utilities_abstract.h.html#variance">variance</a></li></ul></li><li><a onclick="Toggle(this)" style="cursor: pointer;margin-left:-9px"><img src="plus.gif"><font color="green"><u>Sub_Matrix_Expressions</u></font></a><ul style="display:none;"><li><a href="dlib/matrix/matrix_subexp_abstract.h.html#colm">colm</a></li><li><a href="dlib/matrix/matrix_subexp_abstract.h.html#range">range</a></li><li><a href="dlib/matrix/matrix_subexp_abstract.h.html#rowm">rowm</a></li><li><a href="dlib/matrix/matrix_subexp_abstract.h.html#set_colm">set_colm</a></li><li><a href="dlib/matrix/matrix_subexp_abstract.h.html#set_rowm">set_rowm</a></li><li><a href="dlib/matrix/matrix_subexp_abstract.h.html#set_subm">set_subm</a></li><li><a href="dlib/matrix/matrix_subexp_abstract.h.html#subm">subm</a></li></ul></li></ul><br><b>2D/3D Geometry</b><ul class="tree"><li><a href="#border_enumerator">border_enumerator</a></li><li><a href="#camera_transform">camera_transform</a></li><li><a href="#center">center</a></li><li><a href="#centered_rect">centered_rect</a></li><li><a href="#clip_line_to_rectangle">clip_line_to_rectangle</a></li><li><a href="#dcenter">dcenter</a></li><li><a href="#distance_to_line">distance_to_line</a></li><li><a href="#distance_to_rect_edge">distance_to_rect_edge</a></li><li><a href="#drectangle">drectangle</a></li><li><a href="#find_affine_transform">find_affine_transform</a></li><li><a href="#find_projective_transform">find_projective_transform</a></li><li><a href="#find_similarity_transform">find_similarity_transform</a></li><li><a href="#get_rect">get_rect</a></li><li><a href="#grow_rect">grow_rect</a></li><li><a href="#move_rect">move_rect</a></li><li><a href="#nearest_point">nearest_point</a></li><li><a href="#point">point</a></li><li><a href="#point_rotator">point_rotator</a></li><li><a href="#point_transform">point_transform</a></li><li><a href="#point_transform_affine">point_transform_affine</a></li><li><a href="#point_transform_affine3d">point_transform_affine3d</a></li><li><a href="#point_transform_projective">point_transform_projective</a></li><li><a href="#rectangle">rectangle</a></li><li><a href="#resize_rect">resize_rect</a></li><li><a href="#resize_rect_height">resize_rect_height</a></li><li><a href="#resize_rect_width">resize_rect_width</a></li><li><a href="#rotate_around_x">rotate_around_x</a></li><li><a href="#rotate_around_y">rotate_around_y</a></li><li><a href="#rotate_around_z">rotate_around_z</a></li><li><a href="#rotate_point">rotate_point</a></li><li><a href="#rotation_matrix">rotation_matrix</a></li><li><a href="#set_aspect_ratio">set_aspect_ratio</a></li><li><a href="#shrink_rect">shrink_rect</a></li><li><a href="#translate_point">translate_point</a></li><li><a href="#translate_rect">translate_rect</a></li><li><a href="#vector">vector</a></li></ul><br><b>Sparse Vector Tools</b><ul class="tree"><li><a href="dlib/svm/sparse_vector_abstract.h.html#add">add</a></li><li><a href="dlib/svm/sparse_vector_abstract.h.html#add_to">add_to</a></li><li><a href="dlib/svm/sparse_vector_abstract.h.html#assign">assign</a></li><li><a href="dlib/svm/sparse_vector_abstract.h.html#distance">distance</a></li><li><a href="dlib/svm/sparse_vector_abstract.h.html#distance_squared">distance_squared</a></li><li><a href="dlib/svm/sparse_vector_abstract.h.html#dot">dot</a></li><li><a href="dlib/svm/sparse_vector_abstract.h.html#length">length</a></li><li><a href="dlib/svm/sparse_vector_abstract.h.html#length_squared">length_squared</a></li><li><a href="dlib/svm/sparse_vector_abstract.h.html#make_sparse_vector">make_sparse_vector</a></li><li><a href="dlib/svm/sparse_vector_abstract.h.html#make_sparse_vector_inplace">make_sparse_vector_inplace</a></li><li><a href="dlib/svm/sparse_vector_abstract.h.html#max">max</a></li><li><a href="dlib/svm/sparse_vector_abstract.h.html#max_index_plus_one">max_index_plus_one</a></li><li><a href="dlib/svm/sparse_vector_abstract.h.html#min">min</a></li><li><a href="dlib/svm/sparse_vector_abstract.h.html#scale_by">scale_by</a></li><li><a href="dlib/svm/sparse_vector_abstract.h.html#sparse_matrix_vector_multiply">sparse_matrix_vector_multiply</a></li><li><a href="#sparse_to_dense">sparse_to_dense</a></li><li><a href="dlib/svm/sparse_vector_abstract.h.html#subtract">subtract</a></li><li><a href="dlib/svm/sparse_vector_abstract.h.html#subtract_from">subtract_from</a></li></ul><br></td><td width="1"></td></tr><tr><td valign="bottom"></td></tr></table></td></tr></table><a name="border_enumerator"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">border_enumerator</h1><BR><BR>
+            This object is an <a href="containers.html#enumerable">enumerator</a> 
+            over the border <a href="#point">points</a> of a 
+            <a href="#rectangle">rectangle</a>.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/geometry.h&gt;</tt></font></B><BR><b><a href="dlib/geometry/border_enumerator_abstract.h.html"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="camera_transform"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">camera_transform</h1><BR><BR>        
+            This object maps 3D <a href="#vector">points</a> into the image plane of a camera.  Therefore,
+            you can use it to compute 2D representations of 3D data from the point of
+            view of some camera in 3D space.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/geometry.h&gt;</tt></font></B><BR><b><a href="dlib/geometry/point_transforms_abstract.h.html#camera_transform"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="center"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">center</h1><BR><BR>        
+            Returns the center point of a <a href="#rectangle">rectangle</a>.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/geometry.h&gt;</tt></font></B><BR><b><a href="dlib/geometry/rectangle_abstract.h.html#center"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="centered_rect"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">centered_rect</h1><BR><BR>        
+            There are various overloads of this function but the basic idea is
+            that it returns a <a href="#rectangle">rectangle</a> with a given 
+            width and height and centered about a given point.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/geometry.h&gt;</tt></font></B><BR><b><a href="dlib/geometry/rectangle_abstract.h.html#centered_rect"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="clip_line_to_rectangle"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">clip_line_to_rectangle</h1><BR><BR>        
+            This function takes a <a href="#rectangle">rectangle</a> and a line segment and
+            returns the part of the line segment that is entirely contained within the
+            rectangle.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/geometry.h&gt;</tt></font></B><BR><b><a href="dlib/geometry/rectangle_abstract.h.html#clip_line_to_rectangle"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="dcenter"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">dcenter</h1><BR><BR>        
+            Returns the center point of a <a href="#rectangle">rectangle</a>.  This
+            is a version of <a href="#center">center()</a> which returns a double version 
+            of the point rather than one which uses integers to represent the 
+            result.  Therefore, it is slightly more accurate.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/geometry.h&gt;</tt></font></B><BR><b><a href="dlib/geometry/rectangle_abstract.h.html#dcenter"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="distance_to_line"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">distance_to_line</h1><BR><BR>        
+            This function takes a line and a <a href="#point">point</a>
+            and returns the distance from the line to the point.  
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/geometry.h&gt;</tt></font></B><BR><b><a href="dlib/geometry/rectangle_abstract.h.html#distance_to_line"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="distance_to_rect_edge"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">distance_to_rect_edge</h1><BR><BR>        
+            This function takes a <a href="#rectangle">rectangle</a> and a 
+            <a href="#point">point</a> and returns the Manhattan distance between
+            the rectangle's edge and the point.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/geometry.h&gt;</tt></font></B><BR><b><a href="dlib/geometry/rectangle_abstract.h.html#distance_to_rect_edge"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="drectangle"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">drectangle</h1><BR><BR>
+            This object represents a rectangular region inside a Cartesian 
+            coordinate system.  It is very similar to the <a href="#rectangle">rectangle</a>
+            except that it uses double variables instead of longs to represent the location of the rectangle.
+            Therefore, it can position rectangles with sub-pixel accuracy.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/geometry.h&gt;</tt></font></B><BR><b><a href="dlib/geometry/drectangle_abstract.h.html"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="find_affine_transform"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">find_affine_transform</h1><BR><BR>        
+            This is a routine that takes in two sets of points and finds the
+            best <a href="#point_transform_affine">affine transformation</a>
+            that maps between them.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/geometry.h&gt;</tt></font></B><BR><b><a href="dlib/geometry/point_transforms_abstract.h.html#find_affine_transform"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="find_projective_transform"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">find_projective_transform</h1><BR><BR>        
+            This is a routine that takes in two sets of points and finds the
+            best <a href="#point_transform_projective">projective transformation</a>
+            that maps between them.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/geometry.h&gt;</tt></font></B><BR><b><a href="dlib/geometry/point_transforms_abstract.h.html#find_projective_transform"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="find_similarity_transform"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">find_similarity_transform</h1><BR><BR>        
+            This is a routine that takes in two sets of points and finds the
+            best <a href="#point_transform_affine">affine transformation</a>
+            that maps between them.  However, it considers only rotations, translations,
+            and uniform scale changes in finding the mapping.  Therefore, it finds
+            a similarity transformation rather than a general affine transform.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/geometry.h&gt;</tt></font></B><BR><b><a href="dlib/geometry/point_transforms_abstract.h.html#find_similarity_transform"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="get_rect"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">get_rect</h1><BR><BR>        
+            This is a simple template function that returns a rectangle 
+            representing the size of a 2D container (e.g. <a href="containers.html#matrix">matrix</a> or
+            <a href="containers.html#array2d">array2d</a>). 
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/geometry.h&gt;</tt></font></B><BR><b><a href="dlib/geometry/rectangle_abstract.h.html#get_rect"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="grow_rect"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">grow_rect</h1><BR><BR>        
+            This function takes a <a href="#rectangle">rectangle</a> object, 
+            grows its borders by a given amount, and returns the result.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/geometry.h&gt;</tt></font></B><BR><b><a href="dlib/geometry/rectangle_abstract.h.html#grow_rect"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="mat"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">mat</h1><BR><BR>
+            This is a set of simple functions that take objects like std::vector or
+            <a href="containers.html#array2d">array2d</a> and convert them into 
+            <a href="#matrix">matrix</a> objects.  Note that the conversion is 
+            done using template expressions so there is no runtime cost associated
+            with calling mat().
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/matrix.h&gt;</tt></font></B><BR><b><a href="dlib/matrix/matrix_mat_abstract.h.html#mat"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="matrix"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">matrix</h1><BR><BR>
+           This is a 2D matrix object that enables you to write code that deals with
+           matrices using a simple syntax similar to what can be written in MATLAB.  It is implemented using 
+           the <a href="matrix_expressions_ex.cpp.html">expression templates</a> technique which allows it to eliminate the 
+           temporary matrix objects that would normally be returned from expressions 
+           such as M = A+B+C+D;  Normally each invocation of the + operator would 
+           construct and return a temporary matrix object but using this technique 
+           we can avoid creating all these temporary objects and receive a large speed boost.
+           <p>
+           This object is also capable of using BLAS and LAPACK libraries such as ATLAS or the Intel
+           MKL when available.   To enable BLAS support all you have to do is #define 
+           DLIB_USE_BLAS and then make sure you link your application with your 
+           BLAS library.  Similarly, to enable LAPACK support just #define DLIB_USE_LAPACK and 
+           link to your LAPACK library.  Finally, the use of BLAS and LAPACK is transparent to 
+           the user, that is, the dlib matrix object uses BLAS and LAPACK internally to optimize 
+           various operations while still allowing the user to use a simple MATLAB like syntax.  
+           </p><p>
+           Note that the cmake files that come with dlib will automatically link with ATLAS or the Intel
+           MKL if they are installed.  So using cmake makes this easy, but by no means are you required 
+           to use cmake or the dlib cmake files. 
+           </p><p>
+              It is also worth noting that all the preconditions of every function 
+              related to the matrix object are checked by <a href="metaprogramming.html#DLIB_ASSERT">DLIB_ASSERT</a>
+              statements and thus can be enabled by #defining ENABLE_ASSERTS or DEBUG.  Doing
+              this will cause your program to run slower but should catch any usage errors. 
+           </p><BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/matrix.h&gt;</tt></font></B><BR><b><a href="dlib/matrix/matrix_abstract.h.html#matrix"><font style="font-size:1.4em">Detailed Documentation</font></a></b><BR>C++ Example Programs: <a href="matrix_ex.cpp.html">matrix_ex.cpp</a>,
+               <a href="matrix_expressions_ex.cpp.html">matrix_expressions_ex.cpp</a><br><br><br><center><h1>Extensions to matrix</h1></center><div class="extension"><a name="matrix_la"><B><font size="5">matrix_la</font></B></a><Br><BR>
+                  This extension contains linear algebra functions to calculate 
+                  QR, LU, Cholesky, eigenvalue, and singular value decompositions.  It also
+                  contains a few other miscellaneous functions that solve systems of 
+                  equations or calculate values derived from the above decompositions.
+               <BR><BR><b><a href="dlib/matrix/matrix_la_abstract.h.html"><font style="font-size:1.4em">Detailed Documentation</font></a></b></div><div class="extension"><a name="matrix_math_functions"><B><font size="5">matrix_math_functions</font></B></a><Br><BR>This extension contains mathematical functions that operate on each
+                  element of a matrix independently.  
+               <BR><BR><b><a href="dlib/matrix/matrix_math_functions_abstract.h.html"><font style="font-size:1.4em">Detailed Documentation</font></a></b></div><div class="extension"><a name="matrix_sub_expressions"><B><font size="5">matrix_sub_expressions</font></B></a><Br><BR>
+                  This extension contains a number of functions for dealing with sub-matrices.  
+               <BR><BR><b><a href="dlib/matrix/matrix_subexp_abstract.h.html"><font style="font-size:1.4em">Detailed Documentation</font></a></b></div><div class="extension"><a name="matrix_utilities"><B><font size="5">matrix_utilities</font></B></a><Br><BR>
+                  This extension contains miscellaneous utility functions
+                  for manipulating matrix objects.  
+               <BR><BR><b><a href="dlib/matrix/matrix_utilities_abstract.h.html"><font style="font-size:1.4em">Detailed Documentation</font></a></b></div><center></center></div></a><a name="move_rect"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">move_rect</h1><BR><BR>        
+            This function takes a <a href="#rectangle">rectangle</a> and moves
+            it so that it's upper left corner occupies the given location.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/geometry.h&gt;</tt></font></B><BR><b><a href="dlib/geometry/rectangle_abstract.h.html#move_rect"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="nearest_point"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">nearest_point</h1><BR><BR>        
+            This function takes a <a href="#rectangle">rectangle</a> and a 
+            <a href="#point">point</a> and returns the point in the given 
+            rectangle that is nearest to the given point.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/geometry.h&gt;</tt></font></B><BR><b><a href="dlib/geometry/rectangle_abstract.h.html#nearest_point"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="point"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">point</h1><BR><BR>
+               This object represents a point inside a Cartesian coordinate system.
+               Note that a point is simply a typedef for a <a href="#vector">vector</a>
+               that is 2D and uses longs to represent coordinate values.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/geometry.h&gt;</tt></font></B><BR><b><a href="dlib/geometry/vector_abstract.h.html#point"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="point_rotator"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">point_rotator</h1><BR><BR>        
+            This is an object that rotates a 2D <a href="#vector">vector</a> or 
+            <a href="#point">point</a> object about the origin.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/geometry.h&gt;</tt></font></B><BR><b><a href="dlib/geometry/point_transforms_abstract.h.html#point_rotator"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="point_transform"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">point_transform</h1><BR><BR>        
+            This is an object that rotates a 2D <a href="#vector">vector</a> or 
+            <a href="#point">point</a> object about the origin and then adds a 
+            displacement vector.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/geometry.h&gt;</tt></font></B><BR><b><a href="dlib/geometry/point_transforms_abstract.h.html#point_transform"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="point_transform_affine"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">point_transform_affine</h1><BR><BR>        
+            This is an object that applies a 2D affine transformation to a <a href="#vector">vector</a> or 
+            <a href="#point">point</a>.  Note that you can use <a href="#find_affine_transform">find_affine_transform</a>
+            to easily create affine transforms from sets of point correspondences.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/geometry.h&gt;</tt></font></B><BR><b><a href="dlib/geometry/point_transforms_abstract.h.html#point_transform_affine"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="point_transform_affine3d"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">point_transform_affine3d</h1><BR><BR>        
+            This is an object that applies a 3D affine transformation to a <a href="#vector">vector</a>.  
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/geometry.h&gt;</tt></font></B><BR><b><a href="dlib/geometry/point_transforms_abstract.h.html#point_transform_affine3d"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="point_transform_projective"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">point_transform_projective</h1><BR><BR>        
+            This is an object that applies a projective transformation to a <a href="#vector">vector</a> or 
+            <a href="#point">point</a>.  Note that you can use <a href="#find_projective_transform">find_projective_transform</a>
+            to easily create projective transforms from sets of point correspondences.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/geometry.h&gt;</tt></font></B><BR><b><a href="dlib/geometry/point_transforms_abstract.h.html#point_transform_projective"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="rectangle"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">rectangle</h1><BR><BR>
+            This object represents a rectangular region inside a Cartesian 
+            coordinate system.  It allows you to easily represent and manipulate
+            rectangles.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/geometry.h&gt;</tt></font></B><BR><b><a href="dlib/geometry/rectangle_abstract.h.html"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="resize_rect"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">resize_rect</h1><BR><BR>        
+            This function takes a <a href="#rectangle">rectangle</a> and 
+            returns a new rectangle with the given size but with the same upper
+            left corner as the original rectangle.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/geometry.h&gt;</tt></font></B><BR><b><a href="dlib/geometry/rectangle_abstract.h.html#resize_rect"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="resize_rect_height"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">resize_rect_height</h1><BR><BR>        
+            This function takes a <a href="#rectangle">rectangle</a> and 
+            returns a new rectangle with the given height but otherwise with the 
+            same edge points as the original rectangle. 
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/geometry.h&gt;</tt></font></B><BR><b><a href="dlib/geometry/rectangle_abstract.h.html#resize_rect_height"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="resize_rect_width"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">resize_rect_width</h1><BR><BR>        
+            This function takes a <a href="#rectangle">rectangle</a> and 
+            returns a new rectangle with the given width but otherwise with the 
+            same edge points as the original rectangle. 
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/geometry.h&gt;</tt></font></B><BR><b><a href="dlib/geometry/rectangle_abstract.h.html#resize_rect_width"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="rotate_around_x"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">rotate_around_x</h1><BR><BR>        
+            This is a method for creating a <a href="#point_transform_affine3d">point_transform_affine3d</a>
+            that rotates points around the x-axis.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/geometry.h&gt;</tt></font></B><BR><b><a href="dlib/geometry/point_transforms_abstract.h.html#rotate_around_x"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="rotate_around_y"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">rotate_around_y</h1><BR><BR>        
+            This is a method for creating a <a href="#point_transform_affine3d">point_transform_affine3d</a>
+            that rotates points around the y-axis.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/geometry.h&gt;</tt></font></B><BR><b><a href="dlib/geometry/point_transforms_abstract.h.html#rotate_around_y"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="rotate_around_z"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">rotate_around_z</h1><BR><BR>        
+            This is a method for creating a <a href="#point_transform_affine3d">point_transform_affine3d</a>
+            that rotates points around the z-axis.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/geometry.h&gt;</tt></font></B><BR><b><a href="dlib/geometry/point_transforms_abstract.h.html#rotate_around_z"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="rotate_point"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">rotate_point</h1><BR><BR>        
+            This is a function that rotates a 2D <a href="#vector">vector</a> or 
+            <a href="#point">point</a> object about a given point.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/geometry.h&gt;</tt></font></B><BR><b><a href="dlib/geometry/point_transforms_abstract.h.html#rotate_point"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="rotation_matrix"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">rotation_matrix</h1><BR><BR>        
+            This is a method for creating 2D rotation matrices.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/geometry.h&gt;</tt></font></B><BR><b><a href="dlib/geometry/point_transforms_abstract.h.html#rotation_matrix"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="set_aspect_ratio"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">set_aspect_ratio</h1><BR><BR>        
+            This function reshapes a <a href="#rectangle">rectangle</a> so that
+            it has a user specified aspect ratio.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/geometry.h&gt;</tt></font></B><BR><b><a href="dlib/geometry/rectangle_abstract.h.html#set_aspect_ratio"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="shrink_rect"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">shrink_rect</h1><BR><BR>        
+            This function takes a <a href="#rectangle">rectangle</a> object, 
+            shrinks its borders by a given amount, and returns the result.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/geometry.h&gt;</tt></font></B><BR><b><a href="dlib/geometry/rectangle_abstract.h.html#shrink_rect"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="sparse_to_dense"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">sparse_to_dense</h1><BR><BR>
+            This is a set of simple functions that take  
+            <a href="dlib/svm/sparse_vector_abstract.h.html#sparse_vectors">sparse vectors</a> 
+            and converts them into equivalent dense vectors.  
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/sparse_vector.h&gt;</tt></font></B><BR><b><a href="dlib/svm/sparse_vector_abstract.h.html#sparse_to_dense"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="translate_point"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">translate_point</h1><BR><BR>        
+            This is a method for creating a <a href="#point_transform_affine3d">point_transform_affine3d</a>
+            that just translates points. 
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/geometry.h&gt;</tt></font></B><BR><b><a href="dlib/geometry/point_transforms_abstract.h.html#translate_point"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="translate_rect"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">translate_rect</h1><BR><BR>        
+            This function takes a <a href="#rectangle">rectangle</a> and moves
+            it by a given number of units along the x and y axis relative to
+            where it was before the move.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/geometry.h&gt;</tt></font></B><BR><b><a href="dlib/geometry/rectangle_abstract.h.html#translate_rect"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a><a name="vector"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">vector</h1><BR><BR>
+            This object represents a two or three dimensional vector.  
+
+            <p>If you
+            want to work with general N-dimensional column vectors then you
+            should the <a href="#matrix">matrix</a> object.  In particular, you
+            should usually use a matrix with this type:
+            <tt>dlib::matrix&lt;double,0,1&gt;</tt>.</p><BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/geometry.h&gt;</tt></font></B><BR><b><a href="dlib/geometry/vector_abstract.h.html#vector"><font style="font-size:1.4em">Detailed Documentation</font></a></b><br><br><center></center></div></a></div></body></html>

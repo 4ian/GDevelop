@@ -1,0 +1,481 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html xmlns:gcse="googleCustomSearch"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><link rel="shortcut icon" href="dlib-icon.ico"><meta name="verify-v1" content="02MiiaFNVzS5/u0eQhsy3/knioFHsia1X3DXRpHkE6I="><meta name="google-site-verification" content="DGSSJMKDomaDaDTIRJ8jDkv0YMx9Cz7OESbXHjjr6Jw"><title>dlib C++ Library
+   - Data Compression</title><script language="JavaScript">
+
+// ---------------------------------------------
+// --- Name:    Easy DHTML Treeview           --
+// --- Author:  D.D. de Kerf                  --
+// --- Version: 0.2          Date: 13-6-2001  --
+// ---------------------------------------------
+function Toggle(node)
+{
+   // Unfold the branch if it isn't visible
+   var next_node = node.nextSibling;
+   if (next_node.style.display == 'none')
+   {
+      // Change the image (if there is an image)
+      if (node.childNodes.length > 0)
+      {
+         if (node.childNodes.length > 0)
+         { 
+            if (node.childNodes.item(0).nodeName == "IMG")
+            {
+               node.childNodes.item(0).src = "minus.gif";
+            }
+         }
+      }
+
+      next_node.style.display = 'block';
+   }
+   // Collapse the branch if it IS visible
+   else
+   {
+      // Change the image (if there is an image)
+      if (node.childNodes.length > 0)
+      {
+         if (node.childNodes.length > 0)
+         { 
+            if (node.childNodes.item(0).nodeName == "IMG")
+            {
+               node.childNodes.item(0).src = "plus.gif";
+            }
+         }
+      }
+
+      next_node.style.display = 'none';
+   }
+
+}
+function BigToggle(node)
+{
+   // Unfold the branch if it isn't visible
+   var next_node = node.nextSibling;
+   if (next_node.style.display == 'none')
+   {
+      // Change the image (if there is an image)
+      if (node.childNodes.length > 0)
+      {
+         if (node.childNodes.length > 0)
+         { 
+            if (node.childNodes.item(0).nodeName == "IMG")
+            {
+               node.childNodes.item(0).src = "bigminus.gif";
+            }
+         }
+      }
+
+      next_node.style.display = 'block';
+   }
+   // Collapse the branch if it IS visible
+   else
+   {
+      // Change the image (if there is an image)
+      if (node.childNodes.length > 0)
+      {
+         if (node.childNodes.length > 0)
+         { 
+            if (node.childNodes.item(0).nodeName == "IMG")
+            {
+               node.childNodes.item(0).src = "bigplus.gif";
+            }
+         }
+      }
+
+      next_node.style.display = 'none';
+   }
+
+}
+</script><style type="text/css">
+   body {margin:0px;}
+   pre {margin:0px;}
+
+   ul.tree  li { list-style: none;  margin-left:10px;} 
+   ul.tree  { margin:0px; padding:0px; margin-left:5px; font-size:0.95em; }
+   ul.tree  li ul { margin-left:10px; padding:0px; }
+
+   li#term { list-style: none; }
+
+   div.component {
+      background-color:white; 
+      border: 2px solid rgb(102,102,102); 
+      text-align:left;
+      margin-top: 1.5em;
+      padding: 0.7em;
+   }
+
+   div.question {
+      background-color:white; 
+      border: 2px solid rgb(102,102,102); 
+      text-align:left;
+      margin-top: 1.5em;
+      margin-bottom: 90%;
+      padding: 0.7em;
+   }
+
+   div.function {
+      background-color:white; 
+      border: 2px solid rgb(102,102,255); 
+      text-align:left;
+      margin-top: 0.3em;
+      padding: 0.3em;
+   }
+
+   div.class {
+      background-color:white; 
+      border: 2px solid rgb(255,102,102); 
+      text-align:left;
+      margin-top: 0.3em;
+      padding: 0.3em;
+   }
+
+   div.extension {
+      background-color:#FDFDFD; 
+      border: 1px solid rgb(102,102,102); 
+      text-align:left;
+      margin-top: 1.0em;
+      padding: 0.7em;
+   }
+
+   div.logb {
+      text-align:left;
+      padding: 0.0em;
+      float: left;
+      background-color:#c0c0c0; 
+      border: double ; 
+      margin: 0.5em;
+   }
+
+   div.name {
+      float: left;
+   }
+   div.line1 {
+      float:left;
+      width:100%;
+      background-color:#dfdfdf; 
+   }
+   div.line2 {
+      float:left;
+      width:100%;
+   }
+   div.inc {
+      float: right;
+   }
+
+
+   .code_box
+   {
+      color: black;
+      margin: 1em 0.25in;
+      padding: 0.5em;
+      background: rgb(240,240,240);
+      border-top: black dotted 1px;
+      border-left: black dotted 1px;
+      border-right: black solid 2px;
+      border-bottom: black solid 2px;
+   }
+
+
+
+   .bdotted {border-bottom: 1px dotted}
+   .bdashed {border-bottom: 1px dashed}
+   .bsolid {border-bottom: 1px solid}
+   .bdouble {border-bottom: 1px double}
+   .bgroove {border-bottom: 1px groove}
+   .bridge {border-bottom: 1px ridge}
+   .binset {border-bottom: 1px inset}
+   .boutset {border-bottom: 1px outset}
+
+   div.row1 {
+      background-color:#dfdfdf; 
+   }
+   div.row2 {
+      background-color:#f2f2f2; 
+   }
+
+   div.typedefs {
+      margin-left: 1.5em;
+      margin-top: 0.2em;
+      border: 1px dotted;
+      width: 52em;
+   }
+
+   div.tdn {
+      width: 10em;
+   }
+
+   .fullhr {
+      clear: both;
+   }
+
+   body {
+      text-align: center;
+   }
+
+   div.entire_page_header {
+      width:62.5em;  
+      text-align: left;
+      margin-top: 0.4em;
+      margin-left: auto;
+      margin-right: auto;
+   }
+   div.entire_page {
+      width:62.5em;  
+      text-align: left;
+      margin-left: auto;
+      margin-right: auto;
+      clear:both;
+   }
+</style></head><body bgcolor="#EDF3EE"><a name="top"></a><div class="entire_page_header"><a href="http://dlib.net"><img src="dlib-logo.png"></a></div><div class="entire_page"><table bgcolor="white" height="100%" bordercolor="#EDF3EE" CELLSPACING="0" CELLPADDING="10" style="border:0px;margin-top:2px"><tr height="100%"><td BGCOLOR="#F5F5F5" style="padding:7px; border: 1px solid rgb(102,102,102);" VALIGN="TOP" height="100%"><br><table WIDTH="145" height="100%"><tr><td VALIGN="TOP"><b>The Library</b><ul class="tree"><li><a href="algorithms.html">Algorithms</a></li><li><a href="api.html">API Wrappers</a></li><li><a href="bayes.html">Bayesian Nets</a></li><li><a href="compression.html">Compression</a></li><li><a href="containers.html">Containers</a></li><li><a href="graph_tools.html">Graph Tools</a></li><li><a href="imaging.html">Image Processing</a></li><li><a href="linear_algebra.html">Linear Algebra</a></li><li><a href="ml.html">Machine Learning</a></li><li><a href="metaprogramming.html">Metaprogramming</a></li><li><a href="other.html">Miscellaneous</a></li><li><a href="network.html">Networking</a></li><li><a href="optimization.html">Optimization</a></li><li><a href="parsing.html">Parsing</a></li></ul><br><b>Help/Info</b><ul class="tree"><li><a onclick="Toggle(this)" style="cursor: pointer;margin-left:-9px"><img src="plus.gif"><font color="green"><u>Examples: C++</u></font></a><ul style="display:none;"><li><a href="3d_point_cloud_ex.cpp.html">3D_Point_Cloud</a></li><li><a href="assignment_learning_ex.cpp.html">Assignment_Learning</a></li><li><a href="file_to_code_ex.cpp.html">Base64_Encoder</a></li><li><a href="bayes_net_ex.cpp.html">Bayesian_Network</a></li><li><a href="bayes_net_from_disk_ex.cpp.html">Bayesian_Network_From_Disk</a></li><li><a href="bayes_net_gui_ex.cpp.html">Bayesian_Network_GUI</a></li><li><a href="bridge_ex.cpp.html">Bridge</a></li><li><a href="bsp_ex.cpp.html">BSP</a></li><li><a href="svm_c_ex.cpp.html">C-Support_Vector_Machine</a></li><li><a href="compress_stream_ex.cpp.html#_top">Cmd_Line_Parser</a></li><li><a href="compress_stream_ex.cpp.html">Compress_Stream</a></li><li><a href="config_reader_ex.cpp.html">Config_File_Reader</a></li><li><a href="custom_trainer_ex.cpp.html">Custom_Trainers</a></li><li><a href="dir_nav_ex.cpp.html">Directory_Navigation</a></li><li><a href="empirical_kernel_map_ex.cpp.html">Empirical_Kernel_Map</a></li><li><a href="face_detection_ex.cpp.html">Face_Detection</a></li><li><a href="face_landmark_detection_ex.cpp.html">Face_Landmark_Detection</a></li><li><a href="fhog_ex.cpp.html">FHOG_Feature_Extraction</a></li><li><a href="fhog_object_detector_ex.cpp.html">FHOG_Object_Detection</a></li><li><a href="graph_labeling_ex.cpp.html">Graph_Labeling</a></li><li><a href="gui_api_ex.cpp.html">GUI</a></li><li><a href="hough_transform_ex.cpp.html">Hough_Transform</a></li><li><a href="server_http_ex.cpp.html">HTTP_Server</a></li><li><a href="image_ex.cpp.html">Image</a></li><li><a href="iosockstream_ex.cpp.html">IO Socket Streams</a></li><li><a href="server_iostream_ex.cpp.html">IO Streams Server</a></li><li><a href="kcentroid_ex.cpp.html">Kernel_Centroid</a></li><li><a href="kkmeans_ex.cpp.html">Kernel_K-Means_Clustering</a></li><li><a href="krr_regression_ex.cpp.html">Kernel_Ridge_Regression</a></li><li><a href="krls_filter_ex.cpp.html">Kernel_RLS_Filtering</a></li><li><a href="krls_ex.cpp.html">Kernel_RLS_Regression</a></li><li><a href="krr_classification_ex.cpp.html">KRR_Classification</a></li><li><a href="learning_to_track_ex.cpp.html">Learning_to_Track</a></li><li><a href="max_cost_assignment_ex.cpp.html">Linear_Assignment_Problems</a></li><li><a href="linear_manifold_regularizer_ex.cpp.html">Linear_Manifold_Regularizer</a></li><li><a href="mpc_ex.cpp.html">Linear_Model_Predictive_Control</a></li><li><a href="logger_ex.cpp.html">Logger</a></li><li><a href="logger_ex_2.cpp.html">Logger_Advanced</a></li><li><a href="logger_custom_output_ex.cpp.html">Logger_Custom_Output</a></li><li><a href="matrix_ex.cpp.html">Matrix</a></li><li><a href="matrix_expressions_ex.cpp.html">Matrix_Expressions</a></li><li><a href="member_function_pointer_ex.cpp.html">Member_Function_Pointer</a></li><li><a href="model_selection_ex.cpp.html">Model_Selection</a></li><li><a href="multiclass_classification_ex.cpp.html">Multiclass_Classification</a></li><li><a href="multithreaded_object_ex.cpp.html">Multithreaded_Object</a></li><li><a href="mlp_ex.cpp.html">Neural_Network</a></li><li><a href="least_squares_ex.cpp.html">Non-Linear Least Squares</a></li><li><a href="svm_ex.cpp.html">Nu-Support_Vector_Machine</a></li><li><a href="integrate_function_adapt_simp_ex.cpp.html">Numerical_Integration</a></li><li><a href="object_detector_ex.cpp.html">Object_Detector</a></li><li><a href="object_detector_advanced_ex.cpp.html">Object_Detector_Advanced</a></li><li><a href="one_class_classifiers_ex.cpp.html">One_Class_Classifiers</a></li><li><a href="svm_pegasos_ex.cpp.html">Online_SVM</a></li><li><a href="optimization_ex.cpp.html">Optimization</a></li><li><a href="parallel_for_ex.cpp.html">Parallel_For_Loops</a></li><li><a href="pipe_ex.cpp.html">Pipe</a></li><li><a href="pipe_ex_2.cpp.html">Pipe_2</a></li><li><a href="quantum_computing_ex.cpp.html">Quantum_Computing</a></li><li><a href="queue_ex.cpp.html">Queue</a></li><li><a href="rank_features_ex.cpp.html">Rank_Features</a></li><li><a href="rvm_ex.cpp.html">Relevance_Vector_Classification</a></li><li><a href="rvm_regression_ex.cpp.html">Relevance_Vector_Regression</a></li><li><a href="running_stats_ex.cpp.html">Running_Stats</a></li><li><a href="sequence_labeler_ex.cpp.html">Sequence_Labeling</a></li><li><a href="sequence_segmenter_ex.cpp.html">Sequence_Segmentation</a></li><li><a href="sockets_ex.cpp.html">Sockets</a></li><li><a href="sockstreambuf_ex.cpp.html">Sockstreambuf</a></li><li><a href="svm_sparse_ex.cpp.html">Sparse_Vectors</a></li><li><a href="sqlite_ex.cpp.html">SQLite</a></li><li><a href="std_allocator_ex.cpp.html">Std_C++_Allocator</a></li><li><a href="svm_struct_ex.cpp.html">Structural_Support_Vector_Machines</a></li><li><a href="svr_ex.cpp.html">Support_Vector_Regression</a></li><li><a href="surf_ex.cpp.html">SURF</a></li><li><a href="svm_rank_ex.cpp.html">SVM-Rank</a></li><li><a href="threaded_object_ex.cpp.html">Threaded_Object</a></li><li><a href="threads_ex.cpp.html">Threads</a></li><li><a href="thread_function_ex.cpp.html">Thread_Function</a></li><li><a href="thread_pool_ex.cpp.html">Thread_Pool</a></li><li><a href="timer_ex.cpp.html">Timer</a></li><li><a href="train_object_detector.cpp.html">Train_Object_Detector</a></li><li><a href="train_shape_predictor_ex.cpp.html">Train_Shape_Predictor</a></li><li><a href="using_custom_kernels_ex.cpp.html">Using_Custom_Kernels</a></li><li><a href="video_tracking_ex.cpp.html">Video_Object_Tracking</a></li><li><a href="webcam_face_pose_ex.cpp.html">Webcam_Face_Pose_Estimation</a></li><li><a href="xml_parser_ex.cpp.html">XML_Parser</a></li></ul></li><li><a onclick="Toggle(this)" style="cursor: pointer;margin-left:-9px"><img src="plus.gif"><font color="green"><u>Examples: Python</u></font></a><ul style="display:none;"><li><a href="face_detector.py.html">Face_Detector</a></li><li><a href="face_landmark_detection.py.html">Face_Landmark_Detection</a></li><li><a href="find_candidate_object_locations.py.html">find_candidate_object_locations</a></li><li><a href="max_cost_assignment.py.html">Linear_Assignment_Problems</a></li><li><a href="sequence_segmenter.py.html">Sequence_Segmenter</a></li><li><a href="svm_struct.py.html">Structural_Support_Vector_Machines</a></li><li><a href="svm_rank.py.html">SVM-Rank</a></li><li><a href="train_object_detector.py.html">Train_Object_Detector</a></li><li><a href="train_shape_predictor.py.html">Train_Shape_Predictor</a></li><li><a href="correlation_tracker.py.html">Video_Object_Tracking</a></li></ul></li><li><a href="faq.html">FAQ</a></li><li><a href="index.html">Home</a></li><li><a href="compile.html">How to compile</a></li><li><a href="howto_contribute.html">How to contribute</a></li><li><a href="term_index.html">Index</a></li><li><a href="intro.html">Introduction</a></li><li><a href="license.html">License</a></li><li><a href="python/index.html">Python API</a></li><li><a href="books.html">Suggested Books</a></li></ul><br><b>Current Release</b><ul class="tree"><li><a href="change_log.html">Change Log</a></li><li><a href="release_notes.html">Release Notes</a></li><li>Version: 18.16</li></ul><br></td><td width="1"></td></tr><tr><td valign="bottom"><br><br><br><br><br><br><br><br><br>
+      Last Modified:<br>Jan 11, 2009<br><br></td></tr></table></td><td VALIGN="TOP" width="100%" style="border: 1px solid rgb(102,102,102);"><center><h1>Data Compression</h1></center><br><br><p>
+     This page contains a bunch of objects that implement various parts of compression algorithms.  
+     They can be put together in different ways to construct many different algorithms.  
+     Note that the <a href="#compress_stream">compress_stream</a> object contains complete compression algorithms.  So if you
+     just want to compress some data then you can easily use that object and not bother with the others.
+  </p><p>
+      In the column to the right you can see benchmark data for each of the compress_stream 
+      typedefs.  The times measured are the time it takes to compress and then
+      decompress each file.  It was run on a 3.0ghz P4.   For reference see the Canterbury corpus 
+      <a href="http://corpus.canterbury.ac.nz/">web site</a>.
+      </p></td><td BGCOLOR="#F5F5F5" style="padding:7px; border: 1px solid rgb(102,102,102);" VALIGN="TOP" height="100%"><br><table WIDTH="200" height="100%"><tr><td VALIGN="TOP"><b>Objects</b><ul class="tree"><li><a href="#compress_stream">compress_stream</a></li><li><a href="#conditioning_class">conditioning_class</a></li><li><a href="#entropy_decoder">entropy_decoder</a></li><li><a href="#entropy_decoder_model">entropy_decoder_model</a></li><li><a href="#entropy_encoder">entropy_encoder</a></li><li><a href="#entropy_encoder_model">entropy_encoder_model</a></li><li><a href="#lz77_buffer">lz77_buffer</a></li><li><a href="#lzp_buffer">lzp_buffer</a></li></ul><br><b>Benchmarks</b><ul class="tree"><li><a href="kernel_1a.html">kernel_1a</a></li><li><a href="kernel_1b.html">kernel_1b</a></li><li><a href="kernel_1c.html">kernel_1c</a></li><li><a href="kernel_1da.html">kernel_1da</a></li><li><a href="kernel_1db.html">kernel_1db</a></li><li><a href="kernel_1ea.html">kernel_1ea</a></li><li><a href="kernel_1eb.html">kernel_1eb</a></li><li><a href="kernel_1ec.html">kernel_1ec</a></li><li><a href="kernel_2a.html">kernel_2a</a></li><li><a href="kernel_3a.html">kernel_3a</a></li><li><a href="kernel_3b.html">kernel_3b</a></li></ul><br></td><td width="1"></td></tr><tr><td valign="bottom"></td></tr></table></td></tr></table><a name="compress_stream"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">compress_stream</h1><BR><BR>
+            This object is pretty straight forward.  It has no state and just 
+            contains the functions compress and decompress.
+            They do just what their names imply to iostream objects.       
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/compress_stream.h&gt;</tt></font></B><BR><b><a href="dlib/compress_stream/compress_stream_kernel_abstract.h.html"><font style="font-size:1.4em">Detailed Documentation</font></a></b><BR>C++ Example Programs: <a href="compress_stream_ex.cpp.html">compress_stream_ex.cpp</a>,
+               <a href="file_to_code_ex.cpp.html">file_to_code_ex.cpp</a><BR><BR><B>Implementations:</B><blockquote><a href="dlib/compress_stream/compress_stream_kernel_1.h.html">compress_stream_kernel_1</a>:
+                  <br> 
+                  This implementation is done using the <a href="#entropy_encoder_model">entropy_encoder_model</a> and 
+                  <a href="#entropy_decoder_model">entropy_decoder_model</a> objects.
+               <div class="typedefs"><table CELLSPACING="0" CELLPADDING="0" bgcolor="white"><tr><td bgcolor="#E3E3E3" valign="top"><div class="tdn">kernel_1a</div></td><td width="100%" bgcolor="#E3E3E3">is a typedef for compress_stream_kernel_1 which uses entropy_decoder_model_kernel_1b and entropy_decoder_model_kernel_1b</td></tr><tr><td valign="top"><div class="tdn">kernel_1b</div></td><td width="100%">is a typedef for compress_stream_kernel_1 which uses entropy_decoder_model_kernel_2b and entropy_decoder_model_kernel_2b  </td></tr><tr><td bgcolor="#E3E3E3" valign="top"><div class="tdn">kernel_1c</div></td><td width="100%" bgcolor="#E3E3E3">is a typedef for compress_stream_kernel_1 which uses entropy_decoder_model_kernel_3b and entropy_decoder_model_kernel_3b  </td></tr><tr><td valign="top"><div class="tdn">kernel_1da</div></td><td width="100%">is a typedef for compress_stream_kernel_1 which uses entropy_decoder_model_kernel_4a and entropy_decoder_model_kernel_4a  </td></tr><tr><td bgcolor="#E3E3E3" valign="top"><div class="tdn">kernel_1db</div></td><td width="100%" bgcolor="#E3E3E3">is a typedef for compress_stream_kernel_1 which uses entropy_decoder_model_kernel_4b and entropy_decoder_model_kernel_4b  </td></tr><tr><td valign="top"><div class="tdn">kernel_1ea</div></td><td width="100%">is a typedef for compress_stream_kernel_1 which uses entropy_decoder_model_kernel_5a and entropy_decoder_model_kernel_5a  </td></tr><tr><td bgcolor="#E3E3E3" valign="top"><div class="tdn">kernel_1eb</div></td><td width="100%" bgcolor="#E3E3E3">is a typedef for compress_stream_kernel_1 which uses entropy_decoder_model_kernel_5b and entropy_decoder_model_kernel_5b  </td></tr><tr><td valign="top"><div class="tdn">kernel_1ec</div></td><td width="100%">is a typedef for compress_stream_kernel_1 which uses entropy_decoder_model_kernel_5c and entropy_decoder_model_kernel_5c  </td></tr></table></div></blockquote><blockquote><a href="dlib/compress_stream/compress_stream_kernel_2.h.html">compress_stream_kernel_2</a>:
+                  <br> 
+                  This implementation is done using the <a href="#entropy_encoder_model">entropy_encoder_model</a> and 
+                  <a href="#entropy_decoder_model">entropy_decoder_model</a> objects.  It also uses the
+                  <a href="#lz77_buffer">lz77_buffer</a> object.  It uses the entropy coder models to
+                  encode symbols when there is no match found by the lz77_buffer.  
+               <div class="typedefs"><table CELLSPACING="0" CELLPADDING="0" bgcolor="white"><tr><td bgcolor="#E3E3E3" valign="top"><div class="tdn">kernel_2a</div></td><td width="100%" bgcolor="#E3E3E3">is a typedef for compress_stream_kernel_2 which uses entropy_encoder_model_kernel_2b, entropy_decoder_model_kernel_2b, and lz77_buffer_kernel_2a.</td></tr></table></div></blockquote><blockquote><a href="dlib/compress_stream/compress_stream_kernel_3.h.html">compress_stream_kernel_3</a>:
+                  <br> 
+                  This implementation is done using the <a href="#lzp_buffer">lzp_buffer</a> object and
+                  <a href="other.html#crc32">crc32</a> object.  It does not use any sort of entropy coding, instead
+                  a byte aligned output method is used.
+               <div class="typedefs"><table CELLSPACING="0" CELLPADDING="0" bgcolor="white"><tr><td bgcolor="#E3E3E3" valign="top"><div class="tdn">kernel_3a</div></td><td width="100%" bgcolor="#E3E3E3">is a typedef for compress_stream_kernel_3 which uses lzp_buffer_kernel_1.</td></tr><tr><td valign="top"><div class="tdn">kernel_3b</div></td><td width="100%">is a typedef for compress_stream_kernel_3 which uses lzp_buffer_kernel_2.</td></tr></table></div></blockquote><center></center></div></a><a name="conditioning_class"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">conditioning_class</h1><BR><BR>
+                This object represents a conditioning class used for arithmetic style
+                compression.  It maintains the cumulative counts which are needed
+                by the entropy_encoder and entropy_decoder objects below.  
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/conditioning_class.h&gt;</tt></font></B><BR><b><a href="dlib/conditioning_class/conditioning_class_kernel_abstract.h.html"><font style="font-size:1.4em">Detailed Documentation</font></a></b><BR><BR><B>Implementations:</B><blockquote><a href="dlib/conditioning_class/conditioning_class_kernel_1.h.html">conditioning_class_kernel_1</a>:
+                  <br> 
+                  This implementation is done using an array to store all the counts and they are summed 
+                  whenever the cumulative counts are requested.  It's pretty straight forward.
+               <div class="typedefs"><table CELLSPACING="0" CELLPADDING="0" bgcolor="white"><tr><td bgcolor="#E3E3E3" valign="top"><div class="tdn">kernel_1a</div></td><td width="100%" bgcolor="#E3E3E3">is a typedef for conditioning_class_kernel_1</td></tr><tr><td valign="top"><div class="tdn">kernel_1a_c</div></td><td width="100%"> 
+                  is a typedef for kernel_1a that checks its preconditions.             
+                  </td></tr></table></div></blockquote><blockquote><a href="dlib/conditioning_class/conditioning_class_kernel_2.h.html">conditioning_class_kernel_2</a>:
+                  <br> 
+                  This implementation is done using a binary tree where each node in the tree represents one symbol and
+                  contains that symbols count and the sum of all the counts for the nodes to the left.  This way
+                  when you request a cumulative count it can be computed by visiting log n nodes where n is the 
+                  size of the alphabet.
+               <div class="typedefs"><table CELLSPACING="0" CELLPADDING="0" bgcolor="white"><tr><td bgcolor="#E3E3E3" valign="top"><div class="tdn">kernel_2a</div></td><td width="100%" bgcolor="#E3E3E3">is a typedef for conditioning_class_kernel_2</td></tr><tr><td valign="top"><div class="tdn">kernel_2a_c</div></td><td width="100%"> 
+                  is a typedef for kernel_2a that checks its preconditions.             
+                  </td></tr></table></div></blockquote><blockquote><a href="dlib/conditioning_class/conditioning_class_kernel_3.h.html">conditioning_class_kernel_3</a>:
+                  <br> 
+                  This implementation is done using an array to store all the counts and they are 
+                  summed whenever the cumulative counts are requested. The counts are also kept in 
+                  semi-sorted order to speed up the calculation of the cumulative count.
+               <div class="typedefs"><table CELLSPACING="0" CELLPADDING="0" bgcolor="white"><tr><td bgcolor="#E3E3E3" valign="top"><div class="tdn">kernel_3a</div></td><td width="100%" bgcolor="#E3E3E3">is a typedef for conditioning_class_kernel_3</td></tr><tr><td valign="top"><div class="tdn">kernel_3a_c</div></td><td width="100%"> 
+                  is a typedef for kernel_3a that checks its preconditions.             
+                  </td></tr></table></div></blockquote><blockquote><a href="dlib/conditioning_class/conditioning_class_kernel_4.h.html">conditioning_class_kernel_4</a>:
+                  <br> 
+                  This implementation is done using a linked list to store all the counts and they are 
+                  summed whenever the cumulative counts are requested. The counts are also kept in 
+                  semi-sorted order to speed up the calculation of the cumulative count.  This implementation
+                  also uses the <a href="other.html#memory_manager">memory_manager</a> component to create a 
+                  memory pool of linked list nodes.  This implementation is especially useful for high order
+                  contexts and/or very large and sparse alphabets.
+               <div class="typedefs"><table CELLSPACING="0" CELLPADDING="0" bgcolor="white"><tr><td bgcolor="#E3E3E3" valign="top"><div class="tdn">kernel_4a</div></td><td width="100%" bgcolor="#E3E3E3">is a typedef for conditioning_class_kernel_4 with a memory pool of 10,000 nodes.</td></tr><tr><td valign="top"><div class="tdn">kernel_4a_c</div></td><td width="100%"> 
+                  is a typedef for kernel_4a that checks its preconditions.             
+                  </td></tr><tr><td bgcolor="#E3E3E3" valign="top"><div class="tdn">kernel_4b</div></td><td width="100%" bgcolor="#E3E3E3">is a typedef for conditioning_class_kernel_4 with a memory pool of 100,000 nodes.</td></tr><tr><td valign="top"><div class="tdn">kernel_4b_c</div></td><td width="100%"> 
+                  is a typedef for kernel_4b that checks its preconditions.             
+                  </td></tr><tr><td bgcolor="#E3E3E3" valign="top"><div class="tdn">kernel_4c</div></td><td width="100%" bgcolor="#E3E3E3">is a typedef for conditioning_class_kernel_4 with a memory pool of 1,000,000 nodes.</td></tr><tr><td valign="top"><div class="tdn">kernel_4c_c</div></td><td width="100%"> 
+                  is a typedef for kernel_4c that checks its preconditions.             
+                  </td></tr><tr><td bgcolor="#E3E3E3" valign="top"><div class="tdn">kernel_4d</div></td><td width="100%" bgcolor="#E3E3E3">is a typedef for conditioning_class_kernel_4 with a memory pool of 10,000,000 nodes.</td></tr><tr><td valign="top"><div class="tdn">kernel_4d_c</div></td><td width="100%"> 
+                  is a typedef for kernel_4d that checks its preconditions.             
+                  </td></tr></table></div></blockquote><center></center></div></a><a name="entropy_decoder"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">entropy_decoder</h1><BR><BR>
+            This object represents an entropy decoder.  E.g. the decoding part of 
+            an arithmetic coder.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/entropy_decoder.h&gt;</tt></font></B><BR><b><a href="dlib/entropy_decoder/entropy_decoder_kernel_abstract.h.html"><font style="font-size:1.4em">Detailed Documentation</font></a></b><BR><BR><B>Implementations:</B><blockquote><a href="dlib/entropy_decoder/entropy_decoder_kernel_1.h.html">entropy_decoder_kernel_1</a>:
+                  <br> 
+                  This object is implemented using arithmetic coding and is done in the 
+                  straight forward way using integers and fixed precision math. 
+               <div class="typedefs"><table CELLSPACING="0" CELLPADDING="0" bgcolor="white"><tr><td bgcolor="#E3E3E3" valign="top"><div class="tdn">kernel_1a</div></td><td width="100%" bgcolor="#E3E3E3">is a typedef for entropy_decoder_kernel_1</td></tr><tr><td valign="top"><div class="tdn">kernel_1a_c</div></td><td width="100%"> 
+                  is a typedef for kernel_1a that checks its preconditions.             
+                  </td></tr></table></div></blockquote><blockquote><a href="dlib/entropy_decoder/entropy_decoder_kernel_2.h.html">entropy_decoder_kernel_2</a>:
+                  <br> 
+                  This object is implemented using "range" coding and is done 
+                  in the straight forward way using integers and fixed precision math. 
+               <div class="typedefs"><table CELLSPACING="0" CELLPADDING="0" bgcolor="white"><tr><td bgcolor="#E3E3E3" valign="top"><div class="tdn">kernel_2a</div></td><td width="100%" bgcolor="#E3E3E3">is a typedef for entropy_decoder_kernel_2</td></tr><tr><td valign="top"><div class="tdn">kernel_2a_c</div></td><td width="100%"> 
+                  is a typedef for kernel_2a that checks its preconditions.             
+                  </td></tr></table></div></blockquote><center></center></div></a><a name="entropy_decoder_model"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">entropy_decoder_model</h1><BR><BR>
+                This object represents some kind of statistical model.  You
+                can use it to read symbols from an entropy_decoder and it will calculate
+                the cumulative counts/probabilities and manage contexts for you.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/entropy_decoder_model.h&gt;</tt></font></B><BR><b><a href="dlib/entropy_decoder_model/entropy_decoder_model_kernel_abstract.h.html"><font style="font-size:1.4em">Detailed Documentation</font></a></b><BR><BR><B>Implementations:</B><blockquote><a href="dlib/entropy_decoder_model/entropy_decoder_model_kernel_1.h.html">entropy_decoder_model_kernel_1</a>:
+                  <br> 
+                  This object is implemented using the <a href="#conditioning_class">conditioning_class</a> component.
+                  It implements an <i>order-0</i> finite context model and uses lazy exclusions and update exclusions.  
+                  The escape method used is method D.
+               <div class="typedefs"><table CELLSPACING="0" CELLPADDING="0" bgcolor="white"><tr><td bgcolor="#E3E3E3" valign="top"><div class="tdn">kernel_1a</div></td><td width="100%" bgcolor="#E3E3E3">is a typedef for entropy_decoder_model_kernel_1 that uses conditioning_class_kernel_1a</td></tr><tr><td valign="top"><div class="tdn">kernel_1b</div></td><td width="100%">is a typedef for entropy_decoder_model_kernel_1 that uses conditioning_class_kernel_2a</td></tr><tr><td bgcolor="#E3E3E3" valign="top"><div class="tdn">kernel_1c</div></td><td width="100%" bgcolor="#E3E3E3">is a typedef for entropy_decoder_model_kernel_1 that uses conditioning_class_kernel_3a</td></tr></table></div></blockquote><blockquote><a href="dlib/entropy_decoder_model/entropy_decoder_model_kernel_2.h.html">entropy_decoder_model_kernel_2</a>:
+                  <br> 
+                  This object is implemented using the <a href="#conditioning_class">conditioning_class</a> component.
+                  It implements an <i>order-1-0</i> finite context model and uses lazy exclusions and update exclusions.  
+                  The escape method used is method D.
+               <div class="typedefs"><table CELLSPACING="0" CELLPADDING="0" bgcolor="white"><tr><td bgcolor="#E3E3E3" valign="top"><div class="tdn">kernel_2a</div></td><td width="100%" bgcolor="#E3E3E3">is a typedef for entropy_decoder_model_kernel_2 that uses conditioning_class_kernel_1a</td></tr><tr><td valign="top"><div class="tdn">kernel_2b</div></td><td width="100%">is a typedef for entropy_decoder_model_kernel_2 that uses conditioning_class_kernel_2a</td></tr><tr><td bgcolor="#E3E3E3" valign="top"><div class="tdn">kernel_2c</div></td><td width="100%" bgcolor="#E3E3E3">is a typedef for entropy_decoder_model_kernel_2 that uses conditioning_class_kernel_3a</td></tr><tr><td valign="top"><div class="tdn">kernel_2d</div></td><td width="100%">is a typedef for entropy_decoder_model_kernel_2 that uses conditioning_class_kernel_2a for its order-0
+                         context and conditioning_class_kernel_4b for its order-1 context.</td></tr></table></div></blockquote><blockquote><a href="dlib/entropy_decoder_model/entropy_decoder_model_kernel_3.h.html">entropy_decoder_model_kernel_3</a>:
+                  <br> 
+                  This object is implemented using the <a href="#conditioning_class">conditioning_class</a> component.
+                  It implements an <i>order-2-1-0</i> finite context model and uses lazy exclusions and update exclusions.  
+                  The escape method used is method D.
+               <div class="typedefs"><table CELLSPACING="0" CELLPADDING="0" bgcolor="white"><tr><td bgcolor="#E3E3E3" valign="top"><div class="tdn">kernel_3a</div></td><td width="100%" bgcolor="#E3E3E3">   is a typedef for entropy_decoder_model_kernel_3 that uses conditioning_class_kernel_1a for orders 0 and 1
+                        and conditioning_class_kernel_4b for order-2.</td></tr><tr><td valign="top"><div class="tdn">kernel_3b</div></td><td width="100%">   is a typedef for entropy_decoder_model_kernel_3 that uses conditioning_class_kernel_2a for orders 0 and 1
+                        and conditioning_class_kernel_4b for order-2.</td></tr><tr><td bgcolor="#E3E3E3" valign="top"><div class="tdn">kernel_3c</div></td><td width="100%" bgcolor="#E3E3E3">   is a typedef for entropy_decoder_model_kernel_3 that uses conditioning_class_kernel_3a for orders 0 and 1
+                        and conditioning_class_kernel_4b for order-2.</td></tr></table></div></blockquote><blockquote><a href="dlib/entropy_decoder_model/entropy_decoder_model_kernel_4.h.html">entropy_decoder_model_kernel_4</a>:
+                  <br> 
+                  This object is implemented using a variation of the PPM algorithm described by Alistair Moffat in his paper "Implementing 
+                  the PPM data compression scheme."
+                  It provides template arguments to select the maximum order and maximum memory to use.  For speed,
+                  exclusions are not used.  The escape method used is method D.
+               <div class="typedefs"><table CELLSPACING="0" CELLPADDING="0" bgcolor="white"><tr><td bgcolor="#E3E3E3" valign="top"><div class="tdn">kernel_4a</div></td><td width="100%" bgcolor="#E3E3E3">   is a typedef for entropy_decoder_model_kernel_4 with the max order set to 4 and the max number
+                        of nodes set to 200,000</td></tr><tr><td valign="top"><div class="tdn">kernel_4b</div></td><td width="100%">   is a typedef for entropy_decoder_model_kernel_4 with the max order set to 5 and the max number
+                        of nodes set to 1,000,000</td></tr></table></div></blockquote><blockquote><a href="dlib/entropy_decoder_model/entropy_decoder_model_kernel_5.h.html">entropy_decoder_model_kernel_5</a>:
+                  <br> 
+                  This object is implemented using a variation of the PPM algorithm described by Alistair Moffat in his paper "Implementing 
+                  the PPM data compression scheme."
+                  It provides template arguments to select the maximum order and maximum memory to use.  Exclusions are used. The escape method used is method D.
+                  This implementation is very much like kernel_4 except it is tuned for higher compression rather than speed.
+                  This also uses Dmitry Shkarin's Information Inheritance scheme.
+               <div class="typedefs"><table CELLSPACING="0" CELLPADDING="0" bgcolor="white"><tr><td bgcolor="#E3E3E3" valign="top"><div class="tdn">kernel_5a</div></td><td width="100%" bgcolor="#E3E3E3">   is a typedef for entropy_decoder_model_kernel_5 with the max order set to 4 and the max number
+                        of nodes set to 200,000</td></tr><tr><td valign="top"><div class="tdn">kernel_5b</div></td><td width="100%">   is a typedef for entropy_decoder_model_kernel_5 with the max order set to 5 and the max number
+                         of nodes set to 1,000,000</td></tr><tr><td bgcolor="#E3E3E3" valign="top"><div class="tdn">kernel_5c</div></td><td width="100%" bgcolor="#E3E3E3">   is a typedef for entropy_decoder_model_kernel_5 with the max order set to 7 and the max number
+                         of nodes set to 2,500,000</td></tr></table></div></blockquote><blockquote><a href="dlib/entropy_decoder_model/entropy_decoder_model_kernel_6.h.html">entropy_decoder_model_kernel_6</a>:
+                  <br> 
+                  This object just assigns every symbol the same probability.  I.e. it uses an <i>order-(-1)</i> model.
+               <div class="typedefs"><table CELLSPACING="0" CELLPADDING="0" bgcolor="white"><tr><td bgcolor="#E3E3E3" valign="top"><div class="tdn">kernel_6a</div></td><td width="100%" bgcolor="#E3E3E3">is a typedef for entropy_decoder_model_kernel_6</td></tr></table></div></blockquote><center></center></div></a><a name="entropy_encoder"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">entropy_encoder</h1><BR><BR>
+            This object represents an entropy encoder.  E.g. the encoding part of 
+            an arithmetic coder.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/entropy_encoder.h&gt;</tt></font></B><BR><b><a href="dlib/entropy_encoder/entropy_encoder_kernel_abstract.h.html"><font style="font-size:1.4em">Detailed Documentation</font></a></b><BR><BR><B>Implementations:</B><blockquote><a href="dlib/entropy_encoder/entropy_encoder_kernel_1.h.html">entropy_encoder_kernel_1</a>:
+                  <br> 
+                  This object is implemented using arithmetic coding and is done in the 
+                  straight forward way using integers and fixed precision math. 
+               <div class="typedefs"><table CELLSPACING="0" CELLPADDING="0" bgcolor="white"><tr><td bgcolor="#E3E3E3" valign="top"><div class="tdn">kernel_1a</div></td><td width="100%" bgcolor="#E3E3E3">is a typedef for entropy_encoder_kernel_1</td></tr><tr><td valign="top"><div class="tdn">kernel_1a_c</div></td><td width="100%"> 
+                  is a typedef for kernel_1a that checks its preconditions.             
+                  </td></tr></table></div></blockquote><blockquote><a href="dlib/entropy_encoder/entropy_encoder_kernel_2.h.html">entropy_encoder_kernel_2</a>:
+                  <br> 
+                  This object is implemented using "range" coding and is done 
+                  in the straight forward way using integers and fixed precision math. 
+               <div class="typedefs"><table CELLSPACING="0" CELLPADDING="0" bgcolor="white"><tr><td bgcolor="#E3E3E3" valign="top"><div class="tdn">kernel_2a</div></td><td width="100%" bgcolor="#E3E3E3">is a typedef for entropy_encoder_kernel_2</td></tr><tr><td valign="top"><div class="tdn">kernel_2a_c</div></td><td width="100%"> 
+                  is a typedef for kernel_2a that checks its preconditions.             
+                  </td></tr></table></div></blockquote><center></center></div></a><a name="entropy_encoder_model"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">entropy_encoder_model</h1><BR><BR>
+                This object represents some kind of statistical model.  You
+                can use it to write symbols to an entropy_encoder and it will calculate
+                the cumulative counts/probabilities and manage contexts for you.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/entropy_encoder_model.h&gt;</tt></font></B><BR><b><a href="dlib/entropy_encoder_model/entropy_encoder_model_kernel_abstract.h.html"><font style="font-size:1.4em">Detailed Documentation</font></a></b><BR><BR><B>Implementations:</B><blockquote><a href="dlib/entropy_encoder_model/entropy_encoder_model_kernel_1.h.html">entropy_encoder_model_kernel_1</a>:
+                  <br> 
+                  This object is implemented using the <a href="#conditioning_class">conditioning_class</a> component.
+                  It implements an <i>order-0</i> finite context model and uses lazy exclusions and update exclusions.  
+                  The escape method used is method D. 
+               <div class="typedefs"><table CELLSPACING="0" CELLPADDING="0" bgcolor="white"><tr><td bgcolor="#E3E3E3" valign="top"><div class="tdn">kernel_1a</div></td><td width="100%" bgcolor="#E3E3E3">is a typedef for entropy_encoder_model_kernel_1 that uses conditioning_class_kernel_1a</td></tr><tr><td valign="top"><div class="tdn">kernel_1a_c</div></td><td width="100%"> 
+                  is a typedef for kernel_1a that checks its preconditions.             
+                  </td></tr><tr><td bgcolor="#E3E3E3" valign="top"><div class="tdn">kernel_1b</div></td><td width="100%" bgcolor="#E3E3E3">is a typedef for entropy_encoder_model_kernel_1 that uses conditioning_class_kernel_2a</td></tr><tr><td valign="top"><div class="tdn">kernel_1b_c</div></td><td width="100%"> 
+                  is a typedef for kernel_1b that checks its preconditions.             
+                  </td></tr><tr><td bgcolor="#E3E3E3" valign="top"><div class="tdn">kernel_1c</div></td><td width="100%" bgcolor="#E3E3E3">is a typedef for entropy_encoder_model_kernel_1 that uses conditioning_class_kernel_3a</td></tr><tr><td valign="top"><div class="tdn">kernel_1c_c</div></td><td width="100%"> 
+                  is a typedef for kernel_1c that checks its preconditions.             
+                  </td></tr></table></div></blockquote><blockquote><a href="dlib/entropy_encoder_model/entropy_encoder_model_kernel_2.h.html">entropy_encoder_model_kernel_2</a>:
+                  <br> 
+                  This object is implemented using the <a href="#conditioning_class">conditioning_class</a> component.
+                  It implements an <i>order-1-0</i> finite context model and uses lazy exclusions and update exclusions.  
+                  The escape method used is method D.
+               <div class="typedefs"><table CELLSPACING="0" CELLPADDING="0" bgcolor="white"><tr><td bgcolor="#E3E3E3" valign="top"><div class="tdn">kernel_2a</div></td><td width="100%" bgcolor="#E3E3E3">is a typedef for entropy_encoder_model_kernel_2 that uses conditioning_class_kernel_1a</td></tr><tr><td valign="top"><div class="tdn">kernel_2a_c</div></td><td width="100%"> 
+                  is a typedef for kernel_2a that checks its preconditions.             
+                  </td></tr><tr><td bgcolor="#E3E3E3" valign="top"><div class="tdn">kernel_2b</div></td><td width="100%" bgcolor="#E3E3E3">is a typedef for entropy_encoder_model_kernel_2 that uses conditioning_class_kernel_2a</td></tr><tr><td valign="top"><div class="tdn">kernel_2b_c</div></td><td width="100%"> 
+                  is a typedef for kernel_2b that checks its preconditions.             
+                  </td></tr><tr><td bgcolor="#E3E3E3" valign="top"><div class="tdn">kernel_2c</div></td><td width="100%" bgcolor="#E3E3E3">is a typedef for entropy_encoder_model_kernel_2 that uses conditioning_class_kernel_3a</td></tr><tr><td valign="top"><div class="tdn">kernel_2c_c</div></td><td width="100%"> 
+                  is a typedef for kernel_2c that checks its preconditions.             
+                  </td></tr><tr><td bgcolor="#E3E3E3" valign="top"><div class="tdn">kernel_2d</div></td><td width="100%" bgcolor="#E3E3E3">is a typedef for entropy_encoder_model_kernel_2 that uses conditioning_class_kernel_2a for its order-0
+                         context and conditioning_class_kernel_4b for its order-1 context.</td></tr><tr><td valign="top"><div class="tdn">kernel_2d_c</div></td><td width="100%"> 
+                  is a typedef for kernel_2d that checks its preconditions.             
+                  </td></tr></table></div></blockquote><blockquote><a href="dlib/entropy_encoder_model/entropy_encoder_model_kernel_3.h.html">entropy_encoder_model_kernel_3</a>:
+                  <br> 
+                  This object is implemented using the <a href="#conditioning_class">conditioning_class</a> component.
+                  It implements an <i>order-2-1-0</i> finite context model and uses lazy exclusions and update exclusions.  
+                  The escape method used is method D.
+               <div class="typedefs"><table CELLSPACING="0" CELLPADDING="0" bgcolor="white"><tr><td bgcolor="#E3E3E3" valign="top"><div class="tdn">kernel_3a</div></td><td width="100%" bgcolor="#E3E3E3">   is a typedef for entropy_encoder_model_kernel_3 that uses conditioning_class_kernel_1a for orders 0 and 1
+                        and conditioning_class_kernel_4b for order-2.</td></tr><tr><td valign="top"><div class="tdn">kernel_3a_c</div></td><td width="100%"> 
+                  is a typedef for kernel_3a that checks its preconditions.             
+                  </td></tr><tr><td bgcolor="#E3E3E3" valign="top"><div class="tdn">kernel_3b</div></td><td width="100%" bgcolor="#E3E3E3">   is a typedef for entropy_encoder_model_kernel_3 that uses conditioning_class_kernel_2a for orders 0 and 1
+                        and conditioning_class_kernel_4b for order-2.</td></tr><tr><td valign="top"><div class="tdn">kernel_3b_c</div></td><td width="100%"> 
+                  is a typedef for kernel_3b that checks its preconditions.             
+                  </td></tr><tr><td bgcolor="#E3E3E3" valign="top"><div class="tdn">kernel_3c</div></td><td width="100%" bgcolor="#E3E3E3">   is a typedef for entropy_encoder_model_kernel_3 that uses conditioning_class_kernel_3a for orders 0 and 1
+                        and conditioning_class_kernel_4b for order-2.</td></tr><tr><td valign="top"><div class="tdn">kernel_3c_c</div></td><td width="100%"> 
+                  is a typedef for kernel_3c that checks its preconditions.             
+                  </td></tr></table></div></blockquote><blockquote><a href="dlib/entropy_encoder_model/entropy_encoder_model_kernel_4.h.html">entropy_encoder_model_kernel_4</a>:
+                  <br> 
+                  This object is implemented using a variation of the PPM algorithm described by Alistair Moffat in his paper "Implementing 
+                  the PPM data compression scheme."
+                  It provides template arguments to select the maximum order and maximum memory to use.  For speed,
+                  exclusions are not used.  The escape method used is method D.
+               <div class="typedefs"><table CELLSPACING="0" CELLPADDING="0" bgcolor="white"><tr><td bgcolor="#E3E3E3" valign="top"><div class="tdn">kernel_4a</div></td><td width="100%" bgcolor="#E3E3E3">   is a typedef for entropy_encoder_model_kernel_4 with the max order set to 4 and the max number
+                        of nodes set to 200,000</td></tr><tr><td valign="top"><div class="tdn">kernel_4a_c</div></td><td width="100%"> 
+                  is a typedef for kernel_4a that checks its preconditions.             
+                  </td></tr><tr><td bgcolor="#E3E3E3" valign="top"><div class="tdn">kernel_4b</div></td><td width="100%" bgcolor="#E3E3E3">   is a typedef for entropy_encoder_model_kernel_4 with the max order set to 5 and the max number
+                        of nodes set to 1,000,000</td></tr><tr><td valign="top"><div class="tdn">kernel_4b_c</div></td><td width="100%"> 
+                  is a typedef for kernel_4b that checks its preconditions.             
+                  </td></tr></table></div></blockquote><blockquote><a href="dlib/entropy_encoder_model/entropy_encoder_model_kernel_5.h.html">entropy_encoder_model_kernel_5</a>:
+                  <br> 
+                  This object is implemented using a variation of the PPM algorithm described by Alistair Moffat in his paper "Implementing 
+                  the PPM data compression scheme."
+                  It provides template arguments to select the maximum order and maximum memory to use.  Exclusions are used. The escape method used is method D.
+                  This implementation is very much like kernel_4 except it is tuned for higher compression rather than speed.
+                  This also uses Dmitry Shkarin's Information Inheritance scheme.
+               <div class="typedefs"><table CELLSPACING="0" CELLPADDING="0" bgcolor="white"><tr><td bgcolor="#E3E3E3" valign="top"><div class="tdn">kernel_5a</div></td><td width="100%" bgcolor="#E3E3E3">   is a typedef for entropy_encoder_model_kernel_5 with the max order set to 4 and the max number
+                        of nodes set to 200,000</td></tr><tr><td valign="top"><div class="tdn">kernel_5a_c</div></td><td width="100%"> 
+                  is a typedef for kernel_5a that checks its preconditions.             
+                  </td></tr><tr><td bgcolor="#E3E3E3" valign="top"><div class="tdn">kernel_5b</div></td><td width="100%" bgcolor="#E3E3E3">   is a typedef for entropy_encoder_model_kernel_5 with the max order set to 5 and the max number
+                         of nodes set to 1,000,000</td></tr><tr><td valign="top"><div class="tdn">kernel_5b_c</div></td><td width="100%"> 
+                  is a typedef for kernel_5b that checks its preconditions.             
+                  </td></tr><tr><td bgcolor="#E3E3E3" valign="top"><div class="tdn">kernel_5c</div></td><td width="100%" bgcolor="#E3E3E3">   is a typedef for entropy_encoder_model_kernel_5 with the max order set to 7 and the max number
+                         of nodes set to 2,500,000</td></tr><tr><td valign="top"><div class="tdn">kernel_5c_c</div></td><td width="100%"> 
+                  is a typedef for kernel_5c that checks its preconditions.             
+                  </td></tr></table></div></blockquote><blockquote><a href="dlib/entropy_encoder_model/entropy_encoder_model_kernel_6.h.html">entropy_encoder_model_kernel_6</a>:
+                  <br> 
+                  This object just assigns every symbol the same probability.  I.e. it uses an <i>order-(-1)</i> model.
+               <div class="typedefs"><table CELLSPACING="0" CELLPADDING="0" bgcolor="white"><tr><td bgcolor="#E3E3E3" valign="top"><div class="tdn">kernel_6a</div></td><td width="100%" bgcolor="#E3E3E3">is a typedef for entropy_encoder_model_kernel_6</td></tr><tr><td valign="top"><div class="tdn">kernel_6a_c</div></td><td width="100%"> 
+                  is a typedef for kernel_6a that checks its preconditions.             
+                  </td></tr></table></div></blockquote><center></center></div></a><a name="lz77_buffer"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">lz77_buffer</h1><BR><BR>
+            This object represents a pair of buffers (history and lookahead buffers) 
+                used during lz77 style compression.
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/lz77_buffer.h&gt;</tt></font></B><BR><b><a href="dlib/lz77_buffer/lz77_buffer_kernel_abstract.h.html"><font style="font-size:1.4em">Detailed Documentation</font></a></b><BR><BR><B>Implementations:</B><blockquote><a href="dlib/lz77_buffer/lz77_buffer_kernel_1.h.html">lz77_buffer_kernel_1</a>:
+                  <br> 
+                  This object is implemented using the <a href="containers.html#sliding_buffer">sliding_buffer</a> and it 
+                  just does simple linear searches of the history buffer to find matches. 
+               <div class="typedefs"><table CELLSPACING="0" CELLPADDING="0" bgcolor="white"><tr><td bgcolor="#E3E3E3" valign="top"><div class="tdn">kernel_1a</div></td><td width="100%" bgcolor="#E3E3E3">is a typedef for lz77_buffer_kernel_1 that uses sliding_buffer_kernel_1</td></tr><tr><td valign="top"><div class="tdn">kernel_1a_c</div></td><td width="100%"> 
+                  is a typedef for kernel_1a that checks its preconditions.             
+                  </td></tr></table></div></blockquote><blockquote><a href="dlib/lz77_buffer/lz77_buffer_kernel_2.h.html">lz77_buffer_kernel_2</a>:
+                  <br> 
+                  This object is implemented using the <a href="containers.html#sliding_buffer">sliding_buffer</a>.  It
+                  finds matches by using a hash table. 
+               <div class="typedefs"><table CELLSPACING="0" CELLPADDING="0" bgcolor="white"><tr><td bgcolor="#E3E3E3" valign="top"><div class="tdn">kernel_2a</div></td><td width="100%" bgcolor="#E3E3E3">is a typedef for lz77_buffer_kernel_2 that uses sliding_buffer_kernel_1</td></tr><tr><td valign="top"><div class="tdn">kernel_2a_c</div></td><td width="100%"> 
+                  is a typedef for kernel_2a that checks its preconditions.             
+                  </td></tr></table></div></blockquote><center></center></div></a><a name="lzp_buffer"><div class="component"><a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">lzp_buffer</h1><BR><BR>
+                This object represents some variation on the LZP algorithm
+                described by Charles Bloom in his paper "LZP: a new data
+                compression algorithm"
+         <BR><BR><B><font style="font-size:1.4em"><tt>#include &lt;dlib/lzp_buffer.h&gt;</tt></font></B><BR><b><a href="dlib/lzp_buffer/lzp_buffer_kernel_abstract.h.html"><font style="font-size:1.4em">Detailed Documentation</font></a></b><BR><BR><B>Implementations:</B><blockquote><a href="dlib/lzp_buffer/lzp_buffer_kernel_1.h.html">lzp_buffer_kernel_1</a>:
+                  <br> 
+                  This object is implemented using the <a href="containers.html#sliding_buffer">sliding_buffer</a> and uses
+                  an order-3 model to predict matches.
+               <div class="typedefs"><table CELLSPACING="0" CELLPADDING="0" bgcolor="white"><tr><td bgcolor="#E3E3E3" valign="top"><div class="tdn">kernel_1a</div></td><td width="100%" bgcolor="#E3E3E3">is a typedef for lzp_buffer_kernel_1 that uses sliding_buffer_kernel_1</td></tr><tr><td valign="top"><div class="tdn">kernel_1a_c</div></td><td width="100%"> 
+                  is a typedef for kernel_1a that checks its preconditions.             
+                  </td></tr></table></div></blockquote><blockquote><a href="dlib/lzp_buffer/lzp_buffer_kernel_2.h.html">lzp_buffer_kernel_2</a>:
+                  <br> 
+                  This object is implemented using the <a href="containers.html#sliding_buffer">sliding_buffer</a> and uses
+                  an order-5-4-3 model to predict matches.
+               <div class="typedefs"><table CELLSPACING="0" CELLPADDING="0" bgcolor="white"><tr><td bgcolor="#E3E3E3" valign="top"><div class="tdn">kernel_2a</div></td><td width="100%" bgcolor="#E3E3E3">is a typedef for lzp_buffer_kernel_2 that uses sliding_buffer_kernel_1</td></tr><tr><td valign="top"><div class="tdn">kernel_2a_c</div></td><td width="100%"> 
+                  is a typedef for kernel_2a that checks its preconditions.             
+                  </td></tr></table></div></blockquote><center></center></div></a></div></body></html>

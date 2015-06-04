@@ -1,0 +1,193 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - integral_image.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2009  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_INTEGRAL_IMAGE
+<font color='#0000FF'>#define</font> DLIB_INTEGRAL_IMAGE
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='integral_image_abstract.h.html'>integral_image_abstract.h</a>"
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../algs.h.html'>../algs.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../assert.h.html'>../assert.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../geometry.h.html'>../geometry.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../array2d.h.html'>../array2d.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../matrix.h.html'>../matrix.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../pixel.h.html'>../pixel.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../noncopyable.h.html'>../noncopyable.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>class</font> <b><a name='integral_image_generic'></a>integral_image_generic</b> : noncopyable
+    <b>{</b>
+    <font color='#0000FF'>public</font>:
+        <font color='#0000FF'>typedef</font> T value_type;
+
+        <font color='#0000FF'><u>long</u></font> <b><a name='nr'></a>nr</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> int_img.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <b>}</b>
+        <font color='#0000FF'><u>long</u></font> <b><a name='nc'></a>nc</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> int_img.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <b>}</b>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> image_type<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='load'></a>load</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> image_type<font color='#5555FF'>&amp;</font> img_
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            const_image_view<font color='#5555FF'>&lt;</font>image_type<font color='#5555FF'>&gt;</font> <font color='#BB00BB'>img</font><font face='Lucida Console'>(</font>img_<font face='Lucida Console'>)</font>;
+            T pixel;
+            int_img.<font color='#BB00BB'>set_size</font><font face='Lucida Console'>(</font>img.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, img.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// compute the first row of the integral image
+</font>            T temp <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> c <font color='#5555FF'>=</font> <font color='#979000'>0</font>; c <font color='#5555FF'>&lt;</font> img.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>c<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#BB00BB'>assign_pixel</font><font face='Lucida Console'>(</font>pixel, img[<font color='#979000'>0</font>][c]<font face='Lucida Console'>)</font>;
+                temp <font color='#5555FF'>+</font><font color='#5555FF'>=</font> pixel;
+                int_img[<font color='#979000'>0</font>][c] <font color='#5555FF'>=</font> temp;
+            <b>}</b>
+
+            <font color='#009900'>// now compute the rest of the integral image
+</font>            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> r <font color='#5555FF'>=</font> <font color='#979000'>1</font>; r <font color='#5555FF'>&lt;</font> img.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>r<font face='Lucida Console'>)</font>
+            <b>{</b>
+                temp <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> c <font color='#5555FF'>=</font> <font color='#979000'>0</font>; c <font color='#5555FF'>&lt;</font> img.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>c<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#BB00BB'>assign_pixel</font><font face='Lucida Console'>(</font>pixel, img[r][c]<font face='Lucida Console'>)</font>;
+                    temp <font color='#5555FF'>+</font><font color='#5555FF'>=</font> pixel;
+                    int_img[r][c] <font color='#5555FF'>=</font> temp <font color='#5555FF'>+</font> int_img[r<font color='#5555FF'>-</font><font color='#979000'>1</font>][c];
+                <b>}</b>
+            <b>}</b>
+
+        <b>}</b>
+
+        value_type <b><a name='get_sum_of_area'></a>get_sum_of_area</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> rectangle<font color='#5555FF'>&amp;</font> rect
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font><font color='#BB00BB'>get_rect</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>contains</font><font face='Lucida Console'>(</font>rect<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>true</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> rect.<font color='#BB00BB'>is_empty</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font>,
+                "<font color='#CC0000'>\tvalue_type get_sum_of_area(rect)</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tYou have given a rectangle that goes outside the image</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tthis:            </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font>
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\trect.is_empty(): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> rect.<font color='#BB00BB'>is_empty</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\trect:            </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> rect 
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tget_rect(*this): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>get_rect</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font><font face='Lucida Console'>)</font> 
+            <font face='Lucida Console'>)</font>;
+
+            T top_left <font color='#5555FF'>=</font> <font color='#979000'>0</font>, top_right <font color='#5555FF'>=</font> <font color='#979000'>0</font>, bottom_left <font color='#5555FF'>=</font> <font color='#979000'>0</font>, bottom_right <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+
+            bottom_right <font color='#5555FF'>=</font> int_img[rect.<font color='#BB00BB'>bottom</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>][rect.<font color='#BB00BB'>right</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>];
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>rect.<font color='#BB00BB'>left</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#979000'>1</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#979000'>0</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> rect.<font color='#BB00BB'>top</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#979000'>1</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                top_left <font color='#5555FF'>=</font> int_img[rect.<font color='#BB00BB'>top</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#979000'>1</font>][rect.<font color='#BB00BB'>left</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#979000'>1</font>];
+                bottom_left <font color='#5555FF'>=</font> int_img[rect.<font color='#BB00BB'>bottom</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>][rect.<font color='#BB00BB'>left</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#979000'>1</font>];
+                top_right <font color='#5555FF'>=</font> int_img[rect.<font color='#BB00BB'>top</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#979000'>1</font>][rect.<font color='#BB00BB'>right</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>];
+            <b>}</b>
+            <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>rect.<font color='#BB00BB'>left</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#979000'>1</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                bottom_left <font color='#5555FF'>=</font> int_img[rect.<font color='#BB00BB'>bottom</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>][rect.<font color='#BB00BB'>left</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#979000'>1</font>];
+            <b>}</b>
+            <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>rect.<font color='#BB00BB'>top</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#979000'>1</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                top_right <font color='#5555FF'>=</font> int_img[rect.<font color='#BB00BB'>top</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#979000'>1</font>][rect.<font color='#BB00BB'>right</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>];
+            <b>}</b>
+
+            <font color='#0000FF'>return</font> bottom_right <font color='#5555FF'>-</font> bottom_left <font color='#5555FF'>-</font> top_right <font color='#5555FF'>+</font> top_left;
+        <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='swap'></a>swap</b><font face='Lucida Console'>(</font>integral_image_generic<font color='#5555FF'>&amp;</font> item<font face='Lucida Console'>)</font>
+        <b>{</b>
+            int_img.<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>item.int_img<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+    <font color='#0000FF'>private</font>:
+
+        array2d<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font> int_img;
+    <b>}</b>;
+
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='swap'></a>swap</b> <font face='Lucida Console'>(</font>
+        integral_image_generic<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> a,
+        integral_image_generic<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> b
+    <font face='Lucida Console'>)</font> <b>{</b> a.<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>b<font face='Lucida Console'>)</font>; <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>typedef</font> integral_image_generic<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font> integral_image;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> integral_image_type<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>typename</font> integral_image_type::value_type <b><a name='haar_x'></a>haar_x</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> integral_image_type<font color='#5555FF'>&amp;</font> img,
+        <font color='#0000FF'>const</font> point<font color='#5555FF'>&amp;</font> p,
+        <font color='#0000FF'><u>long</u></font> width
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font><font color='#BB00BB'>get_rect</font><font face='Lucida Console'>(</font>img<font face='Lucida Console'>)</font>.<font color='#BB00BB'>contains</font><font face='Lucida Console'>(</font><font color='#BB00BB'>centered_rect</font><font face='Lucida Console'>(</font>p,width,width<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>true</font>,
+            "<font color='#CC0000'>\tlong haar_x(img,p,width)</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tYou have given a point and with that goes outside the image</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tget_rect(img):  </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>get_rect</font><font face='Lucida Console'>(</font>img<font face='Lucida Console'>)</font> 
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tp:              </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> p 
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\twidth:          </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> width 
+        <font face='Lucida Console'>)</font>;
+
+        rectangle left_rect;
+        left_rect.<font color='#BB00BB'>set_left</font> <font face='Lucida Console'>(</font> p.<font color='#BB00BB'>x</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> width <font color='#5555FF'>/</font> <font color='#979000'>2</font> <font face='Lucida Console'>)</font>;
+        left_rect.<font color='#BB00BB'>set_top</font> <font face='Lucida Console'>(</font> p.<font color='#BB00BB'>y</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> width <font color='#5555FF'>/</font> <font color='#979000'>2</font> <font face='Lucida Console'>)</font>;
+        left_rect.<font color='#BB00BB'>set_right</font> <font face='Lucida Console'>(</font> p.<font color='#BB00BB'>x</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#979000'>1</font> <font face='Lucida Console'>)</font>;
+        left_rect.<font color='#BB00BB'>set_bottom</font> <font face='Lucida Console'>(</font> left_rect.<font color='#BB00BB'>top</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> width <font color='#5555FF'>-</font> <font color='#979000'>1</font> <font face='Lucida Console'>)</font>;
+
+        rectangle right_rect;
+        right_rect.<font color='#BB00BB'>set_left</font> <font face='Lucida Console'>(</font> p.<font color='#BB00BB'>x</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>)</font>;
+        right_rect.<font color='#BB00BB'>set_top</font> <font face='Lucida Console'>(</font> left_rect.<font color='#BB00BB'>top</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>)</font>;
+        right_rect.<font color='#BB00BB'>set_right</font> <font face='Lucida Console'>(</font> left_rect.<font color='#BB00BB'>left</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> width <font color='#5555FF'>-</font><font color='#979000'>1</font> <font face='Lucida Console'>)</font>;
+        right_rect.<font color='#BB00BB'>set_bottom</font> <font face='Lucida Console'>(</font> left_rect.<font color='#BB00BB'>bottom</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>return</font> img.<font color='#BB00BB'>get_sum_of_area</font><font face='Lucida Console'>(</font>right_rect<font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> img.<font color='#BB00BB'>get_sum_of_area</font><font face='Lucida Console'>(</font>left_rect<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+    <font color='#009900'>//  ----------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> integral_image_type<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>typename</font> integral_image_type::value_type <b><a name='haar_y'></a>haar_y</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> integral_image_type<font color='#5555FF'>&amp;</font> img,
+        <font color='#0000FF'>const</font> point<font color='#5555FF'>&amp;</font> p,
+        <font color='#0000FF'><u>long</u></font> width
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font><font color='#BB00BB'>get_rect</font><font face='Lucida Console'>(</font>img<font face='Lucida Console'>)</font>.<font color='#BB00BB'>contains</font><font face='Lucida Console'>(</font><font color='#BB00BB'>centered_rect</font><font face='Lucida Console'>(</font>p,width,width<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>true</font>,
+            "<font color='#CC0000'>\tlong haar_y(img,p,width)</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tYou have given a point and with that goes outside the image</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tget_rect(img):  </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>get_rect</font><font face='Lucida Console'>(</font>img<font face='Lucida Console'>)</font> 
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tp:              </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> p 
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\twidth:          </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> width 
+        <font face='Lucida Console'>)</font>;
+
+        rectangle top_rect;
+        top_rect.<font color='#BB00BB'>set_left</font> <font face='Lucida Console'>(</font> p.<font color='#BB00BB'>x</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> width <font color='#5555FF'>/</font> <font color='#979000'>2</font> <font face='Lucida Console'>)</font>;
+        top_rect.<font color='#BB00BB'>set_top</font> <font face='Lucida Console'>(</font> p.<font color='#BB00BB'>y</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> width <font color='#5555FF'>/</font> <font color='#979000'>2</font> <font face='Lucida Console'>)</font>;
+        top_rect.<font color='#BB00BB'>set_right</font> <font face='Lucida Console'>(</font> top_rect.<font color='#BB00BB'>left</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> width <font color='#5555FF'>-</font> <font color='#979000'>1</font> <font face='Lucida Console'>)</font>;
+        top_rect.<font color='#BB00BB'>set_bottom</font> <font face='Lucida Console'>(</font> p.<font color='#BB00BB'>y</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#979000'>1</font> <font face='Lucida Console'>)</font>;
+
+        rectangle bottom_rect;
+        bottom_rect.<font color='#BB00BB'>set_left</font> <font face='Lucida Console'>(</font> top_rect.<font color='#BB00BB'>left</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>)</font>;
+        bottom_rect.<font color='#BB00BB'>set_top</font> <font face='Lucida Console'>(</font> p.<font color='#BB00BB'>y</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>)</font>;
+        bottom_rect.<font color='#BB00BB'>set_right</font> <font face='Lucida Console'>(</font> top_rect.<font color='#BB00BB'>right</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>)</font>;
+        bottom_rect.<font color='#BB00BB'>set_bottom</font> <font face='Lucida Console'>(</font> top_rect.<font color='#BB00BB'>top</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> width <font color='#5555FF'>-</font> <font color='#979000'>1</font> <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>return</font> img.<font color='#BB00BB'>get_sum_of_area</font><font face='Lucida Console'>(</font>bottom_rect<font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> img.<font color='#BB00BB'>get_sum_of_area</font><font face='Lucida Console'>(</font>top_rect<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_INTEGRAL_IMAGE
+</font>
+
+</pre></body></html>

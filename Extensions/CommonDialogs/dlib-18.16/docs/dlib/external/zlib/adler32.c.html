@@ -1,0 +1,182 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - adler32.c</title></head><body bgcolor='white'><pre>
+<font color='#009900'>/* adler32.c -- compute the Adler-32 checksum of a data stream
+ * Copyright (C) 1995-2011 Mark Adler
+ * For conditions of distribution and use, see copyright notice in zlib.h
+ */</font>
+
+<font color='#009900'>/* @(#) $Id$ */</font>
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='zutil.h.html'>zutil.h</a>"
+
+<font color='#0000FF'>#define</font> local <font color='#0000FF'>static</font>
+
+local uLong adler32_combine_ <b><a name='OF'></a>OF</b><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>uLong adler1, uLong adler2, z_off64_t len2<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+<font color='#0000FF'>#define</font> BASE <font color='#979000'>65521</font>      <font color='#009900'>/* largest prime smaller than 65536 */</font>
+<font color='#0000FF'>#define</font> NMAX <font color='#979000'>5552</font>
+<font color='#009900'>/* NMAX is the largest n such that 255n(n+1)/2 + (n+1)(BASE-1) &lt;= 2^32-1 */</font>
+
+<font color='#0000FF'>#define</font> DO1<font face='Lucida Console'>(</font>buf,i<font face='Lucida Console'>)</font>  <b>{</b>adler <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>buf<font face='Lucida Console'>)</font>[i]; sum2 <font color='#5555FF'>+</font><font color='#5555FF'>=</font> adler;<b>}</b>
+<font color='#0000FF'>#define</font> DO2<font face='Lucida Console'>(</font>buf,i<font face='Lucida Console'>)</font>  DO1<font face='Lucida Console'>(</font>buf,i<font face='Lucida Console'>)</font>; DO1<font face='Lucida Console'>(</font>buf,i<font color='#5555FF'>+</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+<font color='#0000FF'>#define</font> DO4<font face='Lucida Console'>(</font>buf,i<font face='Lucida Console'>)</font>  DO2<font face='Lucida Console'>(</font>buf,i<font face='Lucida Console'>)</font>; DO2<font face='Lucida Console'>(</font>buf,i<font color='#5555FF'>+</font><font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+<font color='#0000FF'>#define</font> DO8<font face='Lucida Console'>(</font>buf,i<font face='Lucida Console'>)</font>  DO4<font face='Lucida Console'>(</font>buf,i<font face='Lucida Console'>)</font>; DO4<font face='Lucida Console'>(</font>buf,i<font color='#5555FF'>+</font><font color='#979000'>4</font><font face='Lucida Console'>)</font>;
+<font color='#0000FF'>#define</font> DO16<font face='Lucida Console'>(</font>buf<font face='Lucida Console'>)</font>   DO8<font face='Lucida Console'>(</font>buf,<font color='#979000'>0</font><font face='Lucida Console'>)</font>; DO8<font face='Lucida Console'>(</font>buf,<font color='#979000'>8</font><font face='Lucida Console'>)</font>;
+
+<font color='#009900'>/* use NO_DIVIDE if your processor does not do division in hardware --
+   try it both ways to see which is faster */</font>
+<font color='#0000FF'>#ifdef</font> NO_DIVIDE
+<font color='#009900'>/* note that this assumes BASE is 65521, where 65536 % 65521 == 15
+   (thank you to John Reiser for pointing this out) */</font>
+#  define <b><a name='CHOP'></a>CHOP</b><font face='Lucida Console'>(</font>a<font face='Lucida Console'>)</font> \
+    <font color='#0000FF'>do</font> <b>{</b> \
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> tmp <font color='#5555FF'>=</font> a <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font> <font color='#979000'>16</font>; \
+        a <font color='#5555FF'>&amp;</font><font color='#5555FF'>=</font> <font color='#979000'>0xffffUL</font>; \
+        a <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>tmp <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#979000'>4</font><font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> tmp; \
+    <b>}</b> <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>
+#  define <b><a name='MOD28'></a>MOD28</b><font face='Lucida Console'>(</font>a<font face='Lucida Console'>)</font> \
+    <font color='#0000FF'>do</font> <b>{</b> \
+        <font color='#BB00BB'>CHOP</font><font face='Lucida Console'>(</font>a<font face='Lucida Console'>)</font>; \
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>a <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> BASE<font face='Lucida Console'>)</font> a <font color='#5555FF'>-</font><font color='#5555FF'>=</font> BASE; \
+    <b>}</b> <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>
+#  define <b><a name='MOD'></a>MOD</b><font face='Lucida Console'>(</font>a<font face='Lucida Console'>)</font> \
+    <font color='#0000FF'>do</font> <b>{</b> \
+        <font color='#BB00BB'>CHOP</font><font face='Lucida Console'>(</font>a<font face='Lucida Console'>)</font>; \
+        <font color='#BB00BB'>MOD28</font><font face='Lucida Console'>(</font>a<font face='Lucida Console'>)</font>; \
+    <b>}</b> <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>
+#  define <b><a name='MOD63'></a>MOD63</b><font face='Lucida Console'>(</font>a<font face='Lucida Console'>)</font> \
+    <font color='#0000FF'>do</font> <b>{</b> <font color='#009900'>/* this assumes a is not negative */</font> \
+        z_off64_t tmp <font color='#5555FF'>=</font> a <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font> <font color='#979000'>32</font>; \
+        a <font color='#5555FF'>&amp;</font><font color='#5555FF'>=</font> <font color='#979000'>0xffffffffL</font>; \
+        a <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>tmp <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#979000'>8</font><font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> <font face='Lucida Console'>(</font>tmp <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#979000'>5</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> tmp; \
+        tmp <font color='#5555FF'>=</font> a <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font> <font color='#979000'>16</font>; \
+        a <font color='#5555FF'>&amp;</font><font color='#5555FF'>=</font> <font color='#979000'>0xffffL</font>; \
+        a <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>tmp <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#979000'>4</font><font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> tmp; \
+        tmp <font color='#5555FF'>=</font> a <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font> <font color='#979000'>16</font>; \
+        a <font color='#5555FF'>&amp;</font><font color='#5555FF'>=</font> <font color='#979000'>0xffffL</font>; \
+        a <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>tmp <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#979000'>4</font><font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> tmp; \
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>a <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> BASE<font face='Lucida Console'>)</font> a <font color='#5555FF'>-</font><font color='#5555FF'>=</font> BASE; \
+    <b>}</b> <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>
+<font color='#0000FF'>#else</font>
+#  define <b><a name='MOD'></a>MOD</b><font face='Lucida Console'>(</font>a<font face='Lucida Console'>)</font> a <font color='#5555FF'>%</font><font color='#5555FF'>=</font> BASE
+#  define <b><a name='MOD28'></a>MOD28</b><font face='Lucida Console'>(</font>a<font face='Lucida Console'>)</font> a <font color='#5555FF'>%</font><font color='#5555FF'>=</font> BASE
+#  define <b><a name='MOD63'></a>MOD63</b><font face='Lucida Console'>(</font>a<font face='Lucida Console'>)</font> a <font color='#5555FF'>%</font><font color='#5555FF'>=</font> BASE
+<font color='#0000FF'>#endif</font>
+
+<font color='#009900'>/* ========================================================================= */</font>
+uLong ZEXPORT <b><a name='adler32'></a>adler32</b><font face='Lucida Console'>(</font>adler, buf, len<font face='Lucida Console'>)</font>
+    uLong adler;
+    <font color='#0000FF'>const</font> Bytef <font color='#5555FF'>*</font>buf;
+    uInt len;
+<b>{</b>
+    <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> sum2;
+    <font color='#0000FF'><u>unsigned</u></font> n;
+
+    <font color='#009900'>/* split Adler-32 into component sums */</font>
+    sum2 <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>adler <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font> <font color='#979000'>16</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font> <font color='#979000'>0xffff</font>;
+    adler <font color='#5555FF'>&amp;</font><font color='#5555FF'>=</font> <font color='#979000'>0xffff</font>;
+
+    <font color='#009900'>/* in case user likes doing a byte at a time, keep it fast */</font>
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>len <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font> <b>{</b>
+        adler <font color='#5555FF'>+</font><font color='#5555FF'>=</font> buf[<font color='#979000'>0</font>];
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>adler <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> BASE<font face='Lucida Console'>)</font>
+            adler <font color='#5555FF'>-</font><font color='#5555FF'>=</font> BASE;
+        sum2 <font color='#5555FF'>+</font><font color='#5555FF'>=</font> adler;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>sum2 <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> BASE<font face='Lucida Console'>)</font>
+            sum2 <font color='#5555FF'>-</font><font color='#5555FF'>=</font> BASE;
+        <font color='#0000FF'>return</font> adler <font color='#5555FF'>|</font> <font face='Lucida Console'>(</font>sum2 <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#979000'>16</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+    <font color='#009900'>/* initial Adler-32 value (deferred check for len == 1 speed) */</font>
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>buf <font color='#5555FF'>=</font><font color='#5555FF'>=</font> Z_NULL<font face='Lucida Console'>)</font>
+        <font color='#0000FF'>return</font> <font color='#979000'>1</font>L;
+
+    <font color='#009900'>/* in case short lengths are provided, keep it somewhat fast */</font>
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>len <font color='#5555FF'>&lt;</font> <font color='#979000'>16</font><font face='Lucida Console'>)</font> <b>{</b>
+        <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>len<font color='#5555FF'>-</font><font color='#5555FF'>-</font><font face='Lucida Console'>)</font> <b>{</b>
+            adler <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#5555FF'>*</font>buf<font color='#5555FF'>+</font><font color='#5555FF'>+</font>;
+            sum2 <font color='#5555FF'>+</font><font color='#5555FF'>=</font> adler;
+        <b>}</b>
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>adler <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> BASE<font face='Lucida Console'>)</font>
+            adler <font color='#5555FF'>-</font><font color='#5555FF'>=</font> BASE;
+        <font color='#BB00BB'>MOD28</font><font face='Lucida Console'>(</font>sum2<font face='Lucida Console'>)</font>;            <font color='#009900'>/* only added so many BASE's */</font>
+        <font color='#0000FF'>return</font> adler <font color='#5555FF'>|</font> <font face='Lucida Console'>(</font>sum2 <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#979000'>16</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+    <font color='#009900'>/* do length NMAX blocks -- requires just one modulo operation */</font>
+    <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>len <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> NMAX<font face='Lucida Console'>)</font> <b>{</b>
+        len <font color='#5555FF'>-</font><font color='#5555FF'>=</font> NMAX;
+        n <font color='#5555FF'>=</font> NMAX <font color='#5555FF'>/</font> <font color='#979000'>16</font>;          <font color='#009900'>/* NMAX is divisible by 16 */</font>
+        <font color='#0000FF'>do</font> <b>{</b>
+            <font color='#BB00BB'>DO16</font><font face='Lucida Console'>(</font>buf<font face='Lucida Console'>)</font>;          <font color='#009900'>/* 16 sums unrolled */</font>
+            buf <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#979000'>16</font>;
+        <b>}</b> <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font><font color='#5555FF'>-</font><font color='#5555FF'>-</font>n<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>MOD</font><font face='Lucida Console'>(</font>adler<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>MOD</font><font face='Lucida Console'>(</font>sum2<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+    <font color='#009900'>/* do remaining bytes (less than NMAX, still just one modulo) */</font>
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>len<font face='Lucida Console'>)</font> <b>{</b>                  <font color='#009900'>/* avoid modulos if none remaining */</font>
+        <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>len <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#979000'>16</font><font face='Lucida Console'>)</font> <b>{</b>
+            len <font color='#5555FF'>-</font><font color='#5555FF'>=</font> <font color='#979000'>16</font>;
+            <font color='#BB00BB'>DO16</font><font face='Lucida Console'>(</font>buf<font face='Lucida Console'>)</font>;
+            buf <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#979000'>16</font>;
+        <b>}</b>
+        <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>len<font color='#5555FF'>-</font><font color='#5555FF'>-</font><font face='Lucida Console'>)</font> <b>{</b>
+            adler <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#5555FF'>*</font>buf<font color='#5555FF'>+</font><font color='#5555FF'>+</font>;
+            sum2 <font color='#5555FF'>+</font><font color='#5555FF'>=</font> adler;
+        <b>}</b>
+        <font color='#BB00BB'>MOD</font><font face='Lucida Console'>(</font>adler<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>MOD</font><font face='Lucida Console'>(</font>sum2<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+    <font color='#009900'>/* return recombined sums */</font>
+    <font color='#0000FF'>return</font> adler <font color='#5555FF'>|</font> <font face='Lucida Console'>(</font>sum2 <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#979000'>16</font><font face='Lucida Console'>)</font>;
+<b>}</b>
+
+<font color='#009900'>/* ========================================================================= */</font>
+local uLong <b><a name='adler32_combine_'></a>adler32_combine_</b><font face='Lucida Console'>(</font>adler1, adler2, len2<font face='Lucida Console'>)</font>
+    uLong adler1;
+    uLong adler2;
+    z_off64_t len2;
+<b>{</b>
+    <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> sum1;
+    <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> sum2;
+    <font color='#0000FF'><u>unsigned</u></font> rem;
+
+    <font color='#009900'>/* for negative len, return invalid adler32 as a clue for debugging */</font>
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>len2 <font color='#5555FF'>&lt;</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+        <font color='#0000FF'>return</font> <font color='#979000'>0xffffffffUL</font>;
+
+    <font color='#009900'>/* the derivation of this formula is left as an exercise for the reader */</font>
+    <font color='#BB00BB'>MOD63</font><font face='Lucida Console'>(</font>len2<font face='Lucida Console'>)</font>;                <font color='#009900'>/* assumes len2 &gt;= 0 */</font>
+    rem <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font><font face='Lucida Console'>)</font>len2;
+    sum1 <font color='#5555FF'>=</font> adler1 <font color='#5555FF'>&amp;</font> <font color='#979000'>0xffff</font>;
+    sum2 <font color='#5555FF'>=</font> rem <font color='#5555FF'>*</font> sum1;
+    <font color='#BB00BB'>MOD</font><font face='Lucida Console'>(</font>sum2<font face='Lucida Console'>)</font>;
+    sum1 <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>adler2 <font color='#5555FF'>&amp;</font> <font color='#979000'>0xffff</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> BASE <font color='#5555FF'>-</font> <font color='#979000'>1</font>;
+    sum2 <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>adler1 <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font> <font color='#979000'>16</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font> <font color='#979000'>0xffff</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>adler2 <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font> <font color='#979000'>16</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font> <font color='#979000'>0xffff</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> BASE <font color='#5555FF'>-</font> rem;
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>sum1 <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> BASE<font face='Lucida Console'>)</font> sum1 <font color='#5555FF'>-</font><font color='#5555FF'>=</font> BASE;
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>sum1 <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> BASE<font face='Lucida Console'>)</font> sum1 <font color='#5555FF'>-</font><font color='#5555FF'>=</font> BASE;
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>sum2 <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>BASE <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> sum2 <font color='#5555FF'>-</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>BASE <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>sum2 <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> BASE<font face='Lucida Console'>)</font> sum2 <font color='#5555FF'>-</font><font color='#5555FF'>=</font> BASE;
+    <font color='#0000FF'>return</font> sum1 <font color='#5555FF'>|</font> <font face='Lucida Console'>(</font>sum2 <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#979000'>16</font><font face='Lucida Console'>)</font>;
+<b>}</b>
+
+<font color='#009900'>/* ========================================================================= */</font>
+uLong ZEXPORT <b><a name='adler32_combine'></a>adler32_combine</b><font face='Lucida Console'>(</font>adler1, adler2, len2<font face='Lucida Console'>)</font>
+    uLong adler1;
+    uLong adler2;
+    z_off_t len2;
+<b>{</b>
+    <font color='#0000FF'>return</font> <font color='#BB00BB'>adler32_combine_</font><font face='Lucida Console'>(</font>adler1, adler2, len2<font face='Lucida Console'>)</font>;
+<b>}</b>
+
+uLong ZEXPORT <b><a name='adler32_combine64'></a>adler32_combine64</b><font face='Lucida Console'>(</font>adler1, adler2, len2<font face='Lucida Console'>)</font>
+    uLong adler1;
+    uLong adler2;
+    z_off64_t len2;
+<b>{</b>
+    <font color='#0000FF'>return</font> <font color='#BB00BB'>adler32_combine_</font><font face='Lucida Console'>(</font>adler1, adler2, len2<font face='Lucida Console'>)</font>;
+<b>}</b>
+
+</pre></body></html>

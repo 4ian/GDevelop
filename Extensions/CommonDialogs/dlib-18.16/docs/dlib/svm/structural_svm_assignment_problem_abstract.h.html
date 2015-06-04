@@ -1,0 +1,90 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - structural_svm_assignment_problem_abstract.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2011  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#undef</font> DLIB_STRUCTURAL_SVM_ASSiGNMENT_PROBLEM_ABSTRACT_Hh_
+<font color='#0000FF'>#ifdef</font> DLIB_STRUCTURAL_SVM_ASSiGNMENT_PROBLEM_ABSTRACT_Hh_
+
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../matrix.h.html'>../matrix.h</a>"
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>vector<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='structural_svm_problem_threaded_abstract.h.html'>structural_svm_problem_threaded_abstract.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='assignment_function_abstract.h.html'>assignment_function_abstract.h</a>"
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> feature_extractor
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>class</font> <b><a name='structural_svm_assignment_problem'></a>structural_svm_assignment_problem</b> : noncopyable,
+                                              <font color='#0000FF'>public</font> structural_svm_problem_threaded<font color='#5555FF'>&lt;</font>matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>0</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font>, 
+                                                     <font color='#0000FF'>typename</font> feature_extractor::feature_vector_type <font color='#5555FF'>&gt;</font>
+    <b>{</b>
+        <font color='#009900'>/*!
+            REQUIREMENTS ON feature_extractor
+                It must be an object that implements an interface compatible with 
+                the example_feature_extractor defined in dlib/svm/assignment_function_abstract.h.
+
+            WHAT THIS OBJECT REPRESENTS
+                This object is a tool for learning the parameters needed to use an
+                assignment_function object.  It learns the parameters by formulating the
+                problem as a structural SVM problem.  
+        !*/</font>
+
+    <font color='#0000FF'>public</font>:
+        <font color='#0000FF'>typedef</font> matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>0</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> matrix_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> feature_extractor::feature_vector_type feature_vector_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> feature_extractor::lhs_element lhs_element;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> feature_extractor::rhs_element rhs_element;
+        <font color='#0000FF'>typedef</font> std::pair<font color='#5555FF'>&lt;</font>std::vector<font color='#5555FF'>&lt;</font>lhs_element<font color='#5555FF'>&gt;</font>, std::vector<font color='#5555FF'>&lt;</font>rhs_element<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> sample_type;
+        <font color='#0000FF'>typedef</font> std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font> label_type;
+
+        <b><a name='structural_svm_assignment_problem'></a>structural_svm_assignment_problem</b><font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>sample_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> samples,
+            <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>label_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> labels,
+            <font color='#0000FF'>const</font> feature_extractor<font color='#5555FF'>&amp;</font> fe,
+            <font color='#0000FF'><u>bool</u></font> force_assignment,
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> num_threads,
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> loss_per_false_association,
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> loss_per_missed_association
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - loss_per_false_association &gt; 0
+                - loss_per_missed_association &gt; 0
+                - is_assignment_problem(samples,labels) == true
+                - if (force_assignment) then
+                    - is_forced_assignment_problem(samples,labels) == true
+            ensures
+                - This object attempts to learn a mapping from the given samples to the 
+                  given labels.  In particular, it attempts to learn to predict labels[i] 
+                  based on samples[i].  Or in other words, this object can be used to learn 
+                  a parameter vector and bias, w and b, such that an assignment_function declared as:
+                    assignment_function&lt;feature_extractor&gt; assigner(w,b,fe,force_assignment)
+                  results in an assigner object which attempts to compute the following mapping:
+                    labels[i] == labeler(samples[i])
+                - This object will use num_threads threads during the optimization 
+                  procedure.  You should set this parameter equal to the number of 
+                  available processing cores on your machine.
+                - When solving the structural SVM problem, we will use
+                  loss_per_false_association as the loss for incorrectly associating
+                  objects that shouldn't be associated.
+                - When solving the structural SVM problem, we will use
+                  loss_per_missed_association as the loss for failing to associate to
+                  objects that are supposed to be associated with each other.
+        !*/</font>
+
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_STRUCTURAL_SVM_ASSiGNMENT_PROBLEM_ABSTRACT_Hh_
+</font>
+
+
+
+</pre></body></html>

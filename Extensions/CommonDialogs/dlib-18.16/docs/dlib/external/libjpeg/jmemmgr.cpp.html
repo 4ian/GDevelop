@@ -1,0 +1,1121 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - jmemmgr.cpp</title></head><body bgcolor='white'><pre>
+<font color='#009900'>/*
+ * jmemmgr.c
+ *
+ * Copyright (C) 1991-1997, Thomas G. Lane.
+ * This file is part of the Independent JPEG Group's software.
+ * For conditions of distribution and use, see the accompanying README file.
+ *
+ * This file contains the JPEG system-independent memory management
+ * routines.  This code is usable across a wide variety of machines; most
+ * of the system dependencies have been isolated in a separate file.
+ * The major functions provided here are:
+ *   * pool-based allocation and freeing of memory;
+ *   * policy decisions about how to divide available memory among the
+ *     virtual arrays;
+ *   * control logic for swapping virtual arrays between main memory and
+ *     backing storage.
+ * The separate system-dependent file provides the actual backing-storage
+ * access code, and it contains the policy decision about how much total
+ * main memory to use.
+ * This file is system-dependent in the sense that some of its functions
+ * are unnecessary in some systems.  For example, if there is enough virtual
+ * memory so that backing storage will never be used, much of the virtual
+ * array control logic could be removed.  (Of course, if you have that much
+ * memory then you shouldn't care about a little bit of unused code...)
+ */</font>
+
+<font color='#0000FF'>#define</font> JPEG_INTERNALS
+<font color='#0000FF'>#define</font> AM_MEMORY_MANAGER	<font color='#009900'>/* we define jvirt_Xarray_control structs */</font>
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='jinclude.h.html'>jinclude.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='jpeglib.h.html'>jpeglib.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='jmemsys.h.html'>jmemsys.h</a>"		<font color='#009900'>/* import the system-dependent declarations */</font>
+
+<font color='#0000FF'>#ifndef</font> NO_GETENV
+<font color='#0000FF'>#ifndef</font> HAVE_STDLIB_H		<font color='#009900'>/* &lt;stdlib.h&gt; should declare getenv() */</font>
+<font color='#0000FF'>extern</font> <font color='#0000FF'><u>char</u></font> <font color='#5555FF'>*</font> getenv <b><a name='JPP'></a>JPP</b><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> <font color='#0000FF'><u>char</u></font> <font color='#5555FF'>*</font> name<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+<font color='#0000FF'>#endif</font>
+<font color='#0000FF'>#endif</font>
+
+
+<font color='#009900'>/*
+ * Some important notes:
+ *   The allocation routines provided here must never return NULL.
+ *   They should exit to error_exit if unsuccessful.
+ *
+ *   It's not a good idea to try to merge the sarray and barray routines,
+ *   even though they are textually almost the same, because samples are
+ *   usually stored as bytes while coefficients are shorts or ints.  Thus,
+ *   in machines where byte pointers have a different representation from
+ *   word pointers, the resulting machine code could not be the same.
+ */</font>
+
+
+<font color='#009900'>/*
+ * Many machines require storage alignment: longs must start on 4-byte
+ * boundaries, doubles on 8-byte boundaries, etc.  On such machines, malloc()
+ * always returns pointers that are multiples of the worst-case alignment
+ * requirement, and we had better do so too.
+ * There isn't any really portable way to determine the worst-case alignment
+ * requirement.  This module assumes that the alignment requirement is
+ * multiples of sizeof(ALIGN_TYPE).
+ * By default, we define ALIGN_TYPE as double.  This is necessary on some
+ * workstations (where doubles really do need 8-byte alignment) and will work
+ * fine on nearly everything.  If your machine has lesser alignment needs,
+ * you can save a few bytes by making ALIGN_TYPE smaller.
+ * The only place I know of where this will NOT work is certain Macintosh
+ * 680x0 compilers that define double as a 10-byte IEEE extended float.
+ * Doing 10-byte alignment is counterproductive because longwords won't be
+ * aligned well.  Put "#define ALIGN_TYPE long" in jconfig.h if you have
+ * such a compiler.
+ */</font>
+
+<font color='#0000FF'>#ifndef</font> ALIGN_TYPE		<font color='#009900'>/* so can override from jconfig.h */</font>
+<font color='#0000FF'>#define</font> ALIGN_TYPE  <font color='#0000FF'><u>double</u></font>
+<font color='#0000FF'>#endif</font>
+
+
+<font color='#009900'>/*
+ * We allocate objects from "pools", where each pool is gotten with a single
+ * request to jpeg_get_small() or jpeg_get_large().  There is no per-object
+ * overhead within a pool, except for alignment padding.  Each pool has a
+ * header with a link to the next pool of the same class.
+ * Small and large pool headers are identical except that the latter's
+ * link pointer must be FAR on 80x86 machines.
+ * Notice that the "real" header fields are union'ed with a dummy ALIGN_TYPE
+ * field.  This forces the compiler to make SIZEOF(small_pool_hdr) a multiple
+ * of the alignment requirement of ALIGN_TYPE.
+ */</font>
+
+<font color='#0000FF'>typedef</font> <font color='#0000FF'>union</font> small_pool_struct <font color='#5555FF'>*</font> small_pool_ptr;
+
+<font color='#0000FF'>typedef</font> <font color='#0000FF'>union</font> small_pool_struct <b>{</b>
+  <font color='#0000FF'>struct</font> <b>{</b>
+    small_pool_ptr next;	<font color='#009900'>/* next in list of pools */</font>
+    <font color='#0000FF'><u>size_t</u></font> bytes_used;		<font color='#009900'>/* how many bytes already used within pool */</font>
+    <font color='#0000FF'><u>size_t</u></font> bytes_left;		<font color='#009900'>/* bytes still available in this pool */</font>
+  <b>}</b> hdr;
+  ALIGN_TYPE dummy;		<font color='#009900'>/* included in union to ensure alignment */</font>
+<b>}</b> small_pool_hdr;
+
+<font color='#0000FF'>typedef</font> <font color='#0000FF'>union</font> large_pool_struct FAR <font color='#5555FF'>*</font> large_pool_ptr;
+
+<font color='#0000FF'>typedef</font> <font color='#0000FF'>union</font> large_pool_struct <b>{</b>
+  <font color='#0000FF'>struct</font> <b>{</b>
+    large_pool_ptr next;	<font color='#009900'>/* next in list of pools */</font>
+    <font color='#0000FF'><u>size_t</u></font> bytes_used;		<font color='#009900'>/* how many bytes already used within pool */</font>
+    <font color='#0000FF'><u>size_t</u></font> bytes_left;		<font color='#009900'>/* bytes still available in this pool */</font>
+  <b>}</b> hdr;
+  ALIGN_TYPE dummy;		<font color='#009900'>/* included in union to ensure alignment */</font>
+<b>}</b> large_pool_hdr;
+
+
+<font color='#009900'>/*
+ * Here is the full definition of a memory manager object.
+ */</font>
+
+<font color='#0000FF'>typedef</font> <font color='#0000FF'>struct</font> <b>{</b>
+  <font color='#0000FF'>struct</font> jpeg_memory_mgr pub;	<font color='#009900'>/* public fields */</font>
+
+  <font color='#009900'>/* Each pool identifier (lifetime class) names a linked list of pools. */</font>
+  small_pool_ptr small_list[JPOOL_NUMPOOLS];
+  large_pool_ptr large_list[JPOOL_NUMPOOLS];
+
+  <font color='#009900'>/* Since we only have one lifetime class of virtual arrays, only one
+   * linked list is necessary (for each datatype).  Note that the virtual
+   * array control blocks being linked together are actually stored somewhere
+   * in the small-pool list.
+   */</font>
+  jvirt_sarray_ptr virt_sarray_list;
+  jvirt_barray_ptr virt_barray_list;
+
+  <font color='#009900'>/* This counts total space obtained from jpeg_get_small/large */</font>
+  <font color='#0000FF'><u>long</u></font> total_space_allocated;
+
+  <font color='#009900'>/* alloc_sarray and alloc_barray set this value for use by virtual
+   * array routines.
+   */</font>
+  JDIMENSION last_rowsperchunk;	<font color='#009900'>/* from most recent alloc_sarray/barray */</font>
+<b>}</b> my_memory_mgr;
+
+<font color='#0000FF'>typedef</font> my_memory_mgr <font color='#5555FF'>*</font> my_mem_ptr;
+
+
+<font color='#009900'>/*
+ * The control blocks for virtual arrays.
+ * Note that these blocks are allocated in the "small" pool area.
+ * System-dependent info for the associated backing store (if any) is hidden
+ * inside the backing_store_info struct.
+ */</font>
+
+<font color='#0000FF'>struct</font> <b><a name='jvirt_sarray_control'></a>jvirt_sarray_control</b> <b>{</b>
+  JSAMPARRAY mem_buffer;	<font color='#009900'>/* =&gt; the in-memory buffer */</font>
+  JDIMENSION rows_in_array;	<font color='#009900'>/* total virtual array height */</font>
+  JDIMENSION samplesperrow;	<font color='#009900'>/* width of array (and of memory buffer) */</font>
+  JDIMENSION maxaccess;		<font color='#009900'>/* max rows accessed by access_virt_sarray */</font>
+  JDIMENSION rows_in_mem;	<font color='#009900'>/* height of memory buffer */</font>
+  JDIMENSION rowsperchunk;	<font color='#009900'>/* allocation chunk size in mem_buffer */</font>
+  JDIMENSION cur_start_row;	<font color='#009900'>/* first logical row # in the buffer */</font>
+  JDIMENSION first_undef_row;	<font color='#009900'>/* row # of first uninitialized row */</font>
+  <font color='#0000FF'><u>int</u></font> pre_zero;		<font color='#009900'>/* pre-zero mode requested? */</font>
+  <font color='#0000FF'><u>int</u></font> dirty;		<font color='#009900'>/* do current buffer contents need written? */</font>
+  <font color='#0000FF'><u>int</u></font> b_s_open;		<font color='#009900'>/* is backing-store data valid? */</font>
+  jvirt_sarray_ptr next;	<font color='#009900'>/* link to next virtual sarray control block */</font>
+  backing_store_info b_s_info;	<font color='#009900'>/* System-dependent control info */</font>
+<b>}</b>;
+
+<font color='#0000FF'>struct</font> <b><a name='jvirt_barray_control'></a>jvirt_barray_control</b> <b>{</b>
+  JBLOCKARRAY mem_buffer;	<font color='#009900'>/* =&gt; the in-memory buffer */</font>
+  JDIMENSION rows_in_array;	<font color='#009900'>/* total virtual array height */</font>
+  JDIMENSION blocksperrow;	<font color='#009900'>/* width of array (and of memory buffer) */</font>
+  JDIMENSION maxaccess;		<font color='#009900'>/* max rows accessed by access_virt_barray */</font>
+  JDIMENSION rows_in_mem;	<font color='#009900'>/* height of memory buffer */</font>
+  JDIMENSION rowsperchunk;	<font color='#009900'>/* allocation chunk size in mem_buffer */</font>
+  JDIMENSION cur_start_row;	<font color='#009900'>/* first logical row # in the buffer */</font>
+  JDIMENSION first_undef_row;	<font color='#009900'>/* row # of first uninitialized row */</font>
+  <font color='#0000FF'><u>int</u></font> pre_zero;		<font color='#009900'>/* pre-zero mode requested? */</font>
+  <font color='#0000FF'><u>int</u></font> dirty;		<font color='#009900'>/* do current buffer contents need written? */</font>
+  <font color='#0000FF'><u>int</u></font> b_s_open;		<font color='#009900'>/* is backing-store data valid? */</font>
+  jvirt_barray_ptr next;	<font color='#009900'>/* link to next virtual barray control block */</font>
+  backing_store_info b_s_info;	<font color='#009900'>/* System-dependent control info */</font>
+<b>}</b>;
+
+
+<font color='#0000FF'>#ifdef</font> MEM_STATS		<font color='#009900'>/* optional extra stuff for statistics */</font>
+
+<b><a name='LOCAL'></a>LOCAL</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font>
+<b><a name='print_mem_stats'></a>print_mem_stats</b> <font face='Lucida Console'>(</font>j_common_ptr cinfo, <font color='#0000FF'><u>int</u></font> pool_id<font face='Lucida Console'>)</font>
+<b>{</b>
+  my_mem_ptr mem <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>my_mem_ptr<font face='Lucida Console'>)</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>mem;
+  small_pool_ptr shdr_ptr;
+  large_pool_ptr lhdr_ptr;
+
+  <font color='#009900'>/* Since this is only a debugging stub, we can cheat a little by using
+   * fprintf directly rather than going through the trace message code.
+   * This is helpful because message parm array can't handle longs.
+   */</font>
+  <font color='#BB00BB'>fprintf</font><font face='Lucida Console'>(</font>stderr, "<font color='#CC0000'>Freeing pool %d, total space = %ld\n</font>",
+	  pool_id, mem<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>total_space_allocated<font face='Lucida Console'>)</font>;
+
+  <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>lhdr_ptr <font color='#5555FF'>=</font> mem<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>large_list[pool_id]; lhdr_ptr <font color='#5555FF'>!</font><font color='#5555FF'>=</font> NULL;
+       lhdr_ptr <font color='#5555FF'>=</font> lhdr_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>hdr.next<font face='Lucida Console'>)</font> <b>{</b>
+    <font color='#BB00BB'>fprintf</font><font face='Lucida Console'>(</font>stderr, "<font color='#CC0000'>  Large chunk used %ld\n</font>",
+	    <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font> lhdr_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>hdr.bytes_used<font face='Lucida Console'>)</font>;
+  <b>}</b>
+
+  <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>shdr_ptr <font color='#5555FF'>=</font> mem<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>small_list[pool_id]; shdr_ptr <font color='#5555FF'>!</font><font color='#5555FF'>=</font> NULL;
+       shdr_ptr <font color='#5555FF'>=</font> shdr_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>hdr.next<font face='Lucida Console'>)</font> <b>{</b>
+    <font color='#BB00BB'>fprintf</font><font face='Lucida Console'>(</font>stderr, "<font color='#CC0000'>  Small chunk used %ld free %ld\n</font>",
+	    <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font> shdr_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>hdr.bytes_used,
+	    <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font> shdr_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>hdr.bytes_left<font face='Lucida Console'>)</font>;
+  <b>}</b>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>/* MEM_STATS */</font>
+
+
+<b><a name='LOCAL'></a>LOCAL</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font>
+<b><a name='out_of_memory'></a>out_of_memory</b> <font face='Lucida Console'>(</font>j_common_ptr cinfo, <font color='#0000FF'><u>int</u></font> which<font face='Lucida Console'>)</font>
+<font color='#009900'>/* Report an out-of-memory error and stop execution */</font>
+<font color='#009900'>/* If we compiled MEM_STATS support, report alloc requests before dying */</font>
+<b>{</b>
+<font color='#0000FF'>#ifdef</font> MEM_STATS
+  cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>err<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>trace_level <font color='#5555FF'>=</font> <font color='#979000'>2</font>;	<font color='#009900'>/* force self_destruct to report stats */</font>
+<font color='#0000FF'>#endif</font>
+  <font color='#BB00BB'>ERREXIT1</font><font face='Lucida Console'>(</font>cinfo, JERR_OUT_OF_MEMORY, which<font face='Lucida Console'>)</font>;
+<b>}</b>
+
+
+<font color='#009900'>/*
+ * Allocation of "small" objects.
+ *
+ * For these, we use pooled storage.  When a new pool must be created,
+ * we try to get enough space for the current request plus a "slop" factor,
+ * where the slop will be the amount of leftover space in the new pool.
+ * The speed vs. space tradeoff is largely determined by the slop values.
+ * A different slop value is provided for each pool class (lifetime),
+ * and we also distinguish the first pool of a class from later ones.
+ * NOTE: the values given work fairly well on both 16- and 32-bit-int
+ * machines, but may be too small if longs are 64 bits or more.
+ */</font>
+
+<font color='#0000FF'>static</font> <font color='#0000FF'>const</font> <font color='#0000FF'><u>size_t</u></font> first_pool_slop[JPOOL_NUMPOOLS] <font color='#5555FF'>=</font> 
+<b>{</b>
+	<font color='#979000'>1600</font>,			<font color='#009900'>/* first PERMANENT pool */</font>
+	<font color='#979000'>16000</font>			<font color='#009900'>/* first IMAGE pool */</font>
+<b>}</b>;
+
+<font color='#0000FF'>static</font> <font color='#0000FF'>const</font> <font color='#0000FF'><u>size_t</u></font> extra_pool_slop[JPOOL_NUMPOOLS] <font color='#5555FF'>=</font> 
+<b>{</b>
+	<font color='#979000'>0</font>,			<font color='#009900'>/* additional PERMANENT pools */</font>
+	<font color='#979000'>5000</font>			<font color='#009900'>/* additional IMAGE pools */</font>
+<b>}</b>;
+
+<font color='#0000FF'>#define</font> MIN_SLOP  <font color='#979000'>50</font>		<font color='#009900'>/* greater than 0 to avoid futile looping */</font>
+
+
+<b><a name='METHODDEF'></a>METHODDEF</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font> <font color='#5555FF'>*</font><font face='Lucida Console'>)</font>
+<b><a name='alloc_small'></a>alloc_small</b> <font face='Lucida Console'>(</font>j_common_ptr cinfo, <font color='#0000FF'><u>int</u></font> pool_id, <font color='#0000FF'><u>size_t</u></font> sizeofobject<font face='Lucida Console'>)</font>
+<font color='#009900'>/* Allocate a "small" object */</font>
+<b>{</b>
+  my_mem_ptr mem <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>my_mem_ptr<font face='Lucida Console'>)</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>mem;
+  small_pool_ptr hdr_ptr, prev_hdr_ptr;
+  <font color='#0000FF'><u>char</u></font> <font color='#5555FF'>*</font> data_ptr;
+  <font color='#0000FF'><u>size_t</u></font> odd_bytes, min_request, slop;
+
+  <font color='#009900'>/* Check for unsatisfiable request (do now to ensure no overflow below) */</font>
+  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>sizeofobject <font color='#5555FF'>&gt;</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>size_t</u></font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>MAX_ALLOC_CHUNK<font color='#5555FF'>-</font><font color='#BB00BB'>SIZEOF</font><font face='Lucida Console'>(</font>small_pool_hdr<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+    <font color='#BB00BB'>out_of_memory</font><font face='Lucida Console'>(</font>cinfo, <font color='#979000'>1</font><font face='Lucida Console'>)</font>;	<font color='#009900'>/* request exceeds malloc's ability */</font>
+
+  <font color='#009900'>/* Round up the requested size to a multiple of SIZEOF(ALIGN_TYPE) */</font>
+  odd_bytes <font color='#5555FF'>=</font> sizeofobject <font color='#5555FF'>%</font> <font color='#BB00BB'>SIZEOF</font><font face='Lucida Console'>(</font>ALIGN_TYPE<font face='Lucida Console'>)</font>;
+  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>odd_bytes <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+    sizeofobject <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#BB00BB'>SIZEOF</font><font face='Lucida Console'>(</font>ALIGN_TYPE<font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> odd_bytes;
+
+  <font color='#009900'>/* See if space is available in any existing pool */</font>
+  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>pool_id <font color='#5555FF'>&lt;</font> <font color='#979000'>0</font> <font color='#5555FF'>|</font><font color='#5555FF'>|</font> pool_id <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> JPOOL_NUMPOOLS<font face='Lucida Console'>)</font>
+    <font color='#BB00BB'>ERREXIT1</font><font face='Lucida Console'>(</font>cinfo, JERR_BAD_POOL_ID, pool_id<font face='Lucida Console'>)</font>;	<font color='#009900'>/* safety check */</font>
+  prev_hdr_ptr <font color='#5555FF'>=</font> NULL;
+  hdr_ptr <font color='#5555FF'>=</font> mem<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>small_list[pool_id];
+  <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>hdr_ptr <font color='#5555FF'>!</font><font color='#5555FF'>=</font> NULL<font face='Lucida Console'>)</font> <b>{</b>
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>hdr_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>hdr.bytes_left <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> sizeofobject<font face='Lucida Console'>)</font>
+      <font color='#0000FF'>break</font>;			<font color='#009900'>/* found pool with enough space */</font>
+    prev_hdr_ptr <font color='#5555FF'>=</font> hdr_ptr;
+    hdr_ptr <font color='#5555FF'>=</font> hdr_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>hdr.next;
+  <b>}</b>
+
+  <font color='#009900'>/* Time to make a new pool? */</font>
+  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>hdr_ptr <font color='#5555FF'>=</font><font color='#5555FF'>=</font> NULL<font face='Lucida Console'>)</font> <b>{</b>
+    <font color='#009900'>/* min_request is what we need now, slop is what will be leftover */</font>
+    min_request <font color='#5555FF'>=</font> sizeofobject <font color='#5555FF'>+</font> <font color='#BB00BB'>SIZEOF</font><font face='Lucida Console'>(</font>small_pool_hdr<font face='Lucida Console'>)</font>;
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>prev_hdr_ptr <font color='#5555FF'>=</font><font color='#5555FF'>=</font> NULL<font face='Lucida Console'>)</font>	<font color='#009900'>/* first pool in class? */</font>
+      slop <font color='#5555FF'>=</font> first_pool_slop[pool_id];
+    <font color='#0000FF'>else</font>
+      slop <font color='#5555FF'>=</font> extra_pool_slop[pool_id];
+    <font color='#009900'>/* Don't ask for more than MAX_ALLOC_CHUNK */</font>
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>slop <font color='#5555FF'>&gt;</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>size_t</u></font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>MAX_ALLOC_CHUNK<font color='#5555FF'>-</font>min_request<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+      slop <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>size_t</u></font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>MAX_ALLOC_CHUNK<font color='#5555FF'>-</font>min_request<font face='Lucida Console'>)</font>;
+    <font color='#009900'>/* Try to get space, if fail reduce slop and try again */</font>
+    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>;;<font face='Lucida Console'>)</font> <b>{</b>
+      hdr_ptr <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>small_pool_ptr<font face='Lucida Console'>)</font> <font color='#BB00BB'>jpeg_get_small</font><font face='Lucida Console'>(</font>cinfo, min_request <font color='#5555FF'>+</font> slop<font face='Lucida Console'>)</font>;
+      <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>hdr_ptr <font color='#5555FF'>!</font><font color='#5555FF'>=</font> NULL<font face='Lucida Console'>)</font>
+	<font color='#0000FF'>break</font>;
+      slop <font color='#5555FF'>/</font><font color='#5555FF'>=</font> <font color='#979000'>2</font>;
+      <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>slop <font color='#5555FF'>&lt;</font> MIN_SLOP<font face='Lucida Console'>)</font>	<font color='#009900'>/* give up when it gets real small */</font>
+	<font color='#BB00BB'>out_of_memory</font><font face='Lucida Console'>(</font>cinfo, <font color='#979000'>2</font><font face='Lucida Console'>)</font>; <font color='#009900'>/* jpeg_get_small failed */</font>
+    <b>}</b>
+    mem<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>total_space_allocated <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>min_request <font color='#5555FF'>+</font> slop<font face='Lucida Console'>)</font>;
+    <font color='#009900'>/* Success, initialize the new pool header and add to end of list */</font>
+    hdr_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>hdr.next <font color='#5555FF'>=</font> NULL;
+    hdr_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>hdr.bytes_used <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+    hdr_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>hdr.bytes_left <font color='#5555FF'>=</font> sizeofobject <font color='#5555FF'>+</font> slop;
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>prev_hdr_ptr <font color='#5555FF'>=</font><font color='#5555FF'>=</font> NULL<font face='Lucida Console'>)</font>	<font color='#009900'>/* first pool in class? */</font>
+      mem<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>small_list[pool_id] <font color='#5555FF'>=</font> hdr_ptr;
+    <font color='#0000FF'>else</font>
+      prev_hdr_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>hdr.next <font color='#5555FF'>=</font> hdr_ptr;
+  <b>}</b>
+
+  <font color='#009900'>/* OK, allocate the object from the current pool */</font>
+  data_ptr <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>char</u></font> <font color='#5555FF'>*</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>hdr_ptr <font color='#5555FF'>+</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>; <font color='#009900'>/* point to first data byte in pool */</font>
+  data_ptr <font color='#5555FF'>+</font><font color='#5555FF'>=</font> hdr_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>hdr.bytes_used; <font color='#009900'>/* point to place for object */</font>
+  hdr_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>hdr.bytes_used <font color='#5555FF'>+</font><font color='#5555FF'>=</font> sizeofobject;
+  hdr_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>hdr.bytes_left <font color='#5555FF'>-</font><font color='#5555FF'>=</font> sizeofobject;
+
+  <font color='#0000FF'>return</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font> <font color='#5555FF'>*</font><font face='Lucida Console'>)</font> data_ptr;
+<b>}</b>
+
+
+<font color='#009900'>/*
+ * Allocation of "large" objects.
+ *
+ * The external semantics of these are the same as "small" objects,
+ * except that FAR pointers are used on 80x86.  However the pool
+ * management heuristics are quite different.  We assume that each
+ * request is large enough that it may as well be passed directly to
+ * jpeg_get_large; the pool management just links everything together
+ * so that we can free it all on demand.
+ * Note: the major use of "large" objects is in JSAMPARRAY and JBLOCKARRAY
+ * structures.  The routines that create these structures (see below)
+ * deliberately bunch rows together to ensure a large request size.
+ */</font>
+
+<b><a name='METHODDEF'></a>METHODDEF</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font> FAR <font color='#5555FF'>*</font><font face='Lucida Console'>)</font>
+<b><a name='alloc_large'></a>alloc_large</b> <font face='Lucida Console'>(</font>j_common_ptr cinfo, <font color='#0000FF'><u>int</u></font> pool_id, <font color='#0000FF'><u>size_t</u></font> sizeofobject<font face='Lucida Console'>)</font>
+<font color='#009900'>/* Allocate a "large" object */</font>
+<b>{</b>
+  my_mem_ptr mem <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>my_mem_ptr<font face='Lucida Console'>)</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>mem;
+  large_pool_ptr hdr_ptr;
+  <font color='#0000FF'><u>size_t</u></font> odd_bytes;
+
+  <font color='#009900'>/* Check for unsatisfiable request (do now to ensure no overflow below) */</font>
+  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>sizeofobject <font color='#5555FF'>&gt;</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>size_t</u></font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>MAX_ALLOC_CHUNK<font color='#5555FF'>-</font><font color='#BB00BB'>SIZEOF</font><font face='Lucida Console'>(</font>large_pool_hdr<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+    <font color='#BB00BB'>out_of_memory</font><font face='Lucida Console'>(</font>cinfo, <font color='#979000'>3</font><font face='Lucida Console'>)</font>;	<font color='#009900'>/* request exceeds malloc's ability */</font>
+
+  <font color='#009900'>/* Round up the requested size to a multiple of SIZEOF(ALIGN_TYPE) */</font>
+  odd_bytes <font color='#5555FF'>=</font> sizeofobject <font color='#5555FF'>%</font> <font color='#BB00BB'>SIZEOF</font><font face='Lucida Console'>(</font>ALIGN_TYPE<font face='Lucida Console'>)</font>;
+  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>odd_bytes <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+    sizeofobject <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#BB00BB'>SIZEOF</font><font face='Lucida Console'>(</font>ALIGN_TYPE<font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> odd_bytes;
+
+  <font color='#009900'>/* Always make a new pool */</font>
+  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>pool_id <font color='#5555FF'>&lt;</font> <font color='#979000'>0</font> <font color='#5555FF'>|</font><font color='#5555FF'>|</font> pool_id <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> JPOOL_NUMPOOLS<font face='Lucida Console'>)</font>
+    <font color='#BB00BB'>ERREXIT1</font><font face='Lucida Console'>(</font>cinfo, JERR_BAD_POOL_ID, pool_id<font face='Lucida Console'>)</font>;	<font color='#009900'>/* safety check */</font>
+
+  hdr_ptr <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>large_pool_ptr<font face='Lucida Console'>)</font> <font color='#BB00BB'>jpeg_get_large</font><font face='Lucida Console'>(</font>cinfo, sizeofobject <font color='#5555FF'>+</font>
+					    <font color='#BB00BB'>SIZEOF</font><font face='Lucida Console'>(</font>large_pool_hdr<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>hdr_ptr <font color='#5555FF'>=</font><font color='#5555FF'>=</font> NULL<font face='Lucida Console'>)</font>
+    <font color='#BB00BB'>out_of_memory</font><font face='Lucida Console'>(</font>cinfo, <font color='#979000'>4</font><font face='Lucida Console'>)</font>;	<font color='#009900'>/* jpeg_get_large failed */</font>
+  mem<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>total_space_allocated <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>sizeofobject <font color='#5555FF'>+</font> <font color='#BB00BB'>SIZEOF</font><font face='Lucida Console'>(</font>large_pool_hdr<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+  <font color='#009900'>/* Success, initialize the new pool header and add to list */</font>
+  hdr_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>hdr.next <font color='#5555FF'>=</font> mem<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>large_list[pool_id];
+  <font color='#009900'>/* We maintain space counts in each pool header for statistical purposes,
+   * even though they are not needed for allocation.
+   */</font>
+  hdr_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>hdr.bytes_used <font color='#5555FF'>=</font> sizeofobject;
+  hdr_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>hdr.bytes_left <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+  mem<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>large_list[pool_id] <font color='#5555FF'>=</font> hdr_ptr;
+
+  <font color='#0000FF'>return</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font> FAR <font color='#5555FF'>*</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>hdr_ptr <font color='#5555FF'>+</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>; <font color='#009900'>/* point to first data byte in pool */</font>
+<b>}</b>
+
+
+<font color='#009900'>/*
+ * Creation of 2-D sample arrays.
+ * The pointers are in near heap, the samples themselves in FAR heap.
+ *
+ * To minimize allocation overhead and to allow I/O of large contiguous
+ * blocks, we allocate the sample rows in groups of as many rows as possible
+ * without exceeding MAX_ALLOC_CHUNK total bytes per allocation request.
+ * NB: the virtual array control routines, later in this file, know about
+ * this chunking of rows.  The rowsperchunk value is left in the mem manager
+ * object so that it can be saved away if this sarray is the workspace for
+ * a virtual array.
+ */</font>
+
+<b><a name='METHODDEF'></a>METHODDEF</b><font face='Lucida Console'>(</font>JSAMPARRAY<font face='Lucida Console'>)</font>
+<b><a name='alloc_sarray'></a>alloc_sarray</b> <font face='Lucida Console'>(</font>j_common_ptr cinfo, <font color='#0000FF'><u>int</u></font> pool_id,
+	      JDIMENSION samplesperrow, JDIMENSION numrows<font face='Lucida Console'>)</font>
+<font color='#009900'>/* Allocate a 2-D sample array */</font>
+<b>{</b>
+  my_mem_ptr mem <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>my_mem_ptr<font face='Lucida Console'>)</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>mem;
+  JSAMPARRAY result;
+  JSAMPROW workspace;
+  JDIMENSION rowsperchunk, currow, i;
+  <font color='#0000FF'><u>long</u></font> ltemp;
+
+  <font color='#009900'>/* Calculate max # of rows allowed in one allocation chunk */</font>
+  ltemp <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>MAX_ALLOC_CHUNK<font color='#5555FF'>-</font><font color='#BB00BB'>SIZEOF</font><font face='Lucida Console'>(</font>large_pool_hdr<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>/</font>
+	  <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font> samplesperrow <font color='#5555FF'>*</font> <font color='#BB00BB'>SIZEOF</font><font face='Lucida Console'>(</font>JSAMPLE<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>ltemp <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+    <font color='#BB00BB'>ERREXIT</font><font face='Lucida Console'>(</font>cinfo, JERR_WIDTH_OVERFLOW<font face='Lucida Console'>)</font>;
+  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>ltemp <font color='#5555FF'>&lt;</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font> numrows<font face='Lucida Console'>)</font>
+    rowsperchunk <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>JDIMENSION<font face='Lucida Console'>)</font> ltemp;
+  <font color='#0000FF'>else</font>
+    rowsperchunk <font color='#5555FF'>=</font> numrows;
+  mem<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>last_rowsperchunk <font color='#5555FF'>=</font> rowsperchunk;
+
+  <font color='#009900'>/* Get space for row pointers (small object) */</font>
+  result <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>JSAMPARRAY<font face='Lucida Console'>)</font> <font color='#BB00BB'>alloc_small</font><font face='Lucida Console'>(</font>cinfo, pool_id,
+				    <font face='Lucida Console'>(</font><font color='#0000FF'><u>size_t</u></font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>numrows <font color='#5555FF'>*</font> <font color='#BB00BB'>SIZEOF</font><font face='Lucida Console'>(</font>JSAMPROW<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+  <font color='#009900'>/* Get the rows themselves (large objects) */</font>
+  currow <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+  <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>currow <font color='#5555FF'>&lt;</font> numrows<font face='Lucida Console'>)</font> <b>{</b>
+    rowsperchunk <font color='#5555FF'>=</font> <font color='#BB00BB'>MIN</font><font face='Lucida Console'>(</font>rowsperchunk, numrows <font color='#5555FF'>-</font> currow<font face='Lucida Console'>)</font>;
+    workspace <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>JSAMPROW<font face='Lucida Console'>)</font> <font color='#BB00BB'>alloc_large</font><font face='Lucida Console'>(</font>cinfo, pool_id,
+	<font face='Lucida Console'>(</font><font color='#0000FF'><u>size_t</u></font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>size_t</u></font><font face='Lucida Console'>)</font> rowsperchunk <font color='#5555FF'>*</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>size_t</u></font><font face='Lucida Console'>)</font> samplesperrow
+		  <font color='#5555FF'>*</font> <font color='#BB00BB'>SIZEOF</font><font face='Lucida Console'>(</font>JSAMPLE<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>i <font color='#5555FF'>=</font> rowsperchunk; i <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font>; i<font color='#5555FF'>-</font><font color='#5555FF'>-</font><font face='Lucida Console'>)</font> <b>{</b>
+      result[currow<font color='#5555FF'>+</font><font color='#5555FF'>+</font>] <font color='#5555FF'>=</font> workspace;
+      workspace <font color='#5555FF'>+</font><font color='#5555FF'>=</font> samplesperrow;
+    <b>}</b>
+  <b>}</b>
+
+  <font color='#0000FF'>return</font> result;
+<b>}</b>
+
+
+<font color='#009900'>/*
+ * Creation of 2-D coefficient-block arrays.
+ * This is essentially the same as the code for sample arrays, above.
+ */</font>
+
+<b><a name='METHODDEF'></a>METHODDEF</b><font face='Lucida Console'>(</font>JBLOCKARRAY<font face='Lucida Console'>)</font>
+<b><a name='alloc_barray'></a>alloc_barray</b> <font face='Lucida Console'>(</font>j_common_ptr cinfo, <font color='#0000FF'><u>int</u></font> pool_id,
+	      JDIMENSION blocksperrow, JDIMENSION numrows<font face='Lucida Console'>)</font>
+<font color='#009900'>/* Allocate a 2-D coefficient-block array */</font>
+<b>{</b>
+  my_mem_ptr mem <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>my_mem_ptr<font face='Lucida Console'>)</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>mem;
+  JBLOCKARRAY result;
+  JBLOCKROW workspace;
+  JDIMENSION rowsperchunk, currow, i;
+  <font color='#0000FF'><u>long</u></font> ltemp;
+
+  <font color='#009900'>/* Calculate max # of rows allowed in one allocation chunk */</font>
+  ltemp <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>MAX_ALLOC_CHUNK<font color='#5555FF'>-</font><font color='#BB00BB'>SIZEOF</font><font face='Lucida Console'>(</font>large_pool_hdr<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>/</font>
+	  <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font> blocksperrow <font color='#5555FF'>*</font> <font color='#BB00BB'>SIZEOF</font><font face='Lucida Console'>(</font>JBLOCK<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>ltemp <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+    <font color='#BB00BB'>ERREXIT</font><font face='Lucida Console'>(</font>cinfo, JERR_WIDTH_OVERFLOW<font face='Lucida Console'>)</font>;
+  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>ltemp <font color='#5555FF'>&lt;</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font> numrows<font face='Lucida Console'>)</font>
+    rowsperchunk <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>JDIMENSION<font face='Lucida Console'>)</font> ltemp;
+  <font color='#0000FF'>else</font>
+    rowsperchunk <font color='#5555FF'>=</font> numrows;
+  mem<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>last_rowsperchunk <font color='#5555FF'>=</font> rowsperchunk;
+
+  <font color='#009900'>/* Get space for row pointers (small object) */</font>
+  result <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>JBLOCKARRAY<font face='Lucida Console'>)</font> <font color='#BB00BB'>alloc_small</font><font face='Lucida Console'>(</font>cinfo, pool_id,
+				     <font face='Lucida Console'>(</font><font color='#0000FF'><u>size_t</u></font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>numrows <font color='#5555FF'>*</font> <font color='#BB00BB'>SIZEOF</font><font face='Lucida Console'>(</font>JBLOCKROW<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+  <font color='#009900'>/* Get the rows themselves (large objects) */</font>
+  currow <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+  <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>currow <font color='#5555FF'>&lt;</font> numrows<font face='Lucida Console'>)</font> <b>{</b>
+    rowsperchunk <font color='#5555FF'>=</font> <font color='#BB00BB'>MIN</font><font face='Lucida Console'>(</font>rowsperchunk, numrows <font color='#5555FF'>-</font> currow<font face='Lucida Console'>)</font>;
+    workspace <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>JBLOCKROW<font face='Lucida Console'>)</font> <font color='#BB00BB'>alloc_large</font><font face='Lucida Console'>(</font>cinfo, pool_id,
+	<font face='Lucida Console'>(</font><font color='#0000FF'><u>size_t</u></font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>size_t</u></font><font face='Lucida Console'>)</font> rowsperchunk <font color='#5555FF'>*</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>size_t</u></font><font face='Lucida Console'>)</font> blocksperrow
+		  <font color='#5555FF'>*</font> <font color='#BB00BB'>SIZEOF</font><font face='Lucida Console'>(</font>JBLOCK<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>i <font color='#5555FF'>=</font> rowsperchunk; i <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font>; i<font color='#5555FF'>-</font><font color='#5555FF'>-</font><font face='Lucida Console'>)</font> <b>{</b>
+      result[currow<font color='#5555FF'>+</font><font color='#5555FF'>+</font>] <font color='#5555FF'>=</font> workspace;
+      workspace <font color='#5555FF'>+</font><font color='#5555FF'>=</font> blocksperrow;
+    <b>}</b>
+  <b>}</b>
+
+  <font color='#0000FF'>return</font> result;
+<b>}</b>
+
+
+<font color='#009900'>/*
+ * About virtual array management:
+ *
+ * The above "normal" array routines are only used to allocate strip buffers
+ * (as wide as the image, but just a few rows high).  Full-image-sized buffers
+ * are handled as "virtual" arrays.  The array is still accessed a strip at a
+ * time, but the memory manager must save the whole array for repeated
+ * accesses.  The intended implementation is that there is a strip buffer in
+ * memory (as high as is possible given the desired memory limit), plus a
+ * backing file that holds the rest of the array.
+ *
+ * The request_virt_array routines are told the total size of the image and
+ * the maximum number of rows that will be accessed at once.  The in-memory
+ * buffer must be at least as large as the maxaccess value.
+ *
+ * The request routines create control blocks but not the in-memory buffers.
+ * That is postponed until realize_virt_arrays is called.  At that time the
+ * total amount of space needed is known (approximately, anyway), so free
+ * memory can be divided up fairly.
+ *
+ * The access_virt_array routines are responsible for making a specific strip
+ * area accessible (after reading or writing the backing file, if necessary).
+ * Note that the access routines are told whether the caller intends to modify
+ * the accessed strip; during a read-only pass this saves having to rewrite
+ * data to disk.  The access routines are also responsible for pre-zeroing
+ * any newly accessed rows, if pre-zeroing was requested.
+ *
+ * In current usage, the access requests are usually for nonoverlapping
+ * strips; that is, successive access start_row numbers differ by exactly
+ * num_rows = maxaccess.  This means we can get good performance with simple
+ * buffer dump/reload logic, by making the in-memory buffer be a multiple
+ * of the access height; then there will never be accesses across bufferload
+ * boundaries.  The code will still work with overlapping access requests,
+ * but it doesn't handle bufferload overlaps very efficiently.
+ */</font>
+
+
+<b><a name='METHODDEF'></a>METHODDEF</b><font face='Lucida Console'>(</font>jvirt_sarray_ptr<font face='Lucida Console'>)</font>
+<b><a name='request_virt_sarray'></a>request_virt_sarray</b> <font face='Lucida Console'>(</font>j_common_ptr cinfo, <font color='#0000FF'><u>int</u></font> pool_id, <font color='#0000FF'><u>int</u></font> pre_zero,
+		     JDIMENSION samplesperrow, JDIMENSION numrows,
+		     JDIMENSION maxaccess<font face='Lucida Console'>)</font>
+<font color='#009900'>/* Request a virtual 2-D sample array */</font>
+<b>{</b>
+  my_mem_ptr mem <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>my_mem_ptr<font face='Lucida Console'>)</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>mem;
+  jvirt_sarray_ptr result;
+
+  <font color='#009900'>/* Only IMAGE-lifetime virtual arrays are currently supported */</font>
+  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>pool_id <font color='#5555FF'>!</font><font color='#5555FF'>=</font> JPOOL_IMAGE<font face='Lucida Console'>)</font>
+    <font color='#BB00BB'>ERREXIT1</font><font face='Lucida Console'>(</font>cinfo, JERR_BAD_POOL_ID, pool_id<font face='Lucida Console'>)</font>;	<font color='#009900'>/* safety check */</font>
+
+  <font color='#009900'>/* get control block */</font>
+  result <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>jvirt_sarray_ptr<font face='Lucida Console'>)</font> <font color='#BB00BB'>alloc_small</font><font face='Lucida Console'>(</font>cinfo, pool_id,
+					  <font color='#BB00BB'>SIZEOF</font><font face='Lucida Console'>(</font><font color='#0000FF'>struct</font> <b><a name='jvirt_sarray_control'></a>jvirt_sarray_control</b><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+  result<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>mem_buffer <font color='#5555FF'>=</font> NULL;	<font color='#009900'>/* marks array not yet realized */</font>
+  result<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>rows_in_array <font color='#5555FF'>=</font> numrows;
+  result<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>samplesperrow <font color='#5555FF'>=</font> samplesperrow;
+  result<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>maxaccess <font color='#5555FF'>=</font> maxaccess;
+  result<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>pre_zero <font color='#5555FF'>=</font> pre_zero;
+  result<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>b_s_open <font color='#5555FF'>=</font> FALSE;	<font color='#009900'>/* no associated backing-store object */</font>
+  result<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>next <font color='#5555FF'>=</font> mem<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>virt_sarray_list; <font color='#009900'>/* add to list of virtual arrays */</font>
+  mem<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>virt_sarray_list <font color='#5555FF'>=</font> result;
+
+  <font color='#0000FF'>return</font> result;
+<b>}</b>
+
+
+<b><a name='METHODDEF'></a>METHODDEF</b><font face='Lucida Console'>(</font>jvirt_barray_ptr<font face='Lucida Console'>)</font>
+<b><a name='request_virt_barray'></a>request_virt_barray</b> <font face='Lucida Console'>(</font>j_common_ptr cinfo, <font color='#0000FF'><u>int</u></font> pool_id, <font color='#0000FF'><u>int</u></font> pre_zero,
+		     JDIMENSION blocksperrow, JDIMENSION numrows,
+		     JDIMENSION maxaccess<font face='Lucida Console'>)</font>
+<font color='#009900'>/* Request a virtual 2-D coefficient-block array */</font>
+<b>{</b>
+  my_mem_ptr mem <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>my_mem_ptr<font face='Lucida Console'>)</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>mem;
+  jvirt_barray_ptr result;
+
+  <font color='#009900'>/* Only IMAGE-lifetime virtual arrays are currently supported */</font>
+  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>pool_id <font color='#5555FF'>!</font><font color='#5555FF'>=</font> JPOOL_IMAGE<font face='Lucida Console'>)</font>
+    <font color='#BB00BB'>ERREXIT1</font><font face='Lucida Console'>(</font>cinfo, JERR_BAD_POOL_ID, pool_id<font face='Lucida Console'>)</font>;	<font color='#009900'>/* safety check */</font>
+
+  <font color='#009900'>/* get control block */</font>
+  result <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>jvirt_barray_ptr<font face='Lucida Console'>)</font> <font color='#BB00BB'>alloc_small</font><font face='Lucida Console'>(</font>cinfo, pool_id,
+					  <font color='#BB00BB'>SIZEOF</font><font face='Lucida Console'>(</font><font color='#0000FF'>struct</font> <b><a name='jvirt_barray_control'></a>jvirt_barray_control</b><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+  result<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>mem_buffer <font color='#5555FF'>=</font> NULL;	<font color='#009900'>/* marks array not yet realized */</font>
+  result<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>rows_in_array <font color='#5555FF'>=</font> numrows;
+  result<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>blocksperrow <font color='#5555FF'>=</font> blocksperrow;
+  result<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>maxaccess <font color='#5555FF'>=</font> maxaccess;
+  result<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>pre_zero <font color='#5555FF'>=</font> pre_zero;
+  result<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>b_s_open <font color='#5555FF'>=</font> FALSE;	<font color='#009900'>/* no associated backing-store object */</font>
+  result<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>next <font color='#5555FF'>=</font> mem<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>virt_barray_list; <font color='#009900'>/* add to list of virtual arrays */</font>
+  mem<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>virt_barray_list <font color='#5555FF'>=</font> result;
+
+  <font color='#0000FF'>return</font> result;
+<b>}</b>
+
+
+<b><a name='METHODDEF'></a>METHODDEF</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font>
+<b><a name='realize_virt_arrays'></a>realize_virt_arrays</b> <font face='Lucida Console'>(</font>j_common_ptr cinfo<font face='Lucida Console'>)</font>
+<font color='#009900'>/* Allocate the in-memory buffers for any unrealized virtual arrays */</font>
+<b>{</b>
+  my_mem_ptr mem <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>my_mem_ptr<font face='Lucida Console'>)</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>mem;
+  <font color='#0000FF'><u>long</u></font> space_per_minheight, maximum_space, avail_mem;
+  <font color='#0000FF'><u>long</u></font> minheights, max_minheights;
+  jvirt_sarray_ptr sptr;
+  jvirt_barray_ptr bptr;
+
+  <font color='#009900'>/* Compute the minimum space needed (maxaccess rows in each buffer)
+   * and the maximum space needed (full image height in each buffer).
+   * These may be of use to the system-dependent jpeg_mem_available routine.
+   */</font>
+  space_per_minheight <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+  maximum_space <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+  <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>sptr <font color='#5555FF'>=</font> mem<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>virt_sarray_list; sptr <font color='#5555FF'>!</font><font color='#5555FF'>=</font> NULL; sptr <font color='#5555FF'>=</font> sptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>next<font face='Lucida Console'>)</font> <b>{</b>
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>sptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>mem_buffer <font color='#5555FF'>=</font><font color='#5555FF'>=</font> NULL<font face='Lucida Console'>)</font> <b>{</b> <font color='#009900'>/* if not realized yet */</font>
+      space_per_minheight <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font> sptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>maxaccess <font color='#5555FF'>*</font>
+			     <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font> sptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>samplesperrow <font color='#5555FF'>*</font> <font color='#BB00BB'>SIZEOF</font><font face='Lucida Console'>(</font>JSAMPLE<font face='Lucida Console'>)</font>;
+      maximum_space <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font> sptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>rows_in_array <font color='#5555FF'>*</font>
+		       <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font> sptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>samplesperrow <font color='#5555FF'>*</font> <font color='#BB00BB'>SIZEOF</font><font face='Lucida Console'>(</font>JSAMPLE<font face='Lucida Console'>)</font>;
+    <b>}</b>
+  <b>}</b>
+  <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>bptr <font color='#5555FF'>=</font> mem<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>virt_barray_list; bptr <font color='#5555FF'>!</font><font color='#5555FF'>=</font> NULL; bptr <font color='#5555FF'>=</font> bptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>next<font face='Lucida Console'>)</font> <b>{</b>
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>bptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>mem_buffer <font color='#5555FF'>=</font><font color='#5555FF'>=</font> NULL<font face='Lucida Console'>)</font> <b>{</b> <font color='#009900'>/* if not realized yet */</font>
+      space_per_minheight <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font> bptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>maxaccess <font color='#5555FF'>*</font>
+			     <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font> bptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>blocksperrow <font color='#5555FF'>*</font> <font color='#BB00BB'>SIZEOF</font><font face='Lucida Console'>(</font>JBLOCK<font face='Lucida Console'>)</font>;
+      maximum_space <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font> bptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>rows_in_array <font color='#5555FF'>*</font>
+		       <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font> bptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>blocksperrow <font color='#5555FF'>*</font> <font color='#BB00BB'>SIZEOF</font><font face='Lucida Console'>(</font>JBLOCK<font face='Lucida Console'>)</font>;
+    <b>}</b>
+  <b>}</b>
+
+  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>space_per_minheight <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+    <font color='#0000FF'>return</font>;			<font color='#009900'>/* no unrealized arrays, no work */</font>
+
+  <font color='#009900'>/* Determine amount of memory to actually use; this is system-dependent. */</font>
+  avail_mem <font color='#5555FF'>=</font> <font color='#BB00BB'>jpeg_mem_available</font><font face='Lucida Console'>(</font>cinfo, space_per_minheight, maximum_space,
+				 mem<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>total_space_allocated<font face='Lucida Console'>)</font>;
+
+  <font color='#009900'>/* If the maximum space needed is available, make all the buffers full
+   * height; otherwise parcel it out with the same number of minheights
+   * in each buffer.
+   */</font>
+  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>avail_mem <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> maximum_space<font face='Lucida Console'>)</font>
+    max_minheights <font color='#5555FF'>=</font> <font color='#979000'>1000000000</font>L;
+  <font color='#0000FF'>else</font> <b>{</b>
+    max_minheights <font color='#5555FF'>=</font> avail_mem <font color='#5555FF'>/</font> space_per_minheight;
+    <font color='#009900'>/* If there doesn't seem to be enough space, try to get the minimum
+     * anyway.  This allows a "stub" implementation of jpeg_mem_available().
+     */</font>
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>max_minheights <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+      max_minheights <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+  <b>}</b>
+
+  <font color='#009900'>/* Allocate the in-memory buffers and initialize backing store as needed. */</font>
+
+  <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>sptr <font color='#5555FF'>=</font> mem<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>virt_sarray_list; sptr <font color='#5555FF'>!</font><font color='#5555FF'>=</font> NULL; sptr <font color='#5555FF'>=</font> sptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>next<font face='Lucida Console'>)</font> <b>{</b>
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>sptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>mem_buffer <font color='#5555FF'>=</font><font color='#5555FF'>=</font> NULL<font face='Lucida Console'>)</font> <b>{</b> <font color='#009900'>/* if not realized yet */</font>
+      minheights <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font> sptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>rows_in_array <font color='#5555FF'>-</font> <font color='#979000'>1</font>L<font face='Lucida Console'>)</font> <font color='#5555FF'>/</font> sptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>maxaccess <font color='#5555FF'>+</font> <font color='#979000'>1</font>L;
+      <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>minheights <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> max_minheights<font face='Lucida Console'>)</font> <b>{</b>
+	<font color='#009900'>/* This buffer fits in memory */</font>
+	sptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>rows_in_mem <font color='#5555FF'>=</font> sptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>rows_in_array;
+      <b>}</b> <font color='#0000FF'>else</font> <b>{</b>
+	<font color='#009900'>/* It doesn't fit in memory, create backing store. */</font>
+	sptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>rows_in_mem <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>JDIMENSION<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>max_minheights <font color='#5555FF'>*</font> sptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>maxaccess<font face='Lucida Console'>)</font>;
+	<font color='#BB00BB'>jpeg_open_backing_store</font><font face='Lucida Console'>(</font>cinfo, <font color='#5555FF'>&amp;</font> sptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>b_s_info,
+				<font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font> sptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>rows_in_array <font color='#5555FF'>*</font>
+				<font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font> sptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>samplesperrow <font color='#5555FF'>*</font>
+				<font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font> <font color='#BB00BB'>SIZEOF</font><font face='Lucida Console'>(</font>JSAMPLE<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+	sptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>b_s_open <font color='#5555FF'>=</font> TRUE;
+      <b>}</b>
+      sptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>mem_buffer <font color='#5555FF'>=</font> <font color='#BB00BB'>alloc_sarray</font><font face='Lucida Console'>(</font>cinfo, JPOOL_IMAGE,
+				      sptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>samplesperrow, sptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>rows_in_mem<font face='Lucida Console'>)</font>;
+      sptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>rowsperchunk <font color='#5555FF'>=</font> mem<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>last_rowsperchunk;
+      sptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>cur_start_row <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+      sptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>first_undef_row <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+      sptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>dirty <font color='#5555FF'>=</font> FALSE;
+    <b>}</b>
+  <b>}</b>
+
+  <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>bptr <font color='#5555FF'>=</font> mem<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>virt_barray_list; bptr <font color='#5555FF'>!</font><font color='#5555FF'>=</font> NULL; bptr <font color='#5555FF'>=</font> bptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>next<font face='Lucida Console'>)</font> <b>{</b>
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>bptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>mem_buffer <font color='#5555FF'>=</font><font color='#5555FF'>=</font> NULL<font face='Lucida Console'>)</font> <b>{</b> <font color='#009900'>/* if not realized yet */</font>
+      minheights <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font> bptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>rows_in_array <font color='#5555FF'>-</font> <font color='#979000'>1</font>L<font face='Lucida Console'>)</font> <font color='#5555FF'>/</font> bptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>maxaccess <font color='#5555FF'>+</font> <font color='#979000'>1</font>L;
+      <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>minheights <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> max_minheights<font face='Lucida Console'>)</font> <b>{</b>
+	<font color='#009900'>/* This buffer fits in memory */</font>
+	bptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>rows_in_mem <font color='#5555FF'>=</font> bptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>rows_in_array;
+      <b>}</b> <font color='#0000FF'>else</font> <b>{</b>
+	<font color='#009900'>/* It doesn't fit in memory, create backing store. */</font>
+	bptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>rows_in_mem <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>JDIMENSION<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>max_minheights <font color='#5555FF'>*</font> bptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>maxaccess<font face='Lucida Console'>)</font>;
+	<font color='#BB00BB'>jpeg_open_backing_store</font><font face='Lucida Console'>(</font>cinfo, <font color='#5555FF'>&amp;</font> bptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>b_s_info,
+				<font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font> bptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>rows_in_array <font color='#5555FF'>*</font>
+				<font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font> bptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>blocksperrow <font color='#5555FF'>*</font>
+				<font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font> <font color='#BB00BB'>SIZEOF</font><font face='Lucida Console'>(</font>JBLOCK<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+	bptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>b_s_open <font color='#5555FF'>=</font> TRUE;
+      <b>}</b>
+      bptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>mem_buffer <font color='#5555FF'>=</font> <font color='#BB00BB'>alloc_barray</font><font face='Lucida Console'>(</font>cinfo, JPOOL_IMAGE,
+				      bptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>blocksperrow, bptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>rows_in_mem<font face='Lucida Console'>)</font>;
+      bptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>rowsperchunk <font color='#5555FF'>=</font> mem<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>last_rowsperchunk;
+      bptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>cur_start_row <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+      bptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>first_undef_row <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+      bptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>dirty <font color='#5555FF'>=</font> FALSE;
+    <b>}</b>
+  <b>}</b>
+<b>}</b>
+
+
+<b><a name='LOCAL'></a>LOCAL</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font>
+<b><a name='do_sarray_io'></a>do_sarray_io</b> <font face='Lucida Console'>(</font>j_common_ptr cinfo, jvirt_sarray_ptr ptr, <font color='#0000FF'><u>int</u></font> writing<font face='Lucida Console'>)</font>
+<font color='#009900'>/* Do backing store read or write of a virtual sample array */</font>
+<b>{</b>
+  <font color='#0000FF'><u>long</u></font> bytesperrow, file_offset, byte_count, rows, thisrow, i;
+
+  bytesperrow <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font> ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>samplesperrow <font color='#5555FF'>*</font> <font color='#BB00BB'>SIZEOF</font><font face='Lucida Console'>(</font>JSAMPLE<font face='Lucida Console'>)</font>;
+  file_offset <font color='#5555FF'>=</font> ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>cur_start_row <font color='#5555FF'>*</font> bytesperrow;
+  <font color='#009900'>/* Loop to read or write each allocation chunk in mem_buffer */</font>
+  <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font> ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>rows_in_mem; i <font color='#5555FF'>+</font><font color='#5555FF'>=</font> ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>rowsperchunk<font face='Lucida Console'>)</font> <b>{</b>
+    <font color='#009900'>/* One chunk, but check for short chunk at end of buffer */</font>
+    rows <font color='#5555FF'>=</font> <font color='#BB00BB'>MIN</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font> ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>rowsperchunk, <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font> ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>rows_in_mem <font color='#5555FF'>-</font> i<font face='Lucida Console'>)</font>;
+    <font color='#009900'>/* Transfer no more than is currently defined */</font>
+    thisrow <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font> ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>cur_start_row <font color='#5555FF'>+</font> i;
+    rows <font color='#5555FF'>=</font> <font color='#BB00BB'>MIN</font><font face='Lucida Console'>(</font>rows, <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font> ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>first_undef_row <font color='#5555FF'>-</font> thisrow<font face='Lucida Console'>)</font>;
+    <font color='#009900'>/* Transfer no more than fits in file */</font>
+    rows <font color='#5555FF'>=</font> <font color='#BB00BB'>MIN</font><font face='Lucida Console'>(</font>rows, <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font> ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>rows_in_array <font color='#5555FF'>-</font> thisrow<font face='Lucida Console'>)</font>;
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>rows <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>		<font color='#009900'>/* this chunk might be past end of file! */</font>
+      <font color='#0000FF'>break</font>;
+    byte_count <font color='#5555FF'>=</font> rows <font color='#5555FF'>*</font> bytesperrow;
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>writing<font face='Lucida Console'>)</font>
+      <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>b_s_info.write_backing_store<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>cinfo, <font color='#5555FF'>&amp;</font> ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>b_s_info,
+					    <font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font> FAR <font color='#5555FF'>*</font><font face='Lucida Console'>)</font> ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>mem_buffer[i],
+					    file_offset, byte_count<font face='Lucida Console'>)</font>;
+    <font color='#0000FF'>else</font>
+      <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>b_s_info.read_backing_store<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>cinfo, <font color='#5555FF'>&amp;</font> ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>b_s_info,
+					   <font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font> FAR <font color='#5555FF'>*</font><font face='Lucida Console'>)</font> ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>mem_buffer[i],
+					   file_offset, byte_count<font face='Lucida Console'>)</font>;
+    file_offset <font color='#5555FF'>+</font><font color='#5555FF'>=</font> byte_count;
+  <b>}</b>
+<b>}</b>
+
+
+<b><a name='LOCAL'></a>LOCAL</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font>
+<b><a name='do_barray_io'></a>do_barray_io</b> <font face='Lucida Console'>(</font>j_common_ptr cinfo, jvirt_barray_ptr ptr, <font color='#0000FF'><u>int</u></font> writing<font face='Lucida Console'>)</font>
+<font color='#009900'>/* Do backing store read or write of a virtual coefficient-block array */</font>
+<b>{</b>
+  <font color='#0000FF'><u>long</u></font> bytesperrow, file_offset, byte_count, rows, thisrow, i;
+
+  bytesperrow <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font> ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>blocksperrow <font color='#5555FF'>*</font> <font color='#BB00BB'>SIZEOF</font><font face='Lucida Console'>(</font>JBLOCK<font face='Lucida Console'>)</font>;
+  file_offset <font color='#5555FF'>=</font> ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>cur_start_row <font color='#5555FF'>*</font> bytesperrow;
+  <font color='#009900'>/* Loop to read or write each allocation chunk in mem_buffer */</font>
+  <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font> ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>rows_in_mem; i <font color='#5555FF'>+</font><font color='#5555FF'>=</font> ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>rowsperchunk<font face='Lucida Console'>)</font> <b>{</b>
+    <font color='#009900'>/* One chunk, but check for short chunk at end of buffer */</font>
+    rows <font color='#5555FF'>=</font> <font color='#BB00BB'>MIN</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font> ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>rowsperchunk, <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font> ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>rows_in_mem <font color='#5555FF'>-</font> i<font face='Lucida Console'>)</font>;
+    <font color='#009900'>/* Transfer no more than is currently defined */</font>
+    thisrow <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font> ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>cur_start_row <font color='#5555FF'>+</font> i;
+    rows <font color='#5555FF'>=</font> <font color='#BB00BB'>MIN</font><font face='Lucida Console'>(</font>rows, <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font> ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>first_undef_row <font color='#5555FF'>-</font> thisrow<font face='Lucida Console'>)</font>;
+    <font color='#009900'>/* Transfer no more than fits in file */</font>
+    rows <font color='#5555FF'>=</font> <font color='#BB00BB'>MIN</font><font face='Lucida Console'>(</font>rows, <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font> ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>rows_in_array <font color='#5555FF'>-</font> thisrow<font face='Lucida Console'>)</font>;
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>rows <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>		<font color='#009900'>/* this chunk might be past end of file! */</font>
+      <font color='#0000FF'>break</font>;
+    byte_count <font color='#5555FF'>=</font> rows <font color='#5555FF'>*</font> bytesperrow;
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>writing<font face='Lucida Console'>)</font>
+      <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>b_s_info.write_backing_store<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>cinfo, <font color='#5555FF'>&amp;</font> ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>b_s_info,
+					    <font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font> FAR <font color='#5555FF'>*</font><font face='Lucida Console'>)</font> ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>mem_buffer[i],
+					    file_offset, byte_count<font face='Lucida Console'>)</font>;
+    <font color='#0000FF'>else</font>
+      <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>b_s_info.read_backing_store<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>cinfo, <font color='#5555FF'>&amp;</font> ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>b_s_info,
+					   <font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font> FAR <font color='#5555FF'>*</font><font face='Lucida Console'>)</font> ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>mem_buffer[i],
+					   file_offset, byte_count<font face='Lucida Console'>)</font>;
+    file_offset <font color='#5555FF'>+</font><font color='#5555FF'>=</font> byte_count;
+  <b>}</b>
+<b>}</b>
+
+
+<b><a name='METHODDEF'></a>METHODDEF</b><font face='Lucida Console'>(</font>JSAMPARRAY<font face='Lucida Console'>)</font>
+<b><a name='access_virt_sarray'></a>access_virt_sarray</b> <font face='Lucida Console'>(</font>j_common_ptr cinfo, jvirt_sarray_ptr ptr,
+		    JDIMENSION start_row, JDIMENSION num_rows,
+		    <font color='#0000FF'><u>int</u></font> writable<font face='Lucida Console'>)</font>
+<font color='#009900'>/* Access the part of a virtual sample array starting at start_row */</font>
+<font color='#009900'>/* and extending for num_rows rows.  writable is true if  */</font>
+<font color='#009900'>/* caller intends to modify the accessed area. */</font>
+<b>{</b>
+  JDIMENSION end_row <font color='#5555FF'>=</font> start_row <font color='#5555FF'>+</font> num_rows;
+  JDIMENSION undef_row;
+
+  <font color='#009900'>/* debugging check */</font>
+  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>end_row <font color='#5555FF'>&gt;</font> ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>rows_in_array <font color='#5555FF'>|</font><font color='#5555FF'>|</font> num_rows <font color='#5555FF'>&gt;</font> ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>maxaccess <font color='#5555FF'>|</font><font color='#5555FF'>|</font>
+      ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>mem_buffer <font color='#5555FF'>=</font><font color='#5555FF'>=</font> NULL<font face='Lucida Console'>)</font>
+    <font color='#BB00BB'>ERREXIT</font><font face='Lucida Console'>(</font>cinfo, JERR_BAD_VIRTUAL_ACCESS<font face='Lucida Console'>)</font>;
+
+  <font color='#009900'>/* Make the desired part of the virtual array accessible */</font>
+  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>start_row <font color='#5555FF'>&lt;</font> ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>cur_start_row <font color='#5555FF'>|</font><font color='#5555FF'>|</font>
+      end_row <font color='#5555FF'>&gt;</font> ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>cur_start_row<font color='#5555FF'>+</font>ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>rows_in_mem<font face='Lucida Console'>)</font> <b>{</b>
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font> ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>b_s_open<font face='Lucida Console'>)</font>
+      <font color='#BB00BB'>ERREXIT</font><font face='Lucida Console'>(</font>cinfo, JERR_VIRTUAL_BUG<font face='Lucida Console'>)</font>;
+    <font color='#009900'>/* Flush old buffer contents if necessary */</font>
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>dirty<font face='Lucida Console'>)</font> <b>{</b>
+      <font color='#BB00BB'>do_sarray_io</font><font face='Lucida Console'>(</font>cinfo, ptr, TRUE<font face='Lucida Console'>)</font>;
+      ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>dirty <font color='#5555FF'>=</font> FALSE;
+    <b>}</b>
+    <font color='#009900'>/* Decide what part of virtual array to access.
+     * Algorithm: if target address &gt; current window, assume forward scan,
+     * load starting at target address.  If target address &lt; current window,
+     * assume backward scan, load so that target area is top of window.
+     * Note that when switching from forward write to forward read, will have
+     * start_row = 0, so the limiting case applies and we load from 0 anyway.
+     */</font>
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>start_row <font color='#5555FF'>&gt;</font> ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>cur_start_row<font face='Lucida Console'>)</font> <b>{</b>
+      ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>cur_start_row <font color='#5555FF'>=</font> start_row;
+    <b>}</b> <font color='#0000FF'>else</font> <b>{</b>
+      <font color='#009900'>/* use long arithmetic here to avoid overflow &amp; unsigned problems */</font>
+      <font color='#0000FF'><u>long</u></font> ltemp;
+
+      ltemp <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font> end_row <font color='#5555FF'>-</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font> ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>rows_in_mem;
+      <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>ltemp <font color='#5555FF'>&lt;</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+	ltemp <font color='#5555FF'>=</font> <font color='#979000'>0</font>;		<font color='#009900'>/* don't fall off front end of file */</font>
+      ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>cur_start_row <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>JDIMENSION<font face='Lucida Console'>)</font> ltemp;
+    <b>}</b>
+    <font color='#009900'>/* Read in the selected part of the array.
+     * During the initial write pass, we will do no actual read
+     * because the selected part is all undefined.
+     */</font>
+    <font color='#BB00BB'>do_sarray_io</font><font face='Lucida Console'>(</font>cinfo, ptr, FALSE<font face='Lucida Console'>)</font>;
+  <b>}</b>
+  <font color='#009900'>/* Ensure the accessed part of the array is defined; prezero if needed.
+   * To improve locality of access, we only prezero the part of the array
+   * that the caller is about to access, not the entire in-memory array.
+   */</font>
+  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>first_undef_row <font color='#5555FF'>&lt;</font> end_row<font face='Lucida Console'>)</font> <b>{</b>
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>first_undef_row <font color='#5555FF'>&lt;</font> start_row<font face='Lucida Console'>)</font> <b>{</b>
+      <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>writable<font face='Lucida Console'>)</font>		<font color='#009900'>/* writer skipped over a section of array */</font>
+	<font color='#BB00BB'>ERREXIT</font><font face='Lucida Console'>(</font>cinfo, JERR_BAD_VIRTUAL_ACCESS<font face='Lucida Console'>)</font>;
+      undef_row <font color='#5555FF'>=</font> start_row;	<font color='#009900'>/* but reader is allowed to read ahead */</font>
+    <b>}</b> <font color='#0000FF'>else</font> <b>{</b>
+      undef_row <font color='#5555FF'>=</font> ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>first_undef_row;
+    <b>}</b>
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>writable<font face='Lucida Console'>)</font>
+      ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>first_undef_row <font color='#5555FF'>=</font> end_row;
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>pre_zero<font face='Lucida Console'>)</font> <b>{</b>
+      <font color='#0000FF'><u>size_t</u></font> bytesperrow <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>size_t</u></font><font face='Lucida Console'>)</font> ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>samplesperrow <font color='#5555FF'>*</font> <font color='#BB00BB'>SIZEOF</font><font face='Lucida Console'>(</font>JSAMPLE<font face='Lucida Console'>)</font>;
+      undef_row <font color='#5555FF'>-</font><font color='#5555FF'>=</font> ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>cur_start_row; <font color='#009900'>/* make indexes relative to buffer */</font>
+      end_row <font color='#5555FF'>-</font><font color='#5555FF'>=</font> ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>cur_start_row;
+      <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>undef_row <font color='#5555FF'>&lt;</font> end_row<font face='Lucida Console'>)</font> <b>{</b>
+	<font color='#BB00BB'>jzero_far</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font> FAR <font color='#5555FF'>*</font><font face='Lucida Console'>)</font> ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>mem_buffer[undef_row], bytesperrow<font face='Lucida Console'>)</font>;
+	undef_row<font color='#5555FF'>+</font><font color='#5555FF'>+</font>;
+      <b>}</b>
+    <b>}</b> <font color='#0000FF'>else</font> <b>{</b>
+      <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font> writable<font face='Lucida Console'>)</font>		<font color='#009900'>/* reader looking at undefined data */</font>
+	<font color='#BB00BB'>ERREXIT</font><font face='Lucida Console'>(</font>cinfo, JERR_BAD_VIRTUAL_ACCESS<font face='Lucida Console'>)</font>;
+    <b>}</b>
+  <b>}</b>
+  <font color='#009900'>/* Flag the buffer dirty if caller will write in it */</font>
+  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>writable<font face='Lucida Console'>)</font>
+    ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>dirty <font color='#5555FF'>=</font> TRUE;
+  <font color='#009900'>/* Return address of proper part of the buffer */</font>
+  <font color='#0000FF'>return</font> ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>mem_buffer <font color='#5555FF'>+</font> <font face='Lucida Console'>(</font>start_row <font color='#5555FF'>-</font> ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>cur_start_row<font face='Lucida Console'>)</font>;
+<b>}</b>
+
+
+<b><a name='METHODDEF'></a>METHODDEF</b><font face='Lucida Console'>(</font>JBLOCKARRAY<font face='Lucida Console'>)</font>
+<b><a name='access_virt_barray'></a>access_virt_barray</b> <font face='Lucida Console'>(</font>j_common_ptr cinfo, jvirt_barray_ptr ptr,
+		    JDIMENSION start_row, JDIMENSION num_rows,
+		    <font color='#0000FF'><u>int</u></font> writable<font face='Lucida Console'>)</font>
+<font color='#009900'>/* Access the part of a virtual block array starting at start_row */</font>
+<font color='#009900'>/* and extending for num_rows rows.  writable is true if  */</font>
+<font color='#009900'>/* caller intends to modify the accessed area. */</font>
+<b>{</b>
+  JDIMENSION end_row <font color='#5555FF'>=</font> start_row <font color='#5555FF'>+</font> num_rows;
+  JDIMENSION undef_row;
+
+  <font color='#009900'>/* debugging check */</font>
+  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>end_row <font color='#5555FF'>&gt;</font> ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>rows_in_array <font color='#5555FF'>|</font><font color='#5555FF'>|</font> num_rows <font color='#5555FF'>&gt;</font> ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>maxaccess <font color='#5555FF'>|</font><font color='#5555FF'>|</font>
+      ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>mem_buffer <font color='#5555FF'>=</font><font color='#5555FF'>=</font> NULL<font face='Lucida Console'>)</font>
+    <font color='#BB00BB'>ERREXIT</font><font face='Lucida Console'>(</font>cinfo, JERR_BAD_VIRTUAL_ACCESS<font face='Lucida Console'>)</font>;
+
+  <font color='#009900'>/* Make the desired part of the virtual array accessible */</font>
+  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>start_row <font color='#5555FF'>&lt;</font> ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>cur_start_row <font color='#5555FF'>|</font><font color='#5555FF'>|</font>
+      end_row <font color='#5555FF'>&gt;</font> ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>cur_start_row<font color='#5555FF'>+</font>ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>rows_in_mem<font face='Lucida Console'>)</font> <b>{</b>
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font> ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>b_s_open<font face='Lucida Console'>)</font>
+      <font color='#BB00BB'>ERREXIT</font><font face='Lucida Console'>(</font>cinfo, JERR_VIRTUAL_BUG<font face='Lucida Console'>)</font>;
+    <font color='#009900'>/* Flush old buffer contents if necessary */</font>
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>dirty<font face='Lucida Console'>)</font> <b>{</b>
+      <font color='#BB00BB'>do_barray_io</font><font face='Lucida Console'>(</font>cinfo, ptr, TRUE<font face='Lucida Console'>)</font>;
+      ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>dirty <font color='#5555FF'>=</font> FALSE;
+    <b>}</b>
+    <font color='#009900'>/* Decide what part of virtual array to access.
+     * Algorithm: if target address &gt; current window, assume forward scan,
+     * load starting at target address.  If target address &lt; current window,
+     * assume backward scan, load so that target area is top of window.
+     * Note that when switching from forward write to forward read, will have
+     * start_row = 0, so the limiting case applies and we load from 0 anyway.
+     */</font>
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>start_row <font color='#5555FF'>&gt;</font> ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>cur_start_row<font face='Lucida Console'>)</font> <b>{</b>
+      ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>cur_start_row <font color='#5555FF'>=</font> start_row;
+    <b>}</b> <font color='#0000FF'>else</font> <b>{</b>
+      <font color='#009900'>/* use long arithmetic here to avoid overflow &amp; unsigned problems */</font>
+      <font color='#0000FF'><u>long</u></font> ltemp;
+
+      ltemp <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font> end_row <font color='#5555FF'>-</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font> ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>rows_in_mem;
+      <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>ltemp <font color='#5555FF'>&lt;</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+	ltemp <font color='#5555FF'>=</font> <font color='#979000'>0</font>;		<font color='#009900'>/* don't fall off front end of file */</font>
+      ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>cur_start_row <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>JDIMENSION<font face='Lucida Console'>)</font> ltemp;
+    <b>}</b>
+    <font color='#009900'>/* Read in the selected part of the array.
+     * During the initial write pass, we will do no actual read
+     * because the selected part is all undefined.
+     */</font>
+    <font color='#BB00BB'>do_barray_io</font><font face='Lucida Console'>(</font>cinfo, ptr, FALSE<font face='Lucida Console'>)</font>;
+  <b>}</b>
+  <font color='#009900'>/* Ensure the accessed part of the array is defined; prezero if needed.
+   * To improve locality of access, we only prezero the part of the array
+   * that the caller is about to access, not the entire in-memory array.
+   */</font>
+  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>first_undef_row <font color='#5555FF'>&lt;</font> end_row<font face='Lucida Console'>)</font> <b>{</b>
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>first_undef_row <font color='#5555FF'>&lt;</font> start_row<font face='Lucida Console'>)</font> <b>{</b>
+      <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>writable<font face='Lucida Console'>)</font>		<font color='#009900'>/* writer skipped over a section of array */</font>
+	<font color='#BB00BB'>ERREXIT</font><font face='Lucida Console'>(</font>cinfo, JERR_BAD_VIRTUAL_ACCESS<font face='Lucida Console'>)</font>;
+      undef_row <font color='#5555FF'>=</font> start_row;	<font color='#009900'>/* but reader is allowed to read ahead */</font>
+    <b>}</b> <font color='#0000FF'>else</font> <b>{</b>
+      undef_row <font color='#5555FF'>=</font> ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>first_undef_row;
+    <b>}</b>
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>writable<font face='Lucida Console'>)</font>
+      ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>first_undef_row <font color='#5555FF'>=</font> end_row;
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>pre_zero<font face='Lucida Console'>)</font> <b>{</b>
+      <font color='#0000FF'><u>size_t</u></font> bytesperrow <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>size_t</u></font><font face='Lucida Console'>)</font> ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>blocksperrow <font color='#5555FF'>*</font> <font color='#BB00BB'>SIZEOF</font><font face='Lucida Console'>(</font>JBLOCK<font face='Lucida Console'>)</font>;
+      undef_row <font color='#5555FF'>-</font><font color='#5555FF'>=</font> ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>cur_start_row; <font color='#009900'>/* make indexes relative to buffer */</font>
+      end_row <font color='#5555FF'>-</font><font color='#5555FF'>=</font> ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>cur_start_row;
+      <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>undef_row <font color='#5555FF'>&lt;</font> end_row<font face='Lucida Console'>)</font> <b>{</b>
+	<font color='#BB00BB'>jzero_far</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font> FAR <font color='#5555FF'>*</font><font face='Lucida Console'>)</font> ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>mem_buffer[undef_row], bytesperrow<font face='Lucida Console'>)</font>;
+	undef_row<font color='#5555FF'>+</font><font color='#5555FF'>+</font>;
+      <b>}</b>
+    <b>}</b> <font color='#0000FF'>else</font> <b>{</b>
+      <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font> writable<font face='Lucida Console'>)</font>		<font color='#009900'>/* reader looking at undefined data */</font>
+	<font color='#BB00BB'>ERREXIT</font><font face='Lucida Console'>(</font>cinfo, JERR_BAD_VIRTUAL_ACCESS<font face='Lucida Console'>)</font>;
+    <b>}</b>
+  <b>}</b>
+  <font color='#009900'>/* Flag the buffer dirty if caller will write in it */</font>
+  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>writable<font face='Lucida Console'>)</font>
+    ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>dirty <font color='#5555FF'>=</font> TRUE;
+  <font color='#009900'>/* Return address of proper part of the buffer */</font>
+  <font color='#0000FF'>return</font> ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>mem_buffer <font color='#5555FF'>+</font> <font face='Lucida Console'>(</font>start_row <font color='#5555FF'>-</font> ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>cur_start_row<font face='Lucida Console'>)</font>;
+<b>}</b>
+
+
+<font color='#009900'>/*
+ * Release all objects belonging to a specified pool.
+ */</font>
+
+<b><a name='METHODDEF'></a>METHODDEF</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font>
+<b><a name='free_pool'></a>free_pool</b> <font face='Lucida Console'>(</font>j_common_ptr cinfo, <font color='#0000FF'><u>int</u></font> pool_id<font face='Lucida Console'>)</font>
+<b>{</b>
+  my_mem_ptr mem <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>my_mem_ptr<font face='Lucida Console'>)</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>mem;
+  small_pool_ptr shdr_ptr;
+  large_pool_ptr lhdr_ptr;
+  <font color='#0000FF'><u>size_t</u></font> space_freed;
+
+  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>pool_id <font color='#5555FF'>&lt;</font> <font color='#979000'>0</font> <font color='#5555FF'>|</font><font color='#5555FF'>|</font> pool_id <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> JPOOL_NUMPOOLS<font face='Lucida Console'>)</font>
+    <font color='#BB00BB'>ERREXIT1</font><font face='Lucida Console'>(</font>cinfo, JERR_BAD_POOL_ID, pool_id<font face='Lucida Console'>)</font>;	<font color='#009900'>/* safety check */</font>
+
+<font color='#0000FF'>#ifdef</font> MEM_STATS
+  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>err<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>trace_level <font color='#5555FF'>&gt;</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>
+    <font color='#BB00BB'>print_mem_stats</font><font face='Lucida Console'>(</font>cinfo, pool_id<font face='Lucida Console'>)</font>; <font color='#009900'>/* print pool's memory usage statistics */</font>
+<font color='#0000FF'>#endif</font>
+
+  <font color='#009900'>/* If freeing IMAGE pool, close any virtual arrays first */</font>
+  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>pool_id <font color='#5555FF'>=</font><font color='#5555FF'>=</font> JPOOL_IMAGE<font face='Lucida Console'>)</font> <b>{</b>
+    jvirt_sarray_ptr sptr;
+    jvirt_barray_ptr bptr;
+
+    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>sptr <font color='#5555FF'>=</font> mem<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>virt_sarray_list; sptr <font color='#5555FF'>!</font><font color='#5555FF'>=</font> NULL; sptr <font color='#5555FF'>=</font> sptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>next<font face='Lucida Console'>)</font> <b>{</b>
+      <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>sptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>b_s_open<font face='Lucida Console'>)</font> <b>{</b>	<font color='#009900'>/* there may be no backing store */</font>
+	sptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>b_s_open <font color='#5555FF'>=</font> FALSE;	<font color='#009900'>/* prevent recursive close if error */</font>
+	<font face='Lucida Console'>(</font><font color='#5555FF'>*</font>sptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>b_s_info.close_backing_store<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>cinfo, <font color='#5555FF'>&amp;</font> sptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>b_s_info<font face='Lucida Console'>)</font>;
+      <b>}</b>
+    <b>}</b>
+    mem<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>virt_sarray_list <font color='#5555FF'>=</font> NULL;
+    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>bptr <font color='#5555FF'>=</font> mem<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>virt_barray_list; bptr <font color='#5555FF'>!</font><font color='#5555FF'>=</font> NULL; bptr <font color='#5555FF'>=</font> bptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>next<font face='Lucida Console'>)</font> <b>{</b>
+      <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>bptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>b_s_open<font face='Lucida Console'>)</font> <b>{</b>	<font color='#009900'>/* there may be no backing store */</font>
+	bptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>b_s_open <font color='#5555FF'>=</font> FALSE;	<font color='#009900'>/* prevent recursive close if error */</font>
+	<font face='Lucida Console'>(</font><font color='#5555FF'>*</font>bptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>b_s_info.close_backing_store<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>cinfo, <font color='#5555FF'>&amp;</font> bptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>b_s_info<font face='Lucida Console'>)</font>;
+      <b>}</b>
+    <b>}</b>
+    mem<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>virt_barray_list <font color='#5555FF'>=</font> NULL;
+  <b>}</b>
+
+  <font color='#009900'>/* Release large objects */</font>
+  lhdr_ptr <font color='#5555FF'>=</font> mem<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>large_list[pool_id];
+  mem<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>large_list[pool_id] <font color='#5555FF'>=</font> NULL;
+
+  <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>lhdr_ptr <font color='#5555FF'>!</font><font color='#5555FF'>=</font> NULL<font face='Lucida Console'>)</font> <b>{</b>
+    large_pool_ptr next_lhdr_ptr <font color='#5555FF'>=</font> lhdr_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>hdr.next;
+    space_freed <font color='#5555FF'>=</font> lhdr_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>hdr.bytes_used <font color='#5555FF'>+</font>
+		  lhdr_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>hdr.bytes_left <font color='#5555FF'>+</font>
+		  <font color='#BB00BB'>SIZEOF</font><font face='Lucida Console'>(</font>large_pool_hdr<font face='Lucida Console'>)</font>;
+    <font color='#BB00BB'>jpeg_free_large</font><font face='Lucida Console'>(</font>cinfo, <font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font> FAR <font color='#5555FF'>*</font><font face='Lucida Console'>)</font> lhdr_ptr, space_freed<font face='Lucida Console'>)</font>;
+    mem<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>total_space_allocated <font color='#5555FF'>-</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font>space_freed;
+    lhdr_ptr <font color='#5555FF'>=</font> next_lhdr_ptr;
+  <b>}</b>
+
+  <font color='#009900'>/* Release small objects */</font>
+  shdr_ptr <font color='#5555FF'>=</font> mem<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>small_list[pool_id];
+  mem<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>small_list[pool_id] <font color='#5555FF'>=</font> NULL;
+
+  <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>shdr_ptr <font color='#5555FF'>!</font><font color='#5555FF'>=</font> NULL<font face='Lucida Console'>)</font> <b>{</b>
+    small_pool_ptr next_shdr_ptr <font color='#5555FF'>=</font> shdr_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>hdr.next;
+    space_freed <font color='#5555FF'>=</font> shdr_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>hdr.bytes_used <font color='#5555FF'>+</font>
+		  shdr_ptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>hdr.bytes_left <font color='#5555FF'>+</font>
+		  <font color='#BB00BB'>SIZEOF</font><font face='Lucida Console'>(</font>small_pool_hdr<font face='Lucida Console'>)</font>;
+    <font color='#BB00BB'>jpeg_free_small</font><font face='Lucida Console'>(</font>cinfo, <font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font> <font color='#5555FF'>*</font><font face='Lucida Console'>)</font> shdr_ptr, space_freed<font face='Lucida Console'>)</font>;
+    mem<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>total_space_allocated <font color='#5555FF'>-</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font>space_freed;
+    shdr_ptr <font color='#5555FF'>=</font> next_shdr_ptr;
+  <b>}</b>
+<b>}</b>
+
+
+<font color='#009900'>/*
+ * Close up shop entirely.
+ * Note that this cannot be called unless cinfo-&gt;mem is non-NULL.
+ */</font>
+
+<b><a name='METHODDEF'></a>METHODDEF</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font>
+<b><a name='self_destruct'></a>self_destruct</b> <font face='Lucida Console'>(</font>j_common_ptr cinfo<font face='Lucida Console'>)</font>
+<b>{</b>
+  <font color='#0000FF'><u>int</u></font> pool;
+
+  <font color='#009900'>/* Close all backing store, release all memory.
+   * Releasing pools in reverse order might help avoid fragmentation
+   * with some (brain-damaged) malloc libraries.
+   */</font>
+  <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>pool <font color='#5555FF'>=</font> JPOOL_NUMPOOLS<font color='#5555FF'>-</font><font color='#979000'>1</font>; pool <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> JPOOL_PERMANENT; pool<font color='#5555FF'>-</font><font color='#5555FF'>-</font><font face='Lucida Console'>)</font> <b>{</b>
+    <font color='#BB00BB'>free_pool</font><font face='Lucida Console'>(</font>cinfo, pool<font face='Lucida Console'>)</font>;
+  <b>}</b>
+
+  <font color='#009900'>/* Release the memory manager control block too. */</font>
+  <font color='#BB00BB'>jpeg_free_small</font><font face='Lucida Console'>(</font>cinfo, <font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font> <font color='#5555FF'>*</font><font face='Lucida Console'>)</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>mem, <font color='#BB00BB'>SIZEOF</font><font face='Lucida Console'>(</font>my_memory_mgr<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+  cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>mem <font color='#5555FF'>=</font> NULL;		<font color='#009900'>/* ensures I will be called only once */</font>
+
+  <font color='#BB00BB'>jpeg_mem_term</font><font face='Lucida Console'>(</font>cinfo<font face='Lucida Console'>)</font>;		<font color='#009900'>/* system-dependent cleanup */</font>
+<b>}</b>
+
+
+<font color='#009900'>/*
+ * Memory manager initialization.
+ * When this is called, only the error manager pointer is valid in cinfo!
+ */</font>
+
+<b><a name='GLOBAL'></a>GLOBAL</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font>
+<b><a name='jinit_memory_mgr'></a>jinit_memory_mgr</b> <font face='Lucida Console'>(</font>j_common_ptr cinfo<font face='Lucida Console'>)</font>
+<b>{</b>
+  my_mem_ptr mem;
+  <font color='#0000FF'><u>long</u></font> max_to_use;
+  <font color='#0000FF'><u>int</u></font> pool;
+  <font color='#0000FF'><u>size_t</u></font> test_mac;
+
+  cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>mem <font color='#5555FF'>=</font> NULL;		<font color='#009900'>/* for safety if init fails */</font>
+
+  <font color='#009900'>/* Check for configuration errors.
+   * SIZEOF(ALIGN_TYPE) should be a power of 2; otherwise, it probably
+   * doesn't reflect any real hardware alignment requirement.
+   * The test is a little tricky: for X&gt;0, X and X-1 have no one-bits
+   * in common if and only if X is a power of 2, ie has only one one-bit.
+   * Some compilers may give an "unreachable code" warning here; ignore it.
+   */</font>
+  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#BB00BB'>SIZEOF</font><font face='Lucida Console'>(</font>ALIGN_TYPE<font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>SIZEOF</font><font face='Lucida Console'>(</font>ALIGN_TYPE<font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+    <font color='#BB00BB'>ERREXIT</font><font face='Lucida Console'>(</font>cinfo, JERR_BAD_ALIGN_TYPE<font face='Lucida Console'>)</font>;
+  <font color='#009900'>/* MAX_ALLOC_CHUNK must be representable as type size_t, and must be
+   * a multiple of SIZEOF(ALIGN_TYPE).
+   * Again, an "unreachable code" warning may be ignored here.
+   * But a "constant too large" warning means you need to fix MAX_ALLOC_CHUNK.
+   */</font>
+  test_mac <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>size_t</u></font><font face='Lucida Console'>)</font> MAX_ALLOC_CHUNK;
+  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font> test_mac <font color='#5555FF'>!</font><font color='#5555FF'>=</font> MAX_ALLOC_CHUNK <font color='#5555FF'>|</font><font color='#5555FF'>|</font>
+      <font face='Lucida Console'>(</font>MAX_ALLOC_CHUNK <font color='#5555FF'>%</font> <font color='#BB00BB'>SIZEOF</font><font face='Lucida Console'>(</font>ALIGN_TYPE<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+    <font color='#BB00BB'>ERREXIT</font><font face='Lucida Console'>(</font>cinfo, JERR_BAD_ALLOC_CHUNK<font face='Lucida Console'>)</font>;
+
+  max_to_use <font color='#5555FF'>=</font> <font color='#BB00BB'>jpeg_mem_init</font><font face='Lucida Console'>(</font>cinfo<font face='Lucida Console'>)</font>; <font color='#009900'>/* system-dependent initialization */</font>
+
+  <font color='#009900'>/* Attempt to allocate memory manager's control block */</font>
+  mem <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>my_mem_ptr<font face='Lucida Console'>)</font> <font color='#BB00BB'>jpeg_get_small</font><font face='Lucida Console'>(</font>cinfo, <font color='#BB00BB'>SIZEOF</font><font face='Lucida Console'>(</font>my_memory_mgr<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>mem <font color='#5555FF'>=</font><font color='#5555FF'>=</font> NULL<font face='Lucida Console'>)</font> <b>{</b>
+    <font color='#BB00BB'>jpeg_mem_term</font><font face='Lucida Console'>(</font>cinfo<font face='Lucida Console'>)</font>;	<font color='#009900'>/* system-dependent cleanup */</font>
+    <font color='#BB00BB'>ERREXIT1</font><font face='Lucida Console'>(</font>cinfo, JERR_OUT_OF_MEMORY, <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+  <b>}</b>
+
+  <font color='#009900'>/* OK, fill in the method pointers */</font>
+  mem<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>pub.alloc_small <font color='#5555FF'>=</font> alloc_small;
+  mem<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>pub.alloc_large <font color='#5555FF'>=</font> alloc_large;
+  mem<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>pub.alloc_sarray <font color='#5555FF'>=</font> alloc_sarray;
+  mem<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>pub.alloc_barray <font color='#5555FF'>=</font> alloc_barray;
+  mem<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>pub.request_virt_sarray <font color='#5555FF'>=</font> request_virt_sarray;
+  mem<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>pub.request_virt_barray <font color='#5555FF'>=</font> request_virt_barray;
+  mem<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>pub.realize_virt_arrays <font color='#5555FF'>=</font> realize_virt_arrays;
+  mem<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>pub.access_virt_sarray <font color='#5555FF'>=</font> access_virt_sarray;
+  mem<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>pub.access_virt_barray <font color='#5555FF'>=</font> access_virt_barray;
+  mem<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>pub.free_pool <font color='#5555FF'>=</font> free_pool;
+  mem<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>pub.self_destruct <font color='#5555FF'>=</font> self_destruct;
+
+  <font color='#009900'>/* Make MAX_ALLOC_CHUNK accessible to other modules */</font>
+  mem<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>pub.max_alloc_chunk <font color='#5555FF'>=</font> MAX_ALLOC_CHUNK;
+
+  <font color='#009900'>/* Initialize working state */</font>
+  mem<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>pub.max_memory_to_use <font color='#5555FF'>=</font> max_to_use;
+
+  <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>pool <font color='#5555FF'>=</font> JPOOL_NUMPOOLS<font color='#5555FF'>-</font><font color='#979000'>1</font>; pool <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> JPOOL_PERMANENT; pool<font color='#5555FF'>-</font><font color='#5555FF'>-</font><font face='Lucida Console'>)</font> <b>{</b>
+    mem<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>small_list[pool] <font color='#5555FF'>=</font> NULL;
+    mem<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>large_list[pool] <font color='#5555FF'>=</font> NULL;
+  <b>}</b>
+  mem<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>virt_sarray_list <font color='#5555FF'>=</font> NULL;
+  mem<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>virt_barray_list <font color='#5555FF'>=</font> NULL;
+
+  mem<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>total_space_allocated <font color='#5555FF'>=</font> <font color='#BB00BB'>SIZEOF</font><font face='Lucida Console'>(</font>my_memory_mgr<font face='Lucida Console'>)</font>;
+
+  <font color='#009900'>/* Declare ourselves open for business */</font>
+  cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>mem <font color='#5555FF'>=</font> <font color='#5555FF'>&amp;</font> mem<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>pub;
+
+  <font color='#009900'>/* Check for an environment variable JPEGMEM; if found, override the
+   * default max_memory setting from jpeg_mem_init.  Note that the
+   * surrounding application may again override this value.
+   * If your system doesn't support getenv(), define NO_GETENV to disable
+   * this feature.
+   */</font>
+<font color='#0000FF'>#ifndef</font> NO_GETENV
+  <b>{</b> <font color='#0000FF'><u>char</u></font> <font color='#5555FF'>*</font> memenv;
+
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>memenv <font color='#5555FF'>=</font> <font color='#BB00BB'>getenv</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>JPEGMEM</font>"<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>!</font><font color='#5555FF'>=</font> NULL<font face='Lucida Console'>)</font> <b>{</b>
+      <font color='#0000FF'><u>char</u></font> ch <font color='#5555FF'>=</font> '<font color='#FF0000'>x</font>';
+
+      <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>sscanf</font><font face='Lucida Console'>(</font>memenv, "<font color='#CC0000'>%ld%c</font>", <font color='#5555FF'>&amp;</font>max_to_use, <font color='#5555FF'>&amp;</font>ch<font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font> <b>{</b>
+	<font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>ch <font color='#5555FF'>=</font><font color='#5555FF'>=</font> '<font color='#FF0000'>m</font>' <font color='#5555FF'>|</font><font color='#5555FF'>|</font> ch <font color='#5555FF'>=</font><font color='#5555FF'>=</font> '<font color='#FF0000'>M</font>'<font face='Lucida Console'>)</font>
+	  max_to_use <font color='#5555FF'>*</font><font color='#5555FF'>=</font> <font color='#979000'>1000</font>L;
+	mem<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>pub.max_memory_to_use <font color='#5555FF'>=</font> max_to_use <font color='#5555FF'>*</font> <font color='#979000'>1000</font>L;
+      <b>}</b>
+    <b>}</b>
+  <b>}</b>
+<font color='#0000FF'>#endif</font>
+
+<b>}</b>
+
+</pre></body></html>

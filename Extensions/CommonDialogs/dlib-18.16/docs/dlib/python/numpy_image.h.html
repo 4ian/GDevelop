@@ -1,0 +1,125 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - numpy_image.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2014  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_PYTHON_NuMPY_IMAGE_Hh_
+<font color='#0000FF'>#define</font> DLIB_PYTHON_NuMPY_IMAGE_Hh_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='numpy.h.html'>numpy.h</a>"
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>pixel.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>matrix.h<font color='#5555FF'>&gt;</font>
+
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<font color='#0000FF'>class</font> <b><a name='numpy_gray_image'></a>numpy_gray_image</b>
+<b>{</b>
+<font color='#0000FF'>public</font>:
+
+    <b><a name='numpy_gray_image'></a>numpy_gray_image</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> : _data<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>, _nr<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>, _nc<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+    <b><a name='numpy_gray_image'></a>numpy_gray_image</b> <font face='Lucida Console'>(</font>boost::python::object<font color='#5555FF'>&amp;</font> img<font face='Lucida Console'>)</font> 
+    <b>{</b>
+        <font color='#0000FF'><u>long</u></font> shape[<font color='#979000'>2</font>];
+        <font color='#BB00BB'>get_numpy_ndarray_parts</font><font face='Lucida Console'>(</font>img, _data, shape<font face='Lucida Console'>)</font>;
+        _nr <font color='#5555FF'>=</font> shape[<font color='#979000'>0</font>];
+        _nc <font color='#5555FF'>=</font> shape[<font color='#979000'>1</font>];
+    <b>}</b>
+
+    <font color='#0000FF'>friend</font> <font color='#0000FF'>inline</font> <font color='#0000FF'><u>long</u></font> <b><a name='num_rows'></a>num_rows</b><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> numpy_gray_image<font color='#5555FF'>&amp;</font> img<font face='Lucida Console'>)</font> <b>{</b> <font color='#0000FF'>return</font> img._nr; <b>}</b> 
+    <font color='#0000FF'>friend</font> <font color='#0000FF'>inline</font> <font color='#0000FF'><u>long</u></font> <b><a name='num_columns'></a>num_columns</b><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> numpy_gray_image<font color='#5555FF'>&amp;</font> img<font face='Lucida Console'>)</font> <b>{</b> <font color='#0000FF'>return</font> img._nc; <b>}</b> 
+    <font color='#0000FF'>friend</font> <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font><font color='#5555FF'>*</font> <b><a name='image_data'></a>image_data</b><font face='Lucida Console'>(</font>numpy_gray_image<font color='#5555FF'>&amp;</font> img<font face='Lucida Console'>)</font> <b>{</b> <font color='#0000FF'>return</font> img._data; <b>}</b> 
+    <font color='#0000FF'>friend</font> <font color='#0000FF'>inline</font> <font color='#0000FF'>const</font> <font color='#0000FF'><u>void</u></font><font color='#5555FF'>*</font> <b><a name='image_data'></a>image_data</b><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> numpy_gray_image<font color='#5555FF'>&amp;</font> img<font face='Lucida Console'>)</font> <b>{</b> <font color='#0000FF'>return</font> img._data; <b>}</b>
+    <font color='#0000FF'>friend</font> <font color='#0000FF'>inline</font> <font color='#0000FF'><u>long</u></font> <b><a name='width_step'></a>width_step</b><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> numpy_gray_image<font color='#5555FF'>&amp;</font> img<font face='Lucida Console'>)</font> <b>{</b> <font color='#0000FF'>return</font> img._nc<font color='#5555FF'>*</font><font color='#0000FF'>sizeof</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font face='Lucida Console'>)</font>; <b>}</b>
+
+<font color='#0000FF'>private</font>:
+
+    <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>*</font> _data;
+    <font color='#0000FF'><u>long</u></font> _nr;
+    <font color='#0000FF'><u>long</u></font> _nc;
+<b>}</b>;
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>struct</font> <b><a name='image_traits'></a>image_traits</b><font color='#5555FF'>&lt;</font>numpy_gray_image <font color='#5555FF'>&gt;</font>
+    <b>{</b>
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> pixel_type;
+    <b>}</b>;
+<b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<font color='#0000FF'>inline</font> <font color='#0000FF'><u>bool</u></font> <b><a name='is_gray_python_image'></a>is_gray_python_image</b> <font face='Lucida Console'>(</font>boost::python::object<font color='#5555FF'>&amp;</font> img<font face='Lucida Console'>)</font>
+<b>{</b>
+    <font color='#0000FF'>try</font>
+    <b>{</b>
+        numpy_gray_image <font color='#BB00BB'>temp</font><font face='Lucida Console'>(</font>img<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+    <b>}</b>
+    <font color='#0000FF'>catch</font> <font face='Lucida Console'>(</font>dlib::error<font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>return</font> <font color='#979000'>false</font>;
+    <b>}</b>
+<b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<font color='#0000FF'>class</font> <b><a name='numpy_rgb_image'></a>numpy_rgb_image</b>
+<b>{</b>
+<font color='#0000FF'>public</font>:
+
+    <b><a name='numpy_rgb_image'></a>numpy_rgb_image</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> : _data<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>, _nr<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>, _nc<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+    <b><a name='numpy_rgb_image'></a>numpy_rgb_image</b> <font face='Lucida Console'>(</font>boost::python::object<font color='#5555FF'>&amp;</font> img<font face='Lucida Console'>)</font> 
+    <b>{</b>
+        <font color='#0000FF'><u>long</u></font> shape[<font color='#979000'>3</font>];
+        <font color='#BB00BB'>get_numpy_ndarray_parts</font><font face='Lucida Console'>(</font>img, _data, shape<font face='Lucida Console'>)</font>;
+        _nr <font color='#5555FF'>=</font> shape[<font color='#979000'>0</font>];
+        _nc <font color='#5555FF'>=</font> shape[<font color='#979000'>1</font>];
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>shape[<font color='#979000'>2</font>] <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>3</font><font face='Lucida Console'>)</font>
+            <font color='#0000FF'>throw</font> dlib::<font color='#BB00BB'>error</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>Error, python object is not a three band image and therefore can't be a RGB image.</font>"<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+    <font color='#0000FF'>friend</font> <font color='#0000FF'>inline</font> <font color='#0000FF'><u>long</u></font> <b><a name='num_rows'></a>num_rows</b><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> numpy_rgb_image<font color='#5555FF'>&amp;</font> img<font face='Lucida Console'>)</font> <b>{</b> <font color='#0000FF'>return</font> img._nr; <b>}</b> 
+    <font color='#0000FF'>friend</font> <font color='#0000FF'>inline</font> <font color='#0000FF'><u>long</u></font> <b><a name='num_columns'></a>num_columns</b><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> numpy_rgb_image<font color='#5555FF'>&amp;</font> img<font face='Lucida Console'>)</font> <b>{</b> <font color='#0000FF'>return</font> img._nc; <b>}</b> 
+    <font color='#0000FF'>friend</font> <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font><font color='#5555FF'>*</font> <b><a name='image_data'></a>image_data</b><font face='Lucida Console'>(</font>numpy_rgb_image<font color='#5555FF'>&amp;</font> img<font face='Lucida Console'>)</font> <b>{</b> <font color='#0000FF'>return</font> img._data; <b>}</b> 
+    <font color='#0000FF'>friend</font> <font color='#0000FF'>inline</font> <font color='#0000FF'>const</font> <font color='#0000FF'><u>void</u></font><font color='#5555FF'>*</font> <b><a name='image_data'></a>image_data</b><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> numpy_rgb_image<font color='#5555FF'>&amp;</font> img<font face='Lucida Console'>)</font> <b>{</b> <font color='#0000FF'>return</font> img._data; <b>}</b>
+    <font color='#0000FF'>friend</font> <font color='#0000FF'>inline</font> <font color='#0000FF'><u>long</u></font> <b><a name='width_step'></a>width_step</b><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> numpy_rgb_image<font color='#5555FF'>&amp;</font> img<font face='Lucida Console'>)</font> <b>{</b> <font color='#0000FF'>return</font> img._nc<font color='#5555FF'>*</font><font color='#0000FF'>sizeof</font><font face='Lucida Console'>(</font>dlib::rgb_pixel<font face='Lucida Console'>)</font>; <b>}</b>
+
+
+<font color='#0000FF'>private</font>:
+
+    dlib::rgb_pixel<font color='#5555FF'>*</font> _data;
+    <font color='#0000FF'><u>long</u></font> _nr;
+    <font color='#0000FF'><u>long</u></font> _nc;
+<b>}</b>;
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>struct</font> <b><a name='image_traits'></a>image_traits</b><font color='#5555FF'>&lt;</font>numpy_rgb_image <font color='#5555FF'>&gt;</font>
+    <b>{</b>
+        <font color='#0000FF'>typedef</font> rgb_pixel pixel_type;
+    <b>}</b>;
+<b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+
+<font color='#0000FF'>inline</font> <font color='#0000FF'><u>bool</u></font> <b><a name='is_rgb_python_image'></a>is_rgb_python_image</b> <font face='Lucida Console'>(</font>boost::python::object<font color='#5555FF'>&amp;</font> img<font face='Lucida Console'>)</font>
+<b>{</b>
+    <font color='#0000FF'>try</font>
+    <b>{</b>
+        numpy_rgb_image <font color='#BB00BB'>temp</font><font face='Lucida Console'>(</font>img<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+    <b>}</b>
+    <font color='#0000FF'>catch</font> <font face='Lucida Console'>(</font>dlib::error<font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>return</font> <font color='#979000'>false</font>;
+    <b>}</b>
+<b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_PYTHON_NuMPY_IMAGE_Hh_
+</font>
+
+</pre></body></html>

@@ -1,0 +1,350 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - bridge_abstract.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2011  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#undef</font> DLIB_BRIDGe_ABSTRACT_
+<font color='#0000FF'>#ifdef</font> DLIB_BRIDGe_ABSTRACT_
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>string<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../pipe/pipe_kernel_abstract.h.html'>../pipe/pipe_kernel_abstract.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ---------------------------------------------------------------------------------------- 
+</font>
+    <font color='#0000FF'>struct</font> <b><a name='connect_to_ip_and_port'></a>connect_to_ip_and_port</b>
+    <b>{</b>
+        <b><a name='connect_to_ip_and_port'></a>connect_to_ip_and_port</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> ip,
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>short</u></font> port
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - is_ip_address(ip) == true
+                - port != 0
+            ensures
+                - this object will represent a request to make a TCP connection
+                  to the given IP address and port number.
+        !*/</font>
+    <b>}</b>;
+
+    connect_to_ip_and_port <b><a name='connect_to'></a>connect_to</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> network_address<font color='#5555FF'>&amp;</font> addr
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - addr.port != 0
+        ensures
+            - converts the given network_address object into a connect_to_ip_and_port
+              object.
+    !*/</font>
+
+    <font color='#0000FF'>struct</font> <b><a name='listen_on_port'></a>listen_on_port</b>
+    <b>{</b>
+        <b><a name='listen_on_port'></a>listen_on_port</b><font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>short</u></font> port
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - port != 0
+            ensures
+                - this object will represent a request to listen on the given
+                  port number for incoming TCP connections.
+        !*/</font>
+    <b>}</b>;
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> pipe_type
+        <font color='#5555FF'>&gt;</font>
+    bridge_transmit_decoration<font color='#5555FF'>&lt;</font>pipe_type<font color='#5555FF'>&gt;</font> <b><a name='transmit'></a>transmit</b> <font face='Lucida Console'>(</font> 
+        pipe_type<font color='#5555FF'>&amp;</font> p
+    <font face='Lucida Console'>)</font>; 
+    <font color='#009900'>/*!
+        requires
+            - pipe_type is some kind of dlib::pipe object
+            - the objects in the pipe must be serializable
+        ensures
+            - Adds a type decoration to the given pipe, marking it as a transmit pipe, and 
+              then returns it.  
+    !*/</font>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> pipe_type
+        <font color='#5555FF'>&gt;</font>
+    bridge_receive_decoration<font color='#5555FF'>&lt;</font>pipe_type<font color='#5555FF'>&gt;</font> <b><a name='receive'></a>receive</b> <font face='Lucida Console'>(</font> 
+        pipe_type<font color='#5555FF'>&amp;</font> p
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - pipe_type is some kind of dlib::pipe object
+            - the objects in the pipe must be serializable
+        ensures
+            - Adds a type decoration to the given pipe, marking it as a receive pipe, and 
+              then returns it.  
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>struct</font> <b><a name='bridge_status'></a>bridge_status</b>
+    <b>{</b>
+        <font color='#009900'>/*!
+            WHAT THIS OBJECT REPRESENTS
+                This simple struct represents the state of a bridge object.  A
+                bridge is either connected or not.  If it is connected then it
+                is connected to a foreign host with an IP address and port number
+                as indicated by this object.
+        !*/</font>
+        
+        <b><a name='bridge_status'></a>bridge_status</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>; 
+        <font color='#009900'>/*!
+            ensures
+                - #is_connected == false
+                - #foreign_port == 0
+                - #foreign_ip == ""
+        !*/</font>
+
+        <font color='#0000FF'><u>bool</u></font> is_connected;
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>short</u></font> foreign_port;
+        std::string foreign_ip;
+    <b>}</b>;
+
+<font color='#009900'>// ---------------------------------------------------------------------------------------- 
+</font>
+    <font color='#0000FF'>class</font> <b><a name='bridge'></a>bridge</b> : noncopyable
+    <b>{</b>
+        <font color='#009900'>/*!
+            WHAT THIS OBJECT REPRESENTS
+                This object is a tool for bridging a dlib::pipe object between
+                two network connected applications.  
+
+
+                Note also that this object contains a dlib::logger object
+                which will log various events taking place inside a bridge.
+                If you want to see these log messages then enable the logger
+                named "dlib.bridge".
+
+            
+            BRIDGE PROTOCOL DETAILS
+                The bridge object creates a single TCP connection between
+                two applications.  Whenever it sends an object from a pipe
+                over a TCP connection it sends a byte with the value 1 followed 
+                immediately by the serialized copy of the object from the pipe. 
+                The serialization is performed by calling the global serialize()
+                function.  
+
+                Additionally, a bridge object will periodically send bytes with
+                a value of 0 to ensure the TCP connection remains alive.  These
+                are just read and ignored.  
+        !*/</font>
+
+    <font color='#0000FF'>public</font>:
+
+        <b><a name='bridge'></a>bridge</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - this object is properly initialized
+                - #get_bridge_status().is_connected == false
+        !*/</font>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> U, <font color='#0000FF'>typename</font> V<font color='#5555FF'>&gt;</font>
+        <b><a name='bridge'></a>bridge</b> <font face='Lucida Console'>(</font>
+            T network_parameters,
+            U pipe1,
+            V pipe2 
+        <font face='Lucida Console'>)</font>; 
+        <font color='#009900'>/*!
+            requires
+                - T is of type connect_to_ip_and_port or listen_on_port
+                - U and V are of type bridge_transmit_decoration or bridge_receive_decoration,
+                  however, U and V must be of different types (i.e. one is a receive type and 
+                  another a transmit type).
+            ensures
+                - this object is properly initialized
+                - performs: reconfigure(network_parameters, pipe1, pipe2)
+                  (i.e. using this constructor is identical to using the default constructor 
+                  and then calling reconfigure())
+        !*/</font>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> U<font color='#5555FF'>&gt;</font>
+        <b><a name='bridge'></a>bridge</b> <font face='Lucida Console'>(</font>
+            T network_parameters,
+            U pipe 
+        <font face='Lucida Console'>)</font>; 
+        <font color='#009900'>/*!
+            requires
+                - T is of type connect_to_ip_and_port or listen_on_port
+                - U is of type bridge_transmit_decoration or bridge_receive_decoration.
+            ensures
+                - this object is properly initialized
+                - performs: reconfigure(network_parameters, pipe)
+                  (i.e. using this constructor is identical to using the default constructor 
+                  and then calling reconfigure())
+        !*/</font>
+
+        ~<b><a name='bridge'></a>bridge</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - blocks until all resources associated with this object have been destroyed.
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='clear'></a>clear</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns this object to its default constructed state.  That is, it will
+                  be inactive, neither maintaining a connection nor attempting to acquire one.
+                - Any active connections or listening sockets will be closed.
+        !*/</font>
+
+        bridge_status <b><a name='get_bridge_status'></a>get_bridge_status</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the current status of this bridge object. In particular, returns 
+                  an object BS such that:
+                    - BS.is_connected == true if and only if the bridge has an active TCP 
+                      connection to another computer.
+                    - if (BS.is_connected) then
+                        - BS.foreign_ip == the IP address of the remote host we are connected to.
+                        - BS.foreign_port == the port number on the remote host we are connected to.
+                    - else if (the bridge has previously been connected to a remote host but hasn't been 
+                               reconfigured or cleared since) then
+                        - BS.foreign_ip == the IP address of the remote host we were connected to.
+                        - BS.foreign_port == the port number on the remote host we were connected to.
+                    - else
+                        - BS.foreign_ip == ""
+                        - BS.foreign_port == 0
+        !*/</font>
+
+
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font> <font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> R <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='reconfigure'></a>reconfigure</b> <font face='Lucida Console'>(</font>
+            listen_on_port network_parameters,
+            bridge_transmit_decoration<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font> transmit_pipe,
+            bridge_receive_decoration<font color='#5555FF'>&lt;</font>R<font color='#5555FF'>&gt;</font> receive_pipe
+        <font face='Lucida Console'>)</font>; 
+        <font color='#009900'>/*!
+            ensures
+                - This object will begin listening on the port specified by network_parameters
+                  for incoming TCP connections.  Any previous bridge state is cleared out.
+                - Onces a connection is established we will:
+                    - Stop accepting new connections.
+                    - Begin dequeuing objects from the transmit pipe and serializing them over 
+                      the TCP connection.
+                    - Begin deserializing objects from the TCP connection and enqueueing them 
+                      onto the receive pipe.
+                - if (the current TCP connection is lost) then 
+                    - This object goes back to listening for a new connection.
+                - if (the receive pipe can contain bridge_status objects) then
+                    - Whenever the bridge's status changes the updated bridge_status will be
+                      enqueued onto the receive pipe unless the change was a TCP disconnect 
+                      resulting from a user calling reconfigure(), clear(), or destructing this 
+                      bridge.  The status contents are defined by get_bridge_status().
+            throws
+                - socket_error
+                  This exception is thrown if we are unable to open the listening socket.
+        !*/</font>
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font> <font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> R <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='reconfigure'></a>reconfigure</b> <font face='Lucida Console'>(</font>
+            listen_on_port network_parameters,
+            bridge_receive_decoration<font color='#5555FF'>&lt;</font>R<font color='#5555FF'>&gt;</font> receive_pipe,
+            bridge_transmit_decoration<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font> transmit_pipe
+        <font face='Lucida Console'>)</font>; 
+        <font color='#009900'>/*!
+            ensures
+                - performs reconfigure(network_parameters, transmit_pipe, receive_pipe)
+        !*/</font>
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font> <font color='#0000FF'>typename</font> T <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='reconfigure'></a>reconfigure</b> <font face='Lucida Console'>(</font>
+            listen_on_port network_parameters,
+            bridge_transmit_decoration<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font> transmit_pipe
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - This function is identical to the above two reconfigure() functions 
+                  except that there is no receive pipe.
+        !*/</font>
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font> <font color='#0000FF'>typename</font> R <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='reconfigure'></a>reconfigure</b> <font face='Lucida Console'>(</font>
+            listen_on_port network_parameters,
+            bridge_receive_decoration<font color='#5555FF'>&lt;</font>R<font color='#5555FF'>&gt;</font> receive_pipe
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - This function is identical to the above three reconfigure() functions 
+                  except that there is no transmit pipe.
+        !*/</font>
+
+
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> R<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='reconfigure'></a>reconfigure</b> <font face='Lucida Console'>(</font>
+            connect_to_ip_and_port network_parameters,
+            bridge_transmit_decoration<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font> transmit_pipe,
+            bridge_receive_decoration<font color='#5555FF'>&lt;</font>R<font color='#5555FF'>&gt;</font> receive_pipe
+        <font face='Lucida Console'>)</font>; 
+        <font color='#009900'>/*!
+            ensures
+                - This object will begin making TCP connection attempts to the IP address and port 
+                  specified by network_parameters.  Any previous bridge state is cleared out.
+                - Onces a connection is established we will:
+                    - Stop attempting new connections.
+                    - Begin dequeuing objects from the transmit pipe and serializing them over 
+                      the TCP connection.
+                    - Begin deserializing objects from the TCP connection and enqueueing them 
+                      onto the receive pipe.
+                - if (the current TCP connection is lost) then 
+                    - This object goes back to attempting to make a TCP connection with the
+                      IP address and port specified by network_parameters.
+                - if (the receive pipe can contain bridge_status objects) then
+                    - Whenever the bridge's status changes the updated bridge_status will be
+                      enqueued onto the receive pipe unless the change was a TCP disconnect 
+                      resulting from a user calling reconfigure(), clear(), or destructing this 
+                      bridge.  The status contents are defined by get_bridge_status().
+        !*/</font>
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> R<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='reconfigure'></a>reconfigure</b> <font face='Lucida Console'>(</font>
+            connect_to_ip_and_port network_parameters,
+            bridge_receive_decoration<font color='#5555FF'>&lt;</font>R<font color='#5555FF'>&gt;</font> receive_pipe,
+            bridge_transmit_decoration<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font> transmit_pipe
+        <font face='Lucida Console'>)</font>; 
+        <font color='#009900'>/*!
+            ensures
+                - performs reconfigure(network_parameters, transmit_pipe, receive_pipe)
+        !*/</font>
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='reconfigure'></a>reconfigure</b> <font face='Lucida Console'>(</font>
+            connect_to_ip_and_port network_parameters,
+            bridge_transmit_decoration<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font> transmit_pipe
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - This function is identical to the above two reconfigure() functions 
+                  except that there is no receive pipe.
+        !*/</font>
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> R<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='reconfigure'></a>reconfigure</b> <font face='Lucida Console'>(</font>
+            connect_to_ip_and_port network_parameters,
+            bridge_receive_decoration<font color='#5555FF'>&lt;</font>R<font color='#5555FF'>&gt;</font> receive_pipe
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - This function is identical to the above three reconfigure() functions 
+                  except that there is no transmit pipe.
+        !*/</font>
+
+    <b>}</b>;
+
+<font color='#009900'>// ---------------------------------------------------------------------------------------- 
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_BRIDGe_ABSTRACT_
+</font>
+
+
+</pre></body></html>

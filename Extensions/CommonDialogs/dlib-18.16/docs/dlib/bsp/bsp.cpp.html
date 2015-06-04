@@ -1,0 +1,498 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - bsp.cpp</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2012  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_BSP_CPph_
+<font color='#0000FF'>#define</font> DLIB_BSP_CPph_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='bsp.h.html'>bsp.h</a>"
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>stack<font color='#5555FF'>&gt;</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+    <font color='#0000FF'>namespace</font> impl1
+    <b>{</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='connect_all'></a>connect_all</b> <font face='Lucida Console'>(</font>
+            map_id_to_con<font color='#5555FF'>&amp;</font> cons,
+            <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>network_address<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> hosts,
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> node_id
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            cons.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> hosts.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                scoped_ptr<font color='#5555FF'>&lt;</font>bsp_con<font color='#5555FF'>&gt;</font> <font color='#BB00BB'>con</font><font face='Lucida Console'>(</font><font color='#0000FF'>new</font> <font color='#BB00BB'>bsp_con</font><font face='Lucida Console'>(</font>hosts[i]<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                dlib::<font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>node_id, con<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>stream<font face='Lucida Console'>)</font>; <font color='#009900'>// tell the other end our node_id
+</font>                <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> id <font color='#5555FF'>=</font> i<font color='#5555FF'>+</font><font color='#979000'>1</font>;
+                cons.<font color='#BB00BB'>add</font><font face='Lucida Console'>(</font>id, con<font face='Lucida Console'>)</font>;
+            <b>}</b>
+        <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='connect_all_hostinfo'></a>connect_all_hostinfo</b> <font face='Lucida Console'>(</font>
+            map_id_to_con<font color='#5555FF'>&amp;</font> cons,
+            <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>hostinfo<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> hosts,
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> node_id,
+            std::string<font color='#5555FF'>&amp;</font> error_string 
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            cons.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> hosts.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>try</font>
+                <b>{</b>
+                    scoped_ptr<font color='#5555FF'>&lt;</font>bsp_con<font color='#5555FF'>&gt;</font> <font color='#BB00BB'>con</font><font face='Lucida Console'>(</font><font color='#0000FF'>new</font> <font color='#BB00BB'>bsp_con</font><font face='Lucida Console'>(</font>hosts[i].addr<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                    dlib::<font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>node_id, con<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>stream<font face='Lucida Console'>)</font>; <font color='#009900'>// tell the other end our node_id
+</font>                    con<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>stream.<font color='#BB00BB'>flush</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                    <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> id <font color='#5555FF'>=</font> hosts[i].node_id;
+                    cons.<font color='#BB00BB'>add</font><font face='Lucida Console'>(</font>id, con<font face='Lucida Console'>)</font>;
+                <b>}</b>
+                <font color='#0000FF'>catch</font> <font face='Lucida Console'>(</font>std::exception<font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font>
+                <b>{</b>
+                    std::ostringstream sout;
+                    sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>Could not connect to </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> hosts[i].addr;
+                    error_string <font color='#5555FF'>=</font> sout.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                    <font color='#0000FF'>break</font>;
+                <b>}</b>
+            <b>}</b>
+        <b>}</b>
+
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='send_out_connection_orders'></a>send_out_connection_orders</b> <font face='Lucida Console'>(</font>
+            map_id_to_con<font color='#5555FF'>&amp;</font> cons,
+            <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>network_address<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> hosts
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#009900'>// tell everyone their node ids
+</font>            cons.<font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>cons.<font color='#BB00BB'>move_next</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                dlib::<font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>cons.<font color='#BB00BB'>element</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>key</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, cons.<font color='#BB00BB'>element</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>value</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>stream<font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+            <font color='#009900'>// now tell them who to connect to
+</font>            std::vector<font color='#5555FF'>&lt;</font>hostinfo<font color='#5555FF'>&gt;</font> targets; 
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> hosts.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                hostinfo <font color='#BB00BB'>info</font><font face='Lucida Console'>(</font>hosts[i], i<font color='#5555FF'>+</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+
+                dlib::<font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>targets, cons[info.node_id]<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>stream<font face='Lucida Console'>)</font>;
+                targets.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>info<font face='Lucida Console'>)</font>;
+
+                <font color='#009900'>// let the other host know how many incoming connections to expect
+</font>                <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> num <font color='#5555FF'>=</font> hosts.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font>targets.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                dlib::<font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>num, cons[info.node_id]<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>stream<font face='Lucida Console'>)</font>;
+                cons[info.node_id]<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>stream.<font color='#BB00BB'>flush</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+        <b>}</b>
+
+    <font color='#009900'>// ------------------------------------------------------------------------------------
+</font>
+
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>namespace</font> impl2
+    <b>{</b>
+        <font color='#009900'>// These control bytes are sent before each message between nodes.  Note that many
+</font>        <font color='#009900'>// of these are only sent between the control node (node 0) and the other nodes.
+</font>        <font color='#009900'>// This is because the controller node is responsible for handling the
+</font>        <font color='#009900'>// synchronization that needs to happen when all nodes block on calls to
+</font>        <font color='#009900'>// receive_data()
+</font>        <font color='#009900'>// at the same time.
+</font>
+        <font color='#009900'>// denotes a normal content message.
+</font>        <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>char</u></font> MESSAGE_HEADER            <font color='#5555FF'>=</font> <font color='#979000'>0</font>; 
+
+        <font color='#009900'>// sent to the controller node when someone receives a message via receive_data().
+</font>        <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>char</u></font> GOT_MESSAGE               <font color='#5555FF'>=</font> <font color='#979000'>1</font>; 
+
+        <font color='#009900'>// sent to the controller node when someone sends a message via send().
+</font>        <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>char</u></font> SENT_MESSAGE              <font color='#5555FF'>=</font> <font color='#979000'>2</font>; 
+
+        <font color='#009900'>// sent to the controller node when someone enters a call to receive_data()
+</font>        <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>char</u></font> IN_WAITING_STATE          <font color='#5555FF'>=</font> <font color='#979000'>3</font>; 
+
+        <font color='#009900'>// broadcast when a node terminates itself. 
+</font>        <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>char</u></font> NODE_TERMINATE            <font color='#5555FF'>=</font> <font color='#979000'>5</font>; 
+
+        <font color='#009900'>// broadcast by the controller node when it determines that all nodes are blocked
+</font>        <font color='#009900'>// on calls to receive_data() and there aren't any messages in flight.  This is also
+</font>        <font color='#009900'>// what makes us go to the next epoch.
+</font>        <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>char</u></font> SEE_ALL_IN_WAITING_STATE  <font color='#5555FF'>=</font> <font color='#979000'>6</font>; 
+
+        <font color='#009900'>// This isn't ever transmitted between nodes.  It is used internally to indicate
+</font>        <font color='#009900'>// that an error occurred.
+</font>        <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>char</u></font> READ_ERROR                <font color='#5555FF'>=</font> <font color='#979000'>7</font>;
+
+    <font color='#009900'>// ------------------------------------------------------------------------------------
+</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='read_thread'></a>read_thread</b> <font face='Lucida Console'>(</font>
+            impl1::bsp_con<font color='#5555FF'>*</font> con,
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> node_id,
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> sender_id,
+            impl1::thread_safe_message_queue<font color='#5555FF'>&amp;</font> msg_buffer
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>try</font>
+            <b>{</b>
+                <font color='#0000FF'>while</font><font face='Lucida Console'>(</font><font color='#979000'>true</font><font face='Lucida Console'>)</font>
+                <b>{</b>
+                    impl1::msg_data msg;
+                    <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>msg.msg_type, con<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>stream<font face='Lucida Console'>)</font>;
+                    msg.sender_id <font color='#5555FF'>=</font> sender_id;
+
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>msg.msg_type <font color='#5555FF'>=</font><font color='#5555FF'>=</font> MESSAGE_HEADER<font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        msg.data.<font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font><font color='#0000FF'>new</font> std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>)</font>;
+                        <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>msg.epoch, con<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>stream<font face='Lucida Console'>)</font>;
+                        <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font>msg.data, con<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>stream<font face='Lucida Console'>)</font>;
+                    <b>}</b>
+
+                    msg_buffer.<font color='#BB00BB'>push_and_consume</font><font face='Lucida Console'>(</font>msg<font face='Lucida Console'>)</font>;
+
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>msg.msg_type <font color='#5555FF'>=</font><font color='#5555FF'>=</font> NODE_TERMINATE<font face='Lucida Console'>)</font>
+                        <font color='#0000FF'>break</font>;
+                <b>}</b>
+            <b>}</b>
+            <font color='#0000FF'>catch</font> <font face='Lucida Console'>(</font>std::exception<font color='#5555FF'>&amp;</font> e<font face='Lucida Console'>)</font>
+            <b>{</b>
+                impl1::msg_data msg;
+                msg.data.<font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font><font color='#0000FF'>new</font> std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>)</font>;
+                vectorstream <font color='#BB00BB'>sout</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font>msg.data<font face='Lucida Console'>)</font>;
+                sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>An exception was thrown while attempting to receive a message from processing node </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> sender_id <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>.\n</font>";
+                sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>  Sending processing node address:   </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> con<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>con<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>get_foreign_ip</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>:</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> con<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>con<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>get_foreign_port</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> std::endl;
+                sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>  Receiving processing node address: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> con<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>con<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>get_local_ip</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>:</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> con<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>con<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>get_local_port</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> std::endl;
+                sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>  Receiving processing node id:      </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> node_id <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> std::endl;
+                sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>  Error message in the exception:    </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> e.<font color='#BB00BB'>what</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> std::endl;
+
+                msg.sender_id <font color='#5555FF'>=</font> sender_id;
+                msg.msg_type <font color='#5555FF'>=</font> READ_ERROR;
+
+                msg_buffer.<font color='#BB00BB'>push_and_consume</font><font face='Lucida Console'>(</font>msg<font face='Lucida Console'>)</font>;
+            <b>}</b>
+            <font color='#0000FF'>catch</font> <font face='Lucida Console'>(</font>...<font face='Lucida Console'>)</font>
+            <b>{</b>
+                impl1::msg_data msg;
+                msg.data.<font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font><font color='#0000FF'>new</font> std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>)</font>;
+                vectorstream <font color='#BB00BB'>sout</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font>msg.data<font face='Lucida Console'>)</font>;
+                sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>An exception was thrown while attempting to receive a message from processing node </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> sender_id <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>.\n</font>";
+                sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>  Sending processing node address:   </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> con<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>con<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>get_foreign_ip</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>:</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> con<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>con<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>get_foreign_port</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> std::endl;
+                sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>  Receiving processing node address: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> con<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>con<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>get_local_ip</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>:</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> con<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>con<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>get_local_port</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> std::endl;
+                sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>  Receiving processing node id:      </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> node_id <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> std::endl;
+
+                msg.sender_id <font color='#5555FF'>=</font> sender_id;
+                msg.msg_type <font color='#5555FF'>=</font> READ_ERROR;
+
+                msg_buffer.<font color='#BB00BB'>push_and_consume</font><font face='Lucida Console'>(</font>msg<font face='Lucida Console'>)</font>;
+            <b>}</b>
+        <b>}</b>
+
+    <font color='#009900'>// ------------------------------------------------------------------------------------
+</font>
+    <b>}</b>
+    
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>//                          IMPLEMENTATION OF bsp_context OBJECT MEMBERS
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>void</u></font> bsp_context::
+    <b><a name='close_all_connections_gracefully'></a>close_all_connections_gracefully</b><font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>node_id</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            _cons.<font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>_cons.<font color='#BB00BB'>move_next</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#009900'>// tell the other end that we are intentionally dropping the connection
+</font>                <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>impl2::NODE_TERMINATE,_cons.<font color='#BB00BB'>element</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>value</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>stream<font face='Lucida Console'>)</font>;
+                _cons.<font color='#BB00BB'>element</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>value</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>stream.<font color='#BB00BB'>flush</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+        <b>}</b>
+
+        impl1::msg_data msg;
+        <font color='#009900'>// now wait for all the other nodes to terminate
+</font>        <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>num_terminated_nodes <font color='#5555FF'>&lt;</font> _cons.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>node_id</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> num_waiting_nodes <font color='#5555FF'>+</font> num_terminated_nodes <font color='#5555FF'>=</font><font color='#5555FF'>=</font> _cons.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> outstanding_messages <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                num_waiting_nodes <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                <font color='#BB00BB'>broadcast_byte</font><font face='Lucida Console'>(</font>impl2::SEE_ALL_IN_WAITING_STATE<font face='Lucida Console'>)</font>;
+                <font color='#5555FF'>+</font><font color='#5555FF'>+</font>current_epoch;
+            <b>}</b>
+
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font>msg_buffer.<font color='#BB00BB'>pop</font><font face='Lucida Console'>(</font>msg<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                <font color='#0000FF'>throw</font> dlib::<font color='#BB00BB'>socket_error</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>Error reading from msg_buffer in dlib::bsp_context.</font>"<font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>msg.msg_type <font color='#5555FF'>=</font><font color='#5555FF'>=</font> impl2::NODE_TERMINATE<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#5555FF'>+</font><font color='#5555FF'>+</font>num_terminated_nodes;
+                _cons[msg.sender_id]<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>terminated <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+            <b>}</b>
+            <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>msg.msg_type <font color='#5555FF'>=</font><font color='#5555FF'>=</font> impl2::READ_ERROR<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>throw</font> dlib::<font color='#BB00BB'>socket_error</font><font face='Lucida Console'>(</font>msg.<font color='#BB00BB'>data_to_string</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+            <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>msg.msg_type <font color='#5555FF'>=</font><font color='#5555FF'>=</font> impl2::MESSAGE_HEADER<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>throw</font> dlib::<font color='#BB00BB'>socket_error</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>A BSP node received a message after it has terminated.</font>"<font face='Lucida Console'>)</font>;
+            <b>}</b>
+            <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>msg.msg_type <font color='#5555FF'>=</font><font color='#5555FF'>=</font> impl2::GOT_MESSAGE<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#5555FF'>-</font><font color='#5555FF'>-</font>num_waiting_nodes;
+                <font color='#5555FF'>-</font><font color='#5555FF'>-</font>outstanding_messages;
+            <b>}</b>
+            <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>msg.msg_type <font color='#5555FF'>=</font><font color='#5555FF'>=</font> impl2::SENT_MESSAGE<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#5555FF'>+</font><font color='#5555FF'>+</font>outstanding_messages;
+            <b>}</b>
+            <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>msg.msg_type <font color='#5555FF'>=</font><font color='#5555FF'>=</font> impl2::IN_WAITING_STATE<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#5555FF'>+</font><font color='#5555FF'>+</font>num_waiting_nodes;
+            <b>}</b>
+        <b>}</b>
+
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>node_id</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            _cons.<font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>_cons.<font color='#BB00BB'>move_next</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#009900'>// tell the other end that we are intentionally dropping the connection
+</font>                <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>impl2::NODE_TERMINATE,_cons.<font color='#BB00BB'>element</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>value</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>stream<font face='Lucida Console'>)</font>;
+                _cons.<font color='#BB00BB'>element</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>value</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>stream.<font color='#BB00BB'>flush</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>outstanding_messages <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                std::ostringstream sout;
+                sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>A BSP job was allowed to terminate before all sent messages have been received.\n</font>";
+                sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>There are at least </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> outstanding_messages <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'> messages still in flight.   Make sure all sent messages\n</font>";
+                sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>have a corresponding call to receive().</font>";
+                <font color='#0000FF'>throw</font> dlib::<font color='#BB00BB'>socket_error</font><font face='Lucida Console'>(</font>sout.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+        <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    bsp_context::
+    ~<b><a name='bsp_context'></a>bsp_context</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+    <b>{</b>
+        _cons.<font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>_cons.<font color='#BB00BB'>move_next</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            _cons.<font color='#BB00BB'>element</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>value</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>con<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>shutdown</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        msg_buffer.<font color='#BB00BB'>disable</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// this will wait for all the threads to terminate
+</font>        threads.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    bsp_context::
+    <b><a name='bsp_context'></a>bsp_context</b><font face='Lucida Console'>(</font>
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> node_id_,
+        impl1::map_id_to_con<font color='#5555FF'>&amp;</font> cons_
+    <font face='Lucida Console'>)</font> :
+        outstanding_messages<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>,
+        num_waiting_nodes<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>,
+        num_terminated_nodes<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>,
+        current_epoch<font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>,
+        _cons<font face='Lucida Console'>(</font>cons_<font face='Lucida Console'>)</font>,
+        _node_id<font face='Lucida Console'>(</font>node_id_<font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#009900'>// spawn a bunch of read threads, one for each connection
+</font>        _cons.<font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>_cons.<font color='#BB00BB'>move_next</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            scoped_ptr<font color='#5555FF'>&lt;</font>thread_function<font color='#5555FF'>&gt;</font> <font color='#BB00BB'>ptr</font><font face='Lucida Console'>(</font><font color='#0000FF'>new</font> <font color='#BB00BB'>thread_function</font><font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>impl2::read_thread,
+                                                                _cons.<font color='#BB00BB'>element</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>value</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,
+                                                                _node_id,
+                                                                _cons.<font color='#BB00BB'>element</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>key</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,
+                                                                <font color='#BB00BB'>ref</font><font face='Lucida Console'>(</font>msg_buffer<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            threads.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>ptr<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>bool</u></font> bsp_context::
+    <b><a name='receive_data'></a>receive_data</b> <font face='Lucida Console'>(</font>
+        shared_ptr<font color='#5555FF'>&lt;</font>std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> item,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&amp;</font> sending_node_id
+    <font face='Lucida Console'>)</font> 
+    <b>{</b>
+        <font color='#BB00BB'>notify_control_node</font><font face='Lucida Console'>(</font>impl2::IN_WAITING_STATE<font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font><font color='#979000'>true</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#009900'>// If there aren't any nodes left to give us messages then return right now.
+</font>            <font color='#009900'>// We need to check the msg_buffer size to make sure there aren't any
+</font>            <font color='#009900'>// unprocessed message there.  Recall that this can happen because status
+</font>            <font color='#009900'>// messages always jump to the front of the message buffer.  So we might have
+</font>            <font color='#009900'>// learned about the node terminations before processing their messages for us.
+</font>            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>num_terminated_nodes <font color='#5555FF'>=</font><font color='#5555FF'>=</font> _cons.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> msg_buffer.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>return</font> <font color='#979000'>false</font>;
+            <b>}</b>
+
+            <font color='#009900'>// if all running nodes are currently blocking forever on receive_data()
+</font>            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>node_id</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> outstanding_messages <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> num_terminated_nodes <font color='#5555FF'>+</font> num_waiting_nodes <font color='#5555FF'>=</font><font color='#5555FF'>=</font> _cons.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                num_waiting_nodes <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                <font color='#BB00BB'>broadcast_byte</font><font face='Lucida Console'>(</font>impl2::SEE_ALL_IN_WAITING_STATE<font face='Lucida Console'>)</font>;
+
+                <font color='#009900'>// Note that the reason we have this epoch counter is so we can tell if a
+</font>                <font color='#009900'>// sent message is from before or after one of these "all nodes waiting"
+</font>                <font color='#009900'>// synchronization events.  If we didn't have the epoch count we would have
+</font>                <font color='#009900'>// a race condition where one node gets the SEE_ALL_IN_WAITING_STATE
+</font>                <font color='#009900'>// message before others and then sends out a message to another node
+</font>                <font color='#009900'>// before that node got the SEE_ALL_IN_WAITING_STATE message.  Then that
+</font>                <font color='#009900'>// node would think the normal message came before SEE_ALL_IN_WAITING_STATE
+</font>                <font color='#009900'>// which would be bad.
+</font>                <font color='#5555FF'>+</font><font color='#5555FF'>+</font>current_epoch;
+                <font color='#0000FF'>return</font> <font color='#979000'>false</font>;
+            <b>}</b>
+
+            impl1::msg_data data;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font>msg_buffer.<font color='#BB00BB'>pop</font><font face='Lucida Console'>(</font>data, current_epoch<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                <font color='#0000FF'>throw</font> dlib::<font color='#BB00BB'>socket_error</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>Error reading from msg_buffer in dlib::bsp_context.</font>"<font face='Lucida Console'>)</font>;
+
+
+            <font color='#0000FF'>switch</font><font face='Lucida Console'>(</font>data.msg_type<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>case</font> impl2::MESSAGE_HEADER: <b>{</b>
+                    item <font color='#5555FF'>=</font> data.data;
+                    sending_node_id <font color='#5555FF'>=</font> data.sender_id;
+                    <font color='#BB00BB'>notify_control_node</font><font face='Lucida Console'>(</font>impl2::GOT_MESSAGE<font face='Lucida Console'>)</font>;
+                    <font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+                <b>}</b> <font color='#0000FF'>break</font>;
+
+                <font color='#0000FF'>case</font> impl2::IN_WAITING_STATE: <b>{</b>
+                    <font color='#5555FF'>+</font><font color='#5555FF'>+</font>num_waiting_nodes;
+                <b>}</b> <font color='#0000FF'>break</font>;
+
+                <font color='#0000FF'>case</font> impl2::GOT_MESSAGE: <b>{</b>
+                    <font color='#5555FF'>-</font><font color='#5555FF'>-</font>outstanding_messages;
+                    <font color='#5555FF'>-</font><font color='#5555FF'>-</font>num_waiting_nodes;
+                <b>}</b> <font color='#0000FF'>break</font>;
+
+                <font color='#0000FF'>case</font> impl2::SENT_MESSAGE: <b>{</b>
+                    <font color='#5555FF'>+</font><font color='#5555FF'>+</font>outstanding_messages;
+                <b>}</b> <font color='#0000FF'>break</font>;
+
+                <font color='#0000FF'>case</font> impl2::NODE_TERMINATE: <b>{</b>
+                    <font color='#5555FF'>+</font><font color='#5555FF'>+</font>num_terminated_nodes;
+                    _cons[data.sender_id]<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>terminated <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+                <b>}</b> <font color='#0000FF'>break</font>;
+
+                <font color='#0000FF'>case</font> impl2::SEE_ALL_IN_WAITING_STATE: <b>{</b>
+                    <font color='#5555FF'>+</font><font color='#5555FF'>+</font>current_epoch;
+                    <font color='#0000FF'>return</font> <font color='#979000'>false</font>;
+                <b>}</b> <font color='#0000FF'>break</font>;
+
+                <font color='#0000FF'>case</font> impl2::READ_ERROR: <b>{</b>
+                    <font color='#0000FF'>throw</font> dlib::<font color='#BB00BB'>socket_error</font><font face='Lucida Console'>(</font>data.<font color='#BB00BB'>data_to_string</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                <b>}</b> <font color='#0000FF'>break</font>;
+
+                <font color='#0000FF'>default</font>: <b>{</b>
+                    <font color='#0000FF'>throw</font> dlib::<font color='#BB00BB'>socket_error</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>Unknown message received by dlib::bsp_context</font>"<font face='Lucida Console'>)</font>;
+                <b>}</b> <font color='#0000FF'>break</font>;
+            <b>}</b> <font color='#009900'>// end switch()
+</font>        <b>}</b> <font color='#009900'>// end while (true)
+</font>    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>void</u></font> bsp_context::
+    <b><a name='notify_control_node'></a>notify_control_node</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'><u>char</u></font> val
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>node_id</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> impl2;
+            <font color='#0000FF'>switch</font><font face='Lucida Console'>(</font>val<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>case</font> SENT_MESSAGE: <b>{</b>
+                    <font color='#5555FF'>+</font><font color='#5555FF'>+</font>outstanding_messages;
+                <b>}</b> <font color='#0000FF'>break</font>;
+
+                <font color='#0000FF'>case</font> GOT_MESSAGE: <b>{</b>
+                    <font color='#5555FF'>-</font><font color='#5555FF'>-</font>outstanding_messages;
+                <b>}</b> <font color='#0000FF'>break</font>;
+
+                <font color='#0000FF'>case</font> IN_WAITING_STATE: <b>{</b>
+                    <font color='#009900'>// nothing to do in this case
+</font>                <b>}</b> <font color='#0000FF'>break</font>;
+
+                <font color='#0000FF'>default</font>:
+                    <font color='#BB00BB'>DLIB_CASSERT</font><font face='Lucida Console'>(</font><font color='#979000'>false</font>,"<font color='#CC0000'>This should never happen</font>"<font face='Lucida Console'>)</font>;
+            <b>}</b>
+        <b>}</b>
+        <font color='#0000FF'>else</font>
+        <b>{</b>
+            <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>val, _cons[<font color='#979000'>0</font>]<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>stream<font face='Lucida Console'>)</font>;
+            _cons[<font color='#979000'>0</font>]<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>stream.<font color='#BB00BB'>flush</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>void</u></font> bsp_context::
+    <b><a name='broadcast_byte'></a>broadcast_byte</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'><u>char</u></font> val
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> <font color='#BB00BB'>number_of_nodes</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#009900'>// don't send to yourself or to terminated nodes
+</font>            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>i <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#BB00BB'>node_id</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>|</font><font color='#5555FF'>|</font> _cons[i]<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>terminated<font face='Lucida Console'>)</font>
+                <font color='#0000FF'>continue</font>;
+
+            <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>val, _cons[i]<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>stream<font face='Lucida Console'>)</font>;
+            _cons[i]<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>stream.<font color='#BB00BB'>flush</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>void</u></font> bsp_context::
+    <b><a name='send_data'></a>send_data</b><font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> item,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> target_node_id
+    <font face='Lucida Console'>)</font> 
+    <b>{</b>
+        <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> impl2;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>_cons[target_node_id]<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>terminated<font face='Lucida Console'>)</font>
+            <font color='#0000FF'>throw</font> <font color='#BB00BB'>socket_error</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>Attempt to send a message to a node that has terminated.</font>"<font face='Lucida Console'>)</font>;
+
+        <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>MESSAGE_HEADER, _cons[target_node_id]<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>stream<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>current_epoch, _cons[target_node_id]<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>stream<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item, _cons[target_node_id]<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>stream<font face='Lucida Console'>)</font>;
+        _cons[target_node_id]<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>stream.<font color='#BB00BB'>flush</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+        <font color='#BB00BB'>notify_control_node</font><font face='Lucida Console'>(</font>SENT_MESSAGE<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_BSP_CPph_
+</font>
+
+</pre></body></html>

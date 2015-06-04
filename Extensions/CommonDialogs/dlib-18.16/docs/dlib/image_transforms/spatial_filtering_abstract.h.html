@@ -1,0 +1,490 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - spatial_filtering_abstract.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2006  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#undef</font> DLIB_SPATIAL_FILTERINg_ABSTRACT_
+<font color='#0000FF'>#ifdef</font> DLIB_SPATIAL_FILTERINg_ABSTRACT_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../pixel.h.html'>../pixel.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../matrix.h.html'>../matrix.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../image_processing/generic_image.h.html'>../image_processing/generic_image.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> in_image_type,
+        <font color='#0000FF'>typename</font> out_image_type,
+        <font color='#0000FF'>typename</font> EXP,
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    rectangle <b><a name='spatially_filter_image'></a>spatially_filter_image</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> in_image_type<font color='#5555FF'>&amp;</font> in_img,
+        out_image_type<font color='#5555FF'>&amp;</font> out_img,
+        <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&lt;</font>EXP<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> filter,
+        T scale <font color='#5555FF'>=</font> <font color='#979000'>1</font>,
+        <font color='#0000FF'><u>bool</u></font> use_abs <font color='#5555FF'>=</font> <font color='#979000'>false</font>,
+        <font color='#0000FF'><u>bool</u></font> add_to <font color='#5555FF'>=</font> <font color='#979000'>false</font>
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - in_image_type == an image object that implements the interface defined in
+              dlib/image_processing/generic_image.h 
+            - out_image_type == an image object that implements the interface defined in
+              dlib/image_processing/generic_image.h 
+            - in_img and out_img do not contain pixels with an alpha channel.  That is,
+              pixel_traits::has_alpha is false for the pixels in these objects.
+            - is_same_object(in_img, out_img) == false 
+            - T must be some scalar type
+            - filter.size() != 0
+            - scale != 0
+            - if (in_img doesn't contain grayscale pixels) then
+                - use_abs == false &amp;&amp; add_to == false
+                  (i.e. You can only use the use_abs and add_to options with grayscale images)
+        ensures
+            - Applies the given spatial filter to in_img and stores the result in out_img (i.e.
+              cross-correlates in_img with filter).  Also divides each resulting pixel by scale.  
+            - The intermediate filter computations will be carried out using variables of type EXP::type.
+              This is whatever scalar type is used inside the filter matrix. 
+            - Pixel values are stored into out_img using the assign_pixel() function and therefore
+              any applicable color space conversion or value saturation is performed.  Note that if 
+              add_to is true then the filtered output value will be added to out_img rather than 
+              overwriting the original value.
+            - if (in_img doesn't contain grayscale pixels) then
+                - The filter is applied to each color channel independently.
+            - if (use_abs == true) then
+                - pixel values after filtering that are &lt; 0 are converted to their absolute values.
+            - The filter is applied such that it's centered over the pixel it writes its
+              output into.  For centering purposes, we consider the center element of the
+              filter to be filter(filter.nr()/2,filter.nc()/2).  This means that the filter
+              that writes its output to a pixel at location point(c,r) and is W by H (width
+              by height) pixels in size operates on exactly the pixels in the rectangle
+              centered_rect(point(c,r),W,H) within in_img.
+            - Pixels close enough to the edge of in_img to not have the filter still fit 
+              inside the image are always set to zero.
+            - #out_img.nc() == in_img.nc()
+            - #out_img.nr() == in_img.nr()
+            - returns a rectangle which indicates what pixels in #out_img are considered 
+              non-border pixels and therefore contain output from the filter.
+            - if (use_abs == false &amp;&amp; all images and filers contain float types) then
+                - This function will use SIMD instructions and is particularly fast.  So if
+                  you can use this form of the function it can give a decent speed boost.
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> in_image_type,
+        <font color='#0000FF'>typename</font> out_image_type,
+        <font color='#0000FF'>typename</font> EXP1,
+        <font color='#0000FF'>typename</font> EXP2,
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    rectangle <b><a name='spatially_filter_image_separable'></a>spatially_filter_image_separable</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> in_image_type<font color='#5555FF'>&amp;</font> in_img,
+        out_image_type<font color='#5555FF'>&amp;</font> out_img,
+        <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&lt;</font>EXP1<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> row_filter,
+        <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&lt;</font>EXP2<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> col_filter,
+        T scale <font color='#5555FF'>=</font> <font color='#979000'>1</font>,
+        <font color='#0000FF'><u>bool</u></font> use_abs <font color='#5555FF'>=</font> <font color='#979000'>false</font>,
+        <font color='#0000FF'><u>bool</u></font> add_to <font color='#5555FF'>=</font> <font color='#979000'>false</font>
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - in_image_type == an image object that implements the interface defined in
+              dlib/image_processing/generic_image.h 
+            - out_image_type == an image object that implements the interface defined in
+              dlib/image_processing/generic_image.h 
+            - in_img and out_img do not contain pixels with an alpha channel.  That is,
+              pixel_traits::has_alpha is false for the pixels in these objects.
+            - is_same_object(in_img, out_img) == false 
+            - T must be some scalar type
+            - scale != 0
+            - row_filter.size() != 0
+            - col_filter.size() != 0
+            - is_vector(row_filter) == true
+            - is_vector(col_filter) == true
+            - if (in_img doesn't contain grayscale pixels) then
+                - use_abs == false &amp;&amp; add_to == false
+                  (i.e. You can only use the use_abs and add_to options with grayscale images)
+        ensures
+            - Applies the given separable spatial filter to in_img and stores the result in out_img.  
+              Also divides each resulting pixel by scale.  Calling this function has the same
+              effect as calling the regular spatially_filter_image() routine with a filter,
+              FILT, defined as follows: 
+                - FILT(r,c) == col_filter(r)*row_filter(c)
+            - The intermediate filter computations will be carried out using variables of type EXP1::type.
+              This is whatever scalar type is used inside the row_filter matrix. 
+            - Pixel values are stored into out_img using the assign_pixel() function and therefore
+              any applicable color space conversion or value saturation is performed.  Note that if 
+              add_to is true then the filtered output value will be added to out_img rather than 
+              overwriting the original value.
+            - if (in_img doesn't contain grayscale pixels) then
+                - The filter is applied to each color channel independently.
+            - if (use_abs == true) then
+                - pixel values after filtering that are &lt; 0 are converted to their absolute values
+            - The filter is applied such that it's centered over the pixel it writes its
+              output into.  For centering purposes, we consider the center element of the
+              filter to be FILT(col_filter.size()/2,row_filter.size()/2).  This means that
+              the filter that writes its output to a pixel at location point(c,r) and is W
+              by H (width by height) pixels in size operates on exactly the pixels in the
+              rectangle centered_rect(point(c,r),W,H) within in_img.
+            - Pixels close enough to the edge of in_img to not have the filter still fit 
+              inside the image are always set to zero.
+            - #out_img.nc() == in_img.nc()
+            - #out_img.nr() == in_img.nr()
+            - returns a rectangle which indicates what pixels in #out_img are considered 
+              non-border pixels and therefore contain output from the filter.
+            - if (use_abs == false &amp;&amp; all images and filers contain float types) then
+                - This function will use SIMD instructions and is particularly fast.  So if
+                  you can use this form of the function it can give a decent speed boost.
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> in_image_type,
+        <font color='#0000FF'>typename</font> out_image_type,
+        <font color='#0000FF'>typename</font> EXP1,
+        <font color='#0000FF'>typename</font> EXP2
+        <font color='#5555FF'>&gt;</font>
+    rectangle <b><a name='float_spatially_filter_image_separable'></a>float_spatially_filter_image_separable</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> in_image_type<font color='#5555FF'>&amp;</font> in_img,
+        out_image_type<font color='#5555FF'>&amp;</font> out_img,
+        <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&lt;</font>EXP1<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> row_filter,
+        <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&lt;</font>EXP2<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> col_filter,
+        out_image_type<font color='#5555FF'>&amp;</font> scratch,
+        <font color='#0000FF'><u>bool</u></font> add_to <font color='#5555FF'>=</font> <font color='#979000'>false</font>
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - in_image_type == an image object that implements the interface defined in
+              dlib/image_processing/generic_image.h 
+            - out_image_type == an image object that implements the interface defined in
+              dlib/image_processing/generic_image.h 
+            - in_img, out_img, row_filter, and col_filter must all contain float type elements.
+            - is_same_object(in_img, out_img) == false 
+            - row_filter.size() != 0
+            - col_filter.size() != 0
+            - is_vector(row_filter) == true
+            - is_vector(col_filter) == true
+        ensures
+            - This function is identical to the above spatially_filter_image_separable()
+              function except that it can only be invoked on float images with float
+              filters.  In fact, spatially_filter_image_separable() invokes
+              float_spatially_filter_image_separable() in those cases.  So why is
+              float_spatially_filter_image_separable() in the public API?  The reason is
+              because the separable filtering routines internally allocate an image each
+              time they are called.  If you want to avoid this memory allocation then you
+              can call float_spatially_filter_image_separable() and provide the scratch
+              image as input.  This allows you to reuse the same scratch image for many
+              calls to float_spatially_filter_image_separable() and thereby avoid having it
+              allocated and freed for each call.
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> in_image_type,
+        <font color='#0000FF'>typename</font> out_image_type,
+        <font color='#0000FF'>typename</font> EXP1,
+        <font color='#0000FF'>typename</font> EXP2,
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    rectangle <b><a name='spatially_filter_image_separable_down'></a>spatially_filter_image_separable_down</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> downsample,
+        <font color='#0000FF'>const</font> in_image_type<font color='#5555FF'>&amp;</font> in_img,
+        out_image_type<font color='#5555FF'>&amp;</font> out_img,
+        <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&lt;</font>EXP1<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> row_filter,
+        <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&lt;</font>EXP2<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> col_filter,
+        T scale <font color='#5555FF'>=</font> <font color='#979000'>1</font>,
+        <font color='#0000FF'><u>bool</u></font> use_abs <font color='#5555FF'>=</font> <font color='#979000'>false</font>,
+        <font color='#0000FF'><u>bool</u></font> add_to <font color='#5555FF'>=</font> <font color='#979000'>false</font>
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - in_image_type == an image object that implements the interface defined in
+              dlib/image_processing/generic_image.h 
+            - out_image_type == an image object that implements the interface defined in
+              dlib/image_processing/generic_image.h 
+            - in_img and out_img do not contain pixels with an alpha channel.  That is,
+              pixel_traits::has_alpha is false for the pixels in these objects.
+            - out_img contains grayscale pixels.
+            - is_same_object(in_img, out_img) == false 
+            - T must be some scalar type
+            - scale != 0
+            - is_vector(row_filter) == true
+            - is_vector(col_filter) == true
+            - row_filter.size() % 2 == 1  (i.e. must be odd)
+            - col_filter.size() % 2 == 1  (i.e. must be odd)
+            - downsample &gt; 0
+        ensures
+            - This function is equivalent to calling 
+              spatially_filter_image_separable(in_img,out_img,row_filter,col_filter,scale,use_abs,add_to)
+              and then downsampling the output image by a factor of downsample.  Therefore, 
+              we will have that:
+                - #out_img.nr() == ceil((double)in_img.nr()/downsample)
+                - #out_img.nc() == ceil((double)in_img.nc()/downsample)
+                - #out_img[r][c] == filtered pixel corresponding to in_img[r*downsample][c*downsample]
+            - returns a rectangle which indicates what pixels in #out_img are considered 
+              non-border pixels and therefore contain output from the filter.
+            - Note that the first row and column of non-zero padded data are the following
+                - first_row == ceil(floor(col_filter.size()/2.0)/downsample)
+                - first_col == ceil(floor(row_filter.size()/2.0)/downsample)
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'><u>long</u></font> NR,
+        <font color='#0000FF'><u>long</u></font> NC,
+        <font color='#0000FF'>typename</font> T,
+        <font color='#0000FF'>typename</font> U,
+        <font color='#0000FF'>typename</font> in_image_type
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='separable_3x3_filter_block_grayscale'></a>separable_3x3_filter_block_grayscale</b> <font face='Lucida Console'>(</font>
+        <font color='#BB00BB'>T</font> <font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>block<font face='Lucida Console'>)</font>[NR][NC],
+        <font color='#0000FF'>const</font> in_image_type<font color='#5555FF'>&amp;</font> img,
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&amp;</font> r,
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&amp;</font> c,
+        <font color='#0000FF'>const</font> U<font color='#5555FF'>&amp;</font> fe1, 
+        <font color='#0000FF'>const</font> U<font color='#5555FF'>&amp;</font> fm,  
+        <font color='#0000FF'>const</font> U<font color='#5555FF'>&amp;</font> fe2 
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - in_image_type == an image object that implements the interface defined in
+              dlib/image_processing/generic_image.h 
+            - T and U should be scalar types
+            - shrink_rect(get_rect(img),1).contains(c,r)
+            - shrink_rect(get_rect(img),1).contains(c+NC-1,r+NR-1)
+        ensures
+            - Filters the image in the sub-window of img defined by a rectangle 
+              with its upper left corner at (c,r) and lower right at (c+NC-1,r+NR-1).
+            - The output of the filter is stored in #block.  Note that img will be 
+              interpreted as a grayscale image.
+            - The filter used is defined by the separable filter [fe1 fm fe2].  So the
+              spatial filter is thus:
+                fe1*fe1  fe1*fm  fe2*fe1
+                fe1*fm   fm*fm   fe2*fm
+                fe1*fe2  fe2*fm  fe2*fe2
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'><u>long</u></font> NR,
+        <font color='#0000FF'><u>long</u></font> NC,
+        <font color='#0000FF'>typename</font> T,
+        <font color='#0000FF'>typename</font> U,
+        <font color='#0000FF'>typename</font> in_image_type
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='separable_3x3_filter_block_rgb'></a>separable_3x3_filter_block_rgb</b> <font face='Lucida Console'>(</font>
+        <font color='#BB00BB'>T</font> <font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>block<font face='Lucida Console'>)</font>[NR][NC],
+        <font color='#0000FF'>const</font> in_image_type<font color='#5555FF'>&amp;</font> img,
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&amp;</font> r,
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&amp;</font> c,
+        <font color='#0000FF'>const</font> U<font color='#5555FF'>&amp;</font> fe1, 
+        <font color='#0000FF'>const</font> U<font color='#5555FF'>&amp;</font> fm, 
+        <font color='#0000FF'>const</font> U<font color='#5555FF'>&amp;</font> fe2
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - in_image_type == an image object that implements the interface defined in
+              dlib/image_processing/generic_image.h 
+            - img must contain RGB pixels, that is pixel_traits::rgb == true for the pixels
+              in img.
+            - T should be a struct with .red .green and .blue members.
+            - U should be a scalar type
+            - shrink_rect(get_rect(img),1).contains(c,r)
+            - shrink_rect(get_rect(img),1).contains(c+NC-1,r+NR-1)
+        ensures
+            - Filters the image in the sub-window of img defined by a rectangle 
+              with its upper left corner at (c,r) and lower right at (c+NC-1,r+NR-1).
+            - The output of the filter is stored in #block.  Note that the filter is applied
+              to each color component independently.
+            - The filter used is defined by the separable filter [fe1 fm fe2].  So the
+              spatial filter is thus:
+                fe1*fe1  fe1*fm  fe2*fe1
+                fe1*fm   fm*fm   fe2*fm
+                fe1*fe2  fe2*fm  fe2*fe2
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>double</u></font> <b><a name='gaussian'></a>gaussian</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'><u>double</u></font> x, 
+        <font color='#0000FF'><u>double</u></font> sigma
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - sigma &gt; 0
+        ensures
+            - computes and returns the value of a 1D Gaussian function with mean 0 
+              and standard deviation sigma at the given x value.
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    matrix<font color='#5555FF'>&lt;</font>T,<font color='#979000'>0</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> <b><a name='create_gaussian_filter'></a>create_gaussian_filter</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'><u>double</u></font> sigma,
+        <font color='#0000FF'><u>int</u></font> size 
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - sigma &gt; 0
+            - size &gt; 0 
+            - size is an odd number
+        ensures
+            - returns a separable Gaussian filter F such that:
+                - is_vector(F) == true 
+                - F.size() == size 
+                - F is suitable for use with the spatially_filter_image_separable() routine
+                  and its use with this function corresponds to running a Gaussian filter 
+                  of sigma width over an image.
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> in_image_type,
+        <font color='#0000FF'>typename</font> out_image_type
+        <font color='#5555FF'>&gt;</font>
+    rectangle <b><a name='gaussian_blur'></a>gaussian_blur</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> in_image_type<font color='#5555FF'>&amp;</font> in_img,
+        out_image_type<font color='#5555FF'>&amp;</font> out_img,
+        <font color='#0000FF'><u>double</u></font> sigma <font color='#5555FF'>=</font> <font color='#979000'>1</font>,
+        <font color='#0000FF'><u>int</u></font> max_size <font color='#5555FF'>=</font> <font color='#979000'>1001</font>
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - in_image_type == an image object that implements the interface defined in
+              dlib/image_processing/generic_image.h 
+            - out_image_type == an image object that implements the interface defined in
+              dlib/image_processing/generic_image.h 
+            - in_img and out_img do not contain pixels with an alpha channel.  That is,
+              pixel_traits::has_alpha is false for the pixels in these objects.
+            - is_same_object(in_img, out_img) == false 
+            - sigma &gt; 0
+            - max_size &gt; 0
+            - max_size is an odd number
+        ensures
+            - Filters in_img with a Gaussian filter of sigma width.  The actual spatial filter will
+              be applied to pixel blocks that are at most max_size wide and max_size tall (note that
+              this function will automatically select a smaller block size as appropriate).  The 
+              results are stored into #out_img.
+            - Pixel values are stored into out_img using the assign_pixel() function and therefore
+              any applicable color space conversion or value saturation is performed.
+            - if (in_img doesn't contain grayscale pixels) then
+                - The filter is applied to each color channel independently.
+            - Pixels close enough to the edge of in_img to not have the filter still fit 
+              inside the image are set to zero.
+            - #out_img.nc() == in_img.nc()
+            - #out_img.nr() == in_img.nr()
+            - returns a rectangle which indicates what pixels in #out_img are considered 
+              non-border pixels and therefore contain output from the filter.
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> image_type1, 
+        <font color='#0000FF'>typename</font> image_type2
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='sum_filter'></a>sum_filter</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> image_type1<font color='#5555FF'>&amp;</font> img,
+        image_type2<font color='#5555FF'>&amp;</font> out,
+        <font color='#0000FF'>const</font> rectangle<font color='#5555FF'>&amp;</font> rect
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - out.nr() == img.nr() 
+            - out.nc() == img.nc()
+            - image_type1 == an image object that implements the interface defined in
+              dlib/image_processing/generic_image.h and it must contain grayscale pixels.
+            - image_type2 == an image object that implements the interface defined in
+              dlib/image_processing/generic_image.h and it must contain grayscale pixels.
+            - is_same_object(img,out) == false
+        ensures
+            - for all valid r and c:
+                - let SUM(r,c) == sum of pixels from img which are inside the rectangle 
+                  translate_rect(rect, point(c,r)).
+                - #out[r][c] == out[r][c] + SUM(r,c)
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> image_type1, 
+        <font color='#0000FF'>typename</font> image_type2
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='sum_filter_assign'></a>sum_filter_assign</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> image_type1<font color='#5555FF'>&amp;</font> img,
+        image_type2<font color='#5555FF'>&amp;</font> out,
+        <font color='#0000FF'>const</font> rectangle<font color='#5555FF'>&amp;</font> rect
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - image_type1 == an image object that implements the interface defined in
+              dlib/image_processing/generic_image.h and it must contain grayscale pixels.
+            - image_type2 == an image object that implements the interface defined in
+              dlib/image_processing/generic_image.h and it must contain grayscale pixels.
+            - is_same_object(img,out) == false
+        ensures
+            - #out.nr() == img.nr() 
+            - #out.nc() == img.nc()
+            - for all valid r and c:
+                - let SUM(r,c) == sum of pixels from img which are inside the rectangle 
+                  translate_rect(rect, point(c,r)).
+                - #out[r][c] == SUM(r,c)
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> image_type1, 
+        <font color='#0000FF'>typename</font> image_type2
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='max_filter'></a>max_filter</b> <font face='Lucida Console'>(</font>
+        image_type1<font color='#5555FF'>&amp;</font> img,
+        image_type2<font color='#5555FF'>&amp;</font> out,
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> width,
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> height,
+        <font color='#0000FF'>const</font> <font color='#0000FF'>typename</font> image_traits<font color='#5555FF'>&lt;</font>image_type1<font color='#5555FF'>&gt;</font>::pixel_type<font color='#5555FF'>&amp;</font> thresh
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - out.nr() == img.nr() 
+            - out.nc() == img.nc()
+            - image_type1 == an image object that implements the interface defined in
+              dlib/image_processing/generic_image.h and it must contain grayscale pixels.
+            - image_type2 == an image object that implements the interface defined in
+              dlib/image_processing/generic_image.h and it must contain grayscale pixels.
+            - is_same_object(img,out) == false
+            - width &gt; 0 &amp;&amp; height &gt; 0
+        ensures
+            - for all valid r and c:
+                - let MAX(r,c) == maximum of pixels from img which are inside the rectangle 
+                  centered_rect(point(c,r), width, height)
+                - if (MAX(r,c) &gt;= thresh)
+                    - #out[r][c] == out[r][c] + MAX(r,c)
+                - else
+                    - #out[r][c] == out[r][c] + thresh 
+            - Does not change the size of img.
+            - Uses img as scratch space.  Therefore, the pixel values in img will have
+              been modified by this function.  That is, max_filter() destroys the contents
+              of img. 
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_SPATIAL_FILTERINg_ABSTRACT_
+</font>
+
+</pre></body></html>

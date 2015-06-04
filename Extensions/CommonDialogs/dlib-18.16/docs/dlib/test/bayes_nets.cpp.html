@@ -1,0 +1,414 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - bayes_nets.cpp</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2007  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font>
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='dlib/graph_utils.h.html'>dlib/graph_utils.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='dlib/graph.h.html'>dlib/graph.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='dlib/directed_graph.h.html'>dlib/directed_graph.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='dlib/bayes_utils.h.html'>dlib/bayes_utils.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='dlib/set.h.html'>dlib/set.h</a>"
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>sstream<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>string<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>cstdlib<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>ctime<font color='#5555FF'>&gt;</font>
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='tester.h.html'>tester.h</a>"
+
+<font color='#0000FF'>namespace</font>  
+<b>{</b>
+    <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> test;
+    <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> dlib;
+    <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> std;
+
+    logger <b><a name='dlog'></a>dlog</b><font face='Lucida Console'>(</font>"<font color='#CC0000'>test.bayes_nets</font>"<font face='Lucida Console'>)</font>;
+    <font color='#0000FF'>enum</font> <b><a name='nodes'></a>nodes</b>
+    <b>{</b>
+        A, T, S, L, O, B, D, X
+    <b>}</b>;
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> gtype<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='setup_simple_network'></a>setup_simple_network</b> <font face='Lucida Console'>(</font>
+        gtype<font color='#5555FF'>&amp;</font> bn
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#009900'>/*
+               A
+              / \
+             T   S
+        */</font>
+
+        <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> bayes_node_utils;
+
+        bn.<font color='#BB00BB'>set_number_of_nodes</font><font face='Lucida Console'>(</font><font color='#979000'>3</font><font face='Lucida Console'>)</font>;
+        bn.<font color='#BB00BB'>add_edge</font><font face='Lucida Console'>(</font>A, T<font face='Lucida Console'>)</font>;
+        bn.<font color='#BB00BB'>add_edge</font><font face='Lucida Console'>(</font>A, S<font face='Lucida Console'>)</font>;
+
+
+        <font color='#BB00BB'>set_node_num_values</font><font face='Lucida Console'>(</font>bn, A, <font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>set_node_num_values</font><font face='Lucida Console'>(</font>bn, T, <font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>set_node_num_values</font><font face='Lucida Console'>(</font>bn, S, <font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+
+        assignment parents;
+
+        <font color='#009900'>// set probabilities for node A
+</font>        <font color='#BB00BB'>set_node_probability</font><font face='Lucida Console'>(</font>bn, A, <font color='#979000'>1</font>, parents, <font color='#979000'>0.1</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>set_node_probability</font><font face='Lucida Console'>(</font>bn, A, <font color='#979000'>0</font>, parents, <font color='#979000'>1</font><font color='#5555FF'>-</font><font color='#979000'>0.1</font><font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// set probabilities for node T
+</font>        parents.<font color='#BB00BB'>add</font><font face='Lucida Console'>(</font>A, <font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>set_node_probability</font><font face='Lucida Console'>(</font>bn, T, <font color='#979000'>1</font>, parents, <font color='#979000'>0.5</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>set_node_probability</font><font face='Lucida Console'>(</font>bn, T, <font color='#979000'>0</font>, parents, <font color='#979000'>1</font><font color='#5555FF'>-</font><font color='#979000'>0.5</font><font face='Lucida Console'>)</font>;
+        parents[A] <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <font color='#BB00BB'>set_node_probability</font><font face='Lucida Console'>(</font>bn, T, <font color='#979000'>1</font>, parents, <font color='#979000'>0.5</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>set_node_probability</font><font face='Lucida Console'>(</font>bn, T, <font color='#979000'>0</font>, parents, <font color='#979000'>1</font><font color='#5555FF'>-</font><font color='#979000'>0.5</font><font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// set probabilities for node S
+</font>        parents[A] <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+        <font color='#BB00BB'>set_node_probability</font><font face='Lucida Console'>(</font>bn, S, <font color='#979000'>1</font>, parents, <font color='#979000'>0.5</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>set_node_probability</font><font face='Lucida Console'>(</font>bn, S, <font color='#979000'>0</font>, parents, <font color='#979000'>1</font><font color='#5555FF'>-</font><font color='#979000'>0.5</font><font face='Lucida Console'>)</font>;
+        parents[A] <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <font color='#BB00BB'>set_node_probability</font><font face='Lucida Console'>(</font>bn, S, <font color='#979000'>1</font>, parents, <font color='#979000'>0.5</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>set_node_probability</font><font face='Lucida Console'>(</font>bn, S, <font color='#979000'>0</font>, parents, <font color='#979000'>1</font><font color='#5555FF'>-</font><font color='#979000'>0.5</font><font face='Lucida Console'>)</font>;
+
+
+        <font color='#009900'>// test the serialization code here by pushing this network though it
+</font>        ostringstream sout;
+        <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>bn, sout<font face='Lucida Console'>)</font>;
+        bn.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>bn.<font color='#BB00BB'>number_of_nodes</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+        istringstream <font color='#BB00BB'>sin</font><font face='Lucida Console'>(</font>sout.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>bn, sin<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>bn.<font color='#BB00BB'>number_of_nodes</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>3</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> gtype<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='setup_dyspnea_network'></a>setup_dyspnea_network</b> <font face='Lucida Console'>(</font>
+        gtype<font color='#5555FF'>&amp;</font> bn,
+        <font color='#0000FF'><u>bool</u></font> deterministic_o_node <font color='#5555FF'>=</font> <font color='#979000'>true</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#009900'>/*
+            This is the example network used by David Zaret in his
+            reasoning under uncertainty class at Johns Hopkins
+        */</font>
+
+        <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> bayes_node_utils;
+
+        bn.<font color='#BB00BB'>set_number_of_nodes</font><font face='Lucida Console'>(</font><font color='#979000'>8</font><font face='Lucida Console'>)</font>;
+        bn.<font color='#BB00BB'>add_edge</font><font face='Lucida Console'>(</font>A, T<font face='Lucida Console'>)</font>;
+        bn.<font color='#BB00BB'>add_edge</font><font face='Lucida Console'>(</font>T, O<font face='Lucida Console'>)</font>;
+
+        bn.<font color='#BB00BB'>add_edge</font><font face='Lucida Console'>(</font>O, D<font face='Lucida Console'>)</font>;
+        bn.<font color='#BB00BB'>add_edge</font><font face='Lucida Console'>(</font>O, X<font face='Lucida Console'>)</font>;
+
+        bn.<font color='#BB00BB'>add_edge</font><font face='Lucida Console'>(</font>S, B<font face='Lucida Console'>)</font>;
+        bn.<font color='#BB00BB'>add_edge</font><font face='Lucida Console'>(</font>S, L<font face='Lucida Console'>)</font>;
+
+        bn.<font color='#BB00BB'>add_edge</font><font face='Lucida Console'>(</font>L, O<font face='Lucida Console'>)</font>;
+        bn.<font color='#BB00BB'>add_edge</font><font face='Lucida Console'>(</font>B, D<font face='Lucida Console'>)</font>;
+
+
+        <font color='#BB00BB'>set_node_num_values</font><font face='Lucida Console'>(</font>bn, A, <font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>set_node_num_values</font><font face='Lucida Console'>(</font>bn, T, <font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>set_node_num_values</font><font face='Lucida Console'>(</font>bn, O, <font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>set_node_num_values</font><font face='Lucida Console'>(</font>bn, X, <font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>set_node_num_values</font><font face='Lucida Console'>(</font>bn, L, <font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>set_node_num_values</font><font face='Lucida Console'>(</font>bn, S, <font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>set_node_num_values</font><font face='Lucida Console'>(</font>bn, B, <font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>set_node_num_values</font><font face='Lucida Console'>(</font>bn, D, <font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+
+        assignment parents;
+
+        <font color='#009900'>// set probabilities for node A
+</font>        <font color='#BB00BB'>set_node_probability</font><font face='Lucida Console'>(</font>bn, A, <font color='#979000'>1</font>, parents, <font color='#979000'>0.01</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>set_node_probability</font><font face='Lucida Console'>(</font>bn, A, <font color='#979000'>0</font>, parents, <font color='#979000'>1</font><font color='#5555FF'>-</font><font color='#979000'>0.01</font><font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// set probabilities for node S
+</font>        <font color='#BB00BB'>set_node_probability</font><font face='Lucida Console'>(</font>bn, S, <font color='#979000'>1</font>, parents, <font color='#979000'>0.5</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>set_node_probability</font><font face='Lucida Console'>(</font>bn, S, <font color='#979000'>0</font>, parents, <font color='#979000'>1</font><font color='#5555FF'>-</font><font color='#979000'>0.5</font><font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// set probabilities for node T
+</font>        parents.<font color='#BB00BB'>add</font><font face='Lucida Console'>(</font>A, <font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>set_node_probability</font><font face='Lucida Console'>(</font>bn, T, <font color='#979000'>1</font>, parents, <font color='#979000'>0.05</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>set_node_probability</font><font face='Lucida Console'>(</font>bn, T, <font color='#979000'>0</font>, parents, <font color='#979000'>1</font><font color='#5555FF'>-</font><font color='#979000'>0.05</font><font face='Lucida Console'>)</font>;
+        parents[A] <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <font color='#BB00BB'>set_node_probability</font><font face='Lucida Console'>(</font>bn, T, <font color='#979000'>1</font>, parents, <font color='#979000'>0.01</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>set_node_probability</font><font face='Lucida Console'>(</font>bn, T, <font color='#979000'>0</font>, parents, <font color='#979000'>1</font><font color='#5555FF'>-</font><font color='#979000'>0.01</font><font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// set probabilities for node L
+</font>        parents.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        parents.<font color='#BB00BB'>add</font><font face='Lucida Console'>(</font>S,<font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>set_node_probability</font><font face='Lucida Console'>(</font>bn, L, <font color='#979000'>1</font>, parents, <font color='#979000'>0.1</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>set_node_probability</font><font face='Lucida Console'>(</font>bn, L, <font color='#979000'>0</font>, parents, <font color='#979000'>1</font><font color='#5555FF'>-</font><font color='#979000'>0.1</font><font face='Lucida Console'>)</font>;
+        parents[S] <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <font color='#BB00BB'>set_node_probability</font><font face='Lucida Console'>(</font>bn, L, <font color='#979000'>1</font>, parents, <font color='#979000'>0.01</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>set_node_probability</font><font face='Lucida Console'>(</font>bn, L, <font color='#979000'>0</font>, parents, <font color='#979000'>1</font><font color='#5555FF'>-</font><font color='#979000'>0.01</font><font face='Lucida Console'>)</font>;
+
+
+        <font color='#009900'>// set probabilities for node B
+</font>        parents[S] <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+        <font color='#BB00BB'>set_node_probability</font><font face='Lucida Console'>(</font>bn, B, <font color='#979000'>1</font>, parents, <font color='#979000'>0.6</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>set_node_probability</font><font face='Lucida Console'>(</font>bn, B, <font color='#979000'>0</font>, parents, <font color='#979000'>1</font><font color='#5555FF'>-</font><font color='#979000'>0.6</font><font face='Lucida Console'>)</font>;
+        parents[S] <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <font color='#BB00BB'>set_node_probability</font><font face='Lucida Console'>(</font>bn, B, <font color='#979000'>1</font>, parents, <font color='#979000'>0.3</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>set_node_probability</font><font face='Lucida Console'>(</font>bn, B, <font color='#979000'>0</font>, parents, <font color='#979000'>1</font><font color='#5555FF'>-</font><font color='#979000'>0.3</font><font face='Lucida Console'>)</font>;
+
+
+        <font color='#009900'>// set probabilities for node O
+</font>        <font color='#0000FF'><u>double</u></font> v;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>deterministic_o_node<font face='Lucida Console'>)</font>
+            v <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+        <font color='#0000FF'>else</font>
+            v <font color='#5555FF'>=</font> <font color='#979000'>0.99</font>;
+
+        parents.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        parents.<font color='#BB00BB'>add</font><font face='Lucida Console'>(</font>T,<font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+        parents.<font color='#BB00BB'>add</font><font face='Lucida Console'>(</font>L,<font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>set_node_probability</font><font face='Lucida Console'>(</font>bn, O, <font color='#979000'>1</font>, parents, v<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>set_node_probability</font><font face='Lucida Console'>(</font>bn, O, <font color='#979000'>0</font>, parents, <font color='#979000'>1</font><font color='#5555FF'>-</font>v<font face='Lucida Console'>)</font>;
+        parents[T] <font color='#5555FF'>=</font> <font color='#979000'>0</font>; parents[L] <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+        <font color='#BB00BB'>set_node_probability</font><font face='Lucida Console'>(</font>bn, O, <font color='#979000'>1</font>, parents, v<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>set_node_probability</font><font face='Lucida Console'>(</font>bn, O, <font color='#979000'>0</font>, parents, <font color='#979000'>1</font><font color='#5555FF'>-</font>v<font face='Lucida Console'>)</font>;
+        parents[T] <font color='#5555FF'>=</font> <font color='#979000'>1</font>; parents[L] <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <font color='#BB00BB'>set_node_probability</font><font face='Lucida Console'>(</font>bn, O, <font color='#979000'>1</font>, parents, v<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>set_node_probability</font><font face='Lucida Console'>(</font>bn, O, <font color='#979000'>0</font>, parents, <font color='#979000'>1</font><font color='#5555FF'>-</font>v<font face='Lucida Console'>)</font>;
+        parents[T] <font color='#5555FF'>=</font> <font color='#979000'>0</font>; parents[L] <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <font color='#BB00BB'>set_node_probability</font><font face='Lucida Console'>(</font>bn, O, <font color='#979000'>1</font>, parents, <font color='#979000'>1</font><font color='#5555FF'>-</font>v<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>set_node_probability</font><font face='Lucida Console'>(</font>bn, O, <font color='#979000'>0</font>, parents, v<font face='Lucida Console'>)</font>;
+
+
+        <font color='#009900'>// set probabilities for node D
+</font>        parents.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        parents.<font color='#BB00BB'>add</font><font face='Lucida Console'>(</font>O,<font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+        parents.<font color='#BB00BB'>add</font><font face='Lucida Console'>(</font>B,<font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>set_node_probability</font><font face='Lucida Console'>(</font>bn, D, <font color='#979000'>1</font>, parents, <font color='#979000'>0.9</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>set_node_probability</font><font face='Lucida Console'>(</font>bn, D, <font color='#979000'>0</font>, parents, <font color='#979000'>1</font><font color='#5555FF'>-</font><font color='#979000'>0.9</font><font face='Lucida Console'>)</font>;
+        parents[O] <font color='#5555FF'>=</font> <font color='#979000'>1</font>; parents[B] <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <font color='#BB00BB'>set_node_probability</font><font face='Lucida Console'>(</font>bn, D, <font color='#979000'>1</font>, parents, <font color='#979000'>0.7</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>set_node_probability</font><font face='Lucida Console'>(</font>bn, D, <font color='#979000'>0</font>, parents, <font color='#979000'>1</font><font color='#5555FF'>-</font><font color='#979000'>0.7</font><font face='Lucida Console'>)</font>;
+        parents[O] <font color='#5555FF'>=</font> <font color='#979000'>0</font>; parents[B] <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+        <font color='#BB00BB'>set_node_probability</font><font face='Lucida Console'>(</font>bn, D, <font color='#979000'>1</font>, parents, <font color='#979000'>0.8</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>set_node_probability</font><font face='Lucida Console'>(</font>bn, D, <font color='#979000'>0</font>, parents, <font color='#979000'>1</font><font color='#5555FF'>-</font><font color='#979000'>0.8</font><font face='Lucida Console'>)</font>;
+        parents[O] <font color='#5555FF'>=</font> <font color='#979000'>0</font>; parents[B] <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <font color='#BB00BB'>set_node_probability</font><font face='Lucida Console'>(</font>bn, D, <font color='#979000'>1</font>, parents, <font color='#979000'>0.1</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>set_node_probability</font><font face='Lucida Console'>(</font>bn, D, <font color='#979000'>0</font>, parents, <font color='#979000'>1</font><font color='#5555FF'>-</font><font color='#979000'>0.1</font><font face='Lucida Console'>)</font>;
+
+
+        <font color='#009900'>// set probabilities for node X
+</font>        parents.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        parents.<font color='#BB00BB'>add</font><font face='Lucida Console'>(</font>O,<font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>set_node_probability</font><font face='Lucida Console'>(</font>bn, X, <font color='#979000'>1</font>, parents, <font color='#979000'>0.98</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>set_node_probability</font><font face='Lucida Console'>(</font>bn, X, <font color='#979000'>0</font>, parents, <font color='#979000'>1</font><font color='#5555FF'>-</font><font color='#979000'>0.98</font><font face='Lucida Console'>)</font>;
+        parents[O] <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <font color='#BB00BB'>set_node_probability</font><font face='Lucida Console'>(</font>bn, X, <font color='#979000'>1</font>, parents, <font color='#979000'>0.05</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>set_node_probability</font><font face='Lucida Console'>(</font>bn, X, <font color='#979000'>0</font>, parents, <font color='#979000'>1</font><font color='#5555FF'>-</font><font color='#979000'>0.05</font><font face='Lucida Console'>)</font>;
+
+
+        <font color='#009900'>// test the serialization code here by pushing this network though it
+</font>        ostringstream sout;
+        <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>bn, sout<font face='Lucida Console'>)</font>;
+        bn.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>bn.<font color='#BB00BB'>number_of_nodes</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+        istringstream <font color='#BB00BB'>sin</font><font face='Lucida Console'>(</font>sout.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>bn, sin<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>bn.<font color='#BB00BB'>number_of_nodes</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>8</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+
+    <font color='#0000FF'><u>void</u></font> <b><a name='bayes_nets_test'></a>bayes_nets_test</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font>
+        <font color='#009900'>/*!
+            ensures
+                - runs tests on the bayesian network objects and functions for compliance with the specs 
+        !*/</font>
+    <b>{</b>        
+
+        <font color='#BB00BB'>print_spinner</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+        directed_graph<font color='#5555FF'>&lt;</font>bayes_node<font color='#5555FF'>&gt;</font>::kernel_1a_c bn;
+        <font color='#BB00BB'>setup_dyspnea_network</font><font face='Lucida Console'>(</font>bn<font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> bayes_node_utils;
+
+
+        graph<font color='#5555FF'>&lt;</font>dlib::set<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font>::compare_1b_c, dlib::set<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font>::compare_1b_c<font color='#5555FF'>&gt;</font>::kernel_1a_c join_tree;
+
+        <font color='#BB00BB'>create_moral_graph</font><font face='Lucida Console'>(</font>bn, join_tree<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>create_join_tree</font><font face='Lucida Console'>(</font>join_tree, join_tree<font face='Lucida Console'>)</font>;
+
+        bayesian_network_join_tree <font color='#BB00BB'>solution</font><font face='Lucida Console'>(</font>bn, join_tree<font face='Lucida Console'>)</font>;
+
+        matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>1</font>,<font color='#979000'>2</font><font color='#5555FF'>&gt;</font> dist;
+
+        dist <font color='#5555FF'>=</font> solution.<font color='#BB00BB'>probability</font><font face='Lucida Console'>(</font>A<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font><font color='#BB00BB'>sum</font><font face='Lucida Console'>(</font>dist<font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> <font color='#979000'>1.0</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> <font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>5</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font><font color='#BB00BB'>dist</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> <font color='#979000'>0.01</font> <font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> <font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>5</font><font face='Lucida Console'>)</font>;
+
+        dist <font color='#5555FF'>=</font> solution.<font color='#BB00BB'>probability</font><font face='Lucida Console'>(</font>T<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font><font color='#BB00BB'>sum</font><font face='Lucida Console'>(</font>dist<font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> <font color='#979000'>1.0</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> <font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>5</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font><font color='#BB00BB'>dist</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> <font color='#979000'>0.0104</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> <font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>5</font><font face='Lucida Console'>)</font>;
+
+        dist <font color='#5555FF'>=</font> solution.<font color='#BB00BB'>probability</font><font face='Lucida Console'>(</font>O<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font><font color='#BB00BB'>sum</font><font face='Lucida Console'>(</font>dist<font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> <font color='#979000'>1.0</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> <font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>5</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font><font color='#BB00BB'>dist</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> <font color='#979000'>0.064828</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> <font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>5</font><font face='Lucida Console'>)</font>;
+
+        dist <font color='#5555FF'>=</font> solution.<font color='#BB00BB'>probability</font><font face='Lucida Console'>(</font>X<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font><font color='#BB00BB'>sum</font><font face='Lucida Console'>(</font>dist<font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> <font color='#979000'>1.0</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> <font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>5</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font><font color='#BB00BB'>dist</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> <font color='#979000'>0.11029004</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> <font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>5</font><font face='Lucida Console'>)</font>;
+
+        dist <font color='#5555FF'>=</font> solution.<font color='#BB00BB'>probability</font><font face='Lucida Console'>(</font>L<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font><font color='#BB00BB'>sum</font><font face='Lucida Console'>(</font>dist<font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> <font color='#979000'>1.0</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> <font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>5</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font><font color='#BB00BB'>dist</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> <font color='#979000'>0.055</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> <font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>5</font><font face='Lucida Console'>)</font>;
+
+        dist <font color='#5555FF'>=</font> solution.<font color='#BB00BB'>probability</font><font face='Lucida Console'>(</font>S<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font><font color='#BB00BB'>sum</font><font face='Lucida Console'>(</font>dist<font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> <font color='#979000'>1.0</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> <font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>5</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font><font color='#BB00BB'>dist</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> <font color='#979000'>0.5</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> <font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>5</font><font face='Lucida Console'>)</font>;
+
+        dist <font color='#5555FF'>=</font> solution.<font color='#BB00BB'>probability</font><font face='Lucida Console'>(</font>B<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font><font color='#BB00BB'>sum</font><font face='Lucida Console'>(</font>dist<font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> <font color='#979000'>1.0</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> <font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>5</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font><font color='#BB00BB'>dist</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> <font color='#979000'>0.4499999</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> <font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>5</font><font face='Lucida Console'>)</font>;
+
+        dist <font color='#5555FF'>=</font> solution.<font color='#BB00BB'>probability</font><font face='Lucida Console'>(</font>D<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font><font color='#BB00BB'>sum</font><font face='Lucida Console'>(</font>dist<font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> <font color='#979000'>1.0</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> <font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>5</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font><font color='#BB00BB'>dist</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> <font color='#979000'>0.4359706</font> <font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> <font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>5</font><font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// now lets modify the probabilities of the bayesian network by making O 
+</font>        <font color='#009900'>// not a deterministic node anymore but otherwise leave the network alone
+</font>        <font color='#BB00BB'>setup_dyspnea_network</font><font face='Lucida Console'>(</font>bn, <font color='#979000'>false</font><font face='Lucida Console'>)</font>;
+
+        <font color='#BB00BB'>set_node_value</font><font face='Lucida Console'>(</font>bn, A, <font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>set_node_value</font><font face='Lucida Console'>(</font>bn, X, <font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>set_node_value</font><font face='Lucida Console'>(</font>bn, S, <font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+        <font color='#009900'>// lets also make some of these nodes evidence nodes
+</font>        <font color='#BB00BB'>set_node_as_evidence</font><font face='Lucida Console'>(</font>bn, A<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>set_node_as_evidence</font><font face='Lucida Console'>(</font>bn, X<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>set_node_as_evidence</font><font face='Lucida Console'>(</font>bn, S<font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// reload the solution now that we have changed the probabilities of node O
+</font>        <font color='#BB00BB'>bayesian_network_join_tree</font><font face='Lucida Console'>(</font>bn, join_tree<font face='Lucida Console'>)</font>.<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>solution<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>solution.<font color='#BB00BB'>number_of_nodes</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> bn.<font color='#BB00BB'>number_of_nodes</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+        dist <font color='#5555FF'>=</font> solution.<font color='#BB00BB'>probability</font><font face='Lucida Console'>(</font>A<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font><font color='#BB00BB'>sum</font><font face='Lucida Console'>(</font>dist<font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> <font color='#979000'>1.0</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> <font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>5</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font><font color='#BB00BB'>dist</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> <font color='#979000'>1.0</font> <font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> <font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>5</font><font face='Lucida Console'>)</font>;
+
+        dist <font color='#5555FF'>=</font> solution.<font color='#BB00BB'>probability</font><font face='Lucida Console'>(</font>T<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font><font color='#BB00BB'>sum</font><font face='Lucida Console'>(</font>dist<font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> <font color='#979000'>1.0</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> <font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>5</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font><font color='#BB00BB'>dist</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> <font color='#979000'>0.253508694039</font> <font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> <font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>5</font><font face='Lucida Console'>)</font>;
+
+        dist <font color='#5555FF'>=</font> solution.<font color='#BB00BB'>probability</font><font face='Lucida Console'>(</font>O<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font><font color='#BB00BB'>sum</font><font face='Lucida Console'>(</font>dist<font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> <font color='#979000'>1.0</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> <font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>5</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font><font color='#BB00BB'>dist</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> <font color='#979000'>0.77856184024</font> <font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> <font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>5</font><font face='Lucida Console'>)</font>;
+
+        dist <font color='#5555FF'>=</font> solution.<font color='#BB00BB'>probability</font><font face='Lucida Console'>(</font>X<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font><font color='#BB00BB'>sum</font><font face='Lucida Console'>(</font>dist<font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> <font color='#979000'>1.0</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> <font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>5</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font><font color='#BB00BB'>dist</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> <font color='#979000'>1.0</font> <font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> <font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>5</font><font face='Lucida Console'>)</font>;
+
+        dist <font color='#5555FF'>=</font> solution.<font color='#BB00BB'>probability</font><font face='Lucida Console'>(</font>L<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font><font color='#BB00BB'>sum</font><font face='Lucida Console'>(</font>dist<font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> <font color='#979000'>1.0</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> <font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>5</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font><font color='#BB00BB'>dist</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> <font color='#979000'>0.5070173880</font> <font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> <font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>5</font><font face='Lucida Console'>)</font>;
+
+        dist <font color='#5555FF'>=</font> solution.<font color='#BB00BB'>probability</font><font face='Lucida Console'>(</font>S<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font><font color='#BB00BB'>sum</font><font face='Lucida Console'>(</font>dist<font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> <font color='#979000'>1.0</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> <font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>5</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font><font color='#BB00BB'>dist</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> <font color='#979000'>1.0</font> <font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> <font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>5</font><font face='Lucida Console'>)</font>;
+
+        dist <font color='#5555FF'>=</font> solution.<font color='#BB00BB'>probability</font><font face='Lucida Console'>(</font>B<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font><font color='#BB00BB'>sum</font><font face='Lucida Console'>(</font>dist<font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> <font color='#979000'>1.0</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> <font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>5</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font><font color='#BB00BB'>dist</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> <font color='#979000'>0.6</font>  <font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> <font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>5</font><font face='Lucida Console'>)</font>;
+
+        dist <font color='#5555FF'>=</font> solution.<font color='#BB00BB'>probability</font><font face='Lucida Console'>(</font>D<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font><font color='#BB00BB'>sum</font><font face='Lucida Console'>(</font>dist<font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> <font color='#979000'>1.0</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> <font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>5</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font><font color='#BB00BB'>dist</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> <font color='#979000'>0.7535685520</font> <font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> <font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>5</font><font face='Lucida Console'>)</font>;
+
+
+        <font color='#009900'>// now lets test the bayesian_network_gibbs_sampler 
+</font>        <font color='#BB00BB'>set_node_value</font><font face='Lucida Console'>(</font>bn, A, <font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>set_node_value</font><font face='Lucida Console'>(</font>bn, T, <font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>set_node_value</font><font face='Lucida Console'>(</font>bn, O, <font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>set_node_value</font><font face='Lucida Console'>(</font>bn, X, <font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>set_node_value</font><font face='Lucida Console'>(</font>bn, S, <font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>set_node_value</font><font face='Lucida Console'>(</font>bn, L, <font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>set_node_value</font><font face='Lucida Console'>(</font>bn, B, <font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>set_node_value</font><font face='Lucida Console'>(</font>bn, D, <font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+
+        bayesian_network_gibbs_sampler sampler;
+        matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>1</font>,<font color='#979000'>8</font><font color='#5555FF'>&gt;</font> counts;
+        <font color='#BB00BB'>set_all_elements</font><font face='Lucida Console'>(</font>counts, <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> rounds <font color='#5555FF'>=</font> <font color='#979000'>200000</font>;
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> rounds; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+        <b>{</b>
+            sampler.<font color='#BB00BB'>sample_graph</font><font face='Lucida Console'>(</font>bn<font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> c <font color='#5555FF'>=</font> <font color='#979000'>0</font>; c <font color='#5555FF'>&lt;</font> counts.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>c<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>node_value</font><font face='Lucida Console'>(</font>bn, c<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>
+                    <font color='#BB00BB'>counts</font><font face='Lucida Console'>(</font>c<font face='Lucida Console'>)</font> <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+            <b>}</b>
+
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>i<font color='#5555FF'>&amp;</font><font color='#979000'>0x3FF</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#BB00BB'>print_spinner</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+        <b>}</b>
+
+        counts <font color='#5555FF'>/</font><font color='#5555FF'>=</font> rounds;
+
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font><font color='#BB00BB'>counts</font><font face='Lucida Console'>(</font>A<font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> <font color='#979000'>1.0</font> <font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> <font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font><font color='#BB00BB'>counts</font><font face='Lucida Console'>(</font>T<font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> <font color='#979000'>0.253508694039</font> <font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> <font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST_MSG</font><font face='Lucida Console'>(</font><font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font><font color='#BB00BB'>counts</font><font face='Lucida Console'>(</font>O<font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> <font color='#979000'>0.77856184024</font> <font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> <font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>2</font>,<font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font><font color='#BB00BB'>counts</font><font face='Lucida Console'>(</font>O<font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> <font color='#979000'>0.77856184024</font> <font face='Lucida Console'>)</font> <font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font><font color='#BB00BB'>counts</font><font face='Lucida Console'>(</font>X<font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> <font color='#979000'>1.0</font> <font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> <font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font><font color='#BB00BB'>counts</font><font face='Lucida Console'>(</font>L<font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> <font color='#979000'>0.5070173880</font> <font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> <font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font><font color='#BB00BB'>counts</font><font face='Lucida Console'>(</font>S<font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> <font color='#979000'>1.0</font> <font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> <font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font><font color='#BB00BB'>counts</font><font face='Lucida Console'>(</font>B<font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> <font color='#979000'>0.6</font>  <font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> <font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font><font color='#BB00BB'>counts</font><font face='Lucida Console'>(</font>D<font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> <font color='#979000'>0.7535685520</font> <font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> <font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+
+
+        <font color='#BB00BB'>setup_simple_network</font><font face='Lucida Console'>(</font>bn<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>create_moral_graph</font><font face='Lucida Console'>(</font>bn, join_tree<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>create_join_tree</font><font face='Lucida Console'>(</font>join_tree, join_tree<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>bayesian_network_join_tree</font><font face='Lucida Console'>(</font>bn, join_tree<font face='Lucida Console'>)</font>.<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>solution<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>solution.<font color='#BB00BB'>number_of_nodes</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> bn.<font color='#BB00BB'>number_of_nodes</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+        dist <font color='#5555FF'>=</font> solution.<font color='#BB00BB'>probability</font><font face='Lucida Console'>(</font>A<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font><font color='#BB00BB'>sum</font><font face='Lucida Console'>(</font>dist<font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> <font color='#979000'>1.0</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> <font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>5</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font><font color='#BB00BB'>dist</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> <font color='#979000'>0.1</font> <font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> <font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>5</font><font face='Lucida Console'>)</font>;
+
+        dist <font color='#5555FF'>=</font> solution.<font color='#BB00BB'>probability</font><font face='Lucida Console'>(</font>T<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font><font color='#BB00BB'>sum</font><font face='Lucida Console'>(</font>dist<font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> <font color='#979000'>1.0</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> <font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>5</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font><font color='#BB00BB'>dist</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> <font color='#979000'>0.5</font> <font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> <font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>5</font><font face='Lucida Console'>)</font>;
+
+        dist <font color='#5555FF'>=</font> solution.<font color='#BB00BB'>probability</font><font face='Lucida Console'>(</font>S<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font><font color='#BB00BB'>sum</font><font face='Lucida Console'>(</font>dist<font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> <font color='#979000'>1.0</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> <font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>5</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font><font color='#BB00BB'>dist</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> <font color='#979000'>0.5</font> <font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> <font color='#979000'>1e</font><font color='#5555FF'>-</font><font color='#979000'>5</font><font face='Lucida Console'>)</font>;
+
+
+    <b>}</b>
+
+
+
+
+    <font color='#0000FF'>class</font> <b><a name='bayes_nets_tester'></a>bayes_nets_tester</b> : <font color='#0000FF'>public</font> tester
+    <b>{</b>
+    <font color='#0000FF'>public</font>:
+        <b><a name='bayes_nets_tester'></a>bayes_nets_tester</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> :
+            tester <font face='Lucida Console'>(</font>"<font color='#CC0000'>test_bayes_nets</font>",
+                    "<font color='#CC0000'>Runs tests on the bayes_nets objects and functions.</font>"<font face='Lucida Console'>)</font>
+        <b>{</b><b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='perform_test'></a>perform_test</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#BB00BB'>bayes_nets_test</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+    <b>}</b> a;
+
+<b>}</b>
+
+
+
+
+
+</pre></body></html>

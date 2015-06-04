@@ -1,0 +1,313 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - optimization_test_functions.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2010  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_OPTIMIZATION_TEST_FUNCTiONS_H_h_
+<font color='#0000FF'>#define</font> DLIB_OPTIMIZATION_TEST_FUNCTiONS_H_h_
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>matrix.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>sstream<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>cmath<font color='#5555FF'>&gt;</font>
+
+<font color='#009900'>/*
+
+    Most of the code in this file is converted from the set of Fortran 90 routines 
+    created by John Burkardt.
+
+    The original Fortran can be found here: http://orion.math.iastate.edu/burkardt/f_src/testopt/testopt.html
+
+*/</font>
+
+<font color='#009900'>// GCC 4.8 gives false alarms about some variables being uninitialized.  Disable these
+</font><font color='#009900'>// false warnings.
+</font><font color='#0000FF'>#if</font> <font face='Lucida Console'>(</font> defined<font face='Lucida Console'>(</font>__GNUC__<font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> __GNUC__ <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>4</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> __GNUC_MINOR__ <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>8</font><font face='Lucida Console'>)</font>
+    <font color='#0000FF'>#pragma</font> GCC diagnostic ignored "<font color='#CC0000'>-Wmaybe-uninitialized</font>"
+<font color='#0000FF'>#endif</font>
+
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+    <font color='#0000FF'>namespace</font> test_functions
+    <b>{</b>
+
+    <font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+        matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>0</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> <b><a name='chebyquad_residuals'></a>chebyquad_residuals</b><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>0</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> x<font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'><u>double</u></font> <b><a name='chebyquad_residual'></a>chebyquad_residual</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> i, <font color='#0000FF'>const</font> matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>0</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> x<font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'><u>int</u></font><font color='#5555FF'>&amp;</font> <b><a name='chebyquad_calls'></a>chebyquad_calls</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'><u>double</u></font> <b><a name='chebyquad'></a>chebyquad</b><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>0</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> x <font face='Lucida Console'>)</font>;
+
+        matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>0</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> <b><a name='chebyquad_derivative'></a>chebyquad_derivative</b> <font face='Lucida Console'>(</font><font color='#0000FF'>const</font> matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>0</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> x<font face='Lucida Console'>)</font>;
+
+        matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>0</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> <b><a name='chebyquad_start'></a>chebyquad_start</b> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> n<font face='Lucida Console'>)</font>;
+
+        matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>0</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> <b><a name='chebyquad_solution'></a>chebyquad_solution</b> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> n<font face='Lucida Console'>)</font>;
+
+        matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font> <b><a name='chebyquad_hessian'></a>chebyquad_hessian</b><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>0</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> x<font face='Lucida Console'>)</font>;
+
+    <font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+        <font color='#0000FF'>class</font> <b><a name='chebyquad_function_model'></a>chebyquad_function_model</b> 
+        <b>{</b>
+        <font color='#0000FF'>public</font>:
+
+            <font color='#009900'>// Define the type used to represent column vectors
+</font>            <font color='#0000FF'>typedef</font> matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>0</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> column_vector;
+            <font color='#009900'>// Define the type used to represent the hessian matrix
+</font>            <font color='#0000FF'>typedef</font> matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font> general_matrix;
+
+            <font color='#0000FF'><u>double</u></font> <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font> 
+                <font color='#0000FF'>const</font> column_vector<font color='#5555FF'>&amp;</font> x
+            <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+            <b>{</b>
+                <font color='#0000FF'>return</font> <font color='#BB00BB'>chebyquad</font><font face='Lucida Console'>(</font>x<font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+            <font color='#0000FF'><u>void</u></font> <b><a name='get_derivative_and_hessian'></a>get_derivative_and_hessian</b> <font face='Lucida Console'>(</font>
+                <font color='#0000FF'>const</font> column_vector<font color='#5555FF'>&amp;</font> x,
+                column_vector<font color='#5555FF'>&amp;</font> d,
+                general_matrix<font color='#5555FF'>&amp;</font> h
+            <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+            <b>{</b>
+                d <font color='#5555FF'>=</font> <font color='#BB00BB'>chebyquad_derivative</font><font face='Lucida Console'>(</font>x<font face='Lucida Console'>)</font>;
+                h <font color='#5555FF'>=</font> <font color='#BB00BB'>chebyquad_hessian</font><font face='Lucida Console'>(</font>x<font face='Lucida Console'>)</font>;
+            <b>}</b>
+        <b>}</b>;
+
+    <font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>    <font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>    <font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>    <font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+        <font color='#0000FF'><u>double</u></font> <b><a name='brown_residual'></a>brown_residual</b> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> i, <font color='#0000FF'>const</font> matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>4</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> x<font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - 1 &lt;= i &lt;= 20
+            ensures
+                - returns the ith brown residual
+        !*/</font>
+
+        <font color='#0000FF'><u>double</u></font> <b><a name='brown'></a>brown</b> <font face='Lucida Console'>(</font> <font color='#0000FF'>const</font> matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>4</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> x<font face='Lucida Console'>)</font>;
+
+        matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>4</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> <b><a name='brown_derivative'></a>brown_derivative</b> <font face='Lucida Console'>(</font> <font color='#0000FF'>const</font> matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>4</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> x<font face='Lucida Console'>)</font>;
+
+        matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>4</font>,<font color='#979000'>4</font><font color='#5555FF'>&gt;</font> <b><a name='brown_hessian'></a>brown_hessian</b> <font face='Lucida Console'>(</font> <font color='#0000FF'>const</font> matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>4</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> x<font face='Lucida Console'>)</font>;
+
+        matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>4</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> <b><a name='brown_start'></a>brown_start</b> <font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+        matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>4</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> <b><a name='brown_solution'></a>brown_solution</b> <font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>class</font> <b><a name='brown_function_model'></a>brown_function_model</b> 
+        <b>{</b>
+        <font color='#0000FF'>public</font>:
+
+            <font color='#009900'>// Define the type used to represent column vectors
+</font>            <font color='#0000FF'>typedef</font> matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>4</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> column_vector;
+            <font color='#009900'>// Define the type used to represent the hessian matrix
+</font>            <font color='#0000FF'>typedef</font> matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font> general_matrix;
+
+            <font color='#0000FF'><u>double</u></font> <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font> 
+                <font color='#0000FF'>const</font> column_vector<font color='#5555FF'>&amp;</font> x
+            <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+            <b>{</b>
+                <font color='#0000FF'>return</font> <font color='#BB00BB'>brown</font><font face='Lucida Console'>(</font>x<font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+            <font color='#0000FF'><u>void</u></font> <b><a name='get_derivative_and_hessian'></a>get_derivative_and_hessian</b> <font face='Lucida Console'>(</font>
+                <font color='#0000FF'>const</font> column_vector<font color='#5555FF'>&amp;</font> x,
+                column_vector<font color='#5555FF'>&amp;</font> d,
+                general_matrix<font color='#5555FF'>&amp;</font> h
+            <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+            <b>{</b>
+                d <font color='#5555FF'>=</font> <font color='#BB00BB'>brown_derivative</font><font face='Lucida Console'>(</font>x<font face='Lucida Console'>)</font>;
+                h <font color='#5555FF'>=</font> <font color='#BB00BB'>brown_hessian</font><font face='Lucida Console'>(</font>x<font face='Lucida Console'>)</font>;
+            <b>}</b>
+        <b>}</b>;
+
+    <font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>    <font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>    <font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>    <font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+        matrix<font color='#5555FF'>&lt;</font>T,<font color='#979000'>2</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> <b><a name='rosen_big_start'></a>rosen_big_start</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            matrix<font color='#5555FF'>&lt;</font>T,<font color='#979000'>2</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> x;
+            x <font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>1.2</font>, <font color='#5555FF'>-</font><font color='#979000'>1</font>;
+            <font color='#0000FF'>return</font> x;
+        <b>}</b>
+
+    <font color='#009900'>// This is a variation on the Rosenbrock test function but with large residuals.  The
+</font>    <font color='#009900'>// minimum is at 1, 1 and the objective value is 1.
+</font>        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+        T <b><a name='rosen_big_residual'></a>rosen_big_residual</b> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> i, <font color='#0000FF'>const</font> matrix<font color='#5555FF'>&lt;</font>T,<font color='#979000'>2</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> m<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>using</font> std::pow;
+            <font color='#0000FF'>const</font> T x <font color='#5555FF'>=</font> <font color='#BB00BB'>m</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>; 
+            <font color='#0000FF'>const</font> T y <font color='#5555FF'>=</font> <font color='#BB00BB'>m</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>i <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>return</font> <font color='#979000'>100</font><font color='#5555FF'>*</font><font color='#BB00BB'>pow</font><font face='Lucida Console'>(</font>y <font color='#5555FF'>-</font> x<font color='#5555FF'>*</font>x,<font color='#979000'>2</font><font face='Lucida Console'>)</font><font color='#5555FF'>+</font><font color='#979000'>1.0</font>;
+            <b>}</b>
+            <font color='#0000FF'>else</font> 
+            <b>{</b>
+                <font color='#0000FF'>return</font> <font color='#BB00BB'>pow</font><font face='Lucida Console'>(</font><font color='#979000'>1</font> <font color='#5555FF'>-</font> x,<font color='#979000'>2</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> <font color='#979000'>1.0</font>;
+            <b>}</b>
+        <b>}</b>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+        T <b><a name='rosen_big'></a>rosen_big</b> <font face='Lucida Console'>(</font> <font color='#0000FF'>const</font> matrix<font color='#5555FF'>&lt;</font>T,<font color='#979000'>2</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> m<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>using</font> std::pow;
+            <font color='#0000FF'>return</font> <font color='#979000'>0.5</font><font color='#5555FF'>*</font><font face='Lucida Console'>(</font><font color='#BB00BB'>pow</font><font face='Lucida Console'>(</font><font color='#BB00BB'>rosen_big_residual</font><font face='Lucida Console'>(</font><font color='#979000'>1</font>,m<font face='Lucida Console'>)</font>,<font color='#979000'>2</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> <font color='#BB00BB'>pow</font><font face='Lucida Console'>(</font><font color='#BB00BB'>rosen_big_residual</font><font face='Lucida Console'>(</font><font color='#979000'>2</font>,m<font face='Lucida Console'>)</font>,<font color='#979000'>2</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+        matrix<font color='#5555FF'>&lt;</font>T,<font color='#979000'>2</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> <b><a name='rosen_big_solution'></a>rosen_big_solution</b> <font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            matrix<font color='#5555FF'>&lt;</font>T,<font color='#979000'>2</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> x;
+            <font color='#009900'>// solution from original documentation.
+</font>            x <font color='#5555FF'>=</font> <font color='#979000'>1</font>,<font color='#979000'>1</font>;
+            <font color='#0000FF'>return</font> x;
+        <b>}</b>
+
+    <font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>    <font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>    <font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>    <font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+        matrix<font color='#5555FF'>&lt;</font>T,<font color='#979000'>2</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> <b><a name='rosen_start'></a>rosen_start</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            matrix<font color='#5555FF'>&lt;</font>T,<font color='#979000'>2</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> x;
+            x <font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>1.2</font>, <font color='#5555FF'>-</font><font color='#979000'>1</font>;
+            <font color='#0000FF'>return</font> x;
+        <b>}</b>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+        T <b><a name='rosen'></a>rosen</b> <font face='Lucida Console'>(</font> <font color='#0000FF'>const</font> matrix<font color='#5555FF'>&lt;</font>T,<font color='#979000'>2</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> m<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>const</font> T x <font color='#5555FF'>=</font> <font color='#BB00BB'>m</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>; 
+            <font color='#0000FF'>const</font> T y <font color='#5555FF'>=</font> <font color='#BB00BB'>m</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>using</font> std::pow;
+            <font color='#009900'>// compute Rosenbrock's function and return the result
+</font>            <font color='#0000FF'>return</font> <font color='#979000'>100.0</font><font color='#5555FF'>*</font><font color='#BB00BB'>pow</font><font face='Lucida Console'>(</font>y <font color='#5555FF'>-</font> x<font color='#5555FF'>*</font>x,<font color='#979000'>2</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> <font color='#BB00BB'>pow</font><font face='Lucida Console'>(</font><font color='#979000'>1</font> <font color='#5555FF'>-</font> x,<font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+        T <b><a name='rosen_residual'></a>rosen_residual</b> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> i, <font color='#0000FF'>const</font> matrix<font color='#5555FF'>&lt;</font>T,<font color='#979000'>2</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> m<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>const</font> T x <font color='#5555FF'>=</font> <font color='#BB00BB'>m</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>; 
+            <font color='#0000FF'>const</font> T y <font color='#5555FF'>=</font> <font color='#BB00BB'>m</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+
+
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>i <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>return</font> <font color='#979000'>10</font><font color='#5555FF'>*</font><font face='Lucida Console'>(</font>y <font color='#5555FF'>-</font> x<font color='#5555FF'>*</font>x<font face='Lucida Console'>)</font>;
+            <b>}</b>
+            <font color='#0000FF'>else</font>
+            <b>{</b>
+                <font color='#0000FF'>return</font> <font color='#979000'>1</font> <font color='#5555FF'>-</font> x;
+            <b>}</b>
+        <b>}</b>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+        matrix<font color='#5555FF'>&lt;</font>T,<font color='#979000'>2</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> <b><a name='rosen_residual_derivative'></a>rosen_residual_derivative</b> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> i, <font color='#0000FF'>const</font> matrix<font color='#5555FF'>&lt;</font>T,<font color='#979000'>2</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> m<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>const</font> T x <font color='#5555FF'>=</font> <font color='#BB00BB'>m</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>; 
+
+            matrix<font color='#5555FF'>&lt;</font>T,<font color='#979000'>2</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> d;
+
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>i <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                d <font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>20</font><font color='#5555FF'>*</font>x, <font color='#979000'>10</font>;
+            <b>}</b>
+            <font color='#0000FF'>else</font>
+            <b>{</b>
+                d <font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>1</font>, <font color='#979000'>0</font>;
+            <b>}</b>
+            <font color='#0000FF'>return</font> d;
+        <b>}</b>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>const</font> matrix<font color='#5555FF'>&lt;</font>T,<font color='#979000'>2</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> <b><a name='rosen_derivative'></a>rosen_derivative</b> <font face='Lucida Console'>(</font> <font color='#0000FF'>const</font> matrix<font color='#5555FF'>&lt;</font>T,<font color='#979000'>2</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> m<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>const</font> T x <font color='#5555FF'>=</font> <font color='#BB00BB'>m</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>const</font> T y <font color='#5555FF'>=</font> <font color='#BB00BB'>m</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// make us a column vector of length 2
+</font>            matrix<font color='#5555FF'>&lt;</font>T,<font color='#979000'>2</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> <font color='#BB00BB'>res</font><font face='Lucida Console'>(</font><font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// now compute the gradient vector
+</font>            <font color='#BB00BB'>res</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>400</font><font color='#5555FF'>*</font>x<font color='#5555FF'>*</font><font face='Lucida Console'>(</font>y<font color='#5555FF'>-</font>x<font color='#5555FF'>*</font>x<font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> <font color='#979000'>2</font><font color='#5555FF'>*</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font color='#5555FF'>-</font>x<font face='Lucida Console'>)</font>; <font color='#009900'>// derivative of rosen() with respect to x
+</font>            <font color='#BB00BB'>res</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>200</font><font color='#5555FF'>*</font><font face='Lucida Console'>(</font>y<font color='#5555FF'>-</font>x<font color='#5555FF'>*</font>x<font face='Lucida Console'>)</font>;              <font color='#009900'>// derivative of rosen() with respect to y
+</font>            <font color='#0000FF'>return</font> res;
+        <b>}</b>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>const</font> matrix<font color='#5555FF'>&lt;</font>T,<font color='#979000'>2</font>,<font color='#979000'>2</font><font color='#5555FF'>&gt;</font> <b><a name='rosen_hessian'></a>rosen_hessian</b> <font face='Lucida Console'>(</font> <font color='#0000FF'>const</font> matrix<font color='#5555FF'>&lt;</font>T,<font color='#979000'>2</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> m<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>const</font> T x <font color='#5555FF'>=</font> <font color='#BB00BB'>m</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>const</font> T y <font color='#5555FF'>=</font> <font color='#BB00BB'>m</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// make us a column vector of length 2
+</font>            matrix<font color='#5555FF'>&lt;</font>T,<font color='#979000'>2</font>,<font color='#979000'>2</font><font color='#5555FF'>&gt;</font> res;
+
+            <font color='#009900'>// now compute the gradient vector
+</font>            <font color='#BB00BB'>res</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>400</font><font color='#5555FF'>*</font>y <font color='#5555FF'>+</font> <font color='#979000'>3</font><font color='#5555FF'>*</font><font color='#979000'>400</font><font color='#5555FF'>*</font>x<font color='#5555FF'>*</font>x <font color='#5555FF'>+</font> <font color='#979000'>2</font>; 
+            <font color='#BB00BB'>res</font><font face='Lucida Console'>(</font><font color='#979000'>1</font>,<font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>200</font>;              
+
+            <font color='#BB00BB'>res</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>,<font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>400</font><font color='#5555FF'>*</font>x;              
+            <font color='#BB00BB'>res</font><font face='Lucida Console'>(</font><font color='#979000'>1</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>400</font><font color='#5555FF'>*</font>x;              
+            <font color='#0000FF'>return</font> res;
+        <b>}</b>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+        matrix<font color='#5555FF'>&lt;</font>T,<font color='#979000'>2</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> <b><a name='rosen_solution'></a>rosen_solution</b> <font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            matrix<font color='#5555FF'>&lt;</font>T,<font color='#979000'>2</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> x;
+            <font color='#009900'>// solution from original documentation.
+</font>            x <font color='#5555FF'>=</font> <font color='#979000'>1</font>,<font color='#979000'>1</font>;
+            <font color='#0000FF'>return</font> x;
+        <b>}</b>
+
+    <font color='#009900'>// ------------------------------------------------------------------------------------
+</font>
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>struct</font> <b><a name='rosen_function_model'></a>rosen_function_model</b>
+        <b>{</b>
+            <font color='#0000FF'>typedef</font> matrix<font color='#5555FF'>&lt;</font>T,<font color='#979000'>2</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> column_vector;
+            <font color='#0000FF'>typedef</font> matrix<font color='#5555FF'>&lt;</font>T,<font color='#979000'>2</font>,<font color='#979000'>2</font><font color='#5555FF'>&gt;</font> general_matrix;
+
+            T <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font> column_vector x<font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+            <b>{</b>
+                <font color='#0000FF'>return</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#BB00BB'>rosen</font><font face='Lucida Console'>(</font>x<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+            <font color='#0000FF'><u>void</u></font> <b><a name='get_derivative_and_hessian'></a>get_derivative_and_hessian</b> <font face='Lucida Console'>(</font>
+                <font color='#0000FF'>const</font> column_vector<font color='#5555FF'>&amp;</font> x,
+                column_vector<font color='#5555FF'>&amp;</font> d,
+                general_matrix<font color='#5555FF'>&amp;</font> h
+            <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> 
+            <b>{</b>
+                d <font color='#5555FF'>=</font> <font color='#BB00BB'>rosen_derivative</font><font face='Lucida Console'>(</font>x<font face='Lucida Console'>)</font>;
+                h <font color='#5555FF'>=</font> <font color='#BB00BB'>rosen_hessian</font><font face='Lucida Console'>(</font>x<font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+        <b>}</b>;
+
+    <font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <b>}</b>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_OPTIMIZATION_TEST_FUNCTiONS_H_h_
+</font>
+
+
+
+</pre></body></html>

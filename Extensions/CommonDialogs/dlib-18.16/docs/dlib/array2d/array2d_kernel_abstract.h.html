@@ -1,0 +1,288 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - array2d_kernel_abstract.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2006  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#undef</font> DLIB_ARRAY2D_KERNEl_ABSTRACT_
+<font color='#0000FF'>#ifdef</font> DLIB_ARRAY2D_KERNEl_ABSTRACT_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../interfaces/enumerable.h.html'>../interfaces/enumerable.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../serialize.h.html'>../serialize.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../algs.h.html'>../algs.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../geometry/rectangle_abstract.h.html'>../geometry/rectangle_abstract.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T,
+        <font color='#0000FF'>typename</font> mem_manager <font color='#5555FF'>=</font> default_memory_manager 
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>class</font> <b><a name='array2d'></a>array2d</b> : <font color='#0000FF'>public</font> enumerable<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font>
+    <b>{</b>
+
+        <font color='#009900'>/*!
+            REQUIREMENTS ON T
+                T must have a default constructor.
+
+            REQUIREMENTS ON mem_manager
+                must be an implementation of memory_manager/memory_manager_kernel_abstract.h or
+                must be an implementation of memory_manager_global/memory_manager_global_kernel_abstract.h or
+                must be an implementation of memory_manager_stateless/memory_manager_stateless_kernel_abstract.h 
+                mem_manager::type can be set to anything.
+
+            POINTERS AND REFERENCES TO INTERNAL DATA
+                No member functions in this object will invalidate pointers
+                or references to internal data except for the set_size()
+                and clear() member functions.
+
+            INITIAL VALUE
+                nr() == 0
+                nc() == 0
+                
+            ENUMERATION ORDER
+                The enumerator will iterate over the elements of the array starting
+                with row 0 and then proceeding to row 1 and so on.  Each row will be
+                fully enumerated before proceeding on to the next row and the elements
+                in a row will be enumerated beginning with the 0th column, then the 1st 
+                column and so on.
+
+            WHAT THIS OBJECT REPRESENTS
+                This object represents a 2-Dimensional array of objects of 
+                type T. 
+
+                Also note that unless specified otherwise, no member functions
+                of this object throw exceptions.
+
+
+                Finally, note that this object stores its data contiguously and in 
+                row major order.  Moreover, there is no padding at the end of each row.
+                This means that its width_step() value is always equal to sizeof(type)*nc().  
+        !*/</font>
+
+
+    <font color='#0000FF'>public</font>:
+
+        <font color='#009900'>// ----------------------------------------
+</font>
+        <font color='#0000FF'>typedef</font> T type;
+        <font color='#0000FF'>typedef</font> mem_manager mem_manager_type;
+         
+        <font color='#009900'>// ----------------------------------------
+</font>
+        <font color='#0000FF'>class</font> <b><a name='row'></a>row</b> 
+        <b>{</b>
+            <font color='#009900'>/*!
+                POINTERS AND REFERENCES TO INTERNAL DATA
+                    No member functions in this object will invalidate pointers
+                    or references to internal data.
+
+                WHAT THIS OBJECT REPRESENTS
+                    This object represents a row of Ts in an array2d object.
+            !*/</font>
+        <font color='#0000FF'>public</font>:
+            <font color='#0000FF'><u>long</u></font> <b><a name='nc'></a>nc</b> <font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+            <font color='#009900'>/*!
+                ensures
+                    - returns the number of columns in this row
+            !*/</font>
+
+            <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b>[] <font face='Lucida Console'>(</font>
+                <font color='#0000FF'><u>long</u></font> column
+            <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+            <font color='#009900'>/*!
+                requires
+                    - 0 &lt;= column &lt; nc()
+                ensures
+                    - returns a const reference to the T in the given column 
+            !*/</font>
+
+            T<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b>[] <font face='Lucida Console'>(</font>
+                <font color='#0000FF'><u>long</u></font> column
+            <font face='Lucida Console'>)</font>;
+            <font color='#009900'>/*!
+                requires
+                    - 0 &lt;= column &lt; nc()
+                ensures
+                    - returns a non-const reference to the T in the given column 
+            !*/</font>
+
+        <font color='#0000FF'>private</font>:
+            <font color='#009900'>// restricted functions
+</font>            <b><a name='row'></a>row</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            row<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>=</font><font face='Lucida Console'>(</font>row<font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font>;
+        <b>}</b>;
+
+        <font color='#009900'>// ----------------------------------------
+</font>
+        <b><a name='array2d'></a>array2d</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures 
+                - #*this is properly initialized
+            throws
+                - std::bad_alloc 
+        !*/</font>
+
+        <b><a name='array2d'></a>array2d</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>long</u></font> rows,
+            <font color='#0000FF'><u>long</u></font> cols 
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - rows &gt;= 0 &amp;&amp; cols &gt;= 0
+            ensures
+                - #nc() == cols
+                - #nr() == rows
+                - #at_start() == true
+                - all elements in this array have initial values for their type
+            throws
+                - std::bad_alloc 
+        !*/</font>
+
+        <font color='#0000FF'>virtual</font> ~<b><a name='array2d'></a>array2d</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>; 
+        <font color='#009900'>/*!
+            ensures
+                - all resources associated with *this has been released
+        !*/</font>
+        
+        <font color='#0000FF'><u>void</u></font> <b><a name='clear'></a>clear</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #*this has an initial value for its type
+        !*/</font>
+
+        <font color='#0000FF'><u>long</u></font> <b><a name='nc'></a>nc</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the number of elements there are in a row.  i.e. returns
+                  the number of columns in *this
+        !*/</font>
+
+        <font color='#0000FF'><u>long</u></font> <b><a name='nr'></a>nr</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the number of rows in *this
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_size'></a>set_size</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>long</u></font> rows,
+            <font color='#0000FF'><u>long</u></font> cols
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - rows &gt;= 0 &amp;&amp; cols &gt;= 0
+            ensures
+                - #nc() == cols
+                - #nr() == rows
+                - #at_start() == true
+                - if (the call to set_size() doesn't change the dimensions of this array) then
+                    - all elements in this array retain their values from before this function was called
+                - else
+                    - all elements in this array have initial values for their type
+            throws
+                - std::bad_alloc 
+                    If this exception is thrown then #*this will have an initial
+                    value for its type.
+        !*/</font>
+
+        row <b><a name='operator'></a>operator</b>[] <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>long</u></font> row_index
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - 0 &lt;= row_index &lt; nr()
+            ensures
+                - returns a non-const row of nc() elements that represents the 
+                  given row_index'th row in *this.
+        !*/</font>
+
+        <font color='#0000FF'>const</font> row <b><a name='operator'></a>operator</b>[] <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>long</u></font> row_index
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - 0 &lt;= row_index &lt; nr()
+            ensures
+                - returns a const row of nc() elements that represents the 
+                  given row_index'th row in *this.
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='swap'></a>swap</b> <font face='Lucida Console'>(</font>
+            array2d<font color='#5555FF'>&amp;</font> item
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - swaps *this and item
+        !*/</font> 
+
+        <font color='#0000FF'><u>long</u></font> <b><a name='width_step'></a>width_step</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the size of one row of the image, in bytes.  
+                  More precisely, return a number N such that:
+                  (char*)&amp;item[0][0] + N == (char*)&amp;item[1][0].
+                - for dlib::array2d objects, the returned value
+                  is always equal to sizeof(type)*nc().  However,
+                  other objects which implement dlib::array2d style
+                  interfaces might have padding at the ends of their
+                  rows and therefore might return larger numbers.
+                  An example of such an object is the dlib::cv_image.
+        !*/</font>
+
+    <font color='#0000FF'>private</font>:
+
+        <font color='#009900'>// restricted functions
+</font>        <b><a name='array2d'></a>array2d</b><font face='Lucida Console'>(</font>array2d<font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font>;        <font color='#009900'>// copy constructor
+</font>        array2d<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>=</font><font face='Lucida Console'>(</font>array2d<font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font>;    <font color='#009900'>// assignment operator
+</font>
+    <b>}</b>;
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T,
+        <font color='#0000FF'>typename</font> mem_manager
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='swap'></a>swap</b> <font face='Lucida Console'>(</font>
+        array2d<font color='#5555FF'>&lt;</font>T,mem_manager<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> a, 
+        array2d<font color='#5555FF'>&lt;</font>T,mem_manager<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> b 
+    <font face='Lucida Console'>)</font> <b>{</b> a.<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>b<font face='Lucida Console'>)</font>; <b>}</b>   
+    <font color='#009900'>/*!
+        provides a global swap function
+    !*/</font>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T,
+        <font color='#0000FF'>typename</font> mem_manager
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='serialize'></a>serialize</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> array2d<font color='#5555FF'>&lt;</font>T,mem_manager<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> item, 
+        std::ostream<font color='#5555FF'>&amp;</font> out 
+    <font face='Lucida Console'>)</font>;   
+    <font color='#009900'>/*!
+        Provides serialization support.  Note that the serialization formats used by the
+        dlib::matrix and dlib::array2d objects are compatible.  That means you can load the
+        serialized data from one into another and it will work properly.
+    !*/</font>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T,
+        <font color='#0000FF'>typename</font> mem_manager
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='deserialize'></a>deserialize</b> <font face='Lucida Console'>(</font>
+        array2d<font color='#5555FF'>&lt;</font>T,mem_manager<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> item, 
+        std::istream<font color='#5555FF'>&amp;</font> in
+    <font face='Lucida Console'>)</font>;   
+    <font color='#009900'>/*!
+        provides deserialization support 
+    !*/</font>
+
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_ARRAY2D_KERNEl_ABSTRACT_ 
+</font>
+
+</pre></body></html>

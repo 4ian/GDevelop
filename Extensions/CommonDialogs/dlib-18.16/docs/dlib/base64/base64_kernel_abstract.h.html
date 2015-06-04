@@ -1,0 +1,124 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - base64_kernel_abstract.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2006  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#undef</font> DLIB_BASE64_KERNEl_ABSTRACT_
+<font color='#0000FF'>#ifdef</font> DLIB_BASE64_KERNEl_ABSTRACT_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../algs.h.html'>../algs.h</a>"
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>iosfwd<font color='#5555FF'>&gt;</font>
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+    <font color='#0000FF'>class</font> <b><a name='base64'></a>base64</b> 
+    <b>{</b>
+        <font color='#009900'>/*!
+            INITIAL VALUE
+                - line_ending() == LF
+
+            WHAT THIS OBJECT REPRESENTS
+                This object consists of the two functions encode and decode.
+                These functions allow you to encode and decode data to and from
+                the Base64 Content-Transfer-Encoding defined in section 6.8 of
+                rfc2045.
+        !*/</font>
+
+    <font color='#0000FF'>public</font>:
+
+        <font color='#0000FF'>class</font> <b><a name='decode_error'></a>decode_error</b> : <font color='#0000FF'>public</font> dlib::error <b>{</b><b>}</b>;
+
+        <b><a name='base64'></a>base64</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #*this is properly initialized
+            throws
+                - std::bad_alloc
+        !*/</font>
+
+        <font color='#0000FF'>virtual</font> ~<b><a name='base64'></a>base64</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - all memory associated with *this has been released
+        !*/</font>
+
+        <font color='#0000FF'>enum</font> <b><a name='line_ending_type'></a>line_ending_type</b>
+        <b>{</b>
+            CR,  <font color='#009900'>// i.e. "\r"
+</font>            LF,  <font color='#009900'>// i.e. "\n"
+</font>            CRLF <font color='#009900'>// i.e. "\r\n"
+</font>        <b>}</b>;
+
+        line_ending_type <b><a name='line_ending'></a>line_ending</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the type of end of line bytes the encoder
+                  will use when encoding data to base64 blocks.  Note that
+                  the ostream object you use might apply some sort of transform
+                  to line endings as well.  For example, C++ ofstream objects
+                  usually convert '\n' into whatever a normal newline is for
+                  your platform unless you open a file in binary mode.  But
+                  aside from file streams the ostream objects usually don't
+                  modify the data you pass to them.
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_line_ending'></a>set_line_ending</b> <font face='Lucida Console'>(</font>
+            line_ending_type eol_style
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #line_ending() == eol_style
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='encode'></a>encode</b> <font face='Lucida Console'>(</font>
+            std::istream<font color='#5555FF'>&amp;</font> in,
+            std::ostream<font color='#5555FF'>&amp;</font> out
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - reads all data from in (until EOF is reached) and encodes it
+                  and writes it to out
+            throws
+                - std::ios_base::failure
+                    if there was a problem writing to out then this exception will 
+                    be thrown.                      
+                - any other exception
+                    this exception may be thrown if there is any other problem                    
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='decode'></a>decode</b> <font face='Lucida Console'>(</font>
+            std::istream<font color='#5555FF'>&amp;</font> in,
+            std::ostream<font color='#5555FF'>&amp;</font> out
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - reads data from in (until EOF is reached), decodes it,
+                  and writes it to out. 
+            throws
+                - std::ios_base::failure
+                    if there was a problem writing to out then this exception will 
+                    be thrown.           
+                - decode_error
+                    if an error was detected in the encoded data that prevented
+                    it from being correctly decoded then this exception is 
+                    thrown.  
+                - any other exception
+                    this exception may be thrown if there is any other problem                    
+        !*/</font>
+
+    <font color='#0000FF'>private</font>:
+
+        <font color='#009900'>// restricted functions
+</font>        <b><a name='base64'></a>base64</b><font face='Lucida Console'>(</font>base64<font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font>;        <font color='#009900'>// copy constructor
+</font>        base64<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>=</font><font face='Lucida Console'>(</font>base64<font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font>;    <font color='#009900'>// assignment operator
+</font>
+    <b>}</b>;   
+   
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_BASE64_KERNEl_ABSTRACT_
+</font>
+
+</pre></body></html>

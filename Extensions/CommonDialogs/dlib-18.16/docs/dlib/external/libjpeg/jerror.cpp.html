@@ -1,0 +1,255 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - jerror.cpp</title></head><body bgcolor='white'><pre>
+<font color='#009900'>/*
+ * jerror.c
+ *
+ * Copyright (C) 1991-1998, Thomas G. Lane.
+ * This file is part of the Independent JPEG Group's software.
+ * For conditions of distribution and use, see the accompanying README file.
+ *
+ * This file contains simple error-reporting and trace-message routines.
+ * These are suitable for Unix-like systems and others where writing to
+ * stderr is the right thing to do.  Many applications will want to replace
+ * some or all of these routines.
+ *
+ * If you define USE_WINDOWS_MESSAGEBOX in jconfig.h or in the makefile,
+ * you get a Windows-specific hack to display error messages in a dialog box.
+ * It ain't much, but it beats dropping error messages into the bit bucket,
+ * which is what happens to output to stderr under most Windows C compilers.
+ *
+ * These routines are used by both the compression and decompression code.
+ */</font>
+
+<font color='#009900'>/* this is not a core library module, so it doesn't define JPEG_INTERNALS */</font>
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='jinclude.h.html'>jinclude.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='jpeglib.h.html'>jpeglib.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='jversion.h.html'>jversion.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='jerror.h.html'>jerror.h</a>"
+
+<font color='#0000FF'>#ifdef</font> USE_WINDOWS_MESSAGEBOX
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>windows.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#endif</font>
+
+<font color='#0000FF'>#ifndef</font> EXIT_FAILURE		<font color='#009900'>/* define exit() codes if not provided */</font>
+<font color='#0000FF'>#define</font> EXIT_FAILURE  <font color='#979000'>1</font>
+<font color='#0000FF'>#endif</font>
+
+
+<font color='#009900'>/*
+ * Create the message string table.
+ * We do this from the master message list in jerror.h by re-reading
+ * jerror.h with a suitable definition for macro JMESSAGE.
+ * The message table is made an external symbol just in case any applications
+ * want to refer to it directly.
+ */</font>
+
+<font color='#0000FF'>#ifdef</font> NEED_SHORT_EXTERNAL_NAMES
+<font color='#0000FF'>#define</font> jpeg_std_message_table	jMsgTable
+<font color='#0000FF'>#endif</font>
+
+<font color='#0000FF'>#define</font> JMESSAGE<font face='Lucida Console'>(</font>code,string<font face='Lucida Console'>)</font>	string ,
+
+<font color='#0000FF'>const</font> <font color='#0000FF'><u>char</u></font> <font color='#5555FF'>*</font> <font color='#0000FF'>const</font> jpeg_std_message_table[] <font color='#5555FF'>=</font> <b>{</b>
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='jerror.h.html'>jerror.h</a>"
+  NULL
+<b>}</b>;
+
+
+<font color='#009900'>/*
+ * Error exit handler: must not return to caller.
+ *
+ * Applications may override this if they want to get control back after
+ * an error.  Typically one would longjmp somewhere instead of exiting.
+ * The setjmp buffer can be made a private field within an expanded error
+ * handler object.  Note that the info needed to generate an error message
+ * is stored in the error object, so you can generate the message now or
+ * later, at your convenience.
+ * You should make sure that the JPEG object is cleaned up (with jpeg_abort
+ * or jpeg_destroy) at some point.
+ */</font>
+
+<b><a name='METHODDEF'></a>METHODDEF</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font>
+<b><a name='error_exit'></a>error_exit</b> <font face='Lucida Console'>(</font>j_common_ptr cinfo<font face='Lucida Console'>)</font>
+<b>{</b>
+  <font color='#009900'>/* Always display the message */</font>
+  <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>err<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>output_message<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>cinfo<font face='Lucida Console'>)</font>;
+
+  <font color='#009900'>/* Let the memory manager delete any temp files before we die */</font>
+  <font color='#BB00BB'>jpeg_destroy</font><font face='Lucida Console'>(</font>cinfo<font face='Lucida Console'>)</font>;
+
+  <font color='#BB00BB'>exit</font><font face='Lucida Console'>(</font>EXIT_FAILURE<font face='Lucida Console'>)</font>;
+<b>}</b>
+
+
+<font color='#009900'>/*
+ * Actual output of an error or trace message.
+ * Applications may override this method to send JPEG messages somewhere
+ * other than stderr.
+ *
+ * On Windows, printing to stderr is generally completely useless,
+ * so we provide optional code to produce an error-dialog popup.
+ * Most Windows applications will still prefer to override this routine,
+ * but if they don't, it'll do something at least marginally useful.
+ *
+ * NOTE: to use the library in an environment that doesn't support the
+ * C stdio library, you may have to delete the call to fprintf() entirely,
+ * not just not use this routine.
+ */</font>
+
+<b><a name='METHODDEF'></a>METHODDEF</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font>
+<b><a name='output_message'></a>output_message</b> <font face='Lucida Console'>(</font>j_common_ptr cinfo<font face='Lucida Console'>)</font>
+<b>{</b>
+  <font color='#0000FF'><u>char</u></font> buffer[JMSG_LENGTH_MAX];
+
+  <font color='#009900'>/* Create the message */</font>
+  <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>err<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>format_message<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>cinfo, buffer<font face='Lucida Console'>)</font>;
+
+<font color='#0000FF'>#ifdef</font> USE_WINDOWS_MESSAGEBOX
+  <font color='#009900'>/* Display it in a message dialog box */</font>
+  <font color='#BB00BB'>MessageBox</font><font face='Lucida Console'>(</font><font color='#BB00BB'>GetActiveWindow</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, buffer, "<font color='#CC0000'>JPEG Library Error</font>",
+	     MB_OK <font color='#5555FF'>|</font> MB_ICONERROR<font face='Lucida Console'>)</font>;
+<font color='#0000FF'>#else</font>
+  <font color='#009900'>/* Send it to stderr, adding a newline */</font>
+  <font color='#BB00BB'>fprintf</font><font face='Lucida Console'>(</font>stderr, "<font color='#CC0000'>%s\n</font>", buffer<font face='Lucida Console'>)</font>;
+<font color='#0000FF'>#endif</font>
+<b>}</b>
+
+
+<font color='#009900'>/*
+ * Decide whether to emit a trace or warning message.
+ * msg_level is one of:
+ *   -1: recoverable corrupt-data warning, may want to abort.
+ *    0: important advisory messages (always display to user).
+ *    1: first level of tracing detail.
+ *    2,3,...: successively more detailed tracing messages.
+ * An application might override this method if it wanted to abort on warnings
+ * or change the policy about which messages to display.
+ */</font>
+
+<b><a name='METHODDEF'></a>METHODDEF</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font>
+<b><a name='emit_message'></a>emit_message</b> <font face='Lucida Console'>(</font>j_common_ptr cinfo, <font color='#0000FF'><u>int</u></font> msg_level<font face='Lucida Console'>)</font>
+<b>{</b>
+  <font color='#0000FF'>struct</font> jpeg_error_mgr <font color='#5555FF'>*</font> err <font color='#5555FF'>=</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>err;
+
+  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>msg_level <font color='#5555FF'>&lt;</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font> <b>{</b>
+    <font color='#009900'>/* It's a warning message.  Since corrupt files may generate many warnings,
+     * the policy implemented here is to show only the first warning,
+     * unless trace_level &gt;= 3.
+     */</font>
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>err<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>num_warnings <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font> <font color='#5555FF'>|</font><font color='#5555FF'>|</font> err<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>trace_level <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#979000'>3</font><font face='Lucida Console'>)</font>
+      <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>err<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>output_message<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>cinfo<font face='Lucida Console'>)</font>;
+    <font color='#009900'>/* Always count warnings in num_warnings. */</font>
+    err<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>num_warnings<font color='#5555FF'>+</font><font color='#5555FF'>+</font>;
+  <b>}</b> <font color='#0000FF'>else</font> <b>{</b>
+    <font color='#009900'>/* It's a trace message.  Show it if trace_level &gt;= msg_level. */</font>
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>err<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>trace_level <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> msg_level<font face='Lucida Console'>)</font>
+      <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>err<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>output_message<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>cinfo<font face='Lucida Console'>)</font>;
+  <b>}</b>
+<b>}</b>
+
+
+<font color='#009900'>/*
+ * Format a message string for the most recent JPEG error or message.
+ * The message is stored into buffer, which should be at least JMSG_LENGTH_MAX
+ * characters.  Note that no '\n' character is added to the string.
+ * Few applications should need to override this method.
+ */</font>
+
+<b><a name='METHODDEF'></a>METHODDEF</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font>
+<b><a name='format_message'></a>format_message</b> <font face='Lucida Console'>(</font>j_common_ptr cinfo, <font color='#0000FF'><u>char</u></font> <font color='#5555FF'>*</font> buffer<font face='Lucida Console'>)</font>
+<b>{</b>
+  <font color='#0000FF'>struct</font> jpeg_error_mgr <font color='#5555FF'>*</font> err <font color='#5555FF'>=</font> cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>err;
+  <font color='#0000FF'><u>int</u></font> msg_code <font color='#5555FF'>=</font> err<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>msg_code;
+  <font color='#0000FF'>const</font> <font color='#0000FF'><u>char</u></font> <font color='#5555FF'>*</font> msgtext <font color='#5555FF'>=</font> NULL;
+  <font color='#0000FF'>const</font> <font color='#0000FF'><u>char</u></font> <font color='#5555FF'>*</font> msgptr;
+  <font color='#0000FF'><u>char</u></font> ch;
+  <font color='#0000FF'><u>int</u></font> isstring;
+
+  <font color='#009900'>/* Look up message string in proper table */</font>
+  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>msg_code <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> msg_code <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> err<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>last_jpeg_message<font face='Lucida Console'>)</font> <b>{</b>
+    msgtext <font color='#5555FF'>=</font> err<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>jpeg_message_table[msg_code];
+  <b>}</b> <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>err<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>addon_message_table <font color='#5555FF'>!</font><font color='#5555FF'>=</font> NULL <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font>
+	     msg_code <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> err<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>first_addon_message <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font>
+	     msg_code <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> err<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>last_addon_message<font face='Lucida Console'>)</font> <b>{</b>
+    msgtext <font color='#5555FF'>=</font> err<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>addon_message_table[msg_code <font color='#5555FF'>-</font> err<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>first_addon_message];
+  <b>}</b>
+
+  <font color='#009900'>/* Defend against bogus message number */</font>
+  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>msgtext <font color='#5555FF'>=</font><font color='#5555FF'>=</font> NULL<font face='Lucida Console'>)</font> <b>{</b>
+    err<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>msg_parm.i[<font color='#979000'>0</font>] <font color='#5555FF'>=</font> msg_code;
+    msgtext <font color='#5555FF'>=</font> err<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>jpeg_message_table[<font color='#979000'>0</font>];
+  <b>}</b>
+
+  <font color='#009900'>/* Check for string parameter, as indicated by %s in the message text */</font>
+  isstring <font color='#5555FF'>=</font> FALSE;
+  msgptr <font color='#5555FF'>=</font> msgtext;
+  <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>ch <font color='#5555FF'>=</font> <font color='#5555FF'>*</font>msgptr<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> <font color='#5555FF'>!</font><font color='#5555FF'>=</font> '<font color='#FF0000'>\0</font>'<font face='Lucida Console'>)</font> <b>{</b>
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>ch <font color='#5555FF'>=</font><font color='#5555FF'>=</font> '<font color='#FF0000'>%</font>'<font face='Lucida Console'>)</font> <b>{</b>
+      <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>*</font>msgptr <font color='#5555FF'>=</font><font color='#5555FF'>=</font> '<font color='#FF0000'>s</font>'<font face='Lucida Console'>)</font> isstring <font color='#5555FF'>=</font> TRUE;
+      <font color='#0000FF'>break</font>;
+    <b>}</b>
+  <b>}</b>
+
+  <font color='#009900'>/* Format the message into the passed buffer */</font>
+  <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>isstring<font face='Lucida Console'>)</font>
+    <font color='#BB00BB'>sprintf</font><font face='Lucida Console'>(</font>buffer, msgtext, err<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>msg_parm.s<font face='Lucida Console'>)</font>;
+  <font color='#0000FF'>else</font>
+    <font color='#BB00BB'>sprintf</font><font face='Lucida Console'>(</font>buffer, msgtext,
+	    err<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>msg_parm.i[<font color='#979000'>0</font>], err<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>msg_parm.i[<font color='#979000'>1</font>],
+	    err<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>msg_parm.i[<font color='#979000'>2</font>], err<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>msg_parm.i[<font color='#979000'>3</font>],
+	    err<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>msg_parm.i[<font color='#979000'>4</font>], err<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>msg_parm.i[<font color='#979000'>5</font>],
+	    err<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>msg_parm.i[<font color='#979000'>6</font>], err<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>msg_parm.i[<font color='#979000'>7</font>]<font face='Lucida Console'>)</font>;
+<b>}</b>
+
+
+<font color='#009900'>/*
+ * Reset error state variables at start of a new image.
+ * This is called during compression startup to reset trace/error
+ * processing to default state, without losing any application-specific
+ * method pointers.  An application might possibly want to override
+ * this method if it has additional error processing state.
+ */</font>
+
+<b><a name='METHODDEF'></a>METHODDEF</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font>
+<b><a name='reset_error_mgr'></a>reset_error_mgr</b> <font face='Lucida Console'>(</font>j_common_ptr cinfo<font face='Lucida Console'>)</font>
+<b>{</b>
+  cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>err<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>num_warnings <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+  <font color='#009900'>/* trace_level is not reset since it is an application-supplied parameter */</font>
+  cinfo<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>err<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>msg_code <font color='#5555FF'>=</font> <font color='#979000'>0</font>;	<font color='#009900'>/* may be useful as a flag for "no error" */</font>
+<b>}</b>
+
+
+<font color='#009900'>/*
+ * Fill in the standard error-handling methods in a jpeg_error_mgr object.
+ * Typical call is:
+ *	struct jpeg_compress_struct cinfo;
+ *	struct jpeg_error_mgr err;
+ *
+ *	cinfo.err = jpeg_std_error(&amp;err);
+ * after which the application may override some of the methods.
+ */</font>
+
+<b><a name='GLOBAL'></a>GLOBAL</b><font face='Lucida Console'>(</font><font color='#0000FF'>struct</font> jpeg_error_mgr <font color='#5555FF'>*</font><font face='Lucida Console'>)</font>
+<b><a name='jpeg_std_error'></a>jpeg_std_error</b> <font face='Lucida Console'>(</font><font color='#0000FF'>struct</font> jpeg_error_mgr <font color='#5555FF'>*</font> err<font face='Lucida Console'>)</font>
+<b>{</b>
+  err<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>error_exit <font color='#5555FF'>=</font> error_exit;
+  err<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>emit_message <font color='#5555FF'>=</font> emit_message;
+  err<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>output_message <font color='#5555FF'>=</font> output_message;
+  err<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>format_message <font color='#5555FF'>=</font> format_message;
+  err<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>reset_error_mgr <font color='#5555FF'>=</font> reset_error_mgr;
+
+  err<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>trace_level <font color='#5555FF'>=</font> <font color='#979000'>0</font>;		<font color='#009900'>/* default = no tracing */</font>
+  err<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>num_warnings <font color='#5555FF'>=</font> <font color='#979000'>0</font>;	<font color='#009900'>/* no warnings emitted yet */</font>
+  err<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>msg_code <font color='#5555FF'>=</font> <font color='#979000'>0</font>;		<font color='#009900'>/* may be useful as a flag for "no error" */</font>
+
+  <font color='#009900'>/* Initialize message table pointers */</font>
+  err<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>jpeg_message_table <font color='#5555FF'>=</font> jpeg_std_message_table;
+  err<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>last_jpeg_message <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font> JMSG_LASTMSGCODE <font color='#5555FF'>-</font> <font color='#979000'>1</font>;
+
+  err<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>addon_message_table <font color='#5555FF'>=</font> NULL;
+  err<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>first_addon_message <font color='#5555FF'>=</font> <font color='#979000'>0</font>;	<font color='#009900'>/* for safety */</font>
+  err<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>last_addon_message <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+
+  <font color='#0000FF'>return</font> err;
+<b>}</b>
+
+</pre></body></html>

@@ -1,0 +1,155 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - rank_features_ex.cpp</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// The contents of this file are in the public domain. See LICENSE_FOR_EXAMPLE_PROGRAMS.txt
+</font><font color='#009900'>/*
+
+    This is an example illustrating the use of the rank_features() function 
+    from the dlib C++ Library.  
+
+    This example creates a simple set of data and then shows
+    you how to use the rank_features() function to find a good 
+    set of features (where "good" means the feature set will probably
+    work well with a classification algorithm).
+
+    The data used in this example will be 4 dimensional data and will
+    come from a distribution where points with a distance less than 10
+    from the origin are labeled +1 and all other points are labeled
+    as -1.  Note that this data is conceptually 2 dimensional but we
+    will add two extra features for the purpose of showing what
+    the rank_features() function does.
+*/</font>
+
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>iostream<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>svm.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>rand.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>vector<font color='#5555FF'>&gt;</font>
+
+<font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> std;
+<font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> dlib;
+
+
+<font color='#0000FF'><u>int</u></font> <b><a name='main'></a>main</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+<b>{</b>
+
+    <font color='#009900'>// This first typedef declares a matrix with 4 rows and 1 column.  It will be the
+</font>    <font color='#009900'>// object that contains each of our 4 dimensional samples.  
+</font>    <font color='#0000FF'>typedef</font> matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>, <font color='#979000'>4</font>, <font color='#979000'>1</font><font color='#5555FF'>&gt;</font> sample_type;
+
+
+
+    <font color='#009900'>// Now let's make some vector objects that can hold our samples 
+</font>    std::vector<font color='#5555FF'>&lt;</font>sample_type<font color='#5555FF'>&gt;</font> samples;
+    std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font> labels;
+
+    dlib::rand rnd;
+
+    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> x <font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>30</font>; x <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#979000'>30</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>x<font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> y <font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>30</font>; y <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#979000'>30</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>y<font face='Lucida Console'>)</font>
+        <b>{</b>
+            sample_type samp;
+
+            <font color='#009900'>// the first two features are just the (x,y) position of our points and so
+</font>            <font color='#009900'>// we expect them to be good features since our two classes here are points
+</font>            <font color='#009900'>// close to the origin and points far away from the origin.
+</font>            <font color='#BB00BB'>samp</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> x;
+            <font color='#BB00BB'>samp</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> y;
+
+            <font color='#009900'>// This is a worthless feature since it is just random noise.  It should
+</font>            <font color='#009900'>// be indicated as worthless by the rank_features() function below.
+</font>            <font color='#BB00BB'>samp</font><font face='Lucida Console'>(</font><font color='#979000'>2</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> rnd.<font color='#BB00BB'>get_random_double</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// This is a version of the y feature that is corrupted by random noise.  It
+</font>            <font color='#009900'>// should be ranked as less useful than features 0, and 1, but more useful
+</font>            <font color='#009900'>// than the above feature.
+</font>            <font color='#BB00BB'>samp</font><font face='Lucida Console'>(</font><font color='#979000'>3</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> y<font color='#5555FF'>*</font><font color='#979000'>0.2</font> <font color='#5555FF'>+</font> <font face='Lucida Console'>(</font>rnd.<font color='#BB00BB'>get_random_double</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#979000'>0.5</font><font face='Lucida Console'>)</font><font color='#5555FF'>*</font><font color='#979000'>10</font>;
+
+            <font color='#009900'>// add this sample into our vector of samples.
+</font>            samples.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>samp<font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// if this point is less than 15 from the origin then label it as a +1 class point.  
+</font>            <font color='#009900'>// otherwise it is a -1 class point
+</font>            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>sqrt</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>double</u></font><font face='Lucida Console'>)</font>x<font color='#5555FF'>*</font>x <font color='#5555FF'>+</font> y<font color='#5555FF'>*</font>y<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#979000'>15</font><font face='Lucida Console'>)</font>
+                labels.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font><font color='#5555FF'>+</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>else</font>
+                labels.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font><font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+    <b>}</b>
+
+
+    <font color='#009900'>// Here we normalize all the samples by subtracting their mean and dividing by their standard deviation.
+</font>    <font color='#009900'>// This is generally a good idea since it often heads off numerical stability problems and also 
+</font>    <font color='#009900'>// prevents one large feature from smothering others.
+</font>    <font color='#0000FF'>const</font> sample_type <font color='#BB00BB'>m</font><font face='Lucida Console'>(</font><font color='#BB00BB'>mean</font><font face='Lucida Console'>(</font><font color='#BB00BB'>mat</font><font face='Lucida Console'>(</font>samples<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;  <font color='#009900'>// compute a mean vector
+</font>    <font color='#0000FF'>const</font> sample_type <font color='#BB00BB'>sd</font><font face='Lucida Console'>(</font><font color='#BB00BB'>reciprocal</font><font face='Lucida Console'>(</font><font color='#BB00BB'>stddev</font><font face='Lucida Console'>(</font><font color='#BB00BB'>mat</font><font face='Lucida Console'>(</font>samples<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>; <font color='#009900'>// compute a standard deviation vector
+</font>    <font color='#009900'>// now normalize each sample
+</font>    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> samples.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+        samples[i] <font color='#5555FF'>=</font> <font color='#BB00BB'>pointwise_multiply</font><font face='Lucida Console'>(</font>samples[i] <font color='#5555FF'>-</font> m, sd<font face='Lucida Console'>)</font>; 
+
+    <font color='#009900'>// This is another thing that is often good to do from a numerical stability point of view.  
+</font>    <font color='#009900'>// However, in our case it doesn't really matter.   It's just here to show you how to do it.
+</font>    <font color='#BB00BB'>randomize_samples</font><font face='Lucida Console'>(</font>samples,labels<font face='Lucida Console'>)</font>;
+
+
+
+    <font color='#009900'>// This is a typedef for the type of kernel we are going to use in this example.
+</font>    <font color='#009900'>// In this case I have selected the radial basis kernel that can operate on our
+</font>    <font color='#009900'>// 4D sample_type objects.  In general, I would suggest using the same kernel for
+</font>    <font color='#009900'>// classification and feature ranking. 
+</font>    <font color='#0000FF'>typedef</font> radial_basis_kernel<font color='#5555FF'>&lt;</font>sample_type<font color='#5555FF'>&gt;</font> kernel_type;
+
+    <font color='#009900'>// The radial_basis_kernel has a parameter called gamma that we need to set.  Generally,
+</font>    <font color='#009900'>// you should try the same gamma that you are using for training.  But if you don't
+</font>    <font color='#009900'>// have a particular gamma in mind then you can use the following function to
+</font>    <font color='#009900'>// find a reasonable default gamma for your data.  Another reasonable way to pick a gamma
+</font>    <font color='#009900'>// is often to use 1.0/compute_mean_squared_distance(randomly_subsample(samples, 2000)).  
+</font>    <font color='#009900'>// It computes the mean squared distance between 2000 randomly selected samples and often
+</font>    <font color='#009900'>// works quite well.
+</font>    <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> gamma <font color='#5555FF'>=</font> <font color='#BB00BB'>verbose_find_gamma_with_big_centroid_gap</font><font face='Lucida Console'>(</font>samples, labels<font face='Lucida Console'>)</font>;
+
+    <font color='#009900'>// Next we declare an instance of the kcentroid object.  It is used by rank_features() 
+</font>    <font color='#009900'>// two represent the centroids of the two classes.  The kcentroid has 3 parameters 
+</font>    <font color='#009900'>// you need to set.  The first argument to the constructor is the kernel we wish to 
+</font>    <font color='#009900'>// use.  The second is a parameter that determines the numerical accuracy with which 
+</font>    <font color='#009900'>// the object will perform part of the ranking algorithm.  Generally, smaller values 
+</font>    <font color='#009900'>// give better results but cause the algorithm to attempt to use more dictionary vectors 
+</font>    <font color='#009900'>// (and thus run slower and use more memory).  The third argument, however, is the 
+</font>    <font color='#009900'>// maximum number of dictionary vectors a kcentroid is allowed to use.  So you can use
+</font>    <font color='#009900'>// it to put an upper limit on the runtime complexity.  
+</font>    kcentroid<font color='#5555FF'>&lt;</font>kernel_type<font color='#5555FF'>&gt;</font> <font color='#BB00BB'>kc</font><font face='Lucida Console'>(</font><font color='#BB00BB'>kernel_type</font><font face='Lucida Console'>(</font>gamma<font face='Lucida Console'>)</font>, <font color='#979000'>0.001</font>, <font color='#979000'>25</font><font face='Lucida Console'>)</font>;
+
+    <font color='#009900'>// And finally we get to the feature ranking. Here we call rank_features() with the kcentroid we just made,
+</font>    <font color='#009900'>// the samples and labels we made above, and the number of features we want it to rank.  
+</font>    cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>rank_features</font><font face='Lucida Console'>(</font>kc, samples, labels<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+
+    <font color='#009900'>// The output is:
+</font>    <font color='#009900'>/*
+        0 0.749265 
+        1        1 
+        3 0.933378 
+        2 0.825179 
+    */</font>
+
+    <font color='#009900'>// The first column is a list of the features in order of decreasing goodness.  So the rank_features() function
+</font>    <font color='#009900'>// is telling us that the samples[i](0) and samples[i](1) (i.e. the x and y) features are the best two.  Then
+</font>    <font color='#009900'>// after that the next best feature is the samples[i](3) (i.e. the y corrupted by noise) and finally the worst
+</font>    <font color='#009900'>// feature is the one that is just random noise.  So in this case rank_features did exactly what we would
+</font>    <font color='#009900'>// intuitively expect.
+</font>
+
+    <font color='#009900'>// The second column of the matrix is a number that indicates how much the features up to that point
+</font>    <font color='#009900'>// contribute to the separation of the two classes.  So bigger numbers are better since they
+</font>    <font color='#009900'>// indicate a larger separation.  The max value is always 1.  In the case below we see that the bad
+</font>    <font color='#009900'>// features actually make the class separation go down.
+</font>
+    <font color='#009900'>// So to break it down a little more.
+</font>    <font color='#009900'>//    0 0.749265   &lt;-- class separation of feature 0 all by itself
+</font>    <font color='#009900'>//    1        1   &lt;-- class separation of feature 0 and 1
+</font>    <font color='#009900'>//    3 0.933378   &lt;-- class separation of feature 0, 1, and 3
+</font>    <font color='#009900'>//    2 0.825179   &lt;-- class separation of feature 0, 1, 3, and 2
+</font>        
+
+<b>}</b>
+
+
+</pre></body></html>

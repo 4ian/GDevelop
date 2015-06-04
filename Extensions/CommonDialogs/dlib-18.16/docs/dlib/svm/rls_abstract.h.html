@@ -1,0 +1,163 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - rls_abstract.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2012  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#undef</font> DLIB_RLs_ABSTRACT_Hh_
+<font color='#0000FF'>#ifdef</font> DLIB_RLs_ABSTRACT_Hh_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../matrix/matrix_abstract.h.html'>../matrix/matrix_abstract.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='function_abstract.h.html'>function_abstract.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>class</font> <b><a name='rls'></a>rls</b>
+    <b>{</b>
+        <font color='#009900'>/*!
+            WHAT THIS OBJECT REPRESENTS
+                This is an implementation of the linear version of the recursive least 
+                squares algorithm.  It accepts training points incrementally and, at 
+                each step, maintains the solution to the following optimization problem:
+                    find w minimizing: 0.5*dot(w,w) + C*sum_i(y_i - trans(x_i)*w)^2
+                Where (x_i,y_i) are training pairs.  x_i is some vector and y_i is a target
+                scalar value.
+
+                This object can also be configured to use exponential forgetting.  This is
+                where each training example is weighted by pow(forget_factor, i), where i 
+                indicates the sample's age.  So older samples are weighted less in the 
+                least squares solution and therefore become forgotten after some time.  
+                Therefore, with forgetting, this object solves the following optimization
+                problem at each step:
+                    find w minimizing: 0.5*dot(w,w) + C*sum_i pow(forget_factor, i)*(y_i - trans(x_i)*w)^2
+                Where i starts at 0 and i==0 corresponds to the most recent training point.
+        !*/</font>
+
+    <font color='#0000FF'>public</font>:
+
+
+        <font color='#0000FF'>explicit</font> <b><a name='rls'></a>rls</b><font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>double</u></font> forget_factor,
+            <font color='#0000FF'><u>double</u></font> C <font color='#5555FF'>=</font> <font color='#979000'>1000</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - 0 &lt; forget_factor &lt;= 1
+                - 0 &lt; C
+            ensures
+                - #get_w().size() == 0
+                - #get_c() == C
+                - #get_forget_factor() == forget_factor
+        !*/</font>
+
+        <b><a name='rls'></a>rls</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #get_w().size() == 0
+                - #get_c() == 1000
+                - #get_forget_factor() == 1
+        !*/</font>
+
+        <font color='#0000FF'><u>double</u></font> <b><a name='get_c'></a>get_c</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the regularization parameter.  It is the parameter 
+                  that determines the trade-off between trying to fit the training 
+                  data or allowing more errors but hopefully improving the generalization 
+                  of the resulting regression.  Larger values encourage exact fitting while 
+                  smaller values of C may encourage better generalization. 
+        !*/</font>
+
+        <font color='#0000FF'><u>double</u></font> <b><a name='get_forget_factor'></a>get_forget_factor</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the exponential forgetting factor.  A value of 1 disables forgetting
+                  and results in normal least squares regression.  On the other hand, a smaller 
+                  value causes the regression to forget about old training examples and prefer 
+                  instead to fit more recent examples.  The closer the forget factor is to
+                  zero the faster old examples are forgotten.
+        !*/</font>
+
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> EXP<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='train'></a>train</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&lt;</font>EXP<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> x,
+            <font color='#0000FF'><u>double</u></font> y
+        <font face='Lucida Console'>)</font>
+        <font color='#009900'>/*!
+            requires
+                - is_col_vector(x) == true
+                - if (get_w().size() != 0) then
+                    - x.size() == get_w().size()
+                      (i.e. all training examples must have the same
+                      dimensionality)
+            ensures
+                - #get_w().size() == x.size()
+                - updates #get_w() such that it contains the solution to the least
+                  squares problem of regressing the given x onto the given y as well
+                  as all the previous training examples supplied to train().
+        !*/</font>
+
+        <font color='#0000FF'>const</font> matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>0</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> <b><a name='get_w'></a>get_w</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the regression weights.  These are the values learned by the
+                  least squares procedure.  If train() has not been called then this
+                  function returns an empty vector.
+        !*/</font>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> EXP<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>double</u></font> <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&lt;</font>EXP<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> x
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - is_col_vector(x) == true
+                - get_w().size() == x.size()
+            ensures
+                - returns dot(x, get_w())
+        !*/</font>
+
+        decision_function<font color='#5555FF'>&lt;</font>linear_kernel<font color='#5555FF'>&lt;</font>matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>0</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> <b><a name='get_decision_function'></a>get_decision_function</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - get_w().size() != 0
+            ensures
+                - returns a decision function DF such that:
+                    - DF(x) == dot(x, get_w())
+        !*/</font>
+
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='serialize'></a>serialize</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> rls<font color='#5555FF'>&amp;</font> item, 
+        std::ostream<font color='#5555FF'>&amp;</font> out 
+    <font face='Lucida Console'>)</font>;   
+    <font color='#009900'>/*!
+        provides serialization support 
+    !*/</font>
+
+    <font color='#0000FF'><u>void</u></font> <b><a name='deserialize'></a>deserialize</b> <font face='Lucida Console'>(</font>
+        rls<font color='#5555FF'>&amp;</font> item, 
+        std::istream<font color='#5555FF'>&amp;</font> in
+    <font face='Lucida Console'>)</font>;   
+    <font color='#009900'>/*!
+        provides deserialization support 
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_RLs_ABSTRACT_Hh_
+</font>
+
+
+</pre></body></html>

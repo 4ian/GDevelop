@@ -1,0 +1,48 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - config_reader_thread_safe_abstract.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2007  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#undef</font> DLIB_CONFIG_READER_THREAD_SAFe_ABSTRACT_
+<font color='#0000FF'>#ifdef</font> DLIB_CONFIG_READER_THREAD_SAFe_ABSTRACT_
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>string<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>iosfwd<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='config_reader_kernel_abstract.h.html'>config_reader_kernel_abstract.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../threads/threads_kernel_abstract.h.html'>../threads/threads_kernel_abstract.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+    <font color='#0000FF'>class</font> <b><a name='config_reader_thread_safe'></a>config_reader_thread_safe</b> 
+    <b>{</b>
+
+        <font color='#009900'>/*!                
+            WHAT THIS EXTENSION DOES FOR config_reader 
+                This object extends a normal config_reader by simply wrapping all 
+                its member functions inside mutex locks to make it safe to use
+                in a threaded program.  
+
+                So this object provides an interface identical to the one defined
+                in the config_reader/config_reader_kernel_abstract.h file except that
+                the rmutex returned by get_mutex() is always locked when this 
+                object's member functions are called.
+        !*/</font>
+    
+    <font color='#0000FF'>public</font>:
+
+        <font color='#0000FF'>const</font> rmutex<font color='#5555FF'>&amp;</font> <b><a name='get_mutex'></a>get_mutex</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the rmutex used to make this object thread safe.  i.e. returns
+                  the rmutex that is locked when this object's functions are called.
+        !*/</font>
+
+    <b>}</b>;
+
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_CONFIG_READER_THREAD_SAFe_ABSTRACT_
+</font>
+
+
+</pre></body></html>

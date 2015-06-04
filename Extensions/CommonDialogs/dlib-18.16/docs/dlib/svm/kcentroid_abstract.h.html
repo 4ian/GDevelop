@@ -1,0 +1,342 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - kcentroid_abstract.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2008  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#undef</font> DLIB_KCENTROId_ABSTRACT_
+<font color='#0000FF'>#ifdef</font> DLIB_KCENTROId_ABSTRACT_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../algs.h.html'>../algs.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../serialize.h.html'>../serialize.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='kernel_abstract.h.html'>kernel_abstract.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> kernel_type
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>class</font> <b><a name='kcentroid'></a>kcentroid</b>
+    <b>{</b>
+        <font color='#009900'>/*!
+            REQUIREMENTS ON kernel_type
+                is a kernel function object as defined in dlib/svm/kernel_abstract.h 
+
+            INITIAL VALUE
+                - dictionary_size() == 0
+                - samples_trained() == 0
+
+            WHAT THIS OBJECT REPRESENTS
+                This object represents a weighted sum of sample points in a kernel induced
+                feature space.  It can be used to kernelize any algorithm that requires only
+                the ability to perform vector addition, subtraction, scalar multiplication,
+                and inner products.  
+
+                An example use of this object is as an online algorithm for recursively estimating 
+                the centroid of a sequence of training points.  This object then allows you to 
+                compute the distance between the centroid and any test points.  So you can use 
+                this object to predict how similar a test point is to the data this object has 
+                been trained on (larger distances from the centroid indicate dissimilarity/anomalous 
+                points).  
+
+                Also note that the algorithm internally keeps a set of "dictionary vectors" 
+                that are used to represent the centroid.  You can force the algorithm to use 
+                no more than a set number of vectors by setting the 3rd constructor argument 
+                to whatever you want.  
+
+                This object uses the sparsification technique described in the paper The 
+                Kernel Recursive Least Squares Algorithm by Yaakov Engel.  This technique
+                allows us to keep the number of dictionary vectors down to a minimum.  In fact,
+                the object has a user selectable tolerance parameter that controls the trade off
+                between accuracy and number of stored dictionary vectors.
+        !*/</font>
+
+    <font color='#0000FF'>public</font>:
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> kernel_type::scalar_type scalar_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> kernel_type::sample_type sample_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> kernel_type::mem_manager_type mem_manager_type;
+
+        <b><a name='kcentroid'></a>kcentroid</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - this object is properly initialized
+                - #tolerance() == 0.001 
+                - #get_kernel() == kernel_type() (i.e. whatever the kernel's default value is) 
+                - #max_dictionary_size() == 1000000
+                - #remove_oldest_first() == false 
+        !*/</font>
+
+        <font color='#0000FF'>explicit</font> <b><a name='kcentroid'></a>kcentroid</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> kernel_type<font color='#5555FF'>&amp;</font> kernel_, 
+            scalar_type tolerance_ <font color='#5555FF'>=</font> <font color='#979000'>0.001</font>,
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> max_dictionary_size_ <font color='#5555FF'>=</font> <font color='#979000'>1000000</font>,
+            <font color='#0000FF'><u>bool</u></font> remove_oldest_first_ <font color='#5555FF'>=</font> <font color='#979000'>false</font> 
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - tolerance &gt; 0
+                - max_dictionary_size_ &gt; 1
+            ensures
+                - this object is properly initialized
+                - #tolerance() == tolerance_
+                - #get_kernel() == kernel_
+                - #max_dictionary_size() == max_dictionary_size_
+                - #remove_oldest_first() == remove_oldest_first_
+        !*/</font>
+
+        <font color='#0000FF'>const</font> kernel_type<font color='#5555FF'>&amp;</font> <b><a name='get_kernel'></a>get_kernel</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns a const reference to the kernel used by this object
+        !*/</font>
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='max_dictionary_size'></a>max_dictionary_size</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the maximum number of dictionary vectors this object will 
+                  use at a time.  That is, dictionary_size() will never be greater 
+                  than max_dictionary_size().
+        !*/</font>
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='remove_oldest_first'></a>remove_oldest_first</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - When the maximum dictionary size is reached this object sometimes
+                  needs to discard dictionary vectors when new samples are added via
+                  one of the train functions.  When this happens this object chooses 
+                  the dictionary vector to discard based on the setting of the
+                  remove_oldest_first() parameter.
+                - if (remove_oldest_first() == true) then
+                    - This object discards the oldest dictionary vectors when necessary.  
+                      This is an appropriate mode when using this object in an online
+                      setting and the input training samples come from a slowly 
+                      varying distribution.
+                - else (remove_oldest_first() == false) then
+                    - This object discards the most linearly dependent dictionary vectors 
+                      when necessary.  This it the default behavior and should be used 
+                      in most cases.
+        !*/</font>
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='dictionary_size'></a>dictionary_size</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the number of basis vectors in the dictionary.  These are
+                  the basis vectors used by this object to represent a point in kernel
+                  feature space.
+        !*/</font>
+
+        scalar_type <b><a name='samples_trained'></a>samples_trained</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the number of samples this object has been trained on so far
+        !*/</font>
+
+        scalar_type <b><a name='tolerance'></a>tolerance</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the tolerance to use for the approximately linearly dependent 
+                  test used for sparsification (see the KRLS paper for details).  This is 
+                  a number which governs how accurately this object will approximate the 
+                  centroid it is learning.  Smaller values generally result in a more 
+                  accurate estimate while also resulting in a bigger set of vectors in 
+                  the dictionary.  Bigger tolerances values result in a less accurate 
+                  estimate but also in less dictionary vectors.  (Note that in any case, 
+                  the max_dictionary_size() limits the number of dictionary vectors no 
+                  matter the setting of the tolerance)
+                - The exact meaning of the tolerance parameter is the following: 
+                  Imagine that we have an empirical_kernel_map that contains all
+                  the current dictionary vectors.  Then the tolerance is the minimum
+                  projection error (as given by empirical_kernel_map::project()) required
+                  to cause us to include a new vector in the dictionary.  So each time
+                  you call train() the kcentroid basically just computes the projection
+                  error for that new sample and if it is larger than the tolerance
+                  then that new sample becomes part of the dictionary.
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='clear_dictionary'></a>clear_dictionary</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - clears out all learned data (e.g. #dictionary_size() == 0)
+                - #samples_seen() == 0
+        !*/</font>
+
+        scalar_type <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> kcentroid<font color='#5555FF'>&amp;</font> x
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - x.get_kernel() == get_kernel()
+            ensures
+                - returns the distance in kernel feature space between this centroid and the
+                  centroid represented by x.  
+        !*/</font>
+
+        scalar_type <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> sample_type<font color='#5555FF'>&amp;</font> x
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the distance in kernel feature space between the sample x and the
+                  current estimate of the centroid of the training samples given
+                  to this object so far.
+        !*/</font>
+
+        scalar_type <b><a name='inner_product'></a>inner_product</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> sample_type<font color='#5555FF'>&amp;</font> x
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the inner product of the given x point and the current
+                  estimate of the centroid of the training samples given to this object
+                  so far.
+        !*/</font>
+
+        scalar_type <b><a name='inner_product'></a>inner_product</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> kcentroid<font color='#5555FF'>&amp;</font> x
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - x.get_kernel() == get_kernel()
+            ensures
+                - returns the inner product between x and this centroid object.
+        !*/</font>
+
+        scalar_type <b><a name='squared_norm'></a>squared_norm</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the squared norm of the centroid vector represented by this
+                  object.  I.e. returns this-&gt;inner_product(*this)
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='train'></a>train</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> sample_type<font color='#5555FF'>&amp;</font> x
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - adds the sample x into the current estimate of the centroid
+                - also note that calling this function is equivalent to calling
+                  train(x, samples_trained()/(samples_trained()+1.0, 1.0/(samples_trained()+1.0).  
+                  That is, this function finds the normal unweighted centroid of all training points.
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='train'></a>train</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> sample_type<font color='#5555FF'>&amp;</font> x,
+            scalar_type cscale,
+            scalar_type xscale
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - adds the sample x into the current estimate of the centroid but
+                  uses a user given scale.  That is, this function performs:
+                    - new_centroid = cscale*old_centroid + xscale*x
+                - This function allows you to weight different samples however 
+                  you want.
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='scale_by'></a>scale_by</b> <font face='Lucida Console'>(</font>
+            scalar_type cscale
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - multiplies the current centroid vector by the given scale value.  
+                  This function is equivalent to calling train(some_x_value, cscale, 0).
+                  So it performs:   
+                    - new_centroid == cscale*old_centroid
+        !*/</font>
+
+        scalar_type <b><a name='test_and_train'></a>test_and_train</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> sample_type<font color='#5555FF'>&amp;</font> x
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - calls train(x)
+                - returns (*this)(x)
+                - The reason this function exists is because train() and operator() 
+                  both compute some of the same things.  So this function is more efficient
+                  than calling both individually.
+        !*/</font>
+
+        scalar_type <b><a name='test_and_train'></a>test_and_train</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> sample_type<font color='#5555FF'>&amp;</font> x,
+            scalar_type cscale,
+            scalar_type xscale
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - calls train(x,cscale,xscale)
+                - returns (*this)(x)
+                - The reason this function exists is because train() and operator() 
+                  both compute some of the same things.  So this function is more efficient
+                  than calling both individually.
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='swap'></a>swap</b> <font face='Lucida Console'>(</font>
+            kcentroid<font color='#5555FF'>&amp;</font> item
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - swaps *this with item
+        !*/</font>
+
+        distance_function<font color='#5555FF'>&lt;</font>kernel_type<font color='#5555FF'>&gt;</font> <b><a name='get_distance_function'></a>get_distance_function</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns a distance function F that represents the point learned
+                  by this object so far.  I.e. it is the case that:
+                    - for all x: F(x) == (*this)(x)
+        !*/</font>
+
+
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> kernel_type
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='swap'></a>swap</b><font face='Lucida Console'>(</font>
+        kcentroid<font color='#5555FF'>&lt;</font>kernel_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> a, 
+        kcentroid<font color='#5555FF'>&lt;</font>kernel_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> b
+    <font face='Lucida Console'>)</font> <b>{</b> a.<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>b<font face='Lucida Console'>)</font>; <b>}</b>
+    <font color='#009900'>/*!
+        provides a global swap function
+    !*/</font>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> kernel_type
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='serialize'></a>serialize</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> kcentroid<font color='#5555FF'>&lt;</font>kernel_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> item,
+        std::ostream<font color='#5555FF'>&amp;</font> out
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        provides serialization support for kcentroid objects
+    !*/</font>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> kernel_type 
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='deserialize'></a>deserialize</b> <font face='Lucida Console'>(</font>
+        kcentroid<font color='#5555FF'>&lt;</font>kernel_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> item,
+        std::istream<font color='#5555FF'>&amp;</font> in 
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        provides serialization support for kcentroid objects
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_KCENTROId_ABSTRACT_
+</font>
+
+</pre></body></html>

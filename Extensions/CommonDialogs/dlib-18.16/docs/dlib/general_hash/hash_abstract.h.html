@@ -1,0 +1,185 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - hash_abstract.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2011  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#undef</font> DLIB_HAsH_ABSTRACT_Hh_
+<font color='#0000FF'>#ifdef</font> DLIB_HAsH_ABSTRACT_Hh_ 
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='murmur_hash3_abstract.h.html'>murmur_hash3_abstract.h</a>"
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>vector<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>string<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>map<font color='#5555FF'>&gt;</font>
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    uint32 <b><a name='hash'></a>hash</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> item,
+        uint32 seed <font color='#5555FF'>=</font> <font color='#979000'>0</font>
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        ensures
+            - returns a 32bit hash of the data stored in item.  
+            - Each value of seed results in a different hash function being used.  
+              (e.g. hash(item,0) should generally not be equal to hash(item,1))
+            - uses the murmur_hash3() routine to compute the actual hash.
+            - This routine will always give the same hash value when presented
+              with the same input string.
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    uint32 <b><a name='hash'></a>hash</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> std::wstring<font color='#5555FF'>&amp;</font> item,
+        uint32 seed <font color='#5555FF'>=</font> <font color='#979000'>0</font>
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        ensures
+            - returns a 32bit hash of the data stored in item.  
+            - Each value of seed results in a different hash function being used.  
+              (e.g. hash(item,0) should generally not be equal to hash(item,1))
+            - uses the murmur_hash3() routine to compute the actual hash.
+            - Note that if the memory layout of the elements in item change between
+              hardware platforms then hash() will give different outputs.  If you want
+              hash() to always give the same output for the same input then you must 
+              ensure that elements of item always have the same layout in memory.
+              Typically this means using fixed width types and performing byte swapping
+              to account for endianness before passing item to hash().
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> alloc<font color='#5555FF'>&gt;</font>
+    uint32 <b><a name='hash'></a>hash</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>T,alloc<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> item,
+        uint32 seed <font color='#5555FF'>=</font> <font color='#979000'>0</font>
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - T is a standard layout type (e.g. a POD type like int, float, 
+              or a simple struct).
+        ensures
+            - returns a 32bit hash of the data stored in item.  
+            - Each value of seed results in a different hash function being used.  
+              (e.g. hash(item,0) should generally not be equal to hash(item,1))
+            - uses the murmur_hash3() routine to compute the actual hash.
+            - Note that if the memory layout of the elements in item change between
+              hardware platforms then hash() will give different outputs.  If you want
+              hash() to always give the same output for the same input then you must 
+              ensure that elements of item always have the same layout in memory.
+              Typically this means using fixed width types and performing byte swapping
+              to account for endianness before passing item to hash().
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> U, <font color='#0000FF'>typename</font> alloc<font color='#5555FF'>&gt;</font>
+    uint32 <b><a name='hash'></a>hash</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>std::pair<font color='#5555FF'>&lt;</font>T,U<font color='#5555FF'>&gt;</font>,alloc<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> item,
+        uint32 seed <font color='#5555FF'>=</font> <font color='#979000'>0</font>
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - T and U are standard layout types (e.g. POD types like int, float, 
+              or simple structs).
+        ensures
+            - returns a 32bit hash of the data stored in item.  
+            - Each value of seed results in a different hash function being used.  
+              (e.g. hash(item,0) should generally not be equal to hash(item,1))
+            - uses the murmur_hash3() routine to compute the actual hash.
+            - Note that if the memory layout of the elements in item change between
+              hardware platforms then hash() will give different outputs.  If you want
+              hash() to always give the same output for the same input then you must 
+              ensure that elements of item always have the same layout in memory.
+              Typically this means using fixed width types and performing byte swapping
+              to account for endianness before passing item to hash().
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> U, <font color='#0000FF'>typename</font> comp, <font color='#0000FF'>typename</font> alloc<font color='#5555FF'>&gt;</font>
+    uint32 <b><a name='hash'></a>hash</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> std::map<font color='#5555FF'>&lt;</font>T,U,comp,alloc<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> item,
+        uint32 seed <font color='#5555FF'>=</font> <font color='#979000'>0</font>
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - T and U are standard layout types (e.g. POD types like int, float, 
+              or simple structs).
+        ensures
+            - returns a 32bit hash of the data stored in item.  
+            - Each value of seed results in a different hash function being used.  
+              (e.g. hash(item,0) should generally not be equal to hash(item,1))
+            - uses the murmur_hash3() routine to compute the actual hash.
+            - Note that if the memory layout of the elements in item change between
+              hardware platforms then hash() will give different outputs.  If you want
+              hash() to always give the same output for the same input then you must 
+              ensure that elements of item always have the same layout in memory.
+              Typically this means using fixed width types and performing byte swapping
+              to account for endianness before passing item to hash().  However, since
+              you can't modify the keys in a map you may have to copy it into a 
+              std::vector and then work from there.
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>inline</font> uint32 <b><a name='hash'></a>hash</b> <font face='Lucida Console'>(</font>
+        uint32 item,
+        uint32 seed <font color='#5555FF'>=</font> <font color='#979000'>0</font>
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        ensures
+            - returns a 32bit hash of the data stored in item.  
+            - Each value of seed results in a different hash function being used.  
+              (e.g. hash(item,0) should generally not be equal to hash(item,1))
+            - uses the murmur_hash3_2() routine to compute the actual hash.
+            - This routine will always give the same hash value when presented
+              with the same input.
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>inline</font> uint32 <b><a name='hash'></a>hash</b> <font face='Lucida Console'>(</font>
+        uint64 item,
+        uint32 seed <font color='#5555FF'>=</font> <font color='#979000'>0</font>
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        ensures
+            - returns a 32bit hash of the data stored in item.  
+            - Each value of seed results in a different hash function being used.  
+              (e.g. hash(item,0) should generally not be equal to hash(item,1))
+            - uses the murmur_hash3_128bit_3() routine to compute the actual hash.
+            - This routine will always give the same hash value when presented
+              with the same input.
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> U<font color='#5555FF'>&gt;</font>
+    uint32 <b><a name='hash'></a>hash</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> std::pair<font color='#5555FF'>&lt;</font>T,U<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> item,
+        uint32 seed <font color='#5555FF'>=</font> <font color='#979000'>0</font>
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - hash() is defined for objects of type T and U
+        ensures
+            - returns a 32bit hash of the data stored in item.  
+            - Each value of seed results in a different hash function being used.  
+              (e.g. hash(item,0) should generally not be equal to hash(item,1))
+            - if (calling hash() on items of type T and U is always guaranteed to give the
+              same hash values when presented with the same input) then
+                - This routine will always give the same hash value when presented
+                  with the same input.
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_HAsH_ABSTRACT_Hh_
+</font>
+
+
+</pre></body></html>

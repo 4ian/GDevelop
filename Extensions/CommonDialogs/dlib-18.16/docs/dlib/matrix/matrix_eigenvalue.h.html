@@ -1,0 +1,1382 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - matrix_eigenvalue.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2009  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#009900'>// This code was adapted from code from the JAMA part of NIST's TNT library.
+</font><font color='#009900'>//    See: http://math.nist.gov/tnt/ 
+</font><font color='#0000FF'>#ifndef</font> DLIB_MATRIX_EIGENVALUE_DECOMPOSITION_H
+<font color='#0000FF'>#define</font> DLIB_MATRIX_EIGENVALUE_DECOMPOSITION_H
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='matrix.h.html'>matrix.h</a>" 
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='matrix_utilities.h.html'>matrix_utilities.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='matrix_subexp.h.html'>matrix_subexp.h</a>"
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>algorithm<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>complex<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>cmath<font color='#5555FF'>&gt;</font>
+
+<font color='#0000FF'>#ifdef</font> DLIB_USE_LAPACK
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='lapack/geev.h.html'>lapack/geev.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='lapack/syev.h.html'>lapack/syev.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='lapack/syevr.h.html'>lapack/syevr.h</a>"
+<font color='#0000FF'>#endif</font>
+
+<font color='#0000FF'>#define</font> DLIB_LAPACK_EIGENVALUE_DECOMP_SIZE_THRESH <font color='#979000'>4</font>
+
+<font color='#0000FF'>namespace</font> dlib 
+<b>{</b>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> matrix_exp_type
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>class</font> <b><a name='eigenvalue_decomposition'></a>eigenvalue_decomposition</b>
+    <b>{</b>
+
+    <font color='#0000FF'>public</font>:
+
+        <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>long</u></font> NR <font color='#5555FF'>=</font> matrix_exp_type::NR;
+        <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>long</u></font> NC <font color='#5555FF'>=</font> matrix_exp_type::NC;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> matrix_exp_type::type type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> matrix_exp_type::mem_manager_type mem_manager_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> matrix_exp_type::layout_type layout_type;
+
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> matrix_exp_type::matrix_type matrix_type;
+        <font color='#0000FF'>typedef</font> matrix<font color='#5555FF'>&lt;</font>type,NR,<font color='#979000'>1</font>,mem_manager_type,layout_type<font color='#5555FF'>&gt;</font> column_vector_type;
+
+        <font color='#0000FF'>typedef</font> matrix<font color='#5555FF'>&lt;</font>std::complex<font color='#5555FF'>&lt;</font>type<font color='#5555FF'>&gt;</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,mem_manager_type,layout_type<font color='#5555FF'>&gt;</font> complex_matrix_type;
+        <font color='#0000FF'>typedef</font> matrix<font color='#5555FF'>&lt;</font>std::complex<font color='#5555FF'>&lt;</font>type<font color='#5555FF'>&gt;</font>,NR,<font color='#979000'>1</font>,mem_manager_type,layout_type<font color='#5555FF'>&gt;</font> complex_column_vector_type;
+
+
+        <font color='#009900'>// You have supplied an invalid type of matrix_exp_type.  You have
+</font>        <font color='#009900'>// to use this object with matrices that contain float or double type data.
+</font>        <b><a name='COMPILE_TIME_ASSERT'></a>COMPILE_TIME_ASSERT</b><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>is_same_type<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>float</u></font>, type<font color='#5555FF'>&gt;</font>::value <font color='#5555FF'>|</font><font color='#5555FF'>|</font> 
+                             is_same_type<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>, type<font color='#5555FF'>&gt;</font>::value <font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> EXP<font color='#5555FF'>&gt;</font>
+        <b><a name='eigenvalue_decomposition'></a>eigenvalue_decomposition</b><font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&lt;</font>EXP<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> A
+        <font face='Lucida Console'>)</font>; 
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> EXP<font color='#5555FF'>&gt;</font>
+        <b><a name='eigenvalue_decomposition'></a>eigenvalue_decomposition</b><font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> matrix_op<font color='#5555FF'>&lt;</font>op_make_symmetric<font color='#5555FF'>&lt;</font>EXP<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> A
+        <font face='Lucida Console'>)</font>; 
+
+        <font color='#0000FF'><u>long</u></font> <b><a name='dim'></a>dim</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+        <font color='#0000FF'>const</font> complex_column_vector_type <b><a name='get_eigenvalues'></a>get_eigenvalues</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+        <font color='#0000FF'>const</font> column_vector_type<font color='#5555FF'>&amp;</font> <b><a name='get_real_eigenvalues'></a>get_real_eigenvalues</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+        <font color='#0000FF'>const</font> column_vector_type<font color='#5555FF'>&amp;</font> <b><a name='get_imag_eigenvalues'></a>get_imag_eigenvalues</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+        <font color='#0000FF'>const</font> complex_matrix_type <b><a name='get_v'></a>get_v</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+        <font color='#0000FF'>const</font> complex_matrix_type <b><a name='get_d'></a>get_d</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>; 
+
+        <font color='#0000FF'>const</font> matrix_type<font color='#5555FF'>&amp;</font> <b><a name='get_pseudo_v'></a>get_pseudo_v</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+        <font color='#0000FF'>const</font> matrix_type <b><a name='get_pseudo_d'></a>get_pseudo_d</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>; 
+
+    <font color='#0000FF'>private</font>:
+
+        <font color='#009900'>/** Row and column dimension (square matrix).  */</font>
+        <font color='#0000FF'><u>long</u></font> n;
+
+        <font color='#0000FF'><u>bool</u></font> issymmetric; 
+
+        <font color='#009900'>/** Arrays for internal storage of eigenvalues. */</font>
+
+        column_vector_type d;         <font color='#009900'>/* real part */</font>
+        column_vector_type e;         <font color='#009900'>/* img part */</font>
+
+        <font color='#009900'>/** Array for internal storage of eigenvectors. */</font>
+        matrix_type V;
+
+        <font color='#009900'>/** Array for internal storage of nonsymmetric Hessenberg form.
+        @serial internal storage of nonsymmetric Hessenberg form.
+        */</font>
+        matrix_type H;
+
+
+        <font color='#009900'>/** Working storage for nonsymmetric algorithm.
+        @serial working storage for nonsymmetric algorithm.
+        */</font>
+        column_vector_type ort;
+
+        <font color='#009900'>// Symmetric Householder reduction to tridiagonal form.
+</font>        <font color='#0000FF'><u>void</u></font> <b><a name='tred2'></a>tred2</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+
+        <font color='#009900'>// Symmetric tridiagonal QL algorithm.
+</font>        <font color='#0000FF'><u>void</u></font> <b><a name='tql2'></a>tql2</b> <font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+
+        <font color='#009900'>// Nonsymmetric reduction to Hessenberg form.
+</font>        <font color='#0000FF'><u>void</u></font> <b><a name='orthes'></a>orthes</b> <font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+
+        <font color='#009900'>// Complex scalar division.
+</font>        type cdivr, cdivi;
+        <font color='#0000FF'><u>void</u></font> <b><a name='cdiv_'></a>cdiv_</b><font face='Lucida Console'>(</font>type xr, type xi, type yr, type yi<font face='Lucida Console'>)</font>;
+
+
+        <font color='#009900'>// Nonsymmetric reduction from Hessenberg to real Schur form.
+</font>        <font color='#0000FF'><u>void</u></font> <b><a name='hqr2'></a>hqr2</b> <font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; 
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>//                        Public member functions
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> matrix_exp_type<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> EXP<font color='#5555FF'>&gt;</font>
+    eigenvalue_decomposition<font color='#5555FF'>&lt;</font>matrix_exp_type<font color='#5555FF'>&gt;</font>::
+    <b><a name='eigenvalue_decomposition'></a>eigenvalue_decomposition</b><font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&lt;</font>EXP<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> A_
+    <font face='Lucida Console'>)</font> 
+    <b>{</b>
+        <font color='#BB00BB'>COMPILE_TIME_ASSERT</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>is_same_type<font color='#5555FF'>&lt;</font>type, <font color='#0000FF'>typename</font> EXP::type<font color='#5555FF'>&gt;</font>::value<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+
+        const_temp_matrix<font color='#5555FF'>&lt;</font>EXP<font color='#5555FF'>&gt;</font> <font color='#BB00BB'>A</font><font face='Lucida Console'>(</font>A_<font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// make sure requires clause is not broken
+</font>        <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font>A.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> A.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> A.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font>,
+            "<font color='#CC0000'>\teigenvalue_decomposition::eigenvalue_decomposition(A)</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tYou can only use this on square matrices</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tA.nr():   </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> A.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tA.nc():   </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> A.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tA.size(): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> A.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tthis:     </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font>
+            <font face='Lucida Console'>)</font>;
+
+
+        n <font color='#5555FF'>=</font> A.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        V.<font color='#BB00BB'>set_size</font><font face='Lucida Console'>(</font>n,n<font face='Lucida Console'>)</font>;
+        d.<font color='#BB00BB'>set_size</font><font face='Lucida Console'>(</font>n<font face='Lucida Console'>)</font>;
+        e.<font color='#BB00BB'>set_size</font><font face='Lucida Console'>(</font>n<font face='Lucida Console'>)</font>;
+
+
+        issymmetric <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> j <font color='#5555FF'>=</font> <font color='#979000'>0</font>; <font face='Lucida Console'>(</font>j <font color='#5555FF'>&lt;</font> n<font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> issymmetric; j<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> 
+        <b>{</b>
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; <font face='Lucida Console'>(</font>i <font color='#5555FF'>&lt;</font> n<font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> issymmetric; i<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> 
+            <b>{</b>
+                issymmetric <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>A</font><font face='Lucida Console'>(</font>i,j<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#BB00BB'>A</font><font face='Lucida Console'>(</font>j,i<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+        <b>}</b>
+
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>issymmetric<font face='Lucida Console'>)</font> 
+        <b>{</b>
+            V <font color='#5555FF'>=</font> A;
+
+<font color='#0000FF'>#ifdef</font> DLIB_USE_LAPACK
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>A.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> DLIB_LAPACK_EIGENVALUE_DECOMP_SIZE_THRESH<font face='Lucida Console'>)</font>
+            <b>{</b>
+                e <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+
+                <font color='#009900'>// We could compute the result using syev()
+</font>                <font color='#009900'>//lapack::syev('V', 'L', V,  d);
+</font>
+                <font color='#009900'>// Instead, we use syevr because its faster and maybe more stable.
+</font>                matrix_type <font color='#BB00BB'>tempA</font><font face='Lucida Console'>(</font>A<font face='Lucida Console'>)</font>;
+                matrix<font color='#5555FF'>&lt;</font>lapack::integer,<font color='#979000'>0</font>,<font color='#979000'>0</font>,mem_manager_type,layout_type<font color='#5555FF'>&gt;</font> isupz;
+
+                lapack::integer temp;
+                lapack::<font color='#BB00BB'>syevr</font><font face='Lucida Console'>(</font>'<font color='#FF0000'>V</font>','<font color='#FF0000'>A</font>','<font color='#FF0000'>L</font>',tempA,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#5555FF'>-</font><font color='#979000'>1</font>,temp,d,V,isupz<font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>return</font>;
+            <b>}</b>
+<font color='#0000FF'>#endif</font>
+            <font color='#009900'>// Tridiagonalize.
+</font>            <font color='#BB00BB'>tred2</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// Diagonalize.
+</font>            <font color='#BB00BB'>tql2</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+        <b>}</b> 
+        <font color='#0000FF'>else</font> 
+        <b>{</b>
+
+<font color='#0000FF'>#ifdef</font> DLIB_USE_LAPACK
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>A.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> DLIB_LAPACK_EIGENVALUE_DECOMP_SIZE_THRESH<font face='Lucida Console'>)</font>
+            <b>{</b>
+                matrix<font color='#5555FF'>&lt;</font>type,<font color='#979000'>0</font>,<font color='#979000'>0</font>,mem_manager_type, column_major_layout<font color='#5555FF'>&gt;</font> temp, vl, vr;
+                temp <font color='#5555FF'>=</font> A;
+                lapack::<font color='#BB00BB'>geev</font><font face='Lucida Console'>(</font>'<font color='#FF0000'>N</font>', '<font color='#FF0000'>V</font>', temp, d, e, vl, vr<font face='Lucida Console'>)</font>;
+                V <font color='#5555FF'>=</font> vr;
+                <font color='#0000FF'>return</font>;
+            <b>}</b>
+<font color='#0000FF'>#endif</font>
+            H <font color='#5555FF'>=</font> A;
+
+            ort.<font color='#BB00BB'>set_size</font><font face='Lucida Console'>(</font>n<font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// Reduce to Hessenberg form.
+</font>            <font color='#BB00BB'>orthes</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// Reduce Hessenberg to real Schur form.
+</font>            <font color='#BB00BB'>hqr2</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> matrix_exp_type<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> EXP<font color='#5555FF'>&gt;</font>
+    eigenvalue_decomposition<font color='#5555FF'>&lt;</font>matrix_exp_type<font color='#5555FF'>&gt;</font>::
+    <b><a name='eigenvalue_decomposition'></a>eigenvalue_decomposition</b><font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> matrix_op<font color='#5555FF'>&lt;</font>op_make_symmetric<font color='#5555FF'>&lt;</font>EXP<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> A
+    <font face='Lucida Console'>)</font> 
+    <b>{</b>
+        <font color='#BB00BB'>COMPILE_TIME_ASSERT</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>is_same_type<font color='#5555FF'>&lt;</font>type, <font color='#0000FF'>typename</font> EXP::type<font color='#5555FF'>&gt;</font>::value<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+
+        <font color='#009900'>// make sure requires clause is not broken
+</font>        <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font>A.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> A.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> A.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font>,
+            "<font color='#CC0000'>\teigenvalue_decomposition::eigenvalue_decomposition(A)</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tYou can only use this on square matrices</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tA.nr():   </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> A.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tA.nc():   </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> A.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tA.size(): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> A.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tthis:     </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font>
+            <font face='Lucida Console'>)</font>;
+
+
+        n <font color='#5555FF'>=</font> A.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        V.<font color='#BB00BB'>set_size</font><font face='Lucida Console'>(</font>n,n<font face='Lucida Console'>)</font>;
+        d.<font color='#BB00BB'>set_size</font><font face='Lucida Console'>(</font>n<font face='Lucida Console'>)</font>;
+        e.<font color='#BB00BB'>set_size</font><font face='Lucida Console'>(</font>n<font face='Lucida Console'>)</font>;
+
+
+        V <font color='#5555FF'>=</font> A;
+
+<font color='#0000FF'>#ifdef</font> DLIB_USE_LAPACK
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>A.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> DLIB_LAPACK_EIGENVALUE_DECOMP_SIZE_THRESH<font face='Lucida Console'>)</font>
+        <b>{</b>
+            e <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+
+            <font color='#009900'>// We could compute the result using syev()
+</font>            <font color='#009900'>//lapack::syev('V', 'L', V,  d);
+</font>
+            <font color='#009900'>// Instead, we use syevr because its faster and maybe more stable.
+</font>            matrix_type <font color='#BB00BB'>tempA</font><font face='Lucida Console'>(</font>A<font face='Lucida Console'>)</font>;
+            matrix<font color='#5555FF'>&lt;</font>lapack::integer,<font color='#979000'>0</font>,<font color='#979000'>0</font>,mem_manager_type,layout_type<font color='#5555FF'>&gt;</font> isupz;
+
+            lapack::integer temp;
+            lapack::<font color='#BB00BB'>syevr</font><font face='Lucida Console'>(</font>'<font color='#FF0000'>V</font>','<font color='#FF0000'>A</font>','<font color='#FF0000'>L</font>',tempA,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#979000'>0</font>,<font color='#5555FF'>-</font><font color='#979000'>1</font>,temp,d,V,isupz<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>return</font>;
+        <b>}</b>
+<font color='#0000FF'>#endif</font>
+        <font color='#009900'>// Tridiagonalize.
+</font>        <font color='#BB00BB'>tred2</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// Diagonalize.
+</font>        <font color='#BB00BB'>tql2</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> matrix_exp_type<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>const</font> <font color='#0000FF'>typename</font> eigenvalue_decomposition<font color='#5555FF'>&lt;</font>matrix_exp_type<font color='#5555FF'>&gt;</font>::matrix_type<font color='#5555FF'>&amp;</font> eigenvalue_decomposition<font color='#5555FF'>&lt;</font>matrix_exp_type<font color='#5555FF'>&gt;</font>::
+    <b><a name='get_pseudo_v'></a>get_pseudo_v</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        <font color='#0000FF'>return</font> V;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> matrix_exp_type<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>long</u></font> eigenvalue_decomposition<font color='#5555FF'>&lt;</font>matrix_exp_type<font color='#5555FF'>&gt;</font>::
+    <b><a name='dim'></a>dim</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        <font color='#0000FF'>return</font> V.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> matrix_exp_type<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>const</font> <font color='#0000FF'>typename</font> eigenvalue_decomposition<font color='#5555FF'>&lt;</font>matrix_exp_type<font color='#5555FF'>&gt;</font>::complex_column_vector_type eigenvalue_decomposition<font color='#5555FF'>&lt;</font>matrix_exp_type<font color='#5555FF'>&gt;</font>::
+    <b><a name='get_eigenvalues'></a>get_eigenvalues</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        <font color='#0000FF'>return</font> <font color='#BB00BB'>complex_matrix</font><font face='Lucida Console'>(</font><font color='#BB00BB'>get_real_eigenvalues</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, <font color='#BB00BB'>get_imag_eigenvalues</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> matrix_exp_type<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>const</font> <font color='#0000FF'>typename</font> eigenvalue_decomposition<font color='#5555FF'>&lt;</font>matrix_exp_type<font color='#5555FF'>&gt;</font>::column_vector_type<font color='#5555FF'>&amp;</font> eigenvalue_decomposition<font color='#5555FF'>&lt;</font>matrix_exp_type<font color='#5555FF'>&gt;</font>::
+    <b><a name='get_real_eigenvalues'></a>get_real_eigenvalues</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        <font color='#0000FF'>return</font> d;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> matrix_exp_type<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>const</font> <font color='#0000FF'>typename</font> eigenvalue_decomposition<font color='#5555FF'>&lt;</font>matrix_exp_type<font color='#5555FF'>&gt;</font>::column_vector_type<font color='#5555FF'>&amp;</font> eigenvalue_decomposition<font color='#5555FF'>&lt;</font>matrix_exp_type<font color='#5555FF'>&gt;</font>::
+    <b><a name='get_imag_eigenvalues'></a>get_imag_eigenvalues</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        <font color='#0000FF'>return</font> e;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> matrix_exp_type<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>const</font> <font color='#0000FF'>typename</font> eigenvalue_decomposition<font color='#5555FF'>&lt;</font>matrix_exp_type<font color='#5555FF'>&gt;</font>::complex_matrix_type eigenvalue_decomposition<font color='#5555FF'>&lt;</font>matrix_exp_type<font color='#5555FF'>&gt;</font>::
+    <b><a name='get_d'></a>get_d</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> 
+    <b>{</b>
+        <font color='#0000FF'>return</font> <font color='#BB00BB'>diagm</font><font face='Lucida Console'>(</font><font color='#BB00BB'>complex_matrix</font><font face='Lucida Console'>(</font><font color='#BB00BB'>get_real_eigenvalues</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, <font color='#BB00BB'>get_imag_eigenvalues</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> matrix_exp_type<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>const</font> <font color='#0000FF'>typename</font> eigenvalue_decomposition<font color='#5555FF'>&lt;</font>matrix_exp_type<font color='#5555FF'>&gt;</font>::complex_matrix_type eigenvalue_decomposition<font color='#5555FF'>&lt;</font>matrix_exp_type<font color='#5555FF'>&gt;</font>::
+    <b><a name='get_v'></a>get_v</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> 
+    <b>{</b>
+        complex_matrix_type <font color='#BB00BB'>CV</font><font face='Lucida Console'>(</font>n,n<font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> n; i<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> 
+        <b>{</b>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>e</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font> 
+            <b>{</b>
+                <font color='#BB00BB'>set_colm</font><font face='Lucida Console'>(</font>CV,i<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#BB00BB'>complex_matrix</font><font face='Lucida Console'>(</font><font color='#BB00BB'>colm</font><font face='Lucida Console'>(</font>V,i<font face='Lucida Console'>)</font>, <font color='#BB00BB'>colm</font><font face='Lucida Console'>(</font>V,i<font color='#5555FF'>+</font><font color='#979000'>1</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <b>}</b> 
+            <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>e</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font> 
+            <b>{</b>
+                <font color='#BB00BB'>set_colm</font><font face='Lucida Console'>(</font>CV,i<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#BB00BB'>complex_matrix</font><font face='Lucida Console'>(</font><font color='#BB00BB'>colm</font><font face='Lucida Console'>(</font>V,i<font face='Lucida Console'>)</font>, <font color='#BB00BB'>colm</font><font face='Lucida Console'>(</font>V,i<font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+            <font color='#0000FF'>else</font>
+            <b>{</b>
+                <font color='#BB00BB'>set_colm</font><font face='Lucida Console'>(</font>CV,i<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#BB00BB'>complex_matrix</font><font face='Lucida Console'>(</font><font color='#BB00BB'>colm</font><font face='Lucida Console'>(</font>V,i<font face='Lucida Console'>)</font>, uniform_matrix<font color='#5555FF'>&lt;</font>type<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>n,<font color='#979000'>1</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+        <b>}</b>
+
+        <font color='#0000FF'>return</font> CV;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> matrix_exp_type<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>const</font> <font color='#0000FF'>typename</font> eigenvalue_decomposition<font color='#5555FF'>&lt;</font>matrix_exp_type<font color='#5555FF'>&gt;</font>::matrix_type eigenvalue_decomposition<font color='#5555FF'>&lt;</font>matrix_exp_type<font color='#5555FF'>&gt;</font>::
+    <b><a name='get_pseudo_d'></a>get_pseudo_d</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> 
+    <b>{</b>
+        matrix_type <font color='#BB00BB'>D</font><font face='Lucida Console'>(</font>n,n<font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> n; i<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> 
+        <b>{</b>
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> j <font color='#5555FF'>=</font> <font color='#979000'>0</font>; j <font color='#5555FF'>&lt;</font> n; j<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> 
+            <b>{</b>
+                <font color='#BB00BB'>D</font><font face='Lucida Console'>(</font>i,j<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>0.0</font>;
+            <b>}</b>
+            <font color='#BB00BB'>D</font><font face='Lucida Console'>(</font>i,i<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#BB00BB'>d</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>e</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font> 
+            <b>{</b>
+                <font color='#BB00BB'>D</font><font face='Lucida Console'>(</font>i,i<font color='#5555FF'>+</font><font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#BB00BB'>e</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>;
+            <b>}</b> 
+            <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>e</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font> 
+            <b>{</b>
+                <font color='#BB00BB'>D</font><font face='Lucida Console'>(</font>i,i<font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#BB00BB'>e</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>;
+            <b>}</b>
+        <b>}</b>
+
+        <font color='#0000FF'>return</font> D;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>//                        Private member functions
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<font color='#009900'>// Symmetric Householder reduction to tridiagonal form.
+</font>    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> matrix_exp_type<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> eigenvalue_decomposition<font color='#5555FF'>&lt;</font>matrix_exp_type<font color='#5555FF'>&gt;</font>::
+    <b><a name='tred2'></a>tred2</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> 
+    <b>{</b>
+        <font color='#0000FF'>using</font> std::abs;
+        <font color='#0000FF'>using</font> std::sqrt;
+
+        <font color='#009900'>//  This is derived from the Algol procedures tred2 by
+</font>        <font color='#009900'>//  Bowdler, Martin, Reinsch, and Wilkinson, Handbook for
+</font>        <font color='#009900'>//  Auto. Comp., Vol.ii-Linear Algebra, and the corresponding
+</font>        <font color='#009900'>//  Fortran subroutine in EISPACK.
+</font>
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> j <font color='#5555FF'>=</font> <font color='#979000'>0</font>; j <font color='#5555FF'>&lt;</font> n; j<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> 
+        <b>{</b>
+            <font color='#BB00BB'>d</font><font face='Lucida Console'>(</font>j<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#BB00BB'>V</font><font face='Lucida Console'>(</font>n<font color='#5555FF'>-</font><font color='#979000'>1</font>,j<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#009900'>// Householder reduction to tridiagonal form.
+</font>
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> n<font color='#5555FF'>-</font><font color='#979000'>1</font>; i <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font>; i<font color='#5555FF'>-</font><font color='#5555FF'>-</font><font face='Lucida Console'>)</font> 
+        <b>{</b>
+
+            <font color='#009900'>// Scale to avoid under/overflow.
+</font>
+            type scale <font color='#5555FF'>=</font> <font color='#979000'>0.0</font>;
+            type h <font color='#5555FF'>=</font> <font color='#979000'>0.0</font>;
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> k <font color='#5555FF'>=</font> <font color='#979000'>0</font>; k <font color='#5555FF'>&lt;</font> i; k<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> 
+            <b>{</b>
+                scale <font color='#5555FF'>=</font> scale <font color='#5555FF'>+</font> <font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font><font color='#BB00BB'>d</font><font face='Lucida Console'>(</font>k<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>scale <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0.0</font><font face='Lucida Console'>)</font> 
+            <b>{</b>
+                <font color='#BB00BB'>e</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#BB00BB'>d</font><font face='Lucida Console'>(</font>i<font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> j <font color='#5555FF'>=</font> <font color='#979000'>0</font>; j <font color='#5555FF'>&lt;</font> i; j<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> 
+                <b>{</b>
+                    <font color='#BB00BB'>d</font><font face='Lucida Console'>(</font>j<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#BB00BB'>V</font><font face='Lucida Console'>(</font>i<font color='#5555FF'>-</font><font color='#979000'>1</font>,j<font face='Lucida Console'>)</font>;
+                    <font color='#BB00BB'>V</font><font face='Lucida Console'>(</font>i,j<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>0.0</font>;
+                    <font color='#BB00BB'>V</font><font face='Lucida Console'>(</font>j,i<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>0.0</font>;
+                <b>}</b>
+            <b>}</b>
+            <font color='#0000FF'>else</font> 
+            <b>{</b>
+
+                <font color='#009900'>// Generate Householder vector.
+</font>
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> k <font color='#5555FF'>=</font> <font color='#979000'>0</font>; k <font color='#5555FF'>&lt;</font> i; k<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> 
+                <b>{</b>
+                    <font color='#BB00BB'>d</font><font face='Lucida Console'>(</font>k<font face='Lucida Console'>)</font> <font color='#5555FF'>/</font><font color='#5555FF'>=</font> scale;
+                    h <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#BB00BB'>d</font><font face='Lucida Console'>(</font>k<font face='Lucida Console'>)</font> <font color='#5555FF'>*</font> <font color='#BB00BB'>d</font><font face='Lucida Console'>(</font>k<font face='Lucida Console'>)</font>;
+                <b>}</b>
+                type f <font color='#5555FF'>=</font> <font color='#BB00BB'>d</font><font face='Lucida Console'>(</font>i<font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+                type g <font color='#5555FF'>=</font> <font color='#BB00BB'>sqrt</font><font face='Lucida Console'>(</font>h<font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>f <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font> 
+                <b>{</b>
+                    g <font color='#5555FF'>=</font> <font color='#5555FF'>-</font>g;
+                <b>}</b>
+                <font color='#BB00BB'>e</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> scale <font color='#5555FF'>*</font> g;
+                h <font color='#5555FF'>=</font> h <font color='#5555FF'>-</font> f <font color='#5555FF'>*</font> g;
+                <font color='#BB00BB'>d</font><font face='Lucida Console'>(</font>i<font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> f <font color='#5555FF'>-</font> g;
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> j <font color='#5555FF'>=</font> <font color='#979000'>0</font>; j <font color='#5555FF'>&lt;</font> i; j<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> 
+                <b>{</b>
+                    <font color='#BB00BB'>e</font><font face='Lucida Console'>(</font>j<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>0.0</font>;
+                <b>}</b>
+
+                <font color='#009900'>// Apply similarity transformation to remaining columns.
+</font>
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> j <font color='#5555FF'>=</font> <font color='#979000'>0</font>; j <font color='#5555FF'>&lt;</font> i; j<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> 
+                <b>{</b>
+                    f <font color='#5555FF'>=</font> <font color='#BB00BB'>d</font><font face='Lucida Console'>(</font>j<font face='Lucida Console'>)</font>;
+                    <font color='#BB00BB'>V</font><font face='Lucida Console'>(</font>j,i<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> f;
+                    g <font color='#5555FF'>=</font> <font color='#BB00BB'>e</font><font face='Lucida Console'>(</font>j<font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> <font color='#BB00BB'>V</font><font face='Lucida Console'>(</font>j,j<font face='Lucida Console'>)</font> <font color='#5555FF'>*</font> f;
+                    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> k <font color='#5555FF'>=</font> j<font color='#5555FF'>+</font><font color='#979000'>1</font>; k <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> i<font color='#5555FF'>-</font><font color='#979000'>1</font>; k<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> 
+                    <b>{</b>
+                        g <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#BB00BB'>V</font><font face='Lucida Console'>(</font>k,j<font face='Lucida Console'>)</font> <font color='#5555FF'>*</font> <font color='#BB00BB'>d</font><font face='Lucida Console'>(</font>k<font face='Lucida Console'>)</font>;
+                        <font color='#BB00BB'>e</font><font face='Lucida Console'>(</font>k<font face='Lucida Console'>)</font> <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#BB00BB'>V</font><font face='Lucida Console'>(</font>k,j<font face='Lucida Console'>)</font> <font color='#5555FF'>*</font> f;
+                    <b>}</b>
+                    <font color='#BB00BB'>e</font><font face='Lucida Console'>(</font>j<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> g;
+                <b>}</b>
+                f <font color='#5555FF'>=</font> <font color='#979000'>0.0</font>;
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> j <font color='#5555FF'>=</font> <font color='#979000'>0</font>; j <font color='#5555FF'>&lt;</font> i; j<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> 
+                <b>{</b>
+                    <font color='#BB00BB'>e</font><font face='Lucida Console'>(</font>j<font face='Lucida Console'>)</font> <font color='#5555FF'>/</font><font color='#5555FF'>=</font> h;
+                    f <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#BB00BB'>e</font><font face='Lucida Console'>(</font>j<font face='Lucida Console'>)</font> <font color='#5555FF'>*</font> <font color='#BB00BB'>d</font><font face='Lucida Console'>(</font>j<font face='Lucida Console'>)</font>;
+                <b>}</b>
+                type hh <font color='#5555FF'>=</font> f <font color='#5555FF'>/</font> <font face='Lucida Console'>(</font>h <font color='#5555FF'>+</font> h<font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> j <font color='#5555FF'>=</font> <font color='#979000'>0</font>; j <font color='#5555FF'>&lt;</font> i; j<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> 
+                <b>{</b>
+                    <font color='#BB00BB'>e</font><font face='Lucida Console'>(</font>j<font face='Lucida Console'>)</font> <font color='#5555FF'>-</font><font color='#5555FF'>=</font> hh <font color='#5555FF'>*</font> <font color='#BB00BB'>d</font><font face='Lucida Console'>(</font>j<font face='Lucida Console'>)</font>;
+                <b>}</b>
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> j <font color='#5555FF'>=</font> <font color='#979000'>0</font>; j <font color='#5555FF'>&lt;</font> i; j<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> 
+                <b>{</b>
+                    f <font color='#5555FF'>=</font> <font color='#BB00BB'>d</font><font face='Lucida Console'>(</font>j<font face='Lucida Console'>)</font>;
+                    g <font color='#5555FF'>=</font> <font color='#BB00BB'>e</font><font face='Lucida Console'>(</font>j<font face='Lucida Console'>)</font>;
+                    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> k <font color='#5555FF'>=</font> j; k <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> i<font color='#5555FF'>-</font><font color='#979000'>1</font>; k<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> 
+                    <b>{</b>
+                        <font color='#BB00BB'>V</font><font face='Lucida Console'>(</font>k,j<font face='Lucida Console'>)</font> <font color='#5555FF'>-</font><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>f <font color='#5555FF'>*</font> <font color='#BB00BB'>e</font><font face='Lucida Console'>(</font>k<font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> g <font color='#5555FF'>*</font> <font color='#BB00BB'>d</font><font face='Lucida Console'>(</font>k<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                    <b>}</b>
+                    <font color='#BB00BB'>d</font><font face='Lucida Console'>(</font>j<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#BB00BB'>V</font><font face='Lucida Console'>(</font>i<font color='#5555FF'>-</font><font color='#979000'>1</font>,j<font face='Lucida Console'>)</font>;
+                    <font color='#BB00BB'>V</font><font face='Lucida Console'>(</font>i,j<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>0.0</font>;
+                <b>}</b>
+            <b>}</b>
+            <font color='#BB00BB'>d</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> h;
+        <b>}</b>
+
+        <font color='#009900'>// Accumulate transformations.
+</font>
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> n<font color='#5555FF'>-</font><font color='#979000'>1</font>; i<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> 
+        <b>{</b>
+            <font color='#BB00BB'>V</font><font face='Lucida Console'>(</font>n<font color='#5555FF'>-</font><font color='#979000'>1</font>,i<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#BB00BB'>V</font><font face='Lucida Console'>(</font>i,i<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>V</font><font face='Lucida Console'>(</font>i,i<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>1.0</font>;
+            type h <font color='#5555FF'>=</font> <font color='#BB00BB'>d</font><font face='Lucida Console'>(</font>i<font color='#5555FF'>+</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>h <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0.0</font><font face='Lucida Console'>)</font> 
+            <b>{</b>
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> k <font color='#5555FF'>=</font> <font color='#979000'>0</font>; k <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> i; k<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> 
+                <b>{</b>
+                    <font color='#BB00BB'>d</font><font face='Lucida Console'>(</font>k<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#BB00BB'>V</font><font face='Lucida Console'>(</font>k,i<font color='#5555FF'>+</font><font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>/</font> h;
+                <b>}</b>
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> j <font color='#5555FF'>=</font> <font color='#979000'>0</font>; j <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> i; j<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> 
+                <b>{</b>
+                    type g <font color='#5555FF'>=</font> <font color='#979000'>0.0</font>;
+                    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> k <font color='#5555FF'>=</font> <font color='#979000'>0</font>; k <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> i; k<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> 
+                    <b>{</b>
+                        g <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#BB00BB'>V</font><font face='Lucida Console'>(</font>k,i<font color='#5555FF'>+</font><font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>*</font> <font color='#BB00BB'>V</font><font face='Lucida Console'>(</font>k,j<font face='Lucida Console'>)</font>;
+                    <b>}</b>
+                    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> k <font color='#5555FF'>=</font> <font color='#979000'>0</font>; k <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> i; k<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> 
+                    <b>{</b>
+                        <font color='#BB00BB'>V</font><font face='Lucida Console'>(</font>k,j<font face='Lucida Console'>)</font> <font color='#5555FF'>-</font><font color='#5555FF'>=</font> g <font color='#5555FF'>*</font> <font color='#BB00BB'>d</font><font face='Lucida Console'>(</font>k<font face='Lucida Console'>)</font>;
+                    <b>}</b>
+                <b>}</b>
+            <b>}</b>
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> k <font color='#5555FF'>=</font> <font color='#979000'>0</font>; k <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> i; k<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> 
+            <b>{</b>
+                <font color='#BB00BB'>V</font><font face='Lucida Console'>(</font>k,i<font color='#5555FF'>+</font><font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>0.0</font>;
+            <b>}</b>
+        <b>}</b>
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> j <font color='#5555FF'>=</font> <font color='#979000'>0</font>; j <font color='#5555FF'>&lt;</font> n; j<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> 
+        <b>{</b>
+            <font color='#BB00BB'>d</font><font face='Lucida Console'>(</font>j<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#BB00BB'>V</font><font face='Lucida Console'>(</font>n<font color='#5555FF'>-</font><font color='#979000'>1</font>,j<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>V</font><font face='Lucida Console'>(</font>n<font color='#5555FF'>-</font><font color='#979000'>1</font>,j<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>0.0</font>;
+        <b>}</b>
+        <font color='#BB00BB'>V</font><font face='Lucida Console'>(</font>n<font color='#5555FF'>-</font><font color='#979000'>1</font>,n<font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>1.0</font>;
+        <font color='#BB00BB'>e</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>0.0</font>;
+    <b>}</b> 
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> matrix_exp_type<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> eigenvalue_decomposition<font color='#5555FF'>&lt;</font>matrix_exp_type<font color='#5555FF'>&gt;</font>::
+    <b><a name='tql2'></a>tql2</b> <font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> 
+    <b>{</b>
+        <font color='#0000FF'>using</font> std::pow;
+        <font color='#0000FF'>using</font> std::min;
+        <font color='#0000FF'>using</font> std::max;
+        <font color='#0000FF'>using</font> std::abs;
+
+        <font color='#009900'>//  This is derived from the Algol procedures tql2, by
+</font>        <font color='#009900'>//  Bowdler, Martin, Reinsch, and Wilkinson, Handbook for
+</font>        <font color='#009900'>//  Auto. Comp., Vol.ii-Linear Algebra, and the corresponding
+</font>        <font color='#009900'>//  Fortran subroutine in EISPACK.
+</font>
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>1</font>; i <font color='#5555FF'>&lt;</font> n; i<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> 
+        <b>{</b>
+            <font color='#BB00BB'>e</font><font face='Lucida Console'>(</font>i<font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#BB00BB'>e</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>;
+        <b>}</b>
+        <font color='#BB00BB'>e</font><font face='Lucida Console'>(</font>n<font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>0.0</font>;
+
+        type f <font color='#5555FF'>=</font> <font color='#979000'>0.0</font>;
+        type tst1 <font color='#5555FF'>=</font> <font color='#979000'>0.0</font>;
+        <font color='#0000FF'>const</font> type eps <font color='#5555FF'>=</font> std::numeric_limits<font color='#5555FF'>&lt;</font>type<font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>epsilon</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> l <font color='#5555FF'>=</font> <font color='#979000'>0</font>; l <font color='#5555FF'>&lt;</font> n; l<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> 
+        <b>{</b>
+
+            <font color='#009900'>// Find small subdiagonal element
+</font>
+            tst1 <font color='#5555FF'>=</font> <font color='#BB00BB'>max</font><font face='Lucida Console'>(</font>tst1,<font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font><font color='#BB00BB'>d</font><font face='Lucida Console'>(</font>l<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> <font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font><font color='#BB00BB'>e</font><font face='Lucida Console'>(</font>l<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'><u>long</u></font> m <font color='#5555FF'>=</font> l;
+
+            <font color='#009900'>// Original while-loop from Java code
+</font>            <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>m <font color='#5555FF'>&lt;</font> n<font face='Lucida Console'>)</font> 
+            <b>{</b>
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font><font color='#BB00BB'>e</font><font face='Lucida Console'>(</font>m<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> eps<font color='#5555FF'>*</font>tst1<font face='Lucida Console'>)</font> 
+                <b>{</b>
+                    <font color='#0000FF'>break</font>;
+                <b>}</b>
+                m<font color='#5555FF'>+</font><font color='#5555FF'>+</font>;
+            <b>}</b>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>m <font color='#5555FF'>=</font><font color='#5555FF'>=</font> n<font face='Lucida Console'>)</font>
+                <font color='#5555FF'>-</font><font color='#5555FF'>-</font>m;
+
+
+            <font color='#009900'>// If m == l, d(l) is an eigenvalue,
+</font>            <font color='#009900'>// otherwise, iterate.
+</font>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>m <font color='#5555FF'>&gt;</font> l<font face='Lucida Console'>)</font> 
+            <b>{</b>
+                <font color='#0000FF'><u>long</u></font> iter <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                <font color='#0000FF'>do</font> 
+                <b>{</b>
+                    iter <font color='#5555FF'>=</font> iter <font color='#5555FF'>+</font> <font color='#979000'>1</font>;  <font color='#009900'>// (Could check iteration count here.)
+</font>
+                    <font color='#009900'>// Compute implicit shift
+</font>
+                    type g <font color='#5555FF'>=</font> <font color='#BB00BB'>d</font><font face='Lucida Console'>(</font>l<font face='Lucida Console'>)</font>;
+                    type p <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>d</font><font face='Lucida Console'>(</font>l<font color='#5555FF'>+</font><font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> g<font face='Lucida Console'>)</font> <font color='#5555FF'>/</font> <font face='Lucida Console'>(</font><font color='#979000'>2.0</font> <font color='#5555FF'>*</font> <font color='#BB00BB'>e</font><font face='Lucida Console'>(</font>l<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                    type r <font color='#5555FF'>=</font> <font color='#BB00BB'>hypot</font><font face='Lucida Console'>(</font>p,<font color='#979000'>1.0</font><font face='Lucida Console'>)</font>;
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>p <font color='#5555FF'>&lt;</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font> 
+                    <b>{</b>
+                        r <font color='#5555FF'>=</font> <font color='#5555FF'>-</font>r;
+                    <b>}</b>
+                    <font color='#BB00BB'>d</font><font face='Lucida Console'>(</font>l<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#BB00BB'>e</font><font face='Lucida Console'>(</font>l<font face='Lucida Console'>)</font> <font color='#5555FF'>/</font> <font face='Lucida Console'>(</font>p <font color='#5555FF'>+</font> r<font face='Lucida Console'>)</font>;
+                    <font color='#BB00BB'>d</font><font face='Lucida Console'>(</font>l<font color='#5555FF'>+</font><font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#BB00BB'>e</font><font face='Lucida Console'>(</font>l<font face='Lucida Console'>)</font> <font color='#5555FF'>*</font> <font face='Lucida Console'>(</font>p <font color='#5555FF'>+</font> r<font face='Lucida Console'>)</font>;
+                    type dl1 <font color='#5555FF'>=</font> <font color='#BB00BB'>d</font><font face='Lucida Console'>(</font>l<font color='#5555FF'>+</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+                    type h <font color='#5555FF'>=</font> g <font color='#5555FF'>-</font> <font color='#BB00BB'>d</font><font face='Lucida Console'>(</font>l<font face='Lucida Console'>)</font>;
+                    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> l<font color='#5555FF'>+</font><font color='#979000'>2</font>; i <font color='#5555FF'>&lt;</font> n; i<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> 
+                    <b>{</b>
+                        <font color='#BB00BB'>d</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font> <font color='#5555FF'>-</font><font color='#5555FF'>=</font> h;
+                    <b>}</b>
+                    f <font color='#5555FF'>=</font> f <font color='#5555FF'>+</font> h;
+
+                    <font color='#009900'>// Implicit QL transformation.
+</font>
+                    p <font color='#5555FF'>=</font> <font color='#BB00BB'>d</font><font face='Lucida Console'>(</font>m<font face='Lucida Console'>)</font>;
+                    type c <font color='#5555FF'>=</font> <font color='#979000'>1.0</font>;
+                    type c2 <font color='#5555FF'>=</font> c;
+                    type c3 <font color='#5555FF'>=</font> c;
+                    type el1 <font color='#5555FF'>=</font> <font color='#BB00BB'>e</font><font face='Lucida Console'>(</font>l<font color='#5555FF'>+</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+                    type s <font color='#5555FF'>=</font> <font color='#979000'>0.0</font>;
+                    type s2 <font color='#5555FF'>=</font> <font color='#979000'>0.0</font>;
+                    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> m<font color='#5555FF'>-</font><font color='#979000'>1</font>; i <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> l; i<font color='#5555FF'>-</font><font color='#5555FF'>-</font><font face='Lucida Console'>)</font> 
+                    <b>{</b>
+                        c3 <font color='#5555FF'>=</font> c2;
+                        c2 <font color='#5555FF'>=</font> c;
+                        s2 <font color='#5555FF'>=</font> s;
+                        g <font color='#5555FF'>=</font> c <font color='#5555FF'>*</font> <font color='#BB00BB'>e</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>;
+                        h <font color='#5555FF'>=</font> c <font color='#5555FF'>*</font> p;
+                        r <font color='#5555FF'>=</font> <font color='#BB00BB'>hypot</font><font face='Lucida Console'>(</font>p,<font color='#BB00BB'>e</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                        <font color='#BB00BB'>e</font><font face='Lucida Console'>(</font>i<font color='#5555FF'>+</font><font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> s <font color='#5555FF'>*</font> r;
+                        s <font color='#5555FF'>=</font> <font color='#BB00BB'>e</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font> <font color='#5555FF'>/</font> r;
+                        c <font color='#5555FF'>=</font> p <font color='#5555FF'>/</font> r;
+                        p <font color='#5555FF'>=</font> c <font color='#5555FF'>*</font> <font color='#BB00BB'>d</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> s <font color='#5555FF'>*</font> g;
+                        <font color='#BB00BB'>d</font><font face='Lucida Console'>(</font>i<font color='#5555FF'>+</font><font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> h <font color='#5555FF'>+</font> s <font color='#5555FF'>*</font> <font face='Lucida Console'>(</font>c <font color='#5555FF'>*</font> g <font color='#5555FF'>+</font> s <font color='#5555FF'>*</font> <font color='#BB00BB'>d</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+                        <font color='#009900'>// Accumulate transformation.
+</font>
+                        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> k <font color='#5555FF'>=</font> <font color='#979000'>0</font>; k <font color='#5555FF'>&lt;</font> n; k<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> 
+                        <b>{</b>
+                            h <font color='#5555FF'>=</font> <font color='#BB00BB'>V</font><font face='Lucida Console'>(</font>k,i<font color='#5555FF'>+</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+                            <font color='#BB00BB'>V</font><font face='Lucida Console'>(</font>k,i<font color='#5555FF'>+</font><font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> s <font color='#5555FF'>*</font> <font color='#BB00BB'>V</font><font face='Lucida Console'>(</font>k,i<font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> c <font color='#5555FF'>*</font> h;
+                            <font color='#BB00BB'>V</font><font face='Lucida Console'>(</font>k,i<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> c <font color='#5555FF'>*</font> <font color='#BB00BB'>V</font><font face='Lucida Console'>(</font>k,i<font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> s <font color='#5555FF'>*</font> h;
+                        <b>}</b>
+                    <b>}</b>
+                    p <font color='#5555FF'>=</font> <font color='#5555FF'>-</font>s <font color='#5555FF'>*</font> s2 <font color='#5555FF'>*</font> c3 <font color='#5555FF'>*</font> el1 <font color='#5555FF'>*</font> <font color='#BB00BB'>e</font><font face='Lucida Console'>(</font>l<font face='Lucida Console'>)</font> <font color='#5555FF'>/</font> dl1;
+                    <font color='#BB00BB'>e</font><font face='Lucida Console'>(</font>l<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> s <font color='#5555FF'>*</font> p;
+                    <font color='#BB00BB'>d</font><font face='Lucida Console'>(</font>l<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> c <font color='#5555FF'>*</font> p;
+
+                    <font color='#009900'>// Check for convergence.
+</font>
+                <b>}</b> <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font><font color='#BB00BB'>e</font><font face='Lucida Console'>(</font>l<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> eps<font color='#5555FF'>*</font>tst1<font face='Lucida Console'>)</font>;
+            <b>}</b>
+            <font color='#BB00BB'>d</font><font face='Lucida Console'>(</font>l<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#BB00BB'>d</font><font face='Lucida Console'>(</font>l<font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> f;
+            <font color='#BB00BB'>e</font><font face='Lucida Console'>(</font>l<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>0.0</font>;
+        <b>}</b>
+
+        <font color='#009900'>/*
+            The code to sort the eigenvalues and eigenvectors 
+            has been removed from here since, in the non-symmetric case,
+            we can't sort the eigenvalues in a meaningful way.  If we left this
+            code in here then the user might supply what they thought was a symmetric
+            matrix but was actually slightly non-symmetric due to rounding error
+            and then they would end up in the non-symmetric eigenvalue solver
+            where the eigenvalues don't end up getting sorted.  So to avoid
+            any possible user confusion I'm just removing this.
+        */</font>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> matrix_exp_type<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> eigenvalue_decomposition<font color='#5555FF'>&lt;</font>matrix_exp_type<font color='#5555FF'>&gt;</font>::
+    <b><a name='orthes'></a>orthes</b> <font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> 
+    <b>{</b>
+        <font color='#0000FF'>using</font> std::abs;
+        <font color='#0000FF'>using</font> std::sqrt;
+
+        <font color='#009900'>//  This is derived from the Algol procedures orthes and ortran,
+</font>        <font color='#009900'>//  by Martin and Wilkinson, Handbook for Auto. Comp.,
+</font>        <font color='#009900'>//  Vol.ii-Linear Algebra, and the corresponding
+</font>        <font color='#009900'>//  Fortran subroutines in EISPACK.
+</font>
+        <font color='#0000FF'><u>long</u></font> low <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <font color='#0000FF'><u>long</u></font> high <font color='#5555FF'>=</font> n<font color='#5555FF'>-</font><font color='#979000'>1</font>;
+
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> m <font color='#5555FF'>=</font> low<font color='#5555FF'>+</font><font color='#979000'>1</font>; m <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> high<font color='#5555FF'>-</font><font color='#979000'>1</font>; m<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> 
+        <b>{</b>
+
+            <font color='#009900'>// Scale column.
+</font>
+            type scale <font color='#5555FF'>=</font> <font color='#979000'>0.0</font>;
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> m; i <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> high; i<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> 
+            <b>{</b>
+                scale <font color='#5555FF'>=</font> scale <font color='#5555FF'>+</font> <font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font><font color='#BB00BB'>H</font><font face='Lucida Console'>(</font>i,m<font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>scale <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0.0</font><font face='Lucida Console'>)</font> 
+            <b>{</b>
+
+                <font color='#009900'>// Compute Householder transformation.
+</font>
+                type h <font color='#5555FF'>=</font> <font color='#979000'>0.0</font>;
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> high; i <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> m; i<font color='#5555FF'>-</font><font color='#5555FF'>-</font><font face='Lucida Console'>)</font> 
+                <b>{</b>
+                    <font color='#BB00BB'>ort</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#BB00BB'>H</font><font face='Lucida Console'>(</font>i,m<font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font><font color='#5555FF'>/</font>scale;
+                    h <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#BB00BB'>ort</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font> <font color='#5555FF'>*</font> <font color='#BB00BB'>ort</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>;
+                <b>}</b>
+                type g <font color='#5555FF'>=</font> <font color='#BB00BB'>sqrt</font><font face='Lucida Console'>(</font>h<font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>ort</font><font face='Lucida Console'>(</font>m<font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font> 
+                <b>{</b>
+                    g <font color='#5555FF'>=</font> <font color='#5555FF'>-</font>g;
+                <b>}</b>
+                h <font color='#5555FF'>=</font> h <font color='#5555FF'>-</font> <font color='#BB00BB'>ort</font><font face='Lucida Console'>(</font>m<font face='Lucida Console'>)</font> <font color='#5555FF'>*</font> g;
+                <font color='#BB00BB'>ort</font><font face='Lucida Console'>(</font>m<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#BB00BB'>ort</font><font face='Lucida Console'>(</font>m<font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> g;
+
+                <font color='#009900'>// Apply Householder similarity transformation
+</font>                <font color='#009900'>// H = (I-u*u'/h)*H*(I-u*u')/h)
+</font>
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> j <font color='#5555FF'>=</font> m; j <font color='#5555FF'>&lt;</font> n; j<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> 
+                <b>{</b>
+                    type f <font color='#5555FF'>=</font> <font color='#979000'>0.0</font>;
+                    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> high; i <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> m; i<font color='#5555FF'>-</font><font color='#5555FF'>-</font><font face='Lucida Console'>)</font> 
+                    <b>{</b>
+                        f <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#BB00BB'>ort</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font><font color='#5555FF'>*</font><font color='#BB00BB'>H</font><font face='Lucida Console'>(</font>i,j<font face='Lucida Console'>)</font>;
+                    <b>}</b>
+                    f <font color='#5555FF'>=</font> f<font color='#5555FF'>/</font>h;
+                    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> m; i <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> high; i<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> 
+                    <b>{</b>
+                        <font color='#BB00BB'>H</font><font face='Lucida Console'>(</font>i,j<font face='Lucida Console'>)</font> <font color='#5555FF'>-</font><font color='#5555FF'>=</font> f<font color='#5555FF'>*</font><font color='#BB00BB'>ort</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>;
+                    <b>}</b>
+                <b>}</b>
+
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> high; i<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> 
+                <b>{</b>
+                    type f <font color='#5555FF'>=</font> <font color='#979000'>0.0</font>;
+                    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> j <font color='#5555FF'>=</font> high; j <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> m; j<font color='#5555FF'>-</font><font color='#5555FF'>-</font><font face='Lucida Console'>)</font> 
+                    <b>{</b>
+                        f <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#BB00BB'>ort</font><font face='Lucida Console'>(</font>j<font face='Lucida Console'>)</font><font color='#5555FF'>*</font><font color='#BB00BB'>H</font><font face='Lucida Console'>(</font>i,j<font face='Lucida Console'>)</font>;
+                    <b>}</b>
+                    f <font color='#5555FF'>=</font> f<font color='#5555FF'>/</font>h;
+                    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> j <font color='#5555FF'>=</font> m; j <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> high; j<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> 
+                    <b>{</b>
+                        <font color='#BB00BB'>H</font><font face='Lucida Console'>(</font>i,j<font face='Lucida Console'>)</font> <font color='#5555FF'>-</font><font color='#5555FF'>=</font> f<font color='#5555FF'>*</font><font color='#BB00BB'>ort</font><font face='Lucida Console'>(</font>j<font face='Lucida Console'>)</font>;
+                    <b>}</b>
+                <b>}</b>
+                <font color='#BB00BB'>ort</font><font face='Lucida Console'>(</font>m<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> scale<font color='#5555FF'>*</font><font color='#BB00BB'>ort</font><font face='Lucida Console'>(</font>m<font face='Lucida Console'>)</font>;
+                <font color='#BB00BB'>H</font><font face='Lucida Console'>(</font>m,m<font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> scale<font color='#5555FF'>*</font>g;
+            <b>}</b>
+        <b>}</b>
+
+        <font color='#009900'>// Accumulate transformations (Algol's ortran).
+</font>
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> n; i<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> 
+        <b>{</b>
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> j <font color='#5555FF'>=</font> <font color='#979000'>0</font>; j <font color='#5555FF'>&lt;</font> n; j<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> 
+            <b>{</b>
+                <font color='#BB00BB'>V</font><font face='Lucida Console'>(</font>i,j<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>i <font color='#5555FF'>=</font><font color='#5555FF'>=</font> j ? <font color='#979000'>1.0</font> : <font color='#979000'>0.0</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+        <b>}</b>
+
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> m <font color='#5555FF'>=</font> high<font color='#5555FF'>-</font><font color='#979000'>1</font>; m <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> low<font color='#5555FF'>+</font><font color='#979000'>1</font>; m<font color='#5555FF'>-</font><font color='#5555FF'>-</font><font face='Lucida Console'>)</font> 
+        <b>{</b>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>H</font><font face='Lucida Console'>(</font>m,m<font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0.0</font><font face='Lucida Console'>)</font> 
+            <b>{</b>
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> m<font color='#5555FF'>+</font><font color='#979000'>1</font>; i <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> high; i<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> 
+                <b>{</b>
+                    <font color='#BB00BB'>ort</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#BB00BB'>H</font><font face='Lucida Console'>(</font>i,m<font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+                <b>}</b>
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> j <font color='#5555FF'>=</font> m; j <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> high; j<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> 
+                <b>{</b>
+                    type g <font color='#5555FF'>=</font> <font color='#979000'>0.0</font>;
+                    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> m; i <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> high; i<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> 
+                    <b>{</b>
+                        g <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#BB00BB'>ort</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font> <font color='#5555FF'>*</font> <font color='#BB00BB'>V</font><font face='Lucida Console'>(</font>i,j<font face='Lucida Console'>)</font>;
+                    <b>}</b>
+                    <font color='#009900'>// Double division avoids possible underflow
+</font>                    g <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>g <font color='#5555FF'>/</font> <font color='#BB00BB'>ort</font><font face='Lucida Console'>(</font>m<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>/</font> <font color='#BB00BB'>H</font><font face='Lucida Console'>(</font>m,m<font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+                    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> m; i <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> high; i<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> 
+                    <b>{</b>
+                        <font color='#BB00BB'>V</font><font face='Lucida Console'>(</font>i,j<font face='Lucida Console'>)</font> <font color='#5555FF'>+</font><font color='#5555FF'>=</font> g <font color='#5555FF'>*</font> <font color='#BB00BB'>ort</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>;
+                    <b>}</b>
+                <b>}</b>
+            <b>}</b>
+        <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> matrix_exp_type<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> eigenvalue_decomposition<font color='#5555FF'>&lt;</font>matrix_exp_type<font color='#5555FF'>&gt;</font>::
+    <b><a name='cdiv_'></a>cdiv_</b><font face='Lucida Console'>(</font>type xr, type xi, type yr, type yi<font face='Lucida Console'>)</font>  
+    <b>{</b>
+        <font color='#0000FF'>using</font> std::abs;
+        type r,d;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font>yr<font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> <font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font>yi<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> 
+        <b>{</b>
+            r <font color='#5555FF'>=</font> yi<font color='#5555FF'>/</font>yr;
+            d <font color='#5555FF'>=</font> yr <font color='#5555FF'>+</font> r<font color='#5555FF'>*</font>yi;
+            cdivr <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>xr <font color='#5555FF'>+</font> r<font color='#5555FF'>*</font>xi<font face='Lucida Console'>)</font><font color='#5555FF'>/</font>d;
+            cdivi <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>xi <font color='#5555FF'>-</font> r<font color='#5555FF'>*</font>xr<font face='Lucida Console'>)</font><font color='#5555FF'>/</font>d;
+        <b>}</b> 
+        <font color='#0000FF'>else</font> 
+        <b>{</b>
+            r <font color='#5555FF'>=</font> yr<font color='#5555FF'>/</font>yi;
+            d <font color='#5555FF'>=</font> yi <font color='#5555FF'>+</font> r<font color='#5555FF'>*</font>yr;
+            cdivr <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>r<font color='#5555FF'>*</font>xr <font color='#5555FF'>+</font> xi<font face='Lucida Console'>)</font><font color='#5555FF'>/</font>d;
+            cdivi <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>r<font color='#5555FF'>*</font>xi <font color='#5555FF'>-</font> xr<font face='Lucida Console'>)</font><font color='#5555FF'>/</font>d;
+        <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> matrix_exp_type<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> eigenvalue_decomposition<font color='#5555FF'>&lt;</font>matrix_exp_type<font color='#5555FF'>&gt;</font>::
+    <b><a name='hqr2'></a>hqr2</b> <font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>using</font> std::pow;
+        <font color='#0000FF'>using</font> std::min;
+        <font color='#0000FF'>using</font> std::max;
+        <font color='#0000FF'>using</font> std::abs;
+        <font color='#0000FF'>using</font> std::sqrt;
+
+        <font color='#009900'>//  This is derived from the Algol procedure hqr2,
+</font>        <font color='#009900'>//  by Martin and Wilkinson, Handbook for Auto. Comp.,
+</font>        <font color='#009900'>//  Vol.ii-Linear Algebra, and the corresponding
+</font>        <font color='#009900'>//  Fortran subroutine in EISPACK.
+</font>
+        <font color='#009900'>// Initialize
+</font>
+        <font color='#0000FF'><u>long</u></font> nn <font color='#5555FF'>=</font> <font color='#0000FF'>this</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>n;
+        <font color='#0000FF'><u>long</u></font> n <font color='#5555FF'>=</font> nn<font color='#5555FF'>-</font><font color='#979000'>1</font>;
+        <font color='#0000FF'><u>long</u></font> low <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <font color='#0000FF'><u>long</u></font> high <font color='#5555FF'>=</font> nn<font color='#5555FF'>-</font><font color='#979000'>1</font>;
+        <font color='#0000FF'>const</font> type eps <font color='#5555FF'>=</font> std::numeric_limits<font color='#5555FF'>&lt;</font>type<font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>epsilon</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        type exshift <font color='#5555FF'>=</font> <font color='#979000'>0.0</font>;
+        type p<font color='#5555FF'>=</font><font color='#979000'>0</font>,q<font color='#5555FF'>=</font><font color='#979000'>0</font>,r<font color='#5555FF'>=</font><font color='#979000'>0</font>,s<font color='#5555FF'>=</font><font color='#979000'>0</font>,z<font color='#5555FF'>=</font><font color='#979000'>0</font>,t,w,x,y;
+
+        <font color='#009900'>// Store roots isolated by balanc and compute matrix norm
+</font>
+        type norm <font color='#5555FF'>=</font> <font color='#979000'>0.0</font>;
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> nn; i<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> 
+        <b>{</b>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>i <font color='#5555FF'>&lt;</font> low<font face='Lucida Console'>)</font> <font color='#5555FF'>|</font><font color='#5555FF'>|</font> <font face='Lucida Console'>(</font>i <font color='#5555FF'>&gt;</font> high<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> 
+            <b>{</b>
+                <font color='#BB00BB'>d</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#BB00BB'>H</font><font face='Lucida Console'>(</font>i,i<font face='Lucida Console'>)</font>;
+                <font color='#BB00BB'>e</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>0.0</font>;
+            <b>}</b>
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> j <font color='#5555FF'>=</font> <font color='#BB00BB'>max</font><font face='Lucida Console'>(</font>i<font color='#5555FF'>-</font><font color='#979000'>1</font>,<font color='#979000'>0</font>L<font face='Lucida Console'>)</font>; j <font color='#5555FF'>&lt;</font> nn; j<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> 
+            <b>{</b>
+                norm <font color='#5555FF'>=</font> norm <font color='#5555FF'>+</font> <font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font><font color='#BB00BB'>H</font><font face='Lucida Console'>(</font>i,j<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+        <b>}</b>
+
+        <font color='#009900'>// Outer loop over eigenvalue index
+</font>
+        <font color='#0000FF'><u>long</u></font> iter <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>n <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> low<font face='Lucida Console'>)</font> 
+        <b>{</b>
+
+            <font color='#009900'>// Look for single small sub-diagonal element
+</font>
+            <font color='#0000FF'><u>long</u></font> l <font color='#5555FF'>=</font> n;
+            <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>l <font color='#5555FF'>&gt;</font> low<font face='Lucida Console'>)</font> 
+            <b>{</b>
+                s <font color='#5555FF'>=</font> <font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font><font color='#BB00BB'>H</font><font face='Lucida Console'>(</font>l<font color='#5555FF'>-</font><font color='#979000'>1</font>,l<font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> <font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font><font color='#BB00BB'>H</font><font face='Lucida Console'>(</font>l,l<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>s <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0.0</font><font face='Lucida Console'>)</font> 
+                <b>{</b>
+                    s <font color='#5555FF'>=</font> norm;
+                <b>}</b>
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font><font color='#BB00BB'>H</font><font face='Lucida Console'>(</font>l,l<font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> eps <font color='#5555FF'>*</font> s<font face='Lucida Console'>)</font> 
+                <b>{</b>
+                    <font color='#0000FF'>break</font>;
+                <b>}</b>
+                l<font color='#5555FF'>-</font><font color='#5555FF'>-</font>;
+            <b>}</b>
+
+            <font color='#009900'>// Check for convergence
+</font>            <font color='#009900'>// One root found
+</font>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>l <font color='#5555FF'>=</font><font color='#5555FF'>=</font> n<font face='Lucida Console'>)</font> 
+            <b>{</b>
+                <font color='#BB00BB'>H</font><font face='Lucida Console'>(</font>n,n<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#BB00BB'>H</font><font face='Lucida Console'>(</font>n,n<font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> exshift;
+                <font color='#BB00BB'>d</font><font face='Lucida Console'>(</font>n<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#BB00BB'>H</font><font face='Lucida Console'>(</font>n,n<font face='Lucida Console'>)</font>;
+                <font color='#BB00BB'>e</font><font face='Lucida Console'>(</font>n<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>0.0</font>;
+                n<font color='#5555FF'>-</font><font color='#5555FF'>-</font>;
+                iter <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+
+                <font color='#009900'>// Two roots found
+</font>
+            <b>}</b> 
+            <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>l <font color='#5555FF'>=</font><font color='#5555FF'>=</font> n<font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font> 
+            <b>{</b>
+                w <font color='#5555FF'>=</font> <font color='#BB00BB'>H</font><font face='Lucida Console'>(</font>n,n<font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>*</font> <font color='#BB00BB'>H</font><font face='Lucida Console'>(</font>n<font color='#5555FF'>-</font><font color='#979000'>1</font>,n<font face='Lucida Console'>)</font>;
+                p <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>H</font><font face='Lucida Console'>(</font>n<font color='#5555FF'>-</font><font color='#979000'>1</font>,n<font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> <font color='#BB00BB'>H</font><font face='Lucida Console'>(</font>n,n<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>/</font> <font color='#979000'>2.0</font>;
+                q <font color='#5555FF'>=</font> p <font color='#5555FF'>*</font> p <font color='#5555FF'>+</font> w;
+                z <font color='#5555FF'>=</font> <font color='#BB00BB'>sqrt</font><font face='Lucida Console'>(</font><font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font>q<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                <font color='#BB00BB'>H</font><font face='Lucida Console'>(</font>n,n<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#BB00BB'>H</font><font face='Lucida Console'>(</font>n,n<font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> exshift;
+                <font color='#BB00BB'>H</font><font face='Lucida Console'>(</font>n<font color='#5555FF'>-</font><font color='#979000'>1</font>,n<font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#BB00BB'>H</font><font face='Lucida Console'>(</font>n<font color='#5555FF'>-</font><font color='#979000'>1</font>,n<font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> exshift;
+                x <font color='#5555FF'>=</font> <font color='#BB00BB'>H</font><font face='Lucida Console'>(</font>n,n<font face='Lucida Console'>)</font>;
+
+                <font color='#009900'>// type pair
+</font>
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>q <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font> 
+                <b>{</b>
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>p <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font> 
+                    <b>{</b>
+                        z <font color='#5555FF'>=</font> p <font color='#5555FF'>+</font> z;
+                    <b>}</b> 
+                    <font color='#0000FF'>else</font> 
+                    <b>{</b>
+                        z <font color='#5555FF'>=</font> p <font color='#5555FF'>-</font> z;
+                    <b>}</b>
+                    <font color='#BB00BB'>d</font><font face='Lucida Console'>(</font>n<font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> x <font color='#5555FF'>+</font> z;
+                    <font color='#BB00BB'>d</font><font face='Lucida Console'>(</font>n<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#BB00BB'>d</font><font face='Lucida Console'>(</font>n<font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>z <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0.0</font><font face='Lucida Console'>)</font> 
+                    <b>{</b>
+                        <font color='#BB00BB'>d</font><font face='Lucida Console'>(</font>n<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> x <font color='#5555FF'>-</font> w <font color='#5555FF'>/</font> z;
+                    <b>}</b>
+                    <font color='#BB00BB'>e</font><font face='Lucida Console'>(</font>n<font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>0.0</font>;
+                    <font color='#BB00BB'>e</font><font face='Lucida Console'>(</font>n<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>0.0</font>;
+                    x <font color='#5555FF'>=</font> <font color='#BB00BB'>H</font><font face='Lucida Console'>(</font>n,n<font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+                    s <font color='#5555FF'>=</font> <font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font>x<font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> <font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font>z<font face='Lucida Console'>)</font>;
+                    p <font color='#5555FF'>=</font> x <font color='#5555FF'>/</font> s;
+                    q <font color='#5555FF'>=</font> z <font color='#5555FF'>/</font> s;
+                    r <font color='#5555FF'>=</font> <font color='#BB00BB'>sqrt</font><font face='Lucida Console'>(</font>p <font color='#5555FF'>*</font> p<font color='#5555FF'>+</font>q <font color='#5555FF'>*</font> q<font face='Lucida Console'>)</font>;
+                    p <font color='#5555FF'>=</font> p <font color='#5555FF'>/</font> r;
+                    q <font color='#5555FF'>=</font> q <font color='#5555FF'>/</font> r;
+
+                    <font color='#009900'>// Row modification
+</font>
+                    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> j <font color='#5555FF'>=</font> n<font color='#5555FF'>-</font><font color='#979000'>1</font>; j <font color='#5555FF'>&lt;</font> nn; j<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> 
+                    <b>{</b>
+                        z <font color='#5555FF'>=</font> <font color='#BB00BB'>H</font><font face='Lucida Console'>(</font>n<font color='#5555FF'>-</font><font color='#979000'>1</font>,j<font face='Lucida Console'>)</font>;
+                        <font color='#BB00BB'>H</font><font face='Lucida Console'>(</font>n<font color='#5555FF'>-</font><font color='#979000'>1</font>,j<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> q <font color='#5555FF'>*</font> z <font color='#5555FF'>+</font> p <font color='#5555FF'>*</font> <font color='#BB00BB'>H</font><font face='Lucida Console'>(</font>n,j<font face='Lucida Console'>)</font>;
+                        <font color='#BB00BB'>H</font><font face='Lucida Console'>(</font>n,j<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> q <font color='#5555FF'>*</font> <font color='#BB00BB'>H</font><font face='Lucida Console'>(</font>n,j<font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> p <font color='#5555FF'>*</font> z;
+                    <b>}</b>
+
+                    <font color='#009900'>// Column modification
+</font>
+                    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> n; i<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> 
+                    <b>{</b>
+                        z <font color='#5555FF'>=</font> <font color='#BB00BB'>H</font><font face='Lucida Console'>(</font>i,n<font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+                        <font color='#BB00BB'>H</font><font face='Lucida Console'>(</font>i,n<font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> q <font color='#5555FF'>*</font> z <font color='#5555FF'>+</font> p <font color='#5555FF'>*</font> <font color='#BB00BB'>H</font><font face='Lucida Console'>(</font>i,n<font face='Lucida Console'>)</font>;
+                        <font color='#BB00BB'>H</font><font face='Lucida Console'>(</font>i,n<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> q <font color='#5555FF'>*</font> <font color='#BB00BB'>H</font><font face='Lucida Console'>(</font>i,n<font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> p <font color='#5555FF'>*</font> z;
+                    <b>}</b>
+
+                    <font color='#009900'>// Accumulate transformations
+</font>
+                    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> low; i <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> high; i<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> 
+                    <b>{</b>
+                        z <font color='#5555FF'>=</font> <font color='#BB00BB'>V</font><font face='Lucida Console'>(</font>i,n<font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+                        <font color='#BB00BB'>V</font><font face='Lucida Console'>(</font>i,n<font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> q <font color='#5555FF'>*</font> z <font color='#5555FF'>+</font> p <font color='#5555FF'>*</font> <font color='#BB00BB'>V</font><font face='Lucida Console'>(</font>i,n<font face='Lucida Console'>)</font>;
+                        <font color='#BB00BB'>V</font><font face='Lucida Console'>(</font>i,n<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> q <font color='#5555FF'>*</font> <font color='#BB00BB'>V</font><font face='Lucida Console'>(</font>i,n<font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> p <font color='#5555FF'>*</font> z;
+                    <b>}</b>
+
+                    <font color='#009900'>// Complex pair
+</font>
+                <b>}</b> 
+                <font color='#0000FF'>else</font> 
+                <b>{</b>
+                    <font color='#BB00BB'>d</font><font face='Lucida Console'>(</font>n<font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> x <font color='#5555FF'>+</font> p;
+                    <font color='#BB00BB'>d</font><font face='Lucida Console'>(</font>n<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> x <font color='#5555FF'>+</font> p;
+                    <font color='#BB00BB'>e</font><font face='Lucida Console'>(</font>n<font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> z;
+                    <font color='#BB00BB'>e</font><font face='Lucida Console'>(</font>n<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#5555FF'>-</font>z;
+                <b>}</b>
+                n <font color='#5555FF'>=</font> n <font color='#5555FF'>-</font> <font color='#979000'>2</font>;
+                iter <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+
+                <font color='#009900'>// No convergence yet
+</font>
+            <b>}</b> 
+            <font color='#0000FF'>else</font> 
+            <b>{</b>
+
+                <font color='#009900'>// Form shift
+</font>
+                x <font color='#5555FF'>=</font> <font color='#BB00BB'>H</font><font face='Lucida Console'>(</font>n,n<font face='Lucida Console'>)</font>;
+                y <font color='#5555FF'>=</font> <font color='#979000'>0.0</font>;
+                w <font color='#5555FF'>=</font> <font color='#979000'>0.0</font>;
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>l <font color='#5555FF'>&lt;</font> n<font face='Lucida Console'>)</font> 
+                <b>{</b>
+                    y <font color='#5555FF'>=</font> <font color='#BB00BB'>H</font><font face='Lucida Console'>(</font>n<font color='#5555FF'>-</font><font color='#979000'>1</font>,n<font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+                    w <font color='#5555FF'>=</font> <font color='#BB00BB'>H</font><font face='Lucida Console'>(</font>n,n<font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>*</font> <font color='#BB00BB'>H</font><font face='Lucida Console'>(</font>n<font color='#5555FF'>-</font><font color='#979000'>1</font>,n<font face='Lucida Console'>)</font>;
+                <b>}</b>
+
+                <font color='#009900'>// Wilkinson's original ad hoc shift
+</font>
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>iter <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>10</font><font face='Lucida Console'>)</font> 
+                <b>{</b>
+                    exshift <font color='#5555FF'>+</font><font color='#5555FF'>=</font> x;
+                    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> low; i <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> n; i<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> 
+                    <b>{</b>
+                        <font color='#BB00BB'>H</font><font face='Lucida Console'>(</font>i,i<font face='Lucida Console'>)</font> <font color='#5555FF'>-</font><font color='#5555FF'>=</font> x;
+                    <b>}</b>
+                    s <font color='#5555FF'>=</font> <font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font><font color='#BB00BB'>H</font><font face='Lucida Console'>(</font>n,n<font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> <font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font><font color='#BB00BB'>H</font><font face='Lucida Console'>(</font>n<font color='#5555FF'>-</font><font color='#979000'>1</font>,n<font color='#5555FF'>-</font><font color='#979000'>2</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                    x <font color='#5555FF'>=</font> y <font color='#5555FF'>=</font> <font color='#979000'>0.75</font> <font color='#5555FF'>*</font> s;
+                    w <font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>0.4375</font> <font color='#5555FF'>*</font> s <font color='#5555FF'>*</font> s;
+                <b>}</b>
+
+                <font color='#009900'>// MATLAB's new ad hoc shift
+</font>
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>iter <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>30</font><font face='Lucida Console'>)</font> 
+                <b>{</b>
+                    s <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>y <font color='#5555FF'>-</font> x<font face='Lucida Console'>)</font> <font color='#5555FF'>/</font> <font color='#979000'>2.0</font>;
+                    s <font color='#5555FF'>=</font> s <font color='#5555FF'>*</font> s <font color='#5555FF'>+</font> w;
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>s <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font> 
+                    <b>{</b>
+                        s <font color='#5555FF'>=</font> <font color='#BB00BB'>sqrt</font><font face='Lucida Console'>(</font>s<font face='Lucida Console'>)</font>;
+                        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>y <font color='#5555FF'>&lt;</font> x<font face='Lucida Console'>)</font> 
+                        <b>{</b>
+                            s <font color='#5555FF'>=</font> <font color='#5555FF'>-</font>s;
+                        <b>}</b>
+                        s <font color='#5555FF'>=</font> x <font color='#5555FF'>-</font> w <font color='#5555FF'>/</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>y <font color='#5555FF'>-</font> x<font face='Lucida Console'>)</font> <font color='#5555FF'>/</font> <font color='#979000'>2.0</font> <font color='#5555FF'>+</font> s<font face='Lucida Console'>)</font>;
+                        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> low; i <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> n; i<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> 
+                        <b>{</b>
+                            <font color='#BB00BB'>H</font><font face='Lucida Console'>(</font>i,i<font face='Lucida Console'>)</font> <font color='#5555FF'>-</font><font color='#5555FF'>=</font> s;
+                        <b>}</b>
+                        exshift <font color='#5555FF'>+</font><font color='#5555FF'>=</font> s;
+                        x <font color='#5555FF'>=</font> y <font color='#5555FF'>=</font> w <font color='#5555FF'>=</font> <font color='#979000'>0.964</font>;
+                    <b>}</b>
+                <b>}</b>
+
+                iter <font color='#5555FF'>=</font> iter <font color='#5555FF'>+</font> <font color='#979000'>1</font>;   <font color='#009900'>// (Could check iteration count here.)
+</font>
+                <font color='#009900'>// Look for two consecutive small sub-diagonal elements
+</font>
+                <font color='#0000FF'><u>long</u></font> m <font color='#5555FF'>=</font> n<font color='#5555FF'>-</font><font color='#979000'>2</font>;
+                <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>m <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> l<font face='Lucida Console'>)</font> 
+                <b>{</b>
+                    z <font color='#5555FF'>=</font> <font color='#BB00BB'>H</font><font face='Lucida Console'>(</font>m,m<font face='Lucida Console'>)</font>;
+                    r <font color='#5555FF'>=</font> x <font color='#5555FF'>-</font> z;
+                    s <font color='#5555FF'>=</font> y <font color='#5555FF'>-</font> z;
+                    p <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>r <font color='#5555FF'>*</font> s <font color='#5555FF'>-</font> w<font face='Lucida Console'>)</font> <font color='#5555FF'>/</font> <font color='#BB00BB'>H</font><font face='Lucida Console'>(</font>m<font color='#5555FF'>+</font><font color='#979000'>1</font>,m<font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> <font color='#BB00BB'>H</font><font face='Lucida Console'>(</font>m,m<font color='#5555FF'>+</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+                    q <font color='#5555FF'>=</font> <font color='#BB00BB'>H</font><font face='Lucida Console'>(</font>m<font color='#5555FF'>+</font><font color='#979000'>1</font>,m<font color='#5555FF'>+</font><font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> z <font color='#5555FF'>-</font> r <font color='#5555FF'>-</font> s;
+                    r <font color='#5555FF'>=</font> <font color='#BB00BB'>H</font><font face='Lucida Console'>(</font>m<font color='#5555FF'>+</font><font color='#979000'>2</font>,m<font color='#5555FF'>+</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+                    s <font color='#5555FF'>=</font> <font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font>p<font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> <font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font>q<font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> <font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font>r<font face='Lucida Console'>)</font>;
+                    p <font color='#5555FF'>=</font> p <font color='#5555FF'>/</font> s;
+                    q <font color='#5555FF'>=</font> q <font color='#5555FF'>/</font> s;
+                    r <font color='#5555FF'>=</font> r <font color='#5555FF'>/</font> s;
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>m <font color='#5555FF'>=</font><font color='#5555FF'>=</font> l<font face='Lucida Console'>)</font> 
+                    <b>{</b>
+                        <font color='#0000FF'>break</font>;
+                    <b>}</b>
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font><font color='#BB00BB'>H</font><font face='Lucida Console'>(</font>m,m<font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>*</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font>q<font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> <font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font>r<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font>
+                        eps <font color='#5555FF'>*</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font>p<font face='Lucida Console'>)</font> <font color='#5555FF'>*</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font><font color='#BB00BB'>H</font><font face='Lucida Console'>(</font>m<font color='#5555FF'>-</font><font color='#979000'>1</font>,m<font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> <font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font>z<font face='Lucida Console'>)</font> <font color='#5555FF'>+</font>
+                                         <font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font><font color='#BB00BB'>H</font><font face='Lucida Console'>(</font>m<font color='#5555FF'>+</font><font color='#979000'>1</font>,m<font color='#5555FF'>+</font><font color='#979000'>1</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> 
+                    <b>{</b>
+                        <font color='#0000FF'>break</font>;
+                    <b>}</b>
+                    m<font color='#5555FF'>-</font><font color='#5555FF'>-</font>;
+                <b>}</b>
+
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> m<font color='#5555FF'>+</font><font color='#979000'>2</font>; i <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> n; i<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> 
+                <b>{</b>
+                    <font color='#BB00BB'>H</font><font face='Lucida Console'>(</font>i,i<font color='#5555FF'>-</font><font color='#979000'>2</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>0.0</font>;
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>i <font color='#5555FF'>&gt;</font> m<font color='#5555FF'>+</font><font color='#979000'>2</font><font face='Lucida Console'>)</font> 
+                    <b>{</b>
+                        <font color='#BB00BB'>H</font><font face='Lucida Console'>(</font>i,i<font color='#5555FF'>-</font><font color='#979000'>3</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>0.0</font>;
+                    <b>}</b>
+                <b>}</b>
+
+                <font color='#009900'>// Double QR step involving rows l:n and columns m:n
+</font>
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> k <font color='#5555FF'>=</font> m; k <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> n<font color='#5555FF'>-</font><font color='#979000'>1</font>; k<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> 
+                <b>{</b>
+                    <font color='#0000FF'><u>long</u></font> notlast <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>k <font color='#5555FF'>!</font><font color='#5555FF'>=</font> n<font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>k <font color='#5555FF'>!</font><font color='#5555FF'>=</font> m<font face='Lucida Console'>)</font> 
+                    <b>{</b>
+                        p <font color='#5555FF'>=</font> <font color='#BB00BB'>H</font><font face='Lucida Console'>(</font>k,k<font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+                        q <font color='#5555FF'>=</font> <font color='#BB00BB'>H</font><font face='Lucida Console'>(</font>k<font color='#5555FF'>+</font><font color='#979000'>1</font>,k<font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+                        r <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>notlast ? <font color='#BB00BB'>H</font><font face='Lucida Console'>(</font>k<font color='#5555FF'>+</font><font color='#979000'>2</font>,k<font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font> : <font color='#979000'>0.0</font><font face='Lucida Console'>)</font>;
+                        x <font color='#5555FF'>=</font> <font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font>p<font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> <font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font>q<font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> <font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font>r<font face='Lucida Console'>)</font>;
+                        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>x <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0.0</font><font face='Lucida Console'>)</font> 
+                        <b>{</b>
+                            p <font color='#5555FF'>=</font> p <font color='#5555FF'>/</font> x;
+                            q <font color='#5555FF'>=</font> q <font color='#5555FF'>/</font> x;
+                            r <font color='#5555FF'>=</font> r <font color='#5555FF'>/</font> x;
+                        <b>}</b>
+                    <b>}</b>
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>x <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0.0</font><font face='Lucida Console'>)</font> 
+                    <b>{</b>
+                        <font color='#0000FF'>break</font>;
+                    <b>}</b>
+                    s <font color='#5555FF'>=</font> <font color='#BB00BB'>sqrt</font><font face='Lucida Console'>(</font>p <font color='#5555FF'>*</font> p <font color='#5555FF'>+</font> q <font color='#5555FF'>*</font> q <font color='#5555FF'>+</font> r <font color='#5555FF'>*</font> r<font face='Lucida Console'>)</font>;
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>p <font color='#5555FF'>&lt;</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font> 
+                    <b>{</b>
+                        s <font color='#5555FF'>=</font> <font color='#5555FF'>-</font>s;
+                    <b>}</b>
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>s <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font> 
+                    <b>{</b>
+                        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>k <font color='#5555FF'>!</font><font color='#5555FF'>=</font> m<font face='Lucida Console'>)</font> 
+                        <b>{</b>
+                            <font color='#BB00BB'>H</font><font face='Lucida Console'>(</font>k,k<font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#5555FF'>-</font>s <font color='#5555FF'>*</font> x;
+                        <b>}</b> 
+                        <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>l <font color='#5555FF'>!</font><font color='#5555FF'>=</font> m<font face='Lucida Console'>)</font> 
+                        <b>{</b>
+                            <font color='#BB00BB'>H</font><font face='Lucida Console'>(</font>k,k<font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#BB00BB'>H</font><font face='Lucida Console'>(</font>k,k<font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+                        <b>}</b>
+                        p <font color='#5555FF'>=</font> p <font color='#5555FF'>+</font> s;
+                        x <font color='#5555FF'>=</font> p <font color='#5555FF'>/</font> s;
+                        y <font color='#5555FF'>=</font> q <font color='#5555FF'>/</font> s;
+                        z <font color='#5555FF'>=</font> r <font color='#5555FF'>/</font> s;
+                        q <font color='#5555FF'>=</font> q <font color='#5555FF'>/</font> p;
+                        r <font color='#5555FF'>=</font> r <font color='#5555FF'>/</font> p;
+
+                        <font color='#009900'>// Row modification
+</font>
+                        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> j <font color='#5555FF'>=</font> k; j <font color='#5555FF'>&lt;</font> nn; j<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> 
+                        <b>{</b>
+                            p <font color='#5555FF'>=</font> <font color='#BB00BB'>H</font><font face='Lucida Console'>(</font>k,j<font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> q <font color='#5555FF'>*</font> <font color='#BB00BB'>H</font><font face='Lucida Console'>(</font>k<font color='#5555FF'>+</font><font color='#979000'>1</font>,j<font face='Lucida Console'>)</font>;
+                            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>notlast<font face='Lucida Console'>)</font> 
+                            <b>{</b>
+                                p <font color='#5555FF'>=</font> p <font color='#5555FF'>+</font> r <font color='#5555FF'>*</font> <font color='#BB00BB'>H</font><font face='Lucida Console'>(</font>k<font color='#5555FF'>+</font><font color='#979000'>2</font>,j<font face='Lucida Console'>)</font>;
+                                <font color='#BB00BB'>H</font><font face='Lucida Console'>(</font>k<font color='#5555FF'>+</font><font color='#979000'>2</font>,j<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#BB00BB'>H</font><font face='Lucida Console'>(</font>k<font color='#5555FF'>+</font><font color='#979000'>2</font>,j<font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> p <font color='#5555FF'>*</font> z;
+                            <b>}</b>
+                            <font color='#BB00BB'>H</font><font face='Lucida Console'>(</font>k,j<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#BB00BB'>H</font><font face='Lucida Console'>(</font>k,j<font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> p <font color='#5555FF'>*</font> x;
+                            <font color='#BB00BB'>H</font><font face='Lucida Console'>(</font>k<font color='#5555FF'>+</font><font color='#979000'>1</font>,j<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#BB00BB'>H</font><font face='Lucida Console'>(</font>k<font color='#5555FF'>+</font><font color='#979000'>1</font>,j<font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> p <font color='#5555FF'>*</font> y;
+                        <b>}</b>
+
+                        <font color='#009900'>// Column modification
+</font>
+                        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#BB00BB'>min</font><font face='Lucida Console'>(</font>n,k<font color='#5555FF'>+</font><font color='#979000'>3</font><font face='Lucida Console'>)</font>; i<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> 
+                        <b>{</b>
+                            p <font color='#5555FF'>=</font> x <font color='#5555FF'>*</font> <font color='#BB00BB'>H</font><font face='Lucida Console'>(</font>i,k<font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> y <font color='#5555FF'>*</font> <font color='#BB00BB'>H</font><font face='Lucida Console'>(</font>i,k<font color='#5555FF'>+</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+                            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>notlast<font face='Lucida Console'>)</font> 
+                            <b>{</b>
+                                p <font color='#5555FF'>=</font> p <font color='#5555FF'>+</font> z <font color='#5555FF'>*</font> <font color='#BB00BB'>H</font><font face='Lucida Console'>(</font>i,k<font color='#5555FF'>+</font><font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+                                <font color='#BB00BB'>H</font><font face='Lucida Console'>(</font>i,k<font color='#5555FF'>+</font><font color='#979000'>2</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#BB00BB'>H</font><font face='Lucida Console'>(</font>i,k<font color='#5555FF'>+</font><font color='#979000'>2</font><font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> p <font color='#5555FF'>*</font> r;
+                            <b>}</b>
+                            <font color='#BB00BB'>H</font><font face='Lucida Console'>(</font>i,k<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#BB00BB'>H</font><font face='Lucida Console'>(</font>i,k<font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> p;
+                            <font color='#BB00BB'>H</font><font face='Lucida Console'>(</font>i,k<font color='#5555FF'>+</font><font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#BB00BB'>H</font><font face='Lucida Console'>(</font>i,k<font color='#5555FF'>+</font><font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> p <font color='#5555FF'>*</font> q;
+                        <b>}</b>
+
+                        <font color='#009900'>// Accumulate transformations
+</font>
+                        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> low; i <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> high; i<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> 
+                        <b>{</b>
+                            p <font color='#5555FF'>=</font> x <font color='#5555FF'>*</font> <font color='#BB00BB'>V</font><font face='Lucida Console'>(</font>i,k<font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> y <font color='#5555FF'>*</font> <font color='#BB00BB'>V</font><font face='Lucida Console'>(</font>i,k<font color='#5555FF'>+</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+                            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>notlast<font face='Lucida Console'>)</font> 
+                            <b>{</b>
+                                p <font color='#5555FF'>=</font> p <font color='#5555FF'>+</font> z <font color='#5555FF'>*</font> <font color='#BB00BB'>V</font><font face='Lucida Console'>(</font>i,k<font color='#5555FF'>+</font><font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+                                <font color='#BB00BB'>V</font><font face='Lucida Console'>(</font>i,k<font color='#5555FF'>+</font><font color='#979000'>2</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#BB00BB'>V</font><font face='Lucida Console'>(</font>i,k<font color='#5555FF'>+</font><font color='#979000'>2</font><font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> p <font color='#5555FF'>*</font> r;
+                            <b>}</b>
+                            <font color='#BB00BB'>V</font><font face='Lucida Console'>(</font>i,k<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#BB00BB'>V</font><font face='Lucida Console'>(</font>i,k<font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> p;
+                            <font color='#BB00BB'>V</font><font face='Lucida Console'>(</font>i,k<font color='#5555FF'>+</font><font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#BB00BB'>V</font><font face='Lucida Console'>(</font>i,k<font color='#5555FF'>+</font><font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> p <font color='#5555FF'>*</font> q;
+                        <b>}</b>
+                    <b>}</b>  <font color='#009900'>// (s != 0)
+</font>                <b>}</b>  <font color='#009900'>// k loop
+</font>            <b>}</b>  <font color='#009900'>// check convergence
+</font>        <b>}</b>  <font color='#009900'>// while (n &gt;= low)
+</font>
+        <font color='#009900'>// Backsubstitute to find vectors of upper triangular form
+</font>
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>norm <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0.0</font><font face='Lucida Console'>)</font> 
+        <b>{</b>
+            <font color='#0000FF'>return</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>n <font color='#5555FF'>=</font> nn<font color='#5555FF'>-</font><font color='#979000'>1</font>; n <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#979000'>0</font>; n<font color='#5555FF'>-</font><font color='#5555FF'>-</font><font face='Lucida Console'>)</font> 
+        <b>{</b>
+            p <font color='#5555FF'>=</font> <font color='#BB00BB'>d</font><font face='Lucida Console'>(</font>n<font face='Lucida Console'>)</font>;
+            q <font color='#5555FF'>=</font> <font color='#BB00BB'>e</font><font face='Lucida Console'>(</font>n<font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// Real vector
+</font>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>q <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font> 
+            <b>{</b>
+                <font color='#0000FF'><u>long</u></font> l <font color='#5555FF'>=</font> n;
+                <font color='#BB00BB'>H</font><font face='Lucida Console'>(</font>n,n<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>1.0</font>;
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> n<font color='#5555FF'>-</font><font color='#979000'>1</font>; i <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#979000'>0</font>; i<font color='#5555FF'>-</font><font color='#5555FF'>-</font><font face='Lucida Console'>)</font> 
+                <b>{</b>
+                    w <font color='#5555FF'>=</font> <font color='#BB00BB'>H</font><font face='Lucida Console'>(</font>i,i<font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> p;
+                    r <font color='#5555FF'>=</font> <font color='#979000'>0.0</font>;
+                    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> j <font color='#5555FF'>=</font> l; j <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> n; j<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> 
+                    <b>{</b>
+                        r <font color='#5555FF'>=</font> r <font color='#5555FF'>+</font> <font color='#BB00BB'>H</font><font face='Lucida Console'>(</font>i,j<font face='Lucida Console'>)</font> <font color='#5555FF'>*</font> <font color='#BB00BB'>H</font><font face='Lucida Console'>(</font>j,n<font face='Lucida Console'>)</font>;
+                    <b>}</b>
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>e</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> <font color='#979000'>0.0</font><font face='Lucida Console'>)</font> 
+                    <b>{</b>
+                        z <font color='#5555FF'>=</font> w;
+                        s <font color='#5555FF'>=</font> r;
+                    <b>}</b> 
+                    <font color='#0000FF'>else</font> 
+                    <b>{</b>
+                        l <font color='#5555FF'>=</font> i;
+                        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>e</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0.0</font><font face='Lucida Console'>)</font> 
+                        <b>{</b>
+                            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>w <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0.0</font><font face='Lucida Console'>)</font> 
+                            <b>{</b>
+                                <font color='#BB00BB'>H</font><font face='Lucida Console'>(</font>i,n<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#5555FF'>-</font>r <font color='#5555FF'>/</font> w;
+                            <b>}</b> 
+                            <font color='#0000FF'>else</font> 
+                            <b>{</b>
+                                <font color='#BB00BB'>H</font><font face='Lucida Console'>(</font>i,n<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#5555FF'>-</font>r <font color='#5555FF'>/</font> <font face='Lucida Console'>(</font>eps <font color='#5555FF'>*</font> norm<font face='Lucida Console'>)</font>;
+                            <b>}</b>
+
+                            <font color='#009900'>// Solve real equations
+</font>
+                        <b>}</b> 
+                        <font color='#0000FF'>else</font> 
+                        <b>{</b>
+                            x <font color='#5555FF'>=</font> <font color='#BB00BB'>H</font><font face='Lucida Console'>(</font>i,i<font color='#5555FF'>+</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+                            y <font color='#5555FF'>=</font> <font color='#BB00BB'>H</font><font face='Lucida Console'>(</font>i<font color='#5555FF'>+</font><font color='#979000'>1</font>,i<font face='Lucida Console'>)</font>;
+                            q <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>d</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> p<font face='Lucida Console'>)</font> <font color='#5555FF'>*</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>d</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> p<font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> <font color='#BB00BB'>e</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font> <font color='#5555FF'>*</font> <font color='#BB00BB'>e</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>;
+                            t <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>x <font color='#5555FF'>*</font> s <font color='#5555FF'>-</font> z <font color='#5555FF'>*</font> r<font face='Lucida Console'>)</font> <font color='#5555FF'>/</font> q;
+                            <font color='#BB00BB'>H</font><font face='Lucida Console'>(</font>i,n<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> t;
+                            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font>x<font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> <font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font>z<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> 
+                            <b>{</b>
+                                <font color='#BB00BB'>H</font><font face='Lucida Console'>(</font>i<font color='#5555FF'>+</font><font color='#979000'>1</font>,n<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#5555FF'>-</font>r <font color='#5555FF'>-</font> w <font color='#5555FF'>*</font> t<font face='Lucida Console'>)</font> <font color='#5555FF'>/</font> x;
+                            <b>}</b> 
+                            <font color='#0000FF'>else</font> 
+                            <b>{</b>
+                                <font color='#BB00BB'>H</font><font face='Lucida Console'>(</font>i<font color='#5555FF'>+</font><font color='#979000'>1</font>,n<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#5555FF'>-</font>s <font color='#5555FF'>-</font> y <font color='#5555FF'>*</font> t<font face='Lucida Console'>)</font> <font color='#5555FF'>/</font> z;
+                            <b>}</b>
+                        <b>}</b>
+
+                        <font color='#009900'>// Overflow control
+</font>
+                        t <font color='#5555FF'>=</font> <font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font><font color='#BB00BB'>H</font><font face='Lucida Console'>(</font>i,n<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>eps <font color='#5555FF'>*</font> t<font face='Lucida Console'>)</font> <font color='#5555FF'>*</font> t <font color='#5555FF'>&gt;</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font> 
+                        <b>{</b>
+                            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> j <font color='#5555FF'>=</font> i; j <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> n; j<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> 
+                            <b>{</b>
+                                <font color='#BB00BB'>H</font><font face='Lucida Console'>(</font>j,n<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#BB00BB'>H</font><font face='Lucida Console'>(</font>j,n<font face='Lucida Console'>)</font> <font color='#5555FF'>/</font> t;
+                            <b>}</b>
+                        <b>}</b>
+                    <b>}</b>
+                <b>}</b>
+
+                <font color='#009900'>// Complex vector
+</font>
+            <b>}</b> 
+            <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>q <font color='#5555FF'>&lt;</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font> 
+            <b>{</b>
+                <font color='#0000FF'><u>long</u></font> l <font color='#5555FF'>=</font> n<font color='#5555FF'>-</font><font color='#979000'>1</font>;
+
+                <font color='#009900'>// Last vector component imaginary so matrix is triangular
+</font>
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font><font color='#BB00BB'>H</font><font face='Lucida Console'>(</font>n,n<font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> <font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font><font color='#BB00BB'>H</font><font face='Lucida Console'>(</font>n<font color='#5555FF'>-</font><font color='#979000'>1</font>,n<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> 
+                <b>{</b>
+                    <font color='#BB00BB'>H</font><font face='Lucida Console'>(</font>n<font color='#5555FF'>-</font><font color='#979000'>1</font>,n<font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> q <font color='#5555FF'>/</font> <font color='#BB00BB'>H</font><font face='Lucida Console'>(</font>n,n<font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+                    <font color='#BB00BB'>H</font><font face='Lucida Console'>(</font>n<font color='#5555FF'>-</font><font color='#979000'>1</font>,n<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font face='Lucida Console'>(</font><font color='#BB00BB'>H</font><font face='Lucida Console'>(</font>n,n<font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> p<font face='Lucida Console'>)</font> <font color='#5555FF'>/</font> <font color='#BB00BB'>H</font><font face='Lucida Console'>(</font>n,n<font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+                <b>}</b> 
+                <font color='#0000FF'>else</font> 
+                <b>{</b>
+                    <font color='#BB00BB'>cdiv_</font><font face='Lucida Console'>(</font><font color='#979000'>0.0</font>,<font color='#5555FF'>-</font><font color='#BB00BB'>H</font><font face='Lucida Console'>(</font>n<font color='#5555FF'>-</font><font color='#979000'>1</font>,n<font face='Lucida Console'>)</font>,<font color='#BB00BB'>H</font><font face='Lucida Console'>(</font>n<font color='#5555FF'>-</font><font color='#979000'>1</font>,n<font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font>p,q<font face='Lucida Console'>)</font>;
+                    <font color='#BB00BB'>H</font><font face='Lucida Console'>(</font>n<font color='#5555FF'>-</font><font color='#979000'>1</font>,n<font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> cdivr;
+                    <font color='#BB00BB'>H</font><font face='Lucida Console'>(</font>n<font color='#5555FF'>-</font><font color='#979000'>1</font>,n<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> cdivi;
+                <b>}</b>
+                <font color='#BB00BB'>H</font><font face='Lucida Console'>(</font>n,n<font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>0.0</font>;
+                <font color='#BB00BB'>H</font><font face='Lucida Console'>(</font>n,n<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>1.0</font>;
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> n<font color='#5555FF'>-</font><font color='#979000'>2</font>; i <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#979000'>0</font>; i<font color='#5555FF'>-</font><font color='#5555FF'>-</font><font face='Lucida Console'>)</font> 
+                <b>{</b>
+                    type ra,sa,vr,vi;
+                    ra <font color='#5555FF'>=</font> <font color='#979000'>0.0</font>;
+                    sa <font color='#5555FF'>=</font> <font color='#979000'>0.0</font>;
+                    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> j <font color='#5555FF'>=</font> l; j <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> n; j<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> 
+                    <b>{</b>
+                        ra <font color='#5555FF'>=</font> ra <font color='#5555FF'>+</font> <font color='#BB00BB'>H</font><font face='Lucida Console'>(</font>i,j<font face='Lucida Console'>)</font> <font color='#5555FF'>*</font> <font color='#BB00BB'>H</font><font face='Lucida Console'>(</font>j,n<font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+                        sa <font color='#5555FF'>=</font> sa <font color='#5555FF'>+</font> <font color='#BB00BB'>H</font><font face='Lucida Console'>(</font>i,j<font face='Lucida Console'>)</font> <font color='#5555FF'>*</font> <font color='#BB00BB'>H</font><font face='Lucida Console'>(</font>j,n<font face='Lucida Console'>)</font>;
+                    <b>}</b>
+                    w <font color='#5555FF'>=</font> <font color='#BB00BB'>H</font><font face='Lucida Console'>(</font>i,i<font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> p;
+
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>e</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> <font color='#979000'>0.0</font><font face='Lucida Console'>)</font> 
+                    <b>{</b>
+                        z <font color='#5555FF'>=</font> w;
+                        r <font color='#5555FF'>=</font> ra;
+                        s <font color='#5555FF'>=</font> sa;
+                    <b>}</b> 
+                    <font color='#0000FF'>else</font> 
+                    <b>{</b>
+                        l <font color='#5555FF'>=</font> i;
+                        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>e</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font> 
+                        <b>{</b>
+                            <font color='#BB00BB'>cdiv_</font><font face='Lucida Console'>(</font><font color='#5555FF'>-</font>ra,<font color='#5555FF'>-</font>sa,w,q<font face='Lucida Console'>)</font>;
+                            <font color='#BB00BB'>H</font><font face='Lucida Console'>(</font>i,n<font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> cdivr;
+                            <font color='#BB00BB'>H</font><font face='Lucida Console'>(</font>i,n<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> cdivi;
+                        <b>}</b> 
+                        <font color='#0000FF'>else</font> 
+                        <b>{</b>
+
+                            <font color='#009900'>// Solve complex equations
+</font>
+                            x <font color='#5555FF'>=</font> <font color='#BB00BB'>H</font><font face='Lucida Console'>(</font>i,i<font color='#5555FF'>+</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+                            y <font color='#5555FF'>=</font> <font color='#BB00BB'>H</font><font face='Lucida Console'>(</font>i<font color='#5555FF'>+</font><font color='#979000'>1</font>,i<font face='Lucida Console'>)</font>;
+                            vr <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>d</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> p<font face='Lucida Console'>)</font> <font color='#5555FF'>*</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>d</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> p<font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> <font color='#BB00BB'>e</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font> <font color='#5555FF'>*</font> <font color='#BB00BB'>e</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> q <font color='#5555FF'>*</font> q;
+                            vi <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>d</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> p<font face='Lucida Console'>)</font> <font color='#5555FF'>*</font> <font color='#979000'>2.0</font> <font color='#5555FF'>*</font> q;
+                            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>vr <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0.0</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> <font face='Lucida Console'>(</font>vi <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0.0</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> 
+                            <b>{</b>
+                                vr <font color='#5555FF'>=</font> eps <font color='#5555FF'>*</font> norm <font color='#5555FF'>*</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font>w<font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> <font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font>q<font face='Lucida Console'>)</font> <font color='#5555FF'>+</font>
+                                                   <font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font>x<font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> <font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font>y<font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> <font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font>z<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                            <b>}</b>
+                            <font color='#BB00BB'>cdiv_</font><font face='Lucida Console'>(</font>x<font color='#5555FF'>*</font>r<font color='#5555FF'>-</font>z<font color='#5555FF'>*</font>ra<font color='#5555FF'>+</font>q<font color='#5555FF'>*</font>sa,x<font color='#5555FF'>*</font>s<font color='#5555FF'>-</font>z<font color='#5555FF'>*</font>sa<font color='#5555FF'>-</font>q<font color='#5555FF'>*</font>ra,vr,vi<font face='Lucida Console'>)</font>;
+                            <font color='#BB00BB'>H</font><font face='Lucida Console'>(</font>i,n<font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> cdivr;
+                            <font color='#BB00BB'>H</font><font face='Lucida Console'>(</font>i,n<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> cdivi;
+                            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font>x<font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font>z<font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> <font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font>q<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> 
+                            <b>{</b>
+                                <font color='#BB00BB'>H</font><font face='Lucida Console'>(</font>i<font color='#5555FF'>+</font><font color='#979000'>1</font>,n<font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#5555FF'>-</font>ra <font color='#5555FF'>-</font> w <font color='#5555FF'>*</font> <font color='#BB00BB'>H</font><font face='Lucida Console'>(</font>i,n<font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> q <font color='#5555FF'>*</font> <font color='#BB00BB'>H</font><font face='Lucida Console'>(</font>i,n<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>/</font> x;
+                                <font color='#BB00BB'>H</font><font face='Lucida Console'>(</font>i<font color='#5555FF'>+</font><font color='#979000'>1</font>,n<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#5555FF'>-</font>sa <font color='#5555FF'>-</font> w <font color='#5555FF'>*</font> <font color='#BB00BB'>H</font><font face='Lucida Console'>(</font>i,n<font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> q <font color='#5555FF'>*</font> <font color='#BB00BB'>H</font><font face='Lucida Console'>(</font>i,n<font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>/</font> x;
+                            <b>}</b>
+                            <font color='#0000FF'>else</font> 
+                            <b>{</b>
+                                <font color='#BB00BB'>cdiv_</font><font face='Lucida Console'>(</font><font color='#5555FF'>-</font>r<font color='#5555FF'>-</font>y<font color='#5555FF'>*</font><font color='#BB00BB'>H</font><font face='Lucida Console'>(</font>i,n<font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>,<font color='#5555FF'>-</font>s<font color='#5555FF'>-</font>y<font color='#5555FF'>*</font><font color='#BB00BB'>H</font><font face='Lucida Console'>(</font>i,n<font face='Lucida Console'>)</font>,z,q<font face='Lucida Console'>)</font>;
+                                <font color='#BB00BB'>H</font><font face='Lucida Console'>(</font>i<font color='#5555FF'>+</font><font color='#979000'>1</font>,n<font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> cdivr;
+                                <font color='#BB00BB'>H</font><font face='Lucida Console'>(</font>i<font color='#5555FF'>+</font><font color='#979000'>1</font>,n<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> cdivi;
+                            <b>}</b>
+                        <b>}</b>
+
+                        <font color='#009900'>// Overflow control
+</font>
+                        t <font color='#5555FF'>=</font> <font color='#BB00BB'>max</font><font face='Lucida Console'>(</font><font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font><font color='#BB00BB'>H</font><font face='Lucida Console'>(</font>i,n<font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>,<font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font><font color='#BB00BB'>H</font><font face='Lucida Console'>(</font>i,n<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>eps <font color='#5555FF'>*</font> t<font face='Lucida Console'>)</font> <font color='#5555FF'>*</font> t <font color='#5555FF'>&gt;</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font> 
+                        <b>{</b>
+                            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> j <font color='#5555FF'>=</font> i; j <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> n; j<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> 
+                            <b>{</b>
+                                <font color='#BB00BB'>H</font><font face='Lucida Console'>(</font>j,n<font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#BB00BB'>H</font><font face='Lucida Console'>(</font>j,n<font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>/</font> t;
+                                <font color='#BB00BB'>H</font><font face='Lucida Console'>(</font>j,n<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#BB00BB'>H</font><font face='Lucida Console'>(</font>j,n<font face='Lucida Console'>)</font> <font color='#5555FF'>/</font> t;
+                            <b>}</b>
+                        <b>}</b>
+                    <b>}</b>
+                <b>}</b>
+            <b>}</b>
+        <b>}</b>
+
+        <font color='#009900'>// Vectors of isolated roots
+</font>
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> nn; i<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> 
+        <b>{</b>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>i <font color='#5555FF'>&lt;</font> low <font color='#5555FF'>|</font><font color='#5555FF'>|</font> i <font color='#5555FF'>&gt;</font> high<font face='Lucida Console'>)</font> 
+            <b>{</b>
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> j <font color='#5555FF'>=</font> i; j <font color='#5555FF'>&lt;</font> nn; j<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> 
+                <b>{</b>
+                    <font color='#BB00BB'>V</font><font face='Lucida Console'>(</font>i,j<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#BB00BB'>H</font><font face='Lucida Console'>(</font>i,j<font face='Lucida Console'>)</font>;
+                <b>}</b>
+            <b>}</b>
+        <b>}</b>
+
+        <font color='#009900'>// Back transformation to get eigenvectors of original matrix
+</font>
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> j <font color='#5555FF'>=</font> nn<font color='#5555FF'>-</font><font color='#979000'>1</font>; j <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> low; j<font color='#5555FF'>-</font><font color='#5555FF'>-</font><font face='Lucida Console'>)</font> 
+        <b>{</b>
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> low; i <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> high; i<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> 
+            <b>{</b>
+                z <font color='#5555FF'>=</font> <font color='#979000'>0.0</font>;
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> k <font color='#5555FF'>=</font> low; k <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#BB00BB'>min</font><font face='Lucida Console'>(</font>j,high<font face='Lucida Console'>)</font>; k<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> 
+                <b>{</b>
+                    z <font color='#5555FF'>=</font> z <font color='#5555FF'>+</font> <font color='#BB00BB'>V</font><font face='Lucida Console'>(</font>i,k<font face='Lucida Console'>)</font> <font color='#5555FF'>*</font> <font color='#BB00BB'>H</font><font face='Lucida Console'>(</font>k,j<font face='Lucida Console'>)</font>;
+                <b>}</b>
+                <font color='#BB00BB'>V</font><font face='Lucida Console'>(</font>i,j<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> z;
+            <b>}</b>
+        <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+
+<b>}</b> 
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_MATRIX_EIGENVALUE_DECOMPOSITION_H 
+</font>
+
+
+
+
+</pre></body></html>

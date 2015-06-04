@@ -1,0 +1,224 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - png_loader.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2008  Davis E. King (davis@dlib.net), Nils Labugt
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_PNG_IMPORT
+<font color='#0000FF'>#define</font> DLIB_PNG_IMPORT
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='png_loader_abstract.h.html'>png_loader_abstract.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../smart_pointers.h.html'>../smart_pointers.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='image_loader.h.html'>image_loader.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../pixel.h.html'>../pixel.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../dir_nav.h.html'>../dir_nav.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+    <font color='#0000FF'>struct</font> LibpngData;
+    <font color='#0000FF'>class</font> <b><a name='png_loader'></a>png_loader</b> : noncopyable
+    <b>{</b>
+    <font color='#0000FF'>public</font>:
+
+        <b><a name='png_loader'></a>png_loader</b><font face='Lucida Console'>(</font> <font color='#0000FF'>const</font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>*</font> filename <font face='Lucida Console'>)</font>;
+        <b><a name='png_loader'></a>png_loader</b><font face='Lucida Console'>(</font> <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> filename <font face='Lucida Console'>)</font>;
+        <b><a name='png_loader'></a>png_loader</b><font face='Lucida Console'>(</font> <font color='#0000FF'>const</font> dlib::file<font color='#5555FF'>&amp;</font> f <font face='Lucida Console'>)</font>;
+        ~<b><a name='png_loader'></a>png_loader</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='is_gray'></a>is_gray</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#0000FF'><u>bool</u></font> <b><a name='is_graya'></a>is_graya</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#0000FF'><u>bool</u></font> <b><a name='is_rgb'></a>is_rgb</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#0000FF'><u>bool</u></font> <b><a name='is_rgba'></a>is_rgba</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>int</u></font> <b><a name='bit_depth'></a>bit_depth</b> <font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> bit_depth_; <b>}</b>
+
+        <font color='#0000FF'>template</font><font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='get_image'></a>get_image</b><font face='Lucida Console'>(</font> T<font color='#5555FF'>&amp;</font> t_<font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+<font color='#0000FF'>#ifndef</font> DLIB_PNG_SUPPORT
+            <font color='#009900'>/* !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                You are getting this error because you are trying to use the png_loader
+                object but you haven't defined DLIB_PNG_SUPPORT.  You must do so to use
+                this object.   You must also make sure you set your build environment
+                to link against the libpng library.
+            !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/</font>
+            <font color='#BB00BB'>COMPILE_TIME_ASSERT</font><font face='Lucida Console'>(</font><font color='#0000FF'>sizeof</font><font face='Lucida Console'>(</font>T<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+<font color='#0000FF'>#endif</font>
+
+            <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> image_traits<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font>::pixel_type pixel_type;
+            image_view<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font> <font color='#BB00BB'>t</font><font face='Lucida Console'>(</font>t_<font face='Lucida Console'>)</font>;
+            t.<font color='#BB00BB'>set_size</font><font face='Lucida Console'>(</font> height_, width_ <font face='Lucida Console'>)</font>;
+
+
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>is_gray</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> bit_depth_ <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>8</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font> <font color='#0000FF'><u>unsigned</u></font> n <font color='#5555FF'>=</font> <font color='#979000'>0</font>; n <font color='#5555FF'>&lt;</font> height_;n<font color='#5555FF'>+</font><font color='#5555FF'>+</font> <font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>*</font> v <font color='#5555FF'>=</font> <font color='#BB00BB'>get_row</font><font face='Lucida Console'>(</font> n <font face='Lucida Console'>)</font>;
+                    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font> <font color='#0000FF'><u>unsigned</u></font> m <font color='#5555FF'>=</font> <font color='#979000'>0</font>; m <font color='#5555FF'>&lt;</font> width_;m<font color='#5555FF'>+</font><font color='#5555FF'>+</font> <font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> p <font color='#5555FF'>=</font> v[m];
+                        <font color='#BB00BB'>assign_pixel</font><font face='Lucida Console'>(</font> t[n][m], p <font face='Lucida Console'>)</font>;
+                    <b>}</b>
+                <b>}</b>
+            <b>}</b>
+            <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>is_gray</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> bit_depth_ <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>16</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font> <font color='#0000FF'><u>unsigned</u></font> n <font color='#5555FF'>=</font> <font color='#979000'>0</font>; n <font color='#5555FF'>&lt;</font> height_;n<font color='#5555FF'>+</font><font color='#5555FF'>+</font> <font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#0000FF'>const</font> uint16<font color='#5555FF'>*</font> v <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>uint16<font color='#5555FF'>*</font><font face='Lucida Console'>)</font><font color='#BB00BB'>get_row</font><font face='Lucida Console'>(</font> n <font face='Lucida Console'>)</font>;
+                    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font> <font color='#0000FF'><u>unsigned</u></font> m <font color='#5555FF'>=</font> <font color='#979000'>0</font>; m <font color='#5555FF'>&lt;</font> width_;m<font color='#5555FF'>+</font><font color='#5555FF'>+</font> <font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        dlib::uint16 p <font color='#5555FF'>=</font> v[m];
+                        <font color='#BB00BB'>assign_pixel</font><font face='Lucida Console'>(</font> t[n][m], p <font face='Lucida Console'>)</font>;
+                    <b>}</b>
+                <b>}</b>
+            <b>}</b>
+            <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>is_graya</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> bit_depth_ <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>8</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font> <font color='#0000FF'><u>unsigned</u></font> n <font color='#5555FF'>=</font> <font color='#979000'>0</font>; n <font color='#5555FF'>&lt;</font> height_;n<font color='#5555FF'>+</font><font color='#5555FF'>+</font> <font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>*</font> v <font color='#5555FF'>=</font> <font color='#BB00BB'>get_row</font><font face='Lucida Console'>(</font> n <font face='Lucida Console'>)</font>;
+                    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font> <font color='#0000FF'><u>unsigned</u></font> m <font color='#5555FF'>=</font> <font color='#979000'>0</font>; m <font color='#5555FF'>&lt;</font> width_; m<font color='#5555FF'>+</font><font color='#5555FF'>+</font> <font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> p <font color='#5555FF'>=</font> v[m<font color='#5555FF'>*</font><font color='#979000'>2</font>];
+                        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font>pixel_traits<font color='#5555FF'>&lt;</font>pixel_type<font color='#5555FF'>&gt;</font>::has_alpha<font face='Lucida Console'>)</font>
+                        <b>{</b>
+                            <font color='#BB00BB'>assign_pixel</font><font face='Lucida Console'>(</font> t[n][m], p <font face='Lucida Console'>)</font>;
+                        <b>}</b>
+                        <font color='#0000FF'>else</font>
+                        <b>{</b>
+                            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> pa <font color='#5555FF'>=</font> v[m<font color='#5555FF'>*</font><font color='#979000'>2</font><font color='#5555FF'>+</font><font color='#979000'>1</font>];
+                            rgb_alpha_pixel pix;
+                            <font color='#BB00BB'>assign_pixel</font><font face='Lucida Console'>(</font>pix, p<font face='Lucida Console'>)</font>;
+                            <font color='#BB00BB'>assign_pixel</font><font face='Lucida Console'>(</font>pix.alpha, pa<font face='Lucida Console'>)</font>;
+                            <font color='#BB00BB'>assign_pixel</font><font face='Lucida Console'>(</font>t[n][m], pix<font face='Lucida Console'>)</font>;
+                        <b>}</b>
+                    <b>}</b>
+                <b>}</b>
+            <b>}</b>
+            <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>is_graya</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> bit_depth_ <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>16</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font> <font color='#0000FF'><u>unsigned</u></font> n <font color='#5555FF'>=</font> <font color='#979000'>0</font>; n <font color='#5555FF'>&lt;</font> height_;n<font color='#5555FF'>+</font><font color='#5555FF'>+</font> <font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#0000FF'>const</font> uint16<font color='#5555FF'>*</font> v <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>uint16<font color='#5555FF'>*</font><font face='Lucida Console'>)</font><font color='#BB00BB'>get_row</font><font face='Lucida Console'>(</font> n <font face='Lucida Console'>)</font>;
+                    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font> <font color='#0000FF'><u>unsigned</u></font> m <font color='#5555FF'>=</font> <font color='#979000'>0</font>; m <font color='#5555FF'>&lt;</font> width_; m<font color='#5555FF'>+</font><font color='#5555FF'>+</font> <font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        dlib::uint16 p <font color='#5555FF'>=</font> v[m<font color='#5555FF'>*</font><font color='#979000'>2</font>];
+                        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font>pixel_traits<font color='#5555FF'>&lt;</font>pixel_type<font color='#5555FF'>&gt;</font>::has_alpha<font face='Lucida Console'>)</font>
+                        <b>{</b>
+                            <font color='#BB00BB'>assign_pixel</font><font face='Lucida Console'>(</font> t[n][m], p <font face='Lucida Console'>)</font>;
+                        <b>}</b>
+                        <font color='#0000FF'>else</font>
+                        <b>{</b>
+                            dlib::uint16 pa <font color='#5555FF'>=</font> v[m<font color='#5555FF'>*</font><font color='#979000'>2</font><font color='#5555FF'>+</font><font color='#979000'>1</font>];
+                            rgb_alpha_pixel pix;
+                            <font color='#BB00BB'>assign_pixel</font><font face='Lucida Console'>(</font>pix, p<font face='Lucida Console'>)</font>;
+                            <font color='#BB00BB'>assign_pixel</font><font face='Lucida Console'>(</font>pix.alpha, pa<font face='Lucida Console'>)</font>;
+                            <font color='#BB00BB'>assign_pixel</font><font face='Lucida Console'>(</font>t[n][m], pix<font face='Lucida Console'>)</font>;
+                        <b>}</b>
+                    <b>}</b>
+                <b>}</b>
+            <b>}</b>
+            <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>is_rgb</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> bit_depth_ <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>8</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font> <font color='#0000FF'><u>unsigned</u></font> n <font color='#5555FF'>=</font> <font color='#979000'>0</font>; n <font color='#5555FF'>&lt;</font> height_;n<font color='#5555FF'>+</font><font color='#5555FF'>+</font> <font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>*</font> v <font color='#5555FF'>=</font> <font color='#BB00BB'>get_row</font><font face='Lucida Console'>(</font> n <font face='Lucida Console'>)</font>;
+                    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font> <font color='#0000FF'><u>unsigned</u></font> m <font color='#5555FF'>=</font> <font color='#979000'>0</font>; m <font color='#5555FF'>&lt;</font> width_;m<font color='#5555FF'>+</font><font color='#5555FF'>+</font> <font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        rgb_pixel p;
+                        p.red <font color='#5555FF'>=</font> v[m<font color='#5555FF'>*</font><font color='#979000'>3</font>];
+                        p.green <font color='#5555FF'>=</font> v[m<font color='#5555FF'>*</font><font color='#979000'>3</font><font color='#5555FF'>+</font><font color='#979000'>1</font>];
+                        p.blue <font color='#5555FF'>=</font> v[m<font color='#5555FF'>*</font><font color='#979000'>3</font><font color='#5555FF'>+</font><font color='#979000'>2</font>];
+                        <font color='#BB00BB'>assign_pixel</font><font face='Lucida Console'>(</font> t[n][m], p <font face='Lucida Console'>)</font>;
+                    <b>}</b>
+                <b>}</b>
+            <b>}</b>
+            <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>is_rgb</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> bit_depth_ <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>16</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font> <font color='#0000FF'><u>unsigned</u></font> n <font color='#5555FF'>=</font> <font color='#979000'>0</font>; n <font color='#5555FF'>&lt;</font> height_;n<font color='#5555FF'>+</font><font color='#5555FF'>+</font> <font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#0000FF'>const</font> uint16<font color='#5555FF'>*</font> v <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>uint16<font color='#5555FF'>*</font><font face='Lucida Console'>)</font><font color='#BB00BB'>get_row</font><font face='Lucida Console'>(</font> n <font face='Lucida Console'>)</font>;
+                    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font> <font color='#0000FF'><u>unsigned</u></font> m <font color='#5555FF'>=</font> <font color='#979000'>0</font>; m <font color='#5555FF'>&lt;</font> width_;m<font color='#5555FF'>+</font><font color='#5555FF'>+</font> <font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        rgb_pixel p;
+                        p.red   <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font>uint8<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>v[m<font color='#5555FF'>*</font><font color='#979000'>3</font>]<font face='Lucida Console'>)</font>;
+                        p.green <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font>uint8<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>v[m<font color='#5555FF'>*</font><font color='#979000'>3</font><font color='#5555FF'>+</font><font color='#979000'>1</font>]<font face='Lucida Console'>)</font>;
+                        p.blue  <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font>uint8<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>v[m<font color='#5555FF'>*</font><font color='#979000'>3</font><font color='#5555FF'>+</font><font color='#979000'>2</font>]<font face='Lucida Console'>)</font>;
+                        <font color='#BB00BB'>assign_pixel</font><font face='Lucida Console'>(</font> t[n][m], p <font face='Lucida Console'>)</font>;
+                    <b>}</b>
+                <b>}</b>
+            <b>}</b>
+            <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>is_rgba</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> bit_depth_ <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>8</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font>pixel_traits<font color='#5555FF'>&lt;</font>pixel_type<font color='#5555FF'>&gt;</font>::has_alpha<font face='Lucida Console'>)</font>
+                    <font color='#BB00BB'>assign_all_pixels</font><font face='Lucida Console'>(</font>t,<font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font> <font color='#0000FF'><u>unsigned</u></font> n <font color='#5555FF'>=</font> <font color='#979000'>0</font>; n <font color='#5555FF'>&lt;</font> height_;n<font color='#5555FF'>+</font><font color='#5555FF'>+</font> <font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>*</font> v <font color='#5555FF'>=</font> <font color='#BB00BB'>get_row</font><font face='Lucida Console'>(</font> n <font face='Lucida Console'>)</font>;
+                    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font> <font color='#0000FF'><u>unsigned</u></font> m <font color='#5555FF'>=</font> <font color='#979000'>0</font>; m <font color='#5555FF'>&lt;</font> width_;m<font color='#5555FF'>+</font><font color='#5555FF'>+</font> <font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        rgb_alpha_pixel p;
+                        p.red <font color='#5555FF'>=</font> v[m<font color='#5555FF'>*</font><font color='#979000'>4</font>];
+                        p.green <font color='#5555FF'>=</font> v[m<font color='#5555FF'>*</font><font color='#979000'>4</font><font color='#5555FF'>+</font><font color='#979000'>1</font>];
+                        p.blue <font color='#5555FF'>=</font> v[m<font color='#5555FF'>*</font><font color='#979000'>4</font><font color='#5555FF'>+</font><font color='#979000'>2</font>];
+                        p.alpha <font color='#5555FF'>=</font> v[m<font color='#5555FF'>*</font><font color='#979000'>4</font><font color='#5555FF'>+</font><font color='#979000'>3</font>];
+                        <font color='#BB00BB'>assign_pixel</font><font face='Lucida Console'>(</font> t[n][m], p <font face='Lucida Console'>)</font>;
+                    <b>}</b>
+                <b>}</b>
+            <b>}</b>
+            <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>is_rgba</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> bit_depth_ <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>16</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font>pixel_traits<font color='#5555FF'>&lt;</font>pixel_type<font color='#5555FF'>&gt;</font>::has_alpha<font face='Lucida Console'>)</font>
+                    <font color='#BB00BB'>assign_all_pixels</font><font face='Lucida Console'>(</font>t,<font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font> <font color='#0000FF'><u>unsigned</u></font> n <font color='#5555FF'>=</font> <font color='#979000'>0</font>; n <font color='#5555FF'>&lt;</font> height_;n<font color='#5555FF'>+</font><font color='#5555FF'>+</font> <font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#0000FF'>const</font> uint16<font color='#5555FF'>*</font> v <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>uint16<font color='#5555FF'>*</font><font face='Lucida Console'>)</font><font color='#BB00BB'>get_row</font><font face='Lucida Console'>(</font> n <font face='Lucida Console'>)</font>;
+                    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font> <font color='#0000FF'><u>unsigned</u></font> m <font color='#5555FF'>=</font> <font color='#979000'>0</font>; m <font color='#5555FF'>&lt;</font> width_;m<font color='#5555FF'>+</font><font color='#5555FF'>+</font> <font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        rgb_alpha_pixel p;
+                        p.red   <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font>uint8<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>v[m<font color='#5555FF'>*</font><font color='#979000'>4</font>]<font face='Lucida Console'>)</font>;
+                        p.green <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font>uint8<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>v[m<font color='#5555FF'>*</font><font color='#979000'>4</font><font color='#5555FF'>+</font><font color='#979000'>1</font>]<font face='Lucida Console'>)</font>;
+                        p.blue  <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font>uint8<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>v[m<font color='#5555FF'>*</font><font color='#979000'>4</font><font color='#5555FF'>+</font><font color='#979000'>2</font>]<font face='Lucida Console'>)</font>;
+                        p.alpha <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font>uint8<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>v[m<font color='#5555FF'>*</font><font color='#979000'>4</font><font color='#5555FF'>+</font><font color='#979000'>3</font>]<font face='Lucida Console'>)</font>;
+                        <font color='#BB00BB'>assign_pixel</font><font face='Lucida Console'>(</font> t[n][m], p <font face='Lucida Console'>)</font>;
+                    <b>}</b>
+                <b>}</b>
+            <b>}</b>
+        <b>}</b>
+
+    <font color='#0000FF'>private</font>:
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>*</font> <b><a name='get_row'></a>get_row</b><font face='Lucida Console'>(</font> <font color='#0000FF'><u>unsigned</u></font> i <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#0000FF'><u>void</u></font> <b><a name='read_image'></a>read_image</b><font face='Lucida Console'>(</font> <font color='#0000FF'>const</font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>*</font> filename <font face='Lucida Console'>)</font>;
+        <font color='#0000FF'><u>unsigned</u></font> height_, width_;
+        <font color='#0000FF'><u>unsigned</u></font> bit_depth_;
+        <font color='#0000FF'><u>int</u></font> color_type_;
+        scoped_ptr<font color='#5555FF'>&lt;</font>LibpngData<font color='#5555FF'>&gt;</font> ld_;
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> image_type
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='load_png'></a>load_png</b> <font face='Lucida Console'>(</font>
+        image_type<font color='#5555FF'>&amp;</font> image,
+        <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> file_name
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#BB00BB'>png_loader</font><font face='Lucida Console'>(</font>file_name<font face='Lucida Console'>)</font>.<font color='#BB00BB'>get_image</font><font face='Lucida Console'>(</font>image<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#ifdef</font> NO_MAKEFILE
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='png_loader.cpp.html'>png_loader.cpp</a>"
+<font color='#0000FF'>#endif</font> 
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_PNG_IMPORT 
+</font>
+
+</pre></body></html>

@@ -1,0 +1,93 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - webcam_face_pose_ex.cpp</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// The contents of this file are in the public domain. See LICENSE_FOR_EXAMPLE_PROGRAMS.txt
+</font><font color='#009900'>/*
+
+    This example program shows how to find frontal human faces in an image and
+    estimate their pose.  The pose takes the form of 68 landmarks.  These are
+    points on the face such as the corners of the mouth, along the eyebrows, on
+    the eyes, and so forth.  
+    
+
+    This example is essentially just a version of the <a href="face_landmark_detection_ex.cpp.html">face_landmark_detection_ex.cpp</a>
+    example modified to use OpenCV's VideoCapture object to read from a camera instead 
+    of files.
+
+
+    Finally, note that the face detector is fastest when compiled with at least
+    SSE2 instructions enabled.  So if you are using a PC with an Intel or AMD
+    chip then you should enable at least SSE2 instructions.  If you are using
+    cmake to compile this program you can enable them by using one of the
+    following commands when you create the build project:
+        cmake path_to_dlib_root/examples -DUSE_SSE2_INSTRUCTIONS=ON
+        cmake path_to_dlib_root/examples -DUSE_SSE4_INSTRUCTIONS=ON
+        cmake path_to_dlib_root/examples -DUSE_AVX_INSTRUCTIONS=ON
+    This will set the appropriate compiler options for GCC, clang, Visual
+    Studio, or the Intel compiler.  If you are using another compiler then you
+    need to consult your compiler's manual to determine how to enable these
+    instructions.  Note that AVX is the fastest but requires a CPU from at least
+    2011.  SSE4 is the next fastest and is supported by most current machines.  
+*/</font>
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>opencv.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>opencv2<font color='#5555FF'>/</font>highgui<font color='#5555FF'>/</font>highgui.hpp<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>image_processing<font color='#5555FF'>/</font>frontal_face_detector.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>image_processing<font color='#5555FF'>/</font>render_face_detections.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>gui_widgets.h<font color='#5555FF'>&gt;</font>
+
+<font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> dlib;
+<font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> std;
+
+<font color='#0000FF'><u>int</u></font> <b><a name='main'></a>main</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+<b>{</b>
+    <font color='#0000FF'>try</font>
+    <b>{</b>
+        cv::VideoCapture <font color='#BB00BB'>cap</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+        image_window win;
+
+        <font color='#009900'>// Load face detection and pose estimation models.
+</font>        frontal_face_detector detector <font color='#5555FF'>=</font> <font color='#BB00BB'>get_frontal_face_detector</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        shape_predictor pose_model;
+        <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>shape_predictor_68_face_landmarks.dat</font>"<font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font> pose_model;
+
+        <font color='#009900'>// Grab and process frames until the main window is closed by the user.
+</font>        <font color='#0000FF'>while</font><font face='Lucida Console'>(</font><font color='#5555FF'>!</font>win.<font color='#BB00BB'>is_closed</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#009900'>// Grab a frame
+</font>            cv::Mat temp;
+            cap <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font> temp;
+            <font color='#009900'>// Turn OpenCV's Mat into something dlib can deal with.  Note that this just
+</font>            <font color='#009900'>// wraps the Mat object, it doesn't copy anything.  So cimg is only valid as
+</font>            <font color='#009900'>// long as temp is valid.  Also don't do anything to temp that would cause it
+</font>            <font color='#009900'>// to reallocate the memory which stores the image as that will make cimg
+</font>            <font color='#009900'>// contain dangling pointers.  This basically means you shouldn't modify temp
+</font>            <font color='#009900'>// while using cimg.
+</font>            cv_image<font color='#5555FF'>&lt;</font>bgr_pixel<font color='#5555FF'>&gt;</font> <font color='#BB00BB'>cimg</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// Detect faces 
+</font>            std::vector<font color='#5555FF'>&lt;</font>rectangle<font color='#5555FF'>&gt;</font> faces <font color='#5555FF'>=</font> <font color='#BB00BB'>detector</font><font face='Lucida Console'>(</font>cimg<font face='Lucida Console'>)</font>;
+            <font color='#009900'>// Find the pose of each face.
+</font>            std::vector<font color='#5555FF'>&lt;</font>full_object_detection<font color='#5555FF'>&gt;</font> shapes;
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> faces.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                shapes.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font><font color='#BB00BB'>pose_model</font><font face='Lucida Console'>(</font>cimg, faces[i]<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// Display it all on the screen
+</font>            win.<font color='#BB00BB'>clear_overlay</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            win.<font color='#BB00BB'>set_image</font><font face='Lucida Console'>(</font>cimg<font face='Lucida Console'>)</font>;
+            win.<font color='#BB00BB'>add_overlay</font><font face='Lucida Console'>(</font><font color='#BB00BB'>render_face_detections</font><font face='Lucida Console'>(</font>shapes<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+    <b>}</b>
+    <font color='#0000FF'>catch</font><font face='Lucida Console'>(</font>serialization_error<font color='#5555FF'>&amp;</font> e<font face='Lucida Console'>)</font>
+    <b>{</b>
+        cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>You need dlib's default face landmarking model file to run this example.</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+        cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>You can get it from the following URL: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+        cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>   http://sourceforge.net/projects/dclib/files/dlib/v18.10/shape_predictor_68_face_landmarks.dat.bz2</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+        cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> e.<font color='#BB00BB'>what</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+    <b>}</b>
+    <font color='#0000FF'>catch</font><font face='Lucida Console'>(</font>exception<font color='#5555FF'>&amp;</font> e<font face='Lucida Console'>)</font>
+    <b>{</b>
+        cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> e.<font color='#BB00BB'>what</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+    <b>}</b>
+<b>}</b>
+
+
+</pre></body></html>

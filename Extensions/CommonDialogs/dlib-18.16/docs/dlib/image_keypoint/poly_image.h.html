@@ -1,0 +1,652 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - poly_image.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2011  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_POLY_ImAGE_Hh_
+<font color='#0000FF'>#define</font> DLIB_POLY_ImAGE_Hh_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='poly_image_abstract.h.html'>poly_image_abstract.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='build_separable_poly_filters.h.html'>build_separable_poly_filters.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../algs.h.html'>../algs.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../matrix.h.html'>../matrix.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../array2d.h.html'>../array2d.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../geometry.h.html'>../geometry.h</a>"
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>cmath<font color='#5555FF'>&gt;</font>
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'><u>long</u></font> Downsample
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>class</font> <b><a name='poly_image'></a>poly_image</b> : noncopyable
+    <b>{</b>
+        <b><a name='COMPILE_TIME_ASSERT'></a>COMPILE_TIME_ASSERT</b><font face='Lucida Console'>(</font>Downsample <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+    <font color='#0000FF'>public</font>:
+        <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>long</u></font> downsample <font color='#5555FF'>=</font> Downsample;
+        <font color='#0000FF'>typedef</font> matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>, <font color='#979000'>0</font>, <font color='#979000'>1</font><font color='#5555FF'>&gt;</font> descriptor_type;
+
+        <b><a name='poly_image'></a>poly_image</b><font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>long</u></font> order_,
+            <font color='#0000FF'><u>long</u></font> window_size_,
+            <font color='#0000FF'><u>bool</u></font> normalization <font color='#5555FF'>=</font> <font color='#979000'>true</font>,
+            <font color='#0000FF'><u>bool</u></font> rotation_invariance_ <font color='#5555FF'>=</font> <font color='#979000'>false</font>
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#BB00BB'>setup</font><font face='Lucida Console'>(</font>order_, window_size_<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>set_uses_normalization</font><font face='Lucida Console'>(</font>normalization<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>set_is_rotationally_invariant</font><font face='Lucida Console'>(</font>rotation_invariance_<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <b><a name='poly_image'></a>poly_image</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> 
+        <b>{</b>
+            <font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='clear'></a>clear</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            normalize <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+            rotation_invariance <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+            poly_coef.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            order <font color='#5555FF'>=</font> <font color='#979000'>3</font>;
+            window_size <font color='#5555FF'>=</font> <font color='#979000'>13</font>;
+            border_size <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font>std::<font color='#BB00BB'>ceil</font><font face='Lucida Console'>(</font>std::<font color='#BB00BB'>floor</font><font face='Lucida Console'>(</font>window_size<font color='#5555FF'>/</font><font color='#979000'>2.0</font><font face='Lucida Console'>)</font><font color='#5555FF'>/</font>downsample<font face='Lucida Console'>)</font>;
+            num_rows <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            num_cols <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            filters <font color='#5555FF'>=</font> <font color='#BB00BB'>build_separable_poly_filters</font><font face='Lucida Console'>(</font>order, window_size<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'><u>long</u></font> <b><a name='get_order'></a>get_order</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#0000FF'>return</font> order;
+        <b>}</b>
+
+        <font color='#0000FF'><u>long</u></font> <b><a name='get_window_size'></a>get_window_size</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#0000FF'>return</font> window_size;
+        <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='setup'></a>setup</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>long</u></font> order_,
+            <font color='#0000FF'><u>long</u></font> window_size_
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#009900'>// make sure requires clause is not broken
+</font>            <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font><font color='#979000'>1</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> order_ <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> order_ <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#979000'>6</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font>
+                        window_size_ <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#979000'>3</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> <font face='Lucida Console'>(</font>window_size_<font color='#5555FF'>%</font><font color='#979000'>2</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>1</font>,
+                "<font color='#CC0000'>\t descriptor_type poly_image::setup()</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t Invalid arguments were given to this function.</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t order_:       </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> order_ 
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t window_size_: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> window_size_ 
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t this: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font>
+                <font face='Lucida Console'>)</font>;
+
+
+            poly_coef.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            order <font color='#5555FF'>=</font> order_;
+            window_size <font color='#5555FF'>=</font> window_size_;
+            border_size <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font>std::<font color='#BB00BB'>ceil</font><font face='Lucida Console'>(</font>std::<font color='#BB00BB'>floor</font><font face='Lucida Console'>(</font>window_size<font color='#5555FF'>/</font><font color='#979000'>2.0</font><font face='Lucida Console'>)</font><font color='#5555FF'>/</font>downsample<font face='Lucida Console'>)</font>;
+            num_rows <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            num_cols <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            filters <font color='#5555FF'>=</font> <font color='#BB00BB'>build_separable_poly_filters</font><font face='Lucida Console'>(</font>order, window_size<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='uses_normalization'></a>uses_normalization</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> normalize; <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_uses_normalization'></a>set_uses_normalization</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>bool</u></font> normalization
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            normalize <font color='#5555FF'>=</font> normalization;
+        <b>}</b>
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='is_rotationally_invariant'></a>is_rotationally_invariant</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> rotation_invariance; <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_is_rotationally_invariant'></a>set_is_rotationally_invariant</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>bool</u></font> rotation_invariance_
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            rotation_invariance <font color='#5555FF'>=</font> rotation_invariance_;
+        <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='copy_configuration'></a>copy_configuration</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> poly_image<font color='#5555FF'>&amp;</font> item
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            normalize <font color='#5555FF'>=</font> item.normalize;
+            rotation_invariance <font color='#5555FF'>=</font> item.rotation_invariance;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>order <font color='#5555FF'>!</font><font color='#5555FF'>=</font> item.order <font color='#5555FF'>|</font><font color='#5555FF'>|</font> 
+                window_size <font color='#5555FF'>!</font><font color='#5555FF'>=</font> item.window_size<font face='Lucida Console'>)</font>
+            <b>{</b>
+                order <font color='#5555FF'>=</font> item.order;
+                window_size <font color='#5555FF'>=</font> item.window_size;
+                border_size <font color='#5555FF'>=</font> item.border_size;
+                filters <font color='#5555FF'>=</font> item.filters;
+            <b>}</b>
+        <b>}</b>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'>typename</font> image_type
+            <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='load'></a>load</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> image_type<font color='#5555FF'>&amp;</font> img
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#BB00BB'>COMPILE_TIME_ASSERT</font><font face='Lucida Console'>(</font> pixel_traits<font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> image_traits<font color='#5555FF'>&lt;</font>image_type<font color='#5555FF'>&gt;</font>::pixel_type<font color='#5555FF'>&gt;</font>::has_alpha <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font> <font face='Lucida Console'>)</font>;
+
+            poly_coef.<font color='#BB00BB'>resize</font><font face='Lucida Console'>(</font><font color='#BB00BB'>get_num_dimensions</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            des.<font color='#BB00BB'>set_size</font><font face='Lucida Console'>(</font><font color='#BB00BB'>get_num_dimensions</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>normalize<font face='Lucida Console'>)</font>
+            <b>{</b>
+                array2d<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>float</u></font><font color='#5555FF'>&gt;</font> coef0;
+                rectangle rect <font color='#5555FF'>=</font> <font color='#BB00BB'>filter_image</font><font face='Lucida Console'>(</font>img, coef0, filters[<font color='#979000'>0</font>]<font face='Lucida Console'>)</font>;
+                num_rows <font color='#5555FF'>=</font> rect.<font color='#BB00BB'>height</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                num_cols <font color='#5555FF'>=</font> rect.<font color='#BB00BB'>width</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>1</font>; i <font color='#5555FF'>&lt;</font> filters.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#BB00BB'>filter_image</font><font face='Lucida Console'>(</font>img, poly_coef[i<font color='#5555FF'>-</font><font color='#979000'>1</font>], filters[i]<font face='Lucida Console'>)</font>;
+
+                    <font color='#009900'>// intensity normalize everything
+</font>                    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> r <font color='#5555FF'>=</font> <font color='#979000'>0</font>; r <font color='#5555FF'>&lt;</font> coef0.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>r<font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> c <font color='#5555FF'>=</font> <font color='#979000'>0</font>; c <font color='#5555FF'>&lt;</font> coef0.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>c<font face='Lucida Console'>)</font>
+                        <b>{</b>
+                            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>coef0[r][c] <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>
+                                poly_coef[i<font color='#5555FF'>-</font><font color='#979000'>1</font>][r][c] <font color='#5555FF'>/</font><font color='#5555FF'>=</font> coef0[r][c];
+                            <font color='#0000FF'>else</font>
+                                poly_coef[i<font color='#5555FF'>-</font><font color='#979000'>1</font>][r][c] <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                        <b>}</b>
+                    <b>}</b>
+                <b>}</b>
+
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>rotation_invariance<font face='Lucida Console'>)</font>
+                    <font color='#BB00BB'>rotate_polys</font><font face='Lucida Console'>(</font>rect<font face='Lucida Console'>)</font>;
+            <b>}</b>
+            <font color='#0000FF'>else</font>
+            <b>{</b>
+                rectangle rect;
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> filters.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    rect <font color='#5555FF'>=</font> <font color='#BB00BB'>filter_image</font><font face='Lucida Console'>(</font>img, poly_coef[i], filters[i]<font face='Lucida Console'>)</font>;
+                <b>}</b>
+                num_rows <font color='#5555FF'>=</font> rect.<font color='#BB00BB'>height</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                num_cols <font color='#5555FF'>=</font> rect.<font color='#BB00BB'>width</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>rotation_invariance<font face='Lucida Console'>)</font>
+                    <font color='#BB00BB'>rotate_polys</font><font face='Lucida Console'>(</font>rect<font face='Lucida Console'>)</font>;
+            <b>}</b>
+        <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='unload'></a>unload</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            poly_coef.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            num_rows <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            num_cols <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>inline</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='size'></a>size</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>*</font><font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>; <b>}</b>
+
+        <font color='#0000FF'>inline</font> <font color='#0000FF'><u>long</u></font> <b><a name='nr'></a>nr</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> num_rows; <b>}</b>
+
+        <font color='#0000FF'>inline</font> <font color='#0000FF'><u>long</u></font> <b><a name='nc'></a>nc</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> num_cols; <b>}</b>
+
+        <font color='#0000FF'><u>long</u></font> <b><a name='get_num_dimensions'></a>get_num_dimensions</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>normalize<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#009900'>// -1 because we discard the constant term of the polynomial.
+</font>                <font color='#0000FF'>return</font> filters.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#979000'>1</font>;
+            <b>}</b>
+            <font color='#0000FF'>else</font>
+            <b>{</b>
+                <font color='#0000FF'>return</font> filters.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+        <b>}</b>
+
+        <font color='#0000FF'>inline</font> <font color='#0000FF'>const</font> descriptor_type<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>long</u></font> row,
+            <font color='#0000FF'><u>long</u></font> col
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#009900'>// make sure requires clause is not broken
+</font>            <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font> <font color='#979000'>0</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> row <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> row <font color='#5555FF'>&lt;</font> <font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font>
+                         <font color='#979000'>0</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> col <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> col <font color='#5555FF'>&lt;</font> <font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,
+                "<font color='#CC0000'>\t descriptor_type poly_image::operator()()</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t invalid row or col argument</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t row:  </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> row
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t col:  </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> col 
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t nr(): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> 
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t nc(): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> 
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t this: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font>
+                <font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// add because of the zero border around the poly_coef images
+</font>            row <font color='#5555FF'>+</font><font color='#5555FF'>=</font> border_size;
+            col <font color='#5555FF'>+</font><font color='#5555FF'>=</font> border_size;
+
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> des.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                <font color='#BB00BB'>des</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> poly_coef[i][row][col];
+
+            <font color='#0000FF'>return</font> des;
+        <b>}</b>
+
+        <font color='#0000FF'>const</font> rectangle <b><a name='get_block_rect'></a>get_block_rect</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>long</u></font> row,
+            <font color='#0000FF'><u>long</u></font> col
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#0000FF'>return</font> <font color='#BB00BB'>centered_rect</font><font face='Lucida Console'>(</font>Downsample<font color='#5555FF'>*</font><font color='#BB00BB'>point</font><font face='Lucida Console'>(</font>col<font color='#5555FF'>+</font>border_size, row<font color='#5555FF'>+</font>border_size<font face='Lucida Console'>)</font>, 
+                                 window_size, window_size<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>const</font> point <b><a name='image_to_feat_space'></a>image_to_feat_space</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> point<font color='#5555FF'>&amp;</font> p
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#0000FF'>return</font> p<font color='#5555FF'>/</font>Downsample <font color='#5555FF'>-</font> <font color='#BB00BB'>point</font><font face='Lucida Console'>(</font>border_size, border_size<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>const</font> rectangle <b><a name='image_to_feat_space'></a>image_to_feat_space</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> rectangle<font color='#5555FF'>&amp;</font> rect
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#0000FF'>return</font> <font color='#BB00BB'>rectangle</font><font face='Lucida Console'>(</font><font color='#BB00BB'>image_to_feat_space</font><font face='Lucida Console'>(</font>rect.<font color='#BB00BB'>tl_corner</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>, <font color='#BB00BB'>image_to_feat_space</font><font face='Lucida Console'>(</font>rect.<font color='#BB00BB'>br_corner</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>const</font> point <b><a name='feat_to_image_space'></a>feat_to_image_space</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> point<font color='#5555FF'>&amp;</font> p
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#0000FF'>return</font> <font face='Lucida Console'>(</font>p <font color='#5555FF'>+</font> <font color='#BB00BB'>point</font><font face='Lucida Console'>(</font>border_size, border_size<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font color='#5555FF'>*</font>Downsample;
+        <b>}</b>
+
+        <font color='#0000FF'>const</font> rectangle <b><a name='feat_to_image_space'></a>feat_to_image_space</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> rectangle<font color='#5555FF'>&amp;</font> rect
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#0000FF'>return</font> <font color='#BB00BB'>rectangle</font><font face='Lucida Console'>(</font><font color='#BB00BB'>feat_to_image_space</font><font face='Lucida Console'>(</font>rect.<font color='#BB00BB'>tl_corner</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>, <font color='#BB00BB'>feat_to_image_space</font><font face='Lucida Console'>(</font>rect.<font color='#BB00BB'>br_corner</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+
+
+        <font color='#0000FF'>friend</font> <font color='#0000FF'><u>void</u></font> <b><a name='serialize'></a>serialize</b> <font face='Lucida Console'>(</font><font color='#0000FF'>const</font> poly_image<font color='#5555FF'>&amp;</font> item, std::ostream<font color='#5555FF'>&amp;</font> out<font face='Lucida Console'>)</font> 
+        <b>{</b>
+            <font color='#0000FF'><u>int</u></font> version <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+            <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>version, out<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item.poly_coef, out<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item.order, out<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item.window_size, out<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item.border_size, out<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item.num_rows, out<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item.num_cols, out<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item.normalize, out<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item.rotation_invariance, out<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item.filters, out<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>friend</font> <font color='#0000FF'><u>void</u></font> <b><a name='deserialize'></a>deserialize</b> <font face='Lucida Console'>(</font>poly_image<font color='#5555FF'>&amp;</font> item, std::istream<font color='#5555FF'>&amp;</font> in <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'><u>int</u></font> version <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>version, in<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>version <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>
+                <font color='#0000FF'>throw</font> dlib::<font color='#BB00BB'>serialization_error</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>Unexpected version found while deserializing dlib::poly_image</font>"<font face='Lucida Console'>)</font>;
+
+            <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item.poly_coef, in<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item.order, in<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item.window_size, in<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item.border_size, in<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item.num_rows, in<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item.num_cols, in<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item.normalize, in<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item.rotation_invariance, in<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item.filters, in<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+    <font color='#0000FF'>private</font>:
+
+        matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>float</u></font>,<font color='#979000'>2</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> <b><a name='rotate_order_1'></a>rotate_order_1</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>float</u></font>,<font color='#979000'>2</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> w,
+            <font color='#0000FF'><u>double</u></font> cos_theta,
+            <font color='#0000FF'><u>double</u></font> sin_theta
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> w1 <font color='#5555FF'>=</font> <font color='#BB00BB'>w</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> w2 <font color='#5555FF'>=</font> <font color='#BB00BB'>w</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+            matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>2</font>,<font color='#979000'>2</font><font color='#5555FF'>&gt;</font> M;
+            M <font color='#5555FF'>=</font> w1,  w2,
+                w2, <font color='#5555FF'>-</font>w1;
+
+            matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>2</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> x;
+            x <font color='#5555FF'>=</font> cos_theta, 
+                sin_theta;
+
+            <font color='#0000FF'>return</font> matrix_cast<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>float</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>M<font color='#5555FF'>*</font>x<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>float</u></font>,<font color='#979000'>3</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> <b><a name='rotate_order_2'></a>rotate_order_2</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>float</u></font>,<font color='#979000'>3</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> w,
+            <font color='#0000FF'><u>double</u></font> cos_theta,
+            <font color='#0000FF'><u>double</u></font> sin_theta
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> w1 <font color='#5555FF'>=</font> <font color='#BB00BB'>w</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> w2 <font color='#5555FF'>=</font> <font color='#BB00BB'>w</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> w3 <font color='#5555FF'>=</font> <font color='#BB00BB'>w</font><font face='Lucida Console'>(</font><font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+            matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>3</font>,<font color='#979000'>3</font><font color='#5555FF'>&gt;</font> M;
+            M <font color='#5555FF'>=</font> w1, w2,           w3,
+                w2, <font face='Lucida Console'>(</font><font color='#979000'>2</font><font color='#5555FF'>*</font>w3<font color='#5555FF'>-</font><font color='#979000'>2</font><font color='#5555FF'>*</font>w1<font face='Lucida Console'>)</font>, <font color='#5555FF'>-</font>w2,
+                w3, <font color='#5555FF'>-</font>w2,          w1;
+
+            matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>3</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> x;
+            x <font color='#5555FF'>=</font> std::<font color='#BB00BB'>pow</font><font face='Lucida Console'>(</font>cos_theta,<font color='#979000'>2.0</font><font face='Lucida Console'>)</font>, 
+                cos_theta<font color='#5555FF'>*</font>sin_theta,
+                std::<font color='#BB00BB'>pow</font><font face='Lucida Console'>(</font>sin_theta,<font color='#979000'>2.0</font><font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>return</font> matrix_cast<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>float</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>M<font color='#5555FF'>*</font>x<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>float</u></font>,<font color='#979000'>4</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> <b><a name='rotate_order_3'></a>rotate_order_3</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>float</u></font>,<font color='#979000'>4</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> w,
+            <font color='#0000FF'><u>double</u></font> cos_theta,
+            <font color='#0000FF'><u>double</u></font> sin_theta
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> w1 <font color='#5555FF'>=</font> <font color='#BB00BB'>w</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> w2 <font color='#5555FF'>=</font> <font color='#BB00BB'>w</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> w3 <font color='#5555FF'>=</font> <font color='#BB00BB'>w</font><font face='Lucida Console'>(</font><font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> w4 <font color='#5555FF'>=</font> <font color='#BB00BB'>w</font><font face='Lucida Console'>(</font><font color='#979000'>3</font><font face='Lucida Console'>)</font>;
+            matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>4</font>,<font color='#979000'>4</font><font color='#5555FF'>&gt;</font> M;
+            M <font color='#5555FF'>=</font> w1, w2,            w3,           w4,
+                w2, <font face='Lucida Console'>(</font><font color='#979000'>2</font><font color='#5555FF'>*</font>w3<font color='#5555FF'>-</font><font color='#979000'>3</font><font color='#5555FF'>*</font>w1<font face='Lucida Console'>)</font>, <font face='Lucida Console'>(</font><font color='#979000'>3</font><font color='#5555FF'>*</font>w4<font color='#5555FF'>-</font><font color='#979000'>2</font><font color='#5555FF'>*</font>w2<font face='Lucida Console'>)</font>,   <font color='#5555FF'>-</font>w3,
+                w3, <font face='Lucida Console'>(</font><font color='#979000'>3</font><font color='#5555FF'>*</font>w4<font color='#5555FF'>-</font><font color='#979000'>2</font><font color='#5555FF'>*</font>w2<font face='Lucida Console'>)</font>, <font face='Lucida Console'>(</font><font color='#979000'>3</font><font color='#5555FF'>*</font>w1<font color='#5555FF'>-</font><font color='#979000'>2</font><font color='#5555FF'>*</font>w3<font face='Lucida Console'>)</font>,    w2,
+                w4, <font color='#5555FF'>-</font>w3,           w2,          <font color='#5555FF'>-</font>w1;
+
+            matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>4</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> x;
+            x <font color='#5555FF'>=</font> std::<font color='#BB00BB'>pow</font><font face='Lucida Console'>(</font>cos_theta,<font color='#979000'>3.0</font><font face='Lucida Console'>)</font>, 
+                std::<font color='#BB00BB'>pow</font><font face='Lucida Console'>(</font>cos_theta,<font color='#979000'>2.0</font><font face='Lucida Console'>)</font><font color='#5555FF'>*</font>sin_theta,
+                cos_theta<font color='#5555FF'>*</font>std::<font color='#BB00BB'>pow</font><font face='Lucida Console'>(</font>sin_theta,<font color='#979000'>2.0</font><font face='Lucida Console'>)</font>,
+                std::<font color='#BB00BB'>pow</font><font face='Lucida Console'>(</font>sin_theta,<font color='#979000'>3.0</font><font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>return</font> matrix_cast<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>float</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>M<font color='#5555FF'>*</font>x<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>float</u></font>,<font color='#979000'>5</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> <b><a name='rotate_order_4'></a>rotate_order_4</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>float</u></font>,<font color='#979000'>5</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> w,
+            <font color='#0000FF'><u>double</u></font> cos_theta,
+            <font color='#0000FF'><u>double</u></font> sin_theta
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> w1 <font color='#5555FF'>=</font> <font color='#BB00BB'>w</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> w2 <font color='#5555FF'>=</font> <font color='#BB00BB'>w</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> w3 <font color='#5555FF'>=</font> <font color='#BB00BB'>w</font><font face='Lucida Console'>(</font><font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> w4 <font color='#5555FF'>=</font> <font color='#BB00BB'>w</font><font face='Lucida Console'>(</font><font color='#979000'>3</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> w5 <font color='#5555FF'>=</font> <font color='#BB00BB'>w</font><font face='Lucida Console'>(</font><font color='#979000'>4</font><font face='Lucida Console'>)</font>;
+            matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>5</font>,<font color='#979000'>5</font><font color='#5555FF'>&gt;</font> M;
+            M <font color='#5555FF'>=</font> w1, w2,              w3,            w4,          w5,
+                w2, <font face='Lucida Console'>(</font><font color='#979000'>2</font><font color='#5555FF'>*</font>w3<font color='#5555FF'>-</font><font color='#979000'>4</font><font color='#5555FF'>*</font>w1<font face='Lucida Console'>)</font>, <font face='Lucida Console'>(</font><font color='#979000'>3</font><font color='#5555FF'>*</font>w4<font color='#5555FF'>-</font><font color='#979000'>3</font><font color='#5555FF'>*</font>w2<font face='Lucida Console'>)</font>,      <font face='Lucida Console'>(</font><font color='#979000'>4</font><font color='#5555FF'>*</font>w5<font color='#5555FF'>-</font><font color='#979000'>2</font><font color='#5555FF'>*</font>w3<font face='Lucida Console'>)</font>, <font color='#5555FF'>-</font>w4,
+                w3, <font face='Lucida Console'>(</font><font color='#979000'>3</font><font color='#5555FF'>*</font>w4<font color='#5555FF'>-</font><font color='#979000'>3</font><font color='#5555FF'>*</font>w2<font face='Lucida Console'>)</font>, <font face='Lucida Console'>(</font><font color='#979000'>6</font><font color='#5555FF'>*</font>w1<font color='#5555FF'>-</font><font color='#979000'>4</font><font color='#5555FF'>*</font>w3<font color='#5555FF'>+</font><font color='#979000'>6</font><font color='#5555FF'>*</font>w5<font face='Lucida Console'>)</font>, <font face='Lucida Console'>(</font><font color='#979000'>3</font><font color='#5555FF'>*</font>w2<font color='#5555FF'>-</font><font color='#979000'>3</font><font color='#5555FF'>*</font>w4<font face='Lucida Console'>)</font>,  w3,
+                w4, <font face='Lucida Console'>(</font><font color='#979000'>4</font><font color='#5555FF'>*</font>w5<font color='#5555FF'>-</font><font color='#979000'>2</font><font color='#5555FF'>*</font>w3<font face='Lucida Console'>)</font>, <font face='Lucida Console'>(</font><font color='#979000'>3</font><font color='#5555FF'>*</font>w2<font color='#5555FF'>-</font><font color='#979000'>3</font><font color='#5555FF'>*</font>w4<font face='Lucida Console'>)</font>,      <font face='Lucida Console'>(</font><font color='#979000'>2</font><font color='#5555FF'>*</font>w3<font color='#5555FF'>-</font><font color='#979000'>4</font><font color='#5555FF'>*</font>w1<font face='Lucida Console'>)</font>, <font color='#5555FF'>-</font>w2,
+                w5, <font color='#5555FF'>-</font>w4,            w3,            <font color='#5555FF'>-</font>w2,          w1;
+
+            matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>5</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> x;
+            x <font color='#5555FF'>=</font> std::<font color='#BB00BB'>pow</font><font face='Lucida Console'>(</font>cos_theta,<font color='#979000'>4.0</font><font face='Lucida Console'>)</font>, 
+                std::<font color='#BB00BB'>pow</font><font face='Lucida Console'>(</font>cos_theta,<font color='#979000'>3.0</font><font face='Lucida Console'>)</font><font color='#5555FF'>*</font>sin_theta,
+                std::<font color='#BB00BB'>pow</font><font face='Lucida Console'>(</font>cos_theta,<font color='#979000'>2.0</font><font face='Lucida Console'>)</font><font color='#5555FF'>*</font>std::<font color='#BB00BB'>pow</font><font face='Lucida Console'>(</font>sin_theta,<font color='#979000'>2.0</font><font face='Lucida Console'>)</font>,
+                cos_theta<font color='#5555FF'>*</font>std::<font color='#BB00BB'>pow</font><font face='Lucida Console'>(</font>sin_theta,<font color='#979000'>3.0</font><font face='Lucida Console'>)</font>,
+                std::<font color='#BB00BB'>pow</font><font face='Lucida Console'>(</font>sin_theta,<font color='#979000'>4.0</font><font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>return</font> matrix_cast<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>float</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>M<font color='#5555FF'>*</font>x<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>float</u></font>,<font color='#979000'>6</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> <b><a name='rotate_order_5'></a>rotate_order_5</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>float</u></font>,<font color='#979000'>6</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> w,
+            <font color='#0000FF'><u>double</u></font> cos_theta,
+            <font color='#0000FF'><u>double</u></font> sin_theta
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> w1 <font color='#5555FF'>=</font> <font color='#BB00BB'>w</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> w2 <font color='#5555FF'>=</font> <font color='#BB00BB'>w</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> w3 <font color='#5555FF'>=</font> <font color='#BB00BB'>w</font><font face='Lucida Console'>(</font><font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> w4 <font color='#5555FF'>=</font> <font color='#BB00BB'>w</font><font face='Lucida Console'>(</font><font color='#979000'>3</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> w5 <font color='#5555FF'>=</font> <font color='#BB00BB'>w</font><font face='Lucida Console'>(</font><font color='#979000'>4</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> w6 <font color='#5555FF'>=</font> <font color='#BB00BB'>w</font><font face='Lucida Console'>(</font><font color='#979000'>5</font><font face='Lucida Console'>)</font>;
+            matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>6</font>,<font color='#979000'>6</font><font color='#5555FF'>&gt;</font> M;
+            M <font color='#5555FF'>=</font> w1,     w2,          w3,             w4,                 w5,          w6,
+                w2, <font face='Lucida Console'>(</font><font color='#979000'>2</font><font color='#5555FF'>*</font>w3<font color='#5555FF'>-</font><font color='#979000'>5</font><font color='#5555FF'>*</font>w1<font face='Lucida Console'>)</font>, <font face='Lucida Console'>(</font><font color='#979000'>3</font><font color='#5555FF'>*</font>w4<font color='#5555FF'>-</font><font color='#979000'>4</font><font color='#5555FF'>*</font>w2<font face='Lucida Console'>)</font>,       <font face='Lucida Console'>(</font><font color='#979000'>4</font><font color='#5555FF'>*</font>w5<font color='#5555FF'>-</font><font color='#979000'>3</font><font color='#5555FF'>*</font>w3<font face='Lucida Console'>)</font>,        <font face='Lucida Console'>(</font><font color='#979000'>5</font><font color='#5555FF'>*</font>w6<font color='#5555FF'>-</font><font color='#979000'>2</font><font color='#5555FF'>*</font>w4<font face='Lucida Console'>)</font>, <font color='#5555FF'>-</font>w5,
+                w3, <font face='Lucida Console'>(</font><font color='#979000'>3</font><font color='#5555FF'>*</font>w4<font color='#5555FF'>-</font><font color='#979000'>4</font><font color='#5555FF'>*</font>w2<font face='Lucida Console'>)</font>, <font face='Lucida Console'>(</font><font color='#979000'>10</font><font color='#5555FF'>*</font>w1<font color='#5555FF'>-</font><font color='#979000'>6</font><font color='#5555FF'>*</font>w3<font color='#5555FF'>+</font><font color='#979000'>6</font><font color='#5555FF'>*</font>w5<font face='Lucida Console'>)</font>, <font face='Lucida Console'>(</font><font color='#979000'>6</font><font color='#5555FF'>*</font>w2<font color='#5555FF'>-</font><font color='#979000'>6</font><font color='#5555FF'>*</font>w4<font color='#5555FF'>+</font><font color='#979000'>10</font><font color='#5555FF'>*</font>w6<font face='Lucida Console'>)</font>,  <font face='Lucida Console'>(</font><font color='#979000'>3</font><font color='#5555FF'>*</font>w3<font color='#5555FF'>-</font><font color='#979000'>4</font><font color='#5555FF'>*</font>w5<font face='Lucida Console'>)</font>,  w4,
+                w4, <font face='Lucida Console'>(</font><font color='#979000'>4</font><font color='#5555FF'>*</font>w5<font color='#5555FF'>-</font><font color='#979000'>3</font><font color='#5555FF'>*</font>w3<font face='Lucida Console'>)</font>, <font face='Lucida Console'>(</font><font color='#979000'>6</font><font color='#5555FF'>*</font>w2<font color='#5555FF'>-</font><font color='#979000'>6</font><font color='#5555FF'>*</font>w4<font color='#5555FF'>+</font><font color='#979000'>10</font><font color='#5555FF'>*</font>w6<font face='Lucida Console'>)</font>, <font face='Lucida Console'>(</font><font color='#5555FF'>-</font><font color='#979000'>10</font><font color='#5555FF'>*</font>w1<font color='#5555FF'>+</font><font color='#979000'>6</font><font color='#5555FF'>*</font>w3<font color='#5555FF'>-</font><font color='#979000'>6</font><font color='#5555FF'>*</font>w5<font face='Lucida Console'>)</font>, <font face='Lucida Console'>(</font><font color='#979000'>3</font><font color='#5555FF'>*</font>w4<font color='#5555FF'>-</font><font color='#979000'>4</font><font color='#5555FF'>*</font>w2<font face='Lucida Console'>)</font>, <font color='#5555FF'>-</font>w3,
+                w5, <font face='Lucida Console'>(</font><font color='#979000'>5</font><font color='#5555FF'>*</font>w6<font color='#5555FF'>-</font><font color='#979000'>2</font><font color='#5555FF'>*</font>w4<font face='Lucida Console'>)</font>, <font face='Lucida Console'>(</font><font color='#979000'>3</font><font color='#5555FF'>*</font>w3<font color='#5555FF'>-</font><font color='#979000'>4</font><font color='#5555FF'>*</font>w5<font face='Lucida Console'>)</font>,       <font face='Lucida Console'>(</font><font color='#979000'>3</font><font color='#5555FF'>*</font>w4<font color='#5555FF'>-</font><font color='#979000'>4</font><font color='#5555FF'>*</font>w2<font face='Lucida Console'>)</font>,        <font face='Lucida Console'>(</font><font color='#979000'>5</font><font color='#5555FF'>*</font>w1<font color='#5555FF'>-</font><font color='#979000'>2</font><font color='#5555FF'>*</font>w3<font face='Lucida Console'>)</font>,  w2,
+                w6,    <font color='#5555FF'>-</font>w5,          w4,            <font color='#5555FF'>-</font>w3,                 w2,         <font color='#5555FF'>-</font>w1;
+
+            matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>6</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> x;
+            x <font color='#5555FF'>=</font> std::<font color='#BB00BB'>pow</font><font face='Lucida Console'>(</font>cos_theta,<font color='#979000'>5.0</font><font face='Lucida Console'>)</font>, 
+                std::<font color='#BB00BB'>pow</font><font face='Lucida Console'>(</font>cos_theta,<font color='#979000'>4.0</font><font face='Lucida Console'>)</font><font color='#5555FF'>*</font>sin_theta,
+                std::<font color='#BB00BB'>pow</font><font face='Lucida Console'>(</font>cos_theta,<font color='#979000'>3.0</font><font face='Lucida Console'>)</font><font color='#5555FF'>*</font>std::<font color='#BB00BB'>pow</font><font face='Lucida Console'>(</font>sin_theta,<font color='#979000'>2.0</font><font face='Lucida Console'>)</font>,
+                std::<font color='#BB00BB'>pow</font><font face='Lucida Console'>(</font>cos_theta,<font color='#979000'>2.0</font><font face='Lucida Console'>)</font><font color='#5555FF'>*</font>std::<font color='#BB00BB'>pow</font><font face='Lucida Console'>(</font>sin_theta,<font color='#979000'>3.0</font><font face='Lucida Console'>)</font>,
+                cos_theta<font color='#5555FF'>*</font>std::<font color='#BB00BB'>pow</font><font face='Lucida Console'>(</font>sin_theta,<font color='#979000'>4.0</font><font face='Lucida Console'>)</font>,
+                std::<font color='#BB00BB'>pow</font><font face='Lucida Console'>(</font>sin_theta,<font color='#979000'>5.0</font><font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>return</font> matrix_cast<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>float</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>M<font color='#5555FF'>*</font>x<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>float</u></font>,<font color='#979000'>7</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> <b><a name='rotate_order_6'></a>rotate_order_6</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>float</u></font>,<font color='#979000'>7</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> w,
+            <font color='#0000FF'><u>double</u></font> cos_theta,
+            <font color='#0000FF'><u>double</u></font> sin_theta
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> w1 <font color='#5555FF'>=</font> <font color='#BB00BB'>w</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> w2 <font color='#5555FF'>=</font> <font color='#BB00BB'>w</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> w3 <font color='#5555FF'>=</font> <font color='#BB00BB'>w</font><font face='Lucida Console'>(</font><font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> w4 <font color='#5555FF'>=</font> <font color='#BB00BB'>w</font><font face='Lucida Console'>(</font><font color='#979000'>3</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> w5 <font color='#5555FF'>=</font> <font color='#BB00BB'>w</font><font face='Lucida Console'>(</font><font color='#979000'>4</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> w6 <font color='#5555FF'>=</font> <font color='#BB00BB'>w</font><font face='Lucida Console'>(</font><font color='#979000'>5</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> w7 <font color='#5555FF'>=</font> <font color='#BB00BB'>w</font><font face='Lucida Console'>(</font><font color='#979000'>6</font><font face='Lucida Console'>)</font>;
+            matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>7</font>,<font color='#979000'>7</font><font color='#5555FF'>&gt;</font> M;
+            M <font color='#5555FF'>=</font> w1,     w2,          w3,              w4,                           w5,                 w6,         w7,
+                w2, <font face='Lucida Console'>(</font><font color='#979000'>2</font><font color='#5555FF'>*</font>w3<font color='#5555FF'>-</font><font color='#979000'>6</font><font color='#5555FF'>*</font>w1<font face='Lucida Console'>)</font>, <font face='Lucida Console'>(</font><font color='#979000'>3</font><font color='#5555FF'>*</font>w4<font color='#5555FF'>-</font><font color='#979000'>5</font><font color='#5555FF'>*</font>w2<font face='Lucida Console'>)</font>,        <font face='Lucida Console'>(</font><font color='#979000'>4</font><font color='#5555FF'>*</font>w5<font color='#5555FF'>-</font><font color='#979000'>4</font><font color='#5555FF'>*</font>w3<font face='Lucida Console'>)</font>,                <font face='Lucida Console'>(</font><font color='#979000'>5</font><font color='#5555FF'>*</font>w6<font color='#5555FF'>-</font><font color='#979000'>3</font><font color='#5555FF'>*</font>w4<font face='Lucida Console'>)</font>,         <font face='Lucida Console'>(</font><font color='#979000'>6</font><font color='#5555FF'>*</font>w7<font color='#5555FF'>-</font><font color='#979000'>2</font><font color='#5555FF'>*</font>w5<font face='Lucida Console'>)</font>, <font color='#5555FF'>-</font>w6,
+                w3, <font face='Lucida Console'>(</font><font color='#979000'>3</font><font color='#5555FF'>*</font>w4<font color='#5555FF'>-</font><font color='#979000'>5</font><font color='#5555FF'>*</font>w2<font face='Lucida Console'>)</font>, <font face='Lucida Console'>(</font><font color='#979000'>15</font><font color='#5555FF'>*</font>w1<font color='#5555FF'>-</font><font color='#979000'>8</font><font color='#5555FF'>*</font>w3<font color='#5555FF'>+</font> <font color='#979000'>6</font><font color='#5555FF'>*</font>w5<font face='Lucida Console'>)</font>, <font face='Lucida Console'>(</font> <font color='#979000'>10</font><font color='#5555FF'>*</font>w2 <font color='#5555FF'>-</font><font color='#979000'>9</font><font color='#5555FF'>*</font>w4<font color='#5555FF'>+</font><font color='#979000'>10</font><font color='#5555FF'>*</font>w6<font face='Lucida Console'>)</font>,       <font face='Lucida Console'>(</font>  <font color='#979000'>6</font><font color='#5555FF'>*</font>w3<font color='#5555FF'>-</font><font color='#979000'>8</font><font color='#5555FF'>*</font>w5<font color='#5555FF'>+</font><font color='#979000'>15</font><font color='#5555FF'>*</font>w7<font face='Lucida Console'>)</font>, <font face='Lucida Console'>(</font><font color='#979000'>3</font><font color='#5555FF'>*</font>w4<font color='#5555FF'>-</font><font color='#979000'>5</font><font color='#5555FF'>*</font>w6<font face='Lucida Console'>)</font>,  w5,
+                w4, <font face='Lucida Console'>(</font><font color='#979000'>4</font><font color='#5555FF'>*</font>w5<font color='#5555FF'>-</font><font color='#979000'>4</font><font color='#5555FF'>*</font>w3<font face='Lucida Console'>)</font>, <font face='Lucida Console'>(</font><font color='#979000'>10</font><font color='#5555FF'>*</font>w2<font color='#5555FF'>-</font><font color='#979000'>9</font><font color='#5555FF'>*</font>w4<font color='#5555FF'>+</font><font color='#979000'>10</font><font color='#5555FF'>*</font>w6<font face='Lucida Console'>)</font>, <font face='Lucida Console'>(</font><font color='#5555FF'>-</font><font color='#979000'>20</font><font color='#5555FF'>*</font>w1<font color='#5555FF'>+</font><font color='#979000'>12</font><font color='#5555FF'>*</font>w3<font color='#5555FF'>-</font><font color='#979000'>12</font><font color='#5555FF'>*</font>w5<font color='#5555FF'>+</font><font color='#979000'>20</font><font color='#5555FF'>*</font>w7<font face='Lucida Console'>)</font>, <font face='Lucida Console'>(</font><font color='#5555FF'>-</font><font color='#979000'>10</font><font color='#5555FF'>*</font>w2<font color='#5555FF'>+</font><font color='#979000'>9</font><font color='#5555FF'>*</font>w4<font color='#5555FF'>-</font><font color='#979000'>10</font><font color='#5555FF'>*</font>w6<font face='Lucida Console'>)</font>, <font face='Lucida Console'>(</font><font color='#979000'>4</font><font color='#5555FF'>*</font>w5<font color='#5555FF'>-</font><font color='#979000'>4</font><font color='#5555FF'>*</font>w3<font face='Lucida Console'>)</font>, <font color='#5555FF'>-</font>w4,
+                w5, <font face='Lucida Console'>(</font><font color='#979000'>5</font><font color='#5555FF'>*</font>w6<font color='#5555FF'>-</font><font color='#979000'>3</font><font color='#5555FF'>*</font>w4<font face='Lucida Console'>)</font>, <font face='Lucida Console'>(</font> <font color='#979000'>6</font><font color='#5555FF'>*</font>w3<font color='#5555FF'>-</font><font color='#979000'>8</font><font color='#5555FF'>*</font>w5<font color='#5555FF'>+</font><font color='#979000'>15</font><font color='#5555FF'>*</font>w7<font face='Lucida Console'>)</font>, <font face='Lucida Console'>(</font><font color='#5555FF'>-</font><font color='#979000'>10</font><font color='#5555FF'>*</font>w2 <font color='#5555FF'>+</font><font color='#979000'>9</font><font color='#5555FF'>*</font>w4<font color='#5555FF'>-</font><font color='#979000'>10</font><font color='#5555FF'>*</font>w6<font face='Lucida Console'>)</font>,       <font face='Lucida Console'>(</font> <font color='#979000'>15</font><font color='#5555FF'>*</font>w1<font color='#5555FF'>-</font><font color='#979000'>8</font><font color='#5555FF'>*</font>w3 <font color='#5555FF'>+</font><font color='#979000'>6</font><font color='#5555FF'>*</font>w5<font face='Lucida Console'>)</font>, <font face='Lucida Console'>(</font><font color='#979000'>5</font><font color='#5555FF'>*</font>w2<font color='#5555FF'>-</font><font color='#979000'>3</font><font color='#5555FF'>*</font>w4<font face='Lucida Console'>)</font>,  w3,
+                w6, <font face='Lucida Console'>(</font><font color='#979000'>6</font><font color='#5555FF'>*</font>w7<font color='#5555FF'>-</font><font color='#979000'>2</font><font color='#5555FF'>*</font>w5<font face='Lucida Console'>)</font>, <font face='Lucida Console'>(</font><font color='#979000'>3</font><font color='#5555FF'>*</font>w4<font color='#5555FF'>-</font><font color='#979000'>5</font><font color='#5555FF'>*</font>w6<font face='Lucida Console'>)</font>,        <font face='Lucida Console'>(</font><font color='#979000'>4</font><font color='#5555FF'>*</font>w5<font color='#5555FF'>-</font><font color='#979000'>4</font><font color='#5555FF'>*</font>w3<font face='Lucida Console'>)</font>,                <font face='Lucida Console'>(</font><font color='#979000'>5</font><font color='#5555FF'>*</font>w2<font color='#5555FF'>-</font><font color='#979000'>3</font><font color='#5555FF'>*</font>w4<font face='Lucida Console'>)</font>,         <font face='Lucida Console'>(</font><font color='#979000'>2</font><font color='#5555FF'>*</font>w3<font color='#5555FF'>-</font><font color='#979000'>6</font><font color='#5555FF'>*</font>w1<font face='Lucida Console'>)</font>, <font color='#5555FF'>-</font>w2,
+                w7,     <font color='#5555FF'>-</font>w6,          w5,            <font color='#5555FF'>-</font>w4,                          w3,                 <font color='#5555FF'>-</font>w2,         w1;
+
+            matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>7</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> x;
+            x <font color='#5555FF'>=</font> std::<font color='#BB00BB'>pow</font><font face='Lucida Console'>(</font>cos_theta,<font color='#979000'>6.0</font><font face='Lucida Console'>)</font>, 
+                std::<font color='#BB00BB'>pow</font><font face='Lucida Console'>(</font>cos_theta,<font color='#979000'>5.0</font><font face='Lucida Console'>)</font><font color='#5555FF'>*</font>sin_theta,
+                std::<font color='#BB00BB'>pow</font><font face='Lucida Console'>(</font>cos_theta,<font color='#979000'>4.0</font><font face='Lucida Console'>)</font><font color='#5555FF'>*</font>std::<font color='#BB00BB'>pow</font><font face='Lucida Console'>(</font>sin_theta,<font color='#979000'>2.0</font><font face='Lucida Console'>)</font>,
+                std::<font color='#BB00BB'>pow</font><font face='Lucida Console'>(</font>cos_theta,<font color='#979000'>3.0</font><font face='Lucida Console'>)</font><font color='#5555FF'>*</font>std::<font color='#BB00BB'>pow</font><font face='Lucida Console'>(</font>sin_theta,<font color='#979000'>3.0</font><font face='Lucida Console'>)</font>,
+                std::<font color='#BB00BB'>pow</font><font face='Lucida Console'>(</font>cos_theta,<font color='#979000'>2.0</font><font face='Lucida Console'>)</font><font color='#5555FF'>*</font>std::<font color='#BB00BB'>pow</font><font face='Lucida Console'>(</font>sin_theta,<font color='#979000'>4.0</font><font face='Lucida Console'>)</font>,
+                cos_theta<font color='#5555FF'>*</font>std::<font color='#BB00BB'>pow</font><font face='Lucida Console'>(</font>sin_theta,<font color='#979000'>5.0</font><font face='Lucida Console'>)</font>,
+                std::<font color='#BB00BB'>pow</font><font face='Lucida Console'>(</font>sin_theta,<font color='#979000'>6.0</font><font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>return</font> matrix_cast<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>float</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>M<font color='#5555FF'>*</font>x<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='rotate_polys'></a>rotate_polys</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> rectangle<font color='#5555FF'>&amp;</font> rect
+        <font face='Lucida Console'>)</font>
+        <font color='#009900'>/*!
+            ensures
+                - rotates all the polynomials in poly_coef so that they are
+                  rotationally invariant
+        !*/</font>
+        <b>{</b>
+            <font color='#009900'>// The idea here is to use a rotation matrix to rotate the 
+</font>            <font color='#009900'>// coordinate system for the polynomial so that the x axis
+</font>            <font color='#009900'>// always lines up with the gradient vector (or direction of
+</font>            <font color='#009900'>// max curvature).  This way we can make the representation 
+</font>            <font color='#009900'>// rotation invariant.
+</font>
+            <font color='#009900'>// Note that the rotation matrix is given by:
+</font>            <font color='#009900'>// [ cos_theta -sin_theta ]
+</font>            <font color='#009900'>// [ sin_theta cos_theta  ]
+</font>
+            <font color='#009900'>// need to offset poly_coef to get past the constant term if there isn't any normalization.
+</font>            <font color='#0000FF'>const</font> <font color='#0000FF'><u>int</u></font> off <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>normalize<font face='Lucida Console'>)</font> ? <font color='#979000'>0</font> : <font color='#979000'>1</font>;
+
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> r <font color='#5555FF'>=</font> rect.<font color='#BB00BB'>top</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; r <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> rect.<font color='#BB00BB'>bottom</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>r<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> c <font color='#5555FF'>=</font> rect.<font color='#BB00BB'>left</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; c <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> rect.<font color='#BB00BB'>right</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>c<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    dlib::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>2</font><font color='#5555FF'>&gt;</font> <font color='#BB00BB'>g</font><font face='Lucida Console'>(</font>poly_coef[off<font color='#5555FF'>+</font><font color='#979000'>0</font>][r][c],
+                                             poly_coef[off<font color='#5555FF'>+</font><font color='#979000'>1</font>][r][c]<font face='Lucida Console'>)</font>;
+
+                    <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> len <font color='#5555FF'>=</font> g.<font color='#BB00BB'>length</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>len <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        g <font color='#5555FF'>/</font><font color='#5555FF'>=</font> len;
+                    <b>}</b>
+                    <font color='#0000FF'>else</font>
+                    <b>{</b>
+                        g.<font color='#BB00BB'>x</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+                        g.<font color='#BB00BB'>y</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                    <b>}</b>
+                    <font color='#009900'>// since we normalized g we can find the sin/cos of its angle easily. 
+</font>                    <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> cos_theta <font color='#5555FF'>=</font> g.<font color='#BB00BB'>x</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                    <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> sin_theta <font color='#5555FF'>=</font> g.<font color='#BB00BB'>y</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>order <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>float</u></font>,<font color='#979000'>2</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> w;
+                        w <font color='#5555FF'>=</font> poly_coef[off<font color='#5555FF'>+</font><font color='#979000'>0</font>][r][c],
+                            poly_coef[off<font color='#5555FF'>+</font><font color='#979000'>1</font>][r][c];
+                        w <font color='#5555FF'>=</font> <font color='#BB00BB'>rotate_order_1</font><font face='Lucida Console'>(</font>w, cos_theta, sin_theta<font face='Lucida Console'>)</font>;
+                        poly_coef[off<font color='#5555FF'>+</font><font color='#979000'>0</font>][r][c] <font color='#5555FF'>=</font> <font color='#BB00BB'>w</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+                        poly_coef[off<font color='#5555FF'>+</font><font color='#979000'>1</font>][r][c] <font color='#5555FF'>=</font> <font color='#BB00BB'>w</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+                    <b>}</b>
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>order <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#979000'>2</font><font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>float</u></font>,<font color='#979000'>3</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> w;
+                        w <font color='#5555FF'>=</font> poly_coef[off<font color='#5555FF'>+</font><font color='#979000'>2</font>][r][c],
+                            poly_coef[off<font color='#5555FF'>+</font><font color='#979000'>3</font>][r][c],
+                            poly_coef[off<font color='#5555FF'>+</font><font color='#979000'>4</font>][r][c];
+                        w <font color='#5555FF'>=</font> <font color='#BB00BB'>rotate_order_2</font><font face='Lucida Console'>(</font>w, cos_theta, sin_theta<font face='Lucida Console'>)</font>;
+                        poly_coef[off<font color='#5555FF'>+</font><font color='#979000'>2</font>][r][c] <font color='#5555FF'>=</font> <font color='#BB00BB'>w</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+                        poly_coef[off<font color='#5555FF'>+</font><font color='#979000'>3</font>][r][c] <font color='#5555FF'>=</font> <font color='#BB00BB'>w</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+                        poly_coef[off<font color='#5555FF'>+</font><font color='#979000'>4</font>][r][c] <font color='#5555FF'>=</font> <font color='#BB00BB'>w</font><font face='Lucida Console'>(</font><font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+                    <b>}</b>
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>order <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#979000'>3</font><font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>float</u></font>,<font color='#979000'>4</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> w;
+                        w <font color='#5555FF'>=</font> poly_coef[off<font color='#5555FF'>+</font><font color='#979000'>5</font>][r][c],
+                            poly_coef[off<font color='#5555FF'>+</font><font color='#979000'>6</font>][r][c],
+                            poly_coef[off<font color='#5555FF'>+</font><font color='#979000'>7</font>][r][c],
+                            poly_coef[off<font color='#5555FF'>+</font><font color='#979000'>8</font>][r][c];
+                        w <font color='#5555FF'>=</font> <font color='#BB00BB'>rotate_order_3</font><font face='Lucida Console'>(</font>w, cos_theta, sin_theta<font face='Lucida Console'>)</font>;
+                        poly_coef[off<font color='#5555FF'>+</font><font color='#979000'>5</font>][r][c] <font color='#5555FF'>=</font> <font color='#BB00BB'>w</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+                        poly_coef[off<font color='#5555FF'>+</font><font color='#979000'>6</font>][r][c] <font color='#5555FF'>=</font> <font color='#BB00BB'>w</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+                        poly_coef[off<font color='#5555FF'>+</font><font color='#979000'>7</font>][r][c] <font color='#5555FF'>=</font> <font color='#BB00BB'>w</font><font face='Lucida Console'>(</font><font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+                        poly_coef[off<font color='#5555FF'>+</font><font color='#979000'>8</font>][r][c] <font color='#5555FF'>=</font> <font color='#BB00BB'>w</font><font face='Lucida Console'>(</font><font color='#979000'>3</font><font face='Lucida Console'>)</font>;
+                    <b>}</b>
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>order <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#979000'>4</font><font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>float</u></font>,<font color='#979000'>5</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> w;
+                        w <font color='#5555FF'>=</font> poly_coef[off<font color='#5555FF'>+</font><font color='#979000'>9</font>][r][c],
+                            poly_coef[off<font color='#5555FF'>+</font><font color='#979000'>10</font>][r][c],
+                            poly_coef[off<font color='#5555FF'>+</font><font color='#979000'>11</font>][r][c],
+                            poly_coef[off<font color='#5555FF'>+</font><font color='#979000'>12</font>][r][c],
+                            poly_coef[off<font color='#5555FF'>+</font><font color='#979000'>13</font>][r][c];
+                        w <font color='#5555FF'>=</font> <font color='#BB00BB'>rotate_order_4</font><font face='Lucida Console'>(</font>w, cos_theta, sin_theta<font face='Lucida Console'>)</font>;
+                        poly_coef[off<font color='#5555FF'>+</font><font color='#979000'>9</font>][r][c]  <font color='#5555FF'>=</font> <font color='#BB00BB'>w</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+                        poly_coef[off<font color='#5555FF'>+</font><font color='#979000'>10</font>][r][c] <font color='#5555FF'>=</font> <font color='#BB00BB'>w</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+                        poly_coef[off<font color='#5555FF'>+</font><font color='#979000'>11</font>][r][c] <font color='#5555FF'>=</font> <font color='#BB00BB'>w</font><font face='Lucida Console'>(</font><font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+                        poly_coef[off<font color='#5555FF'>+</font><font color='#979000'>12</font>][r][c] <font color='#5555FF'>=</font> <font color='#BB00BB'>w</font><font face='Lucida Console'>(</font><font color='#979000'>3</font><font face='Lucida Console'>)</font>;
+                        poly_coef[off<font color='#5555FF'>+</font><font color='#979000'>13</font>][r][c] <font color='#5555FF'>=</font> <font color='#BB00BB'>w</font><font face='Lucida Console'>(</font><font color='#979000'>4</font><font face='Lucida Console'>)</font>;
+                    <b>}</b>
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>order <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#979000'>5</font><font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>float</u></font>,<font color='#979000'>6</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> w;
+                        w <font color='#5555FF'>=</font> poly_coef[off<font color='#5555FF'>+</font><font color='#979000'>14</font>][r][c],
+                            poly_coef[off<font color='#5555FF'>+</font><font color='#979000'>15</font>][r][c],
+                            poly_coef[off<font color='#5555FF'>+</font><font color='#979000'>16</font>][r][c],
+                            poly_coef[off<font color='#5555FF'>+</font><font color='#979000'>17</font>][r][c],
+                            poly_coef[off<font color='#5555FF'>+</font><font color='#979000'>18</font>][r][c],
+                            poly_coef[off<font color='#5555FF'>+</font><font color='#979000'>19</font>][r][c];
+                        w <font color='#5555FF'>=</font> <font color='#BB00BB'>rotate_order_5</font><font face='Lucida Console'>(</font>w, cos_theta, sin_theta<font face='Lucida Console'>)</font>;
+                        poly_coef[off<font color='#5555FF'>+</font><font color='#979000'>14</font>][r][c] <font color='#5555FF'>=</font> <font color='#BB00BB'>w</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+                        poly_coef[off<font color='#5555FF'>+</font><font color='#979000'>15</font>][r][c] <font color='#5555FF'>=</font> <font color='#BB00BB'>w</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+                        poly_coef[off<font color='#5555FF'>+</font><font color='#979000'>16</font>][r][c] <font color='#5555FF'>=</font> <font color='#BB00BB'>w</font><font face='Lucida Console'>(</font><font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+                        poly_coef[off<font color='#5555FF'>+</font><font color='#979000'>17</font>][r][c] <font color='#5555FF'>=</font> <font color='#BB00BB'>w</font><font face='Lucida Console'>(</font><font color='#979000'>3</font><font face='Lucida Console'>)</font>;
+                        poly_coef[off<font color='#5555FF'>+</font><font color='#979000'>18</font>][r][c] <font color='#5555FF'>=</font> <font color='#BB00BB'>w</font><font face='Lucida Console'>(</font><font color='#979000'>4</font><font face='Lucida Console'>)</font>;
+                        poly_coef[off<font color='#5555FF'>+</font><font color='#979000'>19</font>][r][c] <font color='#5555FF'>=</font> <font color='#BB00BB'>w</font><font face='Lucida Console'>(</font><font color='#979000'>5</font><font face='Lucida Console'>)</font>;
+                    <b>}</b>
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>order <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#979000'>6</font><font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>float</u></font>,<font color='#979000'>7</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> w;
+                        w <font color='#5555FF'>=</font> poly_coef[off<font color='#5555FF'>+</font><font color='#979000'>20</font>][r][c],
+                            poly_coef[off<font color='#5555FF'>+</font><font color='#979000'>21</font>][r][c],
+                            poly_coef[off<font color='#5555FF'>+</font><font color='#979000'>22</font>][r][c],
+                            poly_coef[off<font color='#5555FF'>+</font><font color='#979000'>23</font>][r][c],
+                            poly_coef[off<font color='#5555FF'>+</font><font color='#979000'>24</font>][r][c],
+                            poly_coef[off<font color='#5555FF'>+</font><font color='#979000'>25</font>][r][c],
+                            poly_coef[off<font color='#5555FF'>+</font><font color='#979000'>26</font>][r][c];
+                        w <font color='#5555FF'>=</font> <font color='#BB00BB'>rotate_order_6</font><font face='Lucida Console'>(</font>w, cos_theta, sin_theta<font face='Lucida Console'>)</font>;
+                        poly_coef[off<font color='#5555FF'>+</font><font color='#979000'>20</font>][r][c] <font color='#5555FF'>=</font> <font color='#BB00BB'>w</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+                        poly_coef[off<font color='#5555FF'>+</font><font color='#979000'>21</font>][r][c] <font color='#5555FF'>=</font> <font color='#BB00BB'>w</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+                        poly_coef[off<font color='#5555FF'>+</font><font color='#979000'>22</font>][r][c] <font color='#5555FF'>=</font> <font color='#BB00BB'>w</font><font face='Lucida Console'>(</font><font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+                        poly_coef[off<font color='#5555FF'>+</font><font color='#979000'>23</font>][r][c] <font color='#5555FF'>=</font> <font color='#BB00BB'>w</font><font face='Lucida Console'>(</font><font color='#979000'>3</font><font face='Lucida Console'>)</font>;
+                        poly_coef[off<font color='#5555FF'>+</font><font color='#979000'>24</font>][r][c] <font color='#5555FF'>=</font> <font color='#BB00BB'>w</font><font face='Lucida Console'>(</font><font color='#979000'>4</font><font face='Lucida Console'>)</font>;
+                        poly_coef[off<font color='#5555FF'>+</font><font color='#979000'>25</font>][r][c] <font color='#5555FF'>=</font> <font color='#BB00BB'>w</font><font face='Lucida Console'>(</font><font color='#979000'>5</font><font face='Lucida Console'>)</font>;
+                        poly_coef[off<font color='#5555FF'>+</font><font color='#979000'>26</font>][r][c] <font color='#5555FF'>=</font> <font color='#BB00BB'>w</font><font face='Lucida Console'>(</font><font color='#979000'>6</font><font face='Lucida Console'>)</font>;
+                    <b>}</b>
+                <b>}</b>
+            <b>}</b>
+
+        <b>}</b>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> image_type<font color='#5555FF'>&gt;</font>
+        rectangle <b><a name='filter_image'></a>filter_image</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> image_type<font color='#5555FF'>&amp;</font> img,
+            array2d<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>float</u></font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> out,
+            <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>separable_filter_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> filter
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            rectangle rect <font color='#5555FF'>=</font> <font color='#BB00BB'>spatially_filter_image_separable_down</font><font face='Lucida Console'>(</font>downsample, img, out, filter[<font color='#979000'>0</font>].first, filter[<font color='#979000'>0</font>].second<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>1</font>; i <font color='#5555FF'>&lt;</font> filter.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#BB00BB'>spatially_filter_image_separable_down</font><font face='Lucida Console'>(</font>downsample, img, out, filter[i].first, filter[i].second, <font color='#979000'>1</font>, <font color='#979000'>false</font>, <font color='#979000'>true</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+            <font color='#0000FF'>return</font> rect;
+        <b>}</b>
+
+
+
+        std::vector<font color='#5555FF'>&lt;</font>std::vector<font color='#5555FF'>&lt;</font>separable_filter_type<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> filters;
+
+        dlib::array<font color='#5555FF'>&lt;</font>array2d<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>float</u></font><font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> poly_coef;
+        <font color='#0000FF'><u>long</u></font> order;
+        <font color='#0000FF'><u>long</u></font> window_size;
+        <font color='#0000FF'><u>long</u></font> border_size;
+        <font color='#0000FF'><u>long</u></font> num_rows;
+        <font color='#0000FF'><u>long</u></font> num_cols;
+
+        <font color='#0000FF'><u>bool</u></font> normalize;
+        <font color='#0000FF'><u>bool</u></font> rotation_invariance;
+
+        <font color='#0000FF'>mutable</font> descriptor_type des;
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_POLY_ImAGE_Hh_
+</font>
+
+
+</pre></body></html>

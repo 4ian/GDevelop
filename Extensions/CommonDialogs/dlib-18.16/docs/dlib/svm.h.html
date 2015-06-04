@@ -1,0 +1,58 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - svm.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2007  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_SVm_HEADER
+<font color='#0000FF'>#define</font> DLIB_SVm_HEADER
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='svm/svm_rank_trainer.h.html'>svm/svm_rank_trainer.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='svm/svm.h.html'>svm/svm.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='svm/krls.h.html'>svm/krls.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='svm/rls.h.html'>svm/rls.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='svm/kcentroid.h.html'>svm/kcentroid.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='svm/kcentroid_overloads.h.html'>svm/kcentroid_overloads.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='svm/kkmeans.h.html'>svm/kkmeans.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='svm/feature_ranking.h.html'>svm/feature_ranking.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='svm/rbf_network.h.html'>svm/rbf_network.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='svm/linearly_independent_subset_finder.h.html'>svm/linearly_independent_subset_finder.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='svm/reduced.h.html'>svm/reduced.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='svm/rvm.h.html'>svm/rvm.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='svm/pegasos.h.html'>svm/pegasos.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='svm/sparse_kernel.h.html'>svm/sparse_kernel.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='svm/null_trainer.h.html'>svm/null_trainer.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='svm/roc_trainer.h.html'>svm/roc_trainer.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='svm/kernel_matrix.h.html'>svm/kernel_matrix.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='svm/empirical_kernel_map.h.html'>svm/empirical_kernel_map.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='svm/svm_c_linear_trainer.h.html'>svm/svm_c_linear_trainer.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='svm/svm_c_linear_dcd_trainer.h.html'>svm/svm_c_linear_dcd_trainer.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='svm/svm_c_ekm_trainer.h.html'>svm/svm_c_ekm_trainer.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='svm/simplify_linear_decision_function.h.html'>svm/simplify_linear_decision_function.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='svm/krr_trainer.h.html'>svm/krr_trainer.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='svm/sort_basis_vectors.h.html'>svm/sort_basis_vectors.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='svm/svm_c_trainer.h.html'>svm/svm_c_trainer.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='svm/svm_one_class_trainer.h.html'>svm/svm_one_class_trainer.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='svm/svr_trainer.h.html'>svm/svr_trainer.h</a>"
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='svm/one_vs_one_decision_function.h.html'>svm/one_vs_one_decision_function.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='svm/multiclass_tools.h.html'>svm/multiclass_tools.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='svm/cross_validate_multiclass_trainer.h.html'>svm/cross_validate_multiclass_trainer.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='svm/cross_validate_regression_trainer.h.html'>svm/cross_validate_regression_trainer.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='svm/cross_validate_object_detection_trainer.h.html'>svm/cross_validate_object_detection_trainer.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='svm/cross_validate_sequence_labeler.h.html'>svm/cross_validate_sequence_labeler.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='svm/cross_validate_sequence_segmenter.h.html'>svm/cross_validate_sequence_segmenter.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='svm/cross_validate_assignment_trainer.h.html'>svm/cross_validate_assignment_trainer.h</a>"
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='svm/one_vs_all_decision_function.h.html'>svm/one_vs_all_decision_function.h</a>"
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='svm/structural_svm_problem.h.html'>svm/structural_svm_problem.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='svm/sequence_labeler.h.html'>svm/sequence_labeler.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='svm/assignment_function.h.html'>svm/assignment_function.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='svm/track_association_function.h.html'>svm/track_association_function.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='svm/active_learning.h.html'>svm/active_learning.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='svm/svr_linear_trainer.h.html'>svm/svr_linear_trainer.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='svm/sequence_segmenter.h.html'>svm/sequence_segmenter.h</a>"
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_SVm_HEADER
+</font>
+
+
+</pre></body></html>

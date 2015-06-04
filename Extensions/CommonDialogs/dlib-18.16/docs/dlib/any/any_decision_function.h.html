@@ -1,0 +1,213 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - any_decision_function.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2010  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_AnY_DECISION_FUNCTION_Hh_
+<font color='#0000FF'>#define</font> DLIB_AnY_DECISION_FUNCTION_Hh_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='any.h.html'>any.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../smart_pointers.h.html'>../smart_pointers.h</a>"
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='any_decision_function_abstract.h.html'>any_decision_function_abstract.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> sample_type_,
+        <font color='#0000FF'>typename</font> result_type_ <font color='#5555FF'>=</font> <font color='#0000FF'><u>double</u></font>
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>class</font> <b><a name='any_decision_function'></a>any_decision_function</b>
+    <b>{</b>
+
+    <font color='#0000FF'>public</font>:
+
+        <font color='#0000FF'>typedef</font> sample_type_ sample_type;
+        <font color='#0000FF'>typedef</font> result_type_ result_type;
+        <font color='#0000FF'>typedef</font> default_memory_manager mem_manager_type;
+
+        <b><a name='any_decision_function'></a>any_decision_function</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+        <b>}</b>
+
+        <b><a name='any_decision_function'></a>any_decision_function</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> any_decision_function<font color='#5555FF'>&amp;</font> item
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>item.data<font face='Lucida Console'>)</font>
+            <b>{</b>
+                item.data<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>copy_to</font><font face='Lucida Console'>(</font>data<font face='Lucida Console'>)</font>;
+            <b>}</b>
+        <b>}</b>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+        <b><a name='any_decision_function'></a>any_decision_function</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> item
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> basic_type<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font>::type U;
+            data.<font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font><font color='#0000FF'>new</font> derived<font color='#5555FF'>&lt;</font>U<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>item<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='clear'></a>clear</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            data.<font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>bool</u></font> <b><a name='contains'></a>contains</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> basic_type<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font>::type U;
+            <font color='#0000FF'>return</font> <font color='#0000FF'>dynamic_cast</font><font color='#5555FF'>&lt;</font>derived<font color='#5555FF'>&lt;</font>U<font color='#5555FF'>&gt;</font><font color='#5555FF'>*</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>data.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <b>}</b>
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='is_empty'></a>is_empty</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#0000FF'>return</font> data.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <b>}</b>
+
+        result_type <b><a name='operator'></a>operator</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> sample_type<font color='#5555FF'>&amp;</font> item
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#009900'>// make sure requires clause is not broken
+</font>            <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font><font color='#BB00BB'>is_empty</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font>,
+                "<font color='#CC0000'>\t result_type any_decision_function::operator()</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t You can't call operator() on an empty any_decision_function</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t this: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font>
+                <font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>return</font> data<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>evaluate</font><font face='Lucida Console'>(</font>item<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+        T<font color='#5555FF'>&amp;</font> <b><a name='cast_to'></a>cast_to</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> 
+        <b>{</b>
+            <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> basic_type<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font>::type U;
+            derived<font color='#5555FF'>&lt;</font>U<font color='#5555FF'>&gt;</font><font color='#5555FF'>*</font> d <font color='#5555FF'>=</font> <font color='#0000FF'>dynamic_cast</font><font color='#5555FF'>&lt;</font>derived<font color='#5555FF'>&lt;</font>U<font color='#5555FF'>&gt;</font><font color='#5555FF'>*</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>data.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>d <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>throw</font> <font color='#BB00BB'>bad_any_cast</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+            <font color='#0000FF'>return</font> d<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>item;
+        <b>}</b>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> <b><a name='cast_to'></a>cast_to</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> basic_type<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font>::type U;
+            derived<font color='#5555FF'>&lt;</font>U<font color='#5555FF'>&gt;</font><font color='#5555FF'>*</font> d <font color='#5555FF'>=</font> <font color='#0000FF'>dynamic_cast</font><font color='#5555FF'>&lt;</font>derived<font color='#5555FF'>&lt;</font>U<font color='#5555FF'>&gt;</font><font color='#5555FF'>*</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>data.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>d <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>throw</font> <font color='#BB00BB'>bad_any_cast</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+            <font color='#0000FF'>return</font> d<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>item;
+        <b>}</b>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+        T<font color='#5555FF'>&amp;</font> <b><a name='get'></a>get</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> 
+        <b>{</b>
+            <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> basic_type<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font>::type U;
+            derived<font color='#5555FF'>&lt;</font>U<font color='#5555FF'>&gt;</font><font color='#5555FF'>*</font> d <font color='#5555FF'>=</font> <font color='#0000FF'>dynamic_cast</font><font color='#5555FF'>&lt;</font>derived<font color='#5555FF'>&lt;</font>U<font color='#5555FF'>&gt;</font><font color='#5555FF'>*</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>data.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>d <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                d <font color='#5555FF'>=</font> <font color='#0000FF'>new</font> derived<font color='#5555FF'>&lt;</font>U<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                data.<font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font>d<font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+            <font color='#0000FF'>return</font> d<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>item;
+        <b>}</b>
+
+        any_decision_function<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> any_decision_function<font color='#5555FF'>&amp;</font> item
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#BB00BB'>any_decision_function</font><font face='Lucida Console'>(</font>item<font face='Lucida Console'>)</font>.<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font><font color='#0000FF'>this</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>return</font> <font color='#5555FF'>*</font><font color='#0000FF'>this</font>;
+        <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='swap'></a>swap</b> <font face='Lucida Console'>(</font>
+            any_decision_function<font color='#5555FF'>&amp;</font> item
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            data.<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>item.data<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+    <font color='#0000FF'>private</font>:
+
+        <font color='#0000FF'>struct</font> <b><a name='base'></a>base</b>
+        <b>{</b>
+            <font color='#0000FF'>virtual</font> ~<b><a name='base'></a>base</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+
+            <font color='#0000FF'>virtual</font> <font color='#0000FF'><u>void</u></font> <b><a name='copy_to'></a>copy_to</b> <font face='Lucida Console'>(</font>
+                scoped_ptr<font color='#5555FF'>&lt;</font>base<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> dest
+            <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+
+            <font color='#0000FF'>virtual</font> result_type <b><a name='evaluate'></a>evaluate</b> <font face='Lucida Console'>(</font>
+                <font color='#0000FF'>const</font> sample_type<font color='#5555FF'>&amp;</font> samp
+            <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <b>}</b>;
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>struct</font> <b><a name='derived'></a>derived</b> : <font color='#0000FF'>public</font> base
+        <b>{</b>
+            T item;
+            <b><a name='derived'></a>derived</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+            <b><a name='derived'></a>derived</b><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> val<font face='Lucida Console'>)</font> : item<font face='Lucida Console'>(</font>val<font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+
+            <font color='#0000FF'>virtual</font> <font color='#0000FF'><u>void</u></font> <b><a name='copy_to'></a>copy_to</b> <font face='Lucida Console'>(</font>
+                scoped_ptr<font color='#5555FF'>&lt;</font>base<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> dest
+            <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+            <b>{</b>
+                dest.<font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font><font color='#0000FF'>new</font> derived<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>item<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+            <font color='#0000FF'>virtual</font> result_type <b><a name='evaluate'></a>evaluate</b> <font face='Lucida Console'>(</font>
+                <font color='#0000FF'>const</font> sample_type<font color='#5555FF'>&amp;</font> samp
+            <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> 
+            <b>{</b>
+                <font color='#0000FF'>return</font> <font color='#BB00BB'>item</font><font face='Lucida Console'>(</font>samp<font face='Lucida Console'>)</font>;
+            <b>}</b>
+        <b>}</b>;
+
+        scoped_ptr<font color='#5555FF'>&lt;</font>base<font color='#5555FF'>&gt;</font> data;
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> sample_type,
+        <font color='#0000FF'>typename</font> result_type
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='swap'></a>swap</b> <font face='Lucida Console'>(</font>
+        any_decision_function<font color='#5555FF'>&lt;</font>sample_type, result_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> a,
+        any_decision_function<font color='#5555FF'>&lt;</font>sample_type, result_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> b
+    <font face='Lucida Console'>)</font> <b>{</b> a.<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>b<font face='Lucida Console'>)</font>; <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> U, <font color='#0000FF'>typename</font> V<font color='#5555FF'>&gt;</font> 
+    T<font color='#5555FF'>&amp;</font> <b><a name='any_cast'></a>any_cast</b><font face='Lucida Console'>(</font>any_decision_function<font color='#5555FF'>&lt;</font>U,V<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> a<font face='Lucida Console'>)</font> <b>{</b> <font color='#0000FF'>return</font> a.<font color='#0000FF'>template</font> cast_to<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <b>}</b>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T, <font color='#0000FF'>typename</font> U, <font color='#0000FF'>typename</font> V<font color='#5555FF'>&gt;</font> 
+    <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> <b><a name='any_cast'></a>any_cast</b><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> any_decision_function<font color='#5555FF'>&lt;</font>U,V<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> a<font face='Lucida Console'>)</font> <b>{</b> <font color='#0000FF'>return</font> a.<font color='#0000FF'>template</font> cast_to<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_AnY_DECISION_FUNCTION_Hh_
+</font>
+
+
+</pre></body></html>

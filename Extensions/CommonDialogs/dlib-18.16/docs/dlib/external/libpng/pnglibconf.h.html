@@ -1,0 +1,214 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - pnglibconf.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>/* libpng 1.6.7 STANDARD API DEFINITION */</font>
+
+<font color='#009900'>/* pnglibconf.h - library build configuration */</font>
+
+<font color='#009900'>/* Libpng version 1.6.7 - November 14, 2013 */</font>
+
+<font color='#009900'>/* Copyright (c) 1998-2013 Glenn Randers-Pehrson */</font>
+
+<font color='#009900'>/* This code is released under the libpng license. */</font>
+<font color='#009900'>/* For conditions of distribution and use, see the disclaimer */</font>
+<font color='#009900'>/* and license in png.h */</font>
+
+<font color='#009900'>/* pnglibconf.h */</font>
+<font color='#009900'>/* Machine generated file: DO NOT EDIT */</font>
+<font color='#009900'>/* Derived from: scripts/pnglibconf.dfa */</font>
+<font color='#0000FF'>#ifndef</font> PNGLCONF_H
+<font color='#0000FF'>#define</font> PNGLCONF_H
+<font color='#009900'>/* options */</font>
+<font color='#0000FF'>#define</font> PNG_16BIT_SUPPORTED
+<font color='#0000FF'>#define</font> PNG_ALIGNED_MEMORY_SUPPORTED
+<font color='#009900'>/*#undef PNG_ARM_NEON_API_SUPPORTED*/</font>
+<font color='#009900'>/*#undef PNG_ARM_NEON_CHECK_SUPPORTED*/</font>
+<font color='#0000FF'>#define</font> PNG_BENIGN_ERRORS_SUPPORTED
+<font color='#0000FF'>#define</font> PNG_BENIGN_READ_ERRORS_SUPPORTED
+<font color='#009900'>/*#undef PNG_BENIGN_WRITE_ERRORS_SUPPORTED*/</font>
+<font color='#0000FF'>#define</font> PNG_BUILD_GRAYSCALE_PALETTE_SUPPORTED
+<font color='#0000FF'>#define</font> PNG_CHECK_FOR_INVALID_INDEX_SUPPORTED
+<font color='#0000FF'>#define</font> PNG_COLORSPACE_SUPPORTED
+<font color='#0000FF'>#define</font> PNG_CONSOLE_IO_SUPPORTED
+<font color='#0000FF'>#define</font> PNG_CONVERT_tIME_SUPPORTED
+<font color='#0000FF'>#define</font> PNG_EASY_ACCESS_SUPPORTED
+<font color='#009900'>/*#undef PNG_ERROR_NUMBERS_SUPPORTED*/</font>
+<font color='#0000FF'>#define</font> PNG_ERROR_TEXT_SUPPORTED
+<font color='#0000FF'>#define</font> PNG_FIXED_POINT_SUPPORTED
+<font color='#0000FF'>#define</font> PNG_FLOATING_ARITHMETIC_SUPPORTED
+<font color='#0000FF'>#define</font> PNG_FLOATING_POINT_SUPPORTED
+<font color='#0000FF'>#define</font> PNG_FORMAT_AFIRST_SUPPORTED
+<font color='#0000FF'>#define</font> PNG_FORMAT_BGR_SUPPORTED
+<font color='#0000FF'>#define</font> PNG_GAMMA_SUPPORTED
+<font color='#0000FF'>#define</font> PNG_GET_PALETTE_MAX_SUPPORTED
+<font color='#0000FF'>#define</font> PNG_HANDLE_AS_UNKNOWN_SUPPORTED
+<font color='#0000FF'>#define</font> PNG_INCH_CONVERSIONS_SUPPORTED
+<font color='#0000FF'>#define</font> PNG_INFO_IMAGE_SUPPORTED
+<font color='#0000FF'>#define</font> PNG_IO_STATE_SUPPORTED
+<font color='#0000FF'>#define</font> PNG_MNG_FEATURES_SUPPORTED
+<font color='#0000FF'>#define</font> PNG_POINTER_INDEXING_SUPPORTED
+<font color='#0000FF'>#define</font> PNG_PROGRESSIVE_READ_SUPPORTED
+<font color='#0000FF'>#define</font> PNG_READ_16BIT_SUPPORTED
+<font color='#0000FF'>#define</font> PNG_READ_ALPHA_MODE_SUPPORTED
+<font color='#0000FF'>#define</font> PNG_READ_ANCILLARY_CHUNKS_SUPPORTED
+<font color='#0000FF'>#define</font> PNG_READ_BACKGROUND_SUPPORTED
+<font color='#0000FF'>#define</font> PNG_READ_BGR_SUPPORTED
+<font color='#0000FF'>#define</font> PNG_READ_CHECK_FOR_INVALID_INDEX_SUPPORTED
+<font color='#0000FF'>#define</font> PNG_READ_COMPOSITE_NODIV_SUPPORTED
+<font color='#0000FF'>#define</font> PNG_READ_COMPRESSED_TEXT_SUPPORTED
+<font color='#0000FF'>#define</font> PNG_READ_EXPAND_16_SUPPORTED
+<font color='#0000FF'>#define</font> PNG_READ_EXPAND_SUPPORTED
+<font color='#0000FF'>#define</font> PNG_READ_FILLER_SUPPORTED
+<font color='#0000FF'>#define</font> PNG_READ_GAMMA_SUPPORTED
+<font color='#0000FF'>#define</font> PNG_READ_GET_PALETTE_MAX_SUPPORTED
+<font color='#0000FF'>#define</font> PNG_READ_GRAY_TO_RGB_SUPPORTED
+<font color='#0000FF'>#define</font> PNG_READ_INTERLACING_SUPPORTED
+<font color='#0000FF'>#define</font> PNG_READ_INT_FUNCTIONS_SUPPORTED
+<font color='#0000FF'>#define</font> PNG_READ_INVERT_ALPHA_SUPPORTED
+<font color='#0000FF'>#define</font> PNG_READ_INVERT_SUPPORTED
+<font color='#0000FF'>#define</font> PNG_READ_OPT_PLTE_SUPPORTED
+<font color='#0000FF'>#define</font> PNG_READ_PACKSWAP_SUPPORTED
+<font color='#0000FF'>#define</font> PNG_READ_PACK_SUPPORTED
+<font color='#0000FF'>#define</font> PNG_READ_QUANTIZE_SUPPORTED
+<font color='#0000FF'>#define</font> PNG_READ_RGB_TO_GRAY_SUPPORTED
+<font color='#0000FF'>#define</font> PNG_READ_SCALE_16_TO_8_SUPPORTED
+<font color='#0000FF'>#define</font> PNG_READ_SHIFT_SUPPORTED
+<font color='#0000FF'>#define</font> PNG_READ_STRIP_16_TO_8_SUPPORTED
+<font color='#0000FF'>#define</font> PNG_READ_STRIP_ALPHA_SUPPORTED
+<font color='#0000FF'>#define</font> PNG_READ_SUPPORTED
+<font color='#0000FF'>#define</font> PNG_READ_SWAP_ALPHA_SUPPORTED
+<font color='#0000FF'>#define</font> PNG_READ_SWAP_SUPPORTED
+<font color='#0000FF'>#define</font> PNG_READ_TEXT_SUPPORTED
+<font color='#0000FF'>#define</font> PNG_READ_TRANSFORMS_SUPPORTED
+<font color='#0000FF'>#define</font> PNG_READ_UNKNOWN_CHUNKS_SUPPORTED
+<font color='#0000FF'>#define</font> PNG_READ_USER_CHUNKS_SUPPORTED
+<font color='#0000FF'>#define</font> PNG_READ_USER_TRANSFORM_SUPPORTED
+<font color='#0000FF'>#define</font> PNG_READ_bKGD_SUPPORTED
+<font color='#0000FF'>#define</font> PNG_READ_cHRM_SUPPORTED
+<font color='#0000FF'>#define</font> PNG_READ_gAMA_SUPPORTED
+<font color='#0000FF'>#define</font> PNG_READ_hIST_SUPPORTED
+<font color='#0000FF'>#define</font> PNG_READ_iCCP_SUPPORTED
+<font color='#0000FF'>#define</font> PNG_READ_iTXt_SUPPORTED
+<font color='#0000FF'>#define</font> PNG_READ_oFFs_SUPPORTED
+<font color='#0000FF'>#define</font> PNG_READ_pCAL_SUPPORTED
+<font color='#0000FF'>#define</font> PNG_READ_pHYs_SUPPORTED
+<font color='#0000FF'>#define</font> PNG_READ_sBIT_SUPPORTED
+<font color='#0000FF'>#define</font> PNG_READ_sCAL_SUPPORTED
+<font color='#0000FF'>#define</font> PNG_READ_sPLT_SUPPORTED
+<font color='#0000FF'>#define</font> PNG_READ_sRGB_SUPPORTED
+<font color='#0000FF'>#define</font> PNG_READ_tEXt_SUPPORTED
+<font color='#0000FF'>#define</font> PNG_READ_tIME_SUPPORTED
+<font color='#0000FF'>#define</font> PNG_READ_tRNS_SUPPORTED
+<font color='#0000FF'>#define</font> PNG_READ_zTXt_SUPPORTED
+<font color='#009900'>/*#undef PNG_SAFE_LIMITS_SUPPORTED*/</font>
+<font color='#0000FF'>#define</font> PNG_SAVE_INT_32_SUPPORTED
+<font color='#0000FF'>#define</font> PNG_SAVE_UNKNOWN_CHUNKS_SUPPORTED
+<font color='#0000FF'>#define</font> PNG_SEQUENTIAL_READ_SUPPORTED
+<font color='#0000FF'>#define</font> PNG_SETJMP_SUPPORTED
+<font color='#0000FF'>#define</font> PNG_SET_CHUNK_CACHE_LIMIT_SUPPORTED
+<font color='#0000FF'>#define</font> PNG_SET_CHUNK_MALLOC_LIMIT_SUPPORTED
+<font color='#0000FF'>#define</font> PNG_SET_OPTION_SUPPORTED
+<font color='#0000FF'>#define</font> PNG_SET_UNKNOWN_CHUNKS_SUPPORTED
+<font color='#0000FF'>#define</font> PNG_SET_USER_LIMITS_SUPPORTED
+<font color='#0000FF'>#define</font> PNG_SIMPLIFIED_READ_AFIRST_SUPPORTED
+<font color='#0000FF'>#define</font> PNG_SIMPLIFIED_READ_BGR_SUPPORTED
+<font color='#0000FF'>#define</font> PNG_SIMPLIFIED_READ_SUPPORTED
+<font color='#0000FF'>#define</font> PNG_SIMPLIFIED_WRITE_AFIRST_SUPPORTED
+<font color='#0000FF'>#define</font> PNG_SIMPLIFIED_WRITE_BGR_SUPPORTED
+<font color='#0000FF'>#define</font> PNG_SIMPLIFIED_WRITE_SUPPORTED
+<font color='#0000FF'>#define</font> PNG_STDIO_SUPPORTED
+<font color='#0000FF'>#define</font> PNG_STORE_UNKNOWN_CHUNKS_SUPPORTED
+<font color='#0000FF'>#define</font> PNG_TEXT_SUPPORTED
+<font color='#0000FF'>#define</font> PNG_TIME_RFC1123_SUPPORTED
+<font color='#0000FF'>#define</font> PNG_UNKNOWN_CHUNKS_SUPPORTED
+<font color='#0000FF'>#define</font> PNG_USER_CHUNKS_SUPPORTED
+<font color='#0000FF'>#define</font> PNG_USER_LIMITS_SUPPORTED
+<font color='#0000FF'>#define</font> PNG_USER_MEM_SUPPORTED
+<font color='#0000FF'>#define</font> PNG_USER_TRANSFORM_INFO_SUPPORTED
+<font color='#0000FF'>#define</font> PNG_USER_TRANSFORM_PTR_SUPPORTED
+<font color='#0000FF'>#define</font> PNG_WARNINGS_SUPPORTED
+<font color='#0000FF'>#define</font> PNG_WRITE_16BIT_SUPPORTED
+<font color='#0000FF'>#define</font> PNG_WRITE_ANCILLARY_CHUNKS_SUPPORTED
+<font color='#0000FF'>#define</font> PNG_WRITE_BGR_SUPPORTED
+<font color='#0000FF'>#define</font> PNG_WRITE_CHECK_FOR_INVALID_INDEX_SUPPORTED
+<font color='#0000FF'>#define</font> PNG_WRITE_COMPRESSED_TEXT_SUPPORTED
+<font color='#0000FF'>#define</font> PNG_WRITE_CUSTOMIZE_ZTXT_COMPRESSION_SUPPORTED
+<font color='#0000FF'>#define</font> PNG_WRITE_FILLER_SUPPORTED
+<font color='#0000FF'>#define</font> PNG_WRITE_FILTER_SUPPORTED
+<font color='#0000FF'>#define</font> PNG_WRITE_FLUSH_SUPPORTED
+<font color='#0000FF'>#define</font> PNG_WRITE_GET_PALETTE_MAX_SUPPORTED
+<font color='#0000FF'>#define</font> PNG_WRITE_INTERLACING_SUPPORTED
+<font color='#0000FF'>#define</font> PNG_WRITE_INT_FUNCTIONS_SUPPORTED
+<font color='#0000FF'>#define</font> PNG_WRITE_INVERT_ALPHA_SUPPORTED
+<font color='#0000FF'>#define</font> PNG_WRITE_INVERT_SUPPORTED
+<font color='#0000FF'>#define</font> PNG_WRITE_OPTIMIZE_CMF_SUPPORTED
+<font color='#0000FF'>#define</font> PNG_WRITE_PACKSWAP_SUPPORTED
+<font color='#0000FF'>#define</font> PNG_WRITE_PACK_SUPPORTED
+<font color='#0000FF'>#define</font> PNG_WRITE_SHIFT_SUPPORTED
+<font color='#0000FF'>#define</font> PNG_WRITE_SUPPORTED
+<font color='#0000FF'>#define</font> PNG_WRITE_SWAP_ALPHA_SUPPORTED
+<font color='#0000FF'>#define</font> PNG_WRITE_SWAP_SUPPORTED
+<font color='#0000FF'>#define</font> PNG_WRITE_TEXT_SUPPORTED
+<font color='#0000FF'>#define</font> PNG_WRITE_TRANSFORMS_SUPPORTED
+<font color='#0000FF'>#define</font> PNG_WRITE_UNKNOWN_CHUNKS_SUPPORTED
+<font color='#0000FF'>#define</font> PNG_WRITE_USER_TRANSFORM_SUPPORTED
+<font color='#0000FF'>#define</font> PNG_WRITE_WEIGHTED_FILTER_SUPPORTED
+<font color='#0000FF'>#define</font> PNG_WRITE_bKGD_SUPPORTED
+<font color='#0000FF'>#define</font> PNG_WRITE_cHRM_SUPPORTED
+<font color='#0000FF'>#define</font> PNG_WRITE_gAMA_SUPPORTED
+<font color='#0000FF'>#define</font> PNG_WRITE_hIST_SUPPORTED
+<font color='#0000FF'>#define</font> PNG_WRITE_iCCP_SUPPORTED
+<font color='#0000FF'>#define</font> PNG_WRITE_iTXt_SUPPORTED
+<font color='#0000FF'>#define</font> PNG_WRITE_oFFs_SUPPORTED
+<font color='#0000FF'>#define</font> PNG_WRITE_pCAL_SUPPORTED
+<font color='#0000FF'>#define</font> PNG_WRITE_pHYs_SUPPORTED
+<font color='#0000FF'>#define</font> PNG_WRITE_sBIT_SUPPORTED
+<font color='#0000FF'>#define</font> PNG_WRITE_sCAL_SUPPORTED
+<font color='#0000FF'>#define</font> PNG_WRITE_sPLT_SUPPORTED
+<font color='#0000FF'>#define</font> PNG_WRITE_sRGB_SUPPORTED
+<font color='#0000FF'>#define</font> PNG_WRITE_tEXt_SUPPORTED
+<font color='#0000FF'>#define</font> PNG_WRITE_tIME_SUPPORTED
+<font color='#0000FF'>#define</font> PNG_WRITE_tRNS_SUPPORTED
+<font color='#0000FF'>#define</font> PNG_WRITE_zTXt_SUPPORTED
+<font color='#0000FF'>#define</font> PNG_bKGD_SUPPORTED
+<font color='#0000FF'>#define</font> PNG_cHRM_SUPPORTED
+<font color='#0000FF'>#define</font> PNG_gAMA_SUPPORTED
+<font color='#0000FF'>#define</font> PNG_hIST_SUPPORTED
+<font color='#0000FF'>#define</font> PNG_iCCP_SUPPORTED
+<font color='#0000FF'>#define</font> PNG_iTXt_SUPPORTED
+<font color='#0000FF'>#define</font> PNG_oFFs_SUPPORTED
+<font color='#0000FF'>#define</font> PNG_pCAL_SUPPORTED
+<font color='#0000FF'>#define</font> PNG_pHYs_SUPPORTED
+<font color='#0000FF'>#define</font> PNG_sBIT_SUPPORTED
+<font color='#0000FF'>#define</font> PNG_sCAL_SUPPORTED
+<font color='#0000FF'>#define</font> PNG_sPLT_SUPPORTED
+<font color='#0000FF'>#define</font> PNG_sRGB_SUPPORTED
+<font color='#0000FF'>#define</font> PNG_tEXt_SUPPORTED
+<font color='#0000FF'>#define</font> PNG_tIME_SUPPORTED
+<font color='#0000FF'>#define</font> PNG_tRNS_SUPPORTED
+<font color='#0000FF'>#define</font> PNG_zTXt_SUPPORTED
+<font color='#009900'>/* end of options */</font>
+<font color='#009900'>/* settings */</font>
+<font color='#0000FF'>#define</font> PNG_API_RULE <font color='#979000'>0</font>
+<font color='#0000FF'>#define</font> PNG_CALLOC_SUPPORTED
+<font color='#0000FF'>#define</font> PNG_COST_SHIFT <font color='#979000'>3</font>
+<font color='#0000FF'>#define</font> PNG_DEFAULT_READ_MACROS <font color='#979000'>1</font>
+<font color='#0000FF'>#define</font> PNG_GAMMA_THRESHOLD_FIXED <font color='#979000'>5000</font>
+<font color='#0000FF'>#define</font> PNG_IDAT_READ_SIZE PNG_ZBUF_SIZE
+<font color='#0000FF'>#define</font> PNG_INFLATE_BUF_SIZE <font color='#979000'>1024</font>
+<font color='#0000FF'>#define</font> PNG_MAX_GAMMA_8 <font color='#979000'>11</font>
+<font color='#0000FF'>#define</font> PNG_QUANTIZE_BLUE_BITS <font color='#979000'>5</font>
+<font color='#0000FF'>#define</font> PNG_QUANTIZE_GREEN_BITS <font color='#979000'>5</font>
+<font color='#0000FF'>#define</font> PNG_QUANTIZE_RED_BITS <font color='#979000'>5</font>
+<font color='#0000FF'>#define</font> PNG_TEXT_Z_DEFAULT_COMPRESSION <font face='Lucida Console'>(</font><font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>
+<font color='#0000FF'>#define</font> PNG_TEXT_Z_DEFAULT_STRATEGY <font color='#979000'>0</font>
+<font color='#0000FF'>#define</font> PNG_WEIGHT_SHIFT <font color='#979000'>8</font>
+<font color='#0000FF'>#define</font> PNG_ZBUF_SIZE <font color='#979000'>8192</font>
+<font color='#0000FF'>#define</font> PNG_ZLIB_VERNUM <font color='#979000'>0</font> <font color='#009900'>/* unknown */</font>
+<font color='#0000FF'>#define</font> PNG_Z_DEFAULT_COMPRESSION <font face='Lucida Console'>(</font><font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>
+<font color='#0000FF'>#define</font> PNG_Z_DEFAULT_NOFILTER_STRATEGY <font color='#979000'>0</font>
+<font color='#0000FF'>#define</font> PNG_Z_DEFAULT_STRATEGY <font color='#979000'>1</font>
+<font color='#0000FF'>#define</font> PNG_sCAL_PRECISION <font color='#979000'>5</font>
+<font color='#0000FF'>#define</font> PNG_sRGB_PROFILE_CHECKS <font color='#979000'>2</font>
+<font color='#009900'>/* end of settings */</font>
+<font color='#0000FF'>#endif</font> <font color='#009900'>/* PNGLCONF_H */</font>
+
+</pre></body></html>

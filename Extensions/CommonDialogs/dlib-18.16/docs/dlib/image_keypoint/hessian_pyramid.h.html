@@ -1,0 +1,534 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - hessian_pyramid.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2009  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_HESSIAN_PYRAMId_Hh_
+<font color='#0000FF'>#define</font> DLIB_HESSIAN_PYRAMId_Hh_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='hessian_pyramid_abstract.h.html'>hessian_pyramid_abstract.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../algs.h.html'>../algs.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../image_transforms/integral_image.h.html'>../image_transforms/integral_image.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../array.h.html'>../array.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../array2d.h.html'>../array2d.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../noncopyable.h.html'>../noncopyable.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../matrix.h.html'>../matrix.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../stl_checked.h.html'>../stl_checked.h</a>"
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>algorithm<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>vector<font color='#5555FF'>&gt;</font>
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>struct</font> <b><a name='interest_point'></a>interest_point</b>
+    <b>{</b>
+        <b><a name='interest_point'></a>interest_point</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> : scale<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>, score<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>, laplacian<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+
+        dlib::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>2</font><font color='#5555FF'>&gt;</font> center;
+        <font color='#0000FF'><u>double</u></font> scale;
+        <font color='#0000FF'><u>double</u></font> score;
+        <font color='#0000FF'><u>double</u></font> laplacian;
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='operator'></a>operator</b> <font color='#5555FF'>&lt;</font> <font face='Lucida Console'>(</font><font color='#0000FF'>const</font> interest_point<font color='#5555FF'>&amp;</font> p<font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> score <font color='#5555FF'>&lt;</font> p.score; <b>}</b>
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='serialize'></a>serialize</b><font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> interest_point<font color='#5555FF'>&amp;</font> item,  
+        std::ostream<font color='#5555FF'>&amp;</font> out
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>try</font>
+        <b>{</b>
+            <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item.center,out<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item.scale,out<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item.score,out<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item.laplacian,out<font face='Lucida Console'>)</font>;
+        <b>}</b>
+        <font color='#0000FF'>catch</font> <font face='Lucida Console'>(</font>serialization_error<font color='#5555FF'>&amp;</font> e<font face='Lucida Console'>)</font>
+        <b>{</b> 
+            <font color='#0000FF'>throw</font> <font color='#BB00BB'>serialization_error</font><font face='Lucida Console'>(</font>e.info <font color='#5555FF'>+</font> "<font color='#CC0000'>\n   while serializing object of type interest_point</font>"<font face='Lucida Console'>)</font>; 
+        <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='deserialize'></a>deserialize</b><font face='Lucida Console'>(</font>
+        interest_point<font color='#5555FF'>&amp;</font> item,  
+        std::istream<font color='#5555FF'>&amp;</font> in 
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>try</font>
+        <b>{</b>
+            <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item.center,in<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item.scale,in<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item.score,in<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item.laplacian,in<font face='Lucida Console'>)</font>;
+        <b>}</b>
+        <font color='#0000FF'>catch</font> <font face='Lucida Console'>(</font>serialization_error<font color='#5555FF'>&amp;</font> e<font face='Lucida Console'>)</font>
+        <b>{</b> 
+            <font color='#0000FF'>throw</font> <font color='#BB00BB'>serialization_error</font><font face='Lucida Console'>(</font>e.info <font color='#5555FF'>+</font> "<font color='#CC0000'>\n   while deserializing object of type interest_point</font>"<font face='Lucida Console'>)</font>; 
+        <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>class</font> <b><a name='hessian_pyramid'></a>hessian_pyramid</b> : noncopyable
+    <b>{</b>
+    <font color='#0000FF'>public</font>:
+        <b><a name='hessian_pyramid'></a>hessian_pyramid</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            num_octaves <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            num_intervals <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            initial_step_size <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> integral_image_type<font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='build_pyramid'></a>build_pyramid</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> integral_image_type<font color='#5555FF'>&amp;</font> img,
+            <font color='#0000FF'><u>long</u></font> num_octaves,
+            <font color='#0000FF'><u>long</u></font> num_intervals,
+            <font color='#0000FF'><u>long</u></font> initial_step_size
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font>num_octaves <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> num_intervals <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> initial_step_size <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font>,
+                "<font color='#CC0000'>\tvoid build_pyramid()</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tAll arguments to this function must be &gt; 0</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t this:              </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font>
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t num_octaves:       </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> num_octaves 
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t num_intervals:     </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> num_intervals 
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t initial_step_size: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> initial_step_size 
+            <font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>this</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>num_octaves <font color='#5555FF'>=</font> num_octaves;
+            <font color='#0000FF'>this</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>num_intervals <font color='#5555FF'>=</font> num_intervals;
+            <font color='#0000FF'>this</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>initial_step_size <font color='#5555FF'>=</font> initial_step_size;
+
+            <font color='#009900'>// allocate space for the pyramid
+</font>            pyramid.<font color='#BB00BB'>resize</font><font face='Lucida Console'>(</font>num_octaves<font color='#5555FF'>*</font>num_intervals<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> o <font color='#5555FF'>=</font> <font color='#979000'>0</font>; o <font color='#5555FF'>&lt;</font> num_octaves; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>o<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> step_size <font color='#5555FF'>=</font> <font color='#BB00BB'>get_step_size</font><font face='Lucida Console'>(</font>o<font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> num_intervals; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    pyramid[num_intervals<font color='#5555FF'>*</font>o <font color='#5555FF'>+</font> i].<font color='#BB00BB'>set_size</font><font face='Lucida Console'>(</font>img.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>/</font>step_size, img.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>/</font>step_size<font face='Lucida Console'>)</font>;
+                <b>}</b>
+            <b>}</b>
+
+            <font color='#009900'>// now fill out the pyramid with data
+</font>            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> o <font color='#5555FF'>=</font> <font color='#979000'>0</font>; o <font color='#5555FF'>&lt;</font> num_octaves; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>o<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> step_size <font color='#5555FF'>=</font> <font color='#BB00BB'>get_step_size</font><font face='Lucida Console'>(</font>o<font face='Lucida Console'>)</font>;
+
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> num_intervals; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> border_size <font color='#5555FF'>=</font> <font color='#BB00BB'>get_border_size</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font><font color='#5555FF'>*</font>step_size;
+                    <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> lobe_size <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>std::<font color='#BB00BB'>pow</font><font face='Lucida Console'>(</font><font color='#979000'>2.0</font>, o<font color='#5555FF'>+</font><font color='#979000'>1.0</font><font face='Lucida Console'>)</font><font color='#5555FF'>+</font><font color='#979000'>0.5</font><font face='Lucida Console'>)</font><font color='#5555FF'>*</font><font face='Lucida Console'>(</font>i<font color='#5555FF'>+</font><font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> <font color='#979000'>1</font>;
+                    <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> area_inv <font color='#5555FF'>=</font> <font color='#979000'>1.0</font><font color='#5555FF'>/</font>std::<font color='#BB00BB'>pow</font><font face='Lucida Console'>(</font><font color='#979000'>3.0</font><font color='#5555FF'>*</font>lobe_size, <font color='#979000'>2.0</font><font face='Lucida Console'>)</font>;
+
+                    <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> lobe_offset <font color='#5555FF'>=</font> lobe_size<font color='#5555FF'>/</font><font color='#979000'>2</font><font color='#5555FF'>+</font><font color='#979000'>1</font>;
+                    <font color='#0000FF'>const</font> point <font color='#BB00BB'>tl</font><font face='Lucida Console'>(</font><font color='#5555FF'>-</font>lobe_offset,<font color='#5555FF'>-</font>lobe_offset<font face='Lucida Console'>)</font>;
+                    <font color='#0000FF'>const</font> point <font color='#BB00BB'>tr</font><font face='Lucida Console'>(</font>lobe_offset,<font color='#5555FF'>-</font>lobe_offset<font face='Lucida Console'>)</font>;
+                    <font color='#0000FF'>const</font> point <font color='#BB00BB'>bl</font><font face='Lucida Console'>(</font><font color='#5555FF'>-</font>lobe_offset,lobe_offset<font face='Lucida Console'>)</font>;
+                    <font color='#0000FF'>const</font> point <font color='#BB00BB'>br</font><font face='Lucida Console'>(</font>lobe_offset,lobe_offset<font face='Lucida Console'>)</font>;
+
+                    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> r <font color='#5555FF'>=</font> border_size; r <font color='#5555FF'>&lt;</font> img.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> border_size; r <font color='#5555FF'>+</font><font color='#5555FF'>=</font> step_size<font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> c <font color='#5555FF'>=</font> border_size; c <font color='#5555FF'>&lt;</font> img.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> border_size; c <font color='#5555FF'>+</font><font color='#5555FF'>=</font> step_size<font face='Lucida Console'>)</font>
+                        <b>{</b>
+                            <font color='#0000FF'>const</font> point <font color='#BB00BB'>p</font><font face='Lucida Console'>(</font>c,r<font face='Lucida Console'>)</font>;
+
+                            <font color='#0000FF'><u>double</u></font> Dxx <font color='#5555FF'>=</font> img.<font color='#BB00BB'>get_sum_of_area</font><font face='Lucida Console'>(</font><font color='#BB00BB'>centered_rect</font><font face='Lucida Console'>(</font>p, lobe_size<font color='#5555FF'>*</font><font color='#979000'>3</font>, <font color='#979000'>2</font><font color='#5555FF'>*</font>lobe_size<font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> 
+                                         img.<font color='#BB00BB'>get_sum_of_area</font><font face='Lucida Console'>(</font><font color='#BB00BB'>centered_rect</font><font face='Lucida Console'>(</font>p, lobe_size,   <font color='#979000'>2</font><font color='#5555FF'>*</font>lobe_size<font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font color='#5555FF'>*</font><font color='#979000'>3.0</font>;
+
+                            <font color='#0000FF'><u>double</u></font> Dyy <font color='#5555FF'>=</font> img.<font color='#BB00BB'>get_sum_of_area</font><font face='Lucida Console'>(</font><font color='#BB00BB'>centered_rect</font><font face='Lucida Console'>(</font>p, <font color='#979000'>2</font><font color='#5555FF'>*</font>lobe_size<font color='#5555FF'>-</font><font color='#979000'>1</font>, lobe_size<font color='#5555FF'>*</font><font color='#979000'>3</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> 
+                                         img.<font color='#BB00BB'>get_sum_of_area</font><font face='Lucida Console'>(</font><font color='#BB00BB'>centered_rect</font><font face='Lucida Console'>(</font>p, <font color='#979000'>2</font><font color='#5555FF'>*</font>lobe_size<font color='#5555FF'>-</font><font color='#979000'>1</font>, lobe_size<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font color='#5555FF'>*</font><font color='#979000'>3.0</font>;
+
+                            <font color='#0000FF'><u>double</u></font> Dxy <font color='#5555FF'>=</font> img.<font color='#BB00BB'>get_sum_of_area</font><font face='Lucida Console'>(</font><font color='#BB00BB'>centered_rect</font><font face='Lucida Console'>(</font>p<font color='#5555FF'>+</font>bl, lobe_size, lobe_size<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> 
+                                         img.<font color='#BB00BB'>get_sum_of_area</font><font face='Lucida Console'>(</font><font color='#BB00BB'>centered_rect</font><font face='Lucida Console'>(</font>p<font color='#5555FF'>+</font>tr, lobe_size, lobe_size<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>-</font>
+                                         img.<font color='#BB00BB'>get_sum_of_area</font><font face='Lucida Console'>(</font><font color='#BB00BB'>centered_rect</font><font face='Lucida Console'>(</font>p<font color='#5555FF'>+</font>tl, lobe_size, lobe_size<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>-</font>
+                                         img.<font color='#BB00BB'>get_sum_of_area</font><font face='Lucida Console'>(</font><font color='#BB00BB'>centered_rect</font><font face='Lucida Console'>(</font>p<font color='#5555FF'>+</font>br, lobe_size, lobe_size<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+                            <font color='#009900'>// now we normalize the filter responses
+</font>                            Dxx <font color='#5555FF'>*</font><font color='#5555FF'>=</font> area_inv;
+                            Dyy <font color='#5555FF'>*</font><font color='#5555FF'>=</font> area_inv;
+                            Dxy <font color='#5555FF'>*</font><font color='#5555FF'>=</font> area_inv;
+
+
+                            <font color='#0000FF'><u>double</u></font> sign_of_laplacian <font color='#5555FF'>=</font> <font color='#5555FF'>+</font><font color='#979000'>1</font>;
+                            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>Dxx <font color='#5555FF'>+</font> Dyy <font color='#5555FF'>&lt;</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                                sign_of_laplacian <font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>1</font>;
+
+                            <font color='#0000FF'><u>double</u></font> determinant <font color='#5555FF'>=</font> Dxx<font color='#5555FF'>*</font>Dyy <font color='#5555FF'>-</font> <font color='#979000'>0.81</font><font color='#5555FF'>*</font>Dxy<font color='#5555FF'>*</font>Dxy;
+
+                            <font color='#009900'>// If the determinant is negative then just blank it out by setting
+</font>                            <font color='#009900'>// it to zero.
+</font>                            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>determinant <font color='#5555FF'>&lt;</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                                determinant <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+
+                            <font color='#009900'>// Save the determinant of the Hessian into our image pyramid.  Also
+</font>                            <font color='#009900'>// pack the laplacian sign into the value so we can get it out later.
+</font>                            pyramid[o<font color='#5555FF'>*</font>num_intervals <font color='#5555FF'>+</font> i][r<font color='#5555FF'>/</font>step_size][c<font color='#5555FF'>/</font>step_size] <font color='#5555FF'>=</font> sign_of_laplacian<font color='#5555FF'>*</font>determinant;
+
+                        <b>}</b>
+                    <b>}</b>
+
+                <b>}</b>
+            <b>}</b>
+        <b>}</b>
+
+        <font color='#0000FF'><u>long</u></font> <b><a name='get_border_size'></a>get_border_size</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>long</u></font> interval 
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font><font color='#979000'>0</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> interval <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> interval <font color='#5555FF'>&lt;</font> <font color='#BB00BB'>intervals</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,
+                "<font color='#CC0000'>\tlong get_border_size(interval)</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tInvalid interval value</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t this:   </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font>
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t interval: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> interval 
+            <font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> lobe_size <font color='#5555FF'>=</font> <font color='#979000'>2.0</font><font color='#5555FF'>*</font><font face='Lucida Console'>(</font>interval<font color='#5555FF'>+</font><font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> <font color='#979000'>1</font>;
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> filter_size <font color='#5555FF'>=</font> <font color='#979000'>3</font><font color='#5555FF'>*</font>lobe_size;
+
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> bs <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>std::<font color='#BB00BB'>ceil</font><font face='Lucida Console'>(</font>filter_size<font color='#5555FF'>/</font><font color='#979000'>2.0</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>return</font> bs;
+        <b>}</b>
+
+        <font color='#0000FF'><u>long</u></font> <b><a name='get_step_size'></a>get_step_size</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>long</u></font> octave
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font><font color='#979000'>0</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> octave <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> octave <font color='#5555FF'>&lt;</font> <font color='#BB00BB'>octaves</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,
+                "<font color='#CC0000'>\tlong get_step_size(octave)</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tInvalid octave value</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t this:   </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font>
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t octave: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> octave 
+            <font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>return</font> initial_step_size<font color='#5555FF'>*</font><font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>std::<font color='#BB00BB'>pow</font><font face='Lucida Console'>(</font><font color='#979000'>2.0</font>, <font face='Lucida Console'>(</font><font color='#0000FF'><u>double</u></font><font face='Lucida Console'>)</font>octave<font face='Lucida Console'>)</font><font color='#5555FF'>+</font><font color='#979000'>0.5</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'><u>long</u></font> <b><a name='nr'></a>nr</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>long</u></font> octave
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font><font color='#979000'>0</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> octave <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> octave <font color='#5555FF'>&lt;</font> <font color='#BB00BB'>octaves</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,
+                "<font color='#CC0000'>\tlong nr(octave)</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tInvalid octave value</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t this:   </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font>
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t octave: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> octave 
+            <font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>return</font> pyramid[num_intervals<font color='#5555FF'>*</font>octave].<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'><u>long</u></font> <b><a name='nc'></a>nc</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>long</u></font> octave
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font><font color='#979000'>0</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> octave <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> octave <font color='#5555FF'>&lt;</font> <font color='#BB00BB'>octaves</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,
+                "<font color='#CC0000'>\tlong nc(octave)</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tInvalid octave value</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t this:   </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font>
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t octave: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> octave 
+            <font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>return</font> pyramid[num_intervals<font color='#5555FF'>*</font>octave].<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'><u>double</u></font> <b><a name='get_value'></a>get_value</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>long</u></font> octave,
+            <font color='#0000FF'><u>long</u></font> interval,
+            <font color='#0000FF'><u>long</u></font> r,
+            <font color='#0000FF'><u>long</u></font> c
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font><font color='#979000'>0</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> octave <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> octave <font color='#5555FF'>&lt;</font> <font color='#BB00BB'>octaves</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font>
+                        <font color='#979000'>0</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> interval <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> interval <font color='#5555FF'>&lt;</font> <font color='#BB00BB'>intervals</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font>
+                        <font color='#BB00BB'>get_border_size</font><font face='Lucida Console'>(</font>interval<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> r <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> r <font color='#5555FF'>&lt;</font> <font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font>octave<font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#BB00BB'>get_border_size</font><font face='Lucida Console'>(</font>interval<font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font>
+                        <font color='#BB00BB'>get_border_size</font><font face='Lucida Console'>(</font>interval<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> c <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> c <font color='#5555FF'>&lt;</font> <font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font>octave<font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#BB00BB'>get_border_size</font><font face='Lucida Console'>(</font>interval<font face='Lucida Console'>)</font>,
+                "<font color='#CC0000'>\tdouble get_value(octave, interval, r, c)</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tInvalid inputs to this function</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t this:      </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font>
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t octave:    </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> octave 
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t interval:  </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> interval 
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t octaves:   </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>octaves</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> 
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t intervals: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>intervals</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t r:         </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> r  
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t c:         </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> c 
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t nr(octave): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font>octave<font face='Lucida Console'>)</font>  
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t nc(octave): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font>octave<font face='Lucida Console'>)</font> 
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t get_border_size(interval): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>get_border_size</font><font face='Lucida Console'>(</font>interval<font face='Lucida Console'>)</font> 
+            <font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>return</font> std::<font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font>pyramid[num_intervals<font color='#5555FF'>*</font>octave <font color='#5555FF'>+</font> interval][r][c]<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'><u>double</u></font> <b><a name='get_laplacian'></a>get_laplacian</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>long</u></font> octave,
+            <font color='#0000FF'><u>long</u></font> interval,
+            <font color='#0000FF'><u>long</u></font> r,
+            <font color='#0000FF'><u>long</u></font> c
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font><font color='#979000'>0</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> octave <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> octave <font color='#5555FF'>&lt;</font> <font color='#BB00BB'>octaves</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font>
+                        <font color='#979000'>0</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> interval <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> interval <font color='#5555FF'>&lt;</font> <font color='#BB00BB'>intervals</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font>
+                        <font color='#BB00BB'>get_border_size</font><font face='Lucida Console'>(</font>interval<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> r <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> r <font color='#5555FF'>&lt;</font> <font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font>octave<font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#BB00BB'>get_border_size</font><font face='Lucida Console'>(</font>interval<font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font>
+                        <font color='#BB00BB'>get_border_size</font><font face='Lucida Console'>(</font>interval<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> c <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> c <font color='#5555FF'>&lt;</font> <font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font>octave<font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#BB00BB'>get_border_size</font><font face='Lucida Console'>(</font>interval<font face='Lucida Console'>)</font>,
+                "<font color='#CC0000'>\tdouble get_laplacian(octave, interval, r, c)</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tInvalid inputs to this function</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t this:      </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font>
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t octave:    </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> octave 
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t interval:  </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> interval 
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t octaves:   </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>octaves</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> 
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t intervals: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>intervals</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t r:         </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> r  
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t c:         </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> c 
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t nr(octave): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font>octave<font face='Lucida Console'>)</font>  
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t nc(octave): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font>octave<font face='Lucida Console'>)</font> 
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t get_border_size(interval): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>get_border_size</font><font face='Lucida Console'>(</font>interval<font face='Lucida Console'>)</font> 
+            <font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// return the sign of the laplacian
+</font>            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>pyramid[num_intervals<font color='#5555FF'>*</font>octave <font color='#5555FF'>+</font> interval][r][c] <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                <font color='#0000FF'>return</font> <font color='#5555FF'>+</font><font color='#979000'>1</font>;
+            <font color='#0000FF'>else</font>
+                <font color='#0000FF'>return</font> <font color='#5555FF'>-</font><font color='#979000'>1</font>;
+        <b>}</b>
+
+        <font color='#0000FF'><u>long</u></font> <b><a name='octaves'></a>octaves</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> num_octaves; <b>}</b>
+
+        <font color='#0000FF'><u>long</u></font> <b><a name='intervals'></a>intervals</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> num_intervals; <b>}</b>
+
+    <font color='#0000FF'>private</font>:
+
+        <font color='#0000FF'><u>long</u></font> num_octaves;
+        <font color='#0000FF'><u>long</u></font> num_intervals;
+        <font color='#0000FF'><u>long</u></font> initial_step_size;
+
+        <font color='#0000FF'>typedef</font> array2d<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font> image_type;
+        <font color='#0000FF'>typedef</font> array<font color='#5555FF'>&lt;</font>image_type<font color='#5555FF'>&gt;</font> pyramid_type;
+
+        pyramid_type pyramid;
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>namespace</font> hessian_pyramid_helpers
+    <b>{</b>
+        <font color='#0000FF'>inline</font> <font color='#0000FF'><u>bool</u></font> <b><a name='is_maximum_in_region'></a>is_maximum_in_region</b><font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> hessian_pyramid<font color='#5555FF'>&amp;</font> pyr,
+            <font color='#0000FF'><u>long</u></font> o, 
+            <font color='#0000FF'><u>long</u></font> i, 
+            <font color='#0000FF'><u>long</u></font> r, 
+            <font color='#0000FF'><u>long</u></font> c
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#009900'>// First check if this point is near the edge of the octave 
+</font>            <font color='#009900'>// If it is then we say it isn't a maximum as these points are
+</font>            <font color='#009900'>// not as reliable.
+</font>            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>i <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#979000'>0</font> <font color='#5555FF'>|</font><font color='#5555FF'>|</font> i<font color='#5555FF'>+</font><font color='#979000'>1</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> pyr.<font color='#BB00BB'>intervals</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>return</font> <font color='#979000'>false</font>;
+            <b>}</b>
+
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> val <font color='#5555FF'>=</font> pyr.<font color='#BB00BB'>get_value</font><font face='Lucida Console'>(</font>o,i,r,c<font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// now check if there are any bigger values around this guy
+</font>            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> ii <font color='#5555FF'>=</font> i<font color='#5555FF'>-</font><font color='#979000'>1</font>; ii <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> i<font color='#5555FF'>+</font><font color='#979000'>1</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>ii<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> rr <font color='#5555FF'>=</font> r<font color='#5555FF'>-</font><font color='#979000'>1</font>; rr <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> r<font color='#5555FF'>+</font><font color='#979000'>1</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>rr<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> cc <font color='#5555FF'>=</font> c<font color='#5555FF'>-</font><font color='#979000'>1</font>; cc <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> c<font color='#5555FF'>+</font><font color='#979000'>1</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>cc<font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>pyr.<font color='#BB00BB'>get_value</font><font face='Lucida Console'>(</font>o,ii,rr,cc<font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font> val<font face='Lucida Console'>)</font>
+                            <font color='#0000FF'>return</font> <font color='#979000'>false</font>;
+                    <b>}</b>
+                <b>}</b>
+            <b>}</b>
+
+            <font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+        <b>}</b>
+
+    <font color='#009900'>// ------------------------------------------------------------------------------------
+</font>
+        <font color='#0000FF'>inline</font> <font color='#0000FF'>const</font> matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>3</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> <b><a name='get_hessian_gradient'></a>get_hessian_gradient</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> hessian_pyramid<font color='#5555FF'>&amp;</font> pyr,
+            <font color='#0000FF'><u>long</u></font> o, 
+            <font color='#0000FF'><u>long</u></font> i, 
+            <font color='#0000FF'><u>long</u></font> r, 
+            <font color='#0000FF'><u>long</u></font> c
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>3</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> grad;
+            <font color='#BB00BB'>grad</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>pyr.<font color='#BB00BB'>get_value</font><font face='Lucida Console'>(</font>o,i,r,c<font color='#5555FF'>+</font><font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> pyr.<font color='#BB00BB'>get_value</font><font face='Lucida Console'>(</font>o,i,r,c<font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font color='#5555FF'>/</font><font color='#979000'>2.0</font>;
+            <font color='#BB00BB'>grad</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>pyr.<font color='#BB00BB'>get_value</font><font face='Lucida Console'>(</font>o,i,r<font color='#5555FF'>+</font><font color='#979000'>1</font>,c<font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> pyr.<font color='#BB00BB'>get_value</font><font face='Lucida Console'>(</font>o,i,r<font color='#5555FF'>-</font><font color='#979000'>1</font>,c<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font color='#5555FF'>/</font><font color='#979000'>2.0</font>;
+            <font color='#BB00BB'>grad</font><font face='Lucida Console'>(</font><font color='#979000'>2</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>pyr.<font color='#BB00BB'>get_value</font><font face='Lucida Console'>(</font>o,i<font color='#5555FF'>+</font><font color='#979000'>1</font>,r,c<font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> pyr.<font color='#BB00BB'>get_value</font><font face='Lucida Console'>(</font>o,i<font color='#5555FF'>-</font><font color='#979000'>1</font>,r,c<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font color='#5555FF'>/</font><font color='#979000'>2.0</font>;
+            <font color='#0000FF'>return</font> grad;
+        <b>}</b>
+
+    <font color='#009900'>// ------------------------------------------------------------------------------------
+</font>
+        <font color='#0000FF'>inline</font> <font color='#0000FF'>const</font> matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>3</font>,<font color='#979000'>3</font><font color='#5555FF'>&gt;</font> <b><a name='get_hessian_hessian'></a>get_hessian_hessian</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> hessian_pyramid<font color='#5555FF'>&amp;</font> pyr,
+            <font color='#0000FF'><u>long</u></font> o, 
+            <font color='#0000FF'><u>long</u></font> i, 
+            <font color='#0000FF'><u>long</u></font> r, 
+            <font color='#0000FF'><u>long</u></font> c
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>3</font>,<font color='#979000'>3</font><font color='#5555FF'>&gt;</font> hess;
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> val <font color='#5555FF'>=</font> pyr.<font color='#BB00BB'>get_value</font><font face='Lucida Console'>(</font>o,i,r,c<font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'><u>double</u></font> Dxx <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>pyr.<font color='#BB00BB'>get_value</font><font face='Lucida Console'>(</font>o,i,r,c<font color='#5555FF'>+</font><font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> pyr.<font color='#BB00BB'>get_value</font><font face='Lucida Console'>(</font>o,i,r,c<font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> <font color='#979000'>2</font><font color='#5555FF'>*</font>val;
+            <font color='#0000FF'><u>double</u></font> Dyy <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>pyr.<font color='#BB00BB'>get_value</font><font face='Lucida Console'>(</font>o,i,r<font color='#5555FF'>+</font><font color='#979000'>1</font>,c<font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> pyr.<font color='#BB00BB'>get_value</font><font face='Lucida Console'>(</font>o,i,r<font color='#5555FF'>-</font><font color='#979000'>1</font>,c<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> <font color='#979000'>2</font><font color='#5555FF'>*</font>val;
+            <font color='#0000FF'><u>double</u></font> Dss <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>pyr.<font color='#BB00BB'>get_value</font><font face='Lucida Console'>(</font>o,i<font color='#5555FF'>+</font><font color='#979000'>1</font>,r,c<font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> pyr.<font color='#BB00BB'>get_value</font><font face='Lucida Console'>(</font>o,i<font color='#5555FF'>-</font><font color='#979000'>1</font>,r,c<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> <font color='#979000'>2</font><font color='#5555FF'>*</font>val;
+
+            <font color='#0000FF'><u>double</u></font> Dxy <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>pyr.<font color='#BB00BB'>get_value</font><font face='Lucida Console'>(</font>o,i,r<font color='#5555FF'>+</font><font color='#979000'>1</font>,c<font color='#5555FF'>+</font><font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> pyr.<font color='#BB00BB'>get_value</font><font face='Lucida Console'>(</font>o,i,r<font color='#5555FF'>-</font><font color='#979000'>1</font>,c<font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>-</font>
+                          pyr.<font color='#BB00BB'>get_value</font><font face='Lucida Console'>(</font>o,i,r<font color='#5555FF'>-</font><font color='#979000'>1</font>,c<font color='#5555FF'>+</font><font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> pyr.<font color='#BB00BB'>get_value</font><font face='Lucida Console'>(</font>o,i,r<font color='#5555FF'>+</font><font color='#979000'>1</font>,c<font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>/</font> <font color='#979000'>4.0</font>;
+
+            <font color='#0000FF'><u>double</u></font> Dxs <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>pyr.<font color='#BB00BB'>get_value</font><font face='Lucida Console'>(</font>o,i<font color='#5555FF'>+</font><font color='#979000'>1</font>,r,c<font color='#5555FF'>+</font><font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> pyr.<font color='#BB00BB'>get_value</font><font face='Lucida Console'>(</font>o,i<font color='#5555FF'>-</font><font color='#979000'>1</font>,r,c<font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>-</font>
+                          pyr.<font color='#BB00BB'>get_value</font><font face='Lucida Console'>(</font>o,i<font color='#5555FF'>-</font><font color='#979000'>1</font>,r,c<font color='#5555FF'>+</font><font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> pyr.<font color='#BB00BB'>get_value</font><font face='Lucida Console'>(</font>o,i<font color='#5555FF'>+</font><font color='#979000'>1</font>,r,c<font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>/</font> <font color='#979000'>4.0</font>;
+
+            <font color='#0000FF'><u>double</u></font> Dys <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>pyr.<font color='#BB00BB'>get_value</font><font face='Lucida Console'>(</font>o,i<font color='#5555FF'>+</font><font color='#979000'>1</font>,r<font color='#5555FF'>+</font><font color='#979000'>1</font>,c<font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> pyr.<font color='#BB00BB'>get_value</font><font face='Lucida Console'>(</font>o,i<font color='#5555FF'>-</font><font color='#979000'>1</font>,r<font color='#5555FF'>-</font><font color='#979000'>1</font>,c<font face='Lucida Console'>)</font> <font color='#5555FF'>-</font>
+                          pyr.<font color='#BB00BB'>get_value</font><font face='Lucida Console'>(</font>o,i<font color='#5555FF'>-</font><font color='#979000'>1</font>,r<font color='#5555FF'>+</font><font color='#979000'>1</font>,c<font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> pyr.<font color='#BB00BB'>get_value</font><font face='Lucida Console'>(</font>o,i<font color='#5555FF'>+</font><font color='#979000'>1</font>,r<font color='#5555FF'>-</font><font color='#979000'>1</font>,c<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>/</font> <font color='#979000'>4.0</font>;
+
+
+            hess <font color='#5555FF'>=</font> Dxx, Dxy, Dxs,
+            Dxy, Dyy, Dys,
+            Dxs, Dys, Dss;
+
+            <font color='#0000FF'>return</font> hess;
+        <b>}</b>
+
+    <font color='#009900'>// ------------------------------------------------------------------------------------
+</font>
+        <font color='#0000FF'>inline</font> <font color='#0000FF'>const</font> interest_point <b><a name='interpolate_point'></a>interpolate_point</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> hessian_pyramid<font color='#5555FF'>&amp;</font> pyr, 
+            <font color='#0000FF'><u>long</u></font> o, 
+            <font color='#0000FF'><u>long</u></font> i, 
+            <font color='#0000FF'><u>long</u></font> r, 
+            <font color='#0000FF'><u>long</u></font> c
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            dlib::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>2</font><font color='#5555FF'>&gt;</font> <font color='#BB00BB'>p</font><font face='Lucida Console'>(</font>c,r<font face='Lucida Console'>)</font>;
+
+            dlib::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>3</font><font color='#5555FF'>&gt;</font> <font color='#BB00BB'>start_point</font><font face='Lucida Console'>(</font>c,r,i<font face='Lucida Console'>)</font>;
+            dlib::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>3</font><font color='#5555FF'>&gt;</font> interpolated_point <font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#BB00BB'>inv</font><font face='Lucida Console'>(</font><font color='#BB00BB'>get_hessian_hessian</font><font face='Lucida Console'>(</font>pyr,o,i,r,c<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font color='#5555FF'>*</font><font color='#BB00BB'>get_hessian_gradient</font><font face='Lucida Console'>(</font>pyr,o,i,r,c<font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>//cout &lt;&lt; "inter: " &lt;&lt;  trans(interpolated_point);
+</font>
+            interest_point temp;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#BB00BB'>max</font><font face='Lucida Console'>(</font><font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font>interpolated_point<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> <font color='#979000'>0.5</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                p <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>start_point<font color='#5555FF'>+</font>interpolated_point<font face='Lucida Console'>)</font><font color='#5555FF'>*</font>pyr.<font color='#BB00BB'>get_step_size</font><font face='Lucida Console'>(</font>o<font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> lobe_size <font color='#5555FF'>=</font> std::<font color='#BB00BB'>pow</font><font face='Lucida Console'>(</font><font color='#979000'>2.0</font>, o<font color='#5555FF'>+</font><font color='#979000'>1.0</font><font face='Lucida Console'>)</font><font color='#5555FF'>*</font><font face='Lucida Console'>(</font>i<font color='#5555FF'>+</font>interpolated_point.<font color='#BB00BB'>z</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>+</font><font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> <font color='#979000'>1</font>;
+                <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> filter_size <font color='#5555FF'>=</font> <font color='#979000'>3</font><font color='#5555FF'>*</font>lobe_size;
+                <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> scale <font color='#5555FF'>=</font> <font color='#979000'>1.2</font><font color='#5555FF'>/</font><font color='#979000'>9.0</font> <font color='#5555FF'>*</font> filter_size;
+
+                temp.center <font color='#5555FF'>=</font> p;
+                temp.scale <font color='#5555FF'>=</font> scale;
+                temp.score <font color='#5555FF'>=</font> pyr.<font color='#BB00BB'>get_value</font><font face='Lucida Console'>(</font>o,i,r,c<font face='Lucida Console'>)</font>;
+                temp.laplacian <font color='#5555FF'>=</font> pyr.<font color='#BB00BB'>get_laplacian</font><font face='Lucida Console'>(</font>o,i,r,c<font face='Lucida Console'>)</font>;
+            <b>}</b>
+            <font color='#0000FF'>else</font>
+            <b>{</b>
+                <font color='#009900'>// this indicates to the caller that no interest point was found.
+</font>                temp.score <font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>1</font>;
+            <b>}</b>
+
+            <font color='#0000FF'>return</font> temp;
+        <b>}</b>
+
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> Alloc<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='get_interest_points'></a>get_interest_points</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> hessian_pyramid<font color='#5555FF'>&amp;</font> pyr,
+        <font color='#0000FF'><u>double</u></font> threshold,
+        std::vector<font color='#5555FF'>&lt;</font>interest_point,Alloc<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> result_points
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font>threshold <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#979000'>0</font>,
+            "<font color='#CC0000'>\tvoid get_interest_points()</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t Invalid arguments to this function</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t threshold: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> threshold 
+        <font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> std;
+        <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> hessian_pyramid_helpers;
+
+        result_points.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> o <font color='#5555FF'>=</font> <font color='#979000'>0</font>; o <font color='#5555FF'>&lt;</font> pyr.<font color='#BB00BB'>octaves</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>o<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> nr <font color='#5555FF'>=</font> pyr.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font>o<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> nc <font color='#5555FF'>=</font> pyr.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font>o<font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// do non-maximum suppression on all the intervals in the current octave and 
+</font>            <font color='#009900'>// accumulate the results in result_points
+</font>            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>1</font>; i <font color='#5555FF'>&lt;</font> pyr.<font color='#BB00BB'>intervals</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#979000'>1</font>;  i <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> border_size <font color='#5555FF'>=</font> pyr.<font color='#BB00BB'>get_border_size</font><font face='Lucida Console'>(</font>i<font color='#5555FF'>+</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> r <font color='#5555FF'>=</font> border_size<font color='#5555FF'>+</font><font color='#979000'>1</font>; r <font color='#5555FF'>&lt;</font> nr <font color='#5555FF'>-</font> border_size<font color='#5555FF'>-</font><font color='#979000'>1</font>; r <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> c <font color='#5555FF'>=</font> border_size<font color='#5555FF'>+</font><font color='#979000'>1</font>; c <font color='#5555FF'>&lt;</font> nc <font color='#5555FF'>-</font> border_size<font color='#5555FF'>-</font><font color='#979000'>1</font>; c <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        <font color='#0000FF'><u>double</u></font> max_val <font color='#5555FF'>=</font> pyr.<font color='#BB00BB'>get_value</font><font face='Lucida Console'>(</font>o,i,r,c<font face='Lucida Console'>)</font>;
+                        <font color='#0000FF'><u>long</u></font> max_i <font color='#5555FF'>=</font> i;
+                        <font color='#0000FF'><u>long</u></font> max_r <font color='#5555FF'>=</font> r;
+                        <font color='#0000FF'><u>long</u></font> max_c <font color='#5555FF'>=</font> c;
+
+
+                        <font color='#009900'>// If the max point we found is really a maximum in its own region and
+</font>                        <font color='#009900'>// is big enough then add it to the results.
+</font>                        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>max_val <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> threshold <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> <font color='#BB00BB'>is_maximum_in_region</font><font face='Lucida Console'>(</font>pyr, o, max_i, max_r, max_c<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                        <b>{</b>
+                            <font color='#009900'>//cout &lt;&lt; max_val &lt;&lt; endl;
+</font>                            interest_point sp <font color='#5555FF'>=</font> <font color='#BB00BB'>interpolate_point</font> <font face='Lucida Console'>(</font>pyr, o, max_i, max_r, max_c<font face='Lucida Console'>)</font>;
+                            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>sp.score <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> threshold<font face='Lucida Console'>)</font>
+                            <b>{</b>
+                                result_points.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>sp<font face='Lucida Console'>)</font>;
+                            <b>}</b>
+                        <b>}</b>
+
+                    <b>}</b>
+                <b>}</b>
+            <b>}</b>
+        <b>}</b>
+
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> Alloc<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='get_interest_points'></a>get_interest_points</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> hessian_pyramid<font color='#5555FF'>&amp;</font> pyr,
+        <font color='#0000FF'><u>double</u></font> threshold,
+        std_vector_c<font color='#5555FF'>&lt;</font>interest_point,Alloc<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> result_points
+    <font face='Lucida Console'>)</font>
+    <font color='#009900'>/*!
+        This function is just an overload that automatically casts std_vector_c objects
+        into std::vector objects.  (Usually this is automatic but the template argument
+        there messes up the conversion so we have to do it explicitly)
+    !*/</font>
+    <b>{</b>
+        std::vector<font color='#5555FF'>&lt;</font>interest_point,Alloc<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> v <font color='#5555FF'>=</font> result_points;
+        <font color='#BB00BB'>get_interest_points</font><font face='Lucida Console'>(</font>pyr, threshold, v<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font>  <font color='#009900'>// DLIB_HESSIAN_PYRAMId_Hh_
+</font>
+
+</pre></body></html>

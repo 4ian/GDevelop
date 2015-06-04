@@ -1,0 +1,298 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - tokenizer_kernel_1.cpp</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2005  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_TOKENIZER_KERNEL_1_CPp_
+<font color='#0000FF'>#define</font> DLIB_TOKENIZER_KERNEL_1_CPp_
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='tokenizer_kernel_1.h.html'>tokenizer_kernel_1.h</a>"
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>iostream<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>cstdio<font color='#5555FF'>&gt;</font>
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    tokenizer_kernel_1::
+    <b><a name='tokenizer_kernel_1'></a>tokenizer_kernel_1</b> <font face='Lucida Console'>(</font>        
+    <font face='Lucida Console'>)</font> :
+        headset<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>,
+        bodyset<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>,
+        have_peeked<font face='Lucida Console'>(</font><font color='#979000'>false</font><font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>try</font>
+        <b>{</b>
+            headset <font color='#5555FF'>=</font> <font color='#0000FF'>new</font> <font color='#0000FF'><u>bool</u></font>[UCHAR_MAX];
+            bodyset <font color='#5555FF'>=</font> <font color='#0000FF'>new</font> <font color='#0000FF'><u>bool</u></font>[UCHAR_MAX];
+
+            <font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+        <font color='#0000FF'>catch</font> <font face='Lucida Console'>(</font>...<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>headset<font face='Lucida Console'>)</font> <font color='#0000FF'>delete</font> [] headset;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>bodyset<font face='Lucida Console'>)</font> <font color='#0000FF'>delete</font> [] headset;
+            <font color='#0000FF'>throw</font>;
+        <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    tokenizer_kernel_1::
+    ~<b><a name='tokenizer_kernel_1'></a>tokenizer_kernel_1</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>delete</font> [] bodyset;
+        <font color='#0000FF'>delete</font> [] headset;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>void</u></font> tokenizer_kernel_1::
+    <b><a name='clear'></a>clear</b><font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> std;
+
+        in <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        streambuf <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        have_peeked <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+
+        head <font color='#5555FF'>=</font> "<font color='#CC0000'>_</font>" <font color='#5555FF'>+</font> <font color='#BB00BB'>lowercase_letters</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> <font color='#BB00BB'>uppercase_letters</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        body <font color='#5555FF'>=</font> "<font color='#CC0000'>_</font>" <font color='#5555FF'>+</font> <font color='#BB00BB'>lowercase_letters</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> <font color='#BB00BB'>uppercase_letters</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> <font color='#BB00BB'>numbers</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> UCHAR_MAX; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+        <b>{</b>
+            headset[i] <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+            bodyset[i] <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>string::size_type i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> head.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            headset[<font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>head[i]<font face='Lucida Console'>)</font>] <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>string::size_type i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> body.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            bodyset[<font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>body[i]<font face='Lucida Console'>)</font>] <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>void</u></font> tokenizer_kernel_1::
+    <b><a name='set_stream'></a>set_stream</b> <font face='Lucida Console'>(</font>
+        std::istream<font color='#5555FF'>&amp;</font> in_
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        in <font color='#5555FF'>=</font> <font color='#5555FF'>&amp;</font>in_;
+        streambuf <font color='#5555FF'>=</font> in_.<font color='#BB00BB'>rdbuf</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        have_peeked <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>bool</u></font> tokenizer_kernel_1::
+    <b><a name='stream_is_set'></a>stream_is_set</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        <font color='#0000FF'>return</font> <font face='Lucida Console'>(</font>in <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    std::istream<font color='#5555FF'>&amp;</font> tokenizer_kernel_1::
+    <b><a name='get_stream'></a>get_stream</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        <font color='#0000FF'>return</font> <font color='#5555FF'>*</font>in;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>void</u></font> tokenizer_kernel_1::
+    <b><a name='get_token'></a>get_token</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'><u>int</u></font><font color='#5555FF'>&amp;</font> type,
+        std::string<font color='#5555FF'>&amp;</font> token
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font>have_peeked<font face='Lucida Console'>)</font>
+        <b>{</b>
+            std::streambuf::int_type ch;
+            ch <font color='#5555FF'>=</font> streambuf<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>sbumpc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>switch</font> <font face='Lucida Console'>(</font>ch<font face='Lucida Console'>)</font>
+            <b>{</b>
+            <font color='#0000FF'>case</font> EOF:
+                type <font color='#5555FF'>=</font> END_OF_FILE;
+                token.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>return</font>;
+
+            <font color='#0000FF'>case</font> '<font color='#FF0000'>\n</font>':
+                type <font color='#5555FF'>=</font> END_OF_LINE;
+                token <font color='#5555FF'>=</font> "<font color='#CC0000'>\n</font>";
+                <font color='#0000FF'>return</font>;
+
+            <font color='#0000FF'>case</font> '<font color='#FF0000'>\r</font>':
+            <font color='#0000FF'>case</font> '<font color='#FF0000'> </font>':
+            <font color='#0000FF'>case</font> '<font color='#FF0000'>\t</font>':
+                type <font color='#5555FF'>=</font> WHITE_SPACE;
+                token <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>ch<font face='Lucida Console'>)</font>;
+                ch <font color='#5555FF'>=</font> streambuf<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>sgetc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>ch <font color='#5555FF'>=</font><font color='#5555FF'>=</font> '<font color='#FF0000'> </font>' <font color='#5555FF'>|</font><font color='#5555FF'>|</font> ch <font color='#5555FF'>=</font><font color='#5555FF'>=</font> '<font color='#FF0000'>\t</font>' <font color='#5555FF'>|</font><font color='#5555FF'>|</font> ch <font color='#5555FF'>=</font><font color='#5555FF'>=</font> '<font color='#FF0000'>\r</font>'<font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> ch <font color='#5555FF'>!</font><font color='#5555FF'>=</font> EOF<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    token <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>ch<font face='Lucida Console'>)</font>;
+                    ch <font color='#5555FF'>=</font> streambuf<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>snextc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                <b>}</b>
+                <font color='#0000FF'>return</font>;
+
+            <font color='#0000FF'>default</font>:
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>headset[<font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>ch<font face='Lucida Console'>)</font>]<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    type <font color='#5555FF'>=</font> IDENTIFIER;
+                    token <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>ch<font face='Lucida Console'>)</font>;
+                    ch <font color='#5555FF'>=</font> streambuf<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>sgetc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                    <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font> bodyset[<font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>ch<font face='Lucida Console'>)</font>] <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> ch <font color='#5555FF'>!</font><font color='#5555FF'>=</font> EOF <font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        token <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>ch<font face='Lucida Console'>)</font>;
+                        ch <font color='#5555FF'>=</font> streambuf<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>snextc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                    <b>}</b>
+                <b>}</b>
+                <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>'<font color='#FF0000'>0</font>' <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> ch <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> ch <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> '<font color='#FF0000'>9</font>'<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    type <font color='#5555FF'>=</font> NUMBER;
+                    token <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>ch<font face='Lucida Console'>)</font>;
+                    ch <font color='#5555FF'>=</font> streambuf<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>sgetc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                    <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>'<font color='#FF0000'>0</font>' <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> ch <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> ch <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> '<font color='#FF0000'>9</font>'<font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> ch <font color='#5555FF'>!</font><font color='#5555FF'>=</font> EOF<font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        token <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>ch<font face='Lucida Console'>)</font>;
+                        ch <font color='#5555FF'>=</font> streambuf<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>snextc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                    <b>}</b>
+                <b>}</b>
+                <font color='#0000FF'>else</font>
+                <b>{</b>
+                    type <font color='#5555FF'>=</font> CHAR;
+                    token <font color='#5555FF'>=</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>ch<font face='Lucida Console'>)</font>;
+                <b>}</b>
+                <font color='#0000FF'>return</font>;
+            <b>}</b> <font color='#009900'>// switch (ch)
+</font>        <b>}</b>
+        
+        <font color='#009900'>// if we get this far it means we have peeked so we should 
+</font>        <font color='#009900'>// return the peek data.
+</font>        type <font color='#5555FF'>=</font> next_type;
+        token <font color='#5555FF'>=</font> next_token;
+        have_peeked <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>int</u></font> tokenizer_kernel_1::
+    <b><a name='peek_type'></a>peek_type</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        <font color='#0000FF'>const_cast</font><font color='#5555FF'>&lt;</font>tokenizer_kernel_1<font color='#5555FF'>*</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#0000FF'>this</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>get_token</font><font face='Lucida Console'>(</font>next_type,next_token<font face='Lucida Console'>)</font>;
+        have_peeked <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+        <font color='#0000FF'>return</font> next_type;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> tokenizer_kernel_1::
+    <b><a name='peek_token'></a>peek_token</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        <font color='#0000FF'>const_cast</font><font color='#5555FF'>&lt;</font>tokenizer_kernel_1<font color='#5555FF'>*</font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#0000FF'>this</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>get_token</font><font face='Lucida Console'>(</font>next_type,next_token<font face='Lucida Console'>)</font>;
+        have_peeked <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+        <font color='#0000FF'>return</font> next_token;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>void</u></font> tokenizer_kernel_1::
+    <b><a name='swap'></a>swap</b> <font face='Lucida Console'>(</font>
+        tokenizer_kernel_1<font color='#5555FF'>&amp;</font> item
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#BB00BB'>exchange</font><font face='Lucida Console'>(</font>in,item.in<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>exchange</font><font face='Lucida Console'>(</font>streambuf,item.streambuf<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>exchange</font><font face='Lucida Console'>(</font>head,item.head<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>exchange</font><font face='Lucida Console'>(</font>body,item.body<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>exchange</font><font face='Lucida Console'>(</font>bodyset,item.bodyset<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>exchange</font><font face='Lucida Console'>(</font>headset,item.headset<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>exchange</font><font face='Lucida Console'>(</font>have_peeked,item.have_peeked<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>exchange</font><font face='Lucida Console'>(</font>next_type,item.next_type<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>exchange</font><font face='Lucida Console'>(</font>next_token,item.next_token<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>    
+    <font color='#0000FF'><u>void</u></font> tokenizer_kernel_1::
+    <b><a name='set_identifier_token'></a>set_identifier_token</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> head_,
+        <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> body_
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> std;
+
+        head <font color='#5555FF'>=</font> head_;
+        body <font color='#5555FF'>=</font> body_;
+
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> UCHAR_MAX; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+        <b>{</b>
+            headset[i] <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+            bodyset[i] <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>string::size_type i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> head.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            headset[<font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>head[i]<font face='Lucida Console'>)</font>] <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>string::size_type i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> body.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            bodyset[<font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>body[i]<font face='Lucida Console'>)</font>] <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>    
+    <font color='#0000FF'>const</font> std::string tokenizer_kernel_1::
+    <b><a name='get_identifier_head'></a>get_identifier_head</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        <font color='#0000FF'>return</font> head;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>    
+    <font color='#0000FF'>const</font> std::string tokenizer_kernel_1::
+    <b><a name='get_identifier_body'></a>get_identifier_body</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        <font color='#0000FF'>return</font> body;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>    
+    <font color='#0000FF'>const</font> std::string tokenizer_kernel_1::
+    <b><a name='lowercase_letters'></a>lowercase_letters</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        <font color='#0000FF'>return</font> std::<font color='#BB00BB'>string</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>abcdefghijklmnopqrstuvwxyz</font>"<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>    
+    <font color='#0000FF'>const</font> std::string tokenizer_kernel_1::
+    <b><a name='uppercase_letters'></a>uppercase_letters</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        <font color='#0000FF'>return</font> std::<font color='#BB00BB'>string</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>ABCDEFGHIJKLMNOPQRSTUVWXYZ</font>"<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>    
+    <font color='#0000FF'>const</font> std::string tokenizer_kernel_1::
+    <b><a name='numbers'></a>numbers</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        <font color='#0000FF'>return</font> std::<font color='#BB00BB'>string</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>0123456789</font>"<font face='Lucida Console'>)</font>;
+    <b>}</b>
+    
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>    
+<b>}</b>
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_TOKENIZER_KERNEL_1_CPp_
+</font>
+
+</pre></body></html>

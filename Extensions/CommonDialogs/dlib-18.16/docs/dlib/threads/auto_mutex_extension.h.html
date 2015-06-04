@@ -1,0 +1,183 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - auto_mutex_extension.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2005  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_AUTO_MUTEX_EXTENSIOn_
+<font color='#0000FF'>#define</font> DLIB_AUTO_MUTEX_EXTENSIOn_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='threads_kernel.h.html'>threads_kernel.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='rmutex_extension.h.html'>rmutex_extension.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='read_write_mutex_extension.h.html'>read_write_mutex_extension.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='auto_mutex_extension_abstract.h.html'>auto_mutex_extension_abstract.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>class</font> <b><a name='auto_mutex'></a>auto_mutex</b>
+    <b>{</b>
+        <font color='#009900'>/*!
+            INITIAL VALUE
+                - if (m != 0) then
+                    - the mutex pointed to by m is locked
+                - if (r != 0) then
+                    - the mutex pointed to by r is locked
+                - if (rw != 0) then
+                    - the mutex pointed to by rw is locked
+                - exactly one of r, m, or rw is not 0.
+
+            CONVENTION
+                - if (m != 0) then
+                    - the mutex pointed to by m is locked
+                - if (r != 0) then
+                    - the mutex pointed to by r is locked
+                - if (rw != 0) then
+                    - the mutex pointed to by rw is locked
+                - exactly one of r, m, or rw is not 0.
+        !*/</font>
+    <font color='#0000FF'>public</font>:
+
+        <font color='#0000FF'>explicit</font> <b><a name='auto_mutex'></a>auto_mutex</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> mutex<font color='#5555FF'>&amp;</font> m_
+        <font face='Lucida Console'>)</font> : m<font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>m_<font face='Lucida Console'>)</font>,
+            r<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>,
+            rw<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            m<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>lock</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>explicit</font> <b><a name='auto_mutex'></a>auto_mutex</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> rmutex<font color='#5555FF'>&amp;</font> r_
+        <font face='Lucida Console'>)</font> : m<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>,
+            r<font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>r_<font face='Lucida Console'>)</font>,
+            rw<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            r<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>lock</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>explicit</font> <b><a name='auto_mutex'></a>auto_mutex</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> read_write_mutex<font color='#5555FF'>&amp;</font> rw_
+        <font face='Lucida Console'>)</font> : m<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>,
+            r<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>,
+            rw<font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>rw_<font face='Lucida Console'>)</font>
+        <b>{</b>
+            rw<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>lock</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='unlock'></a>unlock</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>m <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                m<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>unlock</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                m <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            <b>}</b>
+            <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>r <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                r<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>unlock</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                r <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            <b>}</b>
+            <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>rw <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                rw<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>unlock</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                rw <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            <b>}</b>
+        <b>}</b>
+
+        ~<b><a name='auto_mutex'></a>auto_mutex</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#BB00BB'>unlock</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+    <font color='#0000FF'>private</font>:
+
+        <font color='#0000FF'>const</font> mutex<font color='#5555FF'>*</font> m;
+        <font color='#0000FF'>const</font> rmutex<font color='#5555FF'>*</font> r;
+        <font color='#0000FF'>const</font> read_write_mutex<font color='#5555FF'>*</font> rw;
+
+        <font color='#009900'>// restricted functions
+</font>        <b><a name='auto_mutex'></a>auto_mutex</b><font face='Lucida Console'>(</font>auto_mutex<font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font>;        <font color='#009900'>// copy constructor
+</font>        auto_mutex<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>=</font><font face='Lucida Console'>(</font>auto_mutex<font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font>;    <font color='#009900'>// assignment operator
+</font>    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>class</font> <b><a name='auto_mutex_readonly'></a>auto_mutex_readonly</b>
+    <b>{</b>
+    <font color='#0000FF'>public</font>:
+
+        <font color='#0000FF'>explicit</font> <b><a name='auto_mutex_readonly'></a>auto_mutex_readonly</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> read_write_mutex<font color='#5555FF'>&amp;</font> rw_
+        <font face='Lucida Console'>)</font> : rw<font face='Lucida Console'>(</font>rw_<font face='Lucida Console'>)</font>, _has_write_lock<font face='Lucida Console'>(</font><font color='#979000'>false</font><font face='Lucida Console'>)</font>, _has_read_lock<font face='Lucida Console'>(</font><font color='#979000'>true</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            rw.<font color='#BB00BB'>lock_readonly</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        ~<b><a name='auto_mutex_readonly'></a>auto_mutex_readonly</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#BB00BB'>unlock</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='lock_readonly'></a>lock_readonly</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font>_has_read_lock<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#BB00BB'>unlock</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                rw.<font color='#BB00BB'>lock_readonly</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                _has_read_lock <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+            <b>}</b>
+        <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='lock_write'></a>lock_write</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font>_has_write_lock<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#BB00BB'>unlock</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                rw.<font color='#BB00BB'>lock</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                _has_write_lock <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+            <b>}</b>
+        <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='unlock'></a>unlock</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>_has_write_lock<font face='Lucida Console'>)</font>
+            <b>{</b>
+                rw.<font color='#BB00BB'>unlock</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                _has_write_lock <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+            <b>}</b>
+            <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>_has_read_lock<font face='Lucida Console'>)</font>
+            <b>{</b>
+                rw.<font color='#BB00BB'>unlock_readonly</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                _has_read_lock <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+            <b>}</b>
+        <b>}</b>
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='has_read_lock'></a>has_read_lock</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <b>{</b> <font color='#0000FF'>return</font> _has_read_lock; <b>}</b>
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='has_write_lock'></a>has_write_lock</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <b>{</b> <font color='#0000FF'>return</font> _has_write_lock; <b>}</b>
+
+    <font color='#0000FF'>private</font>:
+
+        <font color='#0000FF'>const</font> read_write_mutex<font color='#5555FF'>&amp;</font> rw;
+        <font color='#0000FF'><u>bool</u></font> _has_write_lock;
+        <font color='#0000FF'><u>bool</u></font> _has_read_lock;
+
+        <font color='#009900'>// restricted functions
+</font>        <b><a name='auto_mutex_readonly'></a>auto_mutex_readonly</b><font face='Lucida Console'>(</font>auto_mutex_readonly<font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font>;        <font color='#009900'>// copy constructor
+</font>        auto_mutex_readonly<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>=</font><font face='Lucida Console'>(</font>auto_mutex_readonly<font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font>;    <font color='#009900'>// assignment operator
+</font>    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_AUTO_MUTEX_EXTENSIOn_
+</font>
+
+</pre></body></html>

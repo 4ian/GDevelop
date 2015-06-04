@@ -1,0 +1,309 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - learning_to_track.cpp</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2014  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font>
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>sstream<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='tester.h.html'>tester.h</a>"
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>svm_threaded.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>rand.h<font color='#5555FF'>&gt;</font>
+
+
+
+<font color='#0000FF'>namespace</font>  
+<b>{</b>
+    <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> test;
+    <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> dlib;
+    <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> std;
+
+    logger <b><a name='dlog'></a>dlog</b><font face='Lucida Console'>(</font>"<font color='#CC0000'>test.learning_to_track</font>"<font face='Lucida Console'>)</font>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>struct</font> <b><a name='detection_dense'></a>detection_dense</b>
+    <b>{</b>
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>struct</font> track_dense track_type;
+        matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>0</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> measurements;
+    <b>}</b>;
+
+
+    <font color='#0000FF'>struct</font> <b><a name='track_dense'></a>track_dense</b>
+    <b>{</b>
+        <font color='#0000FF'>typedef</font> matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>0</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> feature_vector_type;
+
+        <b><a name='track_dense'></a>track_dense</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            time_since_last_association <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='get_similarity_features'></a>get_similarity_features</b><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> detection_dense det, feature_vector_type<font color='#5555FF'>&amp;</font> feats<font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            feats <font color='#5555FF'>=</font> <font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font>last_measurements <font color='#5555FF'>-</font> det.measurements<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='update_track'></a>update_track</b><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> detection_dense det<font face='Lucida Console'>)</font>
+        <b>{</b>
+            last_measurements <font color='#5555FF'>=</font> det.measurements;
+            time_since_last_association <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='propagate_track'></a>propagate_track</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#5555FF'>+</font><font color='#5555FF'>+</font>time_since_last_association;
+        <b>}</b>
+
+        matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>0</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> last_measurements;
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> time_since_last_association;
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>struct</font> <b><a name='detection_sparse'></a>detection_sparse</b>
+    <b>{</b>
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>struct</font> track_sparse track_type;
+        matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>0</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> measurements;
+    <b>}</b>;
+
+
+    <font color='#0000FF'>struct</font> <b><a name='track_sparse'></a>track_sparse</b>
+    <b>{</b>
+        <font color='#0000FF'>typedef</font> std::vector<font color='#5555FF'>&lt;</font>std::pair<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font>,<font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> feature_vector_type;
+
+        <b><a name='track_sparse'></a>track_sparse</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            time_since_last_association <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='get_similarity_features'></a>get_similarity_features</b><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> detection_sparse det, feature_vector_type<font color='#5555FF'>&amp;</font> feats<font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+        <b>{</b>
+            matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>0</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> temp <font color='#5555FF'>=</font> <font color='#BB00BB'>abs</font><font face='Lucida Console'>(</font>last_measurements <font color='#5555FF'>-</font> det.measurements<font face='Lucida Console'>)</font>;
+            feats.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> temp.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                feats.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font><font color='#BB00BB'>make_pair</font><font face='Lucida Console'>(</font>i, <font color='#BB00BB'>temp</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='update_track'></a>update_track</b><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> detection_sparse det<font face='Lucida Console'>)</font>
+        <b>{</b>
+            last_measurements <font color='#5555FF'>=</font> det.measurements;
+            time_since_last_association <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='propagate_track'></a>propagate_track</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#5555FF'>+</font><font color='#5555FF'>+</font>time_since_last_association;
+        <b>}</b>
+
+        matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>0</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> last_measurements;
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> time_since_last_association;
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    dlib::rand rnd;
+    <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> num_objects <font color='#5555FF'>=</font> <font color='#979000'>4</font>;
+    <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> num_properties <font color='#5555FF'>=</font> <font color='#979000'>6</font>;
+    std::vector<font color='#5555FF'>&lt;</font>matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>0</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> <b><a name='object_properties'></a>object_properties</b><font face='Lucida Console'>(</font>num_objects<font face='Lucida Console'>)</font>;
+
+    <font color='#0000FF'><u>void</u></font> <b><a name='initialize_object_properties'></a>initialize_object_properties</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+    <b>{</b>
+        rnd.<font color='#BB00BB'>set_seed</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>23ja2oirfjaf</font>"<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> object_properties.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            object_properties[i] <font color='#5555FF'>=</font> <font color='#BB00BB'>randm</font><font face='Lucida Console'>(</font>num_properties,<font color='#979000'>1</font>,rnd<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> detection<font color='#5555FF'>&gt;</font>
+    detection <b><a name='sample_detection_from_sensor'></a>sample_detection_from_sensor</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> object_id<font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#BB00BB'>DLIB_CASSERT</font><font face='Lucida Console'>(</font>object_id <font color='#5555FF'>&lt;</font> num_objects, 
+            "<font color='#CC0000'>You can't ask to sample a detection from an object that doesn't exist.</font>"<font face='Lucida Console'>)</font>; 
+        detection temp;
+        <font color='#009900'>// Set the measurements equal to the object's true property values plus a little bit of
+</font>        <font color='#009900'>// noise.
+</font>        temp.measurements <font color='#5555FF'>=</font> object_properties[object_id] <font color='#5555FF'>+</font> <font color='#BB00BB'>randm</font><font face='Lucida Console'>(</font>num_properties,<font color='#979000'>1</font>,rnd<font face='Lucida Console'>)</font><font color='#5555FF'>*</font><font color='#979000'>0.1</font>;
+        <font color='#0000FF'>return</font> temp;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> detection<font color='#5555FF'>&gt;</font>
+    std::vector<font color='#5555FF'>&lt;</font>std::vector<font color='#5555FF'>&lt;</font>labeled_detection<font color='#5555FF'>&lt;</font>detection<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> <b><a name='make_random_tracking_data_for_training'></a>make_random_tracking_data_for_training</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>typedef</font> std::vector<font color='#5555FF'>&lt;</font>labeled_detection<font color='#5555FF'>&lt;</font>detection<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> detections_at_single_time_step;
+        <font color='#0000FF'>typedef</font> std::vector<font color='#5555FF'>&lt;</font>detections_at_single_time_step<font color='#5555FF'>&gt;</font> track_history;
+
+        track_history data;
+
+        <font color='#009900'>// At each time step we get a set of detections from the objects in the world.
+</font>        <font color='#009900'>// Simulate 100 time steps worth of data where there are 3 objects present. 
+</font>        <font color='#0000FF'>const</font> <font color='#0000FF'><u>int</u></font> num_time_steps <font color='#5555FF'>=</font> <font color='#979000'>100</font>;
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> num_time_steps; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+        <b>{</b>
+            detections_at_single_time_step <font color='#BB00BB'>dets</font><font face='Lucida Console'>(</font><font color='#979000'>3</font><font face='Lucida Console'>)</font>;
+            <font color='#009900'>// sample a detection from object 0
+</font>            dets[<font color='#979000'>0</font>].det <font color='#5555FF'>=</font> sample_detection_from_sensor<font color='#5555FF'>&lt;</font>detection<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+            dets[<font color='#979000'>0</font>].label <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+
+            <font color='#009900'>// sample a detection from object 1
+</font>            dets[<font color='#979000'>1</font>].det <font color='#5555FF'>=</font> sample_detection_from_sensor<font color='#5555FF'>&lt;</font>detection<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+            dets[<font color='#979000'>1</font>].label <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+
+            <font color='#009900'>// sample a detection from object 2
+</font>            dets[<font color='#979000'>2</font>].det <font color='#5555FF'>=</font> sample_detection_from_sensor<font color='#5555FF'>&lt;</font>detection<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+            dets[<font color='#979000'>2</font>].label <font color='#5555FF'>=</font> <font color='#979000'>2</font>;
+
+            <font color='#BB00BB'>randomize_samples</font><font face='Lucida Console'>(</font>dets, rnd<font face='Lucida Console'>)</font>;
+            data.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>dets<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#009900'>// Now let's imagine object 1 and 2 are gone but a new object, object 3 has arrived.  
+</font>        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> num_time_steps; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+        <b>{</b>
+            detections_at_single_time_step <font color='#BB00BB'>dets</font><font face='Lucida Console'>(</font><font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+            <font color='#009900'>// sample a detection from object 0
+</font>            dets[<font color='#979000'>0</font>].det <font color='#5555FF'>=</font> sample_detection_from_sensor<font color='#5555FF'>&lt;</font>detection<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+            dets[<font color='#979000'>0</font>].label <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+
+            <font color='#009900'>// sample a detection from object 3
+</font>            dets[<font color='#979000'>1</font>].det <font color='#5555FF'>=</font> sample_detection_from_sensor<font color='#5555FF'>&lt;</font>detection<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#979000'>3</font><font face='Lucida Console'>)</font>;
+            dets[<font color='#979000'>1</font>].label <font color='#5555FF'>=</font> <font color='#979000'>3</font>;
+
+            <font color='#BB00BB'>randomize_samples</font><font face='Lucida Console'>(</font>dets, rnd<font face='Lucida Console'>)</font>;
+            data.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>dets<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'>return</font> data;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> detection<font color='#5555FF'>&gt;</font>
+    std::vector<font color='#5555FF'>&lt;</font>detection<font color='#5555FF'>&gt;</font> <b><a name='make_random_detections'></a>make_random_detections</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> num_dets<font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#BB00BB'>DLIB_CASSERT</font><font face='Lucida Console'>(</font>num_dets <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> num_objects, 
+            "<font color='#CC0000'>You can't ask for more detections than there are objects in our little simulation.</font>"<font face='Lucida Console'>)</font>; 
+
+        std::vector<font color='#5555FF'>&lt;</font>detection<font color='#5555FF'>&gt;</font> <font color='#BB00BB'>dets</font><font face='Lucida Console'>(</font>num_dets<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> dets.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+        <b>{</b>
+            dets[i] <font color='#5555FF'>=</font> sample_detection_from_sensor<font color='#5555FF'>&lt;</font>detection<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>i<font face='Lucida Console'>)</font>;
+        <b>}</b>
+        <font color='#BB00BB'>randomize_samples</font><font face='Lucida Console'>(</font>dets, rnd<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>return</font> dets;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> detection<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='test_tracking_stuff'></a>test_tracking_stuff</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#BB00BB'>print_spinner</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+
+        <font color='#0000FF'>typedef</font> std::vector<font color='#5555FF'>&lt;</font>labeled_detection<font color='#5555FF'>&lt;</font>detection<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> detections_at_single_time_step;
+        <font color='#0000FF'>typedef</font> std::vector<font color='#5555FF'>&lt;</font>detections_at_single_time_step<font color='#5555FF'>&gt;</font> track_history;
+        std::vector<font color='#5555FF'>&lt;</font>track_history<font color='#5555FF'>&gt;</font> data;
+        data.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>make_random_tracking_data_for_training<font color='#5555FF'>&lt;</font>detection<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        data.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>make_random_tracking_data_for_training<font color='#5555FF'>&lt;</font>detection<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        data.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>make_random_tracking_data_for_training<font color='#5555FF'>&lt;</font>detection<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        data.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>make_random_tracking_data_for_training<font color='#5555FF'>&lt;</font>detection<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        data.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>make_random_tracking_data_for_training<font color='#5555FF'>&lt;</font>detection<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+
+        structural_track_association_trainer trainer;
+        trainer.<font color='#BB00BB'>set_c</font><font face='Lucida Console'>(</font><font color='#979000'>1000</font><font face='Lucida Console'>)</font>;
+        track_association_function<font color='#5555FF'>&lt;</font>detection<font color='#5555FF'>&gt;</font> assoc <font color='#5555FF'>=</font> trainer.<font color='#BB00BB'>train</font><font face='Lucida Console'>(</font>data<font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'><u>double</u></font> test_val <font color='#5555FF'>=</font> <font color='#BB00BB'>test_track_association_function</font><font face='Lucida Console'>(</font>assoc, data<font face='Lucida Console'>)</font>; 
+        <font color='#BB00BB'>DLIB_TEST_MSG</font><font face='Lucida Console'>(</font> test_val <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>1</font>, test_val<font face='Lucida Console'>)</font>;
+        test_val <font color='#5555FF'>=</font> <font color='#BB00BB'>cross_validate_track_association_trainer</font><font face='Lucida Console'>(</font>trainer, data, <font color='#979000'>5</font><font face='Lucida Console'>)</font>; 
+        <font color='#BB00BB'>DLIB_TEST_MSG</font> <font face='Lucida Console'>(</font> test_val <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>1</font>, test_val<font face='Lucida Console'>)</font>;
+
+
+
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> detection::track_type track;
+        std::vector<font color='#5555FF'>&lt;</font>track<font color='#5555FF'>&gt;</font> tracks;
+
+        std::vector<font color='#5555FF'>&lt;</font>detection<font color='#5555FF'>&gt;</font> dets <font color='#5555FF'>=</font> make_random_detections<font color='#5555FF'>&lt;</font>detection<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#979000'>3</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>assoc</font><font face='Lucida Console'>(</font>tracks, dets<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>tracks.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>3</font><font face='Lucida Console'>)</font>;
+
+        dets <font color='#5555FF'>=</font> make_random_detections<font color='#5555FF'>&lt;</font>detection<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#979000'>3</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>assoc</font><font face='Lucida Console'>(</font>tracks, dets<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>tracks.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>3</font><font face='Lucida Console'>)</font>;
+
+        dets <font color='#5555FF'>=</font> make_random_detections<font color='#5555FF'>&lt;</font>detection<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#979000'>3</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>assoc</font><font face='Lucida Console'>(</font>tracks, dets<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>tracks.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>3</font><font face='Lucida Console'>)</font>;
+
+        dets <font color='#5555FF'>=</font> make_random_detections<font color='#5555FF'>&lt;</font>detection<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#979000'>4</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>assoc</font><font face='Lucida Console'>(</font>tracks, dets<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>tracks.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>4</font><font face='Lucida Console'>)</font>;
+
+        dets <font color='#5555FF'>=</font> make_random_detections<font color='#5555FF'>&lt;</font>detection<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#979000'>3</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>assoc</font><font face='Lucida Console'>(</font>tracks, dets<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>tracks.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>4</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> total_miss <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> tracks.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            total_miss <font color='#5555FF'>+</font><font color='#5555FF'>=</font> tracks[i].time_since_last_association;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>total_miss <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+
+        dets <font color='#5555FF'>=</font> make_random_detections<font color='#5555FF'>&lt;</font>detection<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#979000'>3</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>assoc</font><font face='Lucida Console'>(</font>tracks, dets<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>tracks.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>4</font><font face='Lucida Console'>)</font>;
+        total_miss <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> num_zero <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> tracks.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+        <b>{</b>
+            total_miss <font color='#5555FF'>+</font><font color='#5555FF'>=</font> tracks[i].time_since_last_association;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>tracks[i].time_since_last_association <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                <font color='#5555FF'>+</font><font color='#5555FF'>+</font>num_zero;
+        <b>}</b>
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>total_miss <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>num_zero <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>3</font><font face='Lucida Console'>)</font>;
+
+
+
+        ostringstream sout; 
+        <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>assoc, sout<font face='Lucida Console'>)</font>;
+
+        istringstream <font color='#BB00BB'>sin</font><font face='Lucida Console'>(</font>sout.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>assoc, sin<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font> <font color='#BB00BB'>test_track_association_function</font><font face='Lucida Console'>(</font>assoc, data<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>class</font> <b><a name='test_learning_to_track'></a>test_learning_to_track</b> : <font color='#0000FF'>public</font> tester
+    <b>{</b>
+    <font color='#0000FF'>public</font>:
+        <b><a name='test_learning_to_track'></a>test_learning_to_track</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> :
+            tester <font face='Lucida Console'>(</font>"<font color='#CC0000'>test_learning_to_track</font>",
+                "<font color='#CC0000'>Runs tests on the assignment learning code.</font>"<font face='Lucida Console'>)</font>
+        <b>{</b><b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='perform_test'></a>perform_test</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#BB00BB'>initialize_object_properties</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> <font color='#979000'>3</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>run test_tracking_stuff&lt;detection_dense&gt;()</font>";
+                test_tracking_stuff<font color='#5555FF'>&lt;</font>detection_dense<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                dlog <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> LINFO <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>run test_tracking_stuff&lt;detection_sparse&gt;()</font>";
+                test_tracking_stuff<font color='#5555FF'>&lt;</font>detection_sparse<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+        <b>}</b>
+    <b>}</b> a;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+
+
+</pre></body></html>

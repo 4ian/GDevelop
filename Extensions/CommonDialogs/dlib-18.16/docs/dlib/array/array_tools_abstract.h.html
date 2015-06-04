@@ -1,0 +1,36 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - array_tools_abstract.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2013  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#undef</font> DLIB_ARRAY_tOOLS_ABSTRACT_H_
+<font color='#0000FF'>#ifdef</font> DLIB_ARRAY_tOOLS_ABSTRACT_H_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='array_kernel_abstract.h.html'>array_kernel_abstract.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='split_array'></a>split_array</b> <font face='Lucida Console'>(</font>
+        T<font color='#5555FF'>&amp;</font> a,
+        T<font color='#5555FF'>&amp;</font> b,
+        <font color='#0000FF'><u>double</u></font> frac
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - 0 &lt;= frac &lt;= 1
+            - T must be an array type such as dlib::array or std::vector
+        ensures
+            - This function takes the elements of a and splits them into two groups.  The
+              first group remains in a and the second group is put into b.  The ordering of
+              elements in a is preserved.  In particular, concatenating #a with #b will
+              reproduce the original contents of a.
+            - The elements in a are moved around using global swap().  So they must be
+              swappable, but do not need to be copyable.
+            - #a.size() == floor(a.size()*frac)
+            - #b.size() == a.size()-#a.size()
+    !*/</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_ARRAY_tOOLS_ABSTRACT_H_
+</font>
+
+</pre></body></html>

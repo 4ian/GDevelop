@@ -1,0 +1,245 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - jidctflt.cpp</title></head><body bgcolor='white'><pre>
+<font color='#009900'>/*
+ * jidctflt.c
+ *
+ * Copyright (C) 1994-1998, Thomas G. Lane.
+ * This file is part of the Independent JPEG Group's software.
+ * For conditions of distribution and use, see the accompanying README file.
+ *
+ * This file contains a floating-point implementation of the
+ * inverse DCT (Discrete Cosine Transform).  In the IJG code, this routine
+ * must also perform dequantization of the input coefficients.
+ *
+ * This implementation should be more accurate than either of the integer
+ * IDCT implementations.  However, it may not give the same results on all
+ * machines because of differences in roundoff behavior.  Speed will depend
+ * on the hardware's floating point capacity.
+ *
+ * A 2-D IDCT can be done by 1-D IDCT on each column followed by 1-D IDCT
+ * on each row (or vice versa, but it's more convenient to emit a row at
+ * a time).  Direct algorithms are also available, but they are much more
+ * complex and seem not to be any faster when reduced to code.
+ *
+ * This implementation is based on Arai, Agui, and Nakajima's algorithm for
+ * scaled DCT.  Their original paper (Trans. IEICE E-71(11):1095) is in
+ * Japanese, but the algorithm is described in the Pennebaker &amp; Mitchell
+ * JPEG textbook (see REFERENCES section in file README).  The following code
+ * is based directly on figure 4-8 in P&amp;M.
+ * While an 8-point DCT cannot be done in less than 11 multiplies, it is
+ * possible to arrange the computation so that many of the multiplies are
+ * simple scalings of the final outputs.  These multiplies can then be
+ * folded into the multiplications or divisions by the JPEG quantization
+ * table entries.  The AA&amp;N method leaves only 5 multiplies and 29 adds
+ * to be done in the DCT itself.
+ * The primary disadvantage of this method is that with a fixed-point
+ * implementation, accuracy is lost due to imprecise representation of the
+ * scaled quantization values.  However, that problem does not arise if
+ * we use floating point arithmetic.
+ */</font>
+
+<font color='#0000FF'>#define</font> JPEG_INTERNALS
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='jinclude.h.html'>jinclude.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='jpeglib.h.html'>jpeglib.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='jdct.h.html'>jdct.h</a>"		<font color='#009900'>/* Private declarations for DCT subsystem */</font>
+
+<font color='#0000FF'>#ifdef</font> DCT_FLOAT_SUPPORTED
+
+
+<font color='#009900'>/*
+ * This module is specialized to the case DCTSIZE = 8.
+ */</font>
+
+<font color='#0000FF'>#if</font> DCTSIZE <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>8</font>
+  Sorry, <font color='#0000FF'>this</font> code only copes with <font color='#979000'>8</font>x8 DCTs. <font color='#009900'>/* deliberate syntax err */</font>
+<font color='#0000FF'>#endif</font>
+
+
+<font color='#009900'>/* Dequantize a coefficient by multiplying it by the multiplier-table
+ * entry; produce a float result.
+ */</font>
+
+<font color='#0000FF'>#define</font> DEQUANTIZE<font face='Lucida Console'>(</font>coef,quantval<font face='Lucida Console'>)</font>  <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>FAST_FLOAT<font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>coef<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> <font color='#5555FF'>*</font> <font face='Lucida Console'>(</font>quantval<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+
+
+<font color='#009900'>/*
+ * Perform dequantization and inverse DCT on one block of coefficients.
+ */</font>
+
+<b><a name='GLOBAL'></a>GLOBAL</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>void</u></font><font face='Lucida Console'>)</font>
+<b><a name='jpeg_idct_float'></a>jpeg_idct_float</b> <font face='Lucida Console'>(</font>j_decompress_ptr cinfo, jpeg_component_info <font color='#5555FF'>*</font> compptr,
+		 JCOEFPTR coef_block,
+		 JSAMPARRAY output_buf, JDIMENSION output_col<font face='Lucida Console'>)</font>
+<b>{</b>
+  FAST_FLOAT tmp0, tmp1, tmp2, tmp3, tmp4, tmp5, tmp6, tmp7;
+  FAST_FLOAT tmp10, tmp11, tmp12, tmp13;
+  FAST_FLOAT z5, z10, z11, z12, z13;
+  JCOEFPTR inptr;
+  FLOAT_MULT_TYPE <font color='#5555FF'>*</font> quantptr;
+  FAST_FLOAT <font color='#5555FF'>*</font> wsptr;
+  JSAMPROW outptr;
+  JSAMPLE <font color='#5555FF'>*</font>range_limit <font color='#5555FF'>=</font> <font color='#BB00BB'>IDCT_range_limit</font><font face='Lucida Console'>(</font>cinfo<font face='Lucida Console'>)</font>;
+  <font color='#0000FF'><u>int</u></font> ctr;
+  FAST_FLOAT workspace[DCTSIZE2]; <font color='#009900'>/* buffers data between passes */</font>
+  SHIFT_TEMPS
+
+  <font color='#009900'>/* Pass 1: process columns from input, store into work array. */</font>
+
+  inptr <font color='#5555FF'>=</font> coef_block;
+  quantptr <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>FLOAT_MULT_TYPE <font color='#5555FF'>*</font><font face='Lucida Console'>)</font> compptr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>dct_table;
+  wsptr <font color='#5555FF'>=</font> workspace;
+  <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>ctr <font color='#5555FF'>=</font> DCTSIZE; ctr <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font>; ctr<font color='#5555FF'>-</font><font color='#5555FF'>-</font><font face='Lucida Console'>)</font> <b>{</b>
+    <font color='#009900'>/* Due to quantization, we will usually find that many of the input
+     * coefficients are zero, especially the AC terms.  We can exploit this
+     * by short-circuiting the IDCT calculation for any column in which all
+     * the AC terms are zero.  In that case each output is equal to the
+     * DC coefficient (with scale factor as needed).
+     * With typical images and quantization tables, half or more of the
+     * column DCT calculations can be simplified this way.
+     */</font>
+    
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>inptr[DCTSIZE<font color='#5555FF'>*</font><font color='#979000'>1</font>] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> inptr[DCTSIZE<font color='#5555FF'>*</font><font color='#979000'>2</font>] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font>
+	inptr[DCTSIZE<font color='#5555FF'>*</font><font color='#979000'>3</font>] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> inptr[DCTSIZE<font color='#5555FF'>*</font><font color='#979000'>4</font>] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font>
+	inptr[DCTSIZE<font color='#5555FF'>*</font><font color='#979000'>5</font>] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> inptr[DCTSIZE<font color='#5555FF'>*</font><font color='#979000'>6</font>] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font>
+	inptr[DCTSIZE<font color='#5555FF'>*</font><font color='#979000'>7</font>] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font> <b>{</b>
+      <font color='#009900'>/* AC terms all zero */</font>
+      FAST_FLOAT dcval <font color='#5555FF'>=</font> <font color='#BB00BB'>DEQUANTIZE</font><font face='Lucida Console'>(</font>inptr[DCTSIZE<font color='#5555FF'>*</font><font color='#979000'>0</font>], quantptr[DCTSIZE<font color='#5555FF'>*</font><font color='#979000'>0</font>]<font face='Lucida Console'>)</font>;
+      
+      wsptr[DCTSIZE<font color='#5555FF'>*</font><font color='#979000'>0</font>] <font color='#5555FF'>=</font> dcval;
+      wsptr[DCTSIZE<font color='#5555FF'>*</font><font color='#979000'>1</font>] <font color='#5555FF'>=</font> dcval;
+      wsptr[DCTSIZE<font color='#5555FF'>*</font><font color='#979000'>2</font>] <font color='#5555FF'>=</font> dcval;
+      wsptr[DCTSIZE<font color='#5555FF'>*</font><font color='#979000'>3</font>] <font color='#5555FF'>=</font> dcval;
+      wsptr[DCTSIZE<font color='#5555FF'>*</font><font color='#979000'>4</font>] <font color='#5555FF'>=</font> dcval;
+      wsptr[DCTSIZE<font color='#5555FF'>*</font><font color='#979000'>5</font>] <font color='#5555FF'>=</font> dcval;
+      wsptr[DCTSIZE<font color='#5555FF'>*</font><font color='#979000'>6</font>] <font color='#5555FF'>=</font> dcval;
+      wsptr[DCTSIZE<font color='#5555FF'>*</font><font color='#979000'>7</font>] <font color='#5555FF'>=</font> dcval;
+      
+      inptr<font color='#5555FF'>+</font><font color='#5555FF'>+</font>;			<font color='#009900'>/* advance pointers to next column */</font>
+      quantptr<font color='#5555FF'>+</font><font color='#5555FF'>+</font>;
+      wsptr<font color='#5555FF'>+</font><font color='#5555FF'>+</font>;
+      <font color='#0000FF'>continue</font>;
+    <b>}</b>
+    
+    <font color='#009900'>/* Even part */</font>
+
+    tmp0 <font color='#5555FF'>=</font> <font color='#BB00BB'>DEQUANTIZE</font><font face='Lucida Console'>(</font>inptr[DCTSIZE<font color='#5555FF'>*</font><font color='#979000'>0</font>], quantptr[DCTSIZE<font color='#5555FF'>*</font><font color='#979000'>0</font>]<font face='Lucida Console'>)</font>;
+    tmp1 <font color='#5555FF'>=</font> <font color='#BB00BB'>DEQUANTIZE</font><font face='Lucida Console'>(</font>inptr[DCTSIZE<font color='#5555FF'>*</font><font color='#979000'>2</font>], quantptr[DCTSIZE<font color='#5555FF'>*</font><font color='#979000'>2</font>]<font face='Lucida Console'>)</font>;
+    tmp2 <font color='#5555FF'>=</font> <font color='#BB00BB'>DEQUANTIZE</font><font face='Lucida Console'>(</font>inptr[DCTSIZE<font color='#5555FF'>*</font><font color='#979000'>4</font>], quantptr[DCTSIZE<font color='#5555FF'>*</font><font color='#979000'>4</font>]<font face='Lucida Console'>)</font>;
+    tmp3 <font color='#5555FF'>=</font> <font color='#BB00BB'>DEQUANTIZE</font><font face='Lucida Console'>(</font>inptr[DCTSIZE<font color='#5555FF'>*</font><font color='#979000'>6</font>], quantptr[DCTSIZE<font color='#5555FF'>*</font><font color='#979000'>6</font>]<font face='Lucida Console'>)</font>;
+
+    tmp10 <font color='#5555FF'>=</font> tmp0 <font color='#5555FF'>+</font> tmp2;	<font color='#009900'>/* phase 3 */</font>
+    tmp11 <font color='#5555FF'>=</font> tmp0 <font color='#5555FF'>-</font> tmp2;
+
+    tmp13 <font color='#5555FF'>=</font> tmp1 <font color='#5555FF'>+</font> tmp3;	<font color='#009900'>/* phases 5-3 */</font>
+    tmp12 <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>tmp1 <font color='#5555FF'>-</font> tmp3<font face='Lucida Console'>)</font> <font color='#5555FF'>*</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>FAST_FLOAT<font face='Lucida Console'>)</font> <font color='#979000'>1.414213562</font><font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> tmp13; <font color='#009900'>/* 2*c4 */</font>
+
+    tmp0 <font color='#5555FF'>=</font> tmp10 <font color='#5555FF'>+</font> tmp13;	<font color='#009900'>/* phase 2 */</font>
+    tmp3 <font color='#5555FF'>=</font> tmp10 <font color='#5555FF'>-</font> tmp13;
+    tmp1 <font color='#5555FF'>=</font> tmp11 <font color='#5555FF'>+</font> tmp12;
+    tmp2 <font color='#5555FF'>=</font> tmp11 <font color='#5555FF'>-</font> tmp12;
+    
+    <font color='#009900'>/* Odd part */</font>
+
+    tmp4 <font color='#5555FF'>=</font> <font color='#BB00BB'>DEQUANTIZE</font><font face='Lucida Console'>(</font>inptr[DCTSIZE<font color='#5555FF'>*</font><font color='#979000'>1</font>], quantptr[DCTSIZE<font color='#5555FF'>*</font><font color='#979000'>1</font>]<font face='Lucida Console'>)</font>;
+    tmp5 <font color='#5555FF'>=</font> <font color='#BB00BB'>DEQUANTIZE</font><font face='Lucida Console'>(</font>inptr[DCTSIZE<font color='#5555FF'>*</font><font color='#979000'>3</font>], quantptr[DCTSIZE<font color='#5555FF'>*</font><font color='#979000'>3</font>]<font face='Lucida Console'>)</font>;
+    tmp6 <font color='#5555FF'>=</font> <font color='#BB00BB'>DEQUANTIZE</font><font face='Lucida Console'>(</font>inptr[DCTSIZE<font color='#5555FF'>*</font><font color='#979000'>5</font>], quantptr[DCTSIZE<font color='#5555FF'>*</font><font color='#979000'>5</font>]<font face='Lucida Console'>)</font>;
+    tmp7 <font color='#5555FF'>=</font> <font color='#BB00BB'>DEQUANTIZE</font><font face='Lucida Console'>(</font>inptr[DCTSIZE<font color='#5555FF'>*</font><font color='#979000'>7</font>], quantptr[DCTSIZE<font color='#5555FF'>*</font><font color='#979000'>7</font>]<font face='Lucida Console'>)</font>;
+
+    z13 <font color='#5555FF'>=</font> tmp6 <font color='#5555FF'>+</font> tmp5;		<font color='#009900'>/* phase 6 */</font>
+    z10 <font color='#5555FF'>=</font> tmp6 <font color='#5555FF'>-</font> tmp5;
+    z11 <font color='#5555FF'>=</font> tmp4 <font color='#5555FF'>+</font> tmp7;
+    z12 <font color='#5555FF'>=</font> tmp4 <font color='#5555FF'>-</font> tmp7;
+
+    tmp7 <font color='#5555FF'>=</font> z11 <font color='#5555FF'>+</font> z13;		<font color='#009900'>/* phase 5 */</font>
+    tmp11 <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>z11 <font color='#5555FF'>-</font> z13<font face='Lucida Console'>)</font> <font color='#5555FF'>*</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>FAST_FLOAT<font face='Lucida Console'>)</font> <font color='#979000'>1.414213562</font><font face='Lucida Console'>)</font>; <font color='#009900'>/* 2*c4 */</font>
+
+    z5 <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>z10 <font color='#5555FF'>+</font> z12<font face='Lucida Console'>)</font> <font color='#5555FF'>*</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>FAST_FLOAT<font face='Lucida Console'>)</font> <font color='#979000'>1.847759065</font><font face='Lucida Console'>)</font>; <font color='#009900'>/* 2*c2 */</font>
+    tmp10 <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>FAST_FLOAT<font face='Lucida Console'>)</font> <font color='#979000'>1.082392200</font><font face='Lucida Console'>)</font> <font color='#5555FF'>*</font> z12 <font color='#5555FF'>-</font> z5; <font color='#009900'>/* 2*(c2-c6) */</font>
+    tmp12 <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>FAST_FLOAT<font face='Lucida Console'>)</font> <font color='#5555FF'>-</font><font color='#979000'>2.613125930</font><font face='Lucida Console'>)</font> <font color='#5555FF'>*</font> z10 <font color='#5555FF'>+</font> z5; <font color='#009900'>/* -2*(c2+c6) */</font>
+
+    tmp6 <font color='#5555FF'>=</font> tmp12 <font color='#5555FF'>-</font> tmp7;	<font color='#009900'>/* phase 2 */</font>
+    tmp5 <font color='#5555FF'>=</font> tmp11 <font color='#5555FF'>-</font> tmp6;
+    tmp4 <font color='#5555FF'>=</font> tmp10 <font color='#5555FF'>+</font> tmp5;
+
+    wsptr[DCTSIZE<font color='#5555FF'>*</font><font color='#979000'>0</font>] <font color='#5555FF'>=</font> tmp0 <font color='#5555FF'>+</font> tmp7;
+    wsptr[DCTSIZE<font color='#5555FF'>*</font><font color='#979000'>7</font>] <font color='#5555FF'>=</font> tmp0 <font color='#5555FF'>-</font> tmp7;
+    wsptr[DCTSIZE<font color='#5555FF'>*</font><font color='#979000'>1</font>] <font color='#5555FF'>=</font> tmp1 <font color='#5555FF'>+</font> tmp6;
+    wsptr[DCTSIZE<font color='#5555FF'>*</font><font color='#979000'>6</font>] <font color='#5555FF'>=</font> tmp1 <font color='#5555FF'>-</font> tmp6;
+    wsptr[DCTSIZE<font color='#5555FF'>*</font><font color='#979000'>2</font>] <font color='#5555FF'>=</font> tmp2 <font color='#5555FF'>+</font> tmp5;
+    wsptr[DCTSIZE<font color='#5555FF'>*</font><font color='#979000'>5</font>] <font color='#5555FF'>=</font> tmp2 <font color='#5555FF'>-</font> tmp5;
+    wsptr[DCTSIZE<font color='#5555FF'>*</font><font color='#979000'>4</font>] <font color='#5555FF'>=</font> tmp3 <font color='#5555FF'>+</font> tmp4;
+    wsptr[DCTSIZE<font color='#5555FF'>*</font><font color='#979000'>3</font>] <font color='#5555FF'>=</font> tmp3 <font color='#5555FF'>-</font> tmp4;
+
+    inptr<font color='#5555FF'>+</font><font color='#5555FF'>+</font>;			<font color='#009900'>/* advance pointers to next column */</font>
+    quantptr<font color='#5555FF'>+</font><font color='#5555FF'>+</font>;
+    wsptr<font color='#5555FF'>+</font><font color='#5555FF'>+</font>;
+  <b>}</b>
+  
+  <font color='#009900'>/* Pass 2: process rows from work array, store into output array. */</font>
+  <font color='#009900'>/* Note that we must descale the results by a factor of 8 == 2**3. */</font>
+
+  wsptr <font color='#5555FF'>=</font> workspace;
+  <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>ctr <font color='#5555FF'>=</font> <font color='#979000'>0</font>; ctr <font color='#5555FF'>&lt;</font> DCTSIZE; ctr<font color='#5555FF'>+</font><font color='#5555FF'>+</font><font face='Lucida Console'>)</font> <b>{</b>
+    outptr <font color='#5555FF'>=</font> output_buf[ctr] <font color='#5555FF'>+</font> output_col;
+    <font color='#009900'>/* Rows of zeroes can be exploited in the same way as we did with columns.
+     * However, the column calculation has created many nonzero AC terms, so
+     * the simplification applies less often (typically 5% to 10% of the time).
+     * And testing floats for zero is relatively expensive, so we don't bother.
+     */</font>
+    
+    <font color='#009900'>/* Even part */</font>
+
+    tmp10 <font color='#5555FF'>=</font> wsptr[<font color='#979000'>0</font>] <font color='#5555FF'>+</font> wsptr[<font color='#979000'>4</font>];
+    tmp11 <font color='#5555FF'>=</font> wsptr[<font color='#979000'>0</font>] <font color='#5555FF'>-</font> wsptr[<font color='#979000'>4</font>];
+
+    tmp13 <font color='#5555FF'>=</font> wsptr[<font color='#979000'>2</font>] <font color='#5555FF'>+</font> wsptr[<font color='#979000'>6</font>];
+    tmp12 <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>wsptr[<font color='#979000'>2</font>] <font color='#5555FF'>-</font> wsptr[<font color='#979000'>6</font>]<font face='Lucida Console'>)</font> <font color='#5555FF'>*</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>FAST_FLOAT<font face='Lucida Console'>)</font> <font color='#979000'>1.414213562</font><font face='Lucida Console'>)</font> <font color='#5555FF'>-</font> tmp13;
+
+    tmp0 <font color='#5555FF'>=</font> tmp10 <font color='#5555FF'>+</font> tmp13;
+    tmp3 <font color='#5555FF'>=</font> tmp10 <font color='#5555FF'>-</font> tmp13;
+    tmp1 <font color='#5555FF'>=</font> tmp11 <font color='#5555FF'>+</font> tmp12;
+    tmp2 <font color='#5555FF'>=</font> tmp11 <font color='#5555FF'>-</font> tmp12;
+
+    <font color='#009900'>/* Odd part */</font>
+
+    z13 <font color='#5555FF'>=</font> wsptr[<font color='#979000'>5</font>] <font color='#5555FF'>+</font> wsptr[<font color='#979000'>3</font>];
+    z10 <font color='#5555FF'>=</font> wsptr[<font color='#979000'>5</font>] <font color='#5555FF'>-</font> wsptr[<font color='#979000'>3</font>];
+    z11 <font color='#5555FF'>=</font> wsptr[<font color='#979000'>1</font>] <font color='#5555FF'>+</font> wsptr[<font color='#979000'>7</font>];
+    z12 <font color='#5555FF'>=</font> wsptr[<font color='#979000'>1</font>] <font color='#5555FF'>-</font> wsptr[<font color='#979000'>7</font>];
+
+    tmp7 <font color='#5555FF'>=</font> z11 <font color='#5555FF'>+</font> z13;
+    tmp11 <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>z11 <font color='#5555FF'>-</font> z13<font face='Lucida Console'>)</font> <font color='#5555FF'>*</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>FAST_FLOAT<font face='Lucida Console'>)</font> <font color='#979000'>1.414213562</font><font face='Lucida Console'>)</font>;
+
+    z5 <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>z10 <font color='#5555FF'>+</font> z12<font face='Lucida Console'>)</font> <font color='#5555FF'>*</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>FAST_FLOAT<font face='Lucida Console'>)</font> <font color='#979000'>1.847759065</font><font face='Lucida Console'>)</font>; <font color='#009900'>/* 2*c2 */</font>
+    tmp10 <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>FAST_FLOAT<font face='Lucida Console'>)</font> <font color='#979000'>1.082392200</font><font face='Lucida Console'>)</font> <font color='#5555FF'>*</font> z12 <font color='#5555FF'>-</font> z5; <font color='#009900'>/* 2*(c2-c6) */</font>
+    tmp12 <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>FAST_FLOAT<font face='Lucida Console'>)</font> <font color='#5555FF'>-</font><font color='#979000'>2.613125930</font><font face='Lucida Console'>)</font> <font color='#5555FF'>*</font> z10 <font color='#5555FF'>+</font> z5; <font color='#009900'>/* -2*(c2+c6) */</font>
+
+    tmp6 <font color='#5555FF'>=</font> tmp12 <font color='#5555FF'>-</font> tmp7;
+    tmp5 <font color='#5555FF'>=</font> tmp11 <font color='#5555FF'>-</font> tmp6;
+    tmp4 <font color='#5555FF'>=</font> tmp10 <font color='#5555FF'>+</font> tmp5;
+
+    <font color='#009900'>/* Final output stage: scale down by a factor of 8 and range-limit */</font>
+
+    outptr[<font color='#979000'>0</font>] <font color='#5555FF'>=</font> range_limit[<font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font> <font color='#BB00BB'>DESCALE</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>tmp0 <font color='#5555FF'>+</font> tmp7<font face='Lucida Console'>)</font>, <font color='#979000'>3</font><font face='Lucida Console'>)</font>
+			    <font color='#5555FF'>&amp;</font> RANGE_MASK];
+    outptr[<font color='#979000'>7</font>] <font color='#5555FF'>=</font> range_limit[<font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font> <font color='#BB00BB'>DESCALE</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>tmp0 <font color='#5555FF'>-</font> tmp7<font face='Lucida Console'>)</font>, <font color='#979000'>3</font><font face='Lucida Console'>)</font>
+			    <font color='#5555FF'>&amp;</font> RANGE_MASK];
+    outptr[<font color='#979000'>1</font>] <font color='#5555FF'>=</font> range_limit[<font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font> <font color='#BB00BB'>DESCALE</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>tmp1 <font color='#5555FF'>+</font> tmp6<font face='Lucida Console'>)</font>, <font color='#979000'>3</font><font face='Lucida Console'>)</font>
+			    <font color='#5555FF'>&amp;</font> RANGE_MASK];
+    outptr[<font color='#979000'>6</font>] <font color='#5555FF'>=</font> range_limit[<font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font> <font color='#BB00BB'>DESCALE</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>tmp1 <font color='#5555FF'>-</font> tmp6<font face='Lucida Console'>)</font>, <font color='#979000'>3</font><font face='Lucida Console'>)</font>
+			    <font color='#5555FF'>&amp;</font> RANGE_MASK];
+    outptr[<font color='#979000'>2</font>] <font color='#5555FF'>=</font> range_limit[<font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font> <font color='#BB00BB'>DESCALE</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>tmp2 <font color='#5555FF'>+</font> tmp5<font face='Lucida Console'>)</font>, <font color='#979000'>3</font><font face='Lucida Console'>)</font>
+			    <font color='#5555FF'>&amp;</font> RANGE_MASK];
+    outptr[<font color='#979000'>5</font>] <font color='#5555FF'>=</font> range_limit[<font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font> <font color='#BB00BB'>DESCALE</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>tmp2 <font color='#5555FF'>-</font> tmp5<font face='Lucida Console'>)</font>, <font color='#979000'>3</font><font face='Lucida Console'>)</font>
+			    <font color='#5555FF'>&amp;</font> RANGE_MASK];
+    outptr[<font color='#979000'>4</font>] <font color='#5555FF'>=</font> range_limit[<font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font> <font color='#BB00BB'>DESCALE</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>tmp3 <font color='#5555FF'>+</font> tmp4<font face='Lucida Console'>)</font>, <font color='#979000'>3</font><font face='Lucida Console'>)</font>
+			    <font color='#5555FF'>&amp;</font> RANGE_MASK];
+    outptr[<font color='#979000'>3</font>] <font color='#5555FF'>=</font> range_limit[<font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font><font face='Lucida Console'>)</font> <font color='#BB00BB'>DESCALE</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font><font face='Lucida Console'>)</font> <font face='Lucida Console'>(</font>tmp3 <font color='#5555FF'>-</font> tmp4<font face='Lucida Console'>)</font>, <font color='#979000'>3</font><font face='Lucida Console'>)</font>
+			    <font color='#5555FF'>&amp;</font> RANGE_MASK];
+    
+    wsptr <font color='#5555FF'>+</font><font color='#5555FF'>=</font> DCTSIZE;		<font color='#009900'>/* advance pointer to next row */</font>
+  <b>}</b>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>/* DCT_FLOAT_SUPPORTED */</font>
+
+</pre></body></html>

@@ -1,0 +1,390 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - image_dataset_metadata.cpp</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2011  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_IMAGE_DAtASET_METADATA_CPPh_
+<font color='#0000FF'>#define</font> DLIB_IMAGE_DAtASET_METADATA_CPPh_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='image_dataset_metadata.h.html'>image_dataset_metadata.h</a>"
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>fstream<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>sstream<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../compress_stream.h.html'>../compress_stream.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../base64.h.html'>../base64.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../xml_parser.h.html'>../xml_parser.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../string.h.html'>../string.h</a>"
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+    <font color='#0000FF'>namespace</font> image_dataset_metadata
+    <b>{</b>
+
+    <font color='#009900'>// ------------------------------------------------------------------------------------
+</font>
+        <font color='#0000FF'>const</font> std::string <b><a name='get_decoded_string'></a>get_decoded_string</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'><u>void</u></font> <b><a name='create_image_metadata_stylesheet_file'></a>create_image_metadata_stylesheet_file</b><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> main_filename<font face='Lucida Console'>)</font>
+        <b>{</b>
+            std::string path;
+            std::string::size_type pos <font color='#5555FF'>=</font> main_filename.<font color='#BB00BB'>find_last_of</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>/\\</font>"<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>pos <font color='#5555FF'>!</font><font color='#5555FF'>=</font> std::string::npos<font face='Lucida Console'>)</font>
+                path <font color='#5555FF'>=</font> main_filename.<font color='#BB00BB'>substr</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>,pos<font color='#5555FF'>+</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+
+            std::ofstream <font color='#BB00BB'>fout</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>path <font color='#5555FF'>+</font> "<font color='#CC0000'>image_metadata_stylesheet.xsl</font>"<font face='Lucida Console'>)</font>.<font color='#BB00BB'>c_str</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font>fout<font face='Lucida Console'>)</font>
+                <font color='#0000FF'>throw</font> dlib::<font color='#BB00BB'>error</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>ERROR: Unable to open image_metadata_stylesheet.xsl for writing.</font>"<font face='Lucida Console'>)</font>;
+
+            fout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>get_decoded_string</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font>fout<font face='Lucida Console'>)</font>
+                <font color='#0000FF'>throw</font> dlib::<font color='#BB00BB'>error</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>ERROR: Unable to write to image_metadata_stylesheet.xsl.</font>"<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='save_image_dataset_metadata'></a>save_image_dataset_metadata</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> dataset<font color='#5555FF'>&amp;</font> meta,
+            <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> filename
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#BB00BB'>create_image_metadata_stylesheet_file</font><font face='Lucida Console'>(</font>filename<font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>image<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> images <font color='#5555FF'>=</font> meta.images;
+
+            std::ofstream <font color='#BB00BB'>fout</font><font face='Lucida Console'>(</font>filename.<font color='#BB00BB'>c_str</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font>fout<font face='Lucida Console'>)</font>
+                <font color='#0000FF'>throw</font> dlib::<font color='#BB00BB'>error</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>ERROR: Unable to open </font>" <font color='#5555FF'>+</font> filename <font color='#5555FF'>+</font> "<font color='#CC0000'> for writing.</font>"<font face='Lucida Console'>)</font>;
+
+            fout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>&lt;?xml version='1.0' encoding='ISO-8859-1'?&gt;\n</font>";
+            fout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>&lt;?xml-stylesheet type='text/xsl' href='image_metadata_stylesheet.xsl'?&gt;\n</font>";
+            fout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>&lt;dataset&gt;\n</font>";
+            fout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>&lt;name&gt;</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> meta.name <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>&lt;/name&gt;\n</font>";
+            fout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>&lt;comment&gt;</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> meta.comment <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>&lt;/comment&gt;\n</font>";
+            fout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>&lt;images&gt;\n</font>";
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> images.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                fout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>  &lt;image file='</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> images[i].filename <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>'&gt;\n</font>";
+
+                <font color='#009900'>// save all the boxes
+</font>                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> j <font color='#5555FF'>=</font> <font color='#979000'>0</font>; j <font color='#5555FF'>&lt;</font> images[i].boxes.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>j<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#0000FF'>const</font> box<font color='#5555FF'>&amp;</font> b <font color='#5555FF'>=</font> images[i].boxes[j];
+                    fout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>    &lt;box top='</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> b.rect.<font color='#BB00BB'>top</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>' </font>"
+                                 <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>left='</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> b.rect.<font color='#BB00BB'>left</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>' </font>"
+                                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>width='</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> b.rect.<font color='#BB00BB'>width</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>' </font>"
+                               <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>height='</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> b.rect.<font color='#BB00BB'>height</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>'</font>";
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>b.difficult<font face='Lucida Console'>)</font>
+                        fout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'> difficult='</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> b.difficult <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>'</font>";
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>b.truncated<font face='Lucida Console'>)</font>
+                        fout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'> truncated='</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> b.truncated <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>'</font>";
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>b.occluded<font face='Lucida Console'>)</font>
+                        fout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'> occluded='</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> b.occluded <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>'</font>";
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>b.ignore<font face='Lucida Console'>)</font>
+                        fout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'> ignore='</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> b.ignore <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>'</font>";
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>b.angle <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                        fout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'> angle='</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> b.angle <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>'</font>";
+
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>b.<font color='#BB00BB'>has_label</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>|</font><font color='#5555FF'>|</font> b.parts.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        fout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>&gt;\n</font>";
+
+                        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>b.<font color='#BB00BB'>has_label</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+                            fout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>      &lt;label&gt;</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> b.label <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>&lt;/label&gt;\n</font>";
+                        
+                        <font color='#009900'>// save all the parts
+</font>                        std::map<font color='#5555FF'>&lt;</font>std::string,point<font color='#5555FF'>&gt;</font>::const_iterator itr;
+                        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>itr <font color='#5555FF'>=</font> b.parts.<font color='#BB00BB'>begin</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; itr <font color='#5555FF'>!</font><font color='#5555FF'>=</font> b.parts.<font color='#BB00BB'>end</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>itr<font face='Lucida Console'>)</font>
+                        <b>{</b>
+                            fout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>      &lt;part name='</font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> itr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>first <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>' x='</font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> itr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>second.<font color='#BB00BB'>x</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font>"<font color='#CC0000'>' y='</font>"<font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> itr<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>second.<font color='#BB00BB'>y</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font>"<font color='#CC0000'>'/&gt;\n</font>";
+                        <b>}</b>
+
+                        fout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>    &lt;/box&gt;\n</font>";
+                    <b>}</b>
+                    <font color='#0000FF'>else</font>
+                    <b>{</b>
+                        fout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>/&gt;\n</font>";
+                    <b>}</b>
+                <b>}</b>
+
+
+
+                fout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>  &lt;/image&gt;\n</font>";
+
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font>fout<font face='Lucida Console'>)</font>
+                    <font color='#0000FF'>throw</font> dlib::<font color='#BB00BB'>error</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>ERROR: Unable to write to </font>" <font color='#5555FF'>+</font> filename <font color='#5555FF'>+</font> "<font color='#CC0000'>.</font>"<font face='Lucida Console'>)</font>;
+            <b>}</b>
+            fout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>&lt;/images&gt;\n</font>";
+            fout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>&lt;/dataset&gt;</font>";
+        <b>}</b>
+
+    <font color='#009900'>// ------------------------------------------------------------------------------------
+</font>    <font color='#009900'>// ------------------------------------------------------------------------------------
+</font>    <font color='#009900'>// ------------------------------------------------------------------------------------
+</font>
+        <font color='#0000FF'>class</font> <b><a name='doc_handler'></a>doc_handler</b> : <font color='#0000FF'>public</font> document_handler
+        <b>{</b>
+            std::vector<font color='#5555FF'>&lt;</font>std::string<font color='#5555FF'>&gt;</font> ts;
+            image temp_image;
+            box temp_box;
+
+            dataset<font color='#5555FF'>&amp;</font> meta;
+
+        <font color='#0000FF'>public</font>:
+
+            <b><a name='doc_handler'></a>doc_handler</b><font face='Lucida Console'>(</font>
+                dataset<font color='#5555FF'>&amp;</font> metadata_
+            <font face='Lucida Console'>)</font>:
+                meta<font face='Lucida Console'>(</font>metadata_<font face='Lucida Console'>)</font> 
+            <b>{</b><b>}</b>
+
+
+            <font color='#0000FF'>virtual</font> <font color='#0000FF'><u>void</u></font> <b><a name='start_document'></a>start_document</b> <font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font>
+            <b>{</b>
+                meta <font color='#5555FF'>=</font> <font color='#BB00BB'>dataset</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                ts.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                temp_image <font color='#5555FF'>=</font> <font color='#BB00BB'>image</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                temp_box <font color='#5555FF'>=</font> <font color='#BB00BB'>box</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+            <font color='#0000FF'>virtual</font> <font color='#0000FF'><u>void</u></font> <b><a name='end_document'></a>end_document</b> <font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font>
+            <b>{</b>
+            <b>}</b>
+
+            <font color='#0000FF'>virtual</font> <font color='#0000FF'><u>void</u></font> <b><a name='start_element'></a>start_element</b> <font face='Lucida Console'>(</font> 
+                <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> line_number,
+                <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> name,
+                <font color='#0000FF'>const</font> dlib::attribute_list<font color='#5555FF'>&amp;</font> atts
+            <font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>try</font>
+                <b>{</b>
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>ts.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font> 
+                    <b>{</b>
+                        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>name <font color='#5555FF'>!</font><font color='#5555FF'>=</font> "<font color='#CC0000'>dataset</font>"<font face='Lucida Console'>)</font>
+                        <b>{</b>
+                            std::ostringstream sout;
+                            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>Invalid XML document.  Root tag must be &lt;dataset&gt;.  Found &lt;</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> name <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>&gt; instead.</font>";
+                            <font color='#0000FF'>throw</font> dlib::<font color='#BB00BB'>error</font><font face='Lucida Console'>(</font>sout.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                        <b>}</b>
+                        <font color='#0000FF'>else</font>
+                        <b>{</b>
+                            ts.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>name<font face='Lucida Console'>)</font>;
+                            <font color='#0000FF'>return</font>;
+                        <b>}</b>
+                    <b>}</b>
+
+
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>name <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'>box</font>"<font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>atts.<font color='#BB00BB'>is_in_list</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>top</font>"<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> temp_box.rect.<font color='#BB00BB'>top</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> sa <font color='#5555FF'>=</font> atts["<font color='#CC0000'>top</font>"];
+                        <font color='#0000FF'>else</font> <font color='#0000FF'>throw</font> dlib::<font color='#BB00BB'>error</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>&lt;box&gt; missing required attribute 'top'</font>"<font face='Lucida Console'>)</font>;
+
+                        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>atts.<font color='#BB00BB'>is_in_list</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>left</font>"<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> temp_box.rect.<font color='#BB00BB'>left</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> sa <font color='#5555FF'>=</font> atts["<font color='#CC0000'>left</font>"];
+                        <font color='#0000FF'>else</font> <font color='#0000FF'>throw</font> dlib::<font color='#BB00BB'>error</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>&lt;box&gt; missing required attribute 'left'</font>"<font face='Lucida Console'>)</font>;
+
+                        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>atts.<font color='#BB00BB'>is_in_list</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>width</font>"<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> temp_box.rect.<font color='#BB00BB'>right</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> sa <font color='#5555FF'>=</font> atts["<font color='#CC0000'>width</font>"];
+                        <font color='#0000FF'>else</font> <font color='#0000FF'>throw</font> dlib::<font color='#BB00BB'>error</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>&lt;box&gt; missing required attribute 'width'</font>"<font face='Lucida Console'>)</font>;
+
+                        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>atts.<font color='#BB00BB'>is_in_list</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>height</font>"<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> temp_box.rect.<font color='#BB00BB'>bottom</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> sa <font color='#5555FF'>=</font> atts["<font color='#CC0000'>height</font>"];
+                        <font color='#0000FF'>else</font> <font color='#0000FF'>throw</font> dlib::<font color='#BB00BB'>error</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>&lt;box&gt; missing required attribute 'height'</font>"<font face='Lucida Console'>)</font>;
+
+                        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>atts.<font color='#BB00BB'>is_in_list</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>difficult</font>"<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> temp_box.difficult <font color='#5555FF'>=</font> sa <font color='#5555FF'>=</font> atts["<font color='#CC0000'>difficult</font>"];
+                        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>atts.<font color='#BB00BB'>is_in_list</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>truncated</font>"<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> temp_box.truncated <font color='#5555FF'>=</font> sa <font color='#5555FF'>=</font> atts["<font color='#CC0000'>truncated</font>"];
+                        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>atts.<font color='#BB00BB'>is_in_list</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>occluded</font>"<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>  temp_box.occluded  <font color='#5555FF'>=</font> sa <font color='#5555FF'>=</font> atts["<font color='#CC0000'>occluded</font>"];
+                        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>atts.<font color='#BB00BB'>is_in_list</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>ignore</font>"<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>  temp_box.ignore  <font color='#5555FF'>=</font> sa <font color='#5555FF'>=</font> atts["<font color='#CC0000'>ignore</font>"];
+                        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>atts.<font color='#BB00BB'>is_in_list</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>angle</font>"<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>  temp_box.angle  <font color='#5555FF'>=</font> sa <font color='#5555FF'>=</font> atts["<font color='#CC0000'>angle</font>"];
+
+                        temp_box.rect.<font color='#BB00BB'>bottom</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font><font color='#5555FF'>=</font> temp_box.rect.<font color='#BB00BB'>top</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#979000'>1</font>;
+                        temp_box.rect.<font color='#BB00BB'>right</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font><font color='#5555FF'>=</font> temp_box.rect.<font color='#BB00BB'>left</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#979000'>1</font>;
+                    <b>}</b>
+                    <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>name <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'>part</font>" <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> ts.<font color='#BB00BB'>back</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'>box</font>"<font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        point temp;
+                        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>atts.<font color='#BB00BB'>is_in_list</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>x</font>"<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> temp.<font color='#BB00BB'>x</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> sa <font color='#5555FF'>=</font> atts["<font color='#CC0000'>x</font>"];
+                        <font color='#0000FF'>else</font> <font color='#0000FF'>throw</font> dlib::<font color='#BB00BB'>error</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>&lt;part&gt; missing required attribute 'x'</font>"<font face='Lucida Console'>)</font>;
+
+                        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>atts.<font color='#BB00BB'>is_in_list</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>y</font>"<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> temp.<font color='#BB00BB'>y</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> sa <font color='#5555FF'>=</font> atts["<font color='#CC0000'>y</font>"];
+                        <font color='#0000FF'>else</font> <font color='#0000FF'>throw</font> dlib::<font color='#BB00BB'>error</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>&lt;part&gt; missing required attribute 'y'</font>"<font face='Lucida Console'>)</font>;
+
+                        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>atts.<font color='#BB00BB'>is_in_list</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>name</font>"<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> 
+                        <b>{</b>
+                            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>temp_box.parts.<font color='#BB00BB'>count</font><font face='Lucida Console'>(</font>atts["<font color='#CC0000'>name</font>"]<font face='Lucida Console'>)</font><font color='#5555FF'>=</font><font color='#5555FF'>=</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                            <b>{</b>
+                                temp_box.parts[atts["<font color='#CC0000'>name</font>"]] <font color='#5555FF'>=</font> temp;
+                            <b>}</b>
+                            <font color='#0000FF'>else</font>
+                            <b>{</b>
+                                <font color='#0000FF'>throw</font> dlib::<font color='#BB00BB'>error</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>&lt;part&gt; with name '</font>" <font color='#5555FF'>+</font> atts["<font color='#CC0000'>name</font>"] <font color='#5555FF'>+</font> "<font color='#CC0000'>' is defined more than one time in a single box.</font>"<font face='Lucida Console'>)</font>;
+                            <b>}</b>
+                        <b>}</b>
+                        <font color='#0000FF'>else</font> 
+                        <b>{</b>
+                            <font color='#0000FF'>throw</font> dlib::<font color='#BB00BB'>error</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>&lt;part&gt; missing required attribute 'name'</font>"<font face='Lucida Console'>)</font>;
+                        <b>}</b>
+                    <b>}</b>
+                    <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>name <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'>image</font>"<font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        temp_image.boxes.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+                        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>atts.<font color='#BB00BB'>is_in_list</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>file</font>"<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font> temp_image.filename <font color='#5555FF'>=</font> atts["<font color='#CC0000'>file</font>"];
+                        <font color='#0000FF'>else</font> <font color='#0000FF'>throw</font> dlib::<font color='#BB00BB'>error</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>&lt;image&gt; missing required attribute 'file'</font>"<font face='Lucida Console'>)</font>;
+                    <b>}</b>
+
+                    ts.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>name<font face='Lucida Console'>)</font>;
+                <b>}</b>
+                <font color='#0000FF'>catch</font> <font face='Lucida Console'>(</font>error<font color='#5555FF'>&amp;</font> e<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#0000FF'>throw</font> dlib::<font color='#BB00BB'>error</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>Error on line </font>" <font color='#5555FF'>+</font> <font color='#BB00BB'>cast_to_string</font><font face='Lucida Console'>(</font>line_number<font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> "<font color='#CC0000'>: </font>" <font color='#5555FF'>+</font> e.<font color='#BB00BB'>what</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                <b>}</b>
+            <b>}</b>
+
+            <font color='#0000FF'>virtual</font> <font color='#0000FF'><u>void</u></font> <b><a name='end_element'></a>end_element</b> <font face='Lucida Console'>(</font> 
+                <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> ,
+                <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> name
+            <font face='Lucida Console'>)</font>
+            <b>{</b>
+                ts.<font color='#BB00BB'>pop_back</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>ts.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                    <font color='#0000FF'>return</font>;
+
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>name <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'>box</font>" <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> ts.<font color='#BB00BB'>back</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'>image</font>"<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    temp_image.boxes.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>temp_box<font face='Lucida Console'>)</font>;
+                    temp_box <font color='#5555FF'>=</font> <font color='#BB00BB'>box</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                <b>}</b>
+                <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>name <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'>image</font>" <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> ts.<font color='#BB00BB'>back</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'>images</font>"<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    meta.images.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>temp_image<font face='Lucida Console'>)</font>;
+                    temp_image <font color='#5555FF'>=</font> <font color='#BB00BB'>image</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                <b>}</b>
+            <b>}</b>
+
+            <font color='#0000FF'>virtual</font> <font color='#0000FF'><u>void</u></font> <b><a name='characters'></a>characters</b> <font face='Lucida Console'>(</font> 
+                <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> data
+            <font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>ts.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>2</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> ts[<font color='#979000'>1</font>] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'>name</font>"<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    meta.name <font color='#5555FF'>=</font> <font color='#BB00BB'>trim</font><font face='Lucida Console'>(</font>data<font face='Lucida Console'>)</font>;
+                <b>}</b>
+                <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>ts.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>2</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> ts[<font color='#979000'>1</font>] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'>comment</font>"<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    meta.comment <font color='#5555FF'>=</font> <font color='#BB00BB'>trim</font><font face='Lucida Console'>(</font>data<font face='Lucida Console'>)</font>;
+                <b>}</b>
+                <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>ts.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#979000'>2</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> ts[ts.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#979000'>1</font>] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'>label</font>" <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> 
+                                           ts[ts.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#979000'>2</font>] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'>box</font>"<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    temp_box.label <font color='#5555FF'>=</font> <font color='#BB00BB'>trim</font><font face='Lucida Console'>(</font>data<font face='Lucida Console'>)</font>;
+                <b>}</b>
+            <b>}</b>
+
+            <font color='#0000FF'>virtual</font> <font color='#0000FF'><u>void</u></font> <b><a name='processing_instruction'></a>processing_instruction</b> <font face='Lucida Console'>(</font>
+                <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> ,
+                <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> ,
+                <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> 
+            <font face='Lucida Console'>)</font>
+            <b>{</b>
+            <b>}</b>
+        <b>}</b>;
+
+    <font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+        <font color='#0000FF'>class</font> <b><a name='xml_error_handler'></a>xml_error_handler</b> : <font color='#0000FF'>public</font> error_handler
+        <b>{</b>
+        <font color='#0000FF'>public</font>:
+            <font color='#0000FF'>virtual</font> <font color='#0000FF'><u>void</u></font> <b><a name='error'></a>error</b> <font face='Lucida Console'>(</font>
+                <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> 
+            <font face='Lucida Console'>)</font> <b>{</b> <b>}</b>
+
+            <font color='#0000FF'>virtual</font> <font color='#0000FF'><u>void</u></font> <b><a name='fatal_error'></a>fatal_error</b> <font face='Lucida Console'>(</font>
+                <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> line_number
+            <font face='Lucida Console'>)</font>
+            <b>{</b>
+                std::ostringstream sout;
+                sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>There is a fatal error on line </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> line_number <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'> so parsing will now halt.</font>";
+                <font color='#0000FF'>throw</font> dlib::<font color='#BB00BB'>error</font><font face='Lucida Console'>(</font>sout.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+        <b>}</b>;
+
+    <font color='#009900'>// ------------------------------------------------------------------------------------
+</font>
+        <font color='#0000FF'><u>void</u></font> <b><a name='load_image_dataset_metadata'></a>load_image_dataset_metadata</b> <font face='Lucida Console'>(</font>
+            dataset<font color='#5555FF'>&amp;</font> meta,
+            <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> filename
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            xml_error_handler eh;
+            doc_handler <font color='#BB00BB'>dh</font><font face='Lucida Console'>(</font>meta<font face='Lucida Console'>)</font>;
+
+            std::ifstream <font color='#BB00BB'>fin</font><font face='Lucida Console'>(</font>filename.<font color='#BB00BB'>c_str</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font>fin<font face='Lucida Console'>)</font>
+                <font color='#0000FF'>throw</font> dlib::<font color='#BB00BB'>error</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>ERROR: unable to open </font>" <font color='#5555FF'>+</font> filename <font color='#5555FF'>+</font> "<font color='#CC0000'> for reading.</font>"<font face='Lucida Console'>)</font>;
+
+            xml_parser parser;
+            parser.<font color='#BB00BB'>add_document_handler</font><font face='Lucida Console'>(</font>dh<font face='Lucida Console'>)</font>;
+            parser.<font color='#BB00BB'>add_error_handler</font><font face='Lucida Console'>(</font>eh<font face='Lucida Console'>)</font>;
+            parser.<font color='#BB00BB'>parse</font><font face='Lucida Console'>(</font>fin<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+    <font color='#009900'>// ------------------------------------------------------------------------------------
+</font>    <font color='#009900'>// ------------------------------------------------------------------------------------
+</font>    <font color='#009900'>// ------------------------------------------------------------------------------------
+</font>
+        <font color='#009900'>// This function returns the contents of the file 'images.xsl'
+</font>        <font color='#0000FF'>const</font> std::string <b><a name='get_decoded_string'></a>get_decoded_string</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            dlib::base64 base64_coder;
+            dlib::compress_stream::kernel_1ea compressor;
+            std::ostringstream sout;
+            std::istringstream sin;
+
+            <font color='#009900'>// The base64 encoded data from the file 'image_metadata_stylesheet.xsl' we want to decode and return.
+</font>            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>PFWfgmWfCHr1DkV63lbjjeY2dCc2FbHDOVh0Kd7dkvaOfRYrOG24f0x77/5iMVq8FtE3UBxtGwSd</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>1ZHOHRSHgieNoeBv8ssJQ75RRxYtFKRY3OTPX5eKQoCN9jUaUnHnR4QZtEHgmKqXSs50Yrdd+2Ah</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>gNyarPZCiR6nvqNvCjtP2MP5FxleqNf8Fylatm2KdsXmrv5K87LYVN7i7JMkmZ++cTXYSOxDmxZi</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>OiCH8funXUdF9apDW547gCjz9HOQUI6dkz5dYUeFjfp6dFugpnaJyyprFLKq048Qk7+QiL4CNF/G</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>7e0VpBw8dMpiyRNi2fSQGSZGfIAUQKKT6+rPwQoRH2spdjsdXVWj4XQAqBX87nmqMnqjMhn/Vd1s</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>W5aoC0drwRGu3Xe3gn9vBL8hBkRXcJvEy6q/lb9bYnsLemhE5Zp/+nTmTBjfT9UFYLcsmgsjC+4n</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>Bq6h9QlpuyMYqJ8RvW8pp3mFlvXc3Yg+18t5F0hSMQfaIFYAuDPU2lVzPpY+ba0B39iu9IrPCLsS</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>+tUtSNSmQ74CtzZgKKjkTMA3nwYP2SDmZE3firq42pihT7hdU5vYkes69K8AQl8WZyLPpMww+r0z</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>+veEHPlAuxF7kL3ZvVjdB+xABwwqDe0kSRHRZINYdUfJwJdfYLyDnYoMjj6afqIJZ7QOBPZ42tV5</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>3hYOQTFwTNovOastzJJXQe1kxPg1AQ8ynmfjjJZqD0xKedlyeJybP919mVAA23UryHsq9TVlabou</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>qNl3xZW/mKKktvVsd/nuH62HIv/kgomyhaEUY5HgupupBUbQFZfyljZ5bl3g3V3Y1400Z1xTM/LL</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>LJpeLdlqoGzIe/19vAN1zUUVId9F/OLNUl3Zoar63yZERSJHcsuq/Pasisp0HIGi7rfI9EIQF7C/</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>IhLKLZsJ+LOycreQGOJALZIEZHOqxYLSXG0qaPM5bQL/MQJ2OZfwEhQgYOrjaM7oPOHHEfTq5kcO</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>daMwzefKfxrF2GXbUs0bYsEXsIGwENIUKMliFaAI4qKLxxb94oc+O3BRjWueZjZty2zKawQyTHNd</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>ltFJBUzfffdZN9Wq4zbPzntkM3U6Ys4LRztx5M15dtbhFeKx5rAf2tPXT6wU01hx7EJxBJzpvoDE</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>YwEoYVDSYulRKpgk82cHFzzUDgWXbl4paFSe1L1w8r9KHr67SYJDTUG86Lrm6LJ0rw73Xp0NAFcU</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>MKpiG9g1cHW74HYbUb/yAbtVWt40eB7M637umdo2jWz/r/vP5WnfSMXEbkyWebsa1fFceg/TLWy6</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>E8OTc4XKB48h1oFIlGagOiprxho3+F3TIcxDSwA=</font>";
+
+
+
+            <font color='#009900'>// Put the data into the istream sin
+</font>            sin.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font>sout.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            sout.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font>"<font color='#CC0000'></font>"<font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// Decode the base64 text into its compressed binary form
+</font>            base64_coder.<font color='#BB00BB'>decode</font><font face='Lucida Console'>(</font>sin,sout<font face='Lucida Console'>)</font>;
+            sin.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            sin.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font>sout.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            sout.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font>"<font color='#CC0000'></font>"<font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// Decompress the data into its original form
+</font>            compressor.<font color='#BB00BB'>decompress</font><font face='Lucida Console'>(</font>sin,sout<font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// Return the decoded and decompressed data
+</font>            <font color='#0000FF'>return</font> sout.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+
+    <b>}</b>
+<b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_IMAGE_DAtASET_METADATA_CPPh_
+</font>
+
+
+</pre></body></html>

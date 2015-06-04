@@ -1,0 +1,292 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - tokenizer_kernel_abstract.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2005  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#undef</font> DLIB_TOKENIZER_KERNEl_ABSTRACT_
+<font color='#0000FF'>#ifdef</font> DLIB_TOKENIZER_KERNEl_ABSTRACT_
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>string<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>ioswfd<font color='#5555FF'>&gt;</font>
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+    <font color='#0000FF'>class</font> <b><a name='tokenizer'></a>tokenizer</b> 
+    <b>{</b>
+        <font color='#009900'>/*!
+            INITIAL VALUE
+                stream_is_set() == false
+                get_identifier_head() == "_" + lowercase_letters() + uppercase_letters()
+                get_identifier_body() == "_" + lowercase_letters() + uppercase_letters() + 
+                                         numbers()
+
+            WHAT THIS OBJECT REPRESENTS
+                This object represents a simple tokenizer for textual data.
+
+            BUFFERING
+                This object is allowed to buffer data from the input stream.
+                Thus if you clear it or switch streams (via calling set_stream())
+                any buffered data will be lost.
+
+            TOKENS
+                When picking out tokens the tokenizer will always extract the 
+                longest token it can.  For example, if faced with the string 
+                "555" it will consider the three 5s to be a single NUMBER 
+                token not three smaller NUMBER tokens.
+
+                Also note that no characters in the input stream are discarded.
+                They will all be returned in the text of some token.  
+                Additionally, each character will never be returned more than once.  
+                This means that if you concatenated all returned tokens it would exactly
+                reproduce the contents of the input stream.
+
+                The tokens are defined as follows:
+
+                END_OF_LINE
+                    This is a single character token and is always the '\n' 
+                    character.
+
+                END_OF_FILE
+                    This token represents the end of file.  It doesn't have any
+                    actual characters associated with it.  
+
+                IDENTIFIER
+                    This is a multi-character token.  It is defined as a string that
+                    begins with a character from get_identifier_head() and is 
+                    followed by any number of characters from get_identifier_body().
+                       
+                NUMBER
+                    This is a multi-character token.  It is defined as a sequence of
+                    numbers. 
+
+                WHITE_SPACE
+                    This is a multi character token.  It is defined as a sequence of
+                    one or more spaces, carrage returns, and tabs.  I.e. It is
+                    composed of characters from the following string " \r\t".
+
+                CHAR
+                    This is a single character token.  It matches anything that isn't
+                    part of one of the above tokens.                    
+        !*/</font>
+
+    <font color='#0000FF'>public</font>:
+
+        <font color='#0000FF'>enum</font> 
+        <b>{</b>
+            END_OF_LINE,
+            END_OF_FILE,
+            IDENTIFIER,
+            CHAR,
+            NUMBER,
+            WHITE_SPACE
+        <b>}</b>;
+
+        <b><a name='tokenizer'></a>tokenizer</b> <font face='Lucida Console'>(</font>        
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures                
+                - #*this is properly initialized
+            throws
+                - std::bad_alloc
+        !*/</font>
+
+        <font color='#0000FF'>virtual</font> ~<b><a name='tokenizer'></a>tokenizer</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - any resources associated with *this have been released
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='clear'></a>clear</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #*this has its initial value
+            throws
+                - std::bad_alloc
+                    If this exception is thrown then #*this is unusable 
+                    until clear() is called and succeeds.
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_stream'></a>set_stream</b> <font face='Lucida Console'>(</font>
+            std::istream<font color='#5555FF'>&amp;</font> in
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #*this will read data from in and tokenize it
+                - #stream_is_set() == true
+                - #get_stream() == in
+        !*/</font>
+
+        <font color='#0000FF'><u>bool</u></font> <b><a name='stream_is_set'></a>stream_is_set</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns true if a stream has been associated with *this by calling
+                  set_stream()
+        !*/</font>
+
+        std::istream<font color='#5555FF'>&amp;</font> <b><a name='get_stream'></a>get_stream</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - stream_is_set() == true
+            ensures
+                - returns a reference to the istream object that *this is reading 
+                  from.
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='get_token'></a>get_token</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>int</u></font><font color='#5555FF'>&amp;</font> type,
+            std::string<font color='#5555FF'>&amp;</font> token
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - stream_is_set() == true
+            ensures
+                - #token == the next token from the input stream get_stream()
+                - #type == the type of the token in #token
+            throws
+                - bad_alloc
+                    If this exception is thrown then the call to this function will 
+                    have no effect on *this but the values of #type and #token will be 
+                    undefined.  Additionally, some characters may have been read
+                    from the stream get_stream() and lost.
+        !*/</font>
+
+        <font color='#0000FF'><u>int</u></font> <b><a name='peek_type'></a>peek_type</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - stream_is_set() == true
+            ensures
+                - returns the type of the token that will be returned from
+                  the next call to get_token()
+            throws
+                - bad_alloc
+                    If this exception is thrown then the call to this function will 
+                    have no effect on *this.  However, some characters may have been 
+                    read from the stream get_stream() and lost.
+        !*/</font>
+
+        <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> <b><a name='peek_token'></a>peek_token</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - stream_is_set() == true
+            ensures
+                - returns the text of the token that will be returned from
+                  the next call to get_token()
+            throws
+                - bad_alloc
+                    If this exception is thrown then the call to this function will 
+                    have no effect on *this.  However, some characters may have been 
+                    read from the stream get_stream() and lost.
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_identifier_token'></a>set_identifier_token</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> head,
+            <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> body
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - head.find_first_of(" \r\t\n0123456789") == std::string::npos
+                  (i.e. head doesn't contain any characters from the string
+                  " \r\t\n0123456789").
+                - body.find_frst_of(" \r\t\n") == std::string::npos
+                  (i.e. body doesn't contain any characters from the string " \r\t\n").
+            ensures
+                - #get_identifier_head() == head
+                - #get_identifier_body() == body
+            throws
+                - std::bad_alloc
+                    If this exception is thrown then #*this is unusable 
+                    until clear() is called and succeeds.
+        !*/</font>
+
+        <font color='#0000FF'>const</font> std::string <b><a name='get_identifier_head'></a>get_identifier_head</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns a string containing the characters that can be the start
+                  of an IDENTIFIER token.
+            throws
+                - std::bad_alloc
+                    If this exception is thrown then the call to this function
+                    has no effect.
+        !*/</font>
+
+        <font color='#0000FF'>const</font> std::string <b><a name='get_identifier_body'></a>get_identifier_body</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns a string containing the characters that can appear in the
+                  body of an IDENTIFIER token.
+            throws
+                - std::bad_alloc
+                    If this exception is thrown then the call to this function
+                    has no effect.
+        !*/</font>
+
+        <font color='#0000FF'>const</font> std::string <b><a name='lowercase_letters'></a>lowercase_letters</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns "abcdefghijklmnopqrstuvwxyz"
+            throws
+                - std::bad_alloc
+                    If this exception is thrown then the call to this function
+                    has no effect.
+        !*/</font>
+
+        <font color='#0000FF'>const</font> std::string <b><a name='uppercase_letters'></a>uppercase_letters</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+            throws
+                - std::bad_alloc
+                    If this exception is thrown then the call to this function
+                    has no effect.
+        !*/</font>
+
+        <font color='#0000FF'>const</font> std::string <b><a name='numbers'></a>numbers</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns "0123456789"
+            throws
+                - std::bad_alloc
+                    If this exception is thrown then the call to this function
+                    has no effect.
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='swap'></a>swap</b> <font face='Lucida Console'>(</font>
+            tokenizer<font color='#5555FF'>&amp;</font> item
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - swaps *this and item
+        !*/</font> 
+
+    <font color='#0000FF'>private</font>:
+
+        <font color='#009900'>// restricted functions
+</font>        <b><a name='tokenizer'></a>tokenizer</b><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> tokenizer<font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font>;        <font color='#009900'>// copy constructor
+</font>        tokenizer<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>=</font><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> tokenizer<font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font>;    <font color='#009900'>// assignment operator
+</font>
+    <b>}</b>;    
+
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='swap'></a>swap</b> <font face='Lucida Console'>(</font>
+        tokenizer<font color='#5555FF'>&amp;</font> a, 
+        tokenizer<font color='#5555FF'>&amp;</font> b 
+    <font face='Lucida Console'>)</font> <b>{</b> a.<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>b<font face='Lucida Console'>)</font>; <b>}</b>   
+    <font color='#009900'>/*!
+        provides a global swap function
+    !*/</font>
+
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_TOKENIZER_KERNEl_ABSTRACT_
+</font>
+
+</pre></body></html>

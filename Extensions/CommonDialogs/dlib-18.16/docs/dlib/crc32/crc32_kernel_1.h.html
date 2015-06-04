@@ -1,0 +1,265 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - crc32_kernel_1.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2005  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_CRC32_KERNEl_1_
+<font color='#0000FF'>#define</font> DLIB_CRC32_KERNEl_1_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../algs.h.html'>../algs.h</a>"
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>string<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>vector<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='crc32_kernel_abstract.h.html'>crc32_kernel_abstract.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+    <font color='#0000FF'>class</font> <b><a name='crc32'></a>crc32</b> 
+    <b>{</b>
+        <font color='#009900'>/*!
+            INITIAL VALUE
+                checksum == 0xFFFFFFFF
+
+            CONVENTION
+                get_checksum() == checksum ^ 0xFFFFFFFF
+        !*/</font>
+
+    <font color='#0000FF'>public</font>:
+
+        <font color='#009900'>// this is here for backwards compatibility with older versions of dlib.
+</font>        <font color='#0000FF'>typedef</font> crc32 kernel_1a;
+
+        <font color='#0000FF'>inline</font> <b><a name='crc32'></a>crc32</b> <font face='Lucida Console'>(</font>        
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>inline</font> <b><a name='crc32'></a>crc32</b> <font face='Lucida Console'>(</font>        
+            <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> item
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>inline</font> <b><a name='crc32'></a>crc32</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> item
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>inline</font> <font color='#0000FF'>virtual</font> ~<b><a name='crc32'></a>crc32</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='clear'></a>clear</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='add'></a>add</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> item
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='add'></a>add</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> item
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='add'></a>add</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> item
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>inline</font> <b><a name='operator'></a>operator</b> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> <font color='#BB00BB'>get_checksum</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <b>}</b>
+
+        <font color='#0000FF'>inline</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='get_checksum'></a>get_checksum</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+        <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='swap'></a>swap</b> <font face='Lucida Console'>(</font>
+            crc32<font color='#5555FF'>&amp;</font> item
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>inline</font> crc32<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>=</font><font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> crc32<font color='#5555FF'>&amp;</font>
+        <font face='Lucida Console'>)</font>;  
+
+    <font color='#0000FF'>private</font>:
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> checksum;
+
+        <font color='#0000FF'>inline</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='table'></a>table</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>int</u></font> idx
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> 
+        <b>{</b>
+            <font color='#009900'>/*
+            // This code generates the crc_table used below.
+            unsigned long crc_table[256];
+            for (unsigned long i = 0; i &lt; 256; ++i)
+            {
+                unsigned long temp = i;
+                for (unsigned long j = 0; j &lt; 8; ++j)
+                {
+                    if (temp&amp;1)
+                        temp = (temp&gt;&gt;1)^0xedb88320;
+                    else
+                        temp &gt;&gt;= 1;
+                }
+                crc_table[i] = temp;
+                std::cout &lt;&lt; std::hex &lt;&lt; crc_table[i] &lt;&lt; std::endl;
+            }
+            */</font>
+
+            <font color='#0000FF'>const</font> <font color='#0000FF'>static</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> crc_table[<font color='#979000'>256</font>] <font color='#5555FF'>=</font> <b>{</b>
+                <font color='#979000'>0x00000000</font>, <font color='#979000'>0x77073096</font>, <font color='#979000'>0xee0e612c</font>, <font color='#979000'>0x990951ba</font>, <font color='#979000'>0x76dc419</font>, <font color='#979000'>0x706af48f</font>, <font color='#979000'>0xe963a535</font>, <font color='#979000'>0x9e6495a3</font>,
+                <font color='#979000'>0xedb8832</font>, <font color='#979000'>0x79dcb8a4</font>, <font color='#979000'>0xe0d5e91e</font>, <font color='#979000'>0x97d2d988</font>, <font color='#979000'>0x9b64c2b</font>, <font color='#979000'>0x7eb17cbd</font>, <font color='#979000'>0xe7b82d07</font>, <font color='#979000'>0x90bf1d91</font>,
+                <font color='#979000'>0x1db71064</font>, <font color='#979000'>0x6ab020f2</font>, <font color='#979000'>0xf3b97148</font>, <font color='#979000'>0x84be41de</font>, <font color='#979000'>0x1adad47d</font>, <font color='#979000'>0x6ddde4eb</font>, <font color='#979000'>0xf4d4b551</font>, <font color='#979000'>0x83d385c7</font>,
+                <font color='#979000'>0x136c9856</font>, <font color='#979000'>0x646ba8c0</font>, <font color='#979000'>0xfd62f97a</font>, <font color='#979000'>0x8a65c9ec</font>, <font color='#979000'>0x14015c4f</font>, <font color='#979000'>0x63066cd9</font>, <font color='#979000'>0xfa0f3d63</font>, <font color='#979000'>0x8d080df5</font>,
+                <font color='#979000'>0x3b6e20c8</font>, <font color='#979000'>0x4c69105e</font>, <font color='#979000'>0xd56041e4</font>, <font color='#979000'>0xa2677172</font>, <font color='#979000'>0x3c03e4d1</font>, <font color='#979000'>0x4b04d447</font>, <font color='#979000'>0xd20d85fd</font>, <font color='#979000'>0xa50ab56b</font>,
+                <font color='#979000'>0x35b5a8fa</font>, <font color='#979000'>0x42b2986c</font>, <font color='#979000'>0xdbbbc9d6</font>, <font color='#979000'>0xacbcf940</font>, <font color='#979000'>0x32d86ce3</font>, <font color='#979000'>0x45df5c75</font>, <font color='#979000'>0xdcd60dcf</font>, <font color='#979000'>0xabd13d59</font>,
+                <font color='#979000'>0x26d930ac</font>, <font color='#979000'>0x51de003a</font>, <font color='#979000'>0xc8d75180</font>, <font color='#979000'>0xbfd06116</font>, <font color='#979000'>0x21b4f4b5</font>, <font color='#979000'>0x56b3c423</font>, <font color='#979000'>0xcfba9599</font>, <font color='#979000'>0xb8bda50f</font>,
+                <font color='#979000'>0x2802b89e</font>, <font color='#979000'>0x5f058808</font>, <font color='#979000'>0xc60cd9b2</font>, <font color='#979000'>0xb10be924</font>, <font color='#979000'>0x2f6f7c87</font>, <font color='#979000'>0x58684c11</font>, <font color='#979000'>0xc1611dab</font>, <font color='#979000'>0xb6662d3d</font>,
+                <font color='#979000'>0x76dc4190</font>, <font color='#979000'>0x1db7106</font>, <font color='#979000'>0x98d220bc</font>, <font color='#979000'>0xefd5102a</font>, <font color='#979000'>0x71b18589</font>, <font color='#979000'>0x6b6b51f</font>, <font color='#979000'>0x9fbfe4a5</font>, <font color='#979000'>0xe8b8d433</font>,
+                <font color='#979000'>0x7807c9a2</font>, <font color='#979000'>0xf00f934</font>, <font color='#979000'>0x9609a88e</font>, <font color='#979000'>0xe10e9818</font>, <font color='#979000'>0x7f6a0dbb</font>, <font color='#979000'>0x86d3d2d</font>, <font color='#979000'>0x91646c97</font>, <font color='#979000'>0xe6635c01</font>,
+                <font color='#979000'>0x6b6b51f4</font>, <font color='#979000'>0x1c6c6162</font>, <font color='#979000'>0x856530d8</font>, <font color='#979000'>0xf262004e</font>, <font color='#979000'>0x6c0695ed</font>, <font color='#979000'>0x1b01a57b</font>, <font color='#979000'>0x8208f4c1</font>, <font color='#979000'>0xf50fc457</font>,
+                <font color='#979000'>0x65b0d9c6</font>, <font color='#979000'>0x12b7e950</font>, <font color='#979000'>0x8bbeb8ea</font>, <font color='#979000'>0xfcb9887c</font>, <font color='#979000'>0x62dd1ddf</font>, <font color='#979000'>0x15da2d49</font>, <font color='#979000'>0x8cd37cf3</font>, <font color='#979000'>0xfbd44c65</font>,
+                <font color='#979000'>0x4db26158</font>, <font color='#979000'>0x3ab551ce</font>, <font color='#979000'>0xa3bc0074</font>, <font color='#979000'>0xd4bb30e2</font>, <font color='#979000'>0x4adfa541</font>, <font color='#979000'>0x3dd895d7</font>, <font color='#979000'>0xa4d1c46d</font>, <font color='#979000'>0xd3d6f4fb</font>,
+                <font color='#979000'>0x4369e96a</font>, <font color='#979000'>0x346ed9fc</font>, <font color='#979000'>0xad678846</font>, <font color='#979000'>0xda60b8d0</font>, <font color='#979000'>0x44042d73</font>, <font color='#979000'>0x33031de5</font>, <font color='#979000'>0xaa0a4c5f</font>, <font color='#979000'>0xdd0d7cc9</font>,
+                <font color='#979000'>0x5005713c</font>, <font color='#979000'>0x270241aa</font>, <font color='#979000'>0xbe0b1010</font>, <font color='#979000'>0xc90c2086</font>, <font color='#979000'>0x5768b525</font>, <font color='#979000'>0x206f85b3</font>, <font color='#979000'>0xb966d409</font>, <font color='#979000'>0xce61e49f</font>,
+                <font color='#979000'>0x5edef90e</font>, <font color='#979000'>0x29d9c998</font>, <font color='#979000'>0xb0d09822</font>, <font color='#979000'>0xc7d7a8b4</font>, <font color='#979000'>0x59b33d17</font>, <font color='#979000'>0x2eb40d81</font>, <font color='#979000'>0xb7bd5c3b</font>, <font color='#979000'>0xc0ba6cad</font>,
+                <font color='#979000'>0xedb88320</font>, <font color='#979000'>0x9abfb3b6</font>, <font color='#979000'>0x3b6e20c</font>, <font color='#979000'>0x74b1d29a</font>, <font color='#979000'>0xead54739</font>, <font color='#979000'>0x9dd277af</font>, <font color='#979000'>0x4db2615</font>, <font color='#979000'>0x73dc1683</font>,
+                <font color='#979000'>0xe3630b12</font>, <font color='#979000'>0x94643b84</font>, <font color='#979000'>0xd6d6a3e</font>, <font color='#979000'>0x7a6a5aa8</font>, <font color='#979000'>0xe40ecf0b</font>, <font color='#979000'>0x9309ff9d</font>, <font color='#979000'>0xa00ae27</font>, <font color='#979000'>0x7d079eb1</font>,
+                <font color='#979000'>0xf00f9344</font>, <font color='#979000'>0x8708a3d2</font>, <font color='#979000'>0x1e01f268</font>, <font color='#979000'>0x6906c2fe</font>, <font color='#979000'>0xf762575d</font>, <font color='#979000'>0x806567cb</font>, <font color='#979000'>0x196c3671</font>, <font color='#979000'>0x6e6b06e7</font>,
+                <font color='#979000'>0xfed41b76</font>, <font color='#979000'>0x89d32be0</font>, <font color='#979000'>0x10da7a5a</font>, <font color='#979000'>0x67dd4acc</font>, <font color='#979000'>0xf9b9df6f</font>, <font color='#979000'>0x8ebeeff9</font>, <font color='#979000'>0x17b7be43</font>, <font color='#979000'>0x60b08ed5</font>,
+                <font color='#979000'>0xd6d6a3e8</font>, <font color='#979000'>0xa1d1937e</font>, <font color='#979000'>0x38d8c2c4</font>, <font color='#979000'>0x4fdff252</font>, <font color='#979000'>0xd1bb67f1</font>, <font color='#979000'>0xa6bc5767</font>, <font color='#979000'>0x3fb506dd</font>, <font color='#979000'>0x48b2364b</font>,
+                <font color='#979000'>0xd80d2bda</font>, <font color='#979000'>0xaf0a1b4c</font>, <font color='#979000'>0x36034af6</font>, <font color='#979000'>0x41047a60</font>, <font color='#979000'>0xdf60efc3</font>, <font color='#979000'>0xa867df55</font>, <font color='#979000'>0x316e8eef</font>, <font color='#979000'>0x4669be79</font>,
+                <font color='#979000'>0xcb61b38c</font>, <font color='#979000'>0xbc66831a</font>, <font color='#979000'>0x256fd2a0</font>, <font color='#979000'>0x5268e236</font>, <font color='#979000'>0xcc0c7795</font>, <font color='#979000'>0xbb0b4703</font>, <font color='#979000'>0x220216b9</font>, <font color='#979000'>0x5505262f</font>,
+                <font color='#979000'>0xc5ba3bbe</font>, <font color='#979000'>0xb2bd0b28</font>, <font color='#979000'>0x2bb45a92</font>, <font color='#979000'>0x5cb36a04</font>, <font color='#979000'>0xc2d7ffa7</font>, <font color='#979000'>0xb5d0cf31</font>, <font color='#979000'>0x2cd99e8b</font>, <font color='#979000'>0x5bdeae1d</font>,
+                <font color='#979000'>0x9b64c2b0</font>, <font color='#979000'>0xec63f226</font>, <font color='#979000'>0x756aa39c</font>, <font color='#979000'>0x26d930a</font>, <font color='#979000'>0x9c0906a9</font>, <font color='#979000'>0xeb0e363f</font>, <font color='#979000'>0x72076785</font>, <font color='#979000'>0x5005713</font>,
+                <font color='#979000'>0x95bf4a82</font>, <font color='#979000'>0xe2b87a14</font>, <font color='#979000'>0x7bb12bae</font>, <font color='#979000'>0xcb61b38</font>, <font color='#979000'>0x92d28e9b</font>, <font color='#979000'>0xe5d5be0d</font>, <font color='#979000'>0x7cdcefb7</font>, <font color='#979000'>0xbdbdf21</font>,
+                <font color='#979000'>0x86d3d2d4</font>, <font color='#979000'>0xf1d4e242</font>, <font color='#979000'>0x68ddb3f8</font>, <font color='#979000'>0x1fda836e</font>, <font color='#979000'>0x81be16cd</font>, <font color='#979000'>0xf6b9265b</font>, <font color='#979000'>0x6fb077e1</font>, <font color='#979000'>0x18b74777</font>,
+                <font color='#979000'>0x88085ae6</font>, <font color='#979000'>0xff0f6a70</font>, <font color='#979000'>0x66063bca</font>, <font color='#979000'>0x11010b5c</font>, <font color='#979000'>0x8f659eff</font>, <font color='#979000'>0xf862ae69</font>, <font color='#979000'>0x616bffd3</font>, <font color='#979000'>0x166ccf45</font>,
+                <font color='#979000'>0xa00ae278</font>, <font color='#979000'>0xd70dd2ee</font>, <font color='#979000'>0x4e048354</font>, <font color='#979000'>0x3903b3c2</font>, <font color='#979000'>0xa7672661</font>, <font color='#979000'>0xd06016f7</font>, <font color='#979000'>0x4969474d</font>, <font color='#979000'>0x3e6e77db</font>,
+                <font color='#979000'>0xaed16a4a</font>, <font color='#979000'>0xd9d65adc</font>, <font color='#979000'>0x40df0b66</font>, <font color='#979000'>0x37d83bf0</font>, <font color='#979000'>0xa9bcae53</font>, <font color='#979000'>0xdebb9ec5</font>, <font color='#979000'>0x47b2cf7f</font>, <font color='#979000'>0x30b5ffe9</font>,
+                <font color='#979000'>0xbdbdf21c</font>, <font color='#979000'>0xcabac28a</font>, <font color='#979000'>0x53b39330</font>, <font color='#979000'>0x24b4a3a6</font>, <font color='#979000'>0xbad03605</font>, <font color='#979000'>0xcdd70693</font>, <font color='#979000'>0x54de5729</font>, <font color='#979000'>0x23d967bf</font>,
+                <font color='#979000'>0xb3667a2e</font>, <font color='#979000'>0xc4614ab8</font>, <font color='#979000'>0x5d681b02</font>, <font color='#979000'>0x2a6f2b94</font>, <font color='#979000'>0xb40bbe37</font>, <font color='#979000'>0xc30c8ea1</font>, <font color='#979000'>0x5a05df1b</font>, <font color='#979000'>0x2d02ef8d</font>
+            <b>}</b>;
+
+            <font color='#0000FF'>return</font> crc_table[idx];
+        <b>}</b>
+
+    <b>}</b>;    
+
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='swap'></a>swap</b> <font face='Lucida Console'>(</font>
+        crc32<font color='#5555FF'>&amp;</font> a, 
+        crc32<font color='#5555FF'>&amp;</font> b 
+    <font face='Lucida Console'>)</font> <b>{</b> a.<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>b<font face='Lucida Console'>)</font>; <b>}</b>   
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>    <font color='#009900'>// member function definitions
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    crc32::
+    <b><a name='crc32'></a>crc32</b> <font face='Lucida Console'>(</font>        
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        checksum <font color='#5555FF'>=</font> <font color='#979000'>0xFFFFFFFF</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    crc32::
+    <b><a name='crc32'></a>crc32</b> <font face='Lucida Console'>(</font>        
+        <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> item
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        checksum <font color='#5555FF'>=</font> <font color='#979000'>0xFFFFFFFF</font>;
+        <font color='#BB00BB'>add</font><font face='Lucida Console'>(</font>item<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    crc32::
+    <b><a name='crc32'></a>crc32</b> <font face='Lucida Console'>(</font>        
+        <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> item
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        checksum <font color='#5555FF'>=</font> <font color='#979000'>0xFFFFFFFF</font>;
+        <font color='#BB00BB'>add</font><font face='Lucida Console'>(</font>item<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    crc32::
+    ~<b><a name='crc32'></a>crc32</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>void</u></font> crc32::
+    <b><a name='clear'></a>clear</b><font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        checksum <font color='#5555FF'>=</font> <font color='#979000'>0xFFFFFFFF</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>void</u></font> crc32::
+    <b><a name='add'></a>add</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> item
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        checksum <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>checksum<font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font><font color='#979000'>8</font><font face='Lucida Console'>)</font> ^ <font color='#BB00BB'>table</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>checksum^item<font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font> <font color='#979000'>0xFF</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>void</u></font> crc32::
+    <b><a name='add'></a>add</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> item
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>std::string::size_type i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> item.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            checksum <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>checksum<font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font><font color='#979000'>8</font><font face='Lucida Console'>)</font> ^ <font color='#BB00BB'>table</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>checksum^item[i]<font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font> <font color='#979000'>0xFF</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>void</u></font> crc32::
+    <b><a name='add'></a>add</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> item
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> item.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            checksum <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>checksum<font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font><font color='#979000'>8</font><font face='Lucida Console'>)</font> ^ <font color='#BB00BB'>table</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>checksum^item[i]<font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font> <font color='#979000'>0xFF</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> crc32::
+    <b><a name='get_checksum'></a>get_checksum</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        <font color='#0000FF'>return</font> checksum ^ <font color='#979000'>0xFFFFFFFF</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>void</u></font> crc32::
+    <b><a name='swap'></a>swap</b> <font face='Lucida Console'>(</font>
+        crc32<font color='#5555FF'>&amp;</font> item
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#BB00BB'>exchange</font><font face='Lucida Console'>(</font>checksum,item.checksum<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    crc32<font color='#5555FF'>&amp;</font> crc32::
+    <b><a name='operator'></a>operator</b><font color='#5555FF'>=</font><font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> crc32<font color='#5555FF'>&amp;</font> item
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        checksum <font color='#5555FF'>=</font> item.checksum;
+        <font color='#0000FF'>return</font> <font color='#5555FF'>*</font><font color='#0000FF'>this</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_CRC32_KERNEl_1_
+</font>
+
+</pre></body></html>

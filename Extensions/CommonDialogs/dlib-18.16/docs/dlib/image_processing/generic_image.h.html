@@ -1,0 +1,434 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - generic_image.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2014  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_GeNERIC_IMAGE_Hh_
+<font color='#0000FF'>#define</font> DLIB_GeNERIC_IMAGE_Hh_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../assert.h.html'>../assert.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+    <font color='#009900'>/*!
+        In dlib, an "image" is any object that implements the generic image interface.  In
+        particular, this simply means that an image type (let's refer to it as image_type
+        from here on) has the following seven global functions defined for it:
+            - long        num_rows      (const image_type&amp; img)
+            - long        num_columns   (const image_type&amp; img)
+            - void        set_image_size(      image_type&amp; img, long rows, long cols)
+            - void*       image_data    (      image_type&amp; img)
+            - const void* image_data    (const image_type&amp; img)
+            - long        width_step    (const image_type&amp; img)
+            - void        swap          (      image_type&amp; a, image_type&amp; b)
+        And also provides a specialization of the image_traits template that looks like:
+            namespace dlib
+            {
+                template &lt;&gt; 
+                struct image_traits&lt;image_type&gt;
+                {
+                    typedef the_type_of_pixel_used_in_image_type pixel_type;
+                };
+            }
+
+        Additionally, an image object must be default constructable.  This means that 
+        expressions of the form:
+            image_type img;
+        Must be legal.
+
+        Finally, the type of pixel in image_type must have a pixel_traits specialization.
+        That is, pixel_traits&lt;typename image_traits&lt;image_type&gt;::pixel_type&gt; must be one of
+        the specializations of pixel_traits.  
+        
+        
+        To be very precise, the seven functions defined above are defined thusly:
+
+            long num_rows(
+                const image_type&amp; img
+            ); 
+            /!*
+                ensures
+                    - returns the number of rows in the given image
+            *!/
+
+            long num_columns(
+                const image_type&amp; img
+            );
+            /!*
+                ensures
+                    - returns the number of columns in the given image
+            *!/
+
+            void set_image_size(
+                image_type&amp; img,
+                long rows,
+                long cols 
+            );
+            /!*
+                requires
+                    - rows &gt;= 0 &amp;&amp; cols &gt;= 0
+                ensures
+                    - num_rows(#img) == rows
+                    - num_columns(#img) == cols
+            *!/
+
+            void* image_data(
+                image_type&amp; img
+            );
+            /!*
+                ensures
+                    - returns a non-const pointer to the pixel at row and column position 0,0
+                      in the given image.  Or if the image has zero rows or columns in it
+                      then this function returns NULL.
+                    - The image lays pixels down in row major order.  However, there might
+                      be padding at the end of each row.  The amount of padding is given by
+                      width_step(img).
+            *!/
+
+            const void* image_data(
+                const image_type&amp; img
+            );
+            /!*
+                ensures
+                    - returns a const pointer to the pixel at row and column position 0,0 in
+                      the given image.  Or if the image has zero rows or columns in it then
+                      this function returns NULL.
+                    - The image lays pixels down in row major order.  However, there might
+                      be padding at the end of each row.  The amount of padding is given by
+                      width_step(img).
+            *!/
+
+            long width_step(
+                const image_type&amp; img
+            );
+            /!*
+                ensures
+                    - returns the size of one row of the image, in bytes.  More precisely,
+                      return a number N such that: (char*)image_data(img) + N*R == a
+                      pointer to the first pixel in the R-th row of the image. This means
+                      that the image must lay its pixels down in row major order.
+            *!/
+
+            void swap(
+                image_type&amp; a,
+                image_type&amp; b
+            );
+            /!*
+                ensures
+                    - swaps the state of a and b
+            *!/
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> image_type<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>struct</font> image_traits;
+    <font color='#009900'>/*!
+        WHAT THIS OBJECT REPRESENTS
+            This is a traits class for generic image objects.  You can use it to find out
+            the pixel type contained within an image via an expression of the form:
+                image_traits&lt;image_type&gt;::pixel_type
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>//                   UTILITIES TO MAKE ACCESSING IMAGE PIXELS SIMPLER
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> image_type
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>class</font> <b><a name='image_view'></a>image_view</b>
+    <b>{</b>
+        <font color='#009900'>/*!
+            REQUIREMENTS ON image_type
+                image_type must be an image object as defined at the top of this file.  
+
+            WHAT THIS OBJECT REPRESENTS
+                This object takes an image object and wraps it with an interface that makes
+                it look like a dlib::array2d.  That is, it makes it look similar to a
+                regular 2-dimensional C style array, making code which operates on the
+                pixels simple to read.
+
+                Note that an image_view instance is valid until the image given to its
+                constructor is modified through an interface other than the image_view
+                instance.  This is because, for example, someone might cause the underlying
+                image object to reallocate its memory, thus invalidating the pointer to its
+                pixel data stored in the image_view.    
+
+                As an side, the reason why this object stores a pointer to the image
+                object's data and uses that pointer instead of calling image_data() each
+                time a pixel is accessed is to allow for image objects to implement
+                complex, and possibly slow, image_data() functions.  For example, an image
+                object might perform some kind of synchronization between a GPU and the
+                host memory during a call to image_data().  Therefore, we call image_data()
+                only in image_view's constructor to avoid the performance penalty of
+                calling it for each pixel access.
+        !*/</font>
+
+    <font color='#0000FF'>public</font>:
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> image_traits<font color='#5555FF'>&lt;</font>image_type<font color='#5555FF'>&gt;</font>::pixel_type pixel_type;
+
+        <b><a name='image_view'></a>image_view</b><font face='Lucida Console'>(</font>
+            image_type<font color='#5555FF'>&amp;</font> img
+        <font face='Lucida Console'>)</font> : 
+            _data<font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>char</u></font><font color='#5555FF'>*</font><font face='Lucida Console'>)</font>image_data<font face='Lucida Console'>(</font>img<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>, 
+            _width_step<font face='Lucida Console'>(</font>width_step<font face='Lucida Console'>(</font>img<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>,
+            _nr<font face='Lucida Console'>(</font>num_rows<font face='Lucida Console'>(</font>img<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>,
+            _nc<font face='Lucida Console'>(</font>num_columns<font face='Lucida Console'>(</font>img<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>,
+            _img<font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>img<font face='Lucida Console'>)</font> 
+        <b>{</b><b>}</b>
+
+        <font color='#0000FF'><u>long</u></font> <b><a name='nr'></a>nr</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> _nr; <b>}</b>
+        <font color='#009900'>/*!
+            ensures
+                - returns the number of rows in this image.
+        !*/</font>
+
+        <font color='#0000FF'><u>long</u></font> <b><a name='nc'></a>nc</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> _nc; <b>}</b>
+        <font color='#009900'>/*!
+            ensures
+                - returns the number of columns in this image.
+        !*/</font>
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='size'></a>size</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>*</font><font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>; <b>}</b>
+        <font color='#009900'>/*!
+            ensures
+                - returns the number of pixels in this image.
+        !*/</font>
+
+<font color='#0000FF'>#ifndef</font> ENABLE_ASSERTS
+        pixel_type<font color='#5555FF'>*</font> <b><a name='operator'></a>operator</b>[] <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> row<font face='Lucida Console'>)</font> <b>{</b> <font color='#0000FF'>return</font> <font face='Lucida Console'>(</font>pixel_type<font color='#5555FF'>*</font><font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>_data<font color='#5555FF'>+</font>_width_step<font color='#5555FF'>*</font>row<font face='Lucida Console'>)</font>; <b>}</b>
+        <font color='#009900'>/*!
+            requires
+                - 0 &lt;= row &lt; nr()
+            ensures
+                - returns a pointer to the first pixel in the row-th row.  Therefore, the
+                  pixel at row and column position r,c can be accessed via (*this)[r][c].
+        !*/</font>
+
+        <font color='#0000FF'>const</font> pixel_type<font color='#5555FF'>*</font> <b><a name='operator'></a>operator</b>[] <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> row<font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> <font face='Lucida Console'>(</font><font color='#0000FF'>const</font> pixel_type<font color='#5555FF'>*</font><font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>_data<font color='#5555FF'>+</font>_width_step<font color='#5555FF'>*</font>row<font face='Lucida Console'>)</font>; <b>}</b>
+        <font color='#009900'>/*!
+            requires
+                - 0 &lt;= row &lt; nr()
+            ensures
+                - returns a const pointer to the first pixel in the row-th row.  Therefore,
+                  the pixel at row and column position r,c can be accessed via
+                  (*this)[r][c].
+        !*/</font>
+<font color='#0000FF'>#else</font>
+        <font color='#009900'>// If asserts are enabled then we need to return a proxy class so we can make sure
+</font>        <font color='#009900'>// the column accesses don't go out of bounds.
+</font>        <font color='#0000FF'>struct</font> <b><a name='pix_row'></a>pix_row</b>
+        <b>{</b>
+            <b><a name='pix_row'></a>pix_row</b><font face='Lucida Console'>(</font>pixel_type<font color='#5555FF'>*</font> data_, <font color='#0000FF'><u>long</u></font> nc_<font face='Lucida Console'>)</font> : data<font face='Lucida Console'>(</font>data_<font face='Lucida Console'>)</font>,_nc<font face='Lucida Console'>(</font>nc_<font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+            <font color='#0000FF'>const</font> pixel_type<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b>[] <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> col<font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+            <b>{</b>
+                <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font><font color='#979000'>0</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> col <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> col <font color='#5555FF'>&lt;</font> _nc, 
+                    "<font color='#CC0000'>\t The given column index is out of range.</font>"
+                    <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t col: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> col 
+                    <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t _nc: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> _nc<font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>return</font> data[col];
+            <b>}</b>
+            pixel_type<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b>[] <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> col<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font><font color='#979000'>0</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> col <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> col <font color='#5555FF'>&lt;</font> _nc, 
+                    "<font color='#CC0000'>\t The given column index is out of range.</font>"
+                    <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t col: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> col 
+                    <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t _nc: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> _nc<font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>return</font> data[col];
+            <b>}</b>
+        <font color='#0000FF'>private</font>:
+            pixel_type<font color='#5555FF'>*</font> <font color='#0000FF'>const</font> data;
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> _nc;
+        <b>}</b>;
+        pix_row <b><a name='operator'></a>operator</b>[] <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> row<font face='Lucida Console'>)</font> 
+        <b>{</b> 
+            <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font><font color='#979000'>0</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> row <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> row <font color='#5555FF'>&lt;</font> _nr, 
+                "<font color='#CC0000'>\t The given row index is out of range.</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t row: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> row 
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t _nr: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> _nr<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>return</font> <font color='#BB00BB'>pix_row</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>pixel_type<font color='#5555FF'>*</font><font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>_data<font color='#5555FF'>+</font>_width_step<font color='#5555FF'>*</font>row<font face='Lucida Console'>)</font>, _nc<font face='Lucida Console'>)</font>; 
+        <b>}</b>
+        <font color='#0000FF'>const</font> pix_row <b><a name='operator'></a>operator</b>[] <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> row<font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> 
+        <b>{</b> 
+            <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font><font color='#979000'>0</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> row <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> row <font color='#5555FF'>&lt;</font> _nr, 
+                "<font color='#CC0000'>\t The given row index is out of range.</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t row: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> row 
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t _nr: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> _nr<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>return</font> <font color='#BB00BB'>pix_row</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>pixel_type<font color='#5555FF'>*</font><font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>_data<font color='#5555FF'>+</font>_width_step<font color='#5555FF'>*</font>row<font face='Lucida Console'>)</font>, _nc<font face='Lucida Console'>)</font>; 
+        <b>}</b>
+<font color='#0000FF'>#endif</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_size'></a>set_size</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> rows, <font color='#0000FF'><u>long</u></font> cols<font face='Lucida Console'>)</font> 
+        <font color='#009900'>/*!
+            requires
+                - rows &gt;= 0 &amp;&amp; cols &gt;= 0
+            ensures
+                - Tells the underlying image to resize itself to have the given number of
+                  rows and columns.
+                - #nr() == rows
+                - #nc() == cols
+        !*/</font>
+        <b>{</b> 
+            <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>cols <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#979000'>0</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> rows <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>,
+                        "<font color='#CC0000'>\t image_view::set_size(long rows, long cols)</font>"
+                        <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t The images can't have negative rows or columns.</font>"
+                        <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t cols: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> cols 
+                        <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t rows: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> rows 
+            <font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>set_image_size</font><font face='Lucida Console'>(</font><font color='#5555FF'>*</font>_img, rows, cols<font face='Lucida Console'>)</font>; <font color='#5555FF'>*</font><font color='#0000FF'>this</font> <font color='#5555FF'>=</font> <font color='#5555FF'>*</font>_img; 
+        <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='clear'></a>clear</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <b>{</b> <font color='#BB00BB'>set_size</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>,<font color='#979000'>0</font><font face='Lucida Console'>)</font>; <b>}</b>
+        <font color='#009900'>/*!
+            ensures
+                - sets the image to have 0 pixels in it.
+        !*/</font>
+
+    <font color='#0000FF'>private</font>:
+
+        <font color='#0000FF'><u>char</u></font><font color='#5555FF'>*</font> _data;
+        <font color='#0000FF'><u>long</u></font> _width_step;
+        <font color='#0000FF'><u>long</u></font> _nr;
+        <font color='#0000FF'><u>long</u></font> _nc;
+        image_type<font color='#5555FF'>*</font> _img;
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> image_type<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>class</font> <b><a name='const_image_view'></a>const_image_view</b>
+    <b>{</b>
+        <font color='#009900'>/*!
+            REQUIREMENTS ON image_type
+                image_type must be an image object as defined at the top of this file.  
+
+            WHAT THIS OBJECT REPRESENTS
+                This object is just like the image_view except that it provides a "const"
+                view into an image.  That is, it has the same interface as image_view
+                except that you can't modify the image through a const_image_view.
+        !*/</font>
+
+    <font color='#0000FF'>public</font>:
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> image_traits<font color='#5555FF'>&lt;</font>image_type<font color='#5555FF'>&gt;</font>::pixel_type pixel_type;
+
+        <b><a name='const_image_view'></a>const_image_view</b><font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> image_type<font color='#5555FF'>&amp;</font> img
+        <font face='Lucida Console'>)</font> : 
+            _data<font face='Lucida Console'>(</font><font face='Lucida Console'>(</font><font color='#0000FF'><u>char</u></font><font color='#5555FF'>*</font><font face='Lucida Console'>)</font>image_data<font face='Lucida Console'>(</font>img<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>, 
+            _width_step<font face='Lucida Console'>(</font>width_step<font face='Lucida Console'>(</font>img<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>,
+            _nr<font face='Lucida Console'>(</font>num_rows<font face='Lucida Console'>(</font>img<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>,
+            _nc<font face='Lucida Console'>(</font>num_columns<font face='Lucida Console'>(</font>img<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+        <b>{</b><b>}</b>
+
+        <font color='#0000FF'><u>long</u></font> <b><a name='nr'></a>nr</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> _nr; <b>}</b>
+        <font color='#0000FF'><u>long</u></font> <b><a name='nc'></a>nc</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> _nc; <b>}</b>
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='size'></a>size</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> <font color='#0000FF'>static_cast</font><font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font><font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font><font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>*</font><font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>; <b>}</b>
+<font color='#0000FF'>#ifndef</font> ENABLE_ASSERTS
+        <font color='#0000FF'>const</font> pixel_type<font color='#5555FF'>*</font> <b><a name='operator'></a>operator</b>[] <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> row<font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> <b>{</b> <font color='#0000FF'>return</font> <font face='Lucida Console'>(</font><font color='#0000FF'>const</font> pixel_type<font color='#5555FF'>*</font><font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>_data<font color='#5555FF'>+</font>_width_step<font color='#5555FF'>*</font>row<font face='Lucida Console'>)</font>; <b>}</b>
+<font color='#0000FF'>#else</font>
+        <font color='#009900'>// If asserts are enabled then we need to return a proxy class so we can make sure
+</font>        <font color='#009900'>// the column accesses don't go out of bounds.
+</font>        <font color='#0000FF'>struct</font> <b><a name='pix_row'></a>pix_row</b>
+        <b>{</b>
+            <b><a name='pix_row'></a>pix_row</b><font face='Lucida Console'>(</font>pixel_type<font color='#5555FF'>*</font> data_, <font color='#0000FF'><u>long</u></font> nc_<font face='Lucida Console'>)</font> : data<font face='Lucida Console'>(</font>data_<font face='Lucida Console'>)</font>,_nc<font face='Lucida Console'>(</font>nc_<font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+            <font color='#0000FF'>const</font> pixel_type<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b>[] <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> col<font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+            <b>{</b>
+                <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font><font color='#979000'>0</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> col <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> col <font color='#5555FF'>&lt;</font> _nc, 
+                    "<font color='#CC0000'>\t The given column index is out of range.</font>"
+                    <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t col: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> col 
+                    <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t _nc: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> _nc<font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>return</font> data[col];
+            <b>}</b>
+        <font color='#0000FF'>private</font>:
+            pixel_type<font color='#5555FF'>*</font> <font color='#0000FF'>const</font> data;
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> _nc;
+        <b>}</b>;
+        <font color='#0000FF'>const</font> pix_row <b><a name='operator'></a>operator</b>[] <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> row<font face='Lucida Console'>)</font> <font color='#0000FF'>const</font> 
+        <b>{</b> 
+            <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font><font color='#979000'>0</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> row <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> row <font color='#5555FF'>&lt;</font> _nr, 
+                "<font color='#CC0000'>\t The given row index is out of range.</font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t row: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> row 
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t _nr: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> _nr<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>return</font> <font color='#BB00BB'>pix_row</font><font face='Lucida Console'>(</font><font face='Lucida Console'>(</font>pixel_type<font color='#5555FF'>*</font><font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>_data<font color='#5555FF'>+</font>_width_step<font color='#5555FF'>*</font>row<font face='Lucida Console'>)</font>, _nc<font face='Lucida Console'>)</font>; 
+        <b>}</b>
+<font color='#0000FF'>#endif</font>
+
+    <font color='#0000FF'>private</font>:
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>*</font> _data;
+        <font color='#0000FF'><u>long</u></font> _width_step;
+        <font color='#0000FF'><u>long</u></font> _nr;
+        <font color='#0000FF'><u>long</u></font> _nc;
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> image_type<font color='#5555FF'>&gt;</font>
+    image_view<font color='#5555FF'>&lt;</font>image_type<font color='#5555FF'>&gt;</font> <b><a name='make_image_view'></a>make_image_view</b> <font face='Lucida Console'>(</font> image_type<font color='#5555FF'>&amp;</font> img<font face='Lucida Console'>)</font> 
+    <b>{</b> <font color='#0000FF'>return</font> image_view<font color='#5555FF'>&lt;</font>image_type<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>img<font face='Lucida Console'>)</font>; <b>}</b>
+    <font color='#009900'>/*!
+        requires
+            - image_type == an image object that implements the interface defined at the
+              top of this file.
+        ensures
+            - constructs an image_view from an image object
+    !*/</font>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> image_type<font color='#5555FF'>&gt;</font>
+    const_image_view<font color='#5555FF'>&lt;</font>image_type<font color='#5555FF'>&gt;</font> <b><a name='make_image_view'></a>make_image_view</b> <font face='Lucida Console'>(</font><font color='#0000FF'>const</font> image_type<font color='#5555FF'>&amp;</font> img<font face='Lucida Console'>)</font> 
+    <b>{</b> <font color='#0000FF'>return</font> const_image_view<font color='#5555FF'>&lt;</font>image_type<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>img<font face='Lucida Console'>)</font>; <b>}</b>
+    <font color='#009900'>/*!
+        requires
+            - image_type == an image object that implements the interface defined at the
+              top of this file.
+        ensures
+            - constructs a const_image_view from an image object
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> image_type<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='image_size'></a>image_size</b><font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> image_type<font color='#5555FF'>&amp;</font> img
+    <font face='Lucida Console'>)</font> <b>{</b> <font color='#0000FF'>return</font> <font color='#BB00BB'>num_columns</font><font face='Lucida Console'>(</font>img<font face='Lucida Console'>)</font><font color='#5555FF'>*</font><font color='#BB00BB'>num_rows</font><font face='Lucida Console'>(</font>img<font face='Lucida Console'>)</font>; <b>}</b>
+    <font color='#009900'>/*!
+        requires
+            - image_type == an image object that implements the interface defined at the
+              top of this file.
+        ensures
+            - returns the number of pixels in the given image.
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> image_type<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>long</u></font> <b><a name='num_rows'></a>num_rows</b><font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> image_type<font color='#5555FF'>&amp;</font> img
+    <font face='Lucida Console'>)</font> <b>{</b> <font color='#0000FF'>return</font> img.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <b>}</b>
+    <font color='#009900'>/*!
+        ensures
+            - By default, try to use the member function .nr() to determine the number
+              of rows in an image.  However, as stated at the top of this file, image
+              objects should provide their own overload of num_rows() if needed.
+    !*/</font>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> image_type<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>long</u></font> <b><a name='num_columns'></a>num_columns</b><font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> image_type<font color='#5555FF'>&amp;</font> img
+    <font face='Lucida Console'>)</font> <b>{</b> <font color='#0000FF'>return</font> img.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <b>}</b>
+    <font color='#009900'>/*!
+        ensures
+            - By default, try to use the member function .nc() to determine the number
+              of columns in an image.  However, as stated at the top of this file, image
+              objects should provide their own overload of num_rows() if needed.
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_GeNERIC_IMAGE_Hh_
+</font>
+
+</pre></body></html>

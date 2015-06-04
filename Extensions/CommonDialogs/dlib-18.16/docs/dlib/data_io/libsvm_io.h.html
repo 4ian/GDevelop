@@ -1,0 +1,279 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - libsvm_io.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2010  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_LIBSVM_iO_Hh_
+<font color='#0000FF'>#define</font> DLIB_LIBSVM_iO_Hh_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='libsvm_io_abstract.h.html'>libsvm_io_abstract.h</a>"
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>fstream<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>string<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>utility<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../algs.h.html'>../algs.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../matrix.h.html'>../matrix.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../string.h.html'>../string.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../svm/sparse_vector.h.html'>../svm/sparse_vector.h</a>"
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>vector<font color='#5555FF'>&gt;</font>
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+    <font color='#0000FF'>struct</font> <b><a name='sample_data_io_error'></a>sample_data_io_error</b> : <font color='#0000FF'>public</font> error
+    <b>{</b>
+        <b><a name='sample_data_io_error'></a>sample_data_io_error</b><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> message<font face='Lucida Console'>)</font>: error<font face='Lucida Console'>(</font>message<font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> sample_type, <font color='#0000FF'>typename</font> label_type, <font color='#0000FF'>typename</font> alloc1, <font color='#0000FF'>typename</font> alloc2<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='load_libsvm_formatted_data'></a>load_libsvm_formatted_data</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> file_name,
+        std::vector<font color='#5555FF'>&lt;</font>sample_type, alloc1<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> samples,
+        std::vector<font color='#5555FF'>&lt;</font>label_type, alloc2<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> labels
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> std;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> sample_type::value_type pair_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> basic_type<font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> pair_type::first_type<font color='#5555FF'>&gt;</font>::type key_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> pair_type::second_type value_type;
+
+        <font color='#009900'>// You must use unsigned integral key types in your sparse vectors
+</font>        <font color='#BB00BB'>COMPILE_TIME_ASSERT</font><font face='Lucida Console'>(</font>is_unsigned_type<font color='#5555FF'>&lt;</font>key_type<font color='#5555FF'>&gt;</font>::value<font face='Lucida Console'>)</font>;
+
+        samples.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        labels.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+        ifstream <font color='#BB00BB'>fin</font><font face='Lucida Console'>(</font>file_name.<font color='#BB00BB'>c_str</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font>fin<font face='Lucida Console'>)</font>
+            <font color='#0000FF'>throw</font> <font color='#BB00BB'>sample_data_io_error</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>Unable to open file </font>" <font color='#5555FF'>+</font> file_name<font face='Lucida Console'>)</font>;
+
+        string line;
+        istringstream sin;
+        key_type key;
+        value_type value;
+        label_type label;
+        sample_type sample;
+        <font color='#0000FF'><u>long</u></font> line_num <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>fin.<font color='#BB00BB'>peek</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>!</font><font color='#5555FF'>=</font> EOF<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#5555FF'>+</font><font color='#5555FF'>+</font>line_num;
+            <font color='#BB00BB'>getline</font><font face='Lucida Console'>(</font>fin, line<font face='Lucida Console'>)</font>;
+
+            string::size_type pos <font color='#5555FF'>=</font> line.<font color='#BB00BB'>find_first_not_of</font><font face='Lucida Console'>(</font>"<font color='#CC0000'> \t\r\n</font>"<font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// ignore empty lines or comment lines
+</font>            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>pos <font color='#5555FF'>=</font><font color='#5555FF'>=</font> string::npos <font color='#5555FF'>|</font><font color='#5555FF'>|</font> line[pos] <font color='#5555FF'>=</font><font color='#5555FF'>=</font> '<font color='#FF0000'>#</font>'<font face='Lucida Console'>)</font>
+                <font color='#0000FF'>continue</font>;
+
+            sin.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            sin.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font>line<font face='Lucida Console'>)</font>;
+            sample.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+            sin <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font> label;
+
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font>sin<font face='Lucida Console'>)</font>
+                <font color='#0000FF'>throw</font> <font color='#BB00BB'>sample_data_io_error</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>On line: </font>" <font color='#5555FF'>+</font> <font color='#BB00BB'>cast_to_string</font><font face='Lucida Console'>(</font>line_num<font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> "<font color='#CC0000'>, error while reading file </font>" <font color='#5555FF'>+</font> file_name <font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// eat whitespace
+</font>            sin <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font> ws;
+
+            <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>sin.<font color='#BB00BB'>peek</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>!</font><font color='#5555FF'>=</font> EOF <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> sin.<font color='#BB00BB'>peek</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>!</font><font color='#5555FF'>=</font> '<font color='#FF0000'>#</font>'<font face='Lucida Console'>)</font>
+            <b>{</b>
+
+                sin <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font> key <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font> ws;
+
+                <font color='#009900'>// ignore what should be a : character
+</font>                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>sin.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>!</font><font color='#5555FF'>=</font> '<font color='#FF0000'>:</font>'<font face='Lucida Console'>)</font>
+                    <font color='#0000FF'>throw</font> <font color='#BB00BB'>sample_data_io_error</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>On line: </font>" <font color='#5555FF'>+</font> <font color='#BB00BB'>cast_to_string</font><font face='Lucida Console'>(</font>line_num<font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> "<font color='#CC0000'>, error while reading file </font>" <font color='#5555FF'>+</font> file_name<font face='Lucida Console'>)</font>;
+
+                sin <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font> value;
+
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>sin <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> value <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                <b>{</b>
+                    sample.<font color='#BB00BB'>insert</font><font face='Lucida Console'>(</font>sample.<font color='#BB00BB'>end</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, <font color='#BB00BB'>make_pair</font><font face='Lucida Console'>(</font>key, value<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                <b>}</b>
+
+                sin <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font> ws;
+            <b>}</b>
+
+            samples.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>sample<font face='Lucida Console'>)</font>;
+            labels.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>label<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> sample_type, <font color='#0000FF'>typename</font> alloc<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>typename</font> enable_if<font color='#5555FF'>&lt;</font>is_const_type<font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> sample_type::value_type::first_type<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font>::type 
+    <b><a name='fix_nonzero_indexing'></a>fix_nonzero_indexing</b> <font face='Lucida Console'>(</font>
+        std::vector<font color='#5555FF'>&lt;</font>sample_type,alloc<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> samples
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> sample_type::value_type pair_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> basic_type<font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> pair_type::first_type<font color='#5555FF'>&gt;</font>::type key_type;
+
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>samples.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+            <font color='#0000FF'>return</font>;
+
+        <font color='#009900'>// figure out the min index value
+</font>        key_type min_idx <font color='#5555FF'>=</font> samples[<font color='#979000'>0</font>].<font color='#BB00BB'>begin</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>first;
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> samples.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            min_idx <font color='#5555FF'>=</font> std::<font color='#BB00BB'>min</font><font face='Lucida Console'>(</font>min_idx, samples[i].<font color='#BB00BB'>begin</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>first<font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// Now adjust all the samples so that their min index value is zero.
+</font>        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>min_idx <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            sample_type temp;
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> samples.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#009900'>// copy samples[i] into temp but make sure it has a min index of zero.
+</font>                temp.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>typename</font> sample_type::iterator j;
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>j <font color='#5555FF'>=</font> samples[i].<font color='#BB00BB'>begin</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; j <font color='#5555FF'>!</font><font color='#5555FF'>=</font> samples[i].<font color='#BB00BB'>end</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>j<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    temp.<font color='#BB00BB'>insert</font><font face='Lucida Console'>(</font>temp.<font color='#BB00BB'>end</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, std::<font color='#BB00BB'>make_pair</font><font face='Lucida Console'>(</font>j<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>first<font color='#5555FF'>-</font>min_idx, j<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>second<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                <b>}</b>
+
+                <font color='#009900'>// replace the current sample with temp.
+</font>                samples[i].<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>temp<font face='Lucida Console'>)</font>;
+            <b>}</b>
+        <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<font color='#009900'>// If the "first" values in the std::pair objects are not const then we can modify them 
+</font><font color='#009900'>// directly and that is what this version of fix_nonzero_indexing() does.
+</font>    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> sample_type, <font color='#0000FF'>typename</font> alloc<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>typename</font> disable_if<font color='#5555FF'>&lt;</font>is_const_type<font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> sample_type::value_type::first_type<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font>::type 
+    <b><a name='fix_nonzero_indexing'></a>fix_nonzero_indexing</b> <font face='Lucida Console'>(</font>
+        std::vector<font color='#5555FF'>&lt;</font>sample_type,alloc<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> samples
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> sample_type::value_type pair_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> basic_type<font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> pair_type::first_type<font color='#5555FF'>&gt;</font>::type key_type;
+
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>samples.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+            <font color='#0000FF'>return</font>;
+
+        <font color='#009900'>// figure out the min index value
+</font>        key_type min_idx <font color='#5555FF'>=</font> samples[<font color='#979000'>0</font>].<font color='#BB00BB'>begin</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>first;
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> samples.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            min_idx <font color='#5555FF'>=</font> std::<font color='#BB00BB'>min</font><font face='Lucida Console'>(</font>min_idx, samples[i].<font color='#BB00BB'>begin</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>first<font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// Now adjust all the samples so that their min index value is zero.
+</font>        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>min_idx <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> samples.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>typename</font> sample_type::iterator j;
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>j <font color='#5555FF'>=</font> samples[i].<font color='#BB00BB'>begin</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; j <font color='#5555FF'>!</font><font color='#5555FF'>=</font> samples[i].<font color='#BB00BB'>end</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>j<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    j<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>first <font color='#5555FF'>-</font><font color='#5555FF'>=</font> min_idx;
+                <b>}</b>
+            <b>}</b>
+        <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<font color='#009900'>// This is an overload for sparse vectors
+</font>    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> sample_type, <font color='#0000FF'>typename</font> label_type, <font color='#0000FF'>typename</font> alloc1, <font color='#0000FF'>typename</font> alloc2<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>typename</font> disable_if<font color='#5555FF'>&lt;</font>is_matrix<font color='#5555FF'>&lt;</font>sample_type<font color='#5555FF'>&gt;</font>,<font color='#0000FF'><u>void</u></font><font color='#5555FF'>&gt;</font>::type <b><a name='save_libsvm_formatted_data'></a>save_libsvm_formatted_data</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> file_name,
+        <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>sample_type, alloc1<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> samples,
+        <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>label_type, alloc2<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> labels
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> sample_type::value_type pair_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> basic_type<font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> pair_type::first_type<font color='#5555FF'>&gt;</font>::type key_type;
+
+        <font color='#009900'>// You must use unsigned integral key types in your sparse vectors
+</font>        <font color='#BB00BB'>COMPILE_TIME_ASSERT</font><font face='Lucida Console'>(</font>is_unsigned_type<font color='#5555FF'>&lt;</font>key_type<font color='#5555FF'>&gt;</font>::value<font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// make sure requires clause is not broken
+</font>        <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font>samples.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> labels.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,
+            "<font color='#CC0000'>\t void save_libsvm_formatted_data()</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t You have to have labels for each sample and vice versa</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t samples.size(): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> samples.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t labels.size():  </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> labels.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+            <font face='Lucida Console'>)</font>;
+
+
+        <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> std;
+        ofstream <font color='#BB00BB'>fout</font><font face='Lucida Console'>(</font>file_name.<font color='#BB00BB'>c_str</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        fout.<font color='#BB00BB'>precision</font><font face='Lucida Console'>(</font><font color='#979000'>14</font><font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font>fout<font face='Lucida Console'>)</font>
+            <font color='#0000FF'>throw</font> <font color='#BB00BB'>sample_data_io_error</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>Unable to open file </font>" <font color='#5555FF'>+</font> file_name<font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> samples.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+        <b>{</b>
+            fout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> labels[i];
+
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'>typename</font> sample_type::const_iterator j <font color='#5555FF'>=</font> samples[i].<font color='#BB00BB'>begin</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; j <font color='#5555FF'>!</font><font color='#5555FF'>=</font> samples[i].<font color='#BB00BB'>end</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>j<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>j<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>second <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                    fout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'> </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> j<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>first <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>:</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> j<font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font>second;
+            <b>}</b>
+            fout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n</font>";
+
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font>fout<font face='Lucida Console'>)</font>
+                <font color='#0000FF'>throw</font> <font color='#BB00BB'>sample_data_io_error</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>Error while writing to file </font>" <font color='#5555FF'>+</font> file_name<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<font color='#009900'>// This is an overload for dense vectors
+</font>    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> sample_type, <font color='#0000FF'>typename</font> label_type, <font color='#0000FF'>typename</font> alloc1, <font color='#0000FF'>typename</font> alloc2<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>typename</font> enable_if<font color='#5555FF'>&lt;</font>is_matrix<font color='#5555FF'>&lt;</font>sample_type<font color='#5555FF'>&gt;</font>,<font color='#0000FF'><u>void</u></font><font color='#5555FF'>&gt;</font>::type <b><a name='save_libsvm_formatted_data'></a>save_libsvm_formatted_data</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> file_name,
+        <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>sample_type, alloc1<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> samples,
+        <font color='#0000FF'>const</font> std::vector<font color='#5555FF'>&lt;</font>label_type, alloc2<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> labels
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#009900'>// make sure requires clause is not broken
+</font>        <font color='#BB00BB'>DLIB_ASSERT</font><font face='Lucida Console'>(</font>samples.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> labels.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,
+            "<font color='#CC0000'>\t void save_libsvm_formatted_data()</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t You have to have labels for each sample and vice versa</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t samples.size(): </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> samples.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\t labels.size():  </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> labels.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+            <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> std;
+        ofstream <font color='#BB00BB'>fout</font><font face='Lucida Console'>(</font>file_name.<font color='#BB00BB'>c_str</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+        fout.<font color='#BB00BB'>precision</font><font face='Lucida Console'>(</font><font color='#979000'>14</font><font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font>fout<font face='Lucida Console'>)</font>
+            <font color='#0000FF'>throw</font> <font color='#BB00BB'>sample_data_io_error</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>Unable to open file </font>" <font color='#5555FF'>+</font> file_name<font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> samples.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+        <b>{</b>
+            fout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> labels[i];
+
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> j <font color='#5555FF'>=</font> <font color='#979000'>0</font>; j <font color='#5555FF'>&lt;</font> samples[i].<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>j<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>samples[i]<font face='Lucida Console'>(</font>j<font face='Lucida Console'>)</font> <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                    fout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'> </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> j <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>:</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> samples[i]<font face='Lucida Console'>(</font>j<font face='Lucida Console'>)</font>;
+            <b>}</b>
+            fout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n</font>";
+
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font>fout<font face='Lucida Console'>)</font>
+                <font color='#0000FF'>throw</font> <font color='#BB00BB'>sample_data_io_error</font><font face='Lucida Console'>(</font>"<font color='#CC0000'>Error while writing to file </font>" <font color='#5555FF'>+</font> file_name<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_LIBSVM_iO_Hh_
+</font>
+
+</pre></body></html>

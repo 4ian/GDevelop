@@ -1,0 +1,363 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - face.cpp</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2014  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font>
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='tester.h.html'>tester.h</a>"
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>image_processing<font color='#5555FF'>/</font>frontal_face_detector.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>image_processing.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>vector<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>sstream<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>compress_stream.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>base64.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>image_io.h<font color='#5555FF'>&gt;</font>
+
+<font color='#009900'>//#include &lt;dlib/gui_widgets.h&gt;
+</font><font color='#009900'>//#include &lt;dlib/image_processing/render_face_detections.h&gt;
+</font>
+<font color='#0000FF'>namespace</font>  
+<b>{</b>
+    <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> test;
+    <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> dlib;
+    <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> std;
+    dlib::logger <b><a name='dlog'></a>dlog</b><font face='Lucida Console'>(</font>"<font color='#CC0000'>test.face</font>"<font face='Lucida Console'>)</font>;
+
+
+    <font color='#0000FF'>class</font> <b><a name='face_tester'></a>face_tester</b> : <font color='#0000FF'>public</font> tester
+    <b>{</b>
+    <font color='#0000FF'>public</font>:
+        <b><a name='face_tester'></a>face_tester</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> :
+            tester <font face='Lucida Console'>(</font>
+                "<font color='#CC0000'>test_face</font>",       <font color='#009900'>// the command line argument name for this test
+</font>                "<font color='#CC0000'>Run tests on the face detection/landmarking modules.</font>", <font color='#009900'>// the command line argument description
+</font>                <font color='#979000'>0</font>                     <font color='#009900'>// the number of command line arguments for this test
+</font>            <font face='Lucida Console'>)</font>
+        <b>{</b>
+        <b>}</b>
+
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='get_test_face_landmark_dataset'></a>get_test_face_landmark_dataset</b> <font face='Lucida Console'>(</font>
+            dlib::array<font color='#5555FF'>&lt;</font>array2d<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> images,
+            std::vector<font color='#5555FF'>&lt;</font>std::vector<font color='#5555FF'>&lt;</font>full_object_detection<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> objects
+        <font face='Lucida Console'>)</font>
+        <b>{</b>
+            istringstream <font color='#BB00BB'>sin</font><font face='Lucida Console'>(</font><font color='#BB00BB'>get_decoded_string</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            images.<font color='#BB00BB'>resize</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+            objects.<font color='#BB00BB'>resize</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>load_dng</font><font face='Lucida Console'>(</font>images[<font color='#979000'>0</font>], sin<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>pyramid_up</font><font face='Lucida Console'>(</font>images[<font color='#979000'>0</font>]<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>objects[<font color='#979000'>0</font>], sin<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='perform_test'></a>perform_test</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#BB00BB'>print_spinner</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            dlib::array<font color='#5555FF'>&lt;</font>array2d<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> images;
+            std::vector<font color='#5555FF'>&lt;</font>std::vector<font color='#5555FF'>&lt;</font>full_object_detection<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font> objects;
+            <font color='#BB00BB'>get_test_face_landmark_dataset</font><font face='Lucida Console'>(</font>images, objects<font face='Lucida Console'>)</font>;
+
+            frontal_face_detector detector <font color='#5555FF'>=</font> <font color='#BB00BB'>get_frontal_face_detector</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+            <font color='#BB00BB'>print_spinner</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            shape_predictor_trainer trainer;
+            trainer.<font color='#BB00BB'>set_tree_depth</font><font face='Lucida Console'>(</font><font color='#979000'>2</font><font face='Lucida Console'>)</font>;
+            trainer.<font color='#BB00BB'>set_nu</font><font face='Lucida Console'>(</font><font color='#979000'>0.05</font><font face='Lucida Console'>)</font>;
+            <font color='#009900'>//trainer.be_verbose();
+</font>
+            shape_predictor sp <font color='#5555FF'>=</font> trainer.<font color='#BB00BB'>train</font><font face='Lucida Console'>(</font>images, objects<font face='Lucida Console'>)</font>;
+
+            <font color='#BB00BB'>print_spinner</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// It should have been able to perfectly fit the data
+</font>            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font><font color='#BB00BB'>test_shape_predictor</font><font face='Lucida Console'>(</font>sp, images, objects<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+
+            <font color='#BB00BB'>print_spinner</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// While we are here, make sure the default face detector works
+</font>            std::vector<font color='#5555FF'>&lt;</font>rectangle<font color='#5555FF'>&gt;</font> dets <font color='#5555FF'>=</font> <font color='#BB00BB'>detector</font><font face='Lucida Console'>(</font>images[<font color='#979000'>0</font>]<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>DLIB_TEST</font><font face='Lucida Console'>(</font>dets.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>3</font><font face='Lucida Console'>)</font>;
+
+
+            <font color='#009900'>/*
+            // visualize the detections
+            std::vector&lt;full_object_detection&gt; shapes;
+            for (unsigned long j = 0; j &lt; dets.size(); ++j)
+            {
+                full_object_detection shape = sp(images[0], dets[j]);
+                shapes.push_back(shape);
+            }
+            image_window win(images[0]);
+            win.add_overlay(render_face_detections(shapes));
+            cin.get();
+            */</font>
+
+        <b>}</b>
+
+
+    <font color='#009900'>// ------------------------------------------------------------------------------------
+</font>
+        <font color='#009900'>// This function returns the contents of the file 'test_faces.dat'
+</font>        <font color='#0000FF'>const</font> std::string <b><a name='get_decoded_string'></a>get_decoded_string</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            dlib::base64 base64_coder;
+            dlib::compress_stream::kernel_1ea compressor;
+            std::ostringstream sout;
+            std::istringstream sin;
+
+            <font color='#009900'>// The base64 encoded data from the file 'test_faces.dat' we want to decode and return.
+</font>            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>RFYXmMn7UA64INJ2Umw+YCh5xX6v+y3bqV/1EKP3ZtvdIWxDCoyZ8oJjj/LXTw3PyEMQReTyXO+8</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>423ExTTLMRLxc5gEI4PK8vLMVWdRjRKldYfFLisH5qk7o6TxYfRXqmch/t4c53UfsUuJuVMvA+nf</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>05tfgx0Z2VgrlMmvKSxX0VHEjQ3ZVqQl0mLeur1qoMRmcPjYA4QJOvcruwyz/hFpVU8snvsri4QA</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>hkCrOtvl/iTlLvcWXDM98OXEYLk4vr6z2v73mGGEdbaJFafXOgutY0NRESpJfingJkuZKXNV7fQ8</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>F1DmHwFM0Izoc3fUyN7+xtLo2LSEH8uohv79wjxdbm71n5kgHb6cnpYiiCLOgqKrK+qJUJG1/OBB</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>9IORGL6SHrogefDg76m4ayil0lE4pQLa1fKhXGqphdxDMyBXHkOpxA356i5Evk7jZb/AqHUu/hQV</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>QYOsW20TRhuFfrasrb/Veq10hMZomosAnNb+Uhgnu2Ip4igX6ozJqmCL4NngjEgoXuCA02KzmIqK</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>fcslrBjyg7WZnF2w7UZXcHoZ0AVijb/ANPUqvq9H4k5WCFh53pwG6oj+CG5N7EXLzt9UHtillGJH</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>S252/dLvzaNxSq0vDP+Y0IvtKhZgIlmX3duu+L7iJUMinE90OXQFzhwCaOM8oP3Mq+Becgto5Vjb</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>vv+2xeyrYL9hBfMyPzbBhVWZdaPyI62MGMPjTfmAUmufWm3/Pxey5Jw6MUNX1rfWMXYQTtamdtcE</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>XmuFGhLCWbnJN2GtlOWu+S0LdWAziktr0mdovdFZTwKnd2Fuf1VeMMHBCgF5D56UK6/JTXO1gPlj</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>VpavizirUH46rHVnGOFZHWarPKymXyrQ/VhFbVBSOi9UGbsMo9sYNYhvFlzSBN5orNoY+5AP+Y2X</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>BDw342Vg3YRIZBqaXZ7oOqyDtjFYNf2g7ColnaFrPiYCKg9VQvVQVXvr4Oa6TTryepXylHk11ijw</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>xYgjiENTDKVuXPLVrAEWZD6wq5+LGbmj1cgh59XgLErkoliKxVeEv4ktXqceCFK9YWljqJZSBxFj</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>T64N945O47Oek591sfRFYrjebJz3kooaaOQ7lm4BWpW64Am/Od0FIkggSzPUgf+jYrnPdH4oqv3d</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>NJIXJO8aeCi/WCqgbdgLwpu1MB8cTdbK2TrCbi3sHhQddE6rqZ1XIg25gYTw72q4ZFUHmRrBEgdz</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>i2xh7qHevCWC9Ht7HrUcLl35/UCcNck/ftiDa/xN3rBJp+cJCyS9ZXScFbgFKYfBau8Dx+JA3ygU</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>pvYbUP29UeK5hXZoQzC74UKw/liapW8GbR3ZPV+59xmw1b7phyApZfODkDLG5lyTB5Co6vIfmqXp</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>DSA1I0ZPIk7hJHWtddgvAg6Yv4GhMZs/cn08Z/ZRXYSMw20rA66BeMD+IPFe3MPFPnKsl/qRvXIC</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>gTmLcjPQ5naBo/3haQg4TjJCBCErTC2JktJE0vRfm8v+1kEFoycTsRfhDZtjMnqmqSiNO3VSbnbb</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>et/mFvCdd9kqBXQ4VaeYdJwORA7/TocC84G91jlfNRhbY2KW9xHXYYwscfaV5DtPWhyJBEimzLsz</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>F59UbkO/WOT7HEwJ3p1/ReH6feLrIYwR8OdSeuOUtK2oboodiUmx/if9pyNONd0If9jFGDXvWP/r</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>dL6NdRh68swmPyiCn7sAwaUbd7PF7K+jqgk3jMDMaoWE6p+aAFK3H/JxRO7th2XvX57uA+RKoXEq</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>LBJrDkoPGbA5Ctj6KUWknMM62HVIO1SjwZH7ROOlCVbHvDd3JTT6TNs2Lj8g78q6WRMnDVV0L9Q7</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>S6awjHePvyj9fDn66jpmRxI9TkqNPx0b8tGfOnUoXGKK/WcInBjVd+FYy1SO5FIVZ4JQdiSMgehu</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>EU7X2yjbdgCtVg+kY3ZgYcCMM72NLdm7+U+qVxzfY9bNtzLRsEDNFL2wnq3DkbRRiHKHswEugXjG</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>fFfzqjU71sDH3gc1dhOQT456XK0zhmV/62+N+oTxrFY2F/ArALeDiR1q1JOrE1UDzU/ezAZVWS/a</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>DJ8O9TVZsbOXOU4hAiQ6mR5hh6i5c/zb7jBl6ehNgixrJqguo9PT10P3S6I+IiTG2vHlws4ZoTmz</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>7iOj1ICCN6ivwPj5+afYScxPGLVujxWTW8ksey8RjSIbH+N9wUEAJAcZAGXo2UrP93uRkdLt/cvi</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>Q4eIONlUrJ79hlo1xyvPmyNw9Ye1zG6epUK+lsXxtUbtX+uX+sDM/Gkr5QUdzzorfa4Mj9vEglQp</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>iK5319kTeymqqV25YhNZZsoqCg+eckmoZP21cAHkPYZWAzg4lxhm71EAp+fE67Y44szeCSRNydRh</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>mCl0ZGV59wVfUONdohN/9OQJ8gxifHspscrRszBALwCu2FrniGwRMvIi6lD6tb49dmpPlO1y5SEl</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>HPF2I271RVx0YwFPprp+2/fzsnKIIhfgTNRVji2tfjHPoge84e5O02Z/cLlg7EzIfr/JK8Xd6mwp</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>t3kIofktLqWbnBrr8qEvz2BmHRlEjYlpb6HfbK82ZHiOusVJdhAxRcRIqmImh5wtunlJOXdQqfmg</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>8P0TYVDzQlc6ywbKt/VjTsxI4qisabVvVBkW5VsKU4/JONoNj7fgomwfHqryIIZcgc5vPLawnurD</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>7JR1LRiTy7+7riDIxKdYtgbTuOnK6tO103XC+5NT07cKydDgtTu1gYoTTgzY+gkK53lX2Swbbme7</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>wIFOXRwSK4ntGt4XXuuPbF8gc0T8ez8/tOEXE6Di8Ckj2O3uz2vGM27PQH9YU3Y3YCdcuaHlUIMG</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>s7bgx4nM+xMPmS5baTuAHiPAxp3SepeKpHg0on6Bv99NPSDf7nWRcvvd3+/MHhyDfkbzd88GPnkQ</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>Y7a91Tlj8RKG6B8W+zzn+SWzTIz5eJcLJCEKN7fXm1YjJjk3Tdi99PZA/K3Ek2k2lcd2oQPXj6fc</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>EUs9zy6sZdSjttwsYlZzLW0Rpiscjqs1XNA+2D5UahufMk4AVpnDPqZ/OvmSZIPpTT4r+uQsEZlJ</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>BYf6A9riAPhgR68zPz+i+ffpPcgwURCDviqf370nLIqfbDgJSztxXI2MPsHZqypB+VtvuLTq+M2s</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>NVdvA6z5J35d3fk8EHVo8/TIWbsSulqnpJvjIHT9GeTV4EvaJo0kh092cFQ3QkbRIIzEqnT/o06z</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>/+gqB0fKl93o50EUVzJbz02rPc/4qVaqfSJLg+HEZUg30PB8wQHb2oWqgL1lYDlqrv5plbK2kJm9</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>HW9aQfOyX57rBsYi4aljZl5icy/JElsuNanhnTcTvrHQ/9ntw8QqV2PuVesbbaUQSjDRWG6D1uaK</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>HSYB/6fvMZ+8hy+gq4d/tMKpoCzgERJjJOU+N0vHpKmyZgE0EGkPJwlgev/oxTJtsQndgrNviPkr</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>ub9ZRkS5uM7Jb+1mKztyVWDdtVvxnvgboNayuS5/VdwlbQezQKEiB8I8UWLsgEJiXg9sgjBaFrv8</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>3WgtSQmMRyukOnDPWwDskmUyIHKIye1wOY3H1BUuav52tg8gv1+y2CrVVebRm/8MmhJYe/8DpLeo</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>1eEAX2SNtZH4VzpZSuAdANtYXgBaNTc0uWtw9Wc8mwo2hTfbu5nVYJ6vlUFP7HH7L+1idfrz832x</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>l20/+8EKd8y2f20iP6m1mnKCQ9PUPPhWMfWMkJ21VhKJJDcpKhvQq20O/yqhfxabl+73QZiCS/eR</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>E1ih71FN4x+s952FXOakzYlo5Gge1OCgHE0+YVXBSal4fz6Ye1iRG7+XgLxDIx6AGbOfemRQbOzW</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>e/8pe0kPqkkS5ogdkCGemb3hKTgGFGXgP9IvJ18VuRDxPSHD1e5THwvULz7V0hUWO4aKx8t8tZIK</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>flDB/npEo3L/1jU5rLEuX5KQbxJfEY2V22hND1ohUZdU+Uy6BFZ/hdYzFAUyNdLAFS36wB3XThar</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>54CQ0RGIxCCtv5ucI7VQuc46jkk6SEmZV8FUwv79ExsrB+rAlBvhNOrmVA2vmikrb/iZfA6z1hC2</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>aj8BGiULdcW0YUiN/TXxoVT0qgh87VjPcOfkj8gTRMF8VGAgRs0HpXVXKZf+ncAOKJ59yu3EsOCp</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>vSG5zxDxrUYD7TFxrelev/7Jtan4J8ouFsK8ZA4WmBkbWLDBkKvV09c7Jxfmgt27aVI5uuUBJYb0</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>TdKIG6J/JC85GrRedIb/kRaMiTP0Els6jGp3C/B9PQq6HbzSCUEkLE8is+uWnTDOynbgTtUVEGxH</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>EKZGBtnPfqgZRDOnZTWMO9Hd9qATpI2qRrgxIvHTUhqD3DQQ37AGTcNsMmj/+mXTBV2vbM9H7Q5K</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>APzltdgkGc+hZIL8Fy3CXzzRFlXAEoIcnJ3BKT7AdGg3pEaW1YcX4akaOTDmImZelYTCoTGu1R4Y</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>ZD/rRCeiGR9txS9x9/ptvxeD3J8wYOXxDzCkyMQy1io+izFuN4kTd5MW3RlvepWT4FE2hvjyTyV+</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>G4F+lcZFjCGmJKguZEzH3Qtww3OTGZqOfL9oADqQsUpEl92hm0uNOPHH6+8gWPZgb3EcCRkWeXaA</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>DkTbCC5rV04N6Fg3j27K1v7qkykWB4y61W00dFejgPitoYuln4A8lY9RtIKzJYFfSOKnrAqYGMkn</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>PReI5ZneFTiklSL6FkhWHvr5oz4EsAoU3fLWjky27E1CtpFkPKHLGyc2mnf2N7iBMGa8j2ipy9xd</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>JwInqdDdGIHR5dUmNAy1A4vyGbOE7qa0ErVy4m3riKkyE0ObQTNoBeYa6CUHwNWCLCbiW2VzRY/H</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>s6APvI6QIco+Wu9dx36qklvA6/OfM79BsUACnCRG2yo3bHeTeKMwKIx05RkNNJ76eOhjxOiPJBVR</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>K5V+G3SutaRM0hSK0ABS5nfveZmowfJr8nZHRBAPHyIdv0bJW8lSNIRtZtgwm1dl13+eaeAJNpJm</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>3eVvhP8c43LG938Bjxs/nfDl5GMzPnyLOIYInIt4wTXCZlRbt6pMXs9IX9/DpUt/AF44b+XQLnUT</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>DgJa4In4qREDt58wel1oAGe9xpIqdFNPduUuCo/Ly0XHrBFd3jQFgp0JWZ039GtG2YTHpo8rLfu+</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>TiTAmKnFbVZa6dlOzmVDV+53ptJxiWNfNMa2ri/YEFI7BpKi1FZvMfpGBzNmAdZBAt7kaSvIzqdl</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>OHMqka3GBbzyW1PusVpj6SWBZ7rsfIFPRdVO4PGcOWSIQ/YlZYXtkV82cw+m4D/ScXdlj0VZBB04</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>YfeUz1m8tiWsLdHxIKRI1JcLek5PzCQX33RFmfeqGBEa7q/kCzGiJ0QHiJV07Fxm2NKRUZQIWiJO</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>n1roUf9C06IT03Wd0rcSlwG8Ji9SJZOlBEi7B9Vos61eXMEnkcNiRVeOxLaOfqr20XMde4kquqrS</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>qZi2ZhNVqokhXNswwMtlMDfWBWWI39q4evlS8c60lQjXg39kyKbyVZOzp6KrJ+xDYUxURb2d/7DZ</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>+UpikS9DmbUgWqV1pmx84ARtPp8/5teoBM7qd6sRrpJ1Q4cE4WLQfr/nVnVmSfZVzm6yqlxjGvhQ</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>Bwz85XvMn4xjWIRDNnuwyJh7PoXkoacU54idHA4k7B3qeW59MKtXD3hA34qKUqqE0amH1Xzi3W84</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>HpL4xT9EoNUPv+ufvo/4Yir/YIMIVuj1BFQACONJWezdbHO7ze7DQrceR9ojpVlkM442CArpnYWZ</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>3SR0NRB0PFjJcgA3RPVWW591v7Aw3G7/aUh5OLSZsOoxrnE2Hb8wM4wQXutleUjcUCxdliAbLl/k</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>RcLSE+IzpwRpnSo05sBx91Q71Ws9NeS0Pruy03wScuztfv15MPoBmMH4Nc+JhF/iokGM7C4IICOb</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>Woffq9KzUSWaIEEO+qaKqfnG7+/bW5U/gDW0xAfvTt0IuXtoJH5/Gq/g/anFdecnyCdBa4C02MFJ</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>gLqm9Dyiuh5Hny9bAuE08YxgrfpwOx3nGxQ/MrXwGUNjCxJEz4TkmFt/Z6HmOUhobQ4Xue5rK6gp</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>qWkg7gkXJmpNaj40TFnxQ3Fvw7S1UPNcY3vEvskuYXlB6mI16FCa6ApkR3+krkCKokxelBU5eMxx</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>+j5Lv8hYzlSlULUJrDOmGRxQ65lOJPmxbuukr6Uaeh3/i5m8GLqJ3EAkeIABkck+sT/OCCS+1hmY</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>/wRbadX8sd19GjHTLkZ7jwEss0qQj1LdtcEtqXgtzy7+8NhQv9c4KhxFNZdYDezehZYZuf4+UeHM</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>UAPE6+DX+AtKRD5lSwcAEoFID5GLbsLa+gGWzhmn5dfTDvaJrQNYzI6K1f0MBsWxuXu5SM6dRehm</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>9FR9es1OnhIFP8bg5uR7lfIEsfAH6ysgkJyylceoooXwE+cALB+IYfk3mIHNuDMbrQxWIMZmS1er</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>I45Gz53QPLgcSjH9Z1mzrhaZV3ZiJqrTYETtObMRX0136rNLBCaytijF1H4QBJaNEsuJpHAYQHsC</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>ko8cTk8lzMmh+ENtUjLvrG+pEx9FKCPIgUIZrAAM39fWS5uKhFaAPEkfD/FxbEMdM/hjzbQzcMHy</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>iYywZCaCYwolzrQtlTIL3I4VqzpUk/vWMIZt/PMK8lUGBDxzELkXNTYepRJ+uR6QZKOU+/LpLk8K</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>MD6+BZNl2karSYjx9qDDHuADoiNJbSXLV2NqyJiNyTmdKv8E4e52mVFfetoMp+gpd7vMJaAObPuJ</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>A7rUsNjWz+Zho52LXUSUC1G1MdZPRZPMfk/KvNnXZX93P/KaBXTNLlRf4KkRXQdrnmP5KgKFOvIX</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>KUMJ7UQtP0koYJl8OsFHG5yX+qI4BOJqVT0eUypXtlW/CHRX51Wl11wIDsTqbi7zEkBu3kFLMfnr</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>3MEYcVWthG5Y9KecfsdLtRnQVSFRMEKEn1kpVAb7xqZhwKDqREVs+32AawqNxPdO4JOCC/wW0zzH</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>QlJ8KhbcrxKLaygvVOrqaZGeCNTrrRxpG792CtX4OqXdkxpqcPNjhQJXMgSm/OvHJ1sJOrIHYaru</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>JPDH/J4e0qg28rlRpN/iY9xc5Q/dMxhoEsv87ehP+MPKF5ByxrWHbNc9IaOiz5BQIQWAc1glXkKc</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>oyMgoCbZ1Zss8zJ1+k4NwoC59BpnT4KbZHZP7+MbXZidCSosl1P88yC0vj0BX8MK+8x6PA3X9Zc5</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>Sg2OMThc6WRR3oi/DeHePYqJgPtJwhZt7N651llY8/YIJD7pqVEiB8KJGcrjZ9tDuU0MDTkKnrr7</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>qhlSl/XFBGq0x9zIfYeBt6k2wgrpE2/FjgziM3YuH/e7jfppGx3S3G4O+yrUuAynknZQ6Opq+Qs1</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>PYFZMW8Fj+CPMgXGy/2+JPXULK8vf0hN3FfNDeHiGpuGEVaEBHdZdE3CW8cWwyRSdvQHgPbXwEaL</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>pLGxPhgGQlPLK/JvDQhtL7gqS1LQEAER1sleOHoTV5zEpCsKUcvisz0V7TyFozYnzaG0IcfeGysR</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>Kx7O4dq05dlnXicv2IrhcCp9+QZSHDL/E/t/SEafxZJu+sIhqknM+Sgx3MAhE/U8KyOANAYy1aPB</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>H5Qt5RnDbYuFJXHDG9DfEWWcNP8e2EL1CX0/gncYvIz3b5Ge0gv4hwbV23Xzsi3hOki4A/B44nOd</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>fAE3Ao1D16+6XowEVC8gUh+y1TSnYPTtnB30NbrcMhHNaJP0pYzG41gNaMJNjK8SGXSnPKiXrsJ2</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>1jsvbLaMTEBdCqw+2lgg/QwEVgUef7JhVNKbQKf/HTtuD50Ofa4PXv37Q92/xnHWHwjbWfeNEZWA</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>Y5bqQI/MlWBKWSGFjpoQsfbCzS6P3ieD3ID91DmB7tDjTDYm5Wq6LoHAQzx+tTxiq45Qn5tUg0zx</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>7VC8Xh0ygItADoEqXpKUXdfv0o6G4zxjePM4dvyf4NBkh27q1S/aQwQp8UOury2Eunij57XSxaOb</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>IFwlFJYC6wtmg6oV0QZAburx8qJMLdIvHyqa5YJJ3HGuHJIyiD+tuxWVxDZSJQ1RedYqBPAiloyy</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>Z3j6EJKqNh0kq3c0K/B7gpX0P1ZjOFZUadIbEW6dd8bxl0RuyhzdSUMkn4rWgmx7zPvoOEgXzbK+</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>mJmBT9lEaYE4sFkXfZqDCGq66jdc4RrlD4IZbGkXwMeTuHsfLL1hviKSOyJCTbmS5dKZUdWuVk8R</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>XFqATzyHHdArHR9RvNa2bQk5b59tODpeKCqECv5DJ5T2ap8u21ctDCJiFCHq3gLfw6IumI1L2m6/</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>aPGdZ0d4ZMR9ooQvJuhAODKg0ZsA+LjHTakpfUwHpanPWkCbmhuh3oMC+hMX+AqOi55nr2O5uxRL</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>9UwixLBmRa8g3lbgUGdteTTbvZ2ePyzwxhWp1RS+aFJqtORmRMkgB6vRc4SC1CywKwwHoR3RKEj7</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>uW6oQyLQqPYevLuBrbO6yn7U6DkU6blGF7jg/2y12MpwYPr8l661YMXXsmVHCVSJ0AsPSGhJ8oL3</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>Cqk6DJbpyoN8O1xK4zNE0cToRFMhEBjlim0lg56HtbEHfLkqRwnFqfo6vvK6opxJoShMXDa5jrLH</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>GkpmE4DzaGtZ/P397TF3Y12c6lXJFDYWslp4tMskzsy9FdW63kRUvl6Q3UsWj72qGE6r/PGVetJ9</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>in33oiVHTjYppFrza0ryzPE02V4uobC3y2DtoG/YK/GJFkhm68O0QKxyuBURMfT4j046fBQAbwUo</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>B/Ylsb+srIUK6sIEnnzdJ/8ve3f961Yx5Kywf/9kVZnUz5RoiP/bOWXm6jasSq7LEvX2nT2fweup</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>/TI83XIDWd0rFQoGTfuIuXFfLQbXkX4oZpmYLdr0kQAKjFtNB/JYV5PTE7PskJKD/AS6iYLd2pOf</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>cEYJxPZWSWUSz+EmRNmeDl3lfch9LD6VXgaxY1xPF0/1uQfU+BBikdVQJPlMzVB9QK17ir6rynim</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>CP038a8ctWt5RMBsaJPZr7bieh11aTTW2mC65Y3PYQ8WsXofuw4x3xoXI1S/hGCM2QvmgWq29xHp</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>5Jkp/Z5YLaGBGxCHM+QQm4LzggVnhYjlguAbfEmWFapwhzmx1L26gv2q2AUiozn2I7dAh1vDRKD/</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>u5XMODPPJE+NTsr5DQz7aIdEwRLZynp1FO+VN71nYDa5G8ruF4v320ocRKm/mQ5uzU4X7w69CLdS</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>kmag9jfDGvuolYqCooAts5b7tFIcC3WjlXeLPq5y8HmzY69Z72HrISpq0Fyq4vcZaksLSdpv+Pil</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>iUu6Vmti4LYLHYsmue1UgMzL0qqdRMz6XmCPBkUXYDS4oOoQuDcH5iJo9aWRoADapKUHqIUnoR3O</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>Vx4h5b2/XtCEb8dNF0ubJ+oZGbAize7SWTGnUCQdpz2wxAWFymc5/5jFxfVU2BKSPhrKRYImgnVU</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>8GOms14wCx4wyGuRZY3p9s1uPUBNNjDnJqVg6I+7STXJKrYzeP2gP227k2JE3o9eLehe66hcqaPi</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>egdpG5RfPN9X87FtePJ6lPjJ8j0Ysgoa6l+DDUDuEZHp6APIG5miY893oac8uo/r2RgRNVv6vLFo</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>8VIFR7IwcLj1zXvwriv/Szw3POh7y8svSb4eGKr1c1/5JTJB58Fcjz0AMm2+rW0Twwb3STxn4SZ6</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>nXOyP0btY0VCckovcLoFij3lsl21ZGMdfG9cHVlKL88pg4Ip00QmgcQW3QmBBoCjlPlRVSSsDHGY</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>8TBBGLuxJi7NPzU1HNtjG3cnYw0t49og2hjrIbF+6fHb9x0pPtnJZwX7SbBYlk4Z8v84fR7cjC+9</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>l6SLvaRgqkTj/aaiiHtC17zaxNhP9wHqXmPUZdKM6xs3vsAF1dYOLPlIv+nmMLBPfravTZDkf3p1</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>x56EjPHwT1GULNkLBG8iod/cteD0E0GIZf0g5/o0hfI1t18CMGxfMyeaASZugV3+KL1yOwXD07D0</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>lp8iLn8FlYgXOgUO7+OweJcIu1IwkzLSM2aNbnH3VDPlu/Ff8ZHL0jiuxhQAVT6jdWJSUEOf2yiB</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>8mIGCK7CH9Xv9l/grSdh6GrE+NvvWqKQrhX1k8wxHEM4PnhMSO4R+5dRFWeeh6cYfTNHTYWZ2xzU</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>run1L6tULZzpksLtHYDg0vEEq3hDS/3yf+/cvCX4ibt5pUqorTpAtNvbTaguUyBy2TOAy6fSFGh2</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>eHil/3JEYZXnfFtcBo+pIvt3LWEPlWCUHNKFLQnpd77Y6wUFn3Ku7o7Nu7zBxemmvxxYUXImAlzt</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>354O5G/5G1GUGFf1K2u11fFcuXrfowEE+1eUEpC0KLyxZhOJa5nA6dKtnQbq8wrGXxuGuJGlDSAu</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>0sUYLPmELc+kGUyY6A27B0FKFN50bP1U5iWLAtxt0NmPqOnwzvnj5GYQ9R/ZIpzf73N2OoYL4+ba</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>6E32ION5IxY2YQ1IqEHxsjzvDW5KoQCb8oz63eKgwLHBz/1yhA0ELpzG9ti5pVE4WbGKOtS/2xTh</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>RIgpnpbB7bPUdtw33cjky7t6UAO+QYI1kg8rscd/Ug44hd627JK61SxnGlK5wBRj7aoUxH2yb3Dt</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>jMgmcgZYtdIsHjuU63vrN0acMHULcyCRIFuFEtXgnQNIKjPUG3iuN3714Y9sncW5HqDGAYLyRpaA</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>69XPtqYEajN2uLF1Q9KIeW701X1diQoHw7TFq0p5x1oTMRzjqcz5lnLIM0DycqCPGoGAnyL0o5A3</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>Rw9qaSq1bB5VOdqpZHyN38huATstlHmcO2GqN2r9k2BKqqDYxuzmhB1K5ugoJID0lm6KfR87e+2q</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>CQL1tr6ecqFe4LkO6nRR57w6gl48J0tFYuxsgRcktYvkt/BF1JHNnw/BChE9lDBgBZz8TfAqUv5b</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>Ofi4WiuGxq5sKIa8a5SRwfVbz1h/MBqBEd9nDlZ1acbg9ZGakzwCfH0WrcArLiN9FqGqmiZClS0d</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>cUwftQDUI7yEoiIb18/479c1VU2q5dJddCBaabm8CtGtd8w8KTANBXX4pZoSuOlYUUQaxYsZ/avm</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>RYqfU1uOkHlmqm++EvfKEGW/Rmoq/fCIl4mk7YoLpMcub9wlTSVP2W//uvZG0LYwlZScWGOGmo6Z</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>xa02FmCXVIyXUfnitTEv2oYj3CV/57nW4+1jkXTcYhH8wt5wX5G2eO7qw3esj1x1kL07xmven4Il</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>nmKMri2FNxrWUBzvCwmfKGfPh1IkQ9LAfaJJATfGeBFI33RQdSILTaozNl88dHbUO8I+ZnySvavV</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>uX9Ia4Gvrm0nzV6WYbE4SCDjppsaz0CSZy1exA9t/NFoQFjvf25pszQ9JlDtwDm65ssYqCTLjyoJ</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>AjMMUygef0nD9WxtWkVCywmyR5HIZWqwV/poAROWBUNL72p0kYxDsm8u8D6LFDQJj+/rSQFr4jzF</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>RkH7zemYp52d7nSo7ZV84Pf11aTTWqg1OCwAFz+bcg5wZObUL48+WzPAPePNtlo2ef4hn3tyi/pj</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>v62xZax1oHnnB4ozyZqwSd7aH8LGN4G0Pk37PCagVXLEyLEGQXA3NqxxokimT93xORZOF4hZjhUR</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>EM6aKChyS4DKkB/HN8IEMrPcKL7zadhDrWX6aeAxBOIbF02jTyCo7rFEO4g3TLuy+aX29SStyzAd</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>bESo1w0hmnjboB/cUVh9SU0rWvyHnBveXBU1QFsmKEpEVXbD9iao+VArYlDKQgXS0elIQIJHLJ2v</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>8cVk5GtsXQU9Yd5vyzC9R/ZuUD+fuRcoKYwevCjnVegbn4mCK6VICihqWM5etEr9CqdjjzAtemN3</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>RhW/4c1v6Gfcb3LQIctJmk08SbUfkImRlULjt3sr+iF/9gMx5AneRDqnq1YRbiusqAfpCl83zBFm</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>/txWD4btmU3/Q9TzIYjcDm8JFIpptv1+F6myuN1ElJPj5dcmfBZ2/KQknRf7cFBSFCfeKS2glsIm</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>tTj1p8jK+qKf3GS+v/n6VutWgGXAU7bjZSfaWn3wfNX1rJXOX4Czp1dXxmXuxltVQ09bTpEMQL5o</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>F9LI3ExjgsokVCsnuAc25hTRWP6bUkWsd3fvbVK/Qrg8sYEpq+3836NJyb2BcFVBqmDJaW+MZ2+P</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>dJwzMjQMFfRNnsEBRwHuVTDwa4tyR+1yFOqG514ohI4UKamdebXPlrjm278ztqaN/4ASFsVoQb7O</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>nPvqiMT9REV9ZLiK8z2NK4dDr4KUCr/UihBZqX7qQWnFRyy0VooOFAyP9CjfohLthZ8Y0HWFDMpx</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>0imNkxXlh3CIDNTRXAmgFupIEQyY08sZX/Oqx4NdzpxWLh2S0VJmIupzuxWTnKBRJXWZEVPKqsak</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>zBsNzdtcqrF5dIIY/7d+8LFdEBIZ56wftYkRRvJt9S7mPIY++gohDronAX/ohfwXwu4jCm0OLWzO</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>l4FIAdeN0m65Nng2pWnF6M+qB+b5BT3I5cAh7GF4t3woiWOBF7LnjOYmHe7ZkzPzftxeZ820e+eJ</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>i1pFSQl3/H+aneIsjEQVGxgynGtvGW3pz/0f5rWrRdUG9ZYPJItWXCjJz2k/Eb3fHDA9JVIT9FEM</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>XCsN2FQguDWy7cDxNMKxVRuhomjmVCR50/W9/Wsjg6+tnNNhY5Iukh40jU9uN/WShMpzXNv2QKxR</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>bfUtL0zpojBbZOkAd1LZ++bQREzjPBFQ6G18eQa7DphNarttvCzw9qdgvmwpl3CfvW4PeFChxQ2V</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>SmfUcuFnESjEN30zsEyFtIJNVd1E+4C6vDxk+FRWl+jGbzNkQ1GK+9z6M0HgUxBXMXcHiJbMEJ3s</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>Ri6PqeKjZUAJzORigJmgOO5wURFI+3EVQ0NuPWfaQ/6UZ1n7fdXi8ncmO4jVwY1ptN/4tJL+bAm0</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>eu/c6ug2bfNCTx6TnutxBAg5AvxlDrJIUsx+TsM50J4OZmv7pI4dC0UWU3TpzaYHa/cQ+OY61UT/</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>j1/QPSquxIlWA46SGt/xrUg9iPIWw+2hdRBkhTBE6PrMMHLl5jxWpJ96YH5WDnifNnnhzRDcLfyf</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>9nZYWQaBzm3JangobvnsDPgjF91OfeFJhVPyUwS5u+Sxw+NKPj9wVAaW3gZVS2BOODAud/EvFfQF</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>08t3Ab27GGwWNx9ExN/jlq8EHAM+VRcyfn3hBVjLZdt9fs6zZliYdfyNaA/fgO1iLwY4DOSKgALr</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>Vs5+KDTmyNf5DkAg/W/d1tA/o76/qXUz3gHdm8Q1TqA3ZuR3g1BE6oS4T9Sg62oYIthP99doW8ll</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>FPr0aF+JHwXzG0k6Ao4wGdKmqi+n91pVYI7r2zE1kKtk7GyF0fSmcVnnP42TQfaUbaKB1bMT+a1V</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>NMIydv7QD5F2af3El9np7/1S69sGpoNK7PLow71jdlCewGVrq+iYxZaVhe3xHwerQQ1uGfmRxUSK</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>exonRQPz0yD5fkjRCqq+Hbys1CXe4iKa2uO0pW+yMlvRnMWpV3Bx6uxYR6pECBJ0x8DQHk4cBwa9</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>J/vAlf6dDaVh4PIZy6PF783iAPRusNy0TcCxXTJbIg5YqUb5QAyJ2HEPbIaKeZwSnhytAJKP98JL</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>JC+81f3cN/tJKfWQAJz4RgcrbhUfyf5yWK9rPOwvFf5WKfecfPWc6wpT4IqSrlDe3LQqxpFxJwfG</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>dzNo23TgOFK+H176FNuW7jXD1sUsh9MA3Yycm3BWZ85cK55DOI3T49K2WB0KnFLkhA9wPJNb20qt</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>m1M8QtKwF6jzpMnbBff/vM4oNL0K0QzXovI4gJTDUkHWUlZ3XxMk9PQIqoKZDp9v2JTNW6cs1zcV</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>Jcm2XE2ZhTCFmOQ/DIG1AQIzQfOY6s/VRvHPSkIJH76fo1ex2jj5CmbGw2JFNLPDQIIHEjQJGHFw</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>KpVGso6XF6CdMtcmlswoRrIvN0odvC0md0D1lf09ZuoyNt68aMSxgeBhoQYW4qC6E86Hef3TmzWO</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>esZCvDs2I3UVKgPEkICz2TEHy7dcC1VzU2k/F/cm3+y33lloDem4Dh2igflppvhthcYCLOmFiEW4</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>YtxiVJKpIAKbNHqv9qpxNdcbLCsxkENYKwmmG8E3fLSyE7St/z3dvuTuDI35lxANzv1N04YrvfEr</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>dIPmvepllDz4Ua9TyYQoZezD6UsivW0gfWdbG9dbYnwAZRKEgQjRD1zvGUt/nGCUKdtBDh/Qu7jD</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>c8KMBJx0meoY4jLZBSw3Rccd/KOvzC3UTSsBeTBSkQL7wuSMWZf2cTI3BiWaVTaUXREVmUG0eeSy</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>W+Vym1qM2tPWkUm7V3toeS94LU44OlGDPyoHHUOsT663Zew0ao3+rSqS+KASC4L+6oqP3ffSI2WC</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>517CtYtPA09gFqdWnN02mJ/+gEWrYUZXJsNh31AGQ4e4N2L1Tupy+L+mgkjTyHeiV6dUsvVQ2J36</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>R2VL8EOQcchBMinBo0WKkP6xoTPcCwwMI7T5sHHR+KVUs2DJXTNluNFhYyOic2ImOwhoOHKwfr7I</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>bJERGZYKwwBqGPO0mMnB81MZFumFzoo0SNhvNC9a74X8U6gKtDsQCeIHNXWsWxaO2LmjhlZqXEMC</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>nrLi4UnXweqUgDscbWdq6fE6Ad/ZimmUJlj5iF6aXWj51B2VIgtYXxBFlVPURZDw9z9KPdyidzM1</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>PSitwb6KwWZK8fJ4ZUVOUt1bIki9wAnpyDdAhrPtDVtngS8RJrcCVRrjQ91Vhr95kSTG4b6VtN23</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>m3lhkU/T8RAVAphAait/TICzXeXdnFjALDIubsx1e3FMhV/TJHflVQhnahwTaUuIVqb1ZkmP9aMw</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>0K1G37NbwIRzyHGVWnvJXxKfLeV3n0OJZ3W5dDmTOZSE1s7JdJ4rdEXpiMVsW07TB6JEtIz0c/AV</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>IvDmgF9QH5Ly4Ko171Lg/tVMjBIhCiBU4zQco6brJHx+MoxEsNUXgUCNoMqqjd1a3F5wGsvhlWpn</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>iwNpTje2A/ccVQmoJpDSNByMTB/0GsGJTjZ0dWR0KiltaQaKTlRFlGn/2jgbk+i7ujAGj/Gls6DY</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>WoR/asND5U/rlyzwJS77EefK16ew8w3Nfy2g/vVvpIUQBG67CnjUzxpnutsI7KvZak2Yehg2NIZQ</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>IAuyXMd5zixobwku63RvLT6Fd6D63HnQhEtgtPTcLJT6rQOf2cXAXN3RLOghcpM44flJ0PW679AQ</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>pgVrmELVQr2Dvv2fCb3W5k/JdgvTKrJ2YPIY9Y7q5aSZ28VC1u1k6y/KsppJ+6t+TW8PloS+qKNb</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>2tawgDRraMsNVUTMhABYEPZ+qoYspJPV4rKfVnELc8otpvkR404ulUsELxml0TndtntTjy/f9lmi</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>I7pfDqPsOUfwUtdhuW1XyIhX3RFmavc/VFLHu8gVSmJgdgxjraoe1ldt4F8vgQu22uZu5yBLtxpw</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>WgKVifBtJx/lZ4iAPMNJUZt+Fo+1K3uofYmOg78dsM3BSeghNcNI5ki4NrUJ3yWTzfvrUIr90Ee3</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>VUaGz0/wtOsFI74ef6BaTCYNAt7psf/dwoow4r4FzHgXNqr9MtWvfp22gGCaRLuUWTHgRzIkCflH</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>YyNFYHD+yTaKmSrYay2bBYFGRFe6Vx9b8FR7fmdyqq4HzRwQ2/FVeSQ50OHeT3vWTTg07M31JkZY</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>VlTjnw8Ew9N+o+qI9AFaftksVdXr2YjXMpJMwbHcqK6himQLSkzkUEQXsBI6vQSPobBtPM2oNlCs</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>oEf4AvHYmHxyyzVdSRjQqEoekWURI6htJxRQh0DaDhqOaRQmUp0AkB5StSD8z6o6Wyf0yvzT8OJo</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>NEjaoZbz82eivQUGf3RmYLZIx4xjZ32GA2fUN50RfgyF/KzW1GNLLykJ2NK+saJKGZB7RC2ZlsI6</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>CmkHIZeNwG131Opp+ygasp0GBJUzlKnEzmV9CIBigCv2oPPxewEr7T8/OGDPXWhY2LEgVbgyxLdD</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>MnZlJC28aanAWGoGMcuXgyacFhOWc7I7TTml8jlQv1oDRJU39PQwZZ93HwhhZ2s87wuRYCQdXSH+</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>pdtb9YblyosciNtYJguXl+2iBdGGIqNAp6oxYj/rI5l0pPY7EUkGEnOzQq/U3zCDPL1tdUymaOh8</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>+XGYMMo5L34oxvi79Rh4snSaOO5h0fl0aaZES/v/x5QTtQu4H7qwVfWIsOg8ujFFDFeZmmJpb7pc</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>ff03fNUsHBfS3yf1JvrXhVGDh7byfy8DTFCy07gXUaKJzQJNOjEqX+iu25I+RNxXbfHsRxsWdNEw</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>6aHRUUb+zThVJGkglO5W/S32SJznnjkHdFu1WXBU/DbM7b/quJTUgWnZRLy6CugMu4I/hp5ArKCh</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>vekyQySI/9TjOEPEFW37few/H060cZcz1V3DilvOTBrCoItzdjxZB/cmGxPln3mhkPqGr+NsXRdJ</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>tPMRc91NxvDP1oBnXXEYD418bmxfvqbXZm4Q+bMq07TT5rWABCZ+NFmkgkXryGhfKQWqidxbRenT</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>8teao4iAbwSHWB/Za5+OPYUS4b2u7OULXqkmbQDnTeJX6ou0VFYUpkXStbtLITLJrvAG0BrMq7G9</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>09vbgw6e+krF5JHaFXKAgVf3/SlvRrZi6zgPT7wsY1WLGlMAFNAC58UhizDbVV5Xivj/mVxi29s2</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>tZHKQRshEnuw1KvEp61O4HEnO2dw27v1000YgRz9HtQp9Ra0SsePIjlh8/h5O2VTqJgMlqgAiy9g</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>l7nvX3Ft3a/K7S8GlVMwM8z4DiSzNf0irgnC/+sVu3ZAy13UiviJTv0gZ6iVL78GdPSqhKq6x8IU</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>JGX2sbzthVZUpYPm65WjEBKUKsHWIdeAokKh+sS2TGEAo9COawULVwzYttKSY30UlsBLL/ofpjF/</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>eCWfzunbpZ3MmkXJYVygXCsGgEuxDmWrhcxIF5/pPZDafmaxqHCml/zxew2twDN9lEJV/jqZrwSL</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>I2awqrzxIp/4TfqYj4C8HOQGb4N246snRl3iH2tvzQZrCg1I2mp1s0+xiHESKtfecHfMt8hbb2QZ</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>50c/3MAKQb9WatUDqfZuTnnwXMo5vm0Sh9KqLYQj81LFOzKzf1NDil38GSmFGWPsNm7vm8Q6S6BI</font>";
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>MZafbg2gM+ohtKS/u/36ZADS9/bxf90Fzkn5UEjZUOIRBhYowQNilZzHCABNNXFO/5SUzSJqgLIA</font>";
+
+            <font color='#009900'>// Put the data into the istream sin
+</font>            sin.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font>sout.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            sout.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font>"<font color='#CC0000'></font>"<font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// Decode the base64 text into its compressed binary form
+</font>            base64_coder.<font color='#BB00BB'>decode</font><font face='Lucida Console'>(</font>sin,sout<font face='Lucida Console'>)</font>;
+            sin.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            sin.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font>sout.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+            sout.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font>"<font color='#CC0000'></font>"<font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// Decompress the data into its original form
+</font>            compressor.<font color='#BB00BB'>decompress</font><font face='Lucida Console'>(</font>sin,sout<font face='Lucida Console'>)</font>;
+
+            <font color='#009900'>// Return the decoded and decompressed data
+</font>            <font color='#0000FF'>return</font> sout.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+    <font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <b>}</b>;
+
+    face_tester a;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+
+
+
+</pre></body></html>

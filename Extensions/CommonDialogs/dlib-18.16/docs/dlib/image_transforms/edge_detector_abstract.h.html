@@ -1,0 +1,115 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates. --><head><title>dlib C++ Library - edge_detector_abstract.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2008  Davis E. King (davis@dlib.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#undef</font> DLIB_EDGE_DETECTOr_ABSTRACT_
+<font color='#0000FF'>#ifdef</font> DLIB_EDGE_DETECTOr_ABSTRACT_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../pixel.h.html'>../pixel.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../image_processing/generic_image.h.html'>../image_processing/generic_image.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>char</u></font> <b><a name='edge_orientation'></a>edge_orientation</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> x,
+        <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> y
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        ensures
+            - returns the orientation of the line drawn from the origin to the point (x,y).
+              The orientation is represented pictorially using the four ascii 
+              characters /,|,\, and -.
+            - if (the line is horizontal) then 
+                returns '-' 
+            - if (the line is vertical) then 
+                returns '|' 
+            - if (the line is diagonal with a positive slope) then 
+                returns '/' 
+            - if (the line is diagonal with a negative slope) then 
+                returns '\\' 
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> in_image_type,
+        <font color='#0000FF'>typename</font> out_image_type
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='sobel_edge_detector'></a>sobel_edge_detector</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> in_image_type<font color='#5555FF'>&amp;</font> in_img,
+        out_image_type<font color='#5555FF'>&amp;</font> horz,
+        out_image_type<font color='#5555FF'>&amp;</font> vert
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - in_image_type == an image object that implements the interface defined in
+              dlib/image_processing/generic_image.h 
+            - out_image_type == an image object that implements the interface defined in
+              dlib/image_processing/generic_image.h 
+            - out_image_type must use signed grayscale pixels
+            - is_same_object(in_img,horz) == false
+            - is_same_object(in_img,vert) == false
+            - is_same_object(horz,vert) == false
+        ensures
+            - Applies the sobel edge detector to the given input image and stores the resulting
+              edge detections in the horz and vert images
+            - #horz.nr() == in_img.nr()
+            - #horz.nc() == in_img.nc()
+            - #vert.nr() == in_img.nr()
+            - #vert.nc() == in_img.nc()
+            - for all valid r and c:    
+                - #horz[r][c] == the magnitude of the horizontal gradient at the point in_img[r][c]
+                - #vert[r][c] == the magnitude of the vertical gradient at the point in_img[r][c]
+                - edge_orientation(#vert[r][c], #horz[r][c]) == the edge direction at this point in 
+                  the image
+    !*/</font>
+    
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> in_image_type,
+        <font color='#0000FF'>typename</font> out_image_type
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='suppress_non_maximum_edges'></a>suppress_non_maximum_edges</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> in_image_type<font color='#5555FF'>&amp;</font> horz,
+        <font color='#0000FF'>const</font> in_image_type<font color='#5555FF'>&amp;</font> vert,
+        out_image_type<font color='#5555FF'>&amp;</font> out_img
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - in_image_type == an image object that implements the interface defined in
+              dlib/image_processing/generic_image.h 
+            - out_image_type == an image object that implements the interface defined in
+              dlib/image_processing/generic_image.h 
+            - horz.nr() == vert.nr()
+            - horz.nc() == vert.nc()
+            - is_same_object(out_img, horz) == false
+            - is_same_object(out_img, vert) == false
+            - image_traits&lt;in_image_type&gt;::pixel_type == A signed scalar type (e.g. int, double, etc.) 
+        ensures
+            - #out_img.nr() = horz.nr()
+            - #out_img.nc() = horz.nc()
+            - let edge_strength(r,c) == sqrt(pow(horz[r][c],2) + pow(vert[r][c],2))
+              (i.e. The Euclidean norm of the gradient)
+            - for all valid r and c:
+                - if (edge_strength(r,c) is at a maximum with respect to its 2 neighboring
+                  pixels along the line given by edge_orientation(vert[r][c],horz[r][c])) then
+                    - performs assign_pixel(#out_img[r][c], edge_strength(r,c))
+                - else
+                    - performs assign_pixel(#out_img[r][c], 0)
+    !*/</font>
+    
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_EDGE_DETECTOr_ABSTRACT_
+</font>
+
+
+</pre></body></html>

@@ -5,10 +5,11 @@ Copyright (c) 2008-2015 Florian Rival (Florian.Rival@gmail.com)
 This project is released under the MIT License.
 */
 
-#if defined(GD_IDE_ONLY)
+#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 #include <wx/wx.h> //Must be placed first, otherwise we get nice errors relative to "cannot convert 'const TCHAR*'..." in wx/msw/winundef.h
 #endif
 #include <SFML/Graphics.hpp>
+#include "GDCore/Tools/Localization.h"
 #include "GDCpp/Object.h"
 #include "GDCpp/RuntimeScene.h"
 #include "GDCpp/ImageManager.h"
@@ -210,15 +211,19 @@ void LightObject::LoadEdittimeIcon()
 
 bool LightObject::GenerateThumbnail(const gd::Project & project, wxBitmap & thumbnail) const
 {
+#if !defined(GD_NO_WX_GUI)
     thumbnail = wxBitmap("CppPlatform/Extensions/lightIcon24.png", wxBITMAP_TYPE_ANY);
+#endif
 
     return true;
 }
 
 void LightObject::EditObject( wxWindow* parent, gd::Project & game, gd::MainFrameWrapper & mainFrameWrapper )
 {
+#if !defined(GD_NO_WX_GUI)
     LightObjectEditor dialog(parent, game, *this);
     dialog.ShowModal();
+#endif
 }
 
 void RuntimeLightObject::GetPropertyForDebugger(unsigned int propertyNb, string & name, string & value) const

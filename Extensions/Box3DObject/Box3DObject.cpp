@@ -5,10 +5,11 @@ Copyright (c) 2008-2015 Florian Rival (Florian.Rival@gmail.com)
 This project is released under the MIT License.
 */
 
-#if defined(GD_IDE_ONLY)
+#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 #include <wx/bitmap.h> //Must be placed first, otherwise we get errors relative to "cannot convert 'const TCHAR*'..." in wx/msw/winundef.h
 #include <wx/panel.h>
 #endif
+#include "GDCore/Tools/Localization.h"
 #include "Box3DObject.h"
 #include <SFML/Graphics.hpp>
 #include <SFML/OpenGL.hpp>
@@ -340,15 +341,19 @@ void Box3DObject::ExposeResources(gd::ArbitraryResourceWorker & worker)
 
 bool Box3DObject::GenerateThumbnail(const gd::Project & project, wxBitmap & thumbnail) const
 {
+#if !defined(GD_NO_WX_GUI)
     thumbnail = wxBitmap("CppPlatform/Extensions/Box3Dicon24.png", wxBITMAP_TYPE_ANY);
+#endif
 
     return true;
 }
 
 void Box3DObject::EditObject( wxWindow* parent, gd::Project & game, gd::MainFrameWrapper & mainFrameWrapper )
 {
+#if !defined(GD_NO_WX_GUI)
     Box3DObjectEditor dialog(parent, game, *this, mainFrameWrapper);
     dialog.ShowModal();
+#endif
 }
 
 std::map<std::string, gd::PropertyDescriptor> Box3DObject::GetInitialInstanceProperties(const gd::InitialInstance & position, gd::Project & game, gd::Layout & scene)

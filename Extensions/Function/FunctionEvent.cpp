@@ -22,7 +22,6 @@ This project is released under the MIT License.
 #include "GDCore/IDE/EventsEditorItemsAreas.h"
 #include "GDCore/IDE/EventsEditorSelection.h"
 #include "FunctionEventEditorDlg.h"
-#include <wx/textdlg.h>
 namespace gd { class Project; }
 
 using namespace std;
@@ -88,6 +87,7 @@ void FunctionEvent::UnserializeFrom(gd::Project & project, const gd::SerializerE
  */
 void FunctionEvent::Render(wxDC & dc, int x, int y, unsigned int width, gd::EventsEditorItemsAreas & areas, gd::EventsEditorSelection & selection, const gd::Platform & platform)
 {
+#if !defined(GD_NO_WX_GUI)
     gd::EventsRenderingHelper * renderingHelper = gd::EventsRenderingHelper::Get();
     int border = renderingHelper->instructionsListBorder;
     const int functionTextHeight = 20;
@@ -116,10 +116,12 @@ void FunctionEvent::Render(wxDC & dc, int x, int y, unsigned int width, gd::Even
                                      x+renderingHelper->GetConditionsColumnWidth()+border,
                                      y+functionTextHeight+border,
                                      width-renderingHelper->GetConditionsColumnWidth()-border*2, this, areas, selection, platform);
+#endif
 }
 
 unsigned int FunctionEvent::GetRenderedHeight(unsigned int width, const gd::Platform & platform) const
 {
+#if !defined(GD_NO_WX_GUI)
     if ( eventHeightNeedUpdate )
     {
         gd::EventsRenderingHelper * renderingHelper = gd::EventsRenderingHelper::Get();
@@ -135,12 +137,17 @@ unsigned int FunctionEvent::GetRenderedHeight(unsigned int width, const gd::Plat
     }
 
     return renderedHeight;
+#else
+    return 0;
+#endif
 }
 
 gd::BaseEvent::EditEventReturnType FunctionEvent::EditEvent(wxWindow* parent_, gd::Project & game_, gd::Layout & scene_, gd::MainFrameWrapper & mainFrameWrapper_)
 {
+#if !defined(GD_NO_WX_GUI)
     FunctionEventEditorDlg dialog(parent_, *this, game_, scene_);
     if ( dialog.ShowModal() == 0 ) return Cancelled;
+#endif
 
     return ChangesMade;
 }

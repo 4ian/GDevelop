@@ -105,6 +105,7 @@ void TimedEvent::UnserializeFrom(gd::Project & project, const gd::SerializerElem
  */
 void TimedEvent::Render(wxDC & dc, int x, int y, unsigned int width, gd::EventsEditorItemsAreas & areas, gd::EventsEditorSelection & selection, const gd::Platform & platform)
 {
+#if !defined(GD_NO_WX_GUI)
     gd::EventsRenderingHelper * renderingHelper = gd::EventsRenderingHelper::Get();
     int border = renderingHelper->instructionsListBorder;
     const int functionTextHeight = 20;
@@ -133,10 +134,12 @@ void TimedEvent::Render(wxDC & dc, int x, int y, unsigned int width, gd::EventsE
                                      x+renderingHelper->GetConditionsColumnWidth()+border,
                                      y+functionTextHeight+border,
                                      width-renderingHelper->GetConditionsColumnWidth()-border*2, this, areas, selection, platform);
+#endif
 }
 
 unsigned int TimedEvent::GetRenderedHeight(unsigned int width, const gd::Platform & platform) const
 {
+#if !defined(GD_NO_WX_GUI)
     if ( eventHeightNeedUpdate )
     {
         gd::EventsRenderingHelper * renderingHelper = gd::EventsRenderingHelper::Get();
@@ -152,12 +155,17 @@ unsigned int TimedEvent::GetRenderedHeight(unsigned int width, const gd::Platfor
     }
 
     return renderedHeight;
+#else
+    return 0;
+#endif
 }
 
 gd::BaseEvent::EditEventReturnType TimedEvent::EditEvent(wxWindow* parent, gd::Project & game, gd::Layout & scene, gd::MainFrameWrapper & mainFrameWrapper)
 {
+#if !defined(GD_NO_WX_GUI)
     TimedEventEditorDlg dialog(parent, *this, game, scene);
     if ( dialog.ShowModal() == 0 ) return Cancelled;
+#endif
 
     return ChangesMade;
 }

@@ -5,7 +5,7 @@ Copyright (c) 2008-2015 Florian Rival (Florian.Rival@gmail.com)
 This project is released under the MIT License.
 */
 
-#if defined(GD_IDE_ONLY)
+#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 #ifndef BOX3DOBJECTEDITOR_H
 #define BOX3DOBJECTEDITOR_H
 

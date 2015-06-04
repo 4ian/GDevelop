@@ -46,16 +46,6 @@ void Object::Init(const gd::Object & object)
     	automatisms[it->first] = it->second->Clone();
 }
 
-#if defined(GD_IDE_ONLY)
-sf::Vector2f Object::GetInitialInstanceDefaultSize(gd::InitialInstance & instance, gd::Project & project, gd::Layout & layout) const
-{
-    return sf::Vector2f(32,32);
-}
-
-sf::Vector2f Object::GetInitialInstanceOrigin(gd::InitialInstance & instance, gd::Project & project, gd::Layout & layout) const
-{
-    return sf::Vector2f(0,0);
-}
 
 std::vector < std::string > Object::GetAllAutomatismNames() const
 {
@@ -88,24 +78,6 @@ bool Object::RenameAutomatism(const std::string & name, const std::string & newN
     return true;
 }
 
-gd::Automatism * Object::AddNewAutomatism(gd::Project & project, const std::string & type, const std::string & name)
-{
-    Automatism * automatism = project.GetCurrentPlatform().CreateAutomatism(type);
-
-    if ( automatism != NULL ) {
-        automatism->SetName(name);
-        automatisms[automatism->GetName()] = automatism;
-    }
-
-    return automatism;
-}
-
-std::map<std::string, gd::PropertyDescriptor> Object::GetInitialInstanceProperties(const gd::InitialInstance & instance, gd::Project & project, gd::Layout & layout)
-{
-    std::map<std::string, gd::PropertyDescriptor> nothing;
-    return nothing;
-}
-
 gd::Automatism & Object::GetAutomatism(const std::string & name)
 {
     return *automatisms.find(name)->second;
@@ -119,6 +91,45 @@ const gd::Automatism & Object::GetAutomatism(const std::string & name) const
 bool Object::HasAutomatismNamed(const std::string & name) const
 {
     return automatisms.find(name) != automatisms.end();
+}
+
+bool Object::AddAutomatism(Automatism * automatism)
+{
+    if (automatism && !HasAutomatismNamed(automatism->GetName())) {
+        automatisms[automatism->GetName()] = automatism;
+        return true;
+    }
+
+    return false;
+}
+
+#if defined(GD_IDE_ONLY)
+gd::Automatism * Object::AddNewAutomatism(gd::Project & project, const std::string & type, const std::string & name)
+{
+    Automatism * automatism = project.GetCurrentPlatform().CreateAutomatism(type);
+
+    if ( automatism != NULL ) {
+        automatism->SetName(name);
+        automatisms[automatism->GetName()] = automatism;
+    }
+
+    return automatism;
+}
+
+sf::Vector2f Object::GetInitialInstanceDefaultSize(gd::InitialInstance & instance, gd::Project & project, gd::Layout & layout) const
+{
+    return sf::Vector2f(32,32);
+}
+
+sf::Vector2f Object::GetInitialInstanceOrigin(gd::InitialInstance & instance, gd::Project & project, gd::Layout & layout) const
+{
+    return sf::Vector2f(0,0);
+}
+
+std::map<std::string, gd::PropertyDescriptor> Object::GetInitialInstanceProperties(const gd::InitialInstance & instance, gd::Project & project, gd::Layout & layout)
+{
+    std::map<std::string, gd::PropertyDescriptor> nothing;
+    return nothing;
 }
 
 void Object::DrawInitialInstance(gd::InitialInstance & instance, sf::RenderTarget & renderTarget, gd::Project & project, gd::Layout & layout)

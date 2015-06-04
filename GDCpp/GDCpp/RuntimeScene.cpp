@@ -160,6 +160,7 @@ int RuntimeScene::RenderAndStep()
     }
     #endif
 
+    if (GetCodeExecutionEngine()->Ready())
     {
         #if !defined(RELEASE)
         BT_PROFILE("Events");

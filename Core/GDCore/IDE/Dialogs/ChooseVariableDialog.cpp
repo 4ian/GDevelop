@@ -23,6 +23,7 @@
 #include "GDCore/IDE/EventsVariablesFinder.h"
 #include "GDCore/PlatformDefinition/Object.h"
 #include "GDCore/PlatformDefinition/Project.h"
+#include "GDCore/PlatformDefinition/Layout.h"
 #include "GDCore/PlatformDefinition/VariablesContainer.h"
 #include "GDCore/PlatformDefinition/Variable.h"
 #include "GDCore/Tools/HelpFileAccess.h"
@@ -156,16 +157,11 @@ ChooseVariableDialog::ChooseVariableDialog(wxWindow* parent, gd::VariablesContai
     toolbar->EnableTool(idFindUndeclared, false);
     toolbar->Realize();
 
-    if ( editingOnly )
-    {
-        SetTitle(_("Variables edition"));
-        okBt->SetLabel(_("Ok"));
-    }
-
     //Offer nice background color to toolbar area.
     AuiManager1->GetArtProvider()->SetColour(wxAUI_DOCKART_BACKGROUND_COLOUR, wxSystemSettings::GetColour(wxSYS_COLOUR_MENU));
     gd::SkinHelper::ApplyCurrentSkin(*toolbar);
 
+    UpdateTitle();
     RefreshAll();
 
     //Give a convenient size
@@ -182,6 +178,22 @@ ChooseVariableDialog::ChooseVariableDialog(wxWindow* parent, gd::VariablesContai
     bestHeight = (bestHeight > 500) ? 500 : bestHeight;
 
     SetSize(GetSize().GetWidth(), bestHeight);
+}
+
+void ChooseVariableDialog::UpdateTitle()
+{
+    if ( editingOnly )
+    {
+        std::string context = "";
+        if ( associatedProject != NULL && associatedLayout == NULL ) context = _("Global variables");
+        else if ( associatedProject != NULL && associatedLayout != NULL && associatedObject == NULL  ) context = associatedLayout->GetName() + " " + _("scene variables");
+        else if ( associatedProject != NULL && associatedLayout != NULL && associatedObject != NULL ) context = associatedObject->GetName();
+        else context = "Instance variables";
+
+        SetTitle(wxString::Format(wxString(_("Edit the variables (%s)")),
+            context.c_str()));
+        okBt->SetLabel(_("Ok"));
+    }
 }
 
 ChooseVariableDialog::~ChooseVariableDialog()
@@ -591,6 +603,7 @@ void ChooseVariableDialog::SetAssociatedProject(const gd::Project * project)
     associatedLayout = NULL;
     associatedObject = NULL;
     toolbar->EnableTool(idFindUndeclared, true);
+    UpdateTitle();
 }
 
 void ChooseVariableDialog::SetAssociatedLayout(const gd::Project * project, const gd::Layout * layout)
@@ -599,6 +612,7 @@ void ChooseVariableDialog::SetAssociatedLayout(const gd::Project * project, cons
     associatedLayout = layout;
     associatedObject = NULL;
     toolbar->EnableTool(idFindUndeclared, true);
+    UpdateTitle();
 }
 
 void ChooseVariableDialog::SetAssociatedObject(const gd::Project * project, const gd::Layout * layout, const gd::Object * object)
@@ -607,6 +621,7 @@ void ChooseVariableDialog::SetAssociatedObject(const gd::Project * project, cons
     associatedLayout = layout;
     associatedObject = object;
     toolbar->EnableTool(idFindUndeclared, true);
+    UpdateTitle();
 }
 
 void ChooseVariableDialog::OnResize(wxSizeEvent& event)
@@ -628,6 +643,9 @@ wxTreeListItem ChooseVariableDialog::GetPreviousSibling(wxTreeListCtrl * ctrl, w
         previous = current;
         current = variablesList->GetNextSibling(current);
     }
+
+    wxTreeListItem invalid;
+    return invalid;
 }
 
 }

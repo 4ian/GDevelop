@@ -149,6 +149,7 @@ private:
     void OnMoveDownVarSelected(wxCommandEvent& event);
     void OnFindUndeclaredSelected(wxCommandEvent& event);
     void RefreshAll();
+    void UpdateTitle();
     void UpdateSelectedAndParentVariable();
     void RefreshVariable(wxTreeListItem item, const std::string & name, const gd::Variable & variable);
     wxTreeListItem GetPreviousSibling(wxTreeListCtrl * ctrl, wxTreeListItem item);

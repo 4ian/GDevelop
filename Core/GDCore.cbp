@@ -487,15 +487,6 @@
 			<code_completion />
 			<envvars />
 			<debugger />
-			<DoxyBlocks>
-				<comment_style block="0" line="0" />
-				<doxyfile_project output_directory="doc" />
-				<doxyfile_build />
-				<doxyfile_warnings />
-				<doxyfile_output />
-				<doxyfile_dot have_dot="1" />
-				<general />
-			</DoxyBlocks>
 			<wxsmith version="1">
 				<resources>
 					<wxDialog wxs="wxsmith/ChooseVariableDialog.wxs" src="GDCore\IDE\Dialogs\ChooseVariableDialog.cpp" hdr="GDCore\IDE\Dialogs\ChooseVariableDialog.h" fwddecl="0" i18n="1" name="ChooseVariableDialog" language="CPP" />
@@ -523,12 +514,6 @@
 					<wxPanel wxs="wxsmith/ResourcesEditor.wxs" src="GDCore\IDE\Dialogs\ResourcesEditor.cpp" hdr="GDCore\IDE\Dialogs\ResourcesEditor.h" fwddecl="0" i18n="1" name="ResourcesEditor" language="CPP" />
 				</resources>
 			</wxsmith>
-			<AutoVersioning>
-				<Scheme minor_max="10" build_max="0" rev_max="0" rev_rand_max="10" build_times_to_increment_minor="100" />
-				<Settings autoincrement="0" date_declarations="1" update_manifest="0" do_auto_increment="1" ask_to_increment="0" language="C++" svn="0" svn_directory="" header_path="GDCore\Tools\Version.h" />
-				<Changes_Log show_changes_editor="0" app_title="released version %M.%m.%b of %p" changeslog_path="ChangesLog.txt" />
-				<Code header_guard="VERSION_H" namespace="AutoVersion" prefix="GDCore" />
-			</AutoVersioning>
 		</Extensions>
 	</Project>
 </CodeBlocks_project_file>

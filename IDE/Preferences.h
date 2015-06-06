@@ -2,23 +2,23 @@
 #define PREFERENCES_H
 
 //(*Headers(Preferences)
-#include <wx/fontdlg.h>
-#include <wx/notebook.h>
-#include <wx/sizer.h>
-#include <wx/stattext.h>
-#include <wx/radiobox.h>
-#include <wx/textctrl.h>
-#include <wx/checkbox.h>
 #include <wx/spinctrl.h>
-#include <wx/propgrid/propgrid.h>
-#include <wx/statline.h>
+#include <wx/checkbox.h>
+#include <wx/dialog.h>
+#include <wx/sizer.h>
+#include <wx/notebook.h>
+#include <wx/button.h>
 #include <wx/radiobut.h>
 #include <wx/panel.h>
-#include <wx/choice.h>
-#include <wx/statbmp.h>
-#include <wx/button.h>
-#include <wx/dialog.h>
 #include <wx/listbook.h>
+#include <wx/statline.h>
+#include <wx/stattext.h>
+#include <wx/textctrl.h>
+#include <wx/choice.h>
+#include <wx/propgrid/propgrid.h>
+#include <wx/radiobox.h>
+#include <wx/statbmp.h>
+#include <wx/fontdlg.h>
 //*)
 
 class Preferences: public wxDialog
@@ -29,100 +29,100 @@ class Preferences: public wxDialog
 		virtual ~Preferences();
 
 		//(*Declarations(Preferences)
-		wxStaticText* StaticText10;
-		wxRadioButton* externalCodeEditorCheck;
-		wxButton* eventsEditorFontBt;
-		wxPanel* InactifColorPnl;
-		wxStaticText* StaticText22;
-		wxButton* OkBt;
-		wxStaticText* StaticText9;
-		wxStaticText* StaticText20;
-		wxPanel* backColorPnl;
-		wxPanel* Panel5;
-		wxCheckBox* hideLabelsCheck;
-		wxCheckBox* avertOnSaveCheck;
-		wxCheckBox* MAJCheck;
-		wxRadioBox* ribbonStyleBox;
 		wxButton* gdStyleBt;
-		wxButton* BrowseDossierTempBt;
-		wxTextCtrl* newProjectFolderEdit;
-		wxTextCtrl* codeEditorEdit;
-		wxButton* oxygenStyleBt;
-		wxStaticText* StaticText13;
-		wxPanel* ActifColor2Pnl;
-		wxStaticText* StaticText2;
-		wxPanel* Panel4;
-		wxChoice* sceneEventsTabPosition;
-		wxStaticText* StaticText14;
-		wxCheckBox* logCheck;
-		wxCheckBox* deleteTemporariesCheck;
-		wxButton* Button1;
-		wxStaticText* StaticText6;
-		wxPanel* activeTabColorPnl;
-		wxPanel* borderColorPnl;
-		wxSpinCtrl* codeCompilerThreadEdit;
-		wxStaticText* StaticText19;
-		wxStaticText* StaticText8;
-		wxPanel* toolbarColorPanel;
-		wxStaticText* StaticText11;
-		wxStaticText* StaticText18;
-		wxTextCtrl* autosaveTimeEdit;
-		wxPanel* Panel8;
-		wxPanel* tabColorPnl;
-		wxTextCtrl* eventsCompilerTempDirEdit;
-		wxFontDialog* eventsEditorFontDialog;
+		wxStaticText* StaticText24;
+		wxButton* newProjectFolderBrowseBt;
+		wxStaticText* StaticText22;
+		wxButton* AideBt;
+		wxPanel* ActifColorPnl;
+		wxPanel* Panel6;
 		wxPanel* Panel1;
-		wxTextCtrl* conditionsColumnWidthEdit;
+		wxButton* browseCompilationTempDir;
+		wxStaticText* StaticText21;
+		wxStaticText* StaticText13;
+		wxStaticText* StaticText14;
+		wxPanel* Panel7;
+		wxRadioButton* internalCodeEditorCheck;
+		wxStaticText* StaticText15;
+		wxChoice* sceneEventsTabPosition;
+		wxStaticLine* StaticLine2;
+		wxCheckBox* hideLabelsCheck;
+		wxChoice* langChoice;
+		wxStaticText* StaticText17;
+		wxButton* oxygenStyleBt;
+		wxButton* BrowseDossierTempBt;
+		wxFontDialog* eventsEditorFontDialog;
+		wxPanel* ActifColor2Pnl;
+		wxPanel* inactiveTextColorPnl;
+		wxRadioBox* tabBox;
+		wxCheckBox* autosaveActivatedCheck;
+		wxButton* Button1;
+		wxButton* Button2;
+		wxTextCtrl* autosaveTimeEdit;
 		wxPanel* activeTextColorPnl;
+		wxPanel* activeTabColorPnl;
+		wxPanel* Panel8;
+		wxStaticText* StaticText20;
+		wxStaticText* StaticText18;
+		wxCheckBox* hideContextPanelsLabels;
 		wxStaticText* StaticText1;
+		wxStaticText* StaticText10;
+		wxTextCtrl* newProjectFolderEdit;
+		wxStaticText* StaticText16;
+		wxPanel* ribbonColor2Pnl;
+		wxPanel* Panel2;
+		wxCheckBox* deleteTemporariesCheck;
+		wxTextCtrl* DossierTempCompEdit;
+		wxCheckBox* MAJCheck;
+		wxSpinCtrl* codeCompilerThreadEdit;
 		wxStaticText* StaticText3;
 		wxTextCtrl* EditeurImageEdit;
-		wxPanel* inactiveTextColorPnl;
-		wxButton* browseJavaBt;
-		wxButton* newProjectFolderBrowseBt;
-		wxButton* Button2;
-		wxPanel* InactifColor2Pnl;
-		wxCheckBox* hidePageTabsCheck;
-		wxPanel* Panel6;
-		wxPanel* Panel3;
-		wxStaticText* StaticText21;
-		wxStaticLine* StaticLine2;
+		wxPanel* Panel4;
 		wxStaticText* StaticText23;
-		wxStaticText* StaticText24;
 		wxCheckBox* customToolbarColorCheck;
-		wxRadioBox* tabBox;
-		wxPanel* ActifColorPnl;
-		wxCheckBox* sendInfoCheck;
-		wxCheckBox* hideContextPanelsLabels;
+		wxStaticLine* StaticLine1;
+		wxPanel* Panel5;
+		wxStaticText* StaticText8;
+		wxStaticText* StaticText12;
+		wxButton* officeStyleBt;
+		wxTextCtrl* conditionsColumnWidthEdit;
+		wxButton* AnnulerBt;
+		wxPanel* Panel3;
+		wxStaticText* StaticText7;
+		wxTextCtrl* codeEditorEdit;
+		wxPanel* borderColorPnl;
+		wxPanel* InactifColorPnl;
+		wxRadioBox* ribbonStyleBox;
+		wxTextCtrl* eventsCompilerTempDirEdit;
+		wxCheckBox* logCheck;
+		wxTextCtrl* javaDirEdit;
+		wxStaticText* StaticText4;
+		wxPanel* toolbarColorPanel;
+		wxStaticText* StaticText5;
+		wxButton* eventsEditorFontBt;
+		wxStaticText* StaticText2;
+		wxStaticBitmap* StaticBitmap3;
+		wxCheckBox* avertOnSaveCheck;
+		wxButton* OkBt;
+		wxPanel* fileBtColorPnl;
+		wxStaticText* StaticText6;
+		wxCheckBox* hidePageTabsCheck;
+		wxPanel* backColorPnl;
+		wxButton* browseJavaBt;
+		wxPanel* ribbonColor1Pnl;
+		wxButton* radianceStyleBt;
+		wxStaticText* StaticText19;
+		wxButton* BrowseEditionImage;
+		wxRadioButton* externalCodeEditorCheck;
+		wxPanel* tabColorPnl;
+		wxStaticText* StaticText9;
+		wxRadioBox* toolbarBox;
+		wxPanel* InactifColor2Pnl;
+		wxButton* browseCodeEditorBt;
 		wxPropertyGrid* eventsEditorParametersProperties;
 		wxListbook* Listbook1;
-		wxStaticText* StaticText5;
-		wxStaticText* StaticText7;
-		wxPanel* Panel7;
-		wxPanel* fileBtColorPnl;
-		wxCheckBox* autosaveActivatedCheck;
-		wxStaticLine* StaticLine1;
-		wxButton* BrowseEditionImage;
-		wxTextCtrl* javaDirEdit;
-		wxStaticText* StaticText15;
-		wxStaticText* StaticText12;
-		wxButton* AnnulerBt;
-		wxPanel* Panel2;
-		wxChoice* langChoice;
-		wxButton* radianceStyleBt;
-		wxTextCtrl* DossierTempCompEdit;
-		wxPanel* ribbonColor1Pnl;
-		wxPanel* ribbonColor2Pnl;
-		wxStaticText* StaticText17;
-		wxStaticText* StaticText4;
-		wxButton* browseCodeEditorBt;
-		wxRadioBox* toolbarBox;
-		wxButton* browseCompilationTempDir;
-		wxButton* officeStyleBt;
-		wxStaticText* StaticText16;
-		wxStaticBitmap* StaticBitmap3;
-		wxRadioButton* internalCodeEditorCheck;
-		wxButton* AideBt;
+		wxStaticText* StaticText11;
+		wxCheckBox* sendInfoCheck;
 		//*)
 
 	protected:

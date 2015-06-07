@@ -24,7 +24,7 @@ Binaries/Packaging/opensuse-build-service/gdevelop/
 Binaries/Packaging/opensuse-build-service/final/
 Binaries/Packaging/GDevelop.app
 Binaries/Packaging/logs
-/WebIDE
+/libGD.js
 *.depend
 *.layout
 *.xgdwe
@@ -54,10 +54,9 @@ Binaries/Packaging/logs
 /Binaries/**/JsPlatform/*.dll
 /Binaries/**/JsPlatform/*.dll.a
 *.autosave
-/Binaries/Output/WebIDE/Release
-/Binaries/Output/WebIDE/Debug
-/Binaries/Output/WebIDE/libGD.raw.js
-/WebIDE
+/Binaries/Output/libGD.js/Release
+/Binaries/Output/libGD.js/Debug
+/Binaries/Output/libGD.js/libGD.raw.js
 !/GDCpp/scripts/bcp.exe
 !/scripts/libgettextlib-0-17.dll
 !/scripts/libgettextsrc-0-17.dll

@@ -14,6 +14,13 @@
 #include <vector>
 #include "Utf8/utf8.h"
 #include <SFML/System/String.hpp>
+
+#ifdef __GNUC__
+    #define GD_DEPRECATED    __attribute__((deprecated))
+#else
+    #define GD_DEPRECATED
+#endif
+
 class wxString;
 
 namespace gd
@@ -81,10 +88,11 @@ float ToFloat( const T & value )
 
 /**
  * Specialization for converting wxString to a std::string
+ * \deprecated Use ToLocaleString to convert a wxString to a locale std::string or gd::utf8::FromWxString to convert to an UTF8 std::string instead. If used, this function will produce a warning at runtime as it might cause problems with UTF8 strings.
  * \ingroup CommonProgrammingTools
  */
 template<>
-std::string GD_CORE_API ToString( const wxString & value );
+std::string GD_CORE_API ToString( const wxString & value ) GD_DEPRECATED;
 
 /**
  * Split a string into tokens stored in a vector, using the specified separator.

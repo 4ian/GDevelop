@@ -1270,7 +1270,7 @@ void SpriteObjectEditor::OnAddPointClick(wxCommandEvent& event)
     if ( sprites.empty() ) return;
 
     //Find a new name for the point
-    Point point(GD_T("NewPoint")));
+    Point point(GD_T("NewPoint"));
     unsigned int i = 2;
     while ( sprites[0]->HasPoint(gd::utf8::FromWxString(point.GetName())) )
     {

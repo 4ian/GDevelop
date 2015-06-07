@@ -201,16 +201,16 @@ gdjs.SpriteRuntimeObject.thisIsARuntimeObjectConstructor = "Sprite"; //Notify gd
  * Initialize the extra parameters that could be set for an instance.
  */
 gdjs.SpriteRuntimeObject.prototype.extraInitializationFromInitialInstance = function(initialInstanceData) {
-    if ( initialInstanceData.customSize ) {
-        this.setWidth(initialInstanceData.width);
-        this.setHeight(initialInstanceData.height);
-    }
     if ( initialInstanceData.numberProperties ) {
         var that = this;
         gdjs.iterateOverArray(initialInstanceData.numberProperties, function(extraData) {
             if ( extraData.name === "animation" )
                 that.setAnimation(extraData.value);
         });
+    }
+    if ( initialInstanceData.customSize ) {
+        this.setWidth(initialInstanceData.width);
+        this.setHeight(initialInstanceData.height);
     }
 };
 
@@ -704,12 +704,14 @@ gdjs.SpriteRuntimeObject.prototype.getHeight = function() {
 };
 
 gdjs.SpriteRuntimeObject.prototype.setWidth = function(newWidth) {
+    if ( this._textureDirty ) this._updatePIXITexture();
     if ( this._spriteDirty ) this._updatePIXISprite();
     var newScaleX = newWidth/this._sprite.texture.frame.width;
     this.setScaleX(newScaleX);
 };
 
 gdjs.SpriteRuntimeObject.prototype.setHeight = function(newHeight) {
+    if ( this._textureDirty ) this._updatePIXITexture();
     if ( this._spriteDirty ) this._updatePIXISprite();
     var newScaleY = newHeight/this._sprite.texture.frame.height;
     this.setScaleY(newScaleY);

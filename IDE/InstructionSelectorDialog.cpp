@@ -208,7 +208,7 @@ InstructionSelectorDialog::InstructionSelectorDialog(wxWindow* parent, gd::Proje
     if (editingAction) invertBox->Show(false);
     RefreshList();
     Center();
-    SetSize(800, 600);
+    SetSize(-1, 600);
 }
 
 InstructionSelectorDialog::~InstructionSelectorDialog()

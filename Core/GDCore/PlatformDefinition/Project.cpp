@@ -109,8 +109,8 @@ std::shared_ptr<gd::Object> Project::CreateObject(const std::string & type, cons
     {
         if ( !platformName.empty() && platforms[i]->GetName() != platformName ) continue;
 
-        std::shared_ptr<gd::Object> object = platforms[i]->CreateObject(type, name);
-        if ( object ) return object;
+        std::shared_ptr<gd::Object> object = platforms[i]->CreateObject(type, name); //Create a base object if the type can't be found in the platform
+        if ( object && object->GetType() == type ) return object; //If the object is valid and has the good type (not a base object), return it
     }
 
     return std::shared_ptr<gd::Object>();

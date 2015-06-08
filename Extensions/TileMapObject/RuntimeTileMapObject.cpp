@@ -160,6 +160,16 @@ float RuntimeTileMapObject::GetMapHeight() const
     return static_cast<float>(tileMap.Get().GetRowsCount());
 }
 
+void RuntimeTileMapObject::SetMapSize(int width, int height)
+{
+    if(width < 0 || height < 0 || (GetMapWidth() == width && GetMapHeight() == height)) //Avoid changing the size if the same 
+        return;
+
+    tileMap.Get().SetSize(width, height);
+    vertexArray = TileMapExtension::GenerateVertexArray(tileSet.Get(), tileMap.Get());
+    hitboxes = TileMapExtension::GenerateHitboxes(tileSet.Get(), tileMap.Get());
+}
+
 float RuntimeTileMapObject::GetTile(int layer, int column, int row)
 {
     if(layer < 0 || layer > 2 || column < 0 || column >= tileMap.Get().GetColumnsCount() || row < 0 || row >= tileMap.Get().GetRowsCount())

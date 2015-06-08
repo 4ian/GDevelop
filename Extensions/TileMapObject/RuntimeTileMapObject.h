@@ -65,6 +65,8 @@ public :
     float GetMapWidth() const;
     float GetMapHeight() const;
 
+    void SetMapSize(int width, int height);
+
     float GetTile(int layer, int column, int row);
     void SetTile(int layer, int column, int row, int tileId);
 

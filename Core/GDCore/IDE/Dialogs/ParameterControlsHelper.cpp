@@ -48,6 +48,7 @@ void ParameterControlsHelper::UpdateControls(unsigned int count)
         paramSpacers2.push_back(new wxPanel(window));
         paramEdits.push_back(new wxTextCtrl( window, ID_EDITARRAY, "", wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T( "EditPara" + num )));
         paramBmpBts.push_back(new wxBitmapButton( window, id, gd::CommonBitmapManager::Get()->expressionBt, wxDefaultPosition, wxSize(32,-1), wxBU_AUTODRAW, wxDefaultValidator, num));
+        paramBmpBts.back()->SetMinSize(wxSize(32, 32));
 
         //Connecting events
         window->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &ParameterControlsHelper::OnParameterBtClick, this, id);
@@ -59,7 +60,7 @@ void ParameterControlsHelper::UpdateControls(unsigned int count)
         sizer->Add( paramSpacers1.back(), 0, 0 );
         sizer->Add( paramSpacers2.back(), 0, 0 );
         sizer->Add( paramEdits.back(), 1, wxALL | wxALIGN_LEFT | wxEXPAND | wxALIGN_CENTER_VERTICAL, 5 );
-        sizer->Add( paramBmpBts.back(), 0, wxALL | wxALIGN_LEFT | wxEXPAND | wxALIGN_CENTER_VERTICAL, 5 );
+        sizer->Add( paramBmpBts.back(), 0, wxALL | wxALIGN_LEFT | wxFIXED_MINSIZE | wxALIGN_CENTER_VERTICAL, 5 );
 
         paramSpacers1.back()->Show(false);
         paramSpacers2.back()->Show(false);

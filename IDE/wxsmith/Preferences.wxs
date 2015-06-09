@@ -115,7 +115,6 @@
 														<object class="sizeritem">
 															<object class="wxTextCtrl" name="ID_TEXTCTRL1" variable="autosaveTimeEdit" member="yes">
 																<value>3</value>
-																<size>44,21</size>
 															</object>
 															<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 															<border>5</border>
@@ -195,6 +194,10 @@
 								</object>
 								<object class="sizeritem">
 									<object class="wxChoice" name="ID_CHOICE2" variable="langChoice" member="yes">
+										<content>
+											<item>English</item>
+										</content>
+										<selection>0</selection>
 										<handler function="OnlangChoiceSelect" entry="EVT_CHOICE" />
 									</object>
 									<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
@@ -1017,9 +1020,7 @@
 											<option>1</option>
 										</object>
 										<object class="sizeritem">
-											<object class="wxTextCtrl" name="ID_TEXTCTRL5" variable="conditionsColumnWidthEdit" member="yes">
-												<size>65,21</size>
-											</object>
+											<object class="wxTextCtrl" name="ID_TEXTCTRL5" variable="conditionsColumnWidthEdit" member="yes" />
 											<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 											<border>5</border>
 											<option>1</option>
@@ -1232,7 +1233,6 @@
 			</object>
 		</object>
 		<object class="wxFontDialog" variable="eventsEditorFontDialog" member="yes">
-			<allow_symbols>0</allow_symbols>
 			<enable_effects>0</enable_effects>
 		</object>
 	</object>

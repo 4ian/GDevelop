@@ -24,7 +24,7 @@ Binaries/Packaging/opensuse-build-service/gdevelop/
 Binaries/Packaging/opensuse-build-service/final/
 Binaries/Packaging/GDevelop.app
 Binaries/Packaging/logs
-/libGD.js
+/GDevelop.js
 *.depend
 *.layout
 *.xgdwe

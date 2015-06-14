@@ -51,6 +51,11 @@ Links
 * [GDevelop Roadmap on Trello.com](https://trello.com/b/qf0lM7k8/gdevelop-roadmap), for a global view of the features that could be added.
 * [GitHub issue page](https://github.com/4ian/GD/issues), for technical issues and bugs.
 
+### Related projects
+
+* [GDevelop.js](https://github.com/4ian/GDevelop.js) is a binding to use GDevelop engine in Javascript. 
+* [GDevApp.com](https://gdevapp.com) is a radically innovative online game creator, compatible with GDevelop. It is based on GDevelop.js and can be used on any browser, including iOS and Android.
+
 License
 -------
 

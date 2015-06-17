@@ -179,6 +179,11 @@ sudo apt-get install libsndfile1-dev
 sudo apt-get install libglu1-mesa-dev
 sudo apt-get install libfreetype6-dev
 \endcode
+ * Make sure you also have some basic tools installed:
+\code
+sudo apt-get install build-essential
+sudo apt-get install curl
+\endcode
  *
  * If you want to package the app, you can also install:
 \code

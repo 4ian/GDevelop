@@ -182,6 +182,7 @@ sudo apt-get install libfreetype6-dev
  * Make sure you also have some basic tools installed:
 \code
 sudo apt-get install build-essential
+sudo apt-get install p7zip-full
 sudo apt-get install curl
 \endcode
  *

@@ -11,6 +11,7 @@ This project is released under the MIT License.
 #include <SFML/Graphics/Text.hpp>
 #include "GDCpp/Object.h"
 #include "GDCpp/RuntimeObject.h"
+#include "GDCpp/Utf8String.h"
 class ImageManager;
 class RuntimeScene;
 namespace gd { class Object; }
@@ -46,11 +47,11 @@ public :
 
     /** \brief Change the text.
      */
-    inline void SetString(const std::string & str) { text = str; };
+    inline void SetString(const std::string & str) { text = gd::utf8::String::FromUTF8(str); };
 
     /** \brief Get the text.
      */
-    inline std::string GetString() const { return text; };
+    inline std::string GetString() const { return text.Raw(); };
 
     /** \brief Change the character size.
      */
@@ -90,7 +91,7 @@ private:
     virtual void DoSerializeTo(gd::SerializerElement & element) const;
     #endif
 
-    std::string text;
+    gd::utf8::String text;
     float characterSize;
     std::string fontName;
     bool smoothed;

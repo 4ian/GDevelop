@@ -71,7 +71,7 @@ void TextObject::DoUnserializeFrom(gd::Project & project, const gd::SerializerEl
 void TextObject::DrawInitialInstance(gd::InitialInstance & instance, sf::RenderTarget & renderTarget, gd::Project & project, gd::Layout & layout)
 {
     sf::Text sfText;
-    sfText.setString(gd::utf8::ToSfString(text));
+    sfText.setString(text);
     sfText.setCharacterSize(characterSize);
     sfText.setStyle((bold ? sf::Text::Bold : 0) |
                  (IsItalic() ? sf::Text::Italic : 0) |
@@ -89,7 +89,7 @@ void TextObject::DrawInitialInstance(gd::InitialInstance & instance, sf::RenderT
 sf::Vector2f TextObject::GetInitialInstanceDefaultSize(gd::InitialInstance & instance, gd::Project & project, gd::Layout & layout) const
 {
     sf::Text sfText;
-    sfText.setString(gd::utf8::ToSfString(text));
+    sfText.setString(text);
     sfText.setCharacterSize(characterSize);
     sfText.setStyle((bold ? sf::Text::Bold : 0) |
                  (IsItalic() ? sf::Text::Italic : 0) |

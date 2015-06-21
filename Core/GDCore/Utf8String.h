@@ -35,8 +35,6 @@ class String;
  */
 class GD_CORE_API String
 {
-    template<class ValueType>
-    friend class StringIterator;
 
 public:
 

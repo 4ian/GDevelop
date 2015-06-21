@@ -29,29 +29,29 @@ String::String(const sf::String &string) : m_string()
     m_string = gd::utf8::FromSfString(string);
 }
 
-std::size_t String::GetLength() const
+std::size_t String::size() const
 {
     return StrLength(m_string);
 }
 
-String::Iterator String::Begin()
+String::Iterator String::begin()
 {
-    return String::Iterator(*this, m_string.begin());
+    return String::Iterator(m_string.begin());
 }
 
-String::ConstIterator String::Begin() const
+String::ConstIterator String::begin() const
 {
-    return String::ConstIterator(*this, m_string.cbegin());
+    return String::ConstIterator(m_string.cbegin());
 }
 
-String::Iterator String::End()
+String::Iterator String::end()
 {
-    return String::Iterator(*this, m_string.end());
+    return String::Iterator(m_string.end());
 }
 
-String::ConstIterator String::End() const
+String::ConstIterator String::end() const
 {
-    return String::ConstIterator(*this, m_string.end());
+    return String::ConstIterator(m_string.end());
 }
 
 String String::FromLocale( const std::string &localizedString )
@@ -104,19 +104,19 @@ std::string String::ToUTF8() const
     return m_string;
 }
 
-String String::SubString( std::size_t start, std::size_t length ) const
+String String::substr( std::size_t start, std::size_t length ) const
 {
     String str;
     str.m_string = SubStr(m_string, start, length);
     return str;
 }
 
-std::size_t String::Find( const String &search, std::size_t pos ) const
+std::size_t String::find( const String &search, std::size_t pos ) const
 {
     return gd::utf8::Find(m_string, search.m_string, pos);
 }
 
-std::size_t String::RFind( const String &search, std::size_t pos ) const
+std::size_t String::rfind( const String &search, std::size_t pos ) const
 {
     return gd::utf8::RFind(m_string, search.m_string, pos);
 }
@@ -141,7 +141,7 @@ String& String::operator+=(const String &other)
 
 char32_t String::operator[](const std::size_t position) const
 {
-    ConstIterator it = Begin();
+    ConstIterator it = begin();
     std::advance(it, position);
     return *it;
 }

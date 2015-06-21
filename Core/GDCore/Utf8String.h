@@ -40,36 +40,34 @@ class GD_CORE_API String
 
 public:
 
-    template<class ValueType, class StringType, class InternalIterator>
+    template<class ValueType, class InternalIterator>
     class GD_CORE_API StringIterator : public std::iterator<std::bidirectional_iterator_tag, ValueType, std::size_t>
     {
         friend class String;
 
     public:
-        StringIterator() : str(nullptr), strIt() {};
-        StringIterator(const StringIterator<ValueType, StringType, InternalIterator> &other) : str(other.str), strIt(other.strIt) {};
-        StringIterator<ValueType, StringType, InternalIterator>& operator=(const StringIterator<ValueType, StringType, InternalIterator> &other) { str = other.str; strIt = other.strIt; };
+        StringIterator() : strIt() {};
+        StringIterator(const StringIterator<ValueType, InternalIterator> &other) : strIt(other.strIt) {}
+        StringIterator<ValueType, InternalIterator>& operator=(const StringIterator<ValueType, InternalIterator> &other) { strIt = other.strIt; }
 
-        ValueType operator*() {return ::utf8::peek_next(strIt, str->m_string.cend());};
+        ValueType operator*() {return ::utf8::unchecked::peek_next(strIt);}
 
-        StringIterator<ValueType, StringType, InternalIterator>& operator++() {::utf8::next(strIt, str->m_string.cend()); return *this;};
-        StringIterator<ValueType, StringType, InternalIterator> operator++(int) {StringIterator<ValueType, StringType, InternalIterator> tmp(*this); operator++(); return tmp;};
-        StringIterator<ValueType, StringType, InternalIterator>& operator--() {::utf8::prior(strIt, str->m_string.cbegin()); return *this;};
-        StringIterator<ValueType, StringType, InternalIterator> operator--(int) {StringIterator<ValueType, StringType, InternalIterator> tmp(*this); operator--(); return tmp;};
+        StringIterator<ValueType, InternalIterator>& operator++() { ::utf8::unchecked::next(strIt); return *this; }
+        StringIterator<ValueType, InternalIterator> operator++(int) { StringIterator<ValueType, InternalIterator> tmp(*this); operator++(); return tmp; }
+        StringIterator<ValueType, InternalIterator>& operator--() { ::utf8::unchecked::prior(strIt); return *this; }
+        StringIterator<ValueType, InternalIterator> operator--(int) { StringIterator<ValueType, InternalIterator> tmp(*this); operator--(); return tmp; }
         
-        bool operator==(const StringIterator<ValueType, StringType, InternalIterator> &other) {return ((str == other.str) && (strIt == other.strIt));};
-        bool operator!=(const StringIterator<ValueType, StringType, InternalIterator> &other) {return !operator==(other);};
+        bool operator==(const StringIterator<ValueType, InternalIterator> &other) { return (strIt == other.strIt); }
+        bool operator!=(const StringIterator<ValueType, InternalIterator> &other) { return !operator==(other); }
 
     private:
-        StringIterator(StringType &str, InternalIterator strIt) : str(&str), strIt(strIt) {};
-        StringType *str;
+        StringIterator(InternalIterator strIt) : strIt(strIt) {};
         InternalIterator strIt;
-
     };
 
 
-    typedef StringIterator<char32_t, String, std::string::iterator> Iterator;
-    typedef StringIterator<const char32_t, const String, std::string::const_iterator> ConstIterator;
+    typedef StringIterator<char32_t, std::string::iterator> Iterator;
+    typedef StringIterator<const char32_t, std::string::const_iterator> ConstIterator;
 
     /**
      * Constructs an empty string.
@@ -82,29 +80,39 @@ public:
     String(const sf::String &string);
 
     /**
+     * Returns true if the string is empty.
+     */
+    bool empty() const { return m_string.size() == 0; }
+
+    /**
      * Returns the string's length.
      */
-    std::size_t GetLength() const;
+    std::size_t size() const;
+
+    /**
+     * Clear the string
+     */
+    void clear() { m_string.clear(); }
 
     /**
      * Get a beginning iterator.
      */
-    String::Iterator Begin();
+    String::Iterator begin();
 
     /**
      * Get a constant beginning iterator.
      */
-    String::ConstIterator Begin() const;
+    String::ConstIterator begin() const;
 
     /**
      * Get a ending iterator.
      */
-    String::Iterator End();
+    String::Iterator end();
 
     /**
      * Get a constant ending iterator.
      */
-    String::ConstIterator End() const;
+    String::ConstIterator end() const;
 
     /**
      * Returns a String created from a std::string encoded in the current locale.
@@ -154,19 +162,24 @@ public:
     std::string ToUTF8() const;
 
     /**
+     * Returns the code point at the 
+     */
+    char32_t operator[](const std::size_t position) const;
+
+    /**
      * Returns a sub-string starting from "start" and with length "length".
      */
-    String SubString( std::size_t start, std::size_t length ) const;
+    String substr( std::size_t start, std::size_t length ) const;
 
     /**
      * Returns the position of the first occurence of "search" starting from "pos".
      */
-    std::size_t Find( const String &search, std::size_t pos ) const;
+    std::size_t find( const String &search, std::size_t pos ) const;
 
     /**
      * Returns the position of the last occurence starting before "pos".
      */
-    std::size_t RFind( const String &search, std::size_t pos ) const;
+    std::size_t rfind( const String &search, std::size_t pos ) const;
 
     /**
      * Get the raw UTF8-encoded std::string
@@ -181,7 +194,6 @@ public:
     bool operator==(const String &other) const;
     String operator+(const String &other) const;
     String& operator+=(const String &other);
-    char32_t operator[](const std::size_t position) const;
 
 private:
     std::string m_string; ///< Internal container

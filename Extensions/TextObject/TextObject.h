@@ -91,7 +91,7 @@ private:
     virtual void DoSerializeTo(gd::SerializerElement & element) const;
     #endif
 
-    gd::utf8::String text;
+    gd::String text;
     float characterSize;
     std::string fontName;
     bool smoothed;

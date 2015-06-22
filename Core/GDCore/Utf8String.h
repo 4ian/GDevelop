@@ -222,6 +222,8 @@ private:
 
 }
 
+typedef utf8::String String;
+
 }
 
 #endif

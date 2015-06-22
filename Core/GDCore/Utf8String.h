@@ -48,6 +48,8 @@ public:
     typedef std::string::size_type size_type;
     typedef std::string::difference_type difference_type;
 
+    static const size_type npos = -1;
+
     template<class T>
     class GD_CORE_API StringIterator : public std::iterator<std::bidirectional_iterator_tag, String::value_type, String::difference_type>
     {
@@ -210,17 +212,17 @@ public:
     /**
      * Returns a sub-string starting from "start" and with length "length".
      */
-    String substr( size_type start, size_type length ) const;
+    String substr( size_type start = 0, size_type length = npos ) const;
 
     /**
      * Returns the position of the first occurence of "search" starting from "pos".
      */
-    size_type find( const String &search, size_type pos ) const;
+    size_type find( const String &search, size_type pos = 0 ) const;
 
     /**
      * Returns the position of the last occurence starting before "pos".
      */
-    size_type rfind( const String &search, size_type pos ) const;
+    size_type rfind( const String &search, size_type pos = npos ) const;
 
     /**
      * Get the raw UTF8-encoded std::string

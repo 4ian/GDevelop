@@ -375,33 +375,33 @@ MainFrame::MainFrame( wxWindow* parent ) :
         {
             wxRibbonPanel *ribbonPanel = new wxRibbonPanel(ribbonEditorPage, wxID_ANY, _("Adding resources"), gd::SkinHelper::GetRibbonIcon("list"), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
             wxRibbonButtonBar *ribbonBar = new wxRibbonButtonBar(ribbonPanel, wxID_ANY);
-            ribbonBar->AddButton(ResourcesEditor::idRibbonAdd, !hideLabels ? _("Add an image") : "", gd::SkinHelper::GetRibbonIcon("add"), _("Add an image to the resources"));
-            ribbonBar->AddButton(ResourcesEditor::idRibbonAddFromLibrary, !hideLabels ? _("Add from the library") : "", gd::SkinHelper::GetRibbonIcon("addFromLibrary"), _("Add an image from a library of images"));
-            ribbonBar->AddButton(ResourcesEditor::idRibbonAddDossier, !hideLabels ? _("Add a virtual folder") : "", gd::SkinHelper::GetRibbonIcon("virtualfolderadd"), _("Add a virtual folder to organize resources"));
+            ribbonBar->AddButton(ResourcesEditor::idRibbonAdd, !hideLabels ? _("Add an image") : gd::String(), gd::SkinHelper::GetRibbonIcon("add"), _("Add an image to the resources"));
+            ribbonBar->AddButton(ResourcesEditor::idRibbonAddFromLibrary, !hideLabels ? _("Add from the library") : gd::String(), gd::SkinHelper::GetRibbonIcon("addFromLibrary"), _("Add an image from a library of images"));
+            ribbonBar->AddButton(ResourcesEditor::idRibbonAddDossier, !hideLabels ? _("Add a virtual folder") : gd::String(), gd::SkinHelper::GetRibbonIcon("virtualfolderadd"), _("Add a virtual folder to organize resources"));
             controlsToBeDisabledOnPreview.push_back(ribbonBar);
         }
         {
             wxRibbonPanel *ribbonPanel = new wxRibbonPanel(ribbonEditorPage, wxID_ANY, _("List management"), gd::SkinHelper::GetRibbonIcon("list"), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
             wxRibbonButtonBar *ribbonBar = new wxRibbonButtonBar(ribbonPanel, wxID_ANY);
-            ribbonBar->AddButton(ResourcesEditor::idRibbonDel, !hideLabels ? _("Delete") : "", gd::SkinHelper::GetRibbonIcon("delete"), _("Delete the selected resource"));
-            ribbonBar->AddButton(ResourcesEditor::idRibbonDeleteUnused, !hideLabels ? _("Remove useless resources") : "", gd::SkinHelper::GetRibbonIcon("deleteunknown"), _("Check if there are useless resources that can be removed"));
-            ribbonBar->AddButton(ResourcesEditor::idRibbonUp, !hideLabels ? _("Move up") : "", gd::SkinHelper::GetRibbonIcon("up"));
-            ribbonBar->AddButton(ResourcesEditor::idRibbonDown, !hideLabels ? _("Move down") : "", gd::SkinHelper::GetRibbonIcon("down"));
-            ribbonBar->AddButton(ResourcesEditor::idRibbonRefresh, !hideLabels ? _("Refresh") : "", gd::SkinHelper::GetRibbonIcon("refresh"), _("Refresh the list, if you've done changes in another window"));
+            ribbonBar->AddButton(ResourcesEditor::idRibbonDel, !hideLabels ? _("Delete") : gd::String(), gd::SkinHelper::GetRibbonIcon("delete"), _("Delete the selected resource"));
+            ribbonBar->AddButton(ResourcesEditor::idRibbonDeleteUnused, !hideLabels ? _("Remove useless resources") : gd::String(), gd::SkinHelper::GetRibbonIcon("deleteunknown"), _("Check if there are useless resources that can be removed"));
+            ribbonBar->AddButton(ResourcesEditor::idRibbonUp, !hideLabels ? _("Move up") : gd::String(), gd::SkinHelper::GetRibbonIcon("up"));
+            ribbonBar->AddButton(ResourcesEditor::idRibbonDown, !hideLabels ? _("Move down") : gd::String(), gd::SkinHelper::GetRibbonIcon("down"));
+            ribbonBar->AddButton(ResourcesEditor::idRibbonRefresh, !hideLabels ? _("Refresh") : gd::String(), gd::SkinHelper::GetRibbonIcon("refresh"), _("Refresh the list, if you've done changes in another window"));
             controlsToBeDisabledOnPreview.push_back(ribbonBar);
         }
 
         {
             wxRibbonPanel *ribbonPanel = new wxRibbonPanel(ribbonEditorPage, wxID_ANY, _("View"), gd::SkinHelper::GetRibbonIcon("edit"), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
             wxRibbonButtonBar *ribbonBar = new wxRibbonButtonBar(ribbonPanel, wxID_ANY);
-            ribbonBar->AddButton(ResourcesEditor::idRibbonShowPreview, !hideLabels ? _("Preview") : "", gd::SkinHelper::GetRibbonIcon("view"), _("Show a panel with the image displayed inside"));
-            ribbonBar->AddButton(ResourcesEditor::idRibbonShowPropertyGrid, !hideLabels ? _("Properties") : "", gd::SkinHelper::GetRibbonIcon("editprop"), _("Show the properties of the resource"));
+            ribbonBar->AddButton(ResourcesEditor::idRibbonShowPreview, !hideLabels ? _("Preview") : gd::String(), gd::SkinHelper::GetRibbonIcon("view"), _("Show a panel with the image displayed inside"));
+            ribbonBar->AddButton(ResourcesEditor::idRibbonShowPropertyGrid, !hideLabels ? _("Properties") : gd::String(), gd::SkinHelper::GetRibbonIcon("editprop"), _("Show the properties of the resource"));
             controlsToBeDisabledOnPreview.push_back(ribbonBar);
         }
         {
             wxRibbonPanel *ribbonPanel = new wxRibbonPanel(ribbonEditorPage, wxID_ANY, _("Help"), gd::SkinHelper::GetRibbonIcon("help"), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
             wxRibbonButtonBar *ribbonBar = new wxRibbonButtonBar(ribbonPanel, wxID_ANY);
-            ribbonBar->AddButton(ResourcesEditor::idRibbonHelp, !hideLabels ? _("Help") : "", gd::SkinHelper::GetRibbonIcon("help"), _("Open the online help"));
+            ribbonBar->AddButton(ResourcesEditor::idRibbonHelp, !hideLabels ? _("Help") : gd::String(), gd::SkinHelper::GetRibbonIcon("help"), _("Open the online help"));
             controlsToBeDisabledOnPreview.push_back(ribbonBar);
         }
     }

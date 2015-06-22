@@ -493,7 +493,7 @@ void InstructionSelectorDialog::OnOkBtClick(wxCommandEvent& event)
 
     if ( parametersHaveErrors )
     {
-        if ( wxMessageBox(wxString::Format(_("Error in parameter #%i: %s\n\nYou should correct it before closing this dialog.\nClose the dialog anyway?"),
+        if ( wxMessageBox(wxString::Format(_("Error in parameter #%i: %s\n\nYou should correct it before closing this dialog.\nClose the dialog anyway?").ToWxString(),
             parameterDisplayIndex, message.c_str()), _("The instruction contains one or more errors."), wxYES_NO | wxICON_EXCLAMATION, this) == wxNO )
             return;
     }

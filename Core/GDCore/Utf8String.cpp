@@ -6,11 +6,13 @@
 
 #include "GDCore/Utf8String.h"
 
-#include "GDCore/Utf8Tools.h"
 #include <SFML/System/String.hpp>
+#include "GDCore/CommonTools.h"
+#include "GDCore/Utf8Tools.h"
 
 #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 #include <wx/string.h>
+#include <wx/variant.h>
 #endif
 
 namespace gd
@@ -61,6 +63,27 @@ String::iterator String::end()
 String::const_iterator String::end() const
 {
     return String::const_iterator(m_string.end());
+}
+
+String String::FromInt(int value)
+{
+    String str;
+    str.m_string = ToString<int>(value);
+    return str;
+}
+
+String String::FromFloat(float value)
+{
+    String str;
+    str.m_string = ToString<float>(value);
+    return str;
+}
+
+String String::FromDouble(double value)
+{
+    String str;
+    str.m_string = ToString<double>(value);
+    return str;
 }
 
 String String::FromLocale( const std::string &localizedString )
@@ -159,6 +182,24 @@ String& String::operator+=(const String &other)
     m_string += other.m_string;
     return *this;
 }
+
+#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
+
+String String::operator+(const wxString &other) const
+{
+    String str;
+    str.m_string = m_string;
+    str += FromWxString(other);
+    return str;
+}
+
+String& String::operator+=(const wxString &other)
+{
+    *this += FromWxString(other);
+    return *this;
+}
+
+#endif
 
 String::value_type String::operator[](const String::size_type position) const
 {

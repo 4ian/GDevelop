@@ -406,7 +406,7 @@ void ImportImage::OnfileRPGEditText(wxCommandEvent& event)
 {
     wxImage image;
     if ( image.LoadFile(fileRPGEdit->GetValue()) )
-        tailleImageRPGEdit->SetLabel(_("Size of an image : ")+gd::ToString(image.GetWidth()/4)+"x"+gd::ToString(image.GetHeight()/4));
+        tailleImageRPGEdit->SetLabel(_("Size of an image : ")+gd::String::FromDouble(image.GetWidth()/4)+GD_U8("x")+gd::String::FromDouble(image.GetHeight()/4));
     else
         tailleImageRPGEdit->SetLabel(_("Size of an image : \?x\?"));
 }

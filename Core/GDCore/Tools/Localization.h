@@ -9,7 +9,13 @@
 #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
     #include <wx/intl.h>
  	#include "GDCore/Utf8Tools.h"
+    #include "GDCore/Utf8String.h"
     //Create a new macro to return UTF8 std::string from a translation
+ 	#if defined(_)
+        #undef _
+    #endif
+    #define _(s) gd::String(wxGetTranslation(u8##s))
+
     #define GD_T(s) gd::utf8::FromWxString(wxGetTranslation(u8##s))
 #else
     //Ensure the internationalization macro is still defined as code rely on it:

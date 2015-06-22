@@ -518,8 +518,8 @@ wxRibbonButtonBar* LayoutEditorCanvas::CreateRibbonPage(wxRibbonPage * page)
     {
         wxRibbonPanel *ribbonPanel = new wxRibbonPanel(page, wxID_ANY, _("Mode"), SkinHelper::GetRibbonIcon("preview"), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
         modeRibbonBar = new wxRibbonButtonBar(ribbonPanel, wxID_ANY);
-        modeRibbonBar->AddButton(idRibbonEditMode, !hideLabels ? _("Stop the preview") : "", SkinHelper::GetRibbonIcon("edit"), _("Stop the preview and go back to editing"));
-        modeRibbonBar->AddButton(idRibbonPreviewMode, !hideLabels ? _("Preview") : "", SkinHelper::GetRibbonIcon("preview"), _("Launch a preview"), wxRIBBON_BUTTON_HYBRID);
+        modeRibbonBar->AddButton(idRibbonEditMode, !hideLabels ? _("Stop the preview") : gd::String(), SkinHelper::GetRibbonIcon("edit"), _("Stop the preview and go back to editing"));
+        modeRibbonBar->AddButton(idRibbonPreviewMode, !hideLabels ? _("Preview") : gd::String(), SkinHelper::GetRibbonIcon("preview"), _("Launch a preview"), wxRIBBON_BUTTON_HYBRID);
     }
 
     wxRibbonPanel *toolsPanel = new wxRibbonPanel(page, wxID_ANY, _("Tools"), SkinHelper::GetRibbonIcon("tools"), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
@@ -528,7 +528,7 @@ wxRibbonButtonBar* LayoutEditorCanvas::CreateRibbonPage(wxRibbonPage * page)
     {
         wxRibbonPanel *ribbonPanel = new wxRibbonPanel(page, wxID_ANY, _("Help"), SkinHelper::GetRibbonIcon("help"), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
         wxRibbonButtonBar *ribbonBar = new wxRibbonButtonBar(ribbonPanel, wxID_ANY);
-        ribbonBar->AddButton(idRibbonHelp, !hideLabels ? _("Help") : "", SkinHelper::GetRibbonIcon("help"));
+        ribbonBar->AddButton(idRibbonHelp, !hideLabels ? _("Help") : gd::String(), SkinHelper::GetRibbonIcon("help"));
     }
 
     return ribbonToolbar;
@@ -554,16 +554,16 @@ void LayoutEditorCanvas::CreateEditionRibbonTools()
     wxConfigBase::Get()->Read( _T( "/Skin/HideLabels" ), &hideLabels );
 
     wxRibbonButtonBar * ribbonToolbar = mainFrameWrapper.GetRibbonSceneEditorButtonBar();
-    ribbonToolbar->AddButton(idRibbonObjectsEditor, !hideLabels ? _("Objects editor") : "", gd::SkinHelper::GetRibbonIcon("objects"), _("Show the list of objects of the scene"));
-    ribbonToolbar->AddButton(idRibbonLayersEditor, !hideLabels ? _("Layers editor") : "", gd::SkinHelper::GetRibbonIcon("layers"), _("Show the layers editor"));
-    ribbonToolbar->AddButton(idRibbonObjectsPositionList, !hideLabels ? _("Instances") : "", gd::SkinHelper::GetRibbonIcon("ObjectsPositionsList"), _("Open a list of all instances of objects put on the scene"));
-    ribbonToolbar->AddHybridButton(idRibbonUndo, !hideLabels ? _("Undo") : "", gd::SkinHelper::GetRibbonIcon("undo"), _("Undo the last change"));
-    ribbonToolbar->AddButton(idRibbonRedo, !hideLabels ? _("Redo") : "", gd::SkinHelper::GetRibbonIcon("redo"));
-    ribbonToolbar->AddButton(idRibbonGrid, !hideLabels ? _("Grid") : "", gd::SkinHelper::GetRibbonIcon("grid"));
-    ribbonToolbar->AddButton(idRibbonGridSetup, !hideLabels ? _("Edit the grid") : "", gd::SkinHelper::GetRibbonIcon("gridedit"), _("Edit the size of the grid"));
-    ribbonToolbar->AddButton(idRibbonWindowMask, !hideLabels ? _("Mask") : "", gd::SkinHelper::GetRibbonIcon("windowMask"), _("Show a mask corresponding to the size of the game window"));
-    ribbonToolbar->AddButton(idRibbonOrigine, !hideLabels ? _("Return to the initial position ( 0;0 )") : "", gd::SkinHelper::GetRibbonIcon("center"), _("Go back to the origin of the scene"));
-    ribbonToolbar->AddHybridButton(idRibbonOriginalZoom, !hideLabels ? _("Initial zoom") : "", gd::SkinHelper::GetRibbonIcon("zoom"), _("Go back to the initial zoom level"));
+    ribbonToolbar->AddButton(idRibbonObjectsEditor, !hideLabels ? _("Objects editor") : gd::String(), gd::SkinHelper::GetRibbonIcon("objects"), _("Show the list of objects of the scene"));
+    ribbonToolbar->AddButton(idRibbonLayersEditor, !hideLabels ? _("Layers editor") : gd::String(), gd::SkinHelper::GetRibbonIcon("layers"), _("Show the layers editor"));
+    ribbonToolbar->AddButton(idRibbonObjectsPositionList, !hideLabels ? _("Instances") : gd::String(), gd::SkinHelper::GetRibbonIcon("ObjectsPositionsList"), _("Open a list of all instances of objects put on the scene"));
+    ribbonToolbar->AddHybridButton(idRibbonUndo, !hideLabels ? _("Undo") : gd::String(), gd::SkinHelper::GetRibbonIcon("undo"), _("Undo the last change"));
+    ribbonToolbar->AddButton(idRibbonRedo, !hideLabels ? _("Redo") : gd::String(), gd::SkinHelper::GetRibbonIcon("redo"));
+    ribbonToolbar->AddButton(idRibbonGrid, !hideLabels ? _("Grid") : gd::String(), gd::SkinHelper::GetRibbonIcon("grid"));
+    ribbonToolbar->AddButton(idRibbonGridSetup, !hideLabels ? _("Edit the grid") : gd::String(), gd::SkinHelper::GetRibbonIcon("gridedit"), _("Edit the size of the grid"));
+    ribbonToolbar->AddButton(idRibbonWindowMask, !hideLabels ? _("Mask") : gd::String(), gd::SkinHelper::GetRibbonIcon("windowMask"), _("Show a mask corresponding to the size of the game window"));
+    ribbonToolbar->AddButton(idRibbonOrigine, !hideLabels ? _("Return to the initial position ( 0;0 )") : gd::String(), gd::SkinHelper::GetRibbonIcon("center"), _("Go back to the origin of the scene"));
+    ribbonToolbar->AddHybridButton(idRibbonOriginalZoom, !hideLabels ? _("Initial zoom") : gd::String(), gd::SkinHelper::GetRibbonIcon("zoom"), _("Go back to the initial zoom level"));
 }
 
 void LayoutEditorCanvas::UpdateContextMenu()
@@ -581,10 +581,10 @@ void LayoutEditorCanvas::UpdateContextMenu()
     contextMenu.FindItem(ID_LAYERUPMENU)->Enable(false);
     if ( lowestLayer+1 < layout.GetLayersCount() )
     {
-        string name = layout.GetLayer(lowestLayer+1).GetName();
+        gd::String name = gd::String::FromUTF8(layout.GetLayer(lowestLayer+1).GetName());
         if ( name == "" ) name = _("Base layer");
         contextMenu.FindItem(ID_LAYERUPMENU)->Enable(true);
-        contextMenu.FindItem(ID_LAYERUPMENU)->SetItemLabel(_("Put the object(s) on the layer \"") + gd::utf8::ToWxString(name) +"\"");
+        contextMenu.FindItem(ID_LAYERUPMENU)->SetItemLabel(_("Put the object(s) on the layer \"") + name + GD_U8("\""));
     }
 
     //Can we send the objects on a lower layer ?
@@ -598,11 +598,11 @@ void LayoutEditorCanvas::UpdateContextMenu()
     contextMenu.FindItem(ID_LAYERDOWNMENU)->Enable(false);
     if ( highestLayer >= 1 )
     {
-        string name = layout.GetLayer(highestLayer-1).GetName();
+        gd::String name = gd::String::FromUTF8(layout.GetLayer(highestLayer-1).GetName());
         if ( name == "" ) name = _("Base layer");
 
         contextMenu.FindItem(ID_LAYERDOWNMENU)->Enable(true);
-        contextMenu.FindItem(ID_LAYERDOWNMENU)->SetItemLabel(_("Put the object(s) on the layer \"") + gd::utf8::ToWxString(name) +"\"");
+        contextMenu.FindItem(ID_LAYERDOWNMENU)->SetItemLabel(_("Put the object(s) on the layer \"") + name + GD_U8("\""));
     }
 }
 

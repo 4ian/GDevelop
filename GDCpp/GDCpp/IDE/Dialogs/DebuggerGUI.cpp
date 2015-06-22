@@ -178,7 +178,7 @@ void DebuggerGUI::UpdateGUI()
         it!=sceneVariables.end();++it, ++i)
     {
         m_generalList->SetItem(generalBaseItemCount+i, 0, gd::utf8::ToWxString(it->first));
-        m_generalList->SetItem(generalBaseItemCount+i, 1, it->second->IsStructure() ? _("(Structure)") : gd::utf8::ToWxString(it->second->GetString()));
+        m_generalList->SetItem(generalBaseItemCount+i, 1, it->second->IsStructure() ? _("(Structure)") : gd::String::FromUTF8(it->second->GetString()));
         m_generalList->SetItemFont(generalBaseItemCount+i, *wxNORMAL_FONT);
     }
 
@@ -199,7 +199,7 @@ void DebuggerGUI::UpdateGUI()
         it!=gameVariables.end();++it, ++i)
     {
         m_generalList->SetItem(generalBaseAndVariablesItemCount+i, 0, gd::utf8::ToWxString(it->first));
-        m_generalList->SetItem(generalBaseAndVariablesItemCount+i, 1, it->second->IsStructure() ? _("(Structure)") : gd::utf8::ToWxString(it->second->GetString()));
+        m_generalList->SetItem(generalBaseAndVariablesItemCount+i, 1, it->second->IsStructure() ? _("(Structure)") : gd::String::FromUTF8(it->second->GetString()));
         m_generalList->SetItemFont(generalBaseAndVariablesItemCount+i, *wxNORMAL_FONT);
     }
 
@@ -366,7 +366,7 @@ void DebuggerGUI::UpdateGUI()
         it!=objectVariables.end();++it, ++i)
     {
         m_objectList->SetItem(baseItemCount+i, 0, gd::utf8::ToWxString(it->first));
-        m_objectList->SetItem(baseItemCount+i, 1, it->second->IsStructure() ? _("(Structure)") : gd::utf8::ToWxString(it->second->GetString()));
+        m_objectList->SetItem(baseItemCount+i, 1, it->second->IsStructure() ? _("(Structure)") : gd::String::FromUTF8(it->second->GetString()));
     }
 }
 

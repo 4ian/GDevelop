@@ -185,7 +185,7 @@ void ExtensionsLoader::LoadExtension(const std::string & fullpath, gd::Platform 
         cout << "Unable to load extension " << fullpath << "." << endl;
         cout << "Error returned : \"" << error << "\"" << endl;
         #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
-        wxString userMsg = string(_("Extension "))+ fullpath + string(_(" could not be loaded.\nContact the developer for more informations.\n\nDetailed log:\n") + error);
+        wxString userMsg = _("Extension ")+ gd::String::FromLocale(fullpath) + _(" could not be loaded.\nContact the developer for more informations.\n\nDetailed log:\n") + gd::String::FromLocale(error);
         wxMessageBox(userMsg, _("Extension not compatible"), wxOK | wxICON_EXCLAMATION);
         #endif
 
@@ -200,7 +200,7 @@ void ExtensionsLoader::LoadExtension(const std::string & fullpath, gd::Platform 
         {
             cout << "Unable to load extension " << fullpath << " (Creation function symbol not found)." << endl;
             #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
-            wxString userMsg = string(_("Extension "))+ fullpath + string(_(" could not be loaded.\nContact the developer for more informations." ));
+            wxString userMsg = _("Extension ")+ gd::String::FromLocale(fullpath) + _(" could not be loaded.\nContact the developer for more informations." );
             wxMessageBox(userMsg, _("Extension not compatible"), wxOK | wxICON_EXCLAMATION);
             #endif
         }
@@ -263,7 +263,8 @@ void ExtensionsLoader::LoadExtension(const std::string & fullpath, gd::Platform 
         #endif
 
         #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI) && defined(RELEASE) //Show errors in IDE only
-        wxString userMsg = string(_("Extension "))+ fullpath + string(_(" has errors :\n")) + error + string(_("\nThe extension was not loaded. Contact the developer to get more information." ));
+        wxString userMsg = _("Extension ") + gd::String::FromLocale(fullpath) + _(" has errors :\n") + 
+            gd::String::FromLocale(error) + _("\nThe extension was not loaded. Contact the developer to get more information." );
         wxMessageBox(userMsg, _("Extension not compatible"), wxOK | wxICON_EXCLAMATION);
         #endif
 

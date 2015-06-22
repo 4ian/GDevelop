@@ -15,11 +15,12 @@
 #include "GDCore/Utf8/utf8.h"
 
 #define GD_U8(x) gd::utf8::String::FromUTF8(u8##x)
-#define GD_LOC(x) gd::utf8::String::FromLocale(##x)
+#define GD_LOC(x) gd::utf8::String::FromLocale( (x) ) 
 
 namespace sf {class String;};
 #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 class wxString;
+class wxVariant;
 #endif
 
 namespace gd
@@ -133,6 +134,21 @@ public:
     String::const_iterator end() const;
 
     /**
+     * Returns a String created from an integer.
+     */
+    static String FromInt(int value);
+
+    /**
+     * Returns a String created from a float.
+     */
+    static String FromFloat(float value);
+
+    /**
+     * Returns a String created from a double.
+     */
+    static String FromDouble(double value);
+
+    /**
      * Returns a String created from a std::string encoded in the current locale.
      */
     static String FromLocale( const std::string &localizedString );
@@ -217,8 +233,16 @@ public:
     const std::string& Raw() const { return m_string; }
 
     bool operator==(const String &other) const;
+
     String operator+(const String &other) const;
     String& operator+=(const String &other);
+
+#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
+
+    String operator+(const wxString &other) const;
+    String& operator+=(const wxString &other);
+
+#endif
 
 private:
     std::string m_string; ///< Internal container

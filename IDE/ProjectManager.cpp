@@ -371,41 +371,41 @@ void ProjectManager::CreateRibbonPage(wxRibbonPage * page)
     {
         wxRibbonPanel *ribbonPanel = new wxRibbonPanel(page, wxID_ANY, _("Projects"), SkinHelper::GetRibbonIcon("open"), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
         wxRibbonButtonBar *ribbonBar = new wxRibbonButtonBar(ribbonPanel, wxID_ANY);
-        ribbonBar->AddButton(idRibbonNew, !hideLabels ? _("New") : "", SkinHelper::GetRibbonIcon("new"), _("Create a new game"));
-        ribbonBar->AddHybridButton(idRibbonOpen, !hideLabels ? _("Open") : "", SkinHelper::GetRibbonIcon("open"), _("Open a previously saved project"));
+        ribbonBar->AddButton(idRibbonNew, !hideLabels ? _("New") : gd::String(), SkinHelper::GetRibbonIcon("new"), _("Create a new game"));
+        ribbonBar->AddHybridButton(idRibbonOpen, !hideLabels ? _("Open") : gd::String(), SkinHelper::GetRibbonIcon("open"), _("Open a previously saved project"));
     }
     {
         wxRibbonPanel *ribbonPanel = new wxRibbonPanel(page, wxID_ANY, _("Current project"), SkinHelper::GetRibbonIcon("save"), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
         projectRibbonBar = new wxRibbonButtonBar(ribbonPanel, wxID_ANY);
-        projectRibbonBar->AddHybridButton(idRibbonSave, !hideLabels ? _("Save") : " ", SkinHelper::GetRibbonIcon("save"), _("Save the current project"));
-        projectRibbonBar->AddButton(idRibbonSaveAll, !hideLabels ? _("Save all") : " ", SkinHelper::GetRibbonIcon("save_all"), _("Save all open projects"));
-        projectRibbonBar->AddButton(idRibbonClose, !hideLabels ? _("Close") : "", SkinHelper::GetRibbonIcon("close"), _("Close the current project"));
+        projectRibbonBar->AddHybridButton(idRibbonSave, !hideLabels ? _("Save") : gd::String(), SkinHelper::GetRibbonIcon("save"), _("Save the current project"));
+        projectRibbonBar->AddButton(idRibbonSaveAll, !hideLabels ? _("Save all") : gd::String(), SkinHelper::GetRibbonIcon("save_all"), _("Save all open projects"));
+        projectRibbonBar->AddButton(idRibbonClose, !hideLabels ? _("Close") : gd::String(), SkinHelper::GetRibbonIcon("close"), _("Close the current project"));
     }
     {
         wxRibbonPanel *ribbonPanel = new wxRibbonPanel(page, wxID_ANY, _("Basic Operations"), SkinHelper::GetRibbonIcon("copy"), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
         operationsRibbonBar = new wxRibbonButtonBar(ribbonPanel, wxID_ANY);
-        operationsRibbonBar->AddButton(idRibbonEditImages, !hideLabels ? _("Images") : "", SkinHelper::GetRibbonIcon("image"), _("Display the resources used by the game"));
-        operationsRibbonBar->AddButton(idRibbonAddScene, !hideLabels ? _("Add a scene") : "", SkinHelper::GetRibbonIcon("sceneadd"));
-        operationsRibbonBar->AddButton(idRibbonAddExternalEvents, !hideLabels ? _("Add external events") : "", SkinHelper::GetRibbonIcon("eventsadd"));
-        operationsRibbonBar->AddButton(idRibbonAddExternalLayout, !hideLabels ? _("Add an external layout") : "", SkinHelper::GetRibbonIcon("externallayoutadd"));
-        operationsRibbonBar->AddButton(idRibbonExtensions, !hideLabels ? _("Extensions and platforms") : "", SkinHelper::GetRibbonIcon("extension"));
+        operationsRibbonBar->AddButton(idRibbonEditImages, !hideLabels ? _("Images") : gd::String(), SkinHelper::GetRibbonIcon("image"), _("Display the resources used by the game"));
+        operationsRibbonBar->AddButton(idRibbonAddScene, !hideLabels ? _("Add a scene") : gd::String(), SkinHelper::GetRibbonIcon("sceneadd"));
+        operationsRibbonBar->AddButton(idRibbonAddExternalEvents, !hideLabels ? _("Add external events") : gd::String(), SkinHelper::GetRibbonIcon("eventsadd"));
+        operationsRibbonBar->AddButton(idRibbonAddExternalLayout, !hideLabels ? _("Add an external layout") : gd::String(), SkinHelper::GetRibbonIcon("externallayoutadd"));
+        operationsRibbonBar->AddButton(idRibbonExtensions, !hideLabels ? _("Extensions and platforms") : gd::String(), SkinHelper::GetRibbonIcon("extension"));
     }
     {
         wxRibbonPanel *affichagePanel = new wxRibbonPanel(page, wxID_ANY, _("View"), SkinHelper::GetRibbonIcon("image"), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
         wxRibbonButtonBar *affichage_bar = new wxRibbonButtonBar(affichagePanel, wxID_ANY);
-        affichage_bar->AddButton(idRibbonProjectsManager, !hideLabels ? _("Projects") : "", SkinHelper::GetRibbonIcon("projectManager"), _("Display the project manager"));
-        affichage_bar->AddButton(idRibbonStartPage, !hideLabels ? _("Start page") : "", SkinHelper::GetRibbonIcon("startPage"), _("Open the start page"));
-        affichage_bar->AddButton(idRibbonCppTools, !hideLabels ? _("C++ Tools") : "", SkinHelper::GetRibbonIcon("source_cpp"), _("Display tools related to native games"));
+        affichage_bar->AddButton(idRibbonProjectsManager, !hideLabels ? _("Projects") : gd::String(), SkinHelper::GetRibbonIcon("projectManager"), _("Display the project manager"));
+        affichage_bar->AddButton(idRibbonStartPage, !hideLabels ? _("Start page") : gd::String(), SkinHelper::GetRibbonIcon("startPage"), _("Open the start page"));
+        affichage_bar->AddButton(idRibbonCppTools, !hideLabels ? _("C++ Tools") : gd::String(), SkinHelper::GetRibbonIcon("source_cpp"), _("Display tools related to native games"));
 
         wxRibbonPanel *toolsPanel = new wxRibbonPanel(page, wxID_ANY, _("Tools"), SkinHelper::GetRibbonIcon("tools"), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
         wxRibbonButtonBar *tools_bar = new wxRibbonButtonBar(toolsPanel, wxID_ANY);
-        tools_bar->AddButton(idRibbonEncoder, !hideLabels ? _("Converter") : "", SkinHelper::GetRibbonIcon("audioconverter"), _("Open a tool to convert MP3 files to OGG"));
-        tools_bar->AddDropdownButton(idRibbonImporter, !hideLabels ? _("Image converter") : "", SkinHelper::GetRibbonIcon("imageconverter"), _("Open a tool to convert various images format"));
+        tools_bar->AddButton(idRibbonEncoder, !hideLabels ? _("Converter") : gd::String(), SkinHelper::GetRibbonIcon("audioconverter"), _("Open a tool to convert MP3 files to OGG"));
+        tools_bar->AddDropdownButton(idRibbonImporter, !hideLabels ? _("Image converter") : gd::String(), SkinHelper::GetRibbonIcon("imageconverter"), _("Open a tool to convert various images format"));
     }
     {
         wxRibbonPanel *ribbonPanel = new wxRibbonPanel(page, wxID_ANY, _("Help"), SkinHelper::GetRibbonIcon("help"), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
         wxRibbonButtonBar *ribbonBar = new wxRibbonButtonBar(ribbonPanel, wxID_ANY);
-        ribbonBar->AddButton(idRibbonHelp, !hideLabels ? _("Help") : "", SkinHelper::GetRibbonIcon("help"), _("Open the online help for GDevelop"));
+        ribbonBar->AddButton(idRibbonHelp, !hideLabels ? _("Help") : gd::String(), SkinHelper::GetRibbonIcon("help"), _("Open the online help for GDevelop"));
     }
 
 }
@@ -459,9 +459,9 @@ void ProjectManager::Refresh()
     projectsTree->AddRoot(_("Projects"));
     for (unsigned int i = 0;i<mainEditor.games.size();++i)
     {
-        wxString name = mainEditor.games[i]->GetName() == "" ?
+        wxString name = mainEditor.games[i]->GetName() == GD_U8("") ?
                         _("(No name)") :
-                        gd::utf8::ToWxString(mainEditor.games[i]->GetName());
+                        gd::String::FromUTF8(mainEditor.games[i]->GetName());
 
         //Adding game's root
         gdTreeItemProjectData * gameItemData = new gdTreeItemProjectData("Root", "", mainEditor.games[i].get());

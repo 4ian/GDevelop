@@ -650,7 +650,7 @@ void ResourcesEditor::UpdatePropertyGrid()
     {
         if ( !selection.empty() )
         {
-            propertyGrid->SetPropertyValue(nameProperty, _("(Multiple values)"));
+            propertyGrid->SetPropertyValue(nameProperty, wxString(_("(Multiple values)")));
             propertyGrid->SetPropertyReadOnly(nameProperty);
         }
     }
@@ -658,7 +658,7 @@ void ResourcesEditor::UpdatePropertyGrid()
     if ( !aFolderIsSelected )
     {
         wxPGProperty * fileProperty = propertyGrid->Append( new gd::FileProperty(_("File"), "File", "") );
-        fileProperty->SetAttribute(wxPG_FILE_DIALOG_TITLE, _("Choose the resource file"));
+        fileProperty->SetAttribute(wxPG_FILE_DIALOG_TITLE, wxString(_("Choose the resource file")));
         fileProperty->SetAttribute(wxPG_FILE_INITIAL_PATH, wxFileName::FileName(project.GetProjectFile()).GetPath());
         fileProperty->SetAttribute(wxPG_FILE_SHOW_RELATIVE_PATH, wxFileName::FileName(project.GetProjectFile()).GetPath());
         propertyGrid->SetPropertyHelpString(fileProperty, _("File of the resource.\nThe filename is relative to the project directory."));

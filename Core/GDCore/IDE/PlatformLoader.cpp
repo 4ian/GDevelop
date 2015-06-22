@@ -86,7 +86,8 @@ std::shared_ptr<gd::Platform> PlatformLoader::LoadPlatformInManager(std::string 
         cout << "Loading of "<< fullpath <<" failed." << endl;
         cout << "Error returned : \"" << error << "\"" << endl;
         #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
-        wxString userMsg = string(_("Platform "))+ fullpath + string(_(" could not be loaded.\nContact the developer for more information.\n\nDetailed log:\n") + error);
+        wxString userMsg = _("Platform ") + GD_LOC(fullpath) + 
+            _(" could not be loaded.\nContact the developer for more information.\n\nDetailed log:\n") + GD_LOC(error);
         wxMessageBox(userMsg, _("Platform not compatible"), wxOK | wxICON_EXCLAMATION);
         #endif
     }
@@ -102,7 +103,8 @@ std::shared_ptr<gd::Platform> PlatformLoader::LoadPlatformInManager(std::string 
             CloseLibrary(platformHdl);
 
             #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
-            wxString userMsg = string(_("Platform "))+ fullpath + string(_(" could not be loaded.\nContact the developer for more information.\n\nDetailed log:\nNo valid create/destroy functions." ));
+            wxString userMsg = _("Platform ")+ GD_LOC(fullpath) + 
+                _(" could not be loaded.\nContact the developer for more information.\n\nDetailed log:\nNo valid create/destroy functions." );
             wxMessageBox(userMsg, _("Platform not compatible"), wxOK | wxICON_EXCLAMATION);
             #endif
         }

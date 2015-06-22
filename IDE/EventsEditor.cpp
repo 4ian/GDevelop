@@ -421,55 +421,55 @@ void EventsEditor::CreateRibbonPage(wxRibbonPage * page)
     {
         wxRibbonPanel *ribbonPanel = new wxRibbonPanel(page, wxID_ANY, _("Insert"), gd::SkinHelper::GetRibbonIcon("add"), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
         insertRibbonBar = new wxRibbonButtonBar(ribbonPanel, wxID_ANY);
-        insertRibbonBar->AddButton(idRibbonEvent, !hideLabels ? _("Add an event") : "", gd::SkinHelper::GetRibbonIcon("eventadd"), _("Add a new standard event with conditions and actions"));
-        insertRibbonBar->AddButton(idRibbonSubEvent, !hideLabels ? _("Add a sub event") : "", gd::SkinHelper::GetRibbonIcon("subeventadd"), _("Add a sub event, launched only when the conditions of its parent are fulfilled."));
-        insertRibbonBar->AddButton(idRibbonCom, !hideLabels ? _("Add a comment") : "", gd::SkinHelper::GetRibbonIcon("commentaireadd"), _("Add a comment"));
-        insertRibbonBar->AddDropdownButton(idRibbonSomeEvent, !hideLabels ? _("Add...") : "", gd::SkinHelper::GetRibbonIcon("add"));
+        insertRibbonBar->AddButton(idRibbonEvent, !hideLabels ? _("Add an event") : gd::String(), gd::SkinHelper::GetRibbonIcon("eventadd"), _("Add a new standard event with conditions and actions"));
+        insertRibbonBar->AddButton(idRibbonSubEvent, !hideLabels ? _("Add a sub event") : gd::String(), gd::SkinHelper::GetRibbonIcon("subeventadd"), _("Add a sub event, launched only when the conditions of its parent are fulfilled."));
+        insertRibbonBar->AddButton(idRibbonCom, !hideLabels ? _("Add a comment") : gd::String(), gd::SkinHelper::GetRibbonIcon("commentaireadd"), _("Add a comment"));
+        insertRibbonBar->AddDropdownButton(idRibbonSomeEvent, !hideLabels ? _("Add...") : gd::String(), gd::SkinHelper::GetRibbonIcon("add"));
     }
     {
         wxRibbonPanel *ribbonPanel = new wxRibbonPanel(page, wxID_ANY, _("GDevApp.com"), gd::SkinHelper::GetRibbonIcon("template"), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
         templateRibbonBar = new wxRibbonButtonBar(ribbonPanel, wxID_ANY);
-        templateRibbonBar->AddButton(idRibbonEventStore, !hideLabels ? _("Insert from the events store") : "", gd::SkinHelper::GetRibbonIcon("addtemplate"));
+        templateRibbonBar->AddButton(idRibbonEventStore, !hideLabels ? _("Insert from the events store") : gd::String(), gd::SkinHelper::GetRibbonIcon("addtemplate"));
     }
     {
         wxRibbonPanel *ribbonPanel = new wxRibbonPanel(page, wxID_ANY, _("Delete"), gd::SkinHelper::GetRibbonIcon("delete"), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
         deleteRibbonBar = new wxRibbonButtonBar(ribbonPanel, wxID_ANY);
-        deleteRibbonBar->AddButton(idRibbonDelEvent, !hideLabels ? _("Delete the selection") : "", gd::SkinHelper::GetRibbonIcon("deleteselected"));
+        deleteRibbonBar->AddButton(idRibbonDelEvent, !hideLabels ? _("Delete the selection") : gd::String(), gd::SkinHelper::GetRibbonIcon("deleteselected"));
     }
     {
         wxRibbonPanel *ribbonPanel = new wxRibbonPanel(page, wxID_ANY, _("History"), gd::SkinHelper::GetRibbonIcon("undo"), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
         undoRibbonBar = new wxRibbonButtonBar(ribbonPanel, wxID_ANY);
-        undoRibbonBar->AddButton(idRibbonUndo, !hideLabels ? _("Undo") : "", gd::SkinHelper::GetRibbonIcon("undo"));
-        undoRibbonBar->AddButton(idRibbonRedo, !hideLabels ? _("Redo") : "", gd::SkinHelper::GetRibbonIcon("redo"));
+        undoRibbonBar->AddButton(idRibbonUndo, !hideLabels ? _("Undo") : gd::String(), gd::SkinHelper::GetRibbonIcon("undo"));
+        undoRibbonBar->AddButton(idRibbonRedo, !hideLabels ? _("Redo") : gd::String(), gd::SkinHelper::GetRibbonIcon("redo"));
     }
     {
         wxRibbonPanel *ribbonPanel = new wxRibbonPanel(page, wxID_ANY, _("Clipboard"), gd::SkinHelper::GetRibbonIcon("copy"), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
         clipboardRibbonBar = new wxRibbonButtonBar(ribbonPanel, wxID_ANY);
-        clipboardRibbonBar->AddButton(idRibbonCopy, !hideLabels ? _("Copy") : "", gd::SkinHelper::GetRibbonIcon("copy"));
-        clipboardRibbonBar->AddButton(idRibbonCut, !hideLabels ? _("Cut") : "", gd::SkinHelper::GetRibbonIcon("cut"));
-        clipboardRibbonBar->AddButton(idRibbonPaste, !hideLabels ? _("Paste") : "", gd::SkinHelper::GetRibbonIcon("paste"));
+        clipboardRibbonBar->AddButton(idRibbonCopy, !hideLabels ? _("Copy") : gd::String(), gd::SkinHelper::GetRibbonIcon("copy"));
+        clipboardRibbonBar->AddButton(idRibbonCut, !hideLabels ? _("Cut") : gd::String(), gd::SkinHelper::GetRibbonIcon("cut"));
+        clipboardRibbonBar->AddButton(idRibbonPaste, !hideLabels ? _("Paste") : gd::String(), gd::SkinHelper::GetRibbonIcon("paste"));
     }
     {
         wxRibbonPanel *ribbonPanel = new wxRibbonPanel(page, wxID_ANY, _("Search"), gd::SkinHelper::GetRibbonIcon("search"), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
         wxRibbonButtonBar *ribbonBar = new wxRibbonButtonBar(ribbonPanel, wxID_ANY);
-        ribbonBar->AddButton(idSearchReplace, !hideLabels ? _("Search / Replace") : "", gd::SkinHelper::GetRibbonIcon("search"), _("Search for a specific word in the event and/or replace it by another"));
+        ribbonBar->AddButton(idSearchReplace, !hideLabels ? _("Search / Replace") : gd::String(), gd::SkinHelper::GetRibbonIcon("search"), _("Search for a specific word in the event and/or replace it by another"));
     }
     {
         wxRibbonPanel *ribbonPanel = new wxRibbonPanel(page, wxID_ANY, _("View"), gd::SkinHelper::GetRibbonIcon("view"), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
         wxRibbonButtonBar *ribbonBar = new wxRibbonButtonBar(ribbonPanel, wxID_ANY);
-        ribbonBar->AddButton(idRibbonFoldAll, !hideLabels ? _("Fold all") : "", gd::SkinHelper::GetRibbonIcon("foldAll"), _("Hide all subevents"));
-        ribbonBar->AddButton(idRibbonUnFoldAll, !hideLabels ? _("Unfold") : "", gd::SkinHelper::GetRibbonIcon("unFoldAll"), _("Show all hidden subevents"));
+        ribbonBar->AddButton(idRibbonFoldAll, !hideLabels ? _("Fold all") : gd::String(), gd::SkinHelper::GetRibbonIcon("foldAll"), _("Hide all subevents"));
+        ribbonBar->AddButton(idRibbonUnFoldAll, !hideLabels ? _("Unfold") : gd::String(), gd::SkinHelper::GetRibbonIcon("unFoldAll"), _("Show all hidden subevents"));
     }
     {
         wxRibbonPanel *ribbonPanel = new wxRibbonPanel(page, wxID_ANY, _("Tools"), gd::SkinHelper::GetRibbonIcon("profiler"), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
         wxRibbonButtonBar *ribbonBar = new wxRibbonButtonBar(ribbonPanel, wxID_ANY);
-        ribbonBar->AddButton(idRibbonProfiling, !hideLabels ? _("Display performances") : "", gd::SkinHelper::GetRibbonIcon("profiler"), _("For native games, display the time taken by each events during the last preview when profiling was active."));
-        ribbonBar->AddDropdownButton(idRibbonPlatform, !hideLabels ? _("Current platform") : "", gd::SkinHelper::GetRibbonIcon("extension"), _("Choose the current platform being used to edit the events."));
+        ribbonBar->AddButton(idRibbonProfiling, !hideLabels ? _("Display performances") : gd::String(), gd::SkinHelper::GetRibbonIcon("profiler"), _("For native games, display the time taken by each events during the last preview when profiling was active."));
+        ribbonBar->AddDropdownButton(idRibbonPlatform, !hideLabels ? _("Current platform") : gd::String(), gd::SkinHelper::GetRibbonIcon("extension"), _("Choose the current platform being used to edit the events."));
     }
     {
         wxRibbonPanel *ribbonPanel = new wxRibbonPanel(page, wxID_ANY, _("Help"), gd::SkinHelper::GetRibbonIcon("help"), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
         wxRibbonButtonBar *ribbonBar = new wxRibbonButtonBar(ribbonPanel, wxID_ANY);
-        ribbonBar->AddButton(idRibbonHelp, !hideLabels ? _("Help") : "", gd::SkinHelper::GetRibbonIcon("help"), _("Display the help about the events editor"));
+        ribbonBar->AddButton(idRibbonHelp, !hideLabels ? _("Help") : gd::String(), gd::SkinHelper::GetRibbonIcon("help"), _("Display the help about the events editor"));
     }
 }
 

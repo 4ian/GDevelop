@@ -157,15 +157,16 @@ void ProfileDlg::UpdateGUI()
         return;
     }
 
-    eventsTimeTxt->SetLabel(_("Events:")+ToString(static_cast<double>(lastEventsTime)/1000.0f)+("ms")
+    eventsTimeTxt->SetLabel(_("Events:")+gd::String::FromDouble(static_cast<double>(lastEventsTime)/1000.0f)+_("ms")
                             +_("/ Percent of time used by events:")
-                                     +ToString(static_cast<double>(lastEventsTime)/static_cast<double>((lastEventsTime+lastRenderingTime))*100.0f)
-                                     +("%"));
+                                     +gd::String::FromDouble(static_cast<double>(lastEventsTime)/static_cast<double>((lastEventsTime+lastRenderingTime))*100.0f)
+                                     +GD_LOC("%"));
 
-    totalTimeTxt->SetLabel(_("Total rendering time ( Display + Events ):")+ToString(static_cast<double>((lastRenderingTime+lastEventsTime))/1000.0f)+("ms"));
+    totalTimeTxt->SetLabel(_("Total rendering time ( Display + Events ):")+
+        gd::String::FromDouble(static_cast<double>((lastRenderingTime+lastEventsTime))/1000.0f)+_("ms"));
 
     unsigned int currentObjectCount = sceneCanvas.GetRuntimeScene().objectsInstances.GetAllObjects().size();
-    objectsCountTxt->SetLabel(_("Number of objects:")+ToString(currentObjectCount));
+    objectsCountTxt->SetLabel(_("Number of objects:")+gd::String::FromDouble(currentObjectCount));
 
     //Update events data
     eventsData.push_front(lastEventsTime/1000.0f);
@@ -202,16 +203,16 @@ void ProfileDlg::OnratioGraphicsPaint(wxPaintEvent& event)
 
     if ( !profilingActivated || totalTimeData.empty() )
     {
-        scaleMaxTxt->SetLabel(ToString(50)+"ms\n("+ToString(1.0f/50*1000.0f)+" "+_("fps")+")");
-        scaleMidTxt->SetLabel(ToString(50/2.0f)+"ms\n("+ToString(1.0f/(50/2.0f)*1000.0f)+" "+_("fps")+")");
+        scaleMaxTxt->SetLabel(gd::String::FromDouble(50)+_("ms\n(")+gd::String::FromDouble(1.0f/50*1000.0f)+GD_U8(" ")+_("fps")+GD_U8(")"));
+        scaleMidTxt->SetLabel(gd::String::FromDouble(50/2.0f)+_("ms\n(")+gd::String::FromDouble(1.0f/(50/2.0f)*1000.0f)+GD_U8(" ")+_("fps")+GD_U8(")"));
 
         return;
     }
 
     unsigned int maximumTime = 50;
 
-    scaleMaxTxt->SetLabel(ToString(maximumTime)+"ms\n("+ToString(1.0f/maximumTime*1000.0f)+" "+_("fps")+")");
-    scaleMidTxt->SetLabel(ToString(maximumTime/2.0f)+"ms\n("+ToString(1.0f/(maximumTime/2.0f)*1000.0f)+" "+_("fps")+")");
+    scaleMaxTxt->SetLabel(gd::String::FromDouble(maximumTime)+_("ms\n(")+gd::String::FromDouble(1.0f/maximumTime*1000.0f)+GD_U8(" ")+_("fps")+GD_U8(")"));
+    scaleMidTxt->SetLabel(gd::String::FromDouble(maximumTime/2.0f)+_("ms\n(")+gd::String::FromDouble(1.0f/(maximumTime/2.0f)*1000.0f)+GD_U8(" ")+_("fps")+GD_U8(")"));
 
     //FPS curve
     if ( totalTimeCheck->IsChecked() )

@@ -386,29 +386,29 @@ void ObjectsEditor::CreateRibbonPage(wxRibbonPage * page)
     {
         wxRibbonPanel *ribbonPanel = new wxRibbonPanel(page, wxID_ANY, _("Objects and groups"), gd::SkinHelper::GetRibbonIcon("list"), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
         objectsRibbonBar = new wxRibbonButtonBar(ribbonPanel, wxID_ANY);
-        objectsRibbonBar->AddButton(idRibbonAdd, !hideLabels ? _("Add an object") : "", gd::SkinHelper::GetRibbonIcon("add"), _("Add a new object to the list of the objects of the scene"));
-        objectsRibbonBar->AddButton(idRibbonAddGroup, !hideLabels ? _("Add a group") : "", gd::SkinHelper::GetRibbonIcon("add"), _("Add a new group to the scene"));
-        objectsRibbonBar->AddButton(idRibbonDel, !hideLabels ? _("Delete") : "", gd::SkinHelper::GetRibbonIcon("delete"), _("Delete the selected object or group"));
-        objectsRibbonBar->AddButton(idRibbonUp, !hideLabels ? _("Move up") : "", gd::SkinHelper::GetRibbonIcon("up"));
-        objectsRibbonBar->AddButton(idRibbonDown, !hideLabels ? _("Move down") : "", gd::SkinHelper::GetRibbonIcon("down"));
+        objectsRibbonBar->AddButton(idRibbonAdd, !hideLabels ? _("Add an object") : gd::String(), gd::SkinHelper::GetRibbonIcon("add"), _("Add a new object to the list of the objects of the scene"));
+        objectsRibbonBar->AddButton(idRibbonAddGroup, !hideLabels ? _("Add a group") : gd::String(), gd::SkinHelper::GetRibbonIcon("add"), _("Add a new group to the scene"));
+        objectsRibbonBar->AddButton(idRibbonDel, !hideLabels ? _("Delete") : gd::String(), gd::SkinHelper::GetRibbonIcon("delete"), _("Delete the selected object or group"));
+        objectsRibbonBar->AddButton(idRibbonUp, !hideLabels ? _("Move up") : gd::String(), gd::SkinHelper::GetRibbonIcon("up"));
+        objectsRibbonBar->AddButton(idRibbonDown, !hideLabels ? _("Move down") : gd::String(), gd::SkinHelper::GetRibbonIcon("down"));
     }
     {
         wxRibbonPanel *ribbonPanel = new wxRibbonPanel(page, wxID_ANY, _("Selection"), gd::SkinHelper::GetRibbonIcon("edit"), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
         selectionRibbonBar = new wxRibbonButtonBar(ribbonPanel, wxID_ANY);
-        selectionRibbonBar->AddButton(idRibbonModProp, !hideLabels ? _("Edition") : "", gd::SkinHelper::GetRibbonIcon("editprop"), _("Edit the selected object"));
-        selectionRibbonBar->AddButton(idRibbonModName, !hideLabels ? _("Rename") : "", gd::SkinHelper::GetRibbonIcon("editname"), _("Rename the selected item"));
+        selectionRibbonBar->AddButton(idRibbonModProp, !hideLabels ? _("Edition") : gd::String(), gd::SkinHelper::GetRibbonIcon("editprop"), _("Edit the selected object"));
+        selectionRibbonBar->AddButton(idRibbonModName, !hideLabels ? _("Rename") : gd::String(), gd::SkinHelper::GetRibbonIcon("editname"), _("Rename the selected item"));
     }
     {
         wxRibbonPanel *ribbonPanel = new wxRibbonPanel(page, wxID_ANY, _("Clipboard"), gd::SkinHelper::GetRibbonIcon("copy"), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
         clipboardRibbonBar = new wxRibbonButtonBar(ribbonPanel, wxID_ANY);
-        clipboardRibbonBar->AddButton(idRibbonCopy, !hideLabels ? _("Copy") : "", gd::SkinHelper::GetRibbonIcon("copy"));
-        clipboardRibbonBar->AddButton(idRibbonCut, !hideLabels ? _("Cut") : "", gd::SkinHelper::GetRibbonIcon("cut"));
-        clipboardRibbonBar->AddButton(idRibbonPaste, !hideLabels ? _("Paste") : "", gd::SkinHelper::GetRibbonIcon("paste"));
+        clipboardRibbonBar->AddButton(idRibbonCopy, !hideLabels ? _("Copy") : gd::String(), gd::SkinHelper::GetRibbonIcon("copy"));
+        clipboardRibbonBar->AddButton(idRibbonCut, !hideLabels ? _("Cut") : gd::String(), gd::SkinHelper::GetRibbonIcon("cut"));
+        clipboardRibbonBar->AddButton(idRibbonPaste, !hideLabels ? _("Paste") : gd::String(), gd::SkinHelper::GetRibbonIcon("paste"));
     }
     {
         wxRibbonPanel *ribbonPanel = new wxRibbonPanel(page, wxID_ANY, _("Help"), gd::SkinHelper::GetRibbonIcon("help"), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
         wxRibbonButtonBar *ribbonBar = new wxRibbonButtonBar(ribbonPanel, wxID_ANY);
-        ribbonBar->AddButton(idRibbonHelp, !hideLabels ? _("Help") : "", gd::SkinHelper::GetRibbonIcon("help"), _("Show the online help"));
+        ribbonBar->AddButton(idRibbonHelp, !hideLabels ? _("Help") : gd::String(), gd::SkinHelper::GetRibbonIcon("help"), _("Show the online help"));
     }
 
 }
@@ -1272,9 +1272,9 @@ void ObjectsEditor::OnPasteSelected(wxCommandEvent& event)
         //Add a number to the new name if necessary
         if ( nameChecker.HasObjectOrGroupNamed(name, globalObject /* Only search other layouts if it's a global object */) != gd::ObjectOrGroupFinder::No )
         {
-            name =  _( "CopyOf" ) + object->GetName();
+            name =  GD_T( "CopyOf" ) + object->GetName();
             for (unsigned int i = 2;nameChecker.HasObjectOrGroupNamed(name, globalObject /* Only search other layouts if it's a global object */)!=gd::ObjectOrGroupFinder::No;++i)
-                name = _("CopyOf")+ object->GetName()+ToString(i);
+                name = GD_T("CopyOf")+ object->GetName()+ToString(i);
         }
 
         //Name the object
@@ -1298,9 +1298,9 @@ void ObjectsEditor::OnPasteSelected(wxCommandEvent& event)
         //Add a number to the new name if necessary
         if ( nameChecker.HasObjectOrGroupNamed(name, globalGroup /* Only search other layouts if it's a global object */) != gd::ObjectOrGroupFinder::No )
         {
-            name =  _( "CopyOf" ) + name;
+            name =  GD_T( "CopyOf" ) + name;
             for (unsigned int i = 2;nameChecker.HasObjectOrGroupNamed(name, globalGroup /* Only search other layouts if it's a global object */)!=gd::ObjectOrGroupFinder::No;++i)
-                name = _("CopyOf")+ groupPasted.GetName()+ToString(i);
+                name = GD_T("CopyOf")+ groupPasted.GetName()+ToString(i);
         }
         groupPasted.SetName(name);
         objectsGroups.push_back( groupPasted );

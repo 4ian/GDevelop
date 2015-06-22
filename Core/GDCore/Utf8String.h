@@ -39,6 +39,11 @@ class GD_CORE_API String
 public:
 
     typedef char32_t value_type;
+    typedef char32_t& reference;
+    typedef const char32_t& const_reference;
+    typedef char32_t* pointer;
+    typedef const char32_t* const_pointer;
+
     typedef std::string::size_type size_type;
     typedef std::string::difference_type difference_type;
 
@@ -184,22 +189,22 @@ public:
     /**
      * Returns the code point at the 
      */
-    value_type operator[](const std::size_t position) const;
+    value_type operator[](const size_type position) const;
 
     /**
      * Returns a sub-string starting from "start" and with length "length".
      */
-    String substr( std::size_t start, std::size_t length ) const;
+    String substr( size_type start, size_type length ) const;
 
     /**
      * Returns the position of the first occurence of "search" starting from "pos".
      */
-    size_type find( const String &search, std::size_t pos ) const;
+    size_type find( const String &search, size_type pos ) const;
 
     /**
      * Returns the position of the last occurence starting before "pos".
      */
-    size_type rfind( const String &search, std::size_t pos ) const;
+    size_type rfind( const String &search, size_type pos ) const;
 
     /**
      * Get the raw UTF8-encoded std::string

@@ -125,19 +125,19 @@ std::string String::ToUTF8() const
     return m_string;
 }
 
-String String::substr( std::size_t start, std::size_t length ) const
+String String::substr( String::size_type start, String::size_type length ) const
 {
     String str;
     str.m_string = SubStr(m_string, start, length);
     return str;
 }
 
-String::size_type String::find( const String &search, std::size_t pos ) const
+String::size_type String::find( const String &search, String::size_type pos ) const
 {
     return gd::utf8::Find(m_string, search.m_string, pos);
 }
 
-String::size_type String::rfind( const String &search, std::size_t pos ) const
+String::size_type String::rfind( const String &search, String::size_type pos ) const
 {
     return gd::utf8::RFind(m_string, search.m_string, pos);
 }
@@ -160,7 +160,7 @@ String& String::operator+=(const String &other)
     return *this;
 }
 
-String::value_type String::operator[](const std::size_t position) const
+String::value_type String::operator[](const String::size_type position) const
 {
     const_iterator it = begin();
     std::advance(it, position);

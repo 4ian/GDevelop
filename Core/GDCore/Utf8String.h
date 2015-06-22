@@ -7,6 +7,7 @@
 #ifndef GDCORE_UTF8_STRING_H
 #define GDCORE_UTF8_STRING_H
 
+#include <iostream>
 #include <iterator>
 #include <string>
 #include <SFML/System/String.hpp>
@@ -250,6 +251,18 @@ private:
     std::string m_string; ///< Internal container
 
 };
+
+/**
+ * Output the string in a stream.
+ * \note The string is converted to the current locale before.
+ */
+std::ostream& operator<<(std::ostream &os, const String &str);
+
+/**
+ * Extracts a string from an input string.
+ * \note The content of the string is replaced.
+ */
+std::istream& operator>>(std::istream &is, String &str);
 
 }
 

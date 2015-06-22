@@ -208,6 +208,23 @@ String::value_type String::operator[](const String::size_type position) const
     return *it;
 }
 
+std::ostream& operator<<(std::ostream& os, const String& str)
+{
+    os << str.ToLocale();
+
+    return os;
+}
+
+std::istream& operator>>(std::istream &is, String &str)
+{
+    std::string extractedString;
+    is >> extractedString;
+
+    str = String::FromLocale(extractedString);
+
+    return is;
+}
+
 }
 
 }

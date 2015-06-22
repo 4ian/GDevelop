@@ -29,6 +29,15 @@ String::String(const sf::String &string) : m_string()
     m_string = gd::utf8::FromSfString(string);
 }
 
+#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
+
+String::String(const wxString &string) : m_string()
+{
+    m_string = gd::utf8::FromWxString(string);
+}
+
+#endif
+
 String::size_type String::size() const
 {
     return StrLength(m_string);
@@ -78,7 +87,13 @@ sf::String String::ToSfString() const
     return gd::utf8::ToSfString(m_string);
 }
 
+String::operator sf::String() const
+{
+    return ToSfString();
+}
+
 #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
+
 String String::FromWxString( const wxString &wxStr)
 {
     String str;
@@ -90,6 +105,12 @@ wxString String::ToWxString() const
 {
     return gd::utf8::ToWxString(m_string);
 }
+
+String::operator wxString() const
+{
+    return ToWxString();
+}
+
 #endif
 
 String String::FromUTF8( const std::string &utf8Str )

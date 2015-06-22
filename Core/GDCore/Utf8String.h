@@ -14,7 +14,7 @@
 #include "GDCore/Utf8Tools.h"
 #include "GDCore/Utf8/utf8.h"
 
-#define GD_U8(x) gd::utf8::String::FromUTF8String(u8##x)
+#define GD_U8(x) gd::utf8::String::FromUTF8(u8##x)
 #define GD_LOC(x) gd::utf8::String::FromLocale(##x)
 
 namespace sf {class String;};
@@ -83,6 +83,15 @@ public:
      */
     String(const sf::String &string);
 
+#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
+
+    /**
+     * Constructs a string from a wxString.
+     */
+    String(const wxString &string);
+
+#endif
+
     /**
      * Returns true if the string is empty.
      */
@@ -141,9 +150,10 @@ public:
     /**
      * Implicit conversion operator to sf::String.
      */
-    operator sf::String() const { return ToSfString(); }
+    operator sf::String() const;
 
-    #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
+#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
+
     /**
      * Returns a String created from a wxString.
      */
@@ -153,7 +163,13 @@ public:
      * Returns a wxString from the current string.
      */
     wxString ToWxString() const;
-    #endif
+
+    /**
+     * Implicit conversion operator to wxString.
+     */
+    operator wxString() const;
+
+#endif
 
     /**
      * Returns a String created an UTF8 encoded std::string.

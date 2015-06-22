@@ -31,7 +31,7 @@ using namespace std;
 
 TextObject::TextObject(std::string name_) :
     Object(name_),
-    text("Text"),
+    text(GD_U8("Text")),
     characterSize(20),
     fontName(""),
     smoothed(true),

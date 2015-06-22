@@ -29,29 +29,29 @@ String::String(const sf::String &string) : m_string()
     m_string = gd::utf8::FromSfString(string);
 }
 
-std::size_t String::size() const
+String::size_type String::size() const
 {
     return StrLength(m_string);
 }
 
-String::Iterator String::begin()
+String::iterator String::begin()
 {
-    return String::Iterator(m_string.begin());
+    return String::iterator(m_string.begin());
 }
 
-String::ConstIterator String::begin() const
+String::const_iterator String::begin() const
 {
-    return String::ConstIterator(m_string.cbegin());
+    return String::const_iterator(m_string.cbegin());
 }
 
-String::Iterator String::end()
+String::iterator String::end()
 {
-    return String::Iterator(m_string.end());
+    return String::iterator(m_string.end());
 }
 
-String::ConstIterator String::end() const
+String::const_iterator String::end() const
 {
-    return String::ConstIterator(m_string.end());
+    return String::const_iterator(m_string.end());
 }
 
 String String::FromLocale( const std::string &localizedString )
@@ -111,12 +111,12 @@ String String::substr( std::size_t start, std::size_t length ) const
     return str;
 }
 
-std::size_t String::find( const String &search, std::size_t pos ) const
+String::size_type String::find( const String &search, std::size_t pos ) const
 {
     return gd::utf8::Find(m_string, search.m_string, pos);
 }
 
-std::size_t String::rfind( const String &search, std::size_t pos ) const
+String::size_type String::rfind( const String &search, std::size_t pos ) const
 {
     return gd::utf8::RFind(m_string, search.m_string, pos);
 }
@@ -139,9 +139,9 @@ String& String::operator+=(const String &other)
     return *this;
 }
 
-char32_t String::operator[](const std::size_t position) const
+String::value_type String::operator[](const std::size_t position) const
 {
-    ConstIterator it = begin();
+    const_iterator it = begin();
     std::advance(it, position);
     return *it;
 }

@@ -40,6 +40,22 @@ String::String(const wxString &string) : m_string()
 
 #endif
 
+String& String::operator=(const sf::String &string)
+{
+    m_string = gd::utf8::FromSfString(string);
+    return *this;
+}
+
+#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
+
+String& String::operator=(const wxString &string)
+{
+    m_string = gd::utf8::FromWxString(string);
+    return *this;
+}
+
+#endif
+
 String::size_type String::size() const
 {
     return StrLength(m_string);
@@ -170,13 +186,6 @@ bool String::operator==(const String &other) const
     return (m_string == other.m_string);
 }
 
-String String::operator+(const String &other) const
-{
-    String str;
-    str.m_string = m_string + other.m_string;
-    return str;
-}
-
 String& String::operator+=(const String &other)
 {
     m_string += other.m_string;
@@ -184,14 +193,6 @@ String& String::operator+=(const String &other)
 }
 
 #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
-
-String String::operator+(const wxString &other) const
-{
-    String str;
-    str.m_string = m_string;
-    str += FromWxString(other);
-    return str;
-}
 
 String& String::operator+=(const wxString &other)
 {
@@ -207,6 +208,29 @@ String::value_type String::operator[](const String::size_type position) const
     std::advance(it, position);
     return *it;
 }
+
+String operator+(String lhs, const String &rhs)
+{
+    lhs += rhs;
+    return lhs;
+}
+
+#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
+
+String operator+(String lhs, const wxString &rhs)
+{
+    lhs += String::FromWxString(rhs);
+    return lhs;
+}
+
+String operator+(const wxString &lhs, const String &rhs)
+{
+    String str(lhs);
+    str += rhs;
+    return str;
+}
+
+#endif
 
 std::ostream& operator<<(std::ostream& os, const String& str)
 {

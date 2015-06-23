@@ -15,8 +15,30 @@
 #include "GDCore/Utf8Tools.h"
 #include "GDCore/Utf8/utf8.h"
 
+/**
+ * \name Utility macros
+ * \{
+ */
+
+/**
+ * \relates gd::utf8::String
+ * Use this macro to create a gd::utf8::String from a literal.
+ * \note You don't need to add the u8 literal as it's already added by the macro.
+ */
 #define GD_U8(x) gd::utf8::String::FromUTF8(u8##x)
+
+/**
+ * \relates gd::utf8::String
+ * Use this macro to create a gd::utf8::String from a literal encoded in the current
+ * locale (ANSI on Windows, already UTF8 on Linux).
+ * \note You should consider using GD_U8 to generate a gd::utf8::String from an UTF8
+ * literal.
+ */
 #define GD_LOC(x) gd::utf8::String::FromLocale( (x) ) 
+
+/**
+ * \}
+ */
 
 namespace sf {class String;};
 #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
@@ -33,7 +55,9 @@ namespace utf8
 class String;
 
 /**
- * The String class stores an UTF8-encoded string.
+ * \brief String represents an UTF8 encoded string.
+ * This class represents an UTF8 encoded string. It provides almost the same features as the STL std::string class
+ * but is UTF8 aware (size() returns the number of characters, not the number of bytes for example).
  */
 class GD_CORE_API String
 {
@@ -82,6 +106,11 @@ public:
     typedef std::reverse_iterator<iterator> reverse_iterator;
     typedef std::reverse_iterator<const_iterator> const_reverse_iterator;
 
+/**
+ * \name Constructors
+ * \{
+ */
+
     /**
      * Constructs an empty string.
      */
@@ -101,6 +130,32 @@ public:
 
 #endif
 
+/**
+ * \}
+ */
+
+/**
+ * \name Assignment (implicit conversions)
+ * \{
+ */
+
+    String& operator=(const sf::String &string);
+
+#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
+
+    String& operator=(const wxString &string);
+
+#endif
+
+/**
+ * \}
+ */
+
+/**
+ * \name Size
+ * \{
+ */
+
     /**
      * Returns true if the string is empty.
      */
@@ -115,6 +170,15 @@ public:
      * Clear the string
      */
     void clear() { m_string.clear(); }
+
+/**
+ * \}
+ */
+
+/**
+ * \name Iterators
+ * \{
+ */
 
     /**
      * Get a beginning iterator.
@@ -136,6 +200,15 @@ public:
      */
     String::const_iterator end() const;
 
+/**
+ * \}
+ */
+
+/**
+ * \name Convert from/to numbers
+ * \{
+ */
+
     /**
      * Returns a String created from an integer.
      */
@@ -151,64 +224,149 @@ public:
      */
     static String FromDouble(double value);
 
+/**
+ * \}
+ */
+
+/**
+ * \name Conversions from other string types
+ * \{
+ */
+
     /**
      * Returns a String created from a std::string encoded in the current locale.
+     *
+     * See \ref Conversions2 for more information.
      */
     static String FromLocale( const std::string &localizedString );
 
     /**
-     * Returns a localized std::string from the current string.
-     */
-    std::string ToLocale() const;
-
-    /**
      * Returns a String created from a sf::String (UTF32).
+     *
+     * See \ref Conversions1 for more information.
      */
     static String FromSfString( const sf::String &sfString );
-
-    /**
-     * Returns a sf::String from the current string.
-     */
-    sf::String ToSfString() const;
-
-    /**
-     * Implicit conversion operator to sf::String.
-     */
-    operator sf::String() const;
-
-#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
-
-    /**
-     * Returns a String created from a wxString.
-     */
-    static String FromWxString( const wxString &wxStr);
-
-    /**
-     * Returns a wxString from the current string.
-     */
-    wxString ToWxString() const;
-
-    /**
-     * Implicit conversion operator to wxString.
-     */
-    operator wxString() const;
-
-#endif
 
     /**
      * Returns a String created an UTF8 encoded std::string.
      */
     static String FromUTF8( const std::string &utf8Str );
 
+#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
+
+    /**
+     * Returns a String created from a wxString.
+     *
+     * See \ref Conversions1 for more information.
+     */
+    static String FromWxString( const wxString &wxStr);
+
+#endif
+
+/**
+ * \}
+ */
+
+/**
+ * \name Conversions to other string types
+ * \{
+ */
+
+    /**
+     * Returns a localized std::string from the current string.
+     *
+     * See \ref Conversions2 for more information.
+     */
+    std::string ToLocale() const;
+
+
+
+    /**
+     * Returns a sf::String from the current string.
+     *
+     * See \ref Conversions1 for more information.
+     */
+    sf::String ToSfString() const;
+
+    /**
+     * Implicit conversion operator to sf::String.
+     *
+     * See \ref Conversions1 for more information.
+     */
+    operator sf::String() const;
+
     /**
      * Returns a UTF8 encoded std::string from the current string.
      */
     std::string ToUTF8() const;
 
+#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
+
     /**
-     * Returns the code point at the 
+     * Returns a wxString from the current string.
+     *
+     * See \ref Conversions1 for more information.
+     */
+    wxString ToWxString() const;
+
+    /**
+     * Implicit conversion operator to wxString.
+     *
+     * See \ref Conversions1 for more information.
+     */
+    operator wxString() const;
+
+#endif
+
+/**
+ * \}
+ */
+
+/**
+ * \name Element access / Internal string access
+ * \{
+ */
+
+    /**
+     * Returns the code point at the specified position
      */
     value_type operator[](const size_type position) const;
+
+    /**
+     * Get the raw UTF8-encoded std::string
+     */
+    std::string& Raw() { return m_string; }
+
+    /**
+     * Get the raw UTF8-encoded std::string
+     */
+    const std::string& Raw() const { return m_string; }
+
+/**
+ * \}
+ */
+
+/**
+ * \name String modifiers
+ * \{
+ */
+
+    String& operator+=(const String &other);
+
+#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
+
+    String& operator+=(const wxString &other);
+
+#endif
+
+/**
+ * \}
+ */
+
+/**
+ * \name String operations
+ * \{
+ */
 
     /**
      * Returns a sub-string starting from "start" and with length "length".
@@ -226,26 +384,15 @@ public:
     size_type rfind( const String &search, size_type pos = npos ) const;
 
     /**
-     * Get the raw UTF8-encoded std::string
+     * Compares the current string with another.
      */
-    std::string& Raw() { return m_string; }
+    int compare( const String &other );
 
-    /**
-     * Get the raw UTF8-encoded std::string
-     */
-    const std::string& Raw() const { return m_string; }
+/**
+ * \}
+ */
 
     bool operator==(const String &other) const;
-
-    String operator+(const String &other) const;
-    String& operator+=(const String &other);
-
-#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
-
-    String operator+(const wxString &other) const;
-    String& operator+=(const wxString &other);
-
-#endif
 
 private:
     std::string m_string; ///< Internal container
@@ -253,16 +400,51 @@ private:
 };
 
 /**
+ * \name Non-member operators
+ * \{
+ */
+
+/**
+ * \relates String
+ * \return a String containing the concatenation of lhs and rhs.
+ */
+String operator+(String lhs, const String &rhs);
+
+#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
+
+/**
+ * \relates String
+ * \return a String containing the concatenation of lhs and rhs (rhs is converted
+ * to String).
+ */
+String operator+(String lhs, const wxString &rhs);
+
+/**
+ * \relates String
+ * \return a String containing the concatenation of lhs and rhs (rhs is converted
+ * to String).
+ */
+String operator+(const wxString &lhs, const String &rhs);
+
+#endif
+
+/**
+ * \relates String
  * Output the string in a stream.
  * \note The string is converted to the current locale before.
  */
 std::ostream& operator<<(std::ostream &os, const String &str);
 
 /**
+ * \relates String
  * Extracts a string from an input string.
  * \note The content of the string is replaced.
  */
 std::istream& operator>>(std::istream &is, String &str);
+
+/**
+ * \}
+ */
 
 }
 
@@ -271,3 +453,72 @@ typedef utf8::String String;
 }
 
 #endif
+
+
+/**
+ * \class gd::utf8::String
+ *
+ * \note Instead of gd::utf8::String, you can use gd::String which is just a typedef of gd::utf8::String.
+ *
+ * \section WhatIsUTF8 What is UTF8 and Unicode ?
+ * (from https://en.wikipedia.org/wiki/Unicode and https://en.wikipedia.org/wiki/UTF-8)
+
+ * Unicode is a computing industry standard for the consistent encoding, representation, and handling of text 
+ * expressed in most of the world's writing systems. 
+ * Unicode can be implemented by different character encodings. The most commonly used encodings are UTF-8, UTF-16 
+ * and the now-obsolete UCS-2. 
+ *
+ * UTF-8 is a character encoding capable of encoding all possible characters, or code points, in Unicode.
+ * The encoding is variable-length (not every character is 1 byte long) and uses 8-bit code units. It was designed 
+ * for backward compatibility with ASCII.
+ * UTF-8 encodes each of the 1,112,064 valid code points in the Unicode code space using one to four 8-bit bytes 
+ * (a group of 8 bits is known as an octet in the Unicode Standard). Code points with lower numerical values 
+ * (i.e., earlier code positions in the Unicode character set, which tend to occur more frequently) are encoded using 
+ * fewer bytes. The first 128 characters of Unicode, which correspond one-to-one with ASCII, are encoded using a 
+ * single octet with the same binary value as ASCII, making valid ASCII text valid UTF-8-encoded Unicode as well.
+ *
+ * \section Limitations Limitations
+ * The String class stores internally the string as an UTF8 encoded std::string. This creates some limitations : it's
+ * impossible to edit a single character with operator[]() nor at because the new character length might not be the same.
+ *
+ * \section Conversion Conversions from/to other string types
+ * The String handles implicit conversion with sf::String and wxString (implicit constructor and implicit conversion 
+ * operator). 
+ *
+ * **However, this is not the case with std::string** as this conversion is not often lossless (mostly on Windows). 
+ * You need to explicitly call gd::String::FromLocale or gd::String::FromUTF8
+ * to convert a std::string to a String. If you want to get a String object from a string literal, you can also use
+ * the macro GD_U8() (or GD_LOC() if you literal needs to be in the current locale).
+ *
+ * \subsection Conversions1 Implicit conversion from/to wxString and sf::String 
+ * \code
+ * //Get a String from sf::String
+ * sf::String sfmlStr("This is a test ! ");
+ * gd::utf8::String str1(sfmlStr); //Now contains "This is a test ! " encoded in UTF8
+ * 
+ * //Get a String from wxString
+ * wxString wxStr("Another test ! ");
+ * str = wxStr; //Now contains "Another test ! " encoded in UTF8
+ *
+ * //Get a wxString from String
+ * wxString anotherWxStr = str; //anotherWxStr contains "Another test ! " correctly encoded
+ * 
+ * //Get a sf::String from String
+ * sf::String anotherSfmlString = str; //anotherSfmlString now contains "Another test ! "
+ * \endcode
+ *
+ * \subsection Conversions2 Conversion from/to std::string
+ * \code
+ * //Get a String from a std::string encoded in the current locale
+ * std::string ansiStr = "Some beautiful localized characters. "; //Encoded in ANSI on Windows, UTF8 on Linux
+ * gd::utf8::String str = gd::utf8::String::FromLocale(ansiStr);
+ * 
+ * //Create a String using a string literal encoded in UTF8
+ * gd::utf8::String anotherStr = GD_U8("This is an UTF8 string");
+ * //The same as gd::utf8::String anotherStr = gd::utf8::FromUTF8(u8"This is an UTF8 string");
+ * //When using GD_U8(), you don't need to put the u8 prefix.
+ *
+ * gd::utf8::String finalStr = str + anotherStr; //Concatenates the two Strings
+ * std::cout << finalStr.ToLocale() << std::endl //Shows "Some beautiful localized characters. This is an UTF8 string"
+ * \endcode
+ */

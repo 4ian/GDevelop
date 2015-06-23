@@ -5,14 +5,14 @@
 
 export LD_LIBRARY_PATH=.:$LD_LIBRARY_PATH
 if [ -z ${1+x} ]; then
-	./GDIDE
+	GDK_BACKEND=x11 ./GDIDE
 else
-	./GDIDE "$1"
+	GDK_BACKEND=x11 ./GDIDE "$1"
 fi
 
 if [ "$?" = "127" ]; then
 	mkdir -p ~/.GDevelop
-	./GDIDE 1> ~/.GDevelop/errorMsgWhileLoadingGD.txt 2> ~/.GDevelop/errorMsgWhileLoadingGD.txt
+	GDK_BACKEND=x11 ./GDIDE 1> ~/.GDevelop/errorMsgWhileLoadingGD.txt 2> ~/.GDevelop/errorMsgWhileLoadingGD.txt
 	
 	errorMsg=$(cat < ~/.GDevelop/errorMsgWhileLoadingGD.txt)
 

@@ -26,8 +26,19 @@ describe('gdjs.InputManager', function() {
 		expect(inputManager.getMouseY()).to.be(600);
 
 		expect(inputManager.isMouseButtonPressed(0)).to.be(false);
+		expect(inputManager.isMouseButtonReleased(0)).to.be(false);
 		inputManager.onMouseButtonPressed(0);
 		expect(inputManager.isMouseButtonPressed(0)).to.be(true);
+		expect(inputManager.isMouseButtonReleased(0)).to.be(false);
+		inputManager.onFrameEnded();
+
+		inputManager.onMouseButtonReleased(0);
+		expect(inputManager.isMouseButtonPressed(0)).to.be(false);
+		expect(inputManager.isMouseButtonReleased(0)).to.be(true);
+		inputManager.onFrameEnded();
+
+		expect(inputManager.isMouseButtonPressed(0)).to.be(false);
+		expect(inputManager.isMouseButtonReleased(0)).to.be(false);
 	});
 
 	it('should handle touch events', function(){

@@ -20,6 +20,14 @@ void InputManager::NextFrame()
 	mouseWheelDelta = 0;
 	keyWasPressed = false;
 	charactersEntered.clear();
+
+    oldButtonsPressed = buttonsPressed;
+    buttonsPressed.clear();
+    const auto & buttonMap = GetButtonNameToSfButtonMap();
+    for(auto it = buttonMap.begin();it != buttonMap.end();++it) {
+        buttonsPressed[it->first] =
+            sf::Mouse::isButtonPressed(static_cast<sf::Mouse::Button>(it->second));
+    }
 }
 
 void InputManager::HandleEvent(sf::Event & event)
@@ -77,6 +85,37 @@ bool InputManager::AnyKeyIsPressed() const
         return false;
 
     return keyWasPressed;
+}
+
+sf::Vector2i InputManager::GetMousePosition() const
+{
+    if (!window) return sf::Vector2i(0, 0);
+
+    return sf::Mouse::getPosition(*window);
+}
+
+bool InputManager::IsMouseButtonPressed(const std::string & button) const
+{
+    if (!windowHasFocus && disableInputWhenNotFocused)
+        return false;
+
+    return buttonsPressed.find(button) != buttonsPressed.end() &&
+        buttonsPressed.find(button)->second;
+}
+
+bool InputManager::IsMouseButtonReleased(const std::string & button) const
+{
+    return oldButtonsPressed.find(button) != oldButtonsPressed.end() &&
+        oldButtonsPressed.find(button)->second &&
+        !IsMouseButtonPressed(button);
+}
+
+int InputManager::GetMouseWheelDelta() const
+{
+    if (!windowHasFocus && disableInputWhenNotFocused)
+        return 0;
+
+    return mouseWheelDelta;
 }
 
 const std::map<std::string, int> & InputManager::GetKeyNameToSfKeyMap()
@@ -216,32 +255,36 @@ const std::map<int, std::string> & InputManager::GetSfKeyToKeyNameMap()
     return *map;
 }
 
-
-sf::Vector2i InputManager::GetMousePosition() const
+const std::map<std::string, int> & InputManager::GetButtonNameToSfButtonMap()
 {
-	if (!window) return sf::Vector2i(0, 0);
+    static bool initialized = false;
+    static std::map<std::string, int> * map = new std::map<std::string, int>();
+    if (!initialized)
+    {
+        (*map)["Left"] = sf::Mouse::Left;
+        (*map)["Right"] = sf::Mouse::Right;
+        (*map)["Middle"] = sf::Mouse::Middle;
+        (*map)["XButton1"] = sf::Mouse::XButton1;
+        (*map)["XButton2"] = sf::Mouse::XButton2;
 
-	return sf::Mouse::getPosition(*window);
+        initialized = true;
+    }
+
+    return *map;
 }
 
-bool InputManager::IsMouseButtonPressed(const std::string & button) const
+const std::map<int, std::string> & InputManager::GetSfButtonToButtonNameMap()
 {
-    if (!windowHasFocus && disableInputWhenNotFocused)
-        return false;
+    static bool initialized = false;
+    static std::map<int, std::string> * map = new std::map<int, std::string>();
+    if (!initialized)
+    {
+        const auto & buttonMap = GetButtonNameToSfButtonMap();
+        for(auto it = buttonMap.begin();it!=buttonMap.end();++it)
+            (*map)[it->second] = it->first;
 
-    if ( button == "Left" ) { return sf::Mouse::isButtonPressed( sf::Mouse::Left ); }
-    if ( button == "Right" ) { return sf::Mouse::isButtonPressed( sf::Mouse::Right ); }
-    if ( button == "Middle" ) { return sf::Mouse::isButtonPressed( sf::Mouse::Middle ); }
-    if ( button == "XButton1" ) { return sf::Mouse::isButtonPressed( sf::Mouse::XButton1 ); }
-    if ( button == "XButton2" ) { return sf::Mouse::isButtonPressed( sf::Mouse::XButton2 ); }
+        initialized = true;
+    }
 
-    return false;
-}
-
-int InputManager::GetMouseWheelDelta() const
-{
-    if (!windowHasFocus && disableInputWhenNotFocused)
-        return 0;
-
-    return mouseWheelDelta;
+    return *map;
 }

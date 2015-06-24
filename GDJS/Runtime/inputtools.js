@@ -165,6 +165,12 @@ gdjs.evtTools.input.isMouseButtonPressed = function(runtimeScene, button) {
     return false;
 };
 
+gdjs.evtTools.input.isMouseButtonReleased = function(runtimeScene, button) {
+    if ( button === "Left" ) return runtimeScene.getGame().getInputManager().isMouseButtonReleased(0);
+    if ( button === "Right" ) return runtimeScene.getGame().getInputManager().isMouseButtonReleased(1);
+    return false;
+};
+
 gdjs.evtTools.input.hideCursor = function(runtimeScene) {
     runtimeScene.getPIXIRenderer().view.style.cursor = 'none';
 };

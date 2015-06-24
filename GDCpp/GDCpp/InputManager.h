@@ -37,7 +37,7 @@ public:
     }
 
     /**
-     * @brief Constructor to specify a window to manage.
+     * @brief Constructor with a window to manage.
      */
     InputManager(sf::Window * win);
 
@@ -108,9 +108,17 @@ public:
     bool IsMouseButtonPressed(const std::string & button) const;
 
     /**
+     * @brief Return true if the specified mouse button was released in this frame.
+     */
+    bool IsMouseButtonReleased(const std::string & button) const;
+
+    /**
      * @brief Get the number of ticks the wheel moved during last frame.
      */
     int GetMouseWheelDelta() const;
+
+    static const std::map<std::string, int> & GetButtonNameToSfButtonMap();
+    static const std::map<int, std::string> & GetSfButtonToButtonNameMap();
     ///@}
 
 private:
@@ -120,7 +128,9 @@ private:
     bool keyWasPressed; ///< True if a key was pressed during the last step.
     bool windowHasFocus; ///< True if the render target has the focus.
     bool disableInputWhenNotFocused; ///< True if input should be ignored when focus is lost.
-    std::vector<sf::Uint32> charactersEntered; ///< The characters entered during the last frame.
+    std::vector<sf::Uint32> charactersEntered; ///< The characters entered during this frame.
+    std::map<std::string, bool> buttonsPressed; ///< The buttons pressed during this frame.
+    std::map<std::string, bool> oldButtonsPressed; ///< The buttons pressed during the last frame.
 };
 
 #endif

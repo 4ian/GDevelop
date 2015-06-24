@@ -21,6 +21,7 @@ gdjs.InputManager = function()
     this._pressedKeys = new Hashtable();
     this._lastPressedKey = 0;
     this._pressedMouseButtons = new Array(5);
+    this._releasedMouseButtons = new Array(5);
     this._mouseX = 0;
     this._mouseY = 0;
     this._mouseWheelDelta = 0;
@@ -124,6 +125,7 @@ gdjs.InputManager.prototype.getMouseY = function() {
  */
 gdjs.InputManager.prototype.onMouseButtonPressed = function(buttonCode) {
     this._pressedMouseButtons[buttonCode] = true;
+    this._releasedMouseButtons[buttonCode] = false;
 };
 
 /**
@@ -133,15 +135,25 @@ gdjs.InputManager.prototype.onMouseButtonPressed = function(buttonCode) {
  */
 gdjs.InputManager.prototype.onMouseButtonReleased = function(buttonCode) {
     this._pressedMouseButtons[buttonCode] = false;
+    this._releasedMouseButtons[buttonCode] = true;
 };
 
 /**
  * Return true if the mouse button corresponding to buttonCode is pressed.
  * @method isMouseButtonPressed
- * @param buttonCode {Number} The mouse button code.<br>0: Left button<br>1: Right button
+ * @param buttonCode {Number} The mouse button code (0: Left button, 1: Right button).
  */
 gdjs.InputManager.prototype.isMouseButtonPressed = function(buttonCode) {
     return this._pressedMouseButtons[buttonCode] !== undefined && this._pressedMouseButtons[buttonCode];
+};
+
+/**
+ * Return true if the mouse button corresponding to buttonCode was just released.
+ * @method isMouseButtonReleased
+ * @param buttonCode {Number} The mouse button code (0: Left button, 1: Right button).
+ */
+gdjs.InputManager.prototype.isMouseButtonReleased = function(buttonCode) {
+    return this._releasedMouseButtons[buttonCode] !== undefined && this._releasedMouseButtons[buttonCode];
 };
 
 /**
@@ -234,15 +246,15 @@ gdjs.InputManager.prototype.onTouchEnd = function(identifier) {
 
 gdjs.InputManager.prototype.getStartedTouchIdentifiers = function() {
     return this._startedTouches;
-}
+};
 
 gdjs.InputManager.prototype.popStartedTouch = function() {
     return this._startedTouches.shift();
-}
+};
 
 gdjs.InputManager.prototype.popEndedTouch = function() {
     return this._endedTouches.shift();
-}
+};
 
 /**
  * Set if touch events should simulate mouse events.
@@ -256,7 +268,7 @@ gdjs.InputManager.prototype.touchSimulateMouse = function(enable) {
     if (enable === undefined) enable = true;
 
     this._touchSimulateMouse = enable;
-}
+};
 
 /**
  * Notify the input manager that the frame ended, so anything that last
@@ -268,7 +280,8 @@ gdjs.InputManager.prototype.touchSimulateMouse = function(enable) {
 gdjs.InputManager.prototype.onFrameEnded = function() {
     this._startedTouches.length = 0;
     this._endedTouches.length = 0;
-}
+    this._releasedMouseButtons.length = 0;
+};
 
 /**
  * Add the standard events handler.

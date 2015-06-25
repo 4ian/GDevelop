@@ -441,7 +441,7 @@ private:
  * \relates String
  * \return a String containing the concatenation of lhs and rhs.
  */
-String operator+(String lhs, const String &rhs);
+String GD_CORE_API operator+(String lhs, const String &rhs);
 
 #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 
@@ -450,14 +450,14 @@ String operator+(String lhs, const String &rhs);
  * \return a String containing the concatenation of lhs and rhs (rhs is converted
  * to String).
  */
-String operator+(String lhs, const wxString &rhs);
+String GD_CORE_API operator+(String lhs, const wxString &rhs);
 
 /**
  * \relates String
  * \return a String containing the concatenation of lhs and rhs (rhs is converted
  * to String).
  */
-String operator+(const wxString &lhs, const String &rhs);
+String GD_CORE_API operator+(const wxString &lhs, const String &rhs);
 
 #endif
 
@@ -466,14 +466,14 @@ String operator+(const wxString &lhs, const String &rhs);
  * Output the string in a stream.
  * \note The string is converted to the current locale before.
  */
-std::ostream& operator<<(std::ostream &os, const String &str);
+std::ostream& GD_CORE_API operator<<(std::ostream &os, const String &str);
 
 /**
  * \relates String
  * Extracts a string from an input string.
  * \note The content of the string is replaced.
  */
-std::istream& operator>>(std::istream &is, String &str);
+std::istream& GD_CORE_API operator>>(std::istream &is, String &str);
 
 /**
  * \}

@@ -243,7 +243,7 @@ void String::push_back(String::value_type character)
     ::utf8::unchecked::append(character, std::back_inserter(m_string));
 }
 
-String operator+(String lhs, const String &rhs)
+String GD_CORE_API operator+(String lhs, const String &rhs)
 {
     lhs += rhs;
     return lhs;
@@ -251,13 +251,13 @@ String operator+(String lhs, const String &rhs)
 
 #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 
-String operator+(String lhs, const wxString &rhs)
+String GD_CORE_API operator+(String lhs, const wxString &rhs)
 {
     lhs += String::FromWxString(rhs);
     return lhs;
 }
 
-String operator+(const wxString &lhs, const String &rhs)
+String GD_CORE_API operator+(const wxString &lhs, const String &rhs)
 {
     String str(lhs);
     str += rhs;
@@ -266,14 +266,14 @@ String operator+(const wxString &lhs, const String &rhs)
 
 #endif
 
-std::ostream& operator<<(std::ostream& os, const String& str)
+std::ostream& GD_CORE_API operator<<(std::ostream& os, const String& str)
 {
     os << str.ToLocale();
 
     return os;
 }
 
-std::istream& operator>>(std::istream &is, String &str)
+std::istream& GD_CORE_API operator>>(std::istream &is, String &str)
 {
     std::string extractedString;
     is >> extractedString;

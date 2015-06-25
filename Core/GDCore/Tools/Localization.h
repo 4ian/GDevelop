@@ -25,7 +25,7 @@
  	#if defined(_)
         #undef _
     #endif
-    #define _(s) gd::String(wxGetTranslation(u8##s))
+    #define _(s) gd::String(u8##s)
 #endif
 
 #endif // GDCORE_LOCALIZATION_H

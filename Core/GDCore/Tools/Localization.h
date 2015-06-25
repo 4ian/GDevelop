@@ -10,7 +10,7 @@
     #include <wx/intl.h>
  	#include "GDCore/Utf8Tools.h"
     #include "GDCore/Utf8String.h"
-    //Create a new macro to return UTF8 std::string from a translation
+    //Create a new macro to return UTF8 gd::String from a translation
  	#if defined(_)
         #undef _
     #endif
@@ -20,6 +20,12 @@
 #else
     //Ensure the internationalization macro is still defined as code rely on it:
     #define GD_T(x) std::string(u8##x)
+    
+    //Create a new macro to return UTF8 gd::String from a translation
+ 	#if defined(_)
+        #undef _
+    #endif
+    #define _(s) gd::String(wxGetTranslation(u8##s))
 #endif
 
 #endif // GDCORE_LOCALIZATION_H
